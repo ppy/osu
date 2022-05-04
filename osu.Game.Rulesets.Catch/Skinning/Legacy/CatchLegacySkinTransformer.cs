@@ -90,6 +90,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             return new LegacyHitExplosion();
 
                         return null;
+
+                    default:
+                        throw new UnsupportedSkinComponentException(component);
                 }
             }
 

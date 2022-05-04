@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Settings
 {
     public class TestSceneMigrationScreens : ScreenTestScene
     {
-        [Cached]
+        [Cached(typeof(INotificationOverlay))]
         private readonly NotificationOverlay notifications;
 
         public TestSceneMigrationScreens()

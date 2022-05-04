@@ -26,7 +26,7 @@ namespace osu.Game.Tournament.Screens.Setup
             dropdown.Current.BindValueChanged(v => Button.Enabled.Value = v.NewValue != startupTournament, true);
 
             Action = () => game.GracefullyExit();
-            folderButton.Action = storage.PresentExternally;
+            folderButton.Action = () => storage.PresentExternally();
 
             ButtonText = "Close osu!";
         }

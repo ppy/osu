@@ -129,7 +129,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = Header.HEIGHT,
-                            Child = searchTextBox = new SearchTextBox
+                            Child = searchTextBox = new BasicSearchTextBox
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
@@ -238,15 +238,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         #endregion
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             onReturning();
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             Debug.Assert(selectionLease != null);
 
@@ -261,16 +261,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             onReturning();
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             onLeaving();
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             onLeaving();
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
 
         protected override void OnFocus(FocusEvent e)

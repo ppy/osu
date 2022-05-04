@@ -5,12 +5,14 @@ using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.Break;
 using osu.Game.Screens.Ranking;
+using osu.Game.Users.Drawables;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -39,10 +41,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             seekToBreak(1);
 
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
-            AddUntilStep("results displayed", () => getResultsScreen() != null);
+
+            AddUntilStep("results displayed", () => getResultsScreen()?.IsLoaded == true);
 
             AddAssert("score has combo", () => getResultsScreen().Score.Combo > 100);
             AddAssert("score has no misses", () => getResultsScreen().Score.Statistics[HitResult.Miss] == 0);
+
+            AddUntilStep("avatar displayed", () => getAvatar() != null);
+            AddAssert("avatar not clickable", () => getAvatar().ChildrenOfType<OsuClickableContainer>().First().Action == null);
+
+            ClickableAvatar getAvatar() => getResultsScreen()
+                                           .ChildrenOfType<ClickableAvatar>().FirstOrDefault();
 
             ResultsScreen getResultsScreen() => Stack.CurrentScreen as ResultsScreen;
         }

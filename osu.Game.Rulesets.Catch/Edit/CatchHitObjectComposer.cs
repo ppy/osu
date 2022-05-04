@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class CatchHitObjectComposer : HitObjectComposer<CatchHitObject>
+    public class CatchHitObjectComposer : DistancedHitObjectComposer<CatchHitObject>
     {
         private const float distance_snap_radius = 50;
 
@@ -42,6 +42,10 @@ namespace osu.Game.Rulesets.Catch.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
+            // todo: enable distance spacing once catch supports applying it to its existing distance snap grid implementation.
+            RightSideToolboxContainer.Alpha = 0;
+            DistanceSpacingMultiplier.Disabled = true;
+
             LayerBelowRuleset.Add(new PlayfieldBorder
             {
                 RelativeSizeAxes = Axes.Both,

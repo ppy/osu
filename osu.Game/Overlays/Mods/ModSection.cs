@@ -250,9 +250,9 @@ namespace osu.Game.Overlays.Mods
         protected virtual ModButton CreateModButton(Mod mod) => new ModButton(mod);
 
         /// <summary>
-        /// Play out all remaining animations immediately to leave mods in a good (final) state.
+        /// Run any delayed selections (due to animation) immediately to leave mods in a good (final) state.
         /// </summary>
-        public void FlushAnimation()
+        public void FlushPendingSelections()
         {
             while (pendingSelectionOperations.TryDequeue(out var dequeuedAction))
                 dequeuedAction();

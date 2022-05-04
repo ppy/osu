@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -23,7 +24,9 @@ namespace osu.Game.Overlays.Settings
 
         private IBindable<SettingsSection> selectedSection;
 
-        private OsuSpriteText header;
+        private Box dim;
+
+        private const float inactive_alpha = 0.8f;
 
         public abstract Drawable CreateIcon();
         public abstract LocalisableString Header { get; }
@@ -36,14 +39,27 @@ namespace osu.Game.Overlays.Settings
         private const int header_size = 24;
         private const int border_size = 4;
 
+        private bool matchingFilter = true;
+
         public bool MatchingFilter
         {
-            set => this.FadeTo(value ? 1 : 0);
+            get => matchingFilter;
+            set
+            {
+                bool wasPresent = IsPresent;
+
+                matchingFilter = value;
+
+                if (IsPresent != wasPresent)
+                    Invalidate(Invalidation.Presence);
+            }
         }
+
+        public override bool IsPresent => base.IsPresent && MatchingFilter;
 
         public bool FilteringActive { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private SettingsPanel settingsPanel { get; set; }
 
         protected SettingsSection()
@@ -78,30 +94,45 @@ namespace osu.Game.Overlays.Settings
                 },
                 new Container
                 {
-                    Padding = new MarginPadding
-                    {
-                        Top = 28,
-                        Bottom = 40,
-                    },
+                    Padding = new MarginPadding { Top = border_size },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        header = new OsuSpriteText
+                        new Container
                         {
-                            Font = OsuFont.TorusAlternate.With(size: header_size),
-                            Text = Header,
-                            Margin = new MarginPadding
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding
                             {
-                                Horizontal = SettingsPanel.CONTENT_MARGINS
+                                Top = 24,
+                                Bottom = 40,
+                            },
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Font = OsuFont.TorusAlternate.With(size: header_size),
+                                    Text = Header,
+                                    Margin = new MarginPadding
+                                    {
+                                        Horizontal = SettingsPanel.CONTENT_MARGINS
+                                    }
+                                },
+                                FlowContent
                             }
                         },
-                        FlowContent
+                        dim = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background5,
+                            Alpha = inactive_alpha,
+                        },
                     }
                 },
             });
 
-            selectedSection = settingsPanel.CurrentSection.GetBoundCopy();
+            selectedSection = settingsPanel?.CurrentSection.GetBoundCopy() ?? new Bindable<SettingsSection>(this);
             selectedSection.BindValueChanged(_ => updateContentFade(), true);
         }
 
@@ -122,7 +153,10 @@ namespace osu.Game.Overlays.Settings
         protected override bool OnClick(ClickEvent e)
         {
             if (!isCurrentSection)
+            {
+                Debug.Assert(settingsPanel != null);
                 settingsPanel.SectionsContainer.ScrollTo(this);
+            }
 
             return base.OnClick(e);
         }
@@ -134,17 +168,14 @@ namespace osu.Game.Overlays.Settings
 
         private void updateContentFade()
         {
-            float contentFade = 1;
-            float headerFade = 1;
+            float dimFade = 0;
 
             if (!isCurrentSection)
             {
-                contentFade = 0.25f;
-                headerFade = IsHovered ? 0.5f : 0.25f;
+                dimFade = IsHovered ? 0.5f : inactive_alpha;
             }
 
-            header.FadeTo(headerFade, 500, Easing.OutQuint);
-            FlowContent.FadeTo(contentFade, 500, Easing.OutQuint);
+            dim.FadeTo(dimFade, 300, Easing.OutQuint);
         }
     }
 }

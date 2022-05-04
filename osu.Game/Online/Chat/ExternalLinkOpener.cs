@@ -17,7 +17,7 @@ namespace osu.Game.Online.Chat
         private GameHost host { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         private Bindable<bool> externalLinkWarning;
 

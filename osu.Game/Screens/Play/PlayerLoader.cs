@@ -1,10 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -48,31 +49,31 @@ namespace osu.Game.Screens.Play
         public override bool HandlePositionalInput => true;
 
         // We show the previous screen status
-        protected override UserActivity InitialActivity => null;
+        protected override UserActivity? InitialActivity => null;
 
         protected override bool PlayResumeSound => false;
 
-        protected BeatmapMetadataDisplay MetadataInfo { get; private set; }
+        protected BeatmapMetadataDisplay MetadataInfo { get; private set; } = null!;
 
         /// <summary>
         /// A fill flow containing the player settings groups, exposed for the ability to hide it from inheritors of the player loader.
         /// </summary>
-        protected FillFlowContainer<PlayerSettingsGroup> PlayerSettings { get; private set; }
+        protected FillFlowContainer<PlayerSettingsGroup> PlayerSettings { get; private set; } = null!;
 
-        protected VisualSettings VisualSettings { get; private set; }
+        protected VisualSettings VisualSettings { get; private set; } = null!;
 
-        protected AudioSettings AudioSettings { get; private set; }
+        protected AudioSettings AudioSettings { get; private set; } = null!;
 
-        protected Task LoadTask { get; private set; }
+        protected Task? LoadTask { get; private set; }
 
-        protected Task DisposalTask { get; private set; }
+        protected Task? DisposalTask { get; private set; }
 
         private bool backgroundBrightnessReduction;
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
 
-        private AudioFilter lowPassFilter;
-        private AudioFilter highPassFilter;
+        private AudioFilter lowPassFilter = null!;
+        private AudioFilter highPassFilter = null!;
 
         protected bool BackgroundBrightnessReduction
         {
@@ -90,47 +91,53 @@ namespace osu.Game.Screens.Play
         private bool readyForPush =>
             !playerConsumed
             // don't push unless the player is completely loaded
-            && player?.LoadState == LoadState.Ready
-            // don't push if the user is hovering one of the panes, unless they are idle.
-            && (IsHovered || idleTracker.IsIdle.Value)
-            // don't push if the user is dragging a slider or otherwise.
-            && inputManager?.DraggedDrawable == null
-            // don't push if a focused overlay is visible, like settings.
-            && inputManager?.FocusedDrawable == null;
+            && CurrentPlayer?.LoadState == LoadState.Ready
+            // don't push unless the player is ready to start gameplay
+            && ReadyForGameplay;
+
+        protected virtual bool ReadyForGameplay =>
+            // not ready if the user is hovering one of the panes, unless they are idle.
+            (IsHovered || idleTracker.IsIdle.Value)
+            // not ready if the user is dragging a slider or otherwise.
+            && inputManager.DraggedDrawable == null
+            // not ready if a focused overlay is visible, like settings.
+            && inputManager.FocusedDrawable == null;
 
         private readonly Func<Player> createPlayer;
 
-        private Player player;
+        /// <summary>
+        /// The <see cref="Player"/> instance being loaded by this screen.
+        /// </summary>
+        public Player? CurrentPlayer { get; private set; }
 
         /// <summary>
-        /// Whether the curent player instance has been consumed via <see cref="consumePlayer"/>.
+        /// Whether the current player instance has been consumed via <see cref="consumePlayer"/>.
         /// </summary>
         private bool playerConsumed;
 
-        private LogoTrackingContainer content;
+        private LogoTrackingContainer content = null!;
 
         private bool hideOverlays;
 
-        private InputManager inputManager;
+        private InputManager inputManager = null!;
 
-        private IdleTracker idleTracker;
+        private IdleTracker idleTracker = null!;
 
-        private ScheduledDelegate scheduledPushPlayer;
+        private ScheduledDelegate? scheduledPushPlayer;
 
-        [CanBeNull]
-        private EpilepsyWarning epilepsyWarning;
-
-        [Resolved(CanBeNull = true)]
-        private NotificationOverlay notificationOverlay { get; set; }
+        private EpilepsyWarning? epilepsyWarning;
 
         [Resolved(CanBeNull = true)]
-        private VolumeOverlay volumeOverlay { get; set; }
+        private INotificationOverlay? notificationOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private VolumeOverlay? volumeOverlay { get; set; }
 
         [Resolved]
-        private AudioManager audioManager { get; set; }
+        private AudioManager audioManager { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        private BatteryInfo batteryInfo { get; set; }
+        private BatteryInfo? batteryInfo { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -207,9 +214,9 @@ namespace osu.Game.Screens.Play
 
         #region Screen handling
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             ApplyToBackground(b =>
             {
@@ -233,25 +240,27 @@ namespace osu.Game.Screens.Play
             showBatteryWarningIfNeeded();
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
-            var lastScore = player.Score;
+            Debug.Assert(CurrentPlayer != null);
+
+            var lastScore = CurrentPlayer.Score;
 
             AudioSettings.ReferenceScore.Value = lastScore?.ScoreInfo;
 
             // prepare for a retry.
-            player = null;
+            CurrentPlayer = null;
             playerConsumed = false;
             cancelLoad();
 
             contentIn();
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             BackgroundBrightnessReduction = false;
 
@@ -263,7 +272,7 @@ namespace osu.Game.Screens.Play
             highPassFilter.CutoffTo(0);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             cancelLoad();
             ContentOut();
@@ -279,7 +288,7 @@ namespace osu.Game.Screens.Play
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -344,9 +353,10 @@ namespace osu.Game.Screens.Play
         private Player consumePlayer()
         {
             Debug.Assert(!playerConsumed);
+            Debug.Assert(CurrentPlayer != null);
 
             playerConsumed = true;
-            return player;
+            return CurrentPlayer;
         }
 
         private void prepareNewPlayer()
@@ -354,11 +364,19 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            player = createPlayer();
-            player.RestartCount = restartCount++;
-            player.RestartRequested = restartRequested;
+            CurrentPlayer = createPlayer();
+            CurrentPlayer.RestartCount = restartCount++;
+            CurrentPlayer.RestartRequested = restartRequested;
 
-            LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
+            LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
+            {
+                MetadataInfo.Loading = false;
+                OnPlayerLoaded();
+            });
+        }
+
+        protected virtual void OnPlayerLoaded()
+        {
         }
 
         private void restartRequested()
@@ -472,7 +490,7 @@ namespace osu.Game.Screens.Play
             if (isDisposing)
             {
                 // if the player never got pushed, we should explicitly dispose it.
-                DisposalTask = LoadTask?.ContinueWith(_ => player?.Dispose());
+                DisposalTask = LoadTask?.ContinueWith(_ => CurrentPlayer?.Dispose());
             }
         }
 
@@ -480,7 +498,7 @@ namespace osu.Game.Screens.Play
 
         #region Mute warning
 
-        private Bindable<bool> muteWarningShownOnce;
+        private Bindable<bool> muteWarningShownOnce = null!;
 
         private int restartCount;
 
@@ -509,7 +527,7 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
+            private void load(OsuColour colours, AudioManager audioManager, INotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
                 IconBackground.Colour = colours.RedDark;
@@ -535,7 +553,7 @@ namespace osu.Game.Screens.Play
 
         #region Low battery warning
 
-        private Bindable<bool> batteryWarningShownOnce;
+        private Bindable<bool> batteryWarningShownOnce = null!;
 
         private void showBatteryWarningIfNeeded()
         {
@@ -561,7 +579,7 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.BatteryQuarter;
                 IconBackground.Colour = colours.RedDark;

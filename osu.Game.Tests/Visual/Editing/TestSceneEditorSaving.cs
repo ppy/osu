@@ -18,6 +18,13 @@ namespace osu.Game.Tests.Visual.Editing
     public class TestSceneEditorSaving : EditorSavingTestScene
     {
         [Test]
+        public void TestCantExitWithoutSaving()
+        {
+            AddRepeatStep("Exit", () => InputManager.Key(Key.Escape), 10);
+            AddAssert("Editor is still active screen", () => Game.ScreenStack.CurrentScreen is Editor);
+        }
+
+        [Test]
         public void TestMetadata()
         {
             AddStep("Set artist and title", () =>

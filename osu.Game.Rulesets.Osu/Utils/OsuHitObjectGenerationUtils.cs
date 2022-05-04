@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Utils
 {
-    public static class OsuHitObjectGenerationUtils
+    public static partial class OsuHitObjectGenerationUtils
     {
         // The relative distance to the edge of the playfield before objects' positions should start to "turn around" and curve towards the middle.
         // The closer the hit objects draw to the border, the sharper the turn
