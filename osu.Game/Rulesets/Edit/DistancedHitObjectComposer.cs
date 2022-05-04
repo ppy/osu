@@ -76,15 +76,15 @@ namespace osu.Game.Rulesets.Edit
             if (!DistanceSpacingMultiplier.Disabled)
             {
                 DistanceSpacingMultiplier.Value = EditorBeatmap.BeatmapInfo.DistanceSpacing;
-                DistanceSpacingMultiplier.BindValueChanged(v =>
+                DistanceSpacingMultiplier.BindValueChanged(multiplier =>
                 {
-                    distanceSpacingSlider.ContractedLabelText = $"D. S. ({v.NewValue:0.##x})";
-                    distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({v.NewValue:0.##x})";
+                    distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
+                    distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({multiplier.NewValue:0.##x})";
 
-                    if (v.NewValue != v.OldValue)
-                        onScreenDisplay?.Display(new DistanceSpacingToast(v.NewValue.ToLocalisableString(@"0.##x"), v));
+                    if (multiplier.NewValue != multiplier.OldValue)
+                        onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));
 
-                    EditorBeatmap.BeatmapInfo.DistanceSpacing = v.NewValue;
+                    EditorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
                 }, true);
             }
         }
