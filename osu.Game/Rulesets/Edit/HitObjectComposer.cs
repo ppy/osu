@@ -13,7 +13,6 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -115,8 +114,9 @@ namespace osu.Game.Rulesets.Edit
                                               .WithChild(BlueprintContainer = CreateBlueprintContainer())
                     }
                 },
-                new LeftToolboxFlow
+                new ExpandingToolboxContainer(80, 200)
                 {
+                    Padding = new MarginPadding { Left = 10 },
                     Children = new Drawable[]
                     {
                         new EditorToolboxGroup("toolbox (1-9)")
@@ -382,18 +382,6 @@ namespace osu.Game.Rulesets.Edit
         }
 
         #endregion
-
-        private class LeftToolboxFlow : ExpandingButtonContainer
-        {
-            public LeftToolboxFlow()
-                : base(80, 200)
-            {
-                RelativeSizeAxes = Axes.Y;
-                Padding = new MarginPadding { Right = 10 };
-
-                FillFlow.Spacing = new Vector2(10);
-            }
-        }
     }
 
     /// <summary>
