@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -178,14 +177,19 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(_ => scrollToSelection(), true);
+            // schedules added as the properties may change value while the drawable items haven't been created yet.
+            SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(scrollToSelection));
+            Items.BindCollectionChanged((_, __) => Scheduler.AddOnce(scrollToSelection), true);
         }
 
         private void scrollToSelection()
         {
-            if (SelectedItem.Value == null) return;
+            // SelectedItem and ItemMap/drawable items are managed separately,
+            // so if the item can't be unmapped to a drawable, don't try to scroll to it.
+            // best effort is made to not drop any updates, by subscribing to both sources.
+            if (SelectedItem.Value == null || !ItemMap.TryGetValue(SelectedItem.Value, out var drawableItem))
+                return;
 
-            Debug.Assert(ItemMap.TryGetValue(SelectedItem.Value, out var drawableItem));
             ScrollContainer.ScrollIntoView(drawableItem);
         }
 
