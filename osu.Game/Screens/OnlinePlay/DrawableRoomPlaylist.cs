@@ -6,7 +6,10 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
 using osuTK;
 
@@ -15,7 +18,7 @@ namespace osu.Game.Screens.OnlinePlay
     /// <summary>
     /// A scrollable list which displays the <see cref="PlaylistItem"/>s in a <see cref="Room"/>.
     /// </summary>
-    public class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>
+    public class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The currently-selected item. Selection is visually represented with a border.
@@ -169,5 +172,53 @@ namespace osu.Game.Screens.OnlinePlay
         });
 
         protected virtual DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new DrawableRoomPlaylistItem(item);
+
+        #region Key selection logic (shared with BeatmapCarousel and RoomsContainer)
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.SelectNext:
+                    selectNext(1);
+                    return true;
+
+                case GlobalAction.SelectPrevious:
+                    selectNext(-1);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
+        private void selectNext(int direction)
+        {
+            if (SelectedItem.Disabled)
+                return;
+
+            var visibleRooms = ListContainer.AsEnumerable().Where(r => r.IsPresent);
+
+            PlaylistItem item;
+
+            if (SelectedItem.Value == null)
+                item = visibleRooms.FirstOrDefault()?.Model;
+            else
+            {
+                if (direction < 0)
+                    visibleRooms = visibleRooms.Reverse();
+
+                item = visibleRooms.SkipWhile(r => r.Model != SelectedItem.Value).Skip(1).FirstOrDefault()?.Model;
+            }
+
+            // we already have a valid selection only change selection if we still have a room to switch to.
+            if (item != null)
+                SelectedItem.Value = item;
+        }
+
+        #endregion
     }
 }
