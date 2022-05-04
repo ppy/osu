@@ -139,7 +139,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             return base.OnClick(e);
         }
 
-        #region Key selection logic (shared with BeatmapCarousel and RoomsContainer)
+        #region Key selection logic (shared with BeatmapCarousel and DrawableRoomPlaylist)
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
