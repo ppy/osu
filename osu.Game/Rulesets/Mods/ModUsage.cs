@@ -11,17 +11,17 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// This mod can be used for a per-user gameplay session.
         /// </summary>
-        User,
+        SoloLocal,
 
         /// <summary>
         /// This mod can be used in multiplayer but must be applied to all users.
         /// This is generally the case for mods which affect the length of gameplay.
         /// </summary>
-        MultiplayerRoomWide,
+        MultiplayerGlobal,
 
         /// <summary>
         /// This mod can be used in multiplayer either at a room or per-player level (i.e. "free mod").
         /// </summary>
-        MultiplayerPerPlayer,
+        MultiplayerLocal,
     }
 }
