@@ -195,6 +195,16 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleInGameInterface => new TranslatableString(getKey(@"toggle_in_game_interface"), @"Toggle in-game interface");
 
         /// <summary>
+        /// "Previous beatmap selection"
+        /// </summary>
+        public static LocalisableString SelectPreviousBeatmap => new TranslatableString(getKey(@"select_previous_beatmap"), @"Previous beatmap selection");
+
+        /// <summary>
+        /// "Next beatmap selection"
+        /// </summary>
+        public static LocalisableString SelectNextBeatmap => new TranslatableString(getKey(@"select_next_beatmap"), @"Next beatmap selection");
+
+        /// <summary>
         /// "Toggle Mod Select"
         /// </summary>
         public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle Mod Select");

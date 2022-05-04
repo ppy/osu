@@ -604,34 +604,20 @@ namespace osu.Game.Screens.Select
         public void ScrollToSelected(bool immediate = false) =>
             pendingScrollOperation = immediate ? PendingScrollOperation.Immediate : PendingScrollOperation.Standard;
 
-        #region Key / button selection logic
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            switch (e.Key)
-            {
-                case Key.Left:
-                    SelectNext(-1);
-                    return true;
-
-                case Key.Right:
-                    SelectNext();
-                    return true;
-            }
-
-            return false;
-        }
+        #region Button selection logic
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
                 case GlobalAction.SelectNext:
-                    SelectNext(1, false);
+                case GlobalAction.SelectNextBeatmap:
+                    SelectNext(1, e.Action == GlobalAction.SelectNextBeatmap);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                    SelectNext(-1, false);
+                case GlobalAction.SelectPreviousBeatmap:
+                    SelectNext(-1, e.Action == GlobalAction.SelectPreviousBeatmap);
                     return true;
             }
 

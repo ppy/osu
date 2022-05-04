@@ -100,10 +100,12 @@ namespace osu.Game.Input.Bindings
 
         public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
         {
+            new KeyBinding(InputKey.Left, GlobalAction.SelectPreviousBeatmap),
+            new KeyBinding(InputKey.Right, GlobalAction.SelectNextBeatmap),
             new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
             new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
             new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
-            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions)
+            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -301,5 +303,11 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorFlipVertically))]
         EditorFlipVertically,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPreviousBeatmap))]
+        SelectPreviousBeatmap,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNextBeatmap))]
+        SelectNextBeatmap,
     }
 }
