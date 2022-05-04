@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Show overlay", () => chatOverlay.Show());
             AddAssert("Listing is visible", () => listingVisibility == Visibility.Visible);
-            AddStep("Search for 'number 2'", () => chatOverlay.ChildrenOfType<ChatTextBox>().Single().Text = "number 2");
+            AddStep("Search for 'number 2'", () => chatOverlayTextBox.Text = "number 2");
             AddUntilStep("Only channel 2 visibile", () =>
             {
                 IEnumerable<ChannelListingItem> listingItems = chatOverlay.ChildrenOfType<ChannelListingItem>()
@@ -325,6 +325,28 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel1));
         }
 
+        [Test]
+        public void TextBoxRetainsFocus()
+        {
+            AddStep("Show overlay", () => chatOverlay.Show());
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click selector", () => clickDrawable(chatOverlay.ChildrenOfType<ChannelListSelector>().Single()));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click listing", () => clickDrawable(chatOverlay.ChildrenOfType<ChannelListing>().Single()));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click drawable channel", () => clickDrawable(chatOverlay.ChildrenOfType<DrawableChannel>().Single()));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click channel list", () => clickDrawable(chatOverlay.ChildrenOfType<ChannelList>().Single()));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click top bar", () => clickDrawable(chatOverlay.ChildrenOfType<ChatOverlayTopBar>().Single()));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Hide overlay", () => chatOverlay.Hide());
+            AddAssert("TextBox is not focused", () => InputManager.FocusedDrawable == null);
+        }
+
         private Visibility listingVisibility =>
             chatOverlay.ChildrenOfType<ChannelListing>().Single().State.Value;
 
@@ -336,6 +358,9 @@ namespace osu.Game.Tests.Visual.Online
 
         private ChannelListItem getChannelListItem(Channel channel) =>
             chatOverlay.ChildrenOfType<ChannelListItem>().Single(item => item.Channel == channel);
+
+        private ChatTextBox chatOverlayTextBox =>
+            chatOverlay.ChildrenOfType<ChatTextBox>().Single();
 
         private void clickDrawable(Drawable d)
         {
