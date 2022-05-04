@@ -611,13 +611,13 @@ namespace osu.Game.Screens.Select
             switch (e.Action)
             {
                 case GlobalAction.SelectNext:
-                case GlobalAction.SelectNextBeatmap:
-                    SelectNext(1, e.Action == GlobalAction.SelectNextBeatmap);
+                case GlobalAction.SelectNextGroup:
+                    SelectNext(1, e.Action == GlobalAction.SelectNextGroup);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                case GlobalAction.SelectPreviousBeatmap:
-                    SelectNext(-1, e.Action == GlobalAction.SelectPreviousBeatmap);
+                case GlobalAction.SelectPreviousGroup:
+                    SelectNext(-1, e.Action == GlobalAction.SelectPreviousGroup);
                     return true;
             }
 
