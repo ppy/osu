@@ -382,7 +382,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     OnDragHandled?.Invoke(e);
 
-                    if (timeline.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition).Time is double time)
+                    if (timeline.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition).Time is double time)
                     {
                         switch (hitObject)
                         {
