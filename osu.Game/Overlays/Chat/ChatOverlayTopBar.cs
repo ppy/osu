@@ -4,31 +4,35 @@
 #nullable enable
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
     public class ChatOverlayTopBar : Container
     {
-        // IsHovered is used by overlay
-        public override bool HandlePositionalInput => true;
+        private Box background = null!;
+
+        private Color4 backgroundColour;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, TextureStore textures)
         {
             Children = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3,
+                    Colour = backgroundColour = colourProvider.Background3,
                 },
                 new GridContainer
                 {
@@ -62,6 +66,18 @@ namespace osu.Game.Overlays.Chat
                     },
                 },
             };
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            background.FadeColour(backgroundColour.Lighten(0.1f), 300, Easing.OutQuint);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            background.FadeColour(backgroundColour, 300, Easing.OutQuint);
+            base.OnHoverLost(e);
         }
     }
 }
