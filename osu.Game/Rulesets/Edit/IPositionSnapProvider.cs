@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Edit
         SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition);
 
         /// <summary>
-        /// Given a position, find a value position snap, restricting time to its input value.
+        /// Given a position, find a valid position snap, without changing the time value.
         /// </summary>
         /// <param name="screenSpacePosition">The screen-space position to be snapped.</param>
         /// <returns>The position post-snapping. Time will always be null.</returns>
