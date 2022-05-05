@@ -213,10 +213,10 @@ namespace osu.Game.Tests.Editing
             => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceToDuration(new HitObject(), distance) == expectedDuration);
 
         private void assertSnappedDuration(float distance, double expectedDuration)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.GetSnappedDurationFromDistance(new HitObject(), distance) == expectedDuration);
+            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.FindSnappedDuration(new HitObject(), distance) == expectedDuration);
 
         private void assertSnappedDistance(float distance, float expectedDistance)
-            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.GetSnappedDistanceFromDistance(new HitObject(), distance) == expectedDistance);
+            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.FindSnappedDistance(new HitObject(), distance) == expectedDistance);
 
         private class TestHitObjectComposer : OsuHitObjectComposer
         {
