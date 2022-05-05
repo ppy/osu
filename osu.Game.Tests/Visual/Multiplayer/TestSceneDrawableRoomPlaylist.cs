@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void KeyboardSelection()
+        public void TestKeyboardSelection()
         {
             createPlaylist(p => p.AllowSelection = true);
 
