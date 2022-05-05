@@ -217,7 +217,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void selectNext(int direction)
         {
-            if (SelectedItem.Disabled)
+            if (!AllowSelection)
                 return;
 
             var visibleItems = ListContainer.AsEnumerable().Where(r => r.IsPresent);

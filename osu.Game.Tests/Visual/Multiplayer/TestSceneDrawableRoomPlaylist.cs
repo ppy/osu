@@ -56,6 +56,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
         }
 
         [Test]
@@ -72,6 +75,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertDeleteButtonVisibility(0, true);
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
             AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
         }
 
@@ -90,6 +96,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             moveToItem(0);
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
             AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
         }
 
