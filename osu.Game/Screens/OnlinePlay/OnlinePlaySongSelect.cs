@@ -53,7 +53,7 @@ namespace osu.Game.Screens.OnlinePlay
         private IReadOnlyList<Mod> initialMods;
         private bool itemSelected;
 
-        private FreeModSelectScreen freeModSelectOverlay;
+        private readonly FreeModSelectScreen freeModSelectOverlay;
         private IDisposable freeModSelectOverlayRegistration;
 
         protected OnlinePlaySongSelect(Room room)
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.OnlinePlay
             Mods.BindValueChanged(onModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
 
-            freeModSelectOverlayRegistration = Game?.RegisterBlockingOverlay(freeModSelectOverlay);
+            freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelectOverlay);
         }
 
         private void onModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)

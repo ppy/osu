@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [Resolved(CanBeNull = true)]
-        protected new OsuGame Game { get; private set; }
+        internal IOverlayManager OverlayManager { get; private set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IDialogOverlay dialog, OsuColour colours, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            modSelectOverlayRegistration = Game?.RegisterBlockingOverlay(ModSelect);
+            modSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(ModSelect);
         }
 
         /// <summary>

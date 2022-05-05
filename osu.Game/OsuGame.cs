@@ -63,7 +63,7 @@ namespace osu.Game
     /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
     /// for initial components that are generally retrieved via DI.
     /// </summary>
-    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner
+    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager
     {
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
@@ -184,48 +184,34 @@ namespace osu.Game
             SentryLogger = new SentryLogger(this);
         }
 
+        #region IOverlayManager
+
+        IBindable<OverlayActivation> IOverlayManager.OverlayActivationMode => OverlayActivationMode;
+
         private void updateBlockingOverlayFade() =>
             ScreenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
 
-        /// <summary>
-        /// Registers a blocking <see cref="OverlayContainer"/> that was not created by <see cref="OsuGame"/> itself for later use.
-        /// </summary>
-        /// <remarks>
-        /// The goal of this method is to allow child screens, like <see cref="SongSelect"/> to register their own full-screen blocking overlays
-        /// with background dim.
-        /// In those cases, for the dim to work correctly, the overlays need to be added at the `OsuGame` level directly, rather as children of the screens.
-        /// </remarks>
-        /// <returns>
-        /// An <see cref="IDisposable"/> that should be disposed of when the <paramref name="overlayContainer"/> should be unregistered.
-        /// Disposing of this <see cref="IDisposable"/> will automatically expire the <paramref name="overlayContainer"/>.
-        /// </returns>
-        internal IDisposable RegisterBlockingOverlay(OverlayContainer overlayContainer)
+        IDisposable IOverlayManager.RegisterBlockingOverlay(OverlayContainer overlayContainer)
         {
             if (overlayContainer.Parent != null)
-                throw new ArgumentException($@"Overlays registered via {nameof(RegisterBlockingOverlay)} should not be added to the scene graph.");
+                throw new ArgumentException($@"Overlays registered via {nameof(IOverlayManager.RegisterBlockingOverlay)} should not be added to the scene graph.");
 
             if (externalOverlays.Contains(overlayContainer))
-                throw new ArgumentException($@"{overlayContainer} has already been registered via {nameof(RegisterBlockingOverlay)} once.");
+                throw new ArgumentException($@"{overlayContainer} has already been registered via {nameof(IOverlayManager.RegisterBlockingOverlay)} once.");
 
             externalOverlays.Add(overlayContainer);
             overlayContent.Add(overlayContainer);
             return new InvokeOnDisposal(() => unregisterBlockingOverlay(overlayContainer));
         }
 
-        /// <summary>
-        /// Should be called when <paramref name="overlay"/> has been shown and should begin blocking background input.
-        /// </summary>
-        internal void ShowBlockingOverlay(OverlayContainer overlay)
+        void IOverlayManager.ShowBlockingOverlay(OverlayContainer overlay)
         {
             if (!visibleBlockingOverlays.Contains(overlay))
                 visibleBlockingOverlays.Add(overlay);
             updateBlockingOverlayFade();
         }
 
-        /// <summary>
-        /// Should be called when a blocking <paramref name="overlay"/> has been hidden and should stop blocking background input.
-        /// </summary>
-        internal void HideBlockingOverlay(OverlayContainer overlay) => Schedule(() =>
+        void IOverlayManager.HideBlockingOverlay(OverlayContainer overlay) => Schedule(() =>
         {
             visibleBlockingOverlays.Remove(overlay);
             updateBlockingOverlayFade();
@@ -239,6 +225,8 @@ namespace osu.Game
             externalOverlays.Remove(overlayContainer);
             overlayContainer.Expire();
         }
+
+        #endregion
 
         /// <summary>
         /// Close all game-wide overlays.
