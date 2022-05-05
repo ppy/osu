@@ -220,18 +220,18 @@ namespace osu.Game.Screens.OnlinePlay
             if (SelectedItem.Disabled)
                 return;
 
-            var visibleRooms = ListContainer.AsEnumerable().Where(r => r.IsPresent);
+            var visibleItems = ListContainer.AsEnumerable().Where(r => r.IsPresent);
 
             PlaylistItem item;
 
             if (SelectedItem.Value == null)
-                item = visibleRooms.FirstOrDefault()?.Model;
+                item = visibleItems.FirstOrDefault()?.Model;
             else
             {
                 if (direction < 0)
-                    visibleRooms = visibleRooms.Reverse();
+                    visibleItems = visibleItems.Reverse();
 
-                item = visibleRooms.SkipWhile(r => r.Model != SelectedItem.Value).Skip(1).FirstOrDefault()?.Model;
+                item = visibleItems.SkipWhile(r => r.Model != SelectedItem.Value).Skip(1).FirstOrDefault()?.Model;
             }
 
             // we already have a valid selection only change selection if we still have a room to switch to.
