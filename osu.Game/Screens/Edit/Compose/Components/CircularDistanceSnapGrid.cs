@@ -68,19 +68,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (MaxIntervals == 0)
                 return (StartPosition, StartTime);
 
-            Vector2 direction = position - StartPosition;
-            if (direction == Vector2.Zero)
-                direction = new Vector2(0.001f, 0.001f);
+            // This grid implementation factors in the user's distance spacing specification,
+            // which is usually not considered by an `IDistanceSnapProvider`.
+            float distanceSpacing = (float)DistanceSpacingMultiplier.Value;
 
-            float distance = direction.Length;
+            Vector2 travelVector = (position - StartPosition);
 
-            float radius = DistanceBetweenTick;
-            int radialCount = Math.Clamp((int)MathF.Round(distance / radius), 1, MaxIntervals);
+            if (travelVector == Vector2.Zero)
+                return (StartPosition, StartTime);
 
-            Vector2 normalisedDirection = direction * new Vector2(1f / distance);
-            Vector2 snappedPosition = StartPosition + normalisedDirection * radialCount * radius;
+            float travelLength = travelVector.Length;
 
-            return (snappedPosition, StartTime + SnapProvider.FindSnappedDuration(ReferenceObject, (float)((snappedPosition - StartPosition).Length / DistanceSpacingMultiplier.Value)));
+            // FindSnappedDistance will always round down, but we want to potentially round upwards.
+            travelLength += DistanceBetweenTick / 2;
+
+            // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
+            // to allow for snapping at a non-multiplied ratio.
+            float snappedDistance = SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacing);
+            double snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
+
+            // The multiplier can then be reapplied to the final position.
+            Vector2 snappedPosition = StartPosition + travelVector.Normalized() * snappedDistance * distanceSpacing;
+
+            return (snappedPosition, snappedTime);
         }
     }
 }
