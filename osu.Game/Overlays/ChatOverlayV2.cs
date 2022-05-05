@@ -39,7 +39,8 @@ namespace osu.Game.Overlays
         private ChatTextBar textBar = null!;
         private Container<DrawableChannel> currentChannelContainer = null!;
 
-        private Bindable<float>? chatHeight;
+        private readonly Bindable<float> chatHeight = new Bindable<float>();
+
         private bool isDraggingTopBar;
         private float dragStartChatHeight;
 
@@ -137,7 +138,8 @@ namespace osu.Game.Overlays
 
             loading.Show();
 
-            chatHeight = config.GetBindable<float>(OsuSetting.ChatDisplayHeight).GetBoundCopy();
+            config.BindWith(OsuSetting.ChatDisplayHeight, chatHeight);
+
             chatHeight.BindValueChanged(height => { Height = height.NewValue; }, true);
 
             currentChannel.BindTo(channelManager.CurrentChannel);
@@ -193,7 +195,7 @@ namespace osu.Game.Overlays
             if (!isDraggingTopBar)
                 return base.OnDragStart(e);
 
-            dragStartChatHeight = chatHeight!.Value;
+            dragStartChatHeight = chatHeight.Value;
             return true;
         }
 
@@ -203,7 +205,7 @@ namespace osu.Game.Overlays
                 return;
 
             float targetChatHeight = dragStartChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
-            chatHeight!.Value = targetChatHeight;
+            chatHeight.Value = targetChatHeight;
         }
 
         protected override void OnDragEnd(DragEndEvent e)
