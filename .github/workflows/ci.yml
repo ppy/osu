@@ -33,6 +33,9 @@ jobs:
           path: ${{ github.workspace }}/inspectcode
           key: inspectcode-${{ hashFiles('.config/dotnet-tools.json') }}-${{ hashFiles('.github/workflows/ci.yml' ) }}
 
+      - name: Dotnet code style
+        run: dotnet build -c Debug -warnaserror osu.Desktop.slnf -p:EnforceCodeStyleInBuild=true
+
       - name: CodeFileSanity
         run: |
           # TODO: Add ignore filters and GitHub Workflow Command Reporting in CFS. That way we don't have to do this workaround.
@@ -128,7 +131,7 @@ jobs:
       # cannot accept .sln(f) files as arguments.
       # Build just the main game for now.
       - name: Build
-        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug /p:EnforceCodeStyleInBuild=false
+        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
 
   build-only-ios:
     name: Build only (iOS)
@@ -147,4 +150,4 @@ jobs:
       # cannot accept .sln(f) files as arguments.
       # Build just the main game for now.
       - name: Build
-        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug /p:EnforceCodeStyleInBuild=false
+        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug
