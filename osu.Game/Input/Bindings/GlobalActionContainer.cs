@@ -59,6 +59,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
             new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
 
+            new KeyBinding(InputKey.Left, GlobalAction.SelectPreviousGroup),
+            new KeyBinding(InputKey.Right, GlobalAction.SelectNextGroup),
+
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
@@ -105,7 +108,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
             new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
             new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
-            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions)
+            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -309,5 +312,11 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDecreaseDistanceSpacing))]
         EditorDecreaseDistanceSpacing,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPreviousGroup))]
+        SelectPreviousGroup,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNextGroup))]
+        SelectNextGroup,
     }
 }
