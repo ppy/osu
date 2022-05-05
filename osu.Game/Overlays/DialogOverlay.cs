@@ -87,18 +87,16 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            this.FadeIn(PopupDialog.ENTER_DURATION, Easing.OutQuint);
             lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
-
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
 
-            if (CurrentDialog?.State.Value == Visibility.Visible) CurrentDialog.Hide();
+            if (CurrentDialog?.State.Value == Visibility.Visible)
+                CurrentDialog.Hide();
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
