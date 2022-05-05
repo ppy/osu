@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay
         public new Func<Mod, bool> IsValidMod
         {
             get => base.IsValidMod;
-            set => base.IsValidMod = m => m.IsPlayable(ModUsage.SoloLocal) && value.Invoke(m);
+            set => base.IsValidMod = m => m.UserPlayable && value.Invoke(m);
         }
 
         public FreeModSelectScreen()

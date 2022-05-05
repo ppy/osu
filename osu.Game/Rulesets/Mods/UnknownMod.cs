@@ -15,7 +15,9 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "This mod could not be resolved by the game.";
         public override double ScoreMultiplier => 0;
 
-        public override bool IsPlayable(ModUsage usage) => false;
+        public override bool UserPlayable => false;
+        public override bool ValidForMultiplayer => false;
+        public override bool ValidForMultiplayerAsFreeMod => false;
 
         public override ModType Type => ModType.System;
 

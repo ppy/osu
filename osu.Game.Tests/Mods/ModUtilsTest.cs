@@ -324,12 +324,18 @@ namespace osu.Game.Tests.Mods
             public override string Acronym => string.Empty;
             public override double ScoreMultiplier => 1;
             public override bool HasImplementation => true;
-            public override bool IsPlayable(ModUsage usage) => usage == ModUsage.SoloLocal;
+            public override bool ValidForMultiplayer => false;
+            public override bool ValidForMultiplayerAsFreeMod => false;
         }
 
-        private class InvalidMultiplayerFreeMod : InvalidMultiplayerMod
+        private class InvalidMultiplayerFreeMod : Mod
         {
-            public override bool IsPlayable(ModUsage usage) => usage != ModUsage.MultiplayerLocal;
+            public override string Name => string.Empty;
+            public override string Description => string.Empty;
+            public override string Acronym => string.Empty;
+            public override double ScoreMultiplier => 1;
+            public override bool HasImplementation => true;
+            public override bool ValidForMultiplayerAsFreeMod => false;
         }
 
         public interface IModCompatibilitySpecification
