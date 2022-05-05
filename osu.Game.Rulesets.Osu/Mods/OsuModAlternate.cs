@@ -2,33 +2,43 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModAlternate : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
+    public class OsuModAlternate : Mod, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => @"Alternate";
         public override string Acronym => @"AL";
         public override string Description => @"Don't use the same key twice in a row!";
         public override double ScoreMultiplier => 1.0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax) };
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
 
-        private double firstObjectValidJudgementTime;
-        private IBindable<bool> isBreakTime;
         private const double flash_duration = 1000;
+
+        /// <summary>
+        /// A tracker for periods where alternate should not be forced (i.e. non-gameplay periods).
+        /// </summary>
+        /// <remarks>
+        /// This is different from <see cref="Player.IsBreakTime"/> in that the periods here end strictly at the first object after the break, rather than the break's end time.
+        /// </remarks>
+        private PeriodTracker nonGameplayPeriods;
+
         private OsuAction? lastActionPressed;
         private DrawableRuleset<OsuHitObject> ruleset;
 
@@ -39,29 +49,30 @@ namespace osu.Game.Rulesets.Osu.Mods
             ruleset = drawableRuleset;
             drawableRuleset.KeyBindingInputManager.Add(new InputInterceptor(this));
 
-            var firstHitObject = ruleset.Objects.FirstOrDefault();
-            firstObjectValidJudgementTime = (firstHitObject?.StartTime ?? 0) - (firstHitObject?.HitWindows.WindowFor(HitResult.Meh) ?? 0);
+            var periods = new List<Period>();
+
+            if (drawableRuleset.Objects.Any())
+            {
+                periods.Add(new Period(int.MinValue, getValidJudgementTime(ruleset.Objects.First()) - 1));
+
+                foreach (BreakPeriod b in drawableRuleset.Beatmap.Breaks)
+                    periods.Add(new Period(b.StartTime, getValidJudgementTime(ruleset.Objects.First(h => h.StartTime >= b.EndTime)) - 1));
+
+                static double getValidJudgementTime(HitObject hitObject) => hitObject.StartTime - hitObject.HitWindows.WindowFor(HitResult.Meh);
+            }
+
+            nonGameplayPeriods = new PeriodTracker(periods);
 
             gameplayClock = drawableRuleset.FrameStableClock;
         }
 
-        public void ApplyToPlayer(Player player)
-        {
-            isBreakTime = player.IsBreakTime.GetBoundCopy();
-            isBreakTime.ValueChanged += e =>
-            {
-                if (e.NewValue)
-                    lastActionPressed = null;
-            };
-        }
-
         private bool checkCorrectAction(OsuAction action)
         {
-            if (isBreakTime.Value)
+            if (nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
+            {
+                lastActionPressed = null;
                 return true;
-
-            if (gameplayClock.CurrentTime < firstObjectValidJudgementTime)
-                return true;
+            }
 
             switch (action)
             {

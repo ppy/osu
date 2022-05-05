@@ -275,6 +275,8 @@ namespace osu.Game.Configuration
         AlwaysPlayFirstComboBreak,
         FloatingComments,
         HUDVisibilityMode,
+
+        // This has been migrated to the component itself. can be removed 20221027.
         ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,

@@ -15,7 +15,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -308,23 +307,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public double VisibleRange => track.Length / Zoom;
 
-        public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+        public SnapResult FindSnappedPosition(Vector2 screenSpacePosition) =>
             new SnapResult(screenSpacePosition, null);
 
-        public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) =>
+        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition) =>
             new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(screenSpacePosition))));
 
         private double getTimeFromPosition(Vector2 localPosition) =>
             (localPosition.X / Content.DrawWidth) * track.Length;
-
-        public float GetBeatSnapDistanceAt(HitObject referenceObject) => throw new NotImplementedException();
-
-        public float DurationToDistance(HitObject referenceObject, double duration) => throw new NotImplementedException();
-
-        public double DistanceToDuration(HitObject referenceObject, float distance) => throw new NotImplementedException();
-
-        public double GetSnappedDurationFromDistance(HitObject referenceObject, float distance) => throw new NotImplementedException();
-
-        public float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance) => throw new NotImplementedException();
     }
 }
