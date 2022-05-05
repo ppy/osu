@@ -190,7 +190,12 @@ namespace osu.Game.Screens.OnlinePlay
             if (SelectedItem.Value == null || !ItemMap.TryGetValue(SelectedItem.Value, out var drawableItem))
                 return;
 
-            ScrollContainer.ScrollIntoView(drawableItem);
+            // ScrollIntoView does not handle non-loaded items appropriately, delay scroll until the item finishes loading.
+            // see: https://github.com/ppy/osu-framework/issues/5158
+            if (!drawableItem.IsLoaded)
+                drawableItem.OnLoadComplete += _ => ScrollContainer.ScrollIntoView(drawableItem);
+            else
+                ScrollContainer.ScrollIntoView(drawableItem);
         }
 
         #region Key selection logic (shared with BeatmapCarousel and RoomsContainer)
