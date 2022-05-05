@@ -11,7 +11,6 @@
     <MtouchVerbosity></MtouchVerbosity>
     <CodesignKey>iPhone Developer</CodesignKey>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Generated via osu.Framework.iOS/generate-symbol-strip-flags.sh -->
