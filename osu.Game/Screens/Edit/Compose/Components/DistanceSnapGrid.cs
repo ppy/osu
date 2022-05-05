@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected float DistanceBetweenTick { get; private set; }
 
+        protected IBindable<double> DistanceSpacingMultiplier { get; private set; }
+
         /// <summary>
         /// The maximum number of distance snapping intervals allowed.
         /// </summary>
@@ -52,8 +54,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
-
-        private IBindable<double> distanceSpacingMultiplier;
 
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
         private readonly double? endTime;
@@ -86,13 +86,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             beatDivisor.BindValueChanged(_ => updateSpacing());
 
-            distanceSpacingMultiplier = SnapProvider.DistanceSpacingMultiplier.GetBoundCopy();
-            distanceSpacingMultiplier.BindValueChanged(_ => updateSpacing(), true);
+            DistanceSpacingMultiplier = SnapProvider.DistanceSpacingMultiplier.GetBoundCopy();
+            DistanceSpacingMultiplier.BindValueChanged(_ => updateSpacing(), true);
         }
 
         private void updateSpacing()
         {
-            DistanceBetweenTick = (float)(SnapProvider.GetBeatSnapDistanceAt(ReferenceObject) * distanceSpacingMultiplier.Value);
+            DistanceBetweenTick = (float)(SnapProvider.GetBeatSnapDistanceAt(ReferenceObject) * DistanceSpacingMultiplier.Value);
 
             if (endTime == null)
                 MaxIntervals = int.MaxValue;
