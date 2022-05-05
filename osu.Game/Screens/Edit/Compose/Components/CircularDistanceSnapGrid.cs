@@ -87,6 +87,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float snappedDistance = SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacing);
             double snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
 
+            if (snappedTime > LatestEndTime)
+            {
+                snappedDistance = SnapProvider.DurationToDistance(ReferenceObject, LatestEndTime.Value - ReferenceObject.StartTime);
+            }
+
             // The multiplier can then be reapplied to the final position.
             Vector2 snappedPosition = StartPosition + travelVector.Normalized() * snappedDistance * distanceSpacing;
 
