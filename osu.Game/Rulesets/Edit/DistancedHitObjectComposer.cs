@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Edit
     /// Represents a <see cref="HitObjectComposer{TObject}"/> for rulesets with the concept of distances between objects.
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
-    [Cached(typeof(IDistanceSnapProvider))]
     public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider, IScrollBindingHandler<GlobalAction>
         where TObject : HitObject
     {

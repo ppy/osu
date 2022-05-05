@@ -35,7 +35,6 @@ namespace osu.Game.Rulesets.Edit
     /// Responsible for providing snapping and generally gluing components together.
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
-    [Cached(Type = typeof(IPlacementHandler))]
     public abstract class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
     {
@@ -388,8 +387,7 @@ namespace osu.Game.Rulesets.Edit
     /// A non-generic definition of a HitObject composer class.
     /// Generally used to access certain methods without requiring a generic type for <see cref="HitObjectComposer{T}" />.
     /// </summary>
-    [Cached(typeof(HitObjectComposer))]
-    [Cached(typeof(IPositionSnapProvider))]
+    [Cached]
     public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
         protected HitObjectComposer()
