@@ -659,6 +659,7 @@ namespace osu.Game.Screens.Select
                 return true;
 
             beatmapInfoWedge.Hide();
+            ModSelect.Hide();
 
             this.FadeOut(100);
 
