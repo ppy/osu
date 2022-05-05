@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -162,6 +163,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override ModSelectScreen CreateModSelectOverlay() => new UserModSelectScreen(OverlayColourScheme.Plum)
         {
+            Hotkey = GlobalAction.ToggleModSelection,
             IsValidMod = IsValidMod
         };
 
