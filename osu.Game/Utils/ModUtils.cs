@@ -150,6 +150,11 @@ namespace osu.Game.Utils
         /// <summary>
         /// Checks that all <see cref="Mod"/>s in a combination are valid as "free mods" in a multiplayer match session.
         /// </summary>
+        /// <remarks>
+        /// Note that this does not check compatibility between mods,
+        /// given that the passed mods are expected to be the ones to be allowed for the multiplayer match,
+        /// not to be confused with the list of mods the user currently has selected for the multiplayer match.
+        /// </remarks>
         /// <param name="mods">The mods to check.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
