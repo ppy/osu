@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void assertHasFreeModButton(Type type, bool hasButton = true)
         {
             AddAssert($"{type.ReadableName()} {(hasButton ? "displayed" : "not displayed")} in freemod overlay",
-                () => songSelect.ChildrenOfType<FreeModSelectOverlay>().Single().ChildrenOfType<ModButton>().All(b => b.Mod.GetType() != type));
+                () => this.ChildrenOfType<FreeModSelectScreen>().Single().ChildrenOfType<ModPanel>().All(b => b.Mod.GetType() != type));
         }
 
         private class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect
