@@ -64,20 +64,27 @@ namespace osu.Game.Overlays
         [Cached]
         private readonly Bindable<Channel> currentChannel = new Bindable<Channel>();
 
+        public ChatOverlayV2()
+        {
+            Height = default_chat_height;
+
+            Masking = true;
+
+            const float corner_radius = 7f;
+
+            CornerRadius = corner_radius;
+
+            // Hack to hide the bottom edge corner radius off-screen.
+            Margin = new MarginPadding { Bottom = -corner_radius };
+            Padding = new MarginPadding { Bottom = corner_radius };
+
+            Anchor = Anchor.BottomCentre;
+            Origin = Anchor.BottomCentre;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            // Width = 0.85f; // Matches OnlineOverlay
-            Height = default_chat_height;
-            RelativeSizeAxes = Axes.Both;
-            RelativePositionAxes = Axes.Both;
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
-            Masking = true;
-            CornerRadius = 7f;
-            Margin = new MarginPadding { Bottom = -10 };
-            Padding = new MarginPadding { Bottom = 10 };
-
             Children = new Drawable[]
             {
                 topBar = new ChatOverlayTopBar
