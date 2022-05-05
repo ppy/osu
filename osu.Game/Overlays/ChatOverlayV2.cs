@@ -238,9 +238,9 @@ namespace osu.Game.Overlays
             base.OnFocus(e);
         }
 
-        private void currentChannelChanged(ValueChangedEvent<Channel> e)
+        private void currentChannelChanged(ValueChangedEvent<Channel> channel)
         {
-            Channel? newChannel = e.NewValue;
+            Channel? newChannel = channel.NewValue;
 
             loading.Show();
 
@@ -248,7 +248,7 @@ namespace osu.Game.Overlays
             if (newChannel == null)
             {
                 // Find another channel to switch to
-                newChannel = channelManager.JoinedChannels.FirstOrDefault(chan => chan != e.OldValue);
+                newChannel = channelManager.JoinedChannels.FirstOrDefault(c => c != channel.OldValue);
 
                 if (newChannel == null)
                     selectorActive.Value = true;
