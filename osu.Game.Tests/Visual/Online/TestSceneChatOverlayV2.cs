@@ -133,13 +133,15 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChatHeight()
         {
-            Bindable<float> configChatHeight = config.GetBindable<float>(OsuSetting.ChatDisplayHeight);
+            Bindable<float> configChatHeight = null;
             float newHeight = 0;
 
+            AddStep("Bind config chat height", () => configChatHeight = config.GetBindable<float>(OsuSetting.ChatDisplayHeight).GetBoundCopy());
             AddStep("Set config chat height", () => configChatHeight.Value = 0.4f);
             AddStep("Show overlay", () => chatOverlay.Show());
             AddAssert("Overlay uses config height", () => chatOverlay.Height == 0.4f);
-            AddStep("Drag overlay to new height", () => {
+            AddStep("Drag overlay to new height", () =>
+            {
                 InputManager.MoveMouseTo(chatOverlayTopBar);
                 InputManager.PressButton(MouseButton.Left);
                 InputManager.MoveMouseTo(chatOverlayTopBar, new Vector2(0, -300));
