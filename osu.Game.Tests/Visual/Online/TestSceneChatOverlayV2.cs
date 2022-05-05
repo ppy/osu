@@ -6,12 +6,14 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Net;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -21,6 +23,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Listing;
 using osu.Game.Overlays.Chat.ChannelList;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
@@ -37,6 +40,9 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel testChannel1 => testChannels[0];
         private Channel testChannel2 => testChannels[1];
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -122,6 +128,28 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
             AddStep("Hide overlay", () => chatOverlay.Hide());
             AddAssert("Overlay is hidden", () => chatOverlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestChatHeight()
+        {
+            Bindable<float> configChatHeight = config.GetBindable<float>(OsuSetting.ChatDisplayHeight);
+            float newHeight = 0;
+
+            AddStep("Set config chat height", () => configChatHeight.Value = 0.4f);
+            AddStep("Show overlay", () => chatOverlay.Show());
+            AddAssert("Overlay uses config height", () => chatOverlay.Height == 0.4f);
+            AddStep("Drag overlay to new height", () => {
+                InputManager.MoveMouseTo(chatOverlayTopBar);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(chatOverlayTopBar, new Vector2(0, -300));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+            AddStep("Store new height", () => newHeight = chatOverlay.Height);
+            AddAssert("Config height changed", () => configChatHeight.Value != 0.4f && configChatHeight.Value == newHeight);
+            AddStep("Hide overlay", () => chatOverlay.Hide());
+            AddStep("Show overlay", () => chatOverlay.Show());
+            AddAssert("Overlay uses new height", () => chatOverlay.Height == newHeight);
         }
 
         [Test]
@@ -359,6 +387,9 @@ namespace osu.Game.Tests.Visual.Online
 
         private ChatTextBox chatOverlayTextBox =>
             chatOverlay.ChildrenOfType<ChatTextBox>().Single();
+
+        private ChatOverlayTopBar chatOverlayTopBar =>
+            chatOverlay.ChildrenOfType<ChatOverlayTopBar>().Single();
 
         private void clickDrawable(Drawable d)
         {
