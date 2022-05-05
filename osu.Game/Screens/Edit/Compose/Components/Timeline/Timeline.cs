@@ -306,10 +306,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public double VisibleRange => track.Length / Zoom;
 
-        public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+        public SnapResult FindSnappedPosition(Vector2 screenSpacePosition) =>
             new SnapResult(screenSpacePosition, null);
 
-        public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) =>
+        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition) =>
             new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(screenSpacePosition))));
 
         private double getTimeFromPosition(Vector2 localPosition) =>
