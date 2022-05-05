@@ -19,7 +19,6 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    [Cached(typeof(IPositionSnapProvider))]
     [Cached]
     public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
