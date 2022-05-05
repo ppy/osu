@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 normalisedDirection = direction * new Vector2(1f / distance);
             Vector2 snappedPosition = StartPosition + normalisedDirection * radialCount * radius;
 
-            return (snappedPosition, StartTime + SnapProvider.FindSnappedDuration(ReferenceObject, (snappedPosition - StartPosition).Length));
+            return (snappedPosition, StartTime + SnapProvider.FindSnappedDuration(ReferenceObject, (float)((snappedPosition - StartPosition).Length / DistanceSpacingMultiplier.Value)));
         }
     }
 }
