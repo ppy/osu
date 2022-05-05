@@ -58,8 +58,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected readonly IBindable<long?> RoomId = new Bindable<long?>();
 
-        [Resolved]
-        private OsuGame game { get; set; }
+        [Resolved(CanBeNull = true)]
+        private IOverlayManager overlayManager { get; set; }
 
         [Resolved]
         private MusicController music { get; set; }
@@ -264,7 +264,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateWorkingBeatmap());
 
-            userModsSelectOverlayRegistration = game?.RegisterBlockingOverlay(userModsSelectOverlay);
+            userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
