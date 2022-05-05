@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
+using osu.Framework.Input;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public class TestSceneOsuDistanceSnapGrid : OsuManualInputManagerTestScene
     {
-        private const double beat_length = 100;
+        private const float beat_length = 100;
 
         private static readonly Vector2 grid_position = new Vector2(512, 384);
 
@@ -119,15 +119,27 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestCursorBeforeMovementPoint()
         {
-            AddStep("move mouse to just before movement point", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2((float)beat_length, 0) * 1.45f)));
-            assertSnappedDistance((float)beat_length);
+            AddStep("move mouse to just before movement point", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2(beat_length, 0) * 1.45f)));
+            assertSnappedDistance(beat_length);
         }
 
         [Test]
         public void TestCursorAfterMovementPoint()
         {
-            AddStep("move mouse to just after movement point", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2((float)beat_length, 0) * 1.55f)));
-            assertSnappedDistance((float)beat_length * 2);
+            AddStep("move mouse to just after movement point", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2(beat_length, 0) * 1.55f)));
+            assertSnappedDistance(beat_length * 2);
+        }
+
+        [TestCase(0.5f, beat_length * 2)]
+        [TestCase(1, beat_length * 2)]
+        [TestCase(1.5f, beat_length * 1.5f)]
+        [TestCase(2f, beat_length * 2)]
+        public void TestDistanceSpacingAdjust(float multiplier, float expectedDistance)
+        {
+            AddStep($"Set distance spacing to {multiplier}", () => snapProvider.DistanceSpacingMultiplier.Value = multiplier);
+            AddStep("move mouse to point", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2(beat_length, 0) * 2)));
+
+            assertSnappedDistance(expectedDistance);
         }
 
         [Test]
@@ -147,8 +159,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 };
             });
 
-            AddStep("move mouse outside grid", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2((float)beat_length, 0) * 3f)));
-            assertSnappedDistance((float)beat_length * 2);
+            AddStep("move mouse outside grid", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2(beat_length, 0) * 3f)));
+            assertSnappedDistance(beat_length * 2);
         }
 
         private void assertSnappedDistance(float expectedDistance) => AddAssert($"snap distance = {expectedDistance}", () =>
@@ -163,6 +175,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             public Func<Vector2, Vector2> GetSnapPosition;
 
             private readonly Drawable cursor;
+
+            private InputManager inputManager;
+
+            public override bool HandlePositionalInput => true;
 
             public SnappingCursorContainer()
             {
@@ -180,20 +196,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 base.LoadComplete();
 
-                updatePosition(GetContainingInputManager().CurrentState.Mouse.Position);
+                inputManager = GetContainingInputManager();
             }
 
-            protected override bool OnMouseMove(MouseMoveEvent e)
+            protected override void Update()
             {
-                base.OnMouseMove(e);
-
-                updatePosition(e.ScreenSpaceMousePosition);
-                return true;
-            }
-
-            private void updatePosition(Vector2 screenSpacePosition)
-            {
-                cursor.Position = GetSnapPosition.Invoke(screenSpacePosition);
+                base.Update();
+                cursor.Position = GetSnapPosition.Invoke(inputManager.CurrentState.Mouse.Position);
             }
         }
     }
