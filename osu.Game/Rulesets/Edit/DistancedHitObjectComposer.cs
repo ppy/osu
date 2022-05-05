@@ -145,10 +145,10 @@ namespace osu.Game.Rulesets.Edit
             return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
         }
 
-        public virtual double GetSnappedDurationFromDistance(HitObject referenceObject, float distance)
+        public virtual double FindSnappedDuration(HitObject referenceObject, float distance)
             => BeatSnapProvider.SnapTime(referenceObject.StartTime + DistanceToDuration(referenceObject, distance), referenceObject.StartTime) - referenceObject.StartTime;
 
-        public virtual float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance)
+        public virtual float FindSnappedDistance(HitObject referenceObject, float distance)
         {
             double startTime = referenceObject.StartTime;
 
