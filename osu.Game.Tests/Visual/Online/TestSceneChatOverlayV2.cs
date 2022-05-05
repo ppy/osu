@@ -31,22 +31,20 @@ namespace osu.Game.Tests.Visual.Online
         private ChatOverlayV2 chatOverlay;
         private ChannelManager channelManager;
 
-        private readonly APIUser testUser;
-        private readonly Channel testPMChannel;
-        private readonly Channel[] testChannels;
+        private APIUser testUser;
+        private Channel testPMChannel;
+        private Channel[] testChannels;
+
         private Channel testChannel1 => testChannels[0];
         private Channel testChannel2 => testChannels[1];
-
-        public TestSceneChatOverlayV2()
-        {
-            testUser = new APIUser { Username = "test user", Id = 5071479 };
-            testPMChannel = new Channel(testUser);
-            testChannels = Enumerable.Range(1, 10).Select(createPublicChannel).ToArray();
-        }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            testUser = new APIUser { Username = "test user", Id = 5071479 };
+            testPMChannel = new Channel(testUser);
+            testChannels = Enumerable.Range(1, 10).Select(createPublicChannel).ToArray();
+
             Child = new DependencyProvidingContainer
             {
                 RelativeSizeAxes = Axes.Both,
