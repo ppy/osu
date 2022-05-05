@@ -217,7 +217,7 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in SelectedMods.Value)
             {
                 anyCustomisableMod |= mod.GetSettingsSourceProperties().Any();
-                anyModWithRequiredCustomisationAdded |= !valueChangedEvent.OldValue.Contains(mod) && mod.RequiresConfiguration;
+                anyModWithRequiredCustomisationAdded |= valueChangedEvent.OldValue.All(m => m.GetType() != mod.GetType()) && mod.RequiresConfiguration;
             }
 
             if (anyCustomisableMod)
