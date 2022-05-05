@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Cached(typeof(IDistanceSnapProvider))]
         private readonly SnapProvider snapProvider = new SnapProvider();
 
-        private TestOsuDistanceSnapGrid grid;
+        private OsuDistanceSnapGrid grid;
 
         public TestSceneOsuDistanceSnapGrid()
         {
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.SlateGray
                 },
-                grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }),
+                grid = new OsuDistanceSnapGrid(new HitCircle { Position = grid_position }),
                 new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position }
             };
         });
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.SlateGray
                     },
-                    grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }, new HitCircle { StartTime = 200 }),
+                    grid = new OsuDistanceSnapGrid(new HitCircle { Position = grid_position }, new HitCircle { StartTime = 200 }),
                     new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position }
                 };
             });
@@ -167,16 +167,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             private void updatePosition(Vector2 screenSpacePosition)
             {
                 cursor.Position = GetSnapPosition.Invoke(screenSpacePosition);
-            }
-        }
-
-        private class TestOsuDistanceSnapGrid : OsuDistanceSnapGrid
-        {
-            public new float DistanceSpacing => base.DistanceSpacing;
-
-            public TestOsuDistanceSnapGrid(OsuHitObject hitObject, OsuHitObject nextHitObject = null)
-                : base(hitObject, nextHitObject)
-            {
             }
         }
 

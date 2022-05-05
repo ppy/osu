@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// The spacing between each tick of the beat snapping grid.
         /// </summary>
-        protected float DistanceSpacing { get; private set; }
+        protected float DistanceBetweenTick { get; private set; }
 
         /// <summary>
         /// The maximum number of distance snapping intervals allowed.
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         /// <summary>
         /// The position which the grid should start.
-        /// The first beat snapping tick is located at <see cref="StartPosition"/> + <see cref="DistanceSpacing"/> away from this point.
+        /// The first beat snapping tick is located at <see cref="StartPosition"/> + <see cref="DistanceBetweenTick"/> away from this point.
         /// </summary>
         protected readonly Vector2 StartPosition;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateSpacing()
         {
-            DistanceSpacing = (float)(SnapProvider.GetBeatSnapDistanceAt(ReferenceObject) * distanceSpacingMultiplier.Value);
+            DistanceBetweenTick = (float)(SnapProvider.GetBeatSnapDistanceAt(ReferenceObject) * distanceSpacingMultiplier.Value);
 
             if (endTime == null)
                 MaxIntervals = int.MaxValue;
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 // +1 is added since a snapped hitobject may have its start time slightly less than the snapped time due to floating point errors
                 double maxDuration = endTime.Value - StartTime + 1;
-                MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(ReferenceObject, DistanceSpacing));
+                MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(ReferenceObject, DistanceBetweenTick));
             }
 
             gridCache.Invalidate();
