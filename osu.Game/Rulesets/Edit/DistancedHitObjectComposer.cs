@@ -10,14 +10,12 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -25,7 +23,6 @@ namespace osu.Game.Rulesets.Edit
     /// Represents a <see cref="HitObjectComposer{TObject}"/> for rulesets with the concept of distances between objects.
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
-    [Cached(typeof(IDistanceSnapProvider))]
     public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider, IScrollBindingHandler<GlobalAction>
         where TObject : HitObject
     {
@@ -53,8 +50,9 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(RightSideToolboxContainer = new ExpandingToolboxContainer
+            AddInternal(RightSideToolboxContainer = new ExpandingToolboxContainer(130, 250)
             {
+                Padding = new MarginPadding { Right = 10 },
                 Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -147,10 +145,10 @@ namespace osu.Game.Rulesets.Edit
             return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
         }
 
-        public virtual double GetSnappedDurationFromDistance(HitObject referenceObject, float distance)
+        public virtual double FindSnappedDuration(HitObject referenceObject, float distance)
             => BeatSnapProvider.SnapTime(referenceObject.StartTime + DistanceToDuration(referenceObject, distance), referenceObject.StartTime) - referenceObject.StartTime;
 
-        public virtual float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance)
+        public virtual float FindSnappedDistance(HitObject referenceObject, float distance)
         {
             double startTime = referenceObject.StartTime;
 
@@ -166,20 +164,6 @@ namespace osu.Game.Rulesets.Edit
                 snappedEndTime -= beatLength;
 
             return DurationToDistance(referenceObject, snappedEndTime - startTime);
-        }
-
-        protected class ExpandingToolboxContainer : ExpandingContainer
-        {
-            protected override double HoverExpansionDelay => 250;
-
-            public ExpandingToolboxContainer()
-                : base(130, 250)
-            {
-                RelativeSizeAxes = Axes.Y;
-                Padding = new MarginPadding { Left = 10 };
-
-                FillFlow.Spacing = new Vector2(10);
-            }
         }
 
         private class DistanceSpacingToast : Toast
