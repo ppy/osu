@@ -20,7 +20,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
@@ -188,7 +187,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             if (score.NewValue == null)
                 return;
 
-            if (score.NewValue.Mods.Any(m => !m.IsPlayable(ModUsage.SoloLocal)))
+            if (score.NewValue.Mods.Any(m => !m.UserPlayable))
                 return;
 
             var hitEvents = score.NewValue.HitEvents;

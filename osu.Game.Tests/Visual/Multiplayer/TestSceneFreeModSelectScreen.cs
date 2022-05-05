@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -29,7 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("all visible mods are playable",
                 () => this.ChildrenOfType<ModPanel>()
                           .Where(panel => panel.IsPresent)
-                          .All(panel => panel.Mod.HasImplementation && panel.Mod.IsPlayable(ModUsage.SoloLocal)));
+                          .All(panel => panel.Mod.HasImplementation && panel.Mod.UserPlayable));
 
             AddToggleStep("toggle visibility", visible =>
             {
