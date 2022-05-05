@@ -162,10 +162,10 @@ namespace osu.Game.Tests.Visual.Editing
 
         private class SnapProvider : IDistanceSnapProvider
         {
-            public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+            public SnapResult FindSnappedPosition(Vector2 screenSpacePosition) =>
                 new SnapResult(screenSpacePosition, null);
 
-            public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
+            public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
 
             public IBindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1);
 
