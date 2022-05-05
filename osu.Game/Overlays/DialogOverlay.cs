@@ -50,17 +50,17 @@ namespace osu.Game.Overlays
             if (dialog == CurrentDialog || dialog.State.Value != Visibility.Visible) return;
 
             var lastDialog = CurrentDialog;
+
+            // Immediately update the externally accessible property as this may be used for checks even before
+            // a DialogOverlay instance has finished loading.
             CurrentDialog = dialog;
 
             Scheduler.Add(() =>
             {
                 // if any existing dialog is being displayed, dismiss it before showing a new one.
                 lastDialog?.Hide();
-
-                CurrentDialog = dialog;
-                CurrentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
-
-                dialogContainer.Add(CurrentDialog);
+                dialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
+                dialogContainer.Add(dialog);
 
                 Show();
             }, false);
