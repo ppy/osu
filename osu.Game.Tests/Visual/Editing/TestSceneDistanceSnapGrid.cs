@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         private class TestDistanceSnapGrid : DistanceSnapGrid
         {
-            public new float DistanceSpacing => base.DistanceSpacing;
+            public new float DistanceBetweenTick => base.DistanceBetweenTick;
 
             public TestDistanceSnapGrid(double? endTime = null)
                 : base(new HitObject(), grid_position, 0, endTime)
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 int indexFromPlacement = 0;
 
-                for (float s = StartPosition.X + DistanceSpacing; s <= DrawWidth && indexFromPlacement < MaxIntervals; s += DistanceSpacing, indexFromPlacement++)
+                for (float s = StartPosition.X + DistanceBetweenTick; s <= DrawWidth && indexFromPlacement < MaxIntervals; s += DistanceBetweenTick, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 indexFromPlacement = 0;
 
-                for (float s = StartPosition.X - DistanceSpacing; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceSpacing, indexFromPlacement++)
+                for (float s = StartPosition.X - DistanceBetweenTick; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceBetweenTick, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 indexFromPlacement = 0;
 
-                for (float s = StartPosition.Y + DistanceSpacing; s <= DrawHeight && indexFromPlacement < MaxIntervals; s += DistanceSpacing, indexFromPlacement++)
+                for (float s = StartPosition.Y + DistanceBetweenTick; s <= DrawHeight && indexFromPlacement < MaxIntervals; s += DistanceBetweenTick, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 indexFromPlacement = 0;
 
-                for (float s = StartPosition.Y - DistanceSpacing; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceSpacing, indexFromPlacement++)
+                for (float s = StartPosition.Y - DistanceBetweenTick; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceBetweenTick, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {

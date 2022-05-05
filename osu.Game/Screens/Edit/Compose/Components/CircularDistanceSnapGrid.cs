@@ -30,14 +30,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     Position = StartPosition,
                     Width = crosshair_thickness,
                     EdgeSmoothness = new Vector2(1),
-                    Height = Math.Min(crosshair_max_size, DistanceSpacing * 2),
+                    Height = Math.Min(crosshair_max_size, DistanceBetweenTick * 2),
                 },
                 new Box
                 {
                     Origin = Anchor.Centre,
                     Position = StartPosition,
                     EdgeSmoothness = new Vector2(1),
-                    Width = Math.Min(crosshair_max_size, DistanceSpacing * 2),
+                    Width = Math.Min(crosshair_max_size, DistanceBetweenTick * 2),
                     Height = crosshair_thickness,
                 }
             });
@@ -45,11 +45,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float dx = Math.Max(StartPosition.X, DrawWidth - StartPosition.X);
             float dy = Math.Max(StartPosition.Y, DrawHeight - StartPosition.Y);
             float maxDistance = new Vector2(dx, dy).Length;
-            int requiredCircles = Math.Min(MaxIntervals, (int)(maxDistance / DistanceSpacing));
+            int requiredCircles = Math.Min(MaxIntervals, (int)(maxDistance / DistanceBetweenTick));
 
             for (int i = 0; i < requiredCircles; i++)
             {
-                float radius = (i + 1) * DistanceSpacing * 2;
+                float radius = (i + 1) * DistanceBetweenTick * 2;
 
                 AddInternal(new CircularProgress
                 {
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             float distance = direction.Length;
 
-            float radius = DistanceSpacing;
+            float radius = DistanceBetweenTick;
             int radialCount = Math.Clamp((int)MathF.Round(distance / radius), 1, MaxIntervals);
 
             Vector2 normalisedDirection = direction * new Vector2(1f / distance);
