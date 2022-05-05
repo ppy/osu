@@ -43,6 +43,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected readonly double StartTime;
 
+        protected readonly double? LatestEndTime;
+
         [Resolved]
         protected OsuColour Colours { get; private set; }
 
@@ -56,7 +58,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private BindableBeatDivisor beatDivisor { get; set; }
 
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
-        private readonly double? endTime;
 
         protected readonly HitObject ReferenceObject;
 
@@ -70,7 +71,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected DistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
         {
             ReferenceObject = referenceObject;
-            this.endTime = endTime;
+            LatestEndTime = endTime;
 
             StartPosition = startPosition;
             StartTime = startTime;
@@ -94,12 +95,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             DistanceBetweenTick = (float)(SnapProvider.GetBeatSnapDistanceAt(ReferenceObject) * DistanceSpacingMultiplier.Value);
 
-            if (endTime == null)
+            if (LatestEndTime == null)
                 MaxIntervals = int.MaxValue;
             else
             {
                 // +1 is added since a snapped hitobject may have its start time slightly less than the snapped time due to floating point errors
-                double maxDuration = endTime.Value - StartTime + 1;
+                double maxDuration = LatestEndTime.Value - StartTime + 1;
                 MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(ReferenceObject, DistanceBetweenTick));
             }
 
