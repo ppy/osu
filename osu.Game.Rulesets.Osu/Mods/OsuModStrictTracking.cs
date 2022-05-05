@@ -70,11 +70,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             drawableRuleset.Playfield.RegisterPool<StrictTrackingSliderTailCircle, StrictTrackingDrawableSliderTail>(10, 100);
         }
 
-        private class StrictTrackingSliderTick : SliderTick
-        {
-            public override Judgement CreateJudgement() => new OsuIgnoreJudgement();
-        }
-
         private class StrictTrackingSliderTailCircle : SliderTailCircle
         {
             public StrictTrackingSliderTailCircle(Slider slider)
@@ -115,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     switch (e.Type)
                     {
                         case SliderEventType.Tick:
-                            AddNested(new StrictTrackingSliderTick
+                            AddNested(new SliderTick
                             {
                                 SpanIndex = e.SpanIndex,
                                 SpanStartTime = e.SpanStartTime,
