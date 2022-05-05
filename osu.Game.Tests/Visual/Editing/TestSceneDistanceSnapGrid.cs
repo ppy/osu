@@ -175,9 +175,9 @@ namespace osu.Game.Tests.Visual.Editing
 
             public double DistanceToDuration(HitObject referenceObject, float distance) => distance;
 
-            public double GetSnappedDurationFromDistance(HitObject referenceObject, float distance) => 0;
+            public double FindSnappedDuration(HitObject referenceObject, float distance) => 0;
 
-            public float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance) => 0;
+            public float FindSnappedDistance(HitObject referenceObject, float distance) => 0;
         }
     }
 }
