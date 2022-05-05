@@ -56,9 +56,9 @@ namespace osu.Game.Rulesets.Mania.Edit
         protected override Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) =>
             Playfield.GetColumnByPosition(screenSpacePosition);
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
-            var result = base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
+            var result = base.FindSnappedPositionAndTime(screenSpacePosition);
 
             switch (ScrollingInfo.Direction.Value)
             {
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             }
             else
             {
-                var result = SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
+                var result = FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position);
                 if (result.Time is double time)
                     beatSnapGrid.SelectionTimeRange = (time, time);
                 else
