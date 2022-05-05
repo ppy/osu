@@ -85,6 +85,9 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
+            // Required for the pop in/out animation
+            RelativePositionAxes = Axes.Both;
+
             Children = new Drawable[]
             {
                 topBar = new ChatOverlayTopBar
