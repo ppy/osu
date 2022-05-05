@@ -82,6 +82,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep($"set beat divisor = {divisor}", () => beatDivisor.Value = divisor);
         }
 
+        [TestCase(1.0f)]
+        [TestCase(2.0f)]
+        [TestCase(0.5f)]
+        public void TestDistanceSpacing(float multiplier)
+        {
+            AddStep($"set beat divisor = {multiplier}", () => snapProvider.DistanceSpacingMultiplier.Value = multiplier);
+        }
+
         [Test]
         public void TestCursorInCentre()
         {
@@ -177,7 +185,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
 
-            public IBindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1);
+            public Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1);
+
+            IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
 
             public float GetBeatSnapDistanceAt(HitObject referenceObject) => (float)beat_length;
 
