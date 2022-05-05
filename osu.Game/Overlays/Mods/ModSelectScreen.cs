@@ -20,6 +20,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Input;
 
@@ -43,6 +44,15 @@ namespace osu.Game.Overlays.Mods
                     updateAvailableMods();
             }
         }
+
+        /// <summary>
+        /// Hotkey that should be used to hide the mod select screen.
+        /// </summary>
+        /// <remarks>
+        /// This is handled locally here rather than via <see cref="FooterButtonMods"/>, because this overlay is being registered at the game level
+        /// and therefore takes away keyboard focus from the screen stack.
+        /// </remarks>
+        internal GlobalAction? Hotkey { get; set; }
 
         /// <summary>
         /// Whether configurable <see cref="Mod"/>s can be configured by the local user.
@@ -321,9 +331,20 @@ namespace osu.Game.Overlays.Mods
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (e.Action == GlobalAction.Back && customisationVisible.Value)
             {
                 customisationVisible.Value = false;
+                return true;
+            }
+
+            if (e.Action == Hotkey)
+            {
+                if (customisationVisible.Value)
+                    customisationVisible.Value = false;
+                Hide();
                 return true;
             }
 
