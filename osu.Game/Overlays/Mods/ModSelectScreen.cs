@@ -18,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Input;
@@ -217,7 +218,7 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in SelectedMods.Value)
             {
                 anyCustomisableMod |= mod.GetSettingsSourceProperties().Any();
-                anyModWithRequiredCustomisationAdded |= !valueChangedEvent.OldValue.Contains(mod) && mod.RequiresConfiguration;
+                anyModWithRequiredCustomisationAdded |= valueChangedEvent.OldValue.All(m => m.GetType() != mod.GetType()) && mod.RequiresConfiguration;
             }
 
             if (anyCustomisableMod)
@@ -313,6 +314,17 @@ namespace osu.Game.Overlays.Mods
                       .MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint)
                       .FadeOut(fade_out_duration, Easing.OutQuint);
             }
+        }
+
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Action == GlobalAction.Back && customisationVisible.Value)
+            {
+                customisationVisible.Value = false;
+                return true;
+            }
+
+            return base.OnPressed(e);
         }
 
         internal class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
