@@ -309,7 +309,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            endHandlingTrack();
+            onLeaving();
             base.OnSuspending(e);
         }
 
@@ -327,7 +327,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             RoomManager?.PartRoom();
             Mods.Value = Array.Empty<Mod>();
 
-            endHandlingTrack();
+            onLeaving();
 
             return base.OnExiting(e);
         }
@@ -421,6 +421,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private void beginHandlingTrack()
         {
             Beatmap.BindValueChanged(applyLoopingToTrack, true);
+        }
+
+        private void onLeaving()
+        {
+            userModsSelectOverlay.Hide();
+            endHandlingTrack();
         }
 
         private void endHandlingTrack()

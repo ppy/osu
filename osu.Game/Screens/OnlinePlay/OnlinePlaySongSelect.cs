@@ -155,6 +155,8 @@ namespace osu.Game.Screens.OnlinePlay
                 Mods.Value = initialMods;
             }
 
+            freeModSelectOverlay.Hide();
+
             return base.OnExiting(e);
         }
 
