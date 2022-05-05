@@ -361,7 +361,7 @@ namespace osu.Game.Rulesets.Edit
         /// <returns>The most relevant <see cref="Playfield"/>.</returns>
         protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             double? targetTime = null;
@@ -414,9 +414,9 @@ namespace osu.Game.Rulesets.Edit
 
         #region IPositionSnapProvider
 
-        public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
+        public abstract SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition);
 
-        public virtual SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+        public virtual SnapResult FindSnappedPosition(Vector2 screenSpacePosition) =>
             new SnapResult(screenSpacePosition, null);
 
         #endregion
