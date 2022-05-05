@@ -11,7 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics.Containers;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osuTK;
 
@@ -25,14 +26,19 @@ namespace osu.Game.Overlays.Chat
 
         public event Action<string>? OnSearchTermsChanged;
 
+        public void TextBoxTakeFocus() => chatTextBox.TakeFocus();
+
+        public void TextBoxKillFocus() => chatTextBox.KillFocus();
+
         [Resolved]
         private Bindable<Channel> currentChannel { get; set; } = null!;
 
-        private OsuTextFlowContainer chattingTextContainer = null!;
+        private Container chattingTextContainer = null!;
+        private OsuSpriteText chattingText = null!;
         private Container searchIconContainer = null!;
         private ChatTextBox chatTextBox = null!;
 
-        private const float chatting_text_width = 180;
+        private const float chatting_text_width = 240;
         private const float search_icon_width = 40;
 
         [BackgroundDependencyLoader]
@@ -61,16 +67,20 @@ namespace osu.Game.Overlays.Chat
                     {
                         new Drawable[]
                         {
-                            chattingTextContainer = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 20))
+                            chattingTextContainer = new Container
                             {
-                                Masking = true,
-                                Width = chatting_text_width,
-                                Padding = new MarginPadding { Left = 10 },
                                 RelativeSizeAxes = Axes.Y,
-                                TextAnchor = Anchor.CentreRight,
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Colour = colourProvider.Background1,
+                                Width = chatting_text_width,
+                                Masking = true,
+                                Padding = new MarginPadding { Right = 5 },
+                                Child = chattingText = new OsuSpriteText
+                                {
+                                    Font = OsuFont.Torus.With(size: 20),
+                                    Colour = colourProvider.Background1,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    Truncate = true,
+                                },
                             },
                             searchIconContainer = new Container
                             {
@@ -131,15 +141,15 @@ namespace osu.Game.Overlays.Chat
                 switch (newChannel?.Type)
                 {
                     case ChannelType.Public:
-                        chattingTextContainer.Text = $"chatting in {newChannel.Name}";
+                        chattingText.Text = $"chatting in {newChannel.Name}";
                         break;
 
                     case ChannelType.PM:
-                        chattingTextContainer.Text = $"chatting with {newChannel.Name}";
+                        chattingText.Text = $"chatting with {newChannel.Name}";
                         break;
 
                     default:
-                        chattingTextContainer.Text = string.Empty;
+                        chattingText.Text = string.Empty;
                         break;
                 }
             }, true);
