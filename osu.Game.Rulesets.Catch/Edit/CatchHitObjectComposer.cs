@@ -89,9 +89,9 @@ namespace osu.Game.Rulesets.Catch.Edit
             new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
         });
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
-            var result = base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
+            var result = base.FindSnappedPositionAndTime(screenSpacePosition);
             result.ScreenSpacePosition.X = screenSpacePosition.X;
 
             if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
