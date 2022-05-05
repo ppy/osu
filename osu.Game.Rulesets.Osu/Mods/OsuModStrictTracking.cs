@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using System.Threading;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -23,9 +22,8 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => @"Strict Tracking";
         public override string Acronym => @"ST";
-        public override IconUsage? Icon => FontAwesome.Solid.PenFancy;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => @"Follow circles just got serious...";
+        public override string Description => @"Once you start a slider, follow precisely or get a miss.";
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModClassic), typeof(OsuModTarget) };
 

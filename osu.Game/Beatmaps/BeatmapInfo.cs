@@ -109,7 +109,7 @@ namespace osu.Game.Beatmaps
 
         public bool SamplesMatchPlaybackRate { get; set; } = true;
 
-        public double DistanceSpacing { get; set; }
+        public double DistanceSpacing { get; set; } = 1.0;
 
         public int BeatDivisor { get; set; }
 

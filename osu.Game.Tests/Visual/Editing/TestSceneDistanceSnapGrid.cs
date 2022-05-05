@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
@@ -25,7 +26,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Cached(typeof(EditorBeatmap))]
         private readonly EditorBeatmap editorBeatmap;
 
-        [Cached(typeof(IPositionSnapProvider))]
+        [Cached(typeof(IDistanceSnapProvider))]
         private readonly SnapProvider snapProvider = new SnapProvider();
 
         public TestSceneDistanceSnapGrid()
@@ -159,12 +160,14 @@ namespace osu.Game.Tests.Visual.Editing
                 => (Vector2.Zero, 0);
         }
 
-        private class SnapProvider : IPositionSnapProvider
+        private class SnapProvider : IDistanceSnapProvider
         {
-            public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+            public SnapResult FindSnappedPosition(Vector2 screenSpacePosition) =>
                 new SnapResult(screenSpacePosition, null);
 
-            public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
+            public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
+
+            public IBindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1);
 
             public float GetBeatSnapDistanceAt(HitObject referenceObject) => 10;
 

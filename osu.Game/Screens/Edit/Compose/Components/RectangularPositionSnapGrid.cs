@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -72,33 +75,47 @@ namespace osu.Game.Screens.Edit.Compose.Components
             int index = 0;
             float currentPosition = startPosition;
 
-            while ((endPosition - currentPosition) * Math.Sign(step) > 0)
+            // Make lines the same width independent of display resolution.
+            float lineWidth = DrawWidth / ScreenSpaceDrawQuad.Width;
+
+            List<Box> generatedLines = new List<Box>();
+
+            while (Precision.AlmostBigger((endPosition - currentPosition) * Math.Sign(step), 0))
             {
                 var gridLine = new Box
                 {
                     Colour = Colour4.White,
-                    Alpha = index == 0 ? 0.3f : 0.1f,
-                    EdgeSmoothness = new Vector2(0.2f)
+                    Alpha = 0.1f,
                 };
 
                 if (direction == Direction.Horizontal)
                 {
+                    gridLine.Origin = Anchor.CentreLeft;
                     gridLine.RelativeSizeAxes = Axes.X;
-                    gridLine.Height = 1;
+                    gridLine.Height = lineWidth;
                     gridLine.Y = currentPosition;
                 }
                 else
                 {
+                    gridLine.Origin = Anchor.TopCentre;
                     gridLine.RelativeSizeAxes = Axes.Y;
-                    gridLine.Width = 1;
+                    gridLine.Width = lineWidth;
                     gridLine.X = currentPosition;
                 }
 
-                AddInternal(gridLine);
+                generatedLines.Add(gridLine);
 
                 index += 1;
                 currentPosition = startPosition + index * step;
             }
+
+            if (generatedLines.Count == 0)
+                return;
+
+            generatedLines.First().Alpha = 0.3f;
+            generatedLines.Last().Alpha = 0.3f;
+
+            AddRangeInternal(generatedLines);
         }
 
         public Vector2 GetSnappedPosition(Vector2 original)

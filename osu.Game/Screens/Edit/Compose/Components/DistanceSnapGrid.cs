@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -44,13 +45,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected OsuColour Colours { get; private set; }
 
         [Resolved]
-        protected IPositionSnapProvider SnapProvider { get; private set; }
+        protected IDistanceSnapProvider SnapProvider { get; private set; }
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
+
+        private IBindable<double> distanceSpacingMultiplier;
 
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
         private readonly double? endTime;
@@ -81,12 +84,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            beatDivisor.BindValueChanged(_ => updateSpacing(), true);
+            beatDivisor.BindValueChanged(_ => updateSpacing());
+
+            distanceSpacingMultiplier = SnapProvider.DistanceSpacingMultiplier.GetBoundCopy();
+            distanceSpacingMultiplier.BindValueChanged(_ => updateSpacing(), true);
         }
 
         private void updateSpacing()
         {
-            DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject);
+            DistanceSpacing = (float)(SnapProvider.GetBeatSnapDistanceAt(ReferenceObject) * distanceSpacingMultiplier.Value);
 
             if (endTime == null)
                 MaxIntervals = int.MaxValue;
