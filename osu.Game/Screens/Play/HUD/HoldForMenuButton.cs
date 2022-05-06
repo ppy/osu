@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play.HUD
 
             private void bind()
             {
-                circularProgress.Current.BindTo(Progress);
+                ((IBindable<double>)circularProgress.Current).BindTo(Progress);
                 Progress.ValueChanged += progress => icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
             }
 
