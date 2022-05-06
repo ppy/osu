@@ -178,7 +178,6 @@ namespace osu.Game.Screens.Play.HUD
 
                     if (IsDangerousAction)
                     {
-                        //Child.Scale = new Vector2(1 + (float)progress.NewValue);
                         Colour = Interpolation.ValueAt(progress.NewValue, Color4.White, Color4.Red, 0, 1, Easing.OutQuint);
 
                         if (progress.NewValue > 0 && progress.NewValue < 1)
