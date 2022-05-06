@@ -13,12 +13,10 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
-using osu.Game.Overlays.Dialog;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -29,20 +27,11 @@ namespace osu.Game.Screens.Play.HUD
 
         public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
-        private readonly Button button;
+        private Button button;
 
-        public Action Action
-        {
-            set => button.Action = value;
-        }
+        public Action Action { get; set; }
 
-        private readonly OsuSpriteText text;
-
-        [Resolved]
-        private OsuConfigManager config { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private Player player { get; set; }
+        private OsuSpriteText text;
 
         private readonly Bindable<double> activationDelay = new Bindable<double>();
 
@@ -51,6 +40,11 @@ namespace osu.Game.Screens.Play.HUD
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(20, 0);
             Margin = new MarginPadding(10);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(Player player)
+        {
             Children = new Drawable[]
             {
                 text = new OsuSpriteText
@@ -59,11 +53,12 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
-                button = new Button
+                button = new Button(player?.Configuration.AllowRestart == false)
                 {
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
                     HoverLost = () => text.FadeOut(500, Easing.OutQuint),
-                    IsPaused = { BindTarget = IsPaused }
+                    IsPaused = { BindTarget = IsPaused },
+                    Action = () => Action(),
                 }
             };
             AutoSizeAxes = Axes.Both;
@@ -71,13 +66,6 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void LoadComplete()
         {
-            if (player?.Configuration.AllowRestart == false)
-            {
-                activationDelay.Value = PopupDialogDangerousButton.DANGEROUS_HOLD_ACTIVATION_DELAY;
-            }
-            else
-                config.BindWith(OsuSetting.UIHoldActivationDelay, activationDelay);
-
             activationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
@@ -125,10 +113,10 @@ namespace osu.Game.Screens.Play.HUD
             public Action HoverGained;
             public Action HoverLost;
 
-            [Resolved(canBeNull: true)]
-            private Player player { get; set; }
-
-            protected override double? HoldActivationDelay => player?.Configuration.AllowRestart == false ? PopupDialogDangerousButton.DANGEROUS_HOLD_ACTIVATION_DELAY : (double?)null;
+            public Button(bool isDangerousAction)
+                : base(isDangerousAction)
+            {
+            }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
