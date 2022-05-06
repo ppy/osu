@@ -399,7 +399,7 @@ namespace osu.Game.Overlays.Mods
 
         private readonly Queue<Action> pendingSelectionOperations = new Queue<Action>();
 
-        protected bool SelectionAnimationRunning => pendingSelectionOperations.Count > 0;
+        internal bool SelectionAnimationRunning => pendingSelectionOperations.Count > 0;
 
         protected override void Update()
         {
