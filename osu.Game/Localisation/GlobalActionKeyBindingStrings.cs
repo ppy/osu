@@ -130,6 +130,16 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectNext => new TranslatableString(getKey(@"select_next"), @"Next selection");
 
         /// <summary>
+        /// "Select previous group"
+        /// </summary>
+        public static LocalisableString SelectPreviousGroup => new TranslatableString(getKey(@"select_previous_group"), @"Select previous group");
+
+        /// <summary>
+        /// "Select next group"
+        /// </summary>
+        public static LocalisableString SelectNextGroup => new TranslatableString(getKey(@"select_next_group"), @"Select next group");
+
+        /// <summary>
         /// "Home"
         /// </summary>
         public static LocalisableString Home => new TranslatableString(getKey(@"home"), @"Home");
@@ -238,6 +248,16 @@ namespace osu.Game.Localisation
         /// "Flip selection vertically"
         /// </summary>
         public static LocalisableString EditorFlipVertically => new TranslatableString(getKey(@"editor_flip_vertically"), @"Flip selection vertically");
+
+        /// <summary>
+        /// "Increase distance spacing"
+        /// </summary>
+        public static LocalisableString EditorIncreaseDistanceSpacing => new TranslatableString(getKey(@"editor_increase_distance_spacing"), @"Increase distance spacing");
+
+        /// <summary>
+        /// "Decrease distance spacing"
+        /// </summary>
+        public static LocalisableString EditorDecreaseDistanceSpacing => new TranslatableString(getKey(@"editor_decrease_distance_spacing"), @"Decrease distance spacing");
 
         /// <summary>
         /// "Toggle skin editor"

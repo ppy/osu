@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => @"AL";
         public override string Description => @"Don't use the same key twice in a row!";
         public override double ScoreMultiplier => 1.0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax) };
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
 
