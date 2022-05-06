@@ -34,7 +34,6 @@ namespace osu.Game.Overlays
         private readonly Cached headerTextVisibilityCache = new Cached();
 
         private readonly FillFlowContainer content;
-        private readonly IconButton button;
 
         public BindableBool Expanded { get; } = new BindableBool(true);
 
@@ -87,7 +86,7 @@ namespace osu.Game.Overlays
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Padding = new MarginPadding { Left = 10, Right = 30 },
                                 },
-                                button = new IconButton
+                                new IconButton
                                 {
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.CentreRight,
