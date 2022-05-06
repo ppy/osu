@@ -39,9 +39,9 @@ namespace osu.Game.Overlays
 
         public BindableBool Expanded { get; } = new BindableBool(true);
 
-        private Color4 expandedColour;
-
         private readonly OsuSpriteText headerText;
+
+        private readonly Container headerContent;
 
         /// <summary>
         /// Create a new instance.
@@ -71,7 +71,7 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new Container
+                        headerContent = new Container
                         {
                             Name = @"Header",
                             Origin = Anchor.TopCentre,
@@ -115,12 +115,6 @@ namespace osu.Game.Overlays
                     }
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            expandedColour = colours.Yellow;
         }
 
         protected override void LoadComplete()
@@ -172,7 +166,7 @@ namespace osu.Game.Overlays
                 content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
             }
 
-            button.FadeColour(expanded.NewValue ? expandedColour : Color4.White, 200, Easing.InOutQuint);
+            headerContent.FadeColour(expanded.NewValue ? Color4.White : OsuColour.Gray(0.5f), 200, Easing.OutQuint);
         }
 
         private void updateFadeState()
