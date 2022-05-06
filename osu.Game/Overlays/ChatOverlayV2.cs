@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays
         private LoadingLayer loading = null!;
         private ChannelListing channelListing = null!;
         private ChatTextBar textBar = null!;
-        private Container<DrawableChannel> currentChannelContainer = null!;
+        private Container<ChatOverlayDrawableChannel> currentChannelContainer = null!;
 
         private readonly BindableFloat chatHeight = new BindableFloat();
 
@@ -120,7 +121,7 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.Both,
                             Colour = colourProvider.Background4,
                         },
-                        currentChannelContainer = new Container<DrawableChannel>
+                        currentChannelContainer = new Container<ChatOverlayDrawableChannel>
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
@@ -268,7 +269,7 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            LoadComponentAsync(new DrawableChannel(newChannel), loaded =>
+            LoadComponentAsync(new ChatOverlayDrawableChannel(newChannel), loaded =>
             {
                 currentChannelContainer.Clear();
                 currentChannelContainer.Add(loaded);
@@ -310,5 +311,31 @@ namespace osu.Game.Overlays
             else
                 channelManager.PostMessage(message);
         }
+    }
+
+    public class ChatOverlayDrawableChannel : DrawableChannel
+    {
+        private Colour4 daySepTextColour;
+        private Colour4 daySepLineColour;
+
+        public ChatOverlayDrawableChannel(Channel channel)
+            : base(channel)
+        { }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            ChatLineFlow.Padding = new MarginPadding(0);
+            daySepTextColour = colourProvider.Content1;
+            daySepLineColour = colourProvider.Background5;
+        }
+
+        protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
+        {
+            TextColour = daySepTextColour,
+            LineColour = daySepLineColour,
+            Margin = new MarginPadding { Vertical = 10 },
+            Padding = new MarginPadding { Horizontal = 15 },
+        };
     }
 }

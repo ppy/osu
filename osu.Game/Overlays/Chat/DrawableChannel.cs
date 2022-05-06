@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -123,8 +124,9 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
         {
+            TextColour = colours.ChatBlue.Lighten(0.7f),
+            LineColour = colours.ChatBlue.Lighten(0.7f),
             Margin = new MarginPadding { Vertical = 10 },
-            Colour = colours.ChatBlue.Lighten(0.7f),
         };
 
         private void newMessagesArrived(IEnumerable<Message> newMessages) => Schedule(() =>
@@ -212,12 +214,26 @@ namespace osu.Game.Overlays.Chat
                 set => text.Font = text.Font.With(size: value);
             }
 
+            public ColourInfo TextColour
+            {
+                get => text.Colour;
+                set => text.Colour = value;
+            }
+
             private float lineHeight = 2;
 
             public float LineHeight
             {
                 get => lineHeight;
                 set => lineHeight = leftBox.Height = rightBox.Height = value;
+            }
+
+            private ColourInfo lineColour;
+
+            public ColourInfo LineColour
+            {
+                get => lineColour;
+                set => lineColour = leftBox.Colour = rightBox.Colour = value;
             }
 
             private readonly SpriteText text;
