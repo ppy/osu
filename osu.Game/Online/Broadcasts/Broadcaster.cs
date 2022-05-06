@@ -137,13 +137,25 @@ namespace osu.Game.Online.Broadcasts
             public void Start()
             {
                 OnStart?.Invoke(this, EventArgs.Empty);
-                Task.Factory.StartNew(() => handle(cts.Token), cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                Task.WhenAll(send(cts.Token), receive(cts.Token));
             }
 
             public void Send(string message)
                 => queue.Enqueue(message);
 
-            private async Task handle(CancellationToken token)
+            private async Task send(CancellationToken token)
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    if (socket.State == WebSocketState.Closed || socket.State == WebSocketState.Aborted)
+                        break;
+
+                    if (socket.State == WebSocketState.Open && queue.TryDequeue(out string message))
+                        await socket.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, token).ConfigureAwait(false);
+                }
+            }
+
+            private async Task receive(CancellationToken token)
             {
                 while (!token.IsCancellationRequested)
                 {
@@ -160,9 +172,6 @@ namespace osu.Game.Online.Broadcasts
                         dispose();
                         break;
                     }
-
-                    if (socket.State == WebSocketState.Open && queue.TryDequeue(out string message))
-                        await socket.SendAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, token).ConfigureAwait(false);
                 }
             }
 
