@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return (snappedPosition, snappedTime);
         }
 
-        public class Ring : CircularProgress
+        private class Ring : CircularProgress
         {
             [Resolved]
             private IDistanceSnapProvider snapProvider { get; set; }
