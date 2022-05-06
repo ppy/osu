@@ -95,6 +95,7 @@ namespace osu.Game.Overlays.Mods
                     Padding = new MarginPadding
                     {
                         Top = (ShowTotalMultiplier ? DifficultyMultiplierDisplay.HEIGHT : 0) + PADDING,
+                        Bottom = PADDING
                     },
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
