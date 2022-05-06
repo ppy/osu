@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             AddStep("move mouse outside grid", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2(beat_length, 0) * 3f)));
-            assertSnappedDistance(beat_length * 2);
+            assertSnappedDistance(beat_length);
         }
 
         private void assertSnappedDistance(float expectedDistance) => AddAssert($"snap distance = {expectedDistance}", () =>
