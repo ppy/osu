@@ -10,13 +10,11 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Online.WebSockets
 {
-    [Cached]
-    public abstract class WebSocketClient : CompositeDrawable
+    public abstract class WebSocketServer : CompositeDrawable
     {
         /// <summary>
         /// Whether this is current listening.
@@ -24,7 +22,7 @@ namespace osu.Game.Online.WebSockets
         public bool IsListening => listener?.IsListening ?? false;
 
         /// <summary>
-        /// Gets the number of connections this client currently has.
+        /// Gets the number of connections this server currently has.
         /// </summary>
         public int Connected => connections.Count;
 
@@ -47,7 +45,7 @@ namespace osu.Game.Online.WebSockets
         private readonly List<WebSocketConnection> connections = new List<WebSocketConnection>();
 
         /// <summary>
-        /// Starts the websocket client to listen for incoming connections.
+        /// Starts the websocket server to listen for incoming connections.
         /// </summary>
         public void Start()
         {
@@ -64,7 +62,7 @@ namespace osu.Game.Online.WebSockets
         }
 
         /// <summary>
-        /// Closes the websocket client and stops listenning for incoming connections.
+        /// Closes the websocket server and stops listening for incoming connections.
         /// </summary>
         public void Close()
         {
@@ -158,7 +156,7 @@ namespace osu.Game.Online.WebSockets
         /// Called when a websocket connection has been closed on request.
         /// </summary>
         /// <param name="connection">The websocket connection that closed.</param>
-        /// <param name="requested">Whether this client initiated the close or not.</param>
+        /// <param name="requested">Whether this server initiated the close or not.</param>
         protected virtual void OnConnectionClose(WebSocketConnection connection, bool requested)
         {
         }
@@ -228,9 +226,9 @@ namespace osu.Game.Online.WebSockets
             private bool hasStarted;
             private Task processTask;
             private readonly WebSocket socket;
-            private readonly IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent();
-            private readonly ConcurrentQueue<Message> queue = new ConcurrentQueue<Message>();
+            private readonly IMemoryOwner<byte> buffer = MemoryPool<byte>.Shared.Rent();
             private readonly CancellationTokenSource cts = new CancellationTokenSource();
+            private readonly ConcurrentQueue<Message> queue = new ConcurrentQueue<Message>();
 
             public WebSocketConnection(WebSocket socket)
             {
@@ -279,7 +277,7 @@ namespace osu.Game.Online.WebSockets
                     if (socket.State == WebSocketState.Closed || socket.State == WebSocketState.Aborted)
                         break;
 
-                    var msg = await socket.ReceiveAsync(owner.Memory, token).ConfigureAwait(false);
+                    var msg = await socket.ReceiveAsync(buffer.Memory, token).ConfigureAwait(false);
 
                     if (msg.MessageType == WebSocketMessageType.Close)
                     {
@@ -288,7 +286,7 @@ namespace osu.Game.Online.WebSockets
                     }
                     else
                     {
-                        OnMessage?.Invoke(this, new Message(owner.Memory.Slice(0, msg.Count), msg.MessageType));
+                        OnMessage?.Invoke(this, new Message(buffer.Memory.Slice(0, msg.Count), msg.MessageType));
                     }
                 }
             }
@@ -315,17 +313,17 @@ namespace osu.Game.Online.WebSockets
                 await processTask;
 
                 cts.Dispose();
-                owner.Dispose();
+                buffer.Dispose();
                 socket.Dispose();
 
                 isDisposed = true;
             }
         }
 
-        protected struct Message
+        protected readonly struct Message
         {
-            public ReadOnlyMemory<byte> Content { get; }
-            public WebSocketMessageType Type { get; }
+            public readonly ReadOnlyMemory<byte> Content;
+            public readonly WebSocketMessageType Type;
 
             public Message(ReadOnlyMemory<byte> content, WebSocketMessageType type)
             {

@@ -12,16 +12,16 @@ using osu.Game.Online.WebSockets;
 namespace osu.Game.Tests.Online
 {
     [TestFixture]
-    public class TestSceneWebSocketClient
+    public class TestWebSocketServer
     {
         private ClientWebSocket client;
-        private TestWebSocketClient server;
+        private ServerWebSocket server;
 
         [SetUp]
         public void SetUp()
         {
             client = new ClientWebSocket();
-            server = new TestWebSocketClient();
+            server = new ServerWebSocket();
 
             server.Start();
             client.ConnectAsync(new Uri("ws://localhost:7270/test/"), CancellationToken.None).WaitSafely();
@@ -62,6 +62,7 @@ namespace osu.Game.Tests.Online
             Assert.IsTrue(server.Connected > 0);
             client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).WaitSafely();
             Thread.Sleep(1000);
+            Assert.IsTrue(server.RemoteInitiatedDisconnect);
             Assert.IsTrue(server.Connected == 0);
         }
 
@@ -71,17 +72,24 @@ namespace osu.Game.Tests.Online
             Assert.IsTrue(server.Connected > 0);
             server.Close();
             Thread.Sleep(1000);
+            Assert.IsFalse(server.RemoteInitiatedDisconnect);
             Assert.IsTrue(server.Connected == 0);
         }
 
-        private class TestWebSocketClient : WebSocketClient
+        private class ServerWebSocket : WebSocketServer
         {
             public override string Endpoint => @"test";
+            public bool RemoteInitiatedDisconnect { get; private set; }
             public string LastMessageReceived { get; private set; }
 
             protected override void OnConnectionMessage(WebSocketConnection connection, Message message)
             {
                 LastMessageReceived = Encoding.UTF8.GetString(message.Content.Span);
+            }
+
+            protected override void OnConnectionClose(WebSocketConnection connection, bool requested)
+            {
+                RemoteInitiatedDisconnect = !requested;
             }
         }
     }
