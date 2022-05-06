@@ -10,6 +10,16 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Containers
 {
+    /// <summary>
+    /// A container which adds a common "hold-to-perform" pattern to a container.
+    /// </summary>
+    /// <remarks>
+    /// This container does not handle triggering the hold/abort operations.
+    /// To use this class, please call <see cref="BeginConfirm"/> and <see cref="AbortConfirm"/> when necessary.
+    ///
+    /// The <see cref="Progress"/> is exposed as a transforming bindable which smoothly tracks the progress of a hold operation.
+    /// It can be used for animating and displaying progress directly.
+    /// </remarks>
     public abstract class HoldToConfirmContainer : Container
     {
         public const double DANGEROUS_HOLD_ACTIVATION_DELAY = 500;
@@ -70,6 +80,12 @@ namespace osu.Game.Graphics.Containers
                 config.BindWith(OsuSetting.UIHoldActivationDelay, holdActivationDelay);
         }
 
+        /// <summary>
+        /// Begin a new confirmation. Should be called when the container is interacted with (ie. the user presses a key).
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when already in the process of confirming has no effect.
+        /// </remarks>
         protected void BeginConfirm()
         {
             if (confirming || (!AllowMultipleFires && Fired)) return;
@@ -79,12 +95,9 @@ namespace osu.Game.Graphics.Containers
             this.TransformBindableTo(progress, 1, holdActivationDelay.Value * (1 - progress.Value), Easing.Out).OnComplete(_ => Confirm());
         }
 
-        protected virtual void Confirm()
-        {
-            Action?.Invoke();
-            Fired = true;
-        }
-
+        /// <summary>
+        /// Abort any ongoing confirmation. Should be called when the container's interaction is no longer valid (ie. the user releases a key).
+        /// </summary>
         protected void AbortConfirm()
         {
             if (!AllowMultipleFires && Fired) return;
@@ -96,6 +109,16 @@ namespace osu.Game.Graphics.Containers
                 .TransformBindableTo(progress, progress.Value)
                 .Delay(200)
                 .TransformBindableTo(progress, 0, fadeout_delay, Easing.InSine);
+        }
+
+        /// <summary>
+        /// A method which is invoked when the confirmation sequence completes successfully.
+        /// By default, will fire the associated <see cref="Action"/>.
+        /// </summary>
+        protected virtual void Confirm()
+        {
+            Action?.Invoke();
+            Fired = true;
         }
     }
 }
