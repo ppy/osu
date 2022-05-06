@@ -22,6 +22,11 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 {
                     LabelText = OnlineSettingsStrings.DiscordRichPresence,
                     Current = config.GetBindable<DiscordRichPresenceMode>(OsuSetting.DiscordRichPresence)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Broadcast game state",
+                    Current = config.GetBindable<bool>(OsuSetting.BroadcastGameState),
                 }
             };
         }

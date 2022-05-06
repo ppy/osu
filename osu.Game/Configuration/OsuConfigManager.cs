@@ -162,6 +162,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
             SetDefault(OsuSetting.EditorHitAnimations, false);
+            SetDefault(OsuSetting.BroadcastGameState, false);
         }
 
         public OsuConfigManager(Storage storage)
@@ -344,5 +345,6 @@ namespace osu.Game.Configuration
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
+        BroadcastGameState,
     }
 }
