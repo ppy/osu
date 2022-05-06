@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 float distanceForCurrentTime = snapProvider.DurationToDistance(referenceObject, editorClock.CurrentTime - referenceObject.GetEndTime());
-                float timeBasedAlpha = Math.Clamp(1 - Math.Abs(distanceForCurrentTime - Size.X / 2) / 30, 0, 1);
+                float timeBasedAlpha = 1 - Math.Clamp(Math.Abs(distanceForCurrentTime - Size.X / 2) / 30, 0, 1);
 
                 Colour = baseColour.Opacity(Math.Max(baseColour.A, timeBasedAlpha));
             }
