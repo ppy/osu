@@ -12,6 +12,13 @@ namespace osu.Game.Graphics.Containers
 {
     public abstract class HoldToConfirmContainer : Container
     {
+        public const double DANGEROUS_HOLD_ACTIVATION_DELAY = 500;
+
+        /// <summary>
+        /// Whether the associated action is considered dangerous, warranting a longer hold.
+        /// </summary>
+        public bool IsDangerousAction { get; }
+
         public Action Action;
 
         private const int fadeout_delay = 200;
@@ -29,12 +36,9 @@ namespace osu.Game.Graphics.Containers
         protected virtual bool AllowMultipleFires => false;
 
         /// <summary>
-        /// Specify a custom activation delay, overriding the game-wide user setting.
+        /// The current activation delay for this control.
         /// </summary>
-        /// <remarks>
-        /// This should be used in special cases where we want to be extra sure the user knows what they are doing. An example is when changes would be lost.
-        /// </remarks>
-        protected virtual double? HoldActivationDelay => null;
+        protected IBindable<double> HoldActivationDelay => holdActivationDelay;
 
         public Bindable<double> Progress = new BindableDouble();
 
@@ -43,13 +47,25 @@ namespace osu.Game.Graphics.Containers
         [Resolved]
         private OsuConfigManager config { get; set; }
 
+        protected HoldToConfirmContainer(bool isDangerousAction = false)
+        {
+            IsDangerousAction = isDangerousAction;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            holdActivationDelay = HoldActivationDelay != null
-                ? new Bindable<double>(HoldActivationDelay.Value)
-                : config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
+            if (IsDangerousAction)
+            {
+                holdActivationDelay.Value = DANGEROUS_HOLD_ACTIVATION_DELAY;
+            }
+            else
+            {
+                holdActivationDelay = HoldActivationDelay != null
+                    ? new Bindable<double>(HoldActivationDelay.Value)
+                    : config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
+            }
         }
 
         protected void BeginConfirm()
