@@ -49,15 +49,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             for (int i = 0; i < requiredCircles; i++)
             {
-                float radius = (i + 1) * DistanceBetweenTicks * 2;
+                float diameter = (i + 1) * DistanceBetweenTicks * 2;
 
                 AddInternal(new CircularProgress
                 {
                     Origin = Anchor.Centre,
                     Position = StartPosition,
                     Current = { Value = 1 },
-                    Size = new Vector2(radius),
-                    InnerRadius = 4 * 1f / radius,
+                    Size = new Vector2(diameter),
+                    InnerRadius = 4 * 1f / diameter,
                     Colour = GetColourForIndexFromPlacement(i)
                 });
             }
