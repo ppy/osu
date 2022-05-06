@@ -30,14 +30,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     Position = StartPosition,
                     Width = crosshair_thickness,
                     EdgeSmoothness = new Vector2(1),
-                    Height = Math.Min(crosshair_max_size, DistanceBetweenTick * 2),
+                    Height = Math.Min(crosshair_max_size, DistanceBetweenTicks * 2),
                 },
                 new Box
                 {
                     Origin = Anchor.Centre,
                     Position = StartPosition,
                     EdgeSmoothness = new Vector2(1),
-                    Width = Math.Min(crosshair_max_size, DistanceBetweenTick * 2),
+                    Width = Math.Min(crosshair_max_size, DistanceBetweenTicks * 2),
                     Height = crosshair_thickness,
                 }
             });
@@ -45,11 +45,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float dx = Math.Max(StartPosition.X, DrawWidth - StartPosition.X);
             float dy = Math.Max(StartPosition.Y, DrawHeight - StartPosition.Y);
             float maxDistance = new Vector2(dx, dy).Length;
-            int requiredCircles = Math.Min(MaxIntervals, (int)(maxDistance / DistanceBetweenTick));
+            int requiredCircles = Math.Min(MaxIntervals, (int)(maxDistance / DistanceBetweenTicks));
 
             for (int i = 0; i < requiredCircles; i++)
             {
-                float radius = (i + 1) * DistanceBetweenTick * 2;
+                float radius = (i + 1) * DistanceBetweenTicks * 2;
 
                 AddInternal(new CircularProgress
                 {
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float travelLength = travelVector.Length;
 
             // FindSnappedDistance will always round down, but we want to potentially round upwards.
-            travelLength += DistanceBetweenTick / 2;
+            travelLength += DistanceBetweenTicks / 2;
 
             // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
             // to allow for snapping at a non-multiplied ratio.
