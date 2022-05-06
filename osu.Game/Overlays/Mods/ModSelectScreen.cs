@@ -145,13 +145,18 @@ namespace osu.Game.Overlays.Mods
                 });
             }
 
+            FooterContent.Padding = new MarginPadding
+            {
+                Vertical = PADDING,
+                Horizontal = 70
+            };
+
             if (AllowCustomisation)
             {
-                Footer.Add(new ShearedToggleButton(200)
+                FooterContent.Add(new ShearedToggleButton(200)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Margin = new MarginPadding { Vertical = PADDING, Left = 70 },
                     Text = "Mod Customisation",
                     Active = { BindTarget = customisationVisible }
                 });
