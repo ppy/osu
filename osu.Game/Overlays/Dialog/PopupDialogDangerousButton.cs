@@ -42,7 +42,10 @@ namespace osu.Game.Overlays.Dialog
 
         private class DangerousConfirmContainer : HoldToConfirmContainer
         {
-            protected override double? HoldActivationDelay => 500;
+            public DangerousConfirmContainer()
+                : base(isDangerousAction: true)
+            {
+            }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
