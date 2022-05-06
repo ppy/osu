@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected IDistanceSnapProvider SnapProvider { get; private set; }
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        protected EditorBeatmap Beatmap { get; private set; }
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
@@ -93,16 +93,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateSpacing()
         {
-            DistanceBetweenTicks = (float)(SnapProvider.GetBeatSnapDistanceAt(ReferenceObject) * DistanceSpacingMultiplier.Value);
+            float distanceSpacingMultiplier = (float)DistanceSpacingMultiplier.Value;
+            float beatSnapDistance = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject);
+
+            DistanceBetweenTicks = beatSnapDistance * distanceSpacingMultiplier;
 
             if (LatestEndTime == null)
                 MaxIntervals = int.MaxValue;
             else
-            {
-                // +1 is added since a snapped hitobject may have its start time slightly less than the snapped time due to floating point errors
-                double maxDuration = LatestEndTime.Value - StartTime + 1;
-                MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(ReferenceObject, DistanceBetweenTicks));
-            }
+                MaxIntervals = (int)((LatestEndTime.Value - StartTime) / SnapProvider.DistanceToDuration(ReferenceObject, beatSnapDistance));
 
             gridCache.Invalidate();
         }
@@ -138,7 +137,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>The applicable colour.</returns>
         protected ColourInfo GetColourForIndexFromPlacement(int placementIndex)
         {
-            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(StartTime);
+            var timingPoint = Beatmap.ControlPointInfo.TimingPointAt(StartTime);
             double beatLength = timingPoint.BeatLength / beatDivisor.Value;
             int beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / beatLength);
 
