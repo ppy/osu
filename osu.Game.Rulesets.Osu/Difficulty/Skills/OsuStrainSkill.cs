@@ -38,7 +38,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double difficulty = 0;
             double weight = 1;
 
-            List<double> strains = GetCurrentStrainPeaks().OrderByDescending(d => d).ToList();
+            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+            // These sections will not contribute to the difficulty.
+            var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
+
+            List<double> strains = peaks.OrderByDescending(d => d).ToList();
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)

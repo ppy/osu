@@ -129,7 +129,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = Header.HEIGHT,
-                            Child = searchTextBox = new SearchTextBox
+                            Child = searchTextBox = new BasicSearchTextBox
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
