@@ -56,6 +56,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
         }
 
         [Test]
@@ -72,6 +75,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertDeleteButtonVisibility(0, true);
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
             AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
         }
 
@@ -90,6 +96,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             moveToItem(0);
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
             AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
         }
 
@@ -145,6 +154,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("item 1 is selected", () => playlist.SelectedItem.Value == playlist.Items[1]);
+        }
+
+        [Test]
+        public void TestKeyboardSelection()
+        {
+            createPlaylist(p => p.AllowSelection = true);
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("item 0 is selected", () => playlist.SelectedItem.Value == playlist.Items[0]);
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("item 1 is selected", () => playlist.SelectedItem.Value == playlist.Items[1]);
+
+            AddStep("press up", () => InputManager.Key(Key.Up));
+            AddAssert("item 0 is selected", () => playlist.SelectedItem.Value == playlist.Items[0]);
+
+            AddUntilStep("navigate to last item via keyboard", () =>
+            {
+                InputManager.Key(Key.Down);
+                return playlist.SelectedItem.Value == playlist.Items.Last();
+            });
+            AddAssert("last item is selected", () => playlist.SelectedItem.Value == playlist.Items.Last());
+            AddUntilStep("last item is scrolled into view", () =>
+            {
+                var drawableItem = playlist.ItemMap[playlist.Items.Last()];
+                return playlist.ScreenSpaceDrawQuad.Contains(drawableItem.ScreenSpaceDrawQuad.TopLeft)
+                       && playlist.ScreenSpaceDrawQuad.Contains(drawableItem.ScreenSpaceDrawQuad.BottomRight);
+            });
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("last item is selected", () => playlist.SelectedItem.Value == playlist.Items.Last());
+
+            AddStep("press up", () => InputManager.Key(Key.Up));
+            AddAssert("second last item is selected", () => playlist.SelectedItem.Value == playlist.Items.Reverse().ElementAt(1));
         }
 
         [Test]
