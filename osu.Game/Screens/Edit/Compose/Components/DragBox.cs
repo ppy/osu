@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     ? DrawWidth / ScreenSpaceDrawQuad.Width * 2
                     : DrawHeight / ScreenSpaceDrawQuad.Height * 2;
 
-                Padding = new MarginPadding(-lineThickness);
+                Padding = new MarginPadding(-lineThickness / 2);
 
                 InternalChildren = new Drawable[]
                 {
