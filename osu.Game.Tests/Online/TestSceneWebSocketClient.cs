@@ -77,12 +77,11 @@ namespace osu.Game.Tests.Online
         private class TestWebSocketClient : WebSocketClient
         {
             public override string Endpoint => @"test";
-
             public string LastMessageReceived { get; private set; }
 
-            protected override void OnConnectionMessage(WebSocketConnection connection, string message)
+            protected override void OnConnectionMessage(WebSocketConnection connection, Message message)
             {
-                LastMessageReceived = message;
+                LastMessageReceived = Encoding.UTF8.GetString(message.Content.Span);
             }
         }
     }
