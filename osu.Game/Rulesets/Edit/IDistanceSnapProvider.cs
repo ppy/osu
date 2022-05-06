@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Edit
     {
         /// <summary>
         /// A multiplier which changes the ratio of distance travelled per time unit.
+        /// Importantly, this is provided for manual usage, and not multiplied into any of the methods exposed by this interface.
         /// </summary>
         /// <seealso cref="BeatmapInfo.DistanceSpacing"/>
         IBindable<double> DistanceSpacingMultiplier { get; }
