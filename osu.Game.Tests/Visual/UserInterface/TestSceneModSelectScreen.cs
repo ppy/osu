@@ -164,11 +164,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
             assertCustomisationToggleState(disabled: false, active: true);
 
-            AddStep("dismiss mod customisation", () =>
+            AddStep("dismiss mod customisation via mouse", () =>
             {
                 InputManager.MoveMouseTo(modSelectScreen.ChildrenOfType<ShearedToggleButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
+            assertCustomisationToggleState(disabled: false, active: false);
+
+            AddStep("reset mods", () => SelectedMods.SetDefault());
+            AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            assertCustomisationToggleState(disabled: false, active: true);
+
+            AddStep("dismiss mod customisation via keyboard", () => InputManager.Key(Key.Escape));
+            assertCustomisationToggleState(disabled: false, active: false);
 
             AddStep("append another mod not requiring config", () => SelectedMods.Value = SelectedMods.Value.Append(new OsuModFlashlight()).ToArray());
             assertCustomisationToggleState(disabled: false, active: false);
