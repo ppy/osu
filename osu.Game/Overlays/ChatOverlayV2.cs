@@ -320,7 +320,8 @@ namespace osu.Game.Overlays
 
         public ChatOverlayDrawableChannel(Channel channel)
             : base(channel)
-        { }
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
