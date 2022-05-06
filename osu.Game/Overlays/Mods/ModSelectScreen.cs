@@ -48,16 +48,25 @@ namespace osu.Game.Overlays.Mods
         }
 
         /// <summary>
-        /// Whether configurable <see cref="Mod"/>s can be configured by the local user.
-        /// </summary>
-        protected virtual bool AllowCustomisation => true;
-
-        /// <summary>
         /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
         /// </summary>
         protected virtual bool ShowTotalMultiplier => true;
 
         protected virtual ModColumn CreateModColumn(ModType modType, Key[]? toggleKeys = null) => new ModColumn(modType, false, toggleKeys);
+
+        protected virtual Drawable[] CreateFooterButtons() => new Drawable[]
+        {
+            customisationButton = new ShearedToggleButton(200)
+            {
+                Text = "Mod Customisation",
+                Active = { BindTarget = customisationVisible }
+            },
+            new ShearedButton(200)
+            {
+                Text = "Deselect All",
+                Action = DeselectAll
+            }
+        };
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
@@ -65,6 +74,7 @@ namespace osu.Game.Overlays.Mods
         private ModSettingsArea modSettingsArea = null!;
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
+        private ShearedToggleButton? customisationButton;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -146,22 +156,21 @@ namespace osu.Game.Overlays.Mods
                 });
             }
 
-            FooterContent.Padding = new MarginPadding
+            FooterContent.Child = new FillFlowContainer
             {
-                Vertical = PADDING,
-                Horizontal = 70
-            };
-
-            if (AllowCustomisation)
-            {
-                FooterContent.Add(new ShearedToggleButton(200)
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Horizontal,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                Padding = new MarginPadding
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Text = "Mod Customisation",
-                    Active = { BindTarget = customisationVisible }
-                });
-            }
+                    Vertical = PADDING,
+                    Horizontal = 70
+                },
+                Spacing = new Vector2(10),
+                Children = CreateFooterButtons()
+            };
         }
 
         private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
@@ -216,7 +225,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
         {
-            if (!AllowCustomisation)
+            if (customisationButton == null)
                 return;
 
             bool anyCustomisableMod = false;
@@ -323,6 +332,18 @@ namespace osu.Game.Overlays.Mods
                       .MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint)
                       .FadeOut(fade_out_duration, Easing.OutQuint);
             }
+        }
+
+        protected void SelectAll()
+        {
+            foreach (var column in columnFlow.Columns)
+                column.SelectAll();
+        }
+
+        protected void DeselectAll()
+        {
+            foreach (var column in columnFlow.Columns)
+                column.DeselectAll();
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
