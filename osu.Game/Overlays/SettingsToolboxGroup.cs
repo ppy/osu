@@ -117,32 +117,17 @@ namespace osu.Game.Overlays
             };
         }
 
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            if (invalidation.HasFlagFast(Invalidation.DrawSize))
-                headerTextVisibilityCache.Invalidate();
-
-            return base.OnInvalidate(invalidation, source);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!headerTextVisibilityCache.IsValid)
-                // These toolbox grouped may be contracted to only show icons.
-                // For now, let's hide the header to avoid text truncation weirdness in such cases.
-                headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
+            expandedColour = colours.Yellow;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Expanded.BindValueChanged(v =>
-            {
-                Scheduler.AddOnce(updateExpandedState);
-            }, true);
+            Expanded.BindValueChanged(updateExpandedState, true);
 
             this.Delay(600).Schedule(updateFadeState);
         }
@@ -159,15 +144,27 @@ namespace osu.Game.Overlays
             base.OnHoverLost(e);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        protected override void Update()
         {
-            expandedColour = colours.Yellow;
+            base.Update();
+
+            if (!headerTextVisibilityCache.IsValid)
+                // These toolbox grouped may be contracted to only show icons.
+                // For now, let's hide the header to avoid text truncation weirdness in such cases.
+                headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
         }
 
-        private void updateExpandedState()
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            if (Expanded.Value)
+            if (invalidation.HasFlagFast(Invalidation.DrawSize))
+                headerTextVisibilityCache.Invalidate();
+
+            return base.OnInvalidate(invalidation, source);
+        }
+
+        private void updateExpandedState(ValueChangedEvent<bool> expanded)
+        {
+            if (expanded.NewValue)
                 content.AutoSizeAxes = Axes.Y;
             else
             {
@@ -175,7 +172,7 @@ namespace osu.Game.Overlays
                 content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
             }
 
-            button.FadeColour(Expanded.Value ? expandedColour : Color4.White, 200, Easing.InOutQuint);
+            button.FadeColour(expanded.NewValue ? expandedColour : Color4.White, 200, Easing.InOutQuint);
         }
 
         private void updateFadeState()
