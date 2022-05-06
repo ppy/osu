@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Mods
             set
             {
                 filter = value;
-                updateFilter();
+                updateState();
             }
         }
 
@@ -292,9 +292,7 @@ namespace osu.Game.Overlays.Mods
             {
                 panelFlow.ChildrenEnumerable = loaded;
 
-                updateActiveState();
-                updateToggleAllState();
-                updateFilter();
+                updateState();
 
                 foreach (var panel in panelFlow)
                 {
@@ -308,10 +306,19 @@ namespace osu.Game.Overlays.Mods
             });
         }
 
-        private void updateActiveState()
+        private void updateState()
         {
             foreach (var panel in panelFlow)
+            {
                 panel.Active.Value = SelectedMods.Contains(panel.Mod);
+                panel.ApplyFilter(Filter);
+            }
+
+            if (toggleAllCheckbox != null && !SelectionAnimationRunning)
+            {
+                toggleAllCheckbox.Alpha = panelFlow.Any(panel => !panel.Filtered.Value) ? 1 : 0;
+                toggleAllCheckbox.Current.Value = panelFlow.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
+            }
         }
 
         /// <summary>
@@ -323,13 +330,12 @@ namespace osu.Game.Overlays.Mods
 
         private void panelStateChanged(ModPanel panel)
         {
-            updateToggleAllState();
-
             var newSelectedMods = panel.Active.Value
                 ? SelectedMods.Append(panel.Mod)
                 : SelectedMods.Except(panel.Mod.Yield());
 
             SelectedMods = newSelectedMods.ToArray();
+            updateState();
             if (!externalSelectionUpdateInProgress)
                 SelectionChangedByUser?.Invoke();
         }
@@ -364,7 +370,7 @@ namespace osu.Game.Overlays.Mods
             }
 
             SelectedMods = newSelection;
-            updateActiveState();
+            updateState();
 
             externalSelectionUpdateInProgress = false;
         }
@@ -400,15 +406,6 @@ namespace osu.Game.Overlays.Mods
                     // this will cause the next action to be immediately performed.
                     selectionDelay = initial_multiple_selection_delay;
                 }
-            }
-        }
-
-        private void updateToggleAllState()
-        {
-            if (toggleAllCheckbox != null && !SelectionAnimationRunning)
-            {
-                toggleAllCheckbox.Alpha = panelFlow.Any(panel => !panel.Filtered.Value) ? 1 : 0;
-                toggleAllCheckbox.Current.Value = panelFlow.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
             }
         }
 
@@ -503,18 +500,6 @@ namespace osu.Game.Overlays.Mods
                 else
                     column.DeselectAll();
             }
-        }
-
-        #endregion
-
-        #region Filtering support
-
-        private void updateFilter()
-        {
-            foreach (var modPanel in panelFlow)
-                modPanel.ApplyFilter(Filter);
-
-            updateToggleAllState();
         }
 
         #endregion
