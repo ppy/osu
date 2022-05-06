@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [TestCase(0.5f)]
         public void TestDistanceSpacing(float multiplier)
         {
-            AddStep($"set beat divisor = {multiplier}", () => snapProvider.DistanceSpacingMultiplier.Value = multiplier);
+            AddStep($"set distance spacing = {multiplier}", () => snapProvider.DistanceSpacingMultiplier.Value = multiplier);
         }
 
         [Test]
