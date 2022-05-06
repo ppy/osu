@@ -330,14 +330,16 @@ namespace osu.Game.Overlays.Mods
 
         private void panelStateChanged(ModPanel panel)
         {
+            if (externalSelectionUpdateInProgress)
+                return;
+
             var newSelectedMods = panel.Active.Value
                 ? SelectedMods.Append(panel.Mod)
                 : SelectedMods.Except(panel.Mod.Yield());
 
             SelectedMods = newSelectedMods.ToArray();
             updateState();
-            if (!externalSelectionUpdateInProgress)
-                SelectionChangedByUser?.Invoke();
+            SelectionChangedByUser?.Invoke();
         }
 
         /// <summary>
