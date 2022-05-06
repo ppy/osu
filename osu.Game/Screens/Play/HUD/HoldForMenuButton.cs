@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private OsuSpriteText text;
 
-        private readonly Bindable<double> activationDelay = new Bindable<double>();
-
         public HoldForMenuButton()
         {
             Direction = FillDirection.Horizontal;
@@ -68,7 +66,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void LoadComplete()
         {
-            activationDelay.BindValueChanged(v =>
+            button.HoldActivationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
                     ? "hold for menu"
