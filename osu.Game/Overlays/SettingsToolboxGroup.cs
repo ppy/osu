@@ -141,10 +141,6 @@ namespace osu.Game.Overlays
 
             Expanded.BindValueChanged(v =>
             {
-                // clearing transforms can break autosizing, see: https://github.com/ppy/osu-framework/issues/5064
-                if (v.NewValue != v.OldValue)
-                    content.ClearTransforms();
-
                 Scheduler.AddOnce(updateExpandedState);
             }, true);
 
