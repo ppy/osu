@@ -275,35 +275,48 @@ namespace osu.Game.Overlays.Mods
                 return;
 
             localAvailableMods = newMods;
-            loadPanels();
+
+            if (!IsLoaded)
+                // if we're coming from BDL, perform the first load synchronously to make sure everything is in place as early as possible.
+                onPanelsLoaded(createPanels());
+            else
+                asyncLoadPanels();
         }
 
         private CancellationTokenSource? cancellationTokenSource;
 
-        private void loadPanels()
+        private void asyncLoadPanels()
         {
             cancellationTokenSource?.Cancel();
 
-            var panels = localAvailableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)));
+            var panels = createPanels();
 
             Task? loadTask;
 
-            latestLoadTask = loadTask = LoadComponentsAsync(panels, loaded =>
-            {
-                panelFlow.ChildrenEnumerable = loaded;
-
-                updateState();
-
-                foreach (var panel in panelFlow)
-                {
-                    panel.Active.BindValueChanged(_ => panelStateChanged(panel));
-                }
-            }, (cancellationTokenSource = new CancellationTokenSource()).Token);
+            latestLoadTask = loadTask = LoadComponentsAsync(panels, onPanelsLoaded, (cancellationTokenSource = new CancellationTokenSource()).Token);
             loadTask.ContinueWith(_ =>
             {
                 if (loadTask == latestLoadTask)
                     latestLoadTask = null;
             });
+        }
+
+        private IEnumerable<ModPanel> createPanels()
+        {
+            var panels = localAvailableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)));
+            return panels;
+        }
+
+        private void onPanelsLoaded(IEnumerable<ModPanel> loaded)
+        {
+            panelFlow.ChildrenEnumerable = loaded;
+
+            updateState();
+
+            foreach (var panel in panelFlow)
+            {
+                panel.Active.BindValueChanged(_ => panelStateChanged(panel));
+            }
         }
 
         private void updateState()
