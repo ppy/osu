@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Mods
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             Header.Title = ModSelectScreenStrings.ModSelectTitle;
             Header.Description = ModSelectScreenStrings.ModSelectDescription;
@@ -171,7 +171,13 @@ namespace osu.Game.Overlays.Mods
                     Horizontal = 70
                 },
                 Spacing = new Vector2(10),
-                ChildrenEnumerable = CreateFooterButtons()
+                ChildrenEnumerable = CreateFooterButtons().Prepend(new ShearedButton(200)
+                {
+                    Text = CommonStrings.Back,
+                    Action = Hide,
+                    DarkerColour = colours.Pink2,
+                    LighterColour = colours.Pink1
+                })
             };
         }
 
