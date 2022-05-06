@@ -18,6 +18,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -164,11 +165,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
             assertCustomisationToggleState(disabled: false, active: true);
 
-            AddStep("dismiss mod customisation", () =>
+            AddStep("dismiss mod customisation via toggle", () =>
             {
                 InputManager.MoveMouseTo(modSelectScreen.ChildrenOfType<ShearedToggleButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
+            assertCustomisationToggleState(disabled: false, active: false);
+
+            AddStep("reset mods", () => SelectedMods.SetDefault());
+            AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            assertCustomisationToggleState(disabled: false, active: true);
+
+            AddStep("dismiss mod customisation via keyboard", () => InputManager.Key(Key.Escape));
+            assertCustomisationToggleState(disabled: false, active: false);
 
             AddStep("append another mod not requiring config", () => SelectedMods.Value = SelectedMods.Value.Append(new OsuModFlashlight()).ToArray());
             assertCustomisationToggleState(disabled: false, active: false);
@@ -181,6 +190,29 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("select mod without configuration", () => SelectedMods.Value = new[] { new OsuModAutoplay() });
             assertCustomisationToggleState(disabled: true, active: false); // config was dismissed without explicit user action.
+        }
+
+        [Test]
+        public void TestDismissCustomisationViaDimmedArea()
+        {
+            createScreen();
+            assertCustomisationToggleState(disabled: true, active: false);
+
+            AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            assertCustomisationToggleState(disabled: false, active: true);
+
+            AddStep("move mouse to settings area", () => InputManager.MoveMouseTo(this.ChildrenOfType<ModSettingsArea>().Single()));
+            AddStep("move mouse to dimmed area", () =>
+            {
+                InputManager.MoveMouseTo(new Vector2(
+                    modSelectScreen.ScreenSpaceDrawQuad.TopLeft.X,
+                    (modSelectScreen.ScreenSpaceDrawQuad.TopLeft.Y + modSelectScreen.ScreenSpaceDrawQuad.BottomLeft.Y) / 2));
+            });
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            assertCustomisationToggleState(disabled: false, active: false);
+
+            AddStep("move mouse to first mod panel", () => InputManager.MoveMouseTo(modSelectScreen.ChildrenOfType<ModPanel>().First()));
+            AddAssert("first mod panel is hovered", () => modSelectScreen.ChildrenOfType<ModPanel>().First().IsHovered);
         }
 
         /// <summary>
