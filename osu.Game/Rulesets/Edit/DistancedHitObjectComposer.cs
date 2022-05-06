@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Edit
     public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider, IScrollBindingHandler<GlobalAction>
         where TObject : HitObject
     {
-        protected Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
+        public Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
         {
             MinValue = 0.1,
             MaxValue = 6.0,
