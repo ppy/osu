@@ -275,7 +275,7 @@ namespace osu.Game.Overlays.Mods
                 return;
 
             localAvailableMods = newMods;
-            Scheduler.AddOnce(loadPanels);
+            loadPanels();
         }
 
         private CancellationTokenSource? cancellationTokenSource;
