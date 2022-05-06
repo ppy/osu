@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
@@ -25,7 +24,7 @@ namespace osu.Game.Rulesets.Edit
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) && anyToolboxHovered(screenSpacePos);
 
-        private bool anyToolboxHovered(Vector2 screenSpacePos) => FillFlow.Children.Any(d => d.ScreenSpaceDrawQuad.Contains(screenSpacePos));
+        private bool anyToolboxHovered(Vector2 screenSpacePos) => FillFlow.ScreenSpaceDrawQuad.Contains(screenSpacePos);
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
 
