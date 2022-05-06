@@ -25,11 +25,11 @@ namespace osu.Game.Overlays.Chat.Listing
         public event Action<Channel>? OnRequestJoin;
         public event Action<Channel>? OnRequestLeave;
 
-        public bool FilteringActive { get; set; }
-        public IEnumerable<string> FilterTerms => new[] { channel.Name, channel.Topic ?? string.Empty };
-        public bool MatchingFilter { set => this.FadeTo(value ? 1f : 0f, 100); }
+        public readonly Channel Channel;
 
-        private readonly Channel channel;
+        public bool FilteringActive { get; set; }
+        public IEnumerable<string> FilterTerms => new[] { Channel.Name, Channel.Topic ?? string.Empty };
+        public bool MatchingFilter { set => this.FadeTo(value ? 1f : 0f, 100); }
 
         private Box hoverBox = null!;
         private SpriteIcon checkbox = null!;
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Chat.Listing
 
         public ChannelListingItem(Channel channel)
         {
-            this.channel = channel;
+            Channel = channel;
         }
 
         [BackgroundDependencyLoader]
@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Chat.Listing
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = channel.Name,
+                                Text = Channel.Name,
                                 Font = OsuFont.Torus.With(size: text_size, weight: FontWeight.SemiBold),
                                 Margin = new MarginPadding { Bottom = 2 },
                             },
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Chat.Listing
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = channel.Topic,
+                                Text = Channel.Topic,
                                 Font = OsuFont.Torus.With(size: text_size),
                                 Margin = new MarginPadding { Bottom = 2 },
                             },
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.Chat.Listing
         {
             base.LoadComplete();
 
-            channelJoined = channel.Joined.GetBoundCopy();
+            channelJoined = Channel.Joined.GetBoundCopy();
             channelJoined.BindValueChanged(change =>
             {
                 const double duration = 500;
@@ -155,7 +155,7 @@ namespace osu.Game.Overlays.Chat.Listing
                 }
             }, true);
 
-            Action = () => (channelJoined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(channel);
+            Action = () => (channelJoined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(Channel);
         }
 
         protected override bool OnHover(HoverEvent e)
