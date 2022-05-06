@@ -89,7 +89,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (snappedTime > LatestEndTime)
             {
-                snappedDistance = SnapProvider.DurationToDistance(ReferenceObject, LatestEndTime.Value - ReferenceObject.StartTime);
+                snappedDistance = SnapProvider.DurationToDistance(ReferenceObject, LatestEndTime.Value - ReferenceObject.GetEndTime());
+                snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
             }
 
             // The multiplier can then be reapplied to the final position.
