@@ -454,6 +454,8 @@ namespace osu.Game.Overlays.Mods
                 FinishTransforms();
             }
 
+            protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || Column.SelectionAnimationRunning;
+
             private void updateDim()
             {
                 Colour4 targetColour;
