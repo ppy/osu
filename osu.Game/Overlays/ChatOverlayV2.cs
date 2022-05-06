@@ -39,7 +39,7 @@ namespace osu.Game.Overlays
         private ChatTextBar textBar = null!;
         private Container<DrawableChannel> currentChannelContainer = null!;
 
-        private readonly Bindable<float> chatHeight = new Bindable<float>();
+        private readonly BindableFloat chatHeight = new BindableFloat();
 
         private bool isDraggingTopBar;
         private float dragStartChatHeight;
