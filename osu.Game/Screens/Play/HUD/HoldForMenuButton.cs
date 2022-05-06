@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
-        private Button button;
+        private HoldButton button;
 
         public Action Action { get; set; }
 
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
-                button = new Button(player?.Configuration.AllowRestart == false)
+                button = new HoldButton(player?.Configuration.AllowRestart == false)
                 {
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
                     HoverLost = () => text.FadeOut(500, Easing.OutQuint),
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private class Button : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
+        private class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
         {
             private SpriteIcon icon;
             private CircularProgress circularProgress;
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Play.HUD
             public Action HoverGained;
             public Action HoverLost;
 
-            public Button(bool isDangerousAction)
+            public HoldButton(bool isDangerousAction)
                 : base(isDangerousAction)
             {
             }
