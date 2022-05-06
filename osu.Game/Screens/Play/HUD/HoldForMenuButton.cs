@@ -12,12 +12,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -113,6 +115,11 @@ namespace osu.Game.Screens.Play.HUD
             public Action HoverGained;
             public Action HoverLost;
 
+            private const double shake_duration = 20;
+
+            private bool pendingAnimation;
+            private ScheduledDelegate shakeOperation;
+
             public HoldButton(bool isDangerousAction)
                 : base(isDangerousAction)
             {
@@ -165,10 +172,38 @@ namespace osu.Game.Screens.Play.HUD
             private void bind()
             {
                 ((IBindable<double>)circularProgress.Current).BindTo(Progress);
-                Progress.ValueChanged += progress => icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
+                Progress.ValueChanged += progress =>
+                {
+                    icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
+
+                    if (IsDangerousAction)
+                    {
+                        //Child.Scale = new Vector2(1 + (float)progress.NewValue);
+                        Colour = Interpolation.ValueAt(progress.NewValue, Color4.White, Color4.Red, 0, 1, Easing.OutQuint);
+
+                        if (progress.NewValue > 0 && progress.NewValue < 1)
+                        {
+                            shakeOperation ??= Scheduler.AddDelayed(shake, shake_duration, true);
+                        }
+                        else
+                        {
+                            Child.MoveTo(Vector2.Zero, shake_duration * 2, Easing.OutQuint);
+                            shakeOperation?.Cancel();
+                            shakeOperation = null;
+                        }
+                    }
+                };
             }
 
-            private bool pendingAnimation;
+            private void shake()
+            {
+                const float shake_magnitude = 8;
+
+                Child.MoveTo(new Vector2(
+                    RNG.NextSingle(-1, 1) * (float)Progress.Value * shake_magnitude,
+                    RNG.NextSingle(-1, 1) * (float)Progress.Value * shake_magnitude
+                ), shake_duration);
+            }
 
             protected override void Confirm()
             {
