@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestDistanceSpacing(double multiplier)
         {
             AddStep($"set distance spacing = {multiplier}", () => snapProvider.DistanceSpacingMultiplier.Value = multiplier);
-            AddAssert("distance spacing matches multiplier", () => grid.DistanceBetweenTick == beat_snap_distance * multiplier);
+            AddAssert("distance spacing matches multiplier", () => grid.DistanceBetweenTicks == beat_snap_distance * multiplier);
         }
 
         [TestCase(1.0)]
@@ -103,12 +103,12 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddStep($"set distance spacing = {multiplier}", () => snapProvider.DistanceSpacingMultiplier.Value = multiplier);
-            AddAssert("check correct interval count", () => grid.MaxIntervals == (end_time / grid.DistanceBetweenTick));
+            AddAssert("check correct interval count", () => grid.MaxIntervals == (end_time / grid.DistanceBetweenTicks));
         }
 
         private class TestDistanceSnapGrid : DistanceSnapGrid
         {
-            public new float DistanceBetweenTick => base.DistanceBetweenTick;
+            public new float DistanceBetweenTicks => base.DistanceBetweenTicks;
 
             public new int MaxIntervals => base.MaxIntervals;
 
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 int indexFromPlacement = 0;
 
-                for (float s = StartPosition.X + DistanceBetweenTick; s <= DrawWidth && indexFromPlacement < MaxIntervals; s += DistanceBetweenTick, indexFromPlacement++)
+                for (float s = StartPosition.X + DistanceBetweenTicks; s <= DrawWidth && indexFromPlacement < MaxIntervals; s += DistanceBetweenTicks, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 indexFromPlacement = 0;
 
-                for (float s = StartPosition.X - DistanceBetweenTick; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceBetweenTick, indexFromPlacement++)
+                for (float s = StartPosition.X - DistanceBetweenTicks; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceBetweenTicks, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
@@ -154,7 +154,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 indexFromPlacement = 0;
 
-                for (float s = StartPosition.Y + DistanceBetweenTick; s <= DrawHeight && indexFromPlacement < MaxIntervals; s += DistanceBetweenTick, indexFromPlacement++)
+                for (float s = StartPosition.Y + DistanceBetweenTicks; s <= DrawHeight && indexFromPlacement < MaxIntervals; s += DistanceBetweenTicks, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 indexFromPlacement = 0;
 
-                for (float s = StartPosition.Y - DistanceBetweenTick; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceBetweenTick, indexFromPlacement++)
+                for (float s = StartPosition.Y - DistanceBetweenTicks; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceBetweenTicks, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
