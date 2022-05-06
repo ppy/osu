@@ -464,6 +464,8 @@ namespace osu.Game.Overlays.Mods
 
             public Action? OnClicked { get; set; }
 
+            public override bool HandlePositionalInput => base.HandlePositionalInput && HandleMouse.Value;
+
             protected override bool Handle(UIEvent e)
             {
                 if (!HandleMouse.Value)
