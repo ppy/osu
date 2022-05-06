@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual ModColumn CreateModColumn(ModType modType, Key[]? toggleKeys = null) => new ModColumn(modType, false, toggleKeys);
 
-        protected virtual Drawable[] CreateFooterButtons() => new Drawable[]
+        protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => new[]
         {
             customisationButton = new ShearedToggleButton(200)
             {
@@ -75,6 +75,7 @@ namespace osu.Game.Overlays.Mods
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
         private ShearedToggleButton? customisationButton;
+        private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -156,7 +157,7 @@ namespace osu.Game.Overlays.Mods
                 });
             }
 
-            FooterContent.Child = new FillFlowContainer
+            FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -169,7 +170,7 @@ namespace osu.Game.Overlays.Mods
                     Horizontal = 70
                 },
                 Spacing = new Vector2(10),
-                Children = CreateFooterButtons()
+                ChildrenEnumerable = CreateFooterButtons()
             };
         }
 
@@ -258,6 +259,12 @@ namespace osu.Game.Overlays.Mods
             const double transition_duration = 300;
 
             MainAreaContent.FadeColour(customisationVisible.Value ? Colour4.Gray : Colour4.White, transition_duration, Easing.InOutCubic);
+
+            foreach (var button in footerButtonFlow)
+            {
+                if (button != customisationButton)
+                    button.Enabled.Value = !customisationVisible.Value;
+            }
 
             float modAreaHeight = customisationVisible.Value ? ModSettingsArea.HEIGHT : 0;
 
