@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // This grid implementation factors in the user's distance spacing specification,
             // which is usually not considered by an `IDistanceSnapProvider`.
-            float distanceSpacing = (float)DistanceSpacingMultiplier.Value;
+            float distanceSpacingMultiplier = (float)DistanceSpacingMultiplier.Value;
 
             Vector2 travelVector = (position - StartPosition);
 
@@ -84,17 +84,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
             // to allow for snapping at a non-multiplied ratio.
-            float snappedDistance = SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacing);
+            float snappedDistance = SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacingMultiplier);
             double snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
 
             if (snappedTime > LatestEndTime)
             {
-                snappedDistance = SnapProvider.DurationToDistance(ReferenceObject, LatestEndTime.Value - ReferenceObject.GetEndTime());
+                double tickLength = Beatmap.GetBeatLengthAtTime(StartTime);
+
+                snappedDistance = SnapProvider.DurationToDistance(ReferenceObject, MaxIntervals * tickLength);
                 snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
             }
 
             // The multiplier can then be reapplied to the final position.
-            Vector2 snappedPosition = StartPosition + travelVector.Normalized() * snappedDistance * distanceSpacing;
+            Vector2 snappedPosition = StartPosition + travelVector.Normalized() * snappedDistance * distanceSpacingMultiplier;
 
             return (snappedPosition, snappedTime);
         }
