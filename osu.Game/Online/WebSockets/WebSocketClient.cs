@@ -19,7 +19,7 @@ namespace osu.Game.Online.WebSockets
     public abstract class WebSocketClient : CompositeDrawable
     {
         /// <summary>
-        /// Whether this is current listening on the provided endpoint.
+        /// Whether this is current listening.
         /// </summary>
         public bool IsListening => listener?.IsListening ?? false;
 
@@ -29,9 +29,19 @@ namespace osu.Game.Online.WebSockets
         public int Connected => connections.Count;
 
         /// <summary>
+        /// Gets the host name to listen on.
+        /// </summary>
+        public virtual string HostName => @"localhost";
+
+        /// <summary>
         /// Gets the endpoint to listen on.
         /// </summary>
         public virtual string Endpoint => string.Empty;
+
+        /// <summary>
+        /// Gets the port to listen on.
+        /// </summary>
+        public virtual int Port => 7270;
 
         private HttpListener listener;
         private readonly List<WebSocketConnection> connections = new List<WebSocketConnection>();
@@ -48,7 +58,7 @@ namespace osu.Game.Online.WebSockets
             path = path.EndsWith('/') ? path : path + '/';
 
             listener = new HttpListener();
-            listener.Prefixes.Add(@$"http://localhost:7270/{path}");
+            listener.Prefixes.Add(@$"http://{HostName}:{Port}/{path}");
             listener.Start();
             listener.BeginGetContext(handleRequest, null);
         }
@@ -71,13 +81,12 @@ namespace osu.Game.Online.WebSockets
                 foreach (var connection in connections)
                     await connection.DisposeAsync().ConfigureAwait(false);
 
-                connections.Clear();
                 prev.Close();
             });
         }
 
         /// <summary>
-        /// Broadcasts a message to all connections.
+        /// Broadcasts a message as text to all connections.
         /// </summary>
         public void Broadcast(string message)
         {
@@ -88,9 +97,21 @@ namespace osu.Game.Online.WebSockets
             }
         }
 
+        /// <summary>
+        /// Broadcasts a message as binary to all connections.
+        /// </summary>
+        public void Broadcast(ReadOnlyMemory<byte> message)
+        {
+            lock (connections)
+            {
+                foreach (var connection in connections)
+                    connection.Send(message);
+            }
+        }
+
         private void handleRequest(IAsyncResult result)
         {
-            if (!listener.IsListening)
+            if (!IsListening)
                 return;
 
             try
@@ -155,7 +176,7 @@ namespace osu.Game.Online.WebSockets
         /// </summary>
         /// <param name="connection">The websocket connection that sent a message.</param>
         /// <param name="message">The message received.</param>
-        protected virtual void OnConnectionMessage(WebSocketConnection connection, string message)
+        protected virtual void OnConnectionMessage(WebSocketConnection connection, Message message)
         {
         }
 
@@ -173,16 +194,13 @@ namespace osu.Game.Online.WebSockets
         {
             var connection = (WebSocketConnection)sender;
 
-            if (!args)
-            {
-                lock (connections)
-                    connections.Remove(connection);
-            }
+            lock (connections)
+                connections.Remove(connection);
 
             OnConnectionClose(connection, args);
         }
 
-        private void onConnectionMessage(object sender, string args)
+        private void onConnectionMessage(object sender, Message args)
         {
             OnConnectionMessage((WebSocketConnection)sender, args);
         }
@@ -203,14 +221,15 @@ namespace osu.Game.Online.WebSockets
             public event EventHandler OnStart;
             public event EventHandler OnReady;
             public event EventHandler<bool> OnClose;
-            public event EventHandler<string> OnMessage;
+            public event EventHandler<Message> OnMessage;
 
             private bool isDisposed;
             private bool isReady;
             private bool hasStarted;
+            private Task processTask;
             private readonly WebSocket socket;
             private readonly IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent();
-            private readonly ConcurrentQueue<string> queue = new ConcurrentQueue<string>();
+            private readonly ConcurrentQueue<Message> queue = new ConcurrentQueue<Message>();
             private readonly CancellationTokenSource cts = new CancellationTokenSource();
 
             public WebSocketConnection(WebSocket socket)
@@ -224,13 +243,16 @@ namespace osu.Game.Online.WebSockets
                     return;
 
                 OnStart?.Invoke(this, EventArgs.Empty);
-                Task.WhenAll(receive(cts.Token), send(cts.Token));
+                processTask = Task.WhenAll(receive(cts.Token), send(cts.Token));
 
                 hasStarted = true;
             }
 
-            public void Send(string message)
-                => queue.Enqueue(message);
+            public void Send(string data)
+                => queue.Enqueue(new Message(Encoding.UTF8.GetBytes(data).AsMemory(), WebSocketMessageType.Text));
+
+            public void Send(ReadOnlyMemory<byte> data)
+                => queue.Enqueue(new Message(data, WebSocketMessageType.Binary));
 
             private async Task send(CancellationToken token)
             {
@@ -239,8 +261,8 @@ namespace osu.Game.Online.WebSockets
                     if (socket.State == WebSocketState.Closed || socket.State == WebSocketState.Aborted)
                         break;
 
-                    if (socket.State == WebSocketState.Open && queue.TryDequeue(out string message))
-                        await socket.SendAsync(Encoding.UTF8.GetBytes(message).AsMemory(), WebSocketMessageType.Text, true, token).ConfigureAwait(false);
+                    if (socket.State == WebSocketState.Open && queue.TryDequeue(out var item))
+                        await socket.SendAsync(item.Content, item.Type, true, token).ConfigureAwait(false);
 
                     if (!isReady)
                     {
@@ -264,9 +286,10 @@ namespace osu.Game.Online.WebSockets
                         await disposeAsync(false);
                         break;
                     }
-
-                    if (msg.MessageType == WebSocketMessageType.Text)
-                        OnMessage?.Invoke(this, Encoding.UTF8.GetString(owner.Memory.Slice(0, msg.Count).ToArray()));
+                    else
+                    {
+                        OnMessage?.Invoke(this, new Message(owner.Memory.Slice(0, msg.Count), msg.MessageType));
+                    }
                 }
             }
 
@@ -288,12 +311,26 @@ namespace osu.Game.Online.WebSockets
                     await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
 
                 cts.Cancel();
-                cts.Dispose();
 
+                await processTask;
+
+                cts.Dispose();
                 owner.Dispose();
                 socket.Dispose();
 
                 isDisposed = true;
+            }
+        }
+
+        protected struct Message
+        {
+            public ReadOnlyMemory<byte> Content { get; }
+            public WebSocketMessageType Type { get; }
+
+            public Message(ReadOnlyMemory<byte> content, WebSocketMessageType type)
+            {
+                Content = content;
+                Type = type;
             }
         }
     }
