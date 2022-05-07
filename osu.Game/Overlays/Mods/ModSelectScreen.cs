@@ -384,7 +384,7 @@ namespace osu.Game.Overlays.Mods
                 return true;
             }
 
-            if (e.Action == Hotkey)
+            if (e.Action == Hotkey || e.Action == GlobalAction.Select)
             {
                 if (customisationVisible.Value)
                     customisationVisible.Value = false;
