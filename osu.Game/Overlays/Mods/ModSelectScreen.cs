@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Framework.Lists;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -27,7 +28,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSelectScreen : ShearedOverlayContainer
+    public abstract class ModSelectScreen : ShearedOverlayContainer, ISamplePlaybackDisabler
     {
         protected const int BUTTON_WIDTH = 200;
 
@@ -187,6 +188,8 @@ namespace osu.Game.Overlays.Mods
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            State.BindValueChanged(_ => samplePlaybackDisabled.Value = State.Value == Visibility.Hidden, true);
 
             ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
 
@@ -427,6 +430,13 @@ namespace osu.Game.Overlays.Mods
                 backButton.TriggerClick();
             }
         }
+
+        #endregion
+
+        #region Sample playback control
+
+        private readonly Bindable<bool> samplePlaybackDisabled = new BindableBool(true);
+        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
 
         #endregion
 
