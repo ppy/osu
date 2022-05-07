@@ -4,14 +4,15 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -135,7 +136,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="placementIndex">The 0-based beat index from the point of placement.</param>
         /// <returns>The applicable colour.</returns>
-        protected ColourInfo GetColourForIndexFromPlacement(int placementIndex)
+        protected Color4 GetColourForIndexFromPlacement(int placementIndex)
         {
             var timingPoint = Beatmap.ControlPointInfo.TimingPointAt(StartTime);
             double beatLength = timingPoint.BeatLength / beatDivisor.Value;
@@ -144,7 +145,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 
             int repeatIndex = placementIndex / beatDivisor.Value;
-            return ColourInfo.SingleColour(colour).MultiplyAlpha(0.5f / (repeatIndex + 1));
+            return colour.Opacity(0.5f / (repeatIndex + 1));
         }
     }
 }
