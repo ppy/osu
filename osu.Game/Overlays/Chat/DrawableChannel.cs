@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual ChatLine CreateChatLine(Message m) => new ChatLine(m);
 
-        protected virtual DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
+        protected virtual Drawable CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
         {
             Colour = colours.ChatBlue.Lighten(0.7f),
             Margin = new MarginPadding { Vertical = 10 },

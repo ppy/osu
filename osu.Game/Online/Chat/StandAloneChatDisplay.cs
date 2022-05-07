@@ -171,7 +171,7 @@ namespace osu.Game.Online.Chat
 
             protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
 
-            protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
+            protected override Drawable CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
             {
                 TextSize = 14,
                 Colour = daySepColour,
