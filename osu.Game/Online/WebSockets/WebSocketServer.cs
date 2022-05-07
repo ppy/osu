@@ -11,7 +11,6 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Online.WebSockets
