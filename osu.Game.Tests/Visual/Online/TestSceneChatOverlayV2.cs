@@ -133,22 +133,22 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChatHeight()
         {
-            Bindable<float> configChatHeight = null;
+            BindableFloat configChatHeight = new BindableFloat();
+            config.BindWith(OsuSetting.ChatDisplayHeight, configChatHeight);
             float newHeight = 0;
 
-            AddStep("Bind config chat height", () => configChatHeight = config.GetBindable<float>(OsuSetting.ChatDisplayHeight).GetBoundCopy());
-            AddStep("Set config chat height", () => configChatHeight.Value = 0.4f);
+            AddStep("Reset config chat height", () => configChatHeight.SetDefault());
             AddStep("Show overlay", () => chatOverlay.Show());
-            AddAssert("Overlay uses config height", () => chatOverlay.Height == 0.4f);
-            AddStep("Drag overlay to new height", () =>
+            AddAssert("Overlay uses config height", () => chatOverlay.Height == configChatHeight.Default);
+            AddStep("Click top bar", () =>
             {
                 InputManager.MoveMouseTo(chatOverlayTopBar);
                 InputManager.PressButton(MouseButton.Left);
-                InputManager.MoveMouseTo(chatOverlayTopBar, new Vector2(0, -300));
-                InputManager.ReleaseButton(MouseButton.Left);
             });
+            AddStep("Drag overlay to new height", () => InputManager.MoveMouseTo(chatOverlayTopBar, new Vector2(0, -300)));
+            AddStep("Stop dragging", () => InputManager.ReleaseButton(MouseButton.Left));
             AddStep("Store new height", () => newHeight = chatOverlay.Height);
-            AddAssert("Config height changed", () => configChatHeight.Value != 0.4f && configChatHeight.Value == newHeight);
+            AddAssert("Config height changed", () => !configChatHeight.IsDefault && configChatHeight.Value == newHeight);
             AddStep("Hide overlay", () => chatOverlay.Hide());
             AddStep("Show overlay", () => chatOverlay.Show());
             AddAssert("Overlay uses new height", () => chatOverlay.Height == newHeight);
