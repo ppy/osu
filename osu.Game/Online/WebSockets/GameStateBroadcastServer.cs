@@ -20,18 +20,20 @@ namespace osu.Game.Online.WebSockets
         private void load(OsuConfigManager config)
         {
             enabled = config.GetBindable<bool>(OsuSetting.BroadcastGameState);
-            enabled.BindValueChanged(e =>
+            enabled.BindValueChanged(handleEnableStateChange, true);
+        }
+
+        private void handleEnableStateChange(ValueChangedEvent<bool> e)
+        {
+            if (e.NewValue)
             {
-                if (e.NewValue)
-                {
-                    Start();
-                }
-                else
-                {
-                    enabled.Disabled = true;
-                    Task.Run(() => Close()).ContinueWith(t => enabled.Disabled = false);
-                }
-            }, true);
+                Start();
+            }
+            else
+            {
+                enabled.Disabled = true;
+                Task.Run(() => Close()).ContinueWith(t => enabled.Disabled = false);
+            }
         }
 
         public void Add(GameStateBroadcaster broadcaster)

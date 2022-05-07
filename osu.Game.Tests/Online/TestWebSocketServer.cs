@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestServerMessage()
         {
-            string message = "Hello World";
+            const string message = "Hello World";
             var received = new ArraySegment<byte>(new byte[4096]);
             client.ReceiveAsync(received, CancellationToken.None);
             server.Broadcast(message);

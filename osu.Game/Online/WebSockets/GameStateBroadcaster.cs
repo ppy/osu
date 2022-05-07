@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.IO.Serialization;
 
 namespace osu.Game.Online.WebSockets
 {
@@ -25,14 +26,12 @@ namespace osu.Game.Online.WebSockets
         [Resolved]
         private GameStateBroadcastServer server { get; set; }
 
-        private static readonly JsonSerializerSettings settings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
-
         public sealed override void Broadcast()
         {
             if (!IsLoaded)
                 throw new InvalidOperationException(@"Broadcaster must be loaded before any broadcasts may be sent.");
 
-            Scheduler.AddOnce(() => server.Broadcast(JsonConvert.SerializeObject(this, settings)));
+            Scheduler.AddOnce(() => server.Broadcast(this.Serialize()));
         }
     }
 }
