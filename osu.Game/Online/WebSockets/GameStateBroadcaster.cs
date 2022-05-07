@@ -24,6 +24,7 @@ namespace osu.Game.Online.WebSockets
 
         [Resolved]
         private GameStateBroadcastServer server { get; set; }
+
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
 
         public sealed override void Broadcast()
