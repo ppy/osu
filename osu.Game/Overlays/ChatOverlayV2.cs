@@ -17,7 +17,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.Chat;
@@ -326,11 +328,58 @@ namespace osu.Game.Overlays
             ChatLineFlow.Padding = new MarginPadding(0);
         }
 
-        protected override Drawable CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
+        protected override Drawable CreateDaySeparator(DateTimeOffset time) => new ChatOverlayDaySeparator(time);
+
+        private class ChatOverlayDaySeparator : Container
         {
-            Colour = Colour4.White,
-            Margin = new MarginPadding { Vertical = 10 },
-            Padding = new MarginPadding { Horizontal = 15 },
-        };
+            private readonly DateTimeOffset time;
+
+            public ChatOverlayDaySeparator(DateTimeOffset time)
+            {
+                this.time = time;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Padding = new MarginPadding(15);
+                Child = new GridContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.Absolute, 215),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            Drawable.Empty(),
+                            new OsuSpriteText
+                            {
+                                Text = time.ToLocalTime().ToString("dd MMMM yyyy").ToUpper(),
+                                Font = OsuFont.Torus.With(size: 15, weight: FontWeight.SemiBold),
+                                Colour = colourProvider.Content1,
+                                Margin = new MarginPadding { Right = 10 },
+                            },
+                            new Box
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Colour = colourProvider.Background5,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 2,
+                            },
+                        },
+                    },
+                };
+            }
+        }
     }
 }
