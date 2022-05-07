@@ -60,29 +60,20 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual ModColumn CreateModColumn(ModType modType, Key[]? toggleKeys = null) => new ModColumn(modType, false, toggleKeys);
 
-        protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => new[]
-        {
-            customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
-            {
-                Text = ModSelectScreenStrings.ModCustomisation,
-                Active = { BindTarget = customisationVisible }
-            },
-            new ShearedButton(BUTTON_WIDTH)
-            {
-                Text = CommonStrings.DeselectAll,
-                Action = DeselectAll
-            }
-        };
+        protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
+
+        protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => createDefaultFooterButtons();
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
-        private DifficultyMultiplierDisplay? multiplierDisplay;
         private ModSettingsArea modSettingsArea = null!;
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
-
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
         private ShearedButton backButton = null!;
+
+        private DifficultyMultiplierDisplay? multiplierDisplay;
+
         private ShearedToggleButton? customisationButton;
 
         protected ModSelectScreen(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
@@ -193,14 +184,6 @@ namespace osu.Game.Overlays.Mods
             };
         }
 
-        private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
-            => new ColumnDimContainer(CreateModColumn(modType, toggleKeys))
-            {
-                AutoSizeAxes = Axes.X,
-                RelativeSizeAxes = Axes.Y,
-                RequestScroll = column => columnScroll.ScrollIntoView(column, extraScroll: 140)
-            };
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -223,6 +206,47 @@ namespace osu.Game.Overlays.Mods
 
             updateAvailableMods();
         }
+
+        /// <summary>
+        /// Select all visible mods in all columns.
+        /// </summary>
+        protected void SelectAll()
+        {
+            foreach (var column in columnFlow.Columns)
+                column.SelectAll();
+        }
+
+        /// <summary>
+        /// Deselect all visible mods in all columns.
+        /// </summary>
+        protected void DeselectAll()
+        {
+            foreach (var column in columnFlow.Columns)
+                column.DeselectAll();
+        }
+
+        private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
+            => new ColumnDimContainer(CreateModColumn(modType, toggleKeys))
+            {
+                AutoSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Y,
+                RequestScroll = column => columnScroll.ScrollIntoView(column, extraScroll: 140)
+            };
+
+        private ShearedButton[] createDefaultFooterButtons()
+            => new[]
+            {
+                customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
+                {
+                    Text = ModSelectScreenStrings.ModCustomisation,
+                    Active = { BindTarget = customisationVisible }
+                },
+                new ShearedButton(BUTTON_WIDTH)
+                {
+                    Text = CommonStrings.DeselectAll,
+                    Action = DeselectAll
+                }
+            };
 
         private void updateMultiplier()
         {
@@ -314,7 +338,7 @@ namespace osu.Game.Overlays.Mods
             SelectedMods.Value = ComputeNewModsFromSelection(SelectedMods.Value, candidateSelection);
         }
 
-        protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
+        #region Transition handling
 
         protected override void PopIn()
         {
@@ -360,17 +384,9 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        protected void SelectAll()
-        {
-            foreach (var column in columnFlow.Columns)
-                column.SelectAll();
-        }
+        #endregion
 
-        protected void DeselectAll()
-        {
-            foreach (var column in columnFlow.Columns)
-                column.DeselectAll();
-        }
+        #region Input handling
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
@@ -403,6 +419,8 @@ namespace osu.Game.Overlays.Mods
                     return base.OnPressed(e);
             }
         }
+
+        #endregion
 
         internal class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
         {
