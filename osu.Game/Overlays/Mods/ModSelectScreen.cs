@@ -29,6 +29,8 @@ namespace osu.Game.Overlays.Mods
 {
     public abstract class ModSelectScreen : ShearedOverlayContainer
     {
+        protected const int BUTTON_WIDTH = 200;
+
         protected override OverlayColourScheme ColourScheme => OverlayColourScheme.Green;
 
         [Cached]
@@ -57,12 +59,12 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => new[]
         {
-            customisationButton = new ShearedToggleButton(200)
+            customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
             {
                 Text = ModSelectScreenStrings.ModCustomisation,
                 Active = { BindTarget = customisationVisible }
             },
-            new ShearedButton(200)
+            new ShearedButton(BUTTON_WIDTH)
             {
                 Text = CommonStrings.DeselectAll,
                 Action = DeselectAll
@@ -171,7 +173,7 @@ namespace osu.Game.Overlays.Mods
                     Horizontal = 70
                 },
                 Spacing = new Vector2(10),
-                ChildrenEnumerable = CreateFooterButtons().Prepend(new ShearedButton(200)
+                ChildrenEnumerable = CreateFooterButtons().Prepend(new ShearedButton(BUTTON_WIDTH)
                 {
                     Text = CommonStrings.Back,
                     Action = Hide,
