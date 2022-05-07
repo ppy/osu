@@ -333,10 +333,7 @@ namespace osu.Game.Screens.Select
             (new FooterButtonOptions(), BeatmapOptions)
         };
 
-        protected virtual ModSelectScreen CreateModSelectOverlay() => new UserModSelectScreen
-        {
-            Hotkey = GlobalAction.ToggleModSelection
-        };
+        protected virtual ModSelectScreen CreateModSelectOverlay() => new UserModSelectScreen();
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {

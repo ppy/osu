@@ -20,11 +20,10 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Input;
-using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -48,15 +47,6 @@ namespace osu.Game.Overlays.Mods
                     updateAvailableMods();
             }
         }
-
-        /// <summary>
-        /// Hotkey that should be used to hide the mod select screen.
-        /// </summary>
-        /// <remarks>
-        /// This is handled locally here rather than via <see cref="FooterButtonMods"/>, because this overlay is being registered at the game level
-        /// and therefore takes away keyboard focus from the screen stack.
-        /// </remarks>
-        internal GlobalAction? Hotkey { get; set; }
 
         /// <summary>
         /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
@@ -382,6 +372,8 @@ namespace osu.Game.Overlays.Mods
             if (e.Repeat)
                 return false;
 
+            // This is handled locally here because this overlay is being registered at the game level
+            // and therefore takes away keyboard focus from the screen stack.
             if (e.Action == GlobalAction.Back)
             {
                 if (customisationVisible.Value)
@@ -391,15 +383,20 @@ namespace osu.Game.Overlays.Mods
                 return true;
             }
 
-            if (e.Action == Hotkey || e.Action == GlobalAction.Select)
+            switch (e.Action)
             {
-                if (customisationVisible.Value)
-                    customisationVisible.Value = false;
-                Hide();
-                return true;
-            }
+                case GlobalAction.ToggleModSelection:
+                case GlobalAction.Select:
+                {
+                    if (customisationVisible.Value)
+                        customisationVisible.Value = false;
+                    Hide();
+                    return true;
+                }
 
-            return base.OnPressed(e);
+                default:
+                    return base.OnPressed(e);
+            }
         }
 
         internal class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
