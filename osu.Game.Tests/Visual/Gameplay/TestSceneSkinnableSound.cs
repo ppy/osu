@@ -130,7 +130,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Cached(typeof(ISkinSource))]
-        [Cached(typeof(ISamplePlaybackDisabler))]
         private class TestSkinSourceContainer : Container, ISkinSource, ISamplePlaybackDisabler
         {
             [Resolved]

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Skinning;
 
@@ -10,6 +11,7 @@ namespace osu.Game.Audio
     /// Allows a component to disable sample playback dynamically as required.
     /// Automatically handled by <see cref="PausableSkinnableSound"/>.
     /// </summary>
+    [Cached]
     public interface ISamplePlaybackDisabler
     {
         /// <summary>
