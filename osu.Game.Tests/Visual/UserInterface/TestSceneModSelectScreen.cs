@@ -18,6 +18,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -164,7 +165,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
             assertCustomisationToggleState(disabled: false, active: true);
 
-            AddStep("dismiss mod customisation via mouse", () =>
+            AddStep("dismiss mod customisation via toggle", () =>
             {
                 InputManager.MoveMouseTo(modSelectScreen.ChildrenOfType<ShearedToggleButton>().Single());
                 InputManager.Click(MouseButton.Left);
@@ -189,6 +190,29 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("select mod without configuration", () => SelectedMods.Value = new[] { new OsuModAutoplay() });
             assertCustomisationToggleState(disabled: true, active: false); // config was dismissed without explicit user action.
+        }
+
+        [Test]
+        public void TestDismissCustomisationViaDimmedArea()
+        {
+            createScreen();
+            assertCustomisationToggleState(disabled: true, active: false);
+
+            AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            assertCustomisationToggleState(disabled: false, active: true);
+
+            AddStep("move mouse to settings area", () => InputManager.MoveMouseTo(this.ChildrenOfType<ModSettingsArea>().Single()));
+            AddStep("move mouse to dimmed area", () =>
+            {
+                InputManager.MoveMouseTo(new Vector2(
+                    modSelectScreen.ScreenSpaceDrawQuad.TopLeft.X,
+                    (modSelectScreen.ScreenSpaceDrawQuad.TopLeft.Y + modSelectScreen.ScreenSpaceDrawQuad.BottomLeft.Y) / 2));
+            });
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            assertCustomisationToggleState(disabled: false, active: false);
+
+            AddStep("move mouse to first mod panel", () => InputManager.MoveMouseTo(modSelectScreen.ChildrenOfType<ModPanel>().First()));
+            AddAssert("first mod panel is hovered", () => modSelectScreen.ChildrenOfType<ModPanel>().First().IsHovered);
         }
 
         /// <summary>
@@ -389,6 +413,42 @@ namespace osu.Game.Tests.Visual.UserInterface
             waitForColumnLoad();
 
             AddAssert("unimplemented mod panel is filtered", () => getPanelForMod(typeof(TestUnimplementedMod)).Filtered.Value);
+        }
+
+        [Test]
+        public void TestDeselectAllViaButton()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select DT + HD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden() });
+            AddAssert("DT + HD selected", () => modSelectScreen.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
+
+            AddStep("click deselect all button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("all mods deselected", () => !SelectedMods.Value.Any());
+        }
+
+        [Test]
+        public void TestCloseViaBackButton()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select difficulty adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
+            assertCustomisationToggleState(disabled: false, active: true);
+            AddAssert("back button disabled", () => !this.ChildrenOfType<ShearedButton>().First().Enabled.Value);
+
+            AddStep("dismiss customisation area", () => InputManager.Key(Key.Escape));
+            AddStep("click back button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("mod select hidden", () => modSelectScreen.State.Value == Visibility.Hidden);
         }
 
         private void waitForColumnLoad() => AddUntilStep("all column content loaded",

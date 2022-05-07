@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
+using osu.Framework.Lists;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -23,6 +24,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Input;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -55,16 +57,25 @@ namespace osu.Game.Overlays.Mods
         internal GlobalAction? Hotkey { get; set; }
 
         /// <summary>
-        /// Whether configurable <see cref="Mod"/>s can be configured by the local user.
-        /// </summary>
-        protected virtual bool AllowCustomisation => true;
-
-        /// <summary>
         /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
         /// </summary>
         protected virtual bool ShowTotalMultiplier => true;
 
         protected virtual ModColumn CreateModColumn(ModType modType, Key[]? toggleKeys = null) => new ModColumn(modType, false, toggleKeys);
+
+        protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => new[]
+        {
+            customisationButton = new ShearedToggleButton(200)
+            {
+                Text = ModSelectScreenStrings.ModCustomisation,
+                Active = { BindTarget = customisationVisible }
+            },
+            new ShearedButton(200)
+            {
+                Text = CommonStrings.DeselectAll,
+                Action = DeselectAll
+            }
+        };
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
@@ -72,6 +83,8 @@ namespace osu.Game.Overlays.Mods
         private ModSettingsArea modSettingsArea = null!;
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
+        private ShearedToggleButton? customisationButton;
+        private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
 
         protected ModSelectScreen(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
@@ -79,10 +92,10 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
-            Header.Title = "Mod Select";
-            Header.Description = "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.";
+            Header.Title = ModSelectScreenStrings.ModSelectTitle;
+            Header.Description = ModSelectScreenStrings.ModSelectDescription;
 
             AddRange(new Drawable[]
             {
@@ -107,6 +120,7 @@ namespace osu.Game.Overlays.Mods
                     Padding = new MarginPadding
                     {
                         Top = (ShowTotalMultiplier ? DifficultyMultiplierDisplay.HEIGHT : 0) + PADDING,
+                        Bottom = PADDING
                     },
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
@@ -157,17 +171,27 @@ namespace osu.Game.Overlays.Mods
                 });
             }
 
-            if (AllowCustomisation)
+            FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>
             {
-                Footer.Add(new ShearedToggleButton(200)
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Horizontal,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                Padding = new MarginPadding
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Margin = new MarginPadding { Vertical = PADDING, Left = 70 },
-                    Text = "Mod Customisation",
-                    Active = { BindTarget = customisationVisible }
-                });
-            }
+                    Vertical = PADDING,
+                    Horizontal = 70
+                },
+                Spacing = new Vector2(10),
+                ChildrenEnumerable = CreateFooterButtons().Prepend(new ShearedButton(200)
+                {
+                    Text = CommonStrings.Back,
+                    Action = Hide,
+                    DarkerColour = colours.Pink2,
+                    LighterColour = colours.Pink1
+                })
+            };
         }
 
         private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
@@ -222,7 +246,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
         {
-            if (!AllowCustomisation)
+            if (customisationButton == null)
                 return;
 
             bool anyCustomisableMod = false;
@@ -256,6 +280,12 @@ namespace osu.Game.Overlays.Mods
 
             MainAreaContent.FadeColour(customisationVisible.Value ? Colour4.Gray : Colour4.White, transition_duration, Easing.InOutCubic);
 
+            foreach (var button in footerButtonFlow)
+            {
+                if (button != customisationButton)
+                    button.Enabled.Value = !customisationVisible.Value;
+            }
+
             float modAreaHeight = customisationVisible.Value ? ModSettingsArea.HEIGHT : 0;
 
             modSettingsArea.ResizeHeightTo(modAreaHeight, transition_duration, Easing.InOutCubic);
@@ -277,7 +307,9 @@ namespace osu.Game.Overlays.Mods
         {
             var candidateSelection = columnFlow.Columns.SelectMany(column => column.SelectedMods).ToArray();
 
-            if (candidateSelection.SequenceEqual(SelectedMods.Value))
+            // the following guard intends to check cases where we've already replaced potentially-external mod references with our own and avoid endless recursion.
+            // TODO: replace custom comparer with System.Collections.Generic.ReferenceEqualityComparer when fully on .NET 6
+            if (candidateSelection.SequenceEqual(SelectedMods.Value, new FuncEqualityComparer<Mod>(ReferenceEquals)))
                 return;
 
             SelectedMods.Value = ComputeNewModsFromSelection(SelectedMods.Value, candidateSelection);
@@ -327,6 +359,18 @@ namespace osu.Game.Overlays.Mods
                       .MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint)
                       .FadeOut(fade_out_duration, Easing.OutQuint);
             }
+        }
+
+        protected void SelectAll()
+        {
+            foreach (var column in columnFlow.Columns)
+                column.SelectAll();
+        }
+
+        protected void DeselectAll()
+        {
+            foreach (var column in columnFlow.Columns)
+                column.DeselectAll();
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -448,6 +492,8 @@ namespace osu.Game.Overlays.Mods
                 FinishTransforms();
             }
 
+            protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || Column.SelectionAnimationRunning;
+
             private void updateDim()
             {
                 Colour4 targetColour;
@@ -487,6 +533,8 @@ namespace osu.Game.Overlays.Mods
             public BindableBool HandleMouse { get; } = new BindableBool();
 
             public Action? OnClicked { get; set; }
+
+            public override bool HandlePositionalInput => base.HandlePositionalInput && HandleMouse.Value;
 
             protected override bool Handle(UIEvent e)
             {
