@@ -23,6 +23,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Input;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -58,12 +59,12 @@ namespace osu.Game.Overlays.Mods
         {
             customisationButton = new ShearedToggleButton(200)
             {
-                Text = "Mod Customisation",
+                Text = ModSelectScreenStrings.ModCustomisation,
                 Active = { BindTarget = customisationVisible }
             },
             new ShearedButton(200)
             {
-                Text = "Deselect All",
+                Text = CommonStrings.DeselectAll,
                 Action = DeselectAll
             }
         };
@@ -80,8 +81,8 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
-            Header.Title = "Mod Select";
-            Header.Description = "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.";
+            Header.Title = ModSelectScreenStrings.ModSelectTitle;
+            Header.Description = ModSelectScreenStrings.ModSelectDescription;
 
             AddRange(new Drawable[]
             {

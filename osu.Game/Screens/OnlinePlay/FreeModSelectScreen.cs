@@ -8,6 +8,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osuTK.Input;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -34,14 +35,14 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Text = "Select All",
+                Text = CommonStrings.SelectAll,
                 Action = SelectAll
             },
             new ShearedButton(200)
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Text = "Deselect All",
+                Text = CommonStrings.DeselectAll,
                 Action = DeselectAll
             }
         };
