@@ -326,7 +326,7 @@ namespace osu.Game.Overlays
             ChatLineFlow.Padding = new MarginPadding(0);
         }
 
-        protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
+        protected override Drawable CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
         {
             Colour = Colour4.White,
             Margin = new MarginPadding { Vertical = 10 },
