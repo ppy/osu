@@ -40,40 +40,38 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestServerMessage()
         {
+            string message = "Hello World";
             var received = new ArraySegment<byte>(new byte[4096]);
             client.ReceiveAsync(received, CancellationToken.None);
-            server.Broadcast("Hello World");
+            server.Broadcast(message);
             Thread.Sleep(1000);
-            Assert.IsTrue(received.Count > 0);
+            Assert.AreEqual(message, Encoding.UTF8.GetString(received.Slice(0, message.Length).AsSpan()));
         }
 
         [Test]
-        public void TestClientMessage()
+        public async void TestClientMessage()
         {
             var sent = new ArraySegment<byte>(Encoding.UTF8.GetBytes("Hello World"));
-            client.SendAsync(sent, WebSocketMessageType.Text, true, CancellationToken.None).WaitSafely();
-            Thread.Sleep(1000);
+            await client.SendAsync(sent, WebSocketMessageType.Text, true, CancellationToken.None);
             Assert.AreEqual("Hello World", server.LastMessageReceived);
         }
 
         [Test]
-        public void TestClientClosing()
+        public async void TestClientClosing()
         {
-            Assert.IsTrue(server.Connected > 0);
-            client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).WaitSafely();
-            Thread.Sleep(1000);
+            Assert.NotZero(server.Connected);
+            await client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
             Assert.IsTrue(server.RemoteInitiatedDisconnect);
-            Assert.IsTrue(server.Connected == 0);
+            Assert.Zero(server.Connected);
         }
 
         [Test]
-        public void TestServerClosing()
+        public async void TestServerClosing()
         {
-            Assert.IsTrue(server.Connected > 0);
-            server.Close();
-            Thread.Sleep(1000);
+            Assert.NotZero(server.Connected);
+            await server.Close();
             Assert.IsFalse(server.RemoteInitiatedDisconnect);
-            Assert.IsTrue(server.Connected == 0);
+            Assert.Zero(server.Connected);
         }
 
         private class ServerWebSocket : WebSocketServer
