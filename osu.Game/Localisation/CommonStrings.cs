@@ -59,6 +59,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Importing => new TranslatableString(getKey(@"importing"), @"Importing...");
 
+        /// <summary>
+        /// "Deselect All"
+        /// </summary>
+        public static LocalisableString DeselectAll => new TranslatableString(getKey(@"deselect_all"), @"Deselect All");
+
+        /// <summary>
+        /// "Select All"
+        /// </summary>
+        public static LocalisableString SelectAll => new TranslatableString(getKey(@"select_all"), @"Select All");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

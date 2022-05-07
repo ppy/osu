@@ -432,6 +432,25 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("all mods deselected", () => !SelectedMods.Value.Any());
         }
 
+        [Test]
+        public void TestCloseViaBackButton()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select difficulty adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
+            assertCustomisationToggleState(disabled: false, active: true);
+            AddAssert("back button disabled", () => !this.ChildrenOfType<ShearedButton>().First().Enabled.Value);
+
+            AddStep("dismiss customisation area", () => InputManager.Key(Key.Escape));
+            AddStep("click back button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("mod select hidden", () => modSelectScreen.State.Value == Visibility.Hidden);
+        }
+
         private void waitForColumnLoad() => AddUntilStep("all column content loaded",
             () => modSelectScreen.ChildrenOfType<ModColumn>().Any() && modSelectScreen.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
 

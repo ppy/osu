@@ -23,11 +23,14 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Input;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
     public abstract class ModSelectScreen : ShearedOverlayContainer
     {
+        protected const int BUTTON_WIDTH = 200;
+
         protected override OverlayColourScheme ColourScheme => OverlayColourScheme.Green;
 
         [Cached]
@@ -56,14 +59,14 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => new[]
         {
-            customisationButton = new ShearedToggleButton(200)
+            customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
             {
-                Text = "Mod Customisation",
+                Text = ModSelectScreenStrings.ModCustomisation,
                 Active = { BindTarget = customisationVisible }
             },
-            new ShearedButton(200)
+            new ShearedButton(BUTTON_WIDTH)
             {
-                Text = "Deselect All",
+                Text = CommonStrings.DeselectAll,
                 Action = DeselectAll
             }
         };
@@ -74,14 +77,16 @@ namespace osu.Game.Overlays.Mods
         private ModSettingsArea modSettingsArea = null!;
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
-        private ShearedToggleButton? customisationButton;
+
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
+        private ShearedButton backButton = null!;
+        private ShearedToggleButton? customisationButton;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
-            Header.Title = "Mod Select";
-            Header.Description = "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.";
+            Header.Title = ModSelectScreenStrings.ModSelectTitle;
+            Header.Description = ModSelectScreenStrings.ModSelectDescription;
 
             AddRange(new Drawable[]
             {
@@ -170,7 +175,13 @@ namespace osu.Game.Overlays.Mods
                     Horizontal = 70
                 },
                 Spacing = new Vector2(10),
-                ChildrenEnumerable = CreateFooterButtons()
+                ChildrenEnumerable = CreateFooterButtons().Prepend(backButton = new ShearedButton(BUTTON_WIDTH)
+                {
+                    Text = CommonStrings.Back,
+                    Action = Hide,
+                    DarkerColour = colours.Pink2,
+                    LighterColour = colours.Pink1
+                })
             };
         }
 
@@ -355,9 +366,12 @@ namespace osu.Game.Overlays.Mods
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == GlobalAction.Back && customisationVisible.Value)
+            if (e.Action == GlobalAction.Back)
             {
-                customisationVisible.Value = false;
+                if (customisationVisible.Value)
+                    customisationVisible.Value = false;
+                else
+                    backButton.TriggerClick();
                 return true;
             }
 
