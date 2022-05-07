@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Overlays;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -23,6 +24,7 @@ namespace osu.Game.Screens.OnlinePlay
         }
 
         public FreeModSelectScreen()
+            : base(OverlayColourScheme.Plum)
         {
             IsValidMod = _ => true;
         }

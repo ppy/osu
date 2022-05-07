@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Mods
         private Func<Mod, bool>? filter;
 
         /// <summary>
-        /// Function determining whether each mod in the column should be displayed.
+        /// A function determining whether each mod in the column should be displayed.
         /// A return value of <see langword="true"/> means that the mod is not filtered and therefore its corresponding panel should be displayed.
         /// A return value of <see langword="false"/> means that the mod is filtered out and therefore its corresponding panel should be hidden.
         /// </summary>
@@ -250,9 +250,8 @@ namespace osu.Game.Overlays.Mods
         private void load(OsuGameBase game, OverlayColourProvider colourProvider, OsuColour colours)
         {
             availableMods.BindTo(game.AvailableMods);
-            // this `BindValueChanged` callback is intentionally here, to ensure that local available mods are constructed as early as possible.
-            // this is needed to make sure no external changes to mods are dropped while mod panels are asynchronously loading.
-            availableMods.BindValueChanged(_ => updateLocalAvailableMods(), true);
+            updateLocalAvailableMods(asyncLoadContent: false);
+            availableMods.BindValueChanged(_ => updateLocalAvailableMods(asyncLoadContent: true));
 
             headerBackground.Colour = accentColour = colours.ForModType(ModType);
 
@@ -279,7 +278,7 @@ namespace osu.Game.Overlays.Mods
             toggleAllCheckbox.LabelText = toggleAllCheckbox.Current.Value ? CommonStrings.DeselectAll : CommonStrings.SelectAll;
         }
 
-        private void updateLocalAvailableMods()
+        private void updateLocalAvailableMods(bool asyncLoadContent)
         {
             var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(ModType) ?? Array.Empty<Mod>())
                                   .Select(m => m.DeepClone())
@@ -290,11 +289,10 @@ namespace osu.Game.Overlays.Mods
 
             localAvailableMods = newMods;
 
-            if (!IsLoaded)
-                // if we're coming from BDL, perform the first load synchronously to make sure everything is in place as early as possible.
-                onPanelsLoaded(createPanels());
-            else
+            if (asyncLoadContent)
                 asyncLoadPanels();
+            else
+                onPanelsLoaded(createPanels());
         }
 
         private CancellationTokenSource? cancellationTokenSource;

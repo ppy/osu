@@ -253,12 +253,12 @@ namespace osu.Game.Tests.Visual.Navigation
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
-            AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
 
-            // BackButton handles hover using its child button, so this checks whether or not any of BackButton's children are hovered.
-            AddUntilStep("Back button is hovered", () => Game.ChildrenOfType<BackButton>().First().Children.Any(c => c.IsHovered));
+            AddStep("Move mouse to dimmed area", () => InputManager.MoveMouseTo(new Vector2(
+                songSelect.ScreenSpaceDrawQuad.TopLeft.X + 1,
+                songSelect.ScreenSpaceDrawQuad.TopLeft.Y + songSelect.ScreenSpaceDrawQuad.Height / 2)));
+            AddStep("Click left mouse button", () => InputManager.Click(MouseButton.Left));
 
-            AddStep("Click back button", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("Overlay was hidden", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
             exitViaBackButtonAndConfirm();
         }
@@ -551,7 +551,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
         public class TestPlaySongSelect : PlaySongSelect
         {
-            public ModSelectOverlay ModSelectOverlay => ModSelect;
+            public ModSelectScreen ModSelectOverlay => ModSelect;
 
             public BeatmapOptionsOverlay BeatmapOptionsOverlay => BeatmapOptions;
 
