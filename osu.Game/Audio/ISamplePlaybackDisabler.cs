@@ -4,11 +4,11 @@
 using osu.Framework.Bindables;
 using osu.Game.Skinning;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Audio
 {
     /// <summary>
     /// Allows a component to disable sample playback dynamically as required.
-    /// Handled by <see cref="PausableSkinnableSound"/>.
+    /// Automatically handled by <see cref="PausableSkinnableSound"/>.
     /// </summary>
     public interface ISamplePlaybackDisabler
     {
