@@ -51,17 +51,15 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected Container FooterContent { get; private set; }
 
-        protected abstract OverlayColourScheme ColourScheme { get; }
-
         protected override bool StartHidden => true;
 
         protected override bool BlockNonPositionalInput => true;
 
-        protected ShearedOverlayContainer()
+        protected ShearedOverlayContainer(OverlayColourScheme colourScheme)
         {
             RelativeSizeAxes = Axes.Both;
 
-            ColourProvider = new OverlayColourProvider(ColourScheme);
+            ColourProvider = new OverlayColourProvider(colourScheme);
         }
 
         [BackgroundDependencyLoader]

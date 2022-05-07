@@ -66,7 +66,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         public class TestShearedOverlayContainer : ShearedOverlayContainer
         {
-            protected override OverlayColourScheme ColourScheme => OverlayColourScheme.Green;
+            public TestShearedOverlayContainer()
+                : base(OverlayColourScheme.Green)
+            {
+            }
 
             [BackgroundDependencyLoader]
             private void load()
