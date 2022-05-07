@@ -201,6 +201,10 @@ namespace osu.Game
 
             externalOverlays.Add(overlayContainer);
             overlayContent.Add(overlayContainer);
+
+            if (overlayContainer is OsuFocusedOverlayContainer focusedOverlayContainer)
+                focusedOverlays.Add(focusedOverlayContainer);
+
             return new InvokeOnDisposal(() => unregisterBlockingOverlay(overlayContainer));
         }
 
@@ -223,6 +227,10 @@ namespace osu.Game
         private void unregisterBlockingOverlay(OverlayContainer overlayContainer)
         {
             externalOverlays.Remove(overlayContainer);
+
+            if (overlayContainer is OsuFocusedOverlayContainer focusedOverlayContainer)
+                focusedOverlays.Remove(focusedOverlayContainer);
+
             overlayContainer.Expire();
         }
 
