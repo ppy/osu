@@ -358,7 +358,7 @@ namespace osu.Game.Overlays
                     },
                     Content = new[]
                     {
-                        new Drawable[]
+                        new[]
                         {
                             Drawable.Empty(),
                             new OsuSpriteText
