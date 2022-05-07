@@ -315,26 +315,20 @@ namespace osu.Game.Overlays
 
     public class ChatOverlayDrawableChannel : DrawableChannel
     {
-        private Colour4 daySepTextColour;
-        private Colour4 daySepLineColour;
-
         public ChatOverlayDrawableChannel(Channel channel)
             : base(channel)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             ChatLineFlow.Padding = new MarginPadding(0);
-            daySepTextColour = colourProvider.Content1;
-            daySepLineColour = colourProvider.Background5;
         }
 
         protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
         {
-            TextColour = daySepTextColour,
-            LineColour = daySepLineColour,
+            Colour = Colour4.White,
             Margin = new MarginPadding { Vertical = 10 },
             Padding = new MarginPadding { Horizontal = 15 },
         };

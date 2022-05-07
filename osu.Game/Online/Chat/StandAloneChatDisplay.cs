@@ -174,9 +174,8 @@ namespace osu.Game.Online.Chat
             protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
             {
                 TextSize = 14,
-                TextColour = daySepColour,
+                Colour = daySepColour,
                 LineHeight = 1,
-                LineColour = daySepColour,
                 Padding = new MarginPadding { Horizontal = 10 },
                 Margin = new MarginPadding { Vertical = 5 },
             };
