@@ -324,6 +324,9 @@ namespace osu.Game.Online.WebSockets
                 {
                     await processTask;
                 }
+                catch (OperationCanceledException)
+                {
+                }
                 catch (AggregateException)
                 {
                 }

@@ -5,6 +5,7 @@ using System;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Game.Online.WebSockets;
@@ -44,29 +45,31 @@ namespace osu.Game.Tests.Online
             var received = new ArraySegment<byte>(new byte[4096]);
             client.ReceiveAsync(received, CancellationToken.None);
             server.Broadcast(message);
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             Assert.AreEqual(message, Encoding.UTF8.GetString(received.Slice(0, message.Length).AsSpan()));
         }
 
         [Test]
-        public async void TestClientMessage()
+        public async Task TestClientMessage()
         {
             var sent = new ArraySegment<byte>(Encoding.UTF8.GetBytes("Hello World"));
             await client.SendAsync(sent, WebSocketMessageType.Text, true, CancellationToken.None);
+            await Task.Delay(500);
             Assert.AreEqual("Hello World", server.LastMessageReceived);
         }
 
         [Test]
-        public async void TestClientClosing()
+        public async Task TestClientClosing()
         {
             Assert.NotZero(server.Connected);
             await client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+            await Task.Delay(500);
             Assert.IsTrue(server.RemoteInitiatedDisconnect);
             Assert.Zero(server.Connected);
         }
 
         [Test]
-        public async void TestServerClosing()
+        public async Task TestServerClosing()
         {
             Assert.NotZero(server.Connected);
             await server.Close();
