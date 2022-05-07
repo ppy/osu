@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -99,7 +100,7 @@ namespace osu.Game.Overlays.Mods
                                             Origin = Anchor.Centre,
                                             Margin = new MarginPadding { Horizontal = 18 },
                                             Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
-                                            Text = "Difficulty Multiplier",
+                                            Text = DifficultyMultiplierDisplayStrings.DifficultyMultiplier,
                                             Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
                                         }
                                     }
