@@ -5,11 +5,13 @@ using System;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Online.WebSockets
@@ -20,11 +22,6 @@ namespace osu.Game.Online.WebSockets
         /// Whether this is current listening.
         /// </summary>
         public bool IsListening => listener?.IsListening ?? false;
-
-        /// <summary>
-        /// Gets the number of connections this server currently has.
-        /// </summary>
-        public int Connected => connections.Count;
 
         /// <summary>
         /// Gets the host name to listen on.
@@ -41,7 +38,23 @@ namespace osu.Game.Online.WebSockets
         /// </summary>
         public virtual int Port => 7270;
 
+        /// <summary>
+        /// Gets the number of connections this server currently has.
+        /// </summary>
+        public int Connected
+        {
+            get
+            {
+                semaphore.Wait();
+                int count = connections.Count;
+                semaphore.Release();
+
+                return count;
+            }
+        }
+
         private HttpListener listener;
+        private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
         private readonly List<WebSocketConnection> connections = new List<WebSocketConnection>();
 
         /// <summary>
@@ -64,23 +77,18 @@ namespace osu.Game.Online.WebSockets
         /// <summary>
         /// Closes the websocket server and stops listening for incoming connections.
         /// </summary>
-        public void Close()
+        public async Task Close()
         {
             if (listener == null)
                 return;
 
-            Task.Run(async () =>
-            {
-                var prev = listener;
-                listener = null;
+            listener.Stop();
+            listener.Close();
+            listener = null;
 
-                prev.Stop();
-
-                foreach (var connection in connections)
-                    await connection.DisposeAsync().ConfigureAwait(false);
-
-                prev.Close();
-            });
+            var disposeTasks = connections.Select(c => c.DisposeAsync().AsTask());
+            await Task.WhenAll(disposeTasks);
+            connections.Clear();
         }
 
         /// <summary>
@@ -88,11 +96,12 @@ namespace osu.Game.Online.WebSockets
         /// </summary>
         public void Broadcast(string message)
         {
-            lock (connections)
-            {
-                foreach (var connection in connections)
-                    connection.Send(message);
-            }
+            semaphore.Wait();
+
+            foreach (var connection in connections)
+                connection.Send(message);
+
+            semaphore.Release();
         }
 
         /// <summary>
@@ -100,11 +109,12 @@ namespace osu.Game.Online.WebSockets
         /// </summary>
         public void Broadcast(ReadOnlyMemory<byte> message)
         {
-            lock (connections)
-            {
-                foreach (var connection in connections)
-                    connection.Send(message);
-            }
+            semaphore.Wait();
+
+            foreach (var connection in connections)
+                connection.Send(message);
+
+            semaphore.Release();
         }
 
         private void handleRequest(IAsyncResult result)
@@ -182,20 +192,25 @@ namespace osu.Game.Online.WebSockets
         {
             var connection = (WebSocketConnection)sender;
 
-            lock (connections)
-                connections.Add(connection);
+            semaphore.Wait();
+            connections.Add(connection);
+            semaphore.Release();
 
             OnConnectionStart(connection);
         }
 
-        private void onConnectionClose(object sender, bool args)
+        private void onConnectionClose(object sender, bool requested)
         {
             var connection = (WebSocketConnection)sender;
 
-            lock (connections)
+            if (!requested)
+            {
+                semaphore.Wait();
                 connections.Remove(connection);
+                semaphore.Release();
+            }
 
-            OnConnectionClose(connection, args);
+            OnConnectionClose(connection, requested);
         }
 
         private void onConnectionMessage(object sender, Message args)
@@ -211,7 +226,7 @@ namespace osu.Game.Online.WebSockets
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            Close();
+            Task.Run(() => Close()).ContinueWith(t => semaphore.Dispose());
         }
 
         protected class WebSocketConnection : IAsyncDisposable
@@ -241,7 +256,7 @@ namespace osu.Game.Online.WebSockets
                     return;
 
                 OnStart?.Invoke(this, EventArgs.Empty);
-                processTask = Task.WhenAll(receive(cts.Token), send(cts.Token));
+                processTask = Task.Run(() => Task.WhenAll(receive(cts.Token), send(cts.Token)), cts.Token);
 
                 hasStarted = true;
             }
@@ -296,21 +311,27 @@ namespace osu.Game.Online.WebSockets
                 await disposeAsync(true);
             }
 
-            private async Task disposeAsync(bool notifyConnection)
+            private async Task disposeAsync(bool requested)
             {
                 if (isDisposed)
                     return;
 
-                OnClose?.Invoke(this, notifyConnection);
-
-                if (notifyConnection)
-                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
-                else
-                    await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                OnClose?.Invoke(this, requested);
 
                 cts.Cancel();
 
-                await processTask;
+                try
+                {
+                    await processTask;
+                }
+                catch (AggregateException)
+                {
+                }
+
+                if (requested)
+                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                else
+                    await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
 
                 cts.Dispose();
                 buffer.Dispose();

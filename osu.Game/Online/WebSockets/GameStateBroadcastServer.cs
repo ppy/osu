@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
@@ -13,7 +14,7 @@ namespace osu.Game.Online.WebSockets
     {
         public override string Endpoint => @"state";
 
-        private IBindable<bool> enabled;
+        private Bindable<bool> enabled;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -22,9 +23,14 @@ namespace osu.Game.Online.WebSockets
             enabled.BindValueChanged(e =>
             {
                 if (e.NewValue)
+                {
                     Start();
+                }
                 else
-                    Close();
+                {
+                    enabled.Disabled = true;
+                    Task.Run(() => Close()).ContinueWith(t => enabled.Disabled = false);
+                }
             }, true);
         }
 
