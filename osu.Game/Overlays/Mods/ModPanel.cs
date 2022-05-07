@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -12,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -20,8 +23,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Input;
-
-#nullable enable
 
 namespace osu.Game.Overlays.Mods
 {
@@ -50,6 +51,7 @@ namespace osu.Game.Overlays.Mods
 
         private Colour4 activeColour;
 
+        private readonly Bindable<bool> samplePlaybackDisabled = new BindableBool();
         private Sample? sampleOff;
         private Sample? sampleOn;
 
@@ -139,13 +141,16 @@ namespace osu.Game.Overlays.Mods
             Action = Active.Toggle;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio, OsuColour colours, ISamplePlaybackDisabler? samplePlaybackDisabler)
         {
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
 
             activeColour = colours.ForModType(Mod.Type);
+
+            if (samplePlaybackDisabler != null)
+                ((IBindable<bool>)samplePlaybackDisabled).BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
         }
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(sampleSet);
@@ -166,6 +171,9 @@ namespace osu.Game.Overlays.Mods
 
         private void playStateChangeSamples()
         {
+            if (samplePlaybackDisabled.Value)
+                return;
+
             if (Active.Value)
                 sampleOn?.Play();
             else
