@@ -20,20 +20,21 @@ namespace osu.Game.Tests.Visual.Navigation
 {
     public class TestSceneSkinEditorSceneLibrary : OsuGameTestScene
     {
-        private SkinEditor skinEditor;
+        private TestPlaySongSelect songSelect;
+        private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
 
-        public override void SetUpSteps()
+        private void advanceToSongSelect()
         {
-            base.SetUpSteps();
-
-            Screens.Select.SongSelect songSelect = null;
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
 
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
 
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+        }
 
+        private void openSkinEditor()
+        {
             AddStep("open skin editor", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
@@ -42,13 +43,15 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.ReleaseKey(Key.ControlLeft);
                 InputManager.ReleaseKey(Key.ShiftLeft);
             });
-
-            AddUntilStep("get skin editor", () => (skinEditor = Game.ChildrenOfType<SkinEditor>().FirstOrDefault()) != null);
+            AddUntilStep("skin editor loaded", () => skinEditor != null);
         }
 
         [Test]
         public void TestEditComponentDuringGameplay()
         {
+            advanceToSongSelect();
+            openSkinEditor();
+
             switchToGameplayScene();
 
             BarHitErrorMeter hitErrorMeter = null;
@@ -85,6 +88,8 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestAutoplayCompatibleModsRetainedOnEnteringGameplay()
         {
+            advanceToSongSelect();
+            openSkinEditor();
             AddStep("select DT", () => Game.SelectedMods.Value = new Mod[] { new OsuModDoubleTime() });
 
             switchToGameplayScene();
@@ -95,6 +100,8 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestAutoplayIncompatibleModsRemovedOnEnteringGameplay()
         {
+            advanceToSongSelect();
+            openSkinEditor();
             AddStep("select no fail and spun out", () => Game.SelectedMods.Value = new Mod[] { new OsuModNoFail(), new OsuModSpunOut() });
 
             switchToGameplayScene();
@@ -105,6 +112,8 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestDuplicateAutoplayModRemovedOnEnteringGameplay()
         {
+            advanceToSongSelect();
+            openSkinEditor();
             AddStep("select autoplay", () => Game.SelectedMods.Value = new Mod[] { new OsuModAutoplay() });
 
             switchToGameplayScene();
@@ -115,6 +124,8 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestCinemaModRemovedOnEnteringGameplay()
         {
+            advanceToSongSelect();
+            openSkinEditor();
             AddStep("select cinema", () => Game.SelectedMods.Value = new Mod[] { new OsuModCinema() });
 
             switchToGameplayScene();
