@@ -36,6 +36,11 @@ namespace osu.Game.Overlays.Mods
 
         private Func<Mod, bool> isValidMod = m => true;
 
+        /// <summary>
+        /// A function determining whether each mod in the column should be displayed.
+        /// A return value of <see langword="true"/> means that the mod is not filtered and therefore its corresponding panel should be displayed.
+        /// A return value of <see langword="false"/> means that the mod is filtered out and therefore its corresponding panel should be hidden.
+        /// </summary>
         public Func<Mod, bool> IsValidMod
         {
             get => isValidMod;
