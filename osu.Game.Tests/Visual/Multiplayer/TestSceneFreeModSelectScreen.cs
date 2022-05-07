@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("click select all button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().First());
+                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().ElementAt(1));
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("all mods selected", assertAllAvailableModsSelected);
