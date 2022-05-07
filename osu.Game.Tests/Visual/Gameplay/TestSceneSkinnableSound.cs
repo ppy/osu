@@ -15,7 +15,6 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
