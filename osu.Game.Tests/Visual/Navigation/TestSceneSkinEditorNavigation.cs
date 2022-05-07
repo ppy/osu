@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Settings;
@@ -131,6 +132,16 @@ namespace osu.Game.Tests.Visual.Navigation
             switchToGameplayScene();
 
             AddAssert("no mod selected", () => !((Player)Game.ScreenStack.CurrentScreen).Mods.Value.Any());
+        }
+
+        [Test]
+        public void TestModOverlayClosesOnOpeningSkinEditor()
+        {
+            advanceToSongSelect();
+            AddStep("open mod overlay", () => songSelect.ModSelectOverlay.Show());
+
+            openSkinEditor();
+            AddUntilStep("mod overlay closed", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
         }
 
         private void switchToGameplayScene()
