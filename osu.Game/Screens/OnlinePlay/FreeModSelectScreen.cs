@@ -33,14 +33,14 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override IEnumerable<ShearedButton> CreateFooterButtons() => new[]
         {
-            new ShearedButton(200)
+            new ShearedButton(BUTTON_WIDTH)
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
                 Text = CommonStrings.SelectAll,
                 Action = SelectAll
             },
-            new ShearedButton(200)
+            new ShearedButton(BUTTON_WIDTH)
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,

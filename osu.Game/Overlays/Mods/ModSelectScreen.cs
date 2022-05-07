@@ -30,6 +30,8 @@ namespace osu.Game.Overlays.Mods
 {
     public abstract class ModSelectScreen : ShearedOverlayContainer
     {
+        protected const int BUTTON_WIDTH = 200;
+
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -65,12 +67,12 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => new[]
         {
-            customisationButton = new ShearedToggleButton(200)
+            customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
             {
                 Text = ModSelectScreenStrings.ModCustomisation,
                 Active = { BindTarget = customisationVisible }
             },
-            new ShearedButton(200)
+            new ShearedButton(BUTTON_WIDTH)
             {
                 Text = CommonStrings.DeselectAll,
                 Action = DeselectAll
@@ -83,8 +85,10 @@ namespace osu.Game.Overlays.Mods
         private ModSettingsArea modSettingsArea = null!;
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
-        private ShearedToggleButton? customisationButton;
+
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
+        private ShearedButton backButton = null!;
+        private ShearedToggleButton? customisationButton;
 
         protected ModSelectScreen(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
@@ -184,7 +188,7 @@ namespace osu.Game.Overlays.Mods
                     Horizontal = 70
                 },
                 Spacing = new Vector2(10),
-                ChildrenEnumerable = CreateFooterButtons().Prepend(new ShearedButton(200)
+                ChildrenEnumerable = CreateFooterButtons().Prepend(backButton = new ShearedButton(BUTTON_WIDTH)
                 {
                     Text = CommonStrings.Back,
                     Action = Hide,
@@ -378,9 +382,12 @@ namespace osu.Game.Overlays.Mods
             if (e.Repeat)
                 return false;
 
-            if (e.Action == GlobalAction.Back && customisationVisible.Value)
+            if (e.Action == GlobalAction.Back)
             {
-                customisationVisible.Value = false;
+                if (customisationVisible.Value)
+                    customisationVisible.Value = false;
+                else
+                    backButton.TriggerClick();
                 return true;
             }
 
