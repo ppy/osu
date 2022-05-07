@@ -422,6 +422,9 @@ namespace osu.Game.Overlays.Mods
 
         #endregion
 
+        /// <summary>
+        /// Manages horizontal scrolling of mod columns, along with the "active" states of each column based on visibility.
+        /// </summary>
         internal class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
         {
             public ColumnScrollContainer()
@@ -460,6 +463,9 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        /// <summary>
+        /// Manages padding and layout of mod columns.
+        /// </summary>
         internal class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
         {
             public IEnumerable<ModColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
@@ -496,11 +502,21 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        /// <summary>
+        /// Encapsulates a column and provides dim and input blocking based on an externally managed "active" state.
+        /// </summary>
         internal class ColumnDimContainer : Container
         {
             public ModColumn Column { get; }
 
+            /// <summary>
+            /// Tracks whether this column is in an interactive state. Generally only the case when the column is on-screen.
+            /// </summary>
             public readonly Bindable<bool> Active = new BindableBool();
+
+            /// <summary>
+            /// Invoked when the column is clicked while not active, requesting a scroll to be performed to bring it on-screen.
+            /// </summary>
             public Action<ColumnDimContainer>? RequestScroll { get; set; }
 
             [Resolved]
@@ -555,6 +571,9 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        /// <summary>
+        /// A container which blocks and handles input, managing the "return from customisation" state change.
+        /// </summary>
         private class ClickToReturnContainer : Container
         {
             public BindableBool HandleMouse { get; } = new BindableBool();
