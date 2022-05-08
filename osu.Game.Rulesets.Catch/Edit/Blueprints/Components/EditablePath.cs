@@ -92,13 +92,31 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         public void UpdateHitObjectFromPath(JuiceStream hitObject)
         {
-            path.ConvertToSliderPath(hitObject.Path, hitObject.LegacyConvertedY, hitObject.Velocity);
+            // The SV setting may need to be changed for the current path.
+            var svBindable = hitObject.DifficultyControlPoint.SliderVelocityBindable;
+            double svToVelocityFactor = hitObject.Velocity / svBindable.Value;
+            double requiredVelocity = path.ComputeRequiredVelocity();
+
+            // The value is pre-rounded here because setting it to the bindable will rounded to the nearest value
+            // but it should be always rounded up to satisfy the required minimum velocity condition.
+            //
+            // This is rounded to integers instead of using the precision of the bindable
+            // because it results in a smaller number of non-redundant control points.
+            //
+            // The value is clamped here by the bindable min and max values.
+            // In case the required velocity is too large, the path is not preserved.
+            svBindable.Value = Math.Ceiling(requiredVelocity / svToVelocityFactor);
+
+            // Calculate the velocity using the resulting SV because `hitObject.Velocity` is not recomputed yet.
+            double velocity = svBindable.Value * svToVelocityFactor;
+
+            path.ConvertToSliderPath(hitObject.Path, hitObject.LegacyConvertedY, velocity);
 
             if (beatSnapProvider == null) return;
 
             double endTime = hitObject.StartTime + path.Duration;
             double snappedEndTime = beatSnapProvider.SnapTime(endTime, hitObject.StartTime);
-            hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * hitObject.Velocity;
+            hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * velocity;
         }
 
         public Vector2 ToRelativePosition(Vector2 screenSpacePosition)

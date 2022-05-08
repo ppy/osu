@@ -207,6 +207,11 @@ namespace osu.Game.Rulesets.Catch.Objects
             {
                 double xDifference = Math.Abs((double)vertices[i].X - vertices[i - 1].X);
                 double timeDifference = vertices[i].Time - vertices[i - 1].Time;
+
+                // A short segment won't affect the resulting path much anyways so ignore it to avoid divide-by-zero.
+                if (Precision.AlmostEquals(timeDifference, 0))
+                    continue;
+
                 maximumSlope = Math.Max(maximumSlope, xDifference / timeDifference);
             }
 
