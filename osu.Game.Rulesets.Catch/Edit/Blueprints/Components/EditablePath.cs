@@ -107,16 +107,13 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             // In case the required velocity is too large, the path is not preserved.
             svBindable.Value = Math.Ceiling(requiredVelocity / svToVelocityFactor);
 
-            // Calculate the velocity using the resulting SV because `hitObject.Velocity` is not recomputed yet.
-            double velocity = svBindable.Value * svToVelocityFactor;
-
-            path.ConvertToSliderPath(hitObject.Path, hitObject.LegacyConvertedY, velocity);
+            path.ConvertToSliderPath(hitObject.Path, hitObject.LegacyConvertedY, hitObject.Velocity);
 
             if (beatSnapProvider == null) return;
 
             double endTime = hitObject.StartTime + path.Duration;
             double snappedEndTime = beatSnapProvider.SnapTime(endTime, hitObject.StartTime);
-            hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * velocity;
+            hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * hitObject.Velocity;
         }
 
         public Vector2 ToRelativePosition(Vector2 screenSpacePosition)
