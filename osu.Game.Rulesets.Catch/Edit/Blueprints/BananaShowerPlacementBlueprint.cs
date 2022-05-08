@@ -18,13 +18,18 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             InternalChild = outline = new TimeSpanOutline();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            BeginPlacement();
+        }
+
         protected override void Update()
         {
             base.Update();
 
             outline.UpdateFrom(HitObjectContainer, HitObject);
-
-            BeginPlacement();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
