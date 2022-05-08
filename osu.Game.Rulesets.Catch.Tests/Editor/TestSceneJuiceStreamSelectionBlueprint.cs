@@ -234,10 +234,10 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         {
             var path = new JuiceStreamPath();
             for (int i = 1; i < times.Length; i++)
-                path.Add((times[i] - times[0]) * velocity, positions[i] - positions[0]);
+                path.Add(times[i] - times[0], positions[i] - positions[0]);
 
             var sliderPath = new SliderPath();
-            path.ConvertToSliderPath(sliderPath, 0);
+            path.ConvertToSliderPath(sliderPath, 0, velocity);
             addBlueprintStep(times[0], positions[0], sliderPath, velocity);
         }
 
@@ -245,11 +245,11 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
         private void addVertexCheckStep(int count, int index, double time, float x) => AddAssert($"vertex {index} of {count} at {time}, {x}", () =>
         {
-            double expectedDistance = (time - hitObject.StartTime) * hitObject.Velocity;
+            double expectedTime = time - hitObject.StartTime;
             float expectedX = x - hitObject.OriginalX;
             var vertices = getVertices();
             return vertices.Count == count &&
-                   Precision.AlmostEquals(vertices[index].Distance, expectedDistance, 1e-3) &&
+                   Precision.AlmostEquals(vertices[index].Time, expectedTime, 1e-3) &&
                    Precision.AlmostEquals(vertices[index].X, expectedX);
         });
 
