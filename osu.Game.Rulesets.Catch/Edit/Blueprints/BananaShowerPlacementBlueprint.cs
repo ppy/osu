@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             base.Update();
 
             outline.UpdateFrom(HitObjectContainer, HitObject);
+
+            BeginPlacement();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
