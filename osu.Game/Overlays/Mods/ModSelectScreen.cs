@@ -580,17 +580,20 @@ namespace osu.Game.Overlays.Mods
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Active.BindValueChanged(_ => updateDim(), true);
+                Active.BindValueChanged(_ => updateState());
+                Column.AllFiltered.BindValueChanged(_ => updateState(), true);
                 FinishTransforms();
             }
 
             protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || Column.SelectionAnimationRunning;
 
-            private void updateDim()
+            private void updateState()
             {
                 Colour4 targetColour;
 
-                if (Active.Value)
+                Column.Alpha = Column.AllFiltered.Value ? 0 : 1;
+
+                if (Column.Active.Value)
                     targetColour = Colour4.White;
                 else
                     targetColour = IsHovered ? colours.GrayC : colours.Gray8;
@@ -609,14 +612,14 @@ namespace osu.Game.Overlays.Mods
             protected override bool OnHover(HoverEvent e)
             {
                 base.OnHover(e);
-                updateDim();
+                updateState();
                 return Active.Value;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 base.OnHoverLost(e);
-                updateDim();
+                updateState();
             }
         }
 
