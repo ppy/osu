@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             {
                 path.ResampleVertices(hitObject.NestedHitObjects
                                                .Skip(1).TakeWhile(h => !(h is Fruit)) // Only droplets in the first span are used.
-                                               .Select(h => (h.StartTime - hitObject.StartTime) * hitObject.Velocity));
+                                               .Select(h => h.StartTime - hitObject.StartTime));
             }
 
             vertexStates.Clear();
