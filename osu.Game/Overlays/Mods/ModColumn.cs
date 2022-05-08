@@ -55,7 +55,17 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        /// <summary>
+        /// Determines whether this column should accept user input.
+        /// </summary>
         public Bindable<bool> Active = new BindableBool(true);
+
+        private readonly Bindable<bool> allFiltered = new BindableBool();
+
+        /// <summary>
+        /// True if all of the panels in this column have been filtered out by the current <see cref="Filter"/>.
+        /// </summary>
+        public IBindable<bool> AllFiltered => allFiltered;
 
         /// <summary>
         /// List of mods marked as selected in this column.
@@ -338,6 +348,9 @@ namespace osu.Game.Overlays.Mods
                 panel.Active.Value = SelectedMods.Contains(panel.Mod);
                 panel.ApplyFilter(Filter);
             }
+
+            allFiltered.Value = panelFlow.All(panel => panel.Filtered.Value);
+            Alpha = allFiltered.Value ? 0 : 1;
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
