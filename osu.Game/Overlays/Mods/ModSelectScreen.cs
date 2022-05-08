@@ -213,7 +213,7 @@ namespace osu.Game.Overlays.Mods
             // there is more horizontal content available.
             ScheduleAfterChildren(() =>
             {
-                columnScroll.ScrollTo(100, false);
+                columnScroll.ScrollTo(200, false);
                 columnScroll.ScrollToStart();
             });
         }
