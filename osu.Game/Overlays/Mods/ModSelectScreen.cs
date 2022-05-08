@@ -393,30 +393,38 @@ namespace osu.Game.Overlays.Mods
             if (e.Repeat)
                 return false;
 
-            // This is handled locally here because this overlay is being registered at the game level
-            // and therefore takes away keyboard focus from the screen stack.
-            if (e.Action == GlobalAction.Back)
-            {
-                if (customisationVisible.Value)
-                    customisationVisible.Value = false;
-                else
-                    backButton.TriggerClick();
-                return true;
-            }
-
             switch (e.Action)
             {
+                case GlobalAction.Back:
+                    // Pressing the back binding should only go back one step at a time.
+                    hideOverlay(false);
+                    return true;
+
+                // This is handled locally here because this overlay is being registered at the game level
+                // and therefore takes away keyboard focus from the screen stack.
                 case GlobalAction.ToggleModSelection:
                 case GlobalAction.Select:
                 {
-                    if (customisationVisible.Value)
-                        customisationVisible.Value = false;
-                    Hide();
+                    // Pressing toggle or select should completely hide the overlay in one shot.
+                    hideOverlay(true);
                     return true;
                 }
+            }
 
-                default:
-                    return base.OnPressed(e);
+            return base.OnPressed(e);
+
+            void hideOverlay(bool immediate)
+            {
+                if (customisationVisible.Value)
+                {
+                    Debug.Assert(customisationButton != null);
+                    customisationButton.TriggerClick();
+
+                    if (!immediate)
+                        return;
+                }
+
+                backButton.TriggerClick();
             }
         }
 
