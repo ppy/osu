@@ -208,6 +208,14 @@ namespace osu.Game.Overlays.Mods
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
             updateAvailableMods();
+
+            // Start scrolled slightly to the right to give the user a sense that
+            // there is more horizontal content available.
+            ScheduleAfterChildren(() =>
+            {
+                columnScroll.ScrollTo(200, false);
+                columnScroll.ScrollToStart();
+            });
         }
 
         /// <summary>
