@@ -349,26 +349,51 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                     ColumnDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.Absolute, 215),
-                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, 200),
+                        new Dimension(GridSizeMode.Absolute, 15),
                         new Dimension(),
                     },
                     Content = new[]
                     {
                         new[]
                         {
-                            Drawable.Empty(),
-                            new OsuSpriteText
+                            new GridContainer
                             {
-                                Text = time.ToLocalTime().ToString("dd MMMM yyyy").ToUpper(),
-                                Font = OsuFont.Torus.With(size: 15, weight: FontWeight.SemiBold),
-                                Colour = colourProvider.Content1,
-                                Margin = new MarginPadding { Right = 10 },
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.Absolute, 15),
+                                    new Dimension(GridSizeMode.AutoSize),
+                                },
+                                Content = new[]
+                                {
+                                    new[]
+                                    {
+                                        new Circle
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            Colour = colourProvider.Background5,
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = 2,
+                                        },
+                                        Drawable.Empty(),
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            Text = time.ToLocalTime().ToString("dd MMMM yyyy").ToUpper(),
+                                            Font = OsuFont.Torus.With(size: 15, weight: FontWeight.SemiBold),
+                                            Colour = colourProvider.Content1,
+                                        },
+                                    },
+                                },
                             },
-                            new Box
+                            Drawable.Empty(),
+                            new Circle
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
