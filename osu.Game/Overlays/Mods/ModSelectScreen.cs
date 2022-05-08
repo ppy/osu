@@ -129,7 +129,6 @@ namespace osu.Game.Overlays.Mods
                                 Shear = new Vector2(SHEAR, 0),
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
-                                Spacing = new Vector2(10, 0),
                                 Margin = new MarginPadding { Horizontal = 70 },
                                 Children = new[]
                                 {
@@ -237,12 +236,21 @@ namespace osu.Game.Overlays.Mods
         }
 
         private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
-            => new ColumnDimContainer(CreateModColumn(modType, toggleKeys).With(column => column.Filter = IsValidMod))
+        {
+            var column = CreateModColumn(modType, toggleKeys).With(column =>
+            {
+                column.Filter = IsValidMod;
+                // spacing applied here rather than via `columnFlow.Spacing` to avoid uneven gaps when some of the columns are hidden.
+                column.Margin = new MarginPadding { Right = 10 };
+            });
+
+            return new ColumnDimContainer(column)
             {
                 AutoSizeAxes = Axes.X,
                 RelativeSizeAxes = Axes.Y,
-                RequestScroll = column => columnScroll.ScrollIntoView(column, extraScroll: 140),
+                RequestScroll = col => columnScroll.ScrollIntoView(col, extraScroll: 140),
             };
+        }
 
         private ShearedButton[] createDefaultFooterButtons()
             => new[]
