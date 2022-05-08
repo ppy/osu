@@ -350,7 +350,6 @@ namespace osu.Game.Overlays.Mods
             }
 
             allFiltered.Value = panelFlow.All(panel => panel.Filtered.Value);
-            Alpha = allFiltered.Value ? 0 : 1;
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
