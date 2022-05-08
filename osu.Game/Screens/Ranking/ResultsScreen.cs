@@ -14,7 +14,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
@@ -41,7 +40,7 @@ namespace osu.Game.Screens.Ranking
 
         protected ScorePanelList ScorePanelList { get; private set; }
 
-        protected VerticalScrollContainer VerticalScrollContent { get; private set; }
+        protected Container Content { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
@@ -79,10 +78,9 @@ namespace osu.Game.Screens.Ranking
                 {
                     new Drawable[]
                     {
-                        VerticalScrollContent = new VerticalScrollContainer
+                        Content = new DrawSizePreservingFillContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ScrollbarVisible = false,
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -345,26 +343,6 @@ namespace osu.Game.Screens.Ranking
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-        }
-
-        protected class VerticalScrollContainer : OsuScrollContainer
-        {
-            protected override Container<Drawable> Content => content;
-
-            private readonly Container content;
-
-            public VerticalScrollContainer()
-            {
-                Masking = false;
-
-                base.Content.Add(content = new Container { RelativeSizeAxes = Axes.X });
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-                content.Height = Math.Max(screen_height, DrawHeight);
-            }
         }
     }
 }
