@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Chat
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Padding = new MarginPadding(15);
+                Padding = new MarginPadding { Horizontal = 15, Vertical = 20 };
                 Child = new GridContainer
                 {
                     RelativeSizeAxes = Axes.X,
