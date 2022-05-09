@@ -130,7 +130,6 @@ namespace osu.Game.Overlays.Mods
                                 Shear = new Vector2(SHEAR, 0),
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
-                                Spacing = new Vector2(10, 0),
                                 Margin = new MarginPadding { Horizontal = 70 },
                                 Padding = new MarginPadding { Bottom = 10 },
                                 Children = new[]
@@ -239,12 +238,21 @@ namespace osu.Game.Overlays.Mods
         }
 
         private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
-            => new ColumnDimContainer(CreateModColumn(modType, toggleKeys))
+        {
+            var column = CreateModColumn(modType, toggleKeys).With(column =>
+            {
+                column.Filter = IsValidMod;
+                // spacing applied here rather than via `columnFlow.Spacing` to avoid uneven gaps when some of the columns are hidden.
+                column.Margin = new MarginPadding { Right = 10 };
+            });
+
+            return new ColumnDimContainer(column)
             {
                 AutoSizeAxes = Axes.X,
                 RelativeSizeAxes = Axes.Y,
-                RequestScroll = column => columnScroll.ScrollIntoView(column, extraScroll: 140)
+                RequestScroll = col => columnScroll.ScrollIntoView(col, extraScroll: 140),
             };
+        }
 
         private ShearedButton[] createDefaultFooterButtons()
             => new[]
@@ -353,6 +361,8 @@ namespace osu.Game.Overlays.Mods
 
         #region Transition handling
 
+        private const float distance = 700;
+
         protected override void PopIn()
         {
             const double fade_in_duration = 400;
@@ -364,13 +374,26 @@ namespace osu.Game.Overlays.Mods
                 .FadeIn(fade_in_duration / 2, Easing.OutQuint)
                 .ScaleTo(1, fade_in_duration, Easing.OutElastic);
 
+            int nonFilteredColumnCount = 0;
+
             for (int i = 0; i < columnFlow.Count; i++)
             {
-                columnFlow[i].Column
-                             .TopLevelContent
-                             .Delay(i * 30)
-                             .MoveToY(0, fade_in_duration, Easing.OutQuint)
-                             .FadeIn(fade_in_duration, Easing.OutQuint);
+                var column = columnFlow[i].Column;
+
+                double delay = column.AllFiltered.Value ? 0 : nonFilteredColumnCount * 30;
+                double duration = column.AllFiltered.Value ? 0 : fade_in_duration;
+                float startingYPosition = 0;
+                if (!column.AllFiltered.Value)
+                    startingYPosition = nonFilteredColumnCount % 2 == 0 ? -distance : distance;
+
+                column.TopLevelContent
+                      .MoveToY(startingYPosition)
+                      .Delay(delay)
+                      .MoveToY(0, duration, Easing.OutQuint)
+                      .FadeIn(duration, Easing.OutQuint);
+
+                if (!column.AllFiltered.Value)
+                    nonFilteredColumnCount += 1;
             }
         }
 
@@ -384,16 +407,24 @@ namespace osu.Game.Overlays.Mods
                 .FadeOut(fade_out_duration / 2, Easing.OutQuint)
                 .ScaleTo(0.75f, fade_out_duration, Easing.OutQuint);
 
+            int nonFilteredColumnCount = 0;
+
             for (int i = 0; i < columnFlow.Count; i++)
             {
-                const float distance = 700;
-
                 var column = columnFlow[i].Column;
+
+                double duration = column.AllFiltered.Value ? 0 : fade_out_duration;
+                float newYPosition = 0;
+                if (!column.AllFiltered.Value)
+                    newYPosition = nonFilteredColumnCount % 2 == 0 ? -distance : distance;
 
                 column.FlushPendingSelections();
                 column.TopLevelContent
-                      .MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint)
-                      .FadeOut(fade_out_duration, Easing.OutQuint);
+                      .MoveToY(newYPosition, duration, Easing.OutQuint)
+                      .FadeOut(duration, Easing.OutQuint);
+
+                if (!column.AllFiltered.Value)
+                    nonFilteredColumnCount += 1;
             }
         }
 
@@ -536,17 +567,20 @@ namespace osu.Game.Overlays.Mods
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Active.BindValueChanged(_ => updateDim(), true);
+                Active.BindValueChanged(_ => updateState());
+                Column.AllFiltered.BindValueChanged(_ => updateState(), true);
                 FinishTransforms();
             }
 
             protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || Column.SelectionAnimationRunning;
 
-            private void updateDim()
+            private void updateState()
             {
                 Colour4 targetColour;
 
-                if (Active.Value)
+                Column.Alpha = Column.AllFiltered.Value ? 0 : 1;
+
+                if (Column.Active.Value)
                     targetColour = Colour4.White;
                 else
                     targetColour = IsHovered ? colours.GrayC : colours.Gray8;
@@ -565,14 +599,14 @@ namespace osu.Game.Overlays.Mods
             protected override bool OnHover(HoverEvent e)
             {
                 base.OnHover(e);
-                updateDim();
+                updateState();
                 return Active.Value;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 base.OnHoverLost(e);
-                updateDim();
+                updateState();
             }
         }
 
