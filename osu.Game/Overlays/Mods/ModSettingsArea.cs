@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Mods
                         new[] { Empty() },
                         new Drawable[]
                         {
-                            new NestedVerticalScrollContainer
+                            new OsuScrollContainer(Direction.Vertical)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 ClampExtension = 100,

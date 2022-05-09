@@ -415,6 +415,72 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("unimplemented mod panel is filtered", () => getPanelForMod(typeof(TestUnimplementedMod)).Filtered.Value);
         }
 
+        [Test]
+        public void TestDeselectAllViaButton()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select DT + HD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden() });
+            AddAssert("DT + HD selected", () => modSelectScreen.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
+
+            AddStep("click deselect all button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("all mods deselected", () => !SelectedMods.Value.Any());
+        }
+
+        [Test]
+        public void TestCloseViaBackButton()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select difficulty adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
+            assertCustomisationToggleState(disabled: false, active: true);
+            AddAssert("back button disabled", () => !this.ChildrenOfType<ShearedButton>().First().Enabled.Value);
+
+            AddStep("dismiss customisation area", () => InputManager.Key(Key.Escape));
+            AddStep("click back button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("mod select hidden", () => modSelectScreen.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestColumnHiding()
+        {
+            AddStep("create screen", () => Child = modSelectScreen = new UserModSelectScreen
+            {
+                RelativeSizeAxes = Axes.Both,
+                State = { Value = Visibility.Visible },
+                SelectedMods = { BindTarget = SelectedMods },
+                IsValidMod = mod => mod.Type == ModType.DifficultyIncrease || mod.Type == ModType.Conversion
+            });
+            waitForColumnLoad();
+            changeRuleset(0);
+
+            AddAssert("two columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 2);
+
+            AddStep("unset filter", () => modSelectScreen.IsValidMod = _ => true);
+            AddAssert("all columns visible", () => this.ChildrenOfType<ModColumn>().All(col => col.IsPresent));
+
+            AddStep("filter out everything", () => modSelectScreen.IsValidMod = _ => false);
+            AddAssert("no columns visible", () => this.ChildrenOfType<ModColumn>().All(col => !col.IsPresent));
+
+            AddStep("hide", () => modSelectScreen.Hide());
+            AddStep("set filter for 3 columns", () => modSelectScreen.IsValidMod = mod => mod.Type == ModType.DifficultyReduction
+                                                                                          || mod.Type == ModType.Automation
+                                                                                          || mod.Type == ModType.Conversion);
+
+            AddStep("show", () => modSelectScreen.Show());
+            AddUntilStep("3 columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 3);
+        }
+
         private void waitForColumnLoad() => AddUntilStep("all column content loaded",
             () => modSelectScreen.ChildrenOfType<ModColumn>().Any() && modSelectScreen.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
 

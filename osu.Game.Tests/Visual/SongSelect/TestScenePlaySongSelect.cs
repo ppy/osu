@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -18,6 +19,7 @@ using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -918,6 +920,19 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check ruleset is correct for score", () => Ruleset.Value.OnlineID == 0);
         }
 
+        [Test]
+        public void TestModOverlayToggling()
+        {
+            changeRuleset(0);
+            createSongSelect();
+
+            AddStep("toggle mod overlay on", () => InputManager.Key(Key.F1));
+            AddUntilStep("mod overlay shown", () => songSelect.ModSelect.State.Value == Visibility.Visible);
+
+            AddStep("toggle mod overlay off", () => InputManager.Key(Key.F1));
+            AddUntilStep("mod overlay hidden", () => songSelect.ModSelect.State.Value == Visibility.Hidden);
+        }
+
         private void waitForInitialSelection()
         {
             AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
@@ -993,6 +1008,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
             public IWorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
+            public new ModSelectScreen ModSelect => base.ModSelect;
 
             public new void PresentScore(ScoreInfo score) => base.PresentScore(score);
 

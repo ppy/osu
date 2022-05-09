@@ -168,8 +168,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
 
+            AddUntilStep("mod select contents loaded",
+                () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
             AddUntilStep("mod select contains only double time mod",
-                () => this.ChildrenOfType<UserModSelectOverlay>().SingleOrDefault()?.ChildrenOfType<ModButton>().SingleOrDefault()?.Mod is OsuModDoubleTime);
+                () => this.ChildrenOfType<UserModSelectScreen>()
+                          .SingleOrDefault()?
+                          .ChildrenOfType<ModPanel>()
+                          .SingleOrDefault(panel => !panel.Filtered.Value)?.Mod is OsuModDoubleTime);
         }
     }
 }

@@ -57,6 +57,17 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestScaling()
+        {
+            // scheduling is needed as scaling the content immediately causes the entire scene to shake badly, for some odd reason.
+            AddSliderStep("scale", 0.5f, 1.6f, 1f, v => Schedule(() =>
+            {
+                Content.Scale = new Vector2(v);
+                Content.Size = new Vector2(1f / v);
+            }));
+        }
+
+        [Test]
         public void TestResultsWithoutPlayer()
         {
             TestResultsScreen screen = null;

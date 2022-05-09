@@ -31,8 +31,6 @@ namespace osu.Game.Overlays
     [Cached]
     public class FirstRunSetupOverlay : ShearedOverlayContainer
     {
-        protected override OverlayColourScheme ColourScheme => OverlayColourScheme.Purple;
-
         [Resolved]
         private IPerformFromScreenRunner performer { get; set; } = null!;
 
@@ -69,6 +67,11 @@ namespace osu.Game.Overlays
         private Bindable<OverlayActivation>? overlayActivationMode;
 
         private Container content = null!;
+
+        public FirstRunSetupOverlay()
+            : base(OverlayColourScheme.Purple)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

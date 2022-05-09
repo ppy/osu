@@ -2,11 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -51,14 +55,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 float diameter = (i + 1) * DistanceBetweenTicks * 2;
 
-                AddInternal(new CircularProgress
+                AddInternal(new Ring(ReferenceObject, GetColourForIndexFromPlacement(i))
                 {
-                    Origin = Anchor.Centre,
                     Position = StartPosition,
-                    Current = { Value = 1 },
+                    Origin = Anchor.Centre,
                     Size = new Vector2(diameter),
                     InnerRadius = 4 * 1f / diameter,
-                    Colour = GetColourForIndexFromPlacement(i)
                 });
             }
         }
@@ -99,6 +101,46 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 snappedPosition = StartPosition + travelVector.Normalized() * snappedDistance * distanceSpacingMultiplier;
 
             return (snappedPosition, snappedTime);
+        }
+
+        private class Ring : CircularProgress
+        {
+            [Resolved]
+            private IDistanceSnapProvider snapProvider { get; set; }
+
+            [Resolved(canBeNull: true)]
+            private EditorClock editorClock { get; set; }
+
+            private readonly HitObject referenceObject;
+
+            private readonly Color4 baseColour;
+
+            public Ring(HitObject referenceObject, Color4 baseColour)
+            {
+                this.referenceObject = referenceObject;
+
+                Colour = this.baseColour = baseColour;
+
+                Current.Value = 1;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (editorClock == null)
+                    return;
+
+                float distanceSpacingMultiplier = (float)snapProvider.DistanceSpacingMultiplier.Value;
+                double timeFromReferencePoint = editorClock.CurrentTime - referenceObject.GetEndTime();
+
+                float distanceForCurrentTime = snapProvider.DurationToDistance(referenceObject, timeFromReferencePoint)
+                                               * distanceSpacingMultiplier;
+
+                float timeBasedAlpha = 1 - Math.Clamp(Math.Abs(distanceForCurrentTime - Size.X / 2) / 30, 0, 1);
+
+                Colour = baseColour.Opacity(Math.Max(baseColour.A, timeBasedAlpha));
+            }
         }
     }
 }
