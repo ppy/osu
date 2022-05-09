@@ -12,12 +12,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Back"
         /// </summary>
-        public static LocalisableString Back => new TranslatableString(getKey(@"back"), @"Back");
+        public static LocalisableString Back => new TranslatableString(getKey(@"llin_back"), @"上一步");
 
         /// <summary>
         /// "Next"
         /// </summary>
-        public static LocalisableString Next => new TranslatableString(getKey(@"next"), @"Next");
+        public static LocalisableString Next => new TranslatableString(getKey(@"llin_next"), @"下一步");
 
         /// <summary>
         /// "Finish"
@@ -27,12 +27,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Enabled"
         /// </summary>
-        public static LocalisableString Enabled => new TranslatableString(getKey(@"enabled"), @"启用");
+        public static LocalisableString Enabled => new TranslatableString(getKey(@"llin_enabled"), @"已启用");
 
         /// <summary>
         /// "Disabled"
         /// </summary>
-        public static LocalisableString Disabled => new TranslatableString(getKey(@"disabled"), @"Disabled");
+        public static LocalisableString Disabled => new TranslatableString(getKey(@"llin_disabled"), @"已禁用");
 
         /// <summary>
         /// "Default"
@@ -62,12 +62,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Deselect All"
         /// </summary>
-        public static LocalisableString DeselectAll => new TranslatableString(getKey(@"deselect_all"), @"Deselect All");
+        public static LocalisableString DeselectAll => new TranslatableString(getKey(@"llin_deselect_all"), @"取消全选");
 
         /// <summary>
         /// "Select All"
         /// </summary>
-        public static LocalisableString SelectAll => new TranslatableString(getKey(@"select_all"), @"Select All");
+        public static LocalisableString SelectAll => new TranslatableString(getKey(@"llin_select_all"), @"全选");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

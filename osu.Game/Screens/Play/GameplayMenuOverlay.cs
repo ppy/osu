@@ -148,8 +148,7 @@ namespace osu.Game.Screens.Play
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Margin = new MarginPadding(25),
-                    AllowAutoDisplay = false
+                    Margin = new MarginPadding(25)
                 }
             };
 
