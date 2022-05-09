@@ -165,7 +165,12 @@ namespace osu.Game.Overlays
             };
             channelList.OnRequestLeave += channel => channelManager.LeaveChannel(channel);
 
-            channelListing.OnRequestJoin += channel => channelManager.JoinChannel(channel);
+            channelListing.OnRequestJoin += channel =>
+            {
+                channelManager.JoinChannel(channel);
+                // Manually joining a channel should keep the selector open
+                selectorActive.Value = true;
+            };
             channelListing.OnRequestLeave += channel => channelManager.LeaveChannel(channel);
 
             textBar.OnSearchTermsChanged += searchTerms => channelListing.SearchTerm = searchTerms;
@@ -255,6 +260,10 @@ namespace osu.Game.Overlays
             // Channel is null when leaving the currently selected channel
             if (newChannel == null)
             {
+                // Don't need to autoswitch if the selector is visible
+                if (selectorActive.Value)
+                    return;
+
                 // Find another channel to switch to
                 newChannel = channelManager.JoinedChannels.FirstOrDefault(c => c != channel.OldValue);
 
