@@ -156,6 +156,8 @@ namespace osu.Game.Overlays
 
         private void updateExpandedState(ValueChangedEvent<bool> expanded)
         {
+            content.ClearTransforms();
+
             if (expanded.NewValue)
                 content.AutoSizeAxes = Axes.Y;
             else
