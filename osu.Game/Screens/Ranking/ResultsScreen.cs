@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     new Drawable[]
                     {
-                        Content = new Container
+                        Content = new DrawSizePreservingFillContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Child = new Container
