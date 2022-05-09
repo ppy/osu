@@ -46,6 +46,20 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
+        private readonly BindableNumber<double> frequencyAdjustment = new BindableDouble
+        {
+            Default = 1,
+            Value = 1,
+            Precision = 0.01
+        };
+
+        private readonly BindableNumber<double> tempoAdjustment = new BindableDouble
+        {
+            Default = 1,
+            Value = 1,
+            Precision = 0.01
+        };
+
         private ITrack track;
 
         protected ModTimeRamp()
@@ -57,7 +71,11 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToTrack(ITrack track)
         {
+            // stored only for the purpose of accessing track.CurrentTime.
             this.track = track;
+
+            track.AddAdjustment(AdjustableProperty.Frequency, frequencyAdjustment);
+            track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
 
             FinalRate.TriggerChange();
             AdjustPitch.TriggerChange();
@@ -100,13 +118,13 @@ namespace osu.Game.Rulesets.Mods
 
         private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
         {
-            // remove existing old adjustment
-            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
+            adjustmentForPitchSetting(adjustPitchSetting.OldValue).UnbindFrom(SpeedChange);
+            adjustmentForPitchSetting(adjustPitchSetting.OldValue).SetDefault();
 
-            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
+            adjustmentForPitchSetting(adjustPitchSetting.NewValue).BindTo(SpeedChange);
         }
 
-        private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
-            => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
+        private BindableNumber<double> adjustmentForPitchSetting(bool adjustPitchSettingValue)
+            => adjustPitchSettingValue ? frequencyAdjustment : tempoAdjustment;
     }
 }

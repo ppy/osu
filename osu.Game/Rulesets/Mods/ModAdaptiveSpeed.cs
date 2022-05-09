@@ -65,6 +65,22 @@ namespace osu.Game.Rulesets.Mods
             Value = 1
         };
 
+        private readonly BindableNumber<double> frequencyAdjustment = new BindableDouble
+        {
+            MinValue = min_allowable_rate,
+            MaxValue = max_allowable_rate,
+            Default = 1,
+            Value = 1
+        };
+
+        private readonly BindableNumber<double> tempoAdjustment = new BindableDouble
+        {
+            MinValue = min_allowable_rate,
+            MaxValue = max_allowable_rate,
+            Default = 1,
+            Value = 1
+        };
+
         // The two constants below denote the maximum allowable range of rates that `SpeedChange` can take.
         // The range is purposefully wider than the range of values that `InitialRate` allows
         // in order to give some leeway for change even when extreme initial rates are chosen.
@@ -79,7 +95,6 @@ namespace osu.Game.Rulesets.Mods
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
         private const double rate_change_on_miss = 0.95d;
 
-        private ITrack track;
         private double targetRate = 1d;
 
         /// <summary>
@@ -143,7 +158,8 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToTrack(ITrack track)
         {
-            this.track = track;
+            track.AddAdjustment(AdjustableProperty.Frequency, frequencyAdjustment);
+            track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
 
             InitialRate.TriggerChange();
             AdjustPitch.TriggerChange();
@@ -209,13 +225,14 @@ namespace osu.Game.Rulesets.Mods
 
         private void adjustPitchChanged(ValueChangedEvent<bool> adjustPitchSetting)
         {
-            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
+            adjustmentForPitchSetting(adjustPitchSetting.OldValue).UnbindFrom(SpeedChange);
+            adjustmentForPitchSetting(adjustPitchSetting.OldValue).SetDefault();
 
-            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
+            adjustmentForPitchSetting(adjustPitchSetting.NewValue).BindTo(SpeedChange);
         }
 
-        private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
-            => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
+        private BindableNumber<double> adjustmentForPitchSetting(bool adjustPitchSettingValue)
+            => adjustPitchSettingValue ? frequencyAdjustment : tempoAdjustment;
 
         private IEnumerable<HitObject> getAllApplicableHitObjects(IEnumerable<HitObject> hitObjects)
         {
