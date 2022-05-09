@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
@@ -175,6 +176,42 @@ namespace osu.Game.Tests.Visual.Multiplayer
                           .SingleOrDefault()?
                           .ChildrenOfType<ModPanel>()
                           .SingleOrDefault(panel => !panel.Filtered.Value)?.Mod is OsuModDoubleTime);
+        }
+
+        [Test]
+        public void TestNextPlaylistItemSelectedAfterCompletion()
+        {
+            AddStep("add two playlist items", () =>
+            {
+                SelectedRoom.Value.Playlist.AddRange(new[]
+                {
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    },
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                });
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            AddStep("change user to loaded", () => MultiplayerClient.ChangeState(MultiplayerUserState.Loaded));
+            AddUntilStep("user playing", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Playing);
+            AddStep("abort gameplay", () => MultiplayerClient.AbortGameplay());
+
+            AddUntilStep("last playlist item selected", () =>
+            {
+                var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.APIRoom?.Playlist.Last().ID);
+                return lastItem.IsSelectedItem;
+            });
         }
     }
 }

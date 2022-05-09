@@ -451,6 +451,36 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("mod select hidden", () => modSelectScreen.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestColumnHiding()
+        {
+            AddStep("create screen", () => Child = modSelectScreen = new UserModSelectScreen
+            {
+                RelativeSizeAxes = Axes.Both,
+                State = { Value = Visibility.Visible },
+                SelectedMods = { BindTarget = SelectedMods },
+                IsValidMod = mod => mod.Type == ModType.DifficultyIncrease || mod.Type == ModType.Conversion
+            });
+            waitForColumnLoad();
+            changeRuleset(0);
+
+            AddAssert("two columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 2);
+
+            AddStep("unset filter", () => modSelectScreen.IsValidMod = _ => true);
+            AddAssert("all columns visible", () => this.ChildrenOfType<ModColumn>().All(col => col.IsPresent));
+
+            AddStep("filter out everything", () => modSelectScreen.IsValidMod = _ => false);
+            AddAssert("no columns visible", () => this.ChildrenOfType<ModColumn>().All(col => !col.IsPresent));
+
+            AddStep("hide", () => modSelectScreen.Hide());
+            AddStep("set filter for 3 columns", () => modSelectScreen.IsValidMod = mod => mod.Type == ModType.DifficultyReduction
+                                                                                          || mod.Type == ModType.Automation
+                                                                                          || mod.Type == ModType.Conversion);
+
+            AddStep("show", () => modSelectScreen.Show());
+            AddUntilStep("3 columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 3);
+        }
+
         private void waitForColumnLoad() => AddUntilStep("all column content loaded",
             () => modSelectScreen.ChildrenOfType<ModColumn>().Any() && modSelectScreen.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
 

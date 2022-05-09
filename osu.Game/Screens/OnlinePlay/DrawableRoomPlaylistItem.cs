@@ -65,6 +65,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         public readonly PlaylistItem Item;
 
+        public bool IsSelectedItem => SelectedItem.Value?.ID == Item.ID;
+
         private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
         private readonly IBindable<bool> valid = new Bindable<bool>();
 
@@ -128,12 +130,10 @@ namespace osu.Game.Screens.OnlinePlay
 
             SelectedItem.BindValueChanged(selected =>
             {
-                bool isCurrent = selected.NewValue == Model;
-
                 if (!valid.Value)
                 {
                     // Don't allow selection when not valid.
-                    if (isCurrent)
+                    if (IsSelectedItem)
                     {
                         SelectedItem.Value = selected.OldValue;
                     }
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.OnlinePlay
                     return;
                 }
 
-                maskingContainer.BorderThickness = isCurrent ? 5 : 0;
+                maskingContainer.BorderThickness = IsSelectedItem ? 5 : 0;
             }, true);
 
             valid.BindValueChanged(_ => Scheduler.AddOnce(refresh));
