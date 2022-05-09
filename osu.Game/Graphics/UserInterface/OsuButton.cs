@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,7 +12,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -88,11 +86,11 @@ namespace osu.Game.Graphics.UserInterface
                 AddInternal(new HoverClickSounds(hoverSounds.Value));
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour colours)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
             if (backgroundColour == null)
-                BackgroundColour = overlayColourProvider?.Highlight1 ?? colours.Blue3;
+                BackgroundColour = colours.BlueDark;
         }
 
         protected override void LoadComplete()
