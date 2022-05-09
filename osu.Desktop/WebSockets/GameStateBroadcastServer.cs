@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
+using osu.Game.Online.Broadcasts;
 
-namespace osu.Game.Online.WebSockets
+namespace osu.Desktop.WebSockets
 {
-    public class GameStateBroadcastServer : WebSocketServer
+    [Cached(typeof(IGameStateBroadcastServer))]
+    public class GameStateBroadcastServer : WebSocketServer, IGameStateBroadcastServer
     {
         public override string Endpoint => @"state";
 
@@ -25,13 +27,14 @@ namespace osu.Game.Online.WebSockets
 
         private void handleEnableStateChange(ValueChangedEvent<bool> e)
         {
+            enabled.Disabled = true;
+
             if (e.NewValue)
             {
-                Start();
+                Task.Run(() => Start()).ContinueWith(t => enabled.Disabled = false);
             }
             else
             {
-                enabled.Disabled = true;
                 Task.Run(() => Close()).ContinueWith(t => enabled.Disabled = false);
             }
         }

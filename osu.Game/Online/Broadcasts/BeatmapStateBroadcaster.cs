@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 
-namespace osu.Game.Online.WebSockets
+namespace osu.Game.Online.Broadcasts
 {
     public class BeatmapStateBroadcaster : GameStateBroadcaster<BeatmapInfo>
     {

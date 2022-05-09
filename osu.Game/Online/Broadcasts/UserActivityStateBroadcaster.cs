@@ -6,7 +6,7 @@ using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Users;
 
-namespace osu.Game.Online.WebSockets
+namespace osu.Game.Online.Broadcasts
 {
     public class UserActivityStateBroadcaster : GameStateBroadcaster<string>
     {
