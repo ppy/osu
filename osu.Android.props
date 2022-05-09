@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <LangVersion>8.0</LangVersion>
     <OutputPath>bin\$(Configuration)</OutputPath>

@@ -12,11 +12,19 @@ namespace osu.Game.Overlays.Mods
 {
     public class UserModSelectScreen : ModSelectScreen
     {
+        public UserModSelectScreen(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
+            : base(colourScheme)
+        {
+        }
+
         protected override ModColumn CreateModColumn(ModType modType, Key[] toggleKeys = null) => new UserModColumn(modType, false, toggleKeys);
 
-        protected override IReadOnlyList<Mod> ComputeNewModsFromSelection(IEnumerable<Mod> addedMods, IEnumerable<Mod> removedMods)
+        protected override IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection)
         {
-            IEnumerable<Mod> modsAfterRemoval = SelectedMods.Value.Except(removedMods).ToList();
+            var addedMods = newSelection.Except(oldSelection);
+            var removedMods = oldSelection.Except(newSelection);
+
+            IEnumerable<Mod> modsAfterRemoval = newSelection.Except(removedMods).ToList();
 
             // the preference is that all new mods should override potential incompatible old mods.
             // in general that's a bit difficult to compute if more than one mod is added at a time,

@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Threading;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 
@@ -16,15 +17,11 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private DialogOverlay overlay;
 
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-            AddStep("create dialog overlay", () => Child = overlay = new DialogOverlay());
-        }
-
         [Test]
         public void TestBasic()
         {
+            AddStep("create dialog overlay", () => Child = overlay = new DialogOverlay());
+
             TestPopupDialog firstDialog = null;
             TestPopupDialog secondDialog = null;
 
@@ -89,8 +86,48 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestPushBeforeLoad()
+        {
+            PopupDialog dialog = null;
+
+            AddStep("create dialog overlay", () => overlay = new SlowLoadingDialogOverlay());
+
+            AddStep("start loading overlay", () => LoadComponentAsync(overlay, Add));
+
+            AddStep("push dialog before loaded", () =>
+            {
+                overlay.Push(dialog = new TestPopupDialog
+                {
+                    Buttons = new PopupDialogButton[]
+                    {
+                        new PopupDialogOkButton { Text = @"OK" },
+                    },
+                });
+            });
+
+            AddStep("complete load", () => ((SlowLoadingDialogOverlay)overlay).LoadEvent.Set());
+
+            AddUntilStep("wait for load", () => overlay.IsLoaded);
+
+            AddAssert("dialog displayed", () => overlay.CurrentDialog == dialog);
+        }
+
+        public class SlowLoadingDialogOverlay : DialogOverlay
+        {
+            public ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadEvent.Wait(10000);
+            }
+        }
+
+        [Test]
         public void TestDismissBeforePush()
         {
+            AddStep("create dialog overlay", () => Child = overlay = new DialogOverlay());
+
             TestPopupDialog testDialog = null;
             AddStep("dismissed dialog push", () =>
             {
@@ -107,6 +144,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestDismissBeforePushViaButtonPress()
         {
+            AddStep("create dialog overlay", () => Child = overlay = new DialogOverlay());
+
             TestPopupDialog testDialog = null;
             AddStep("dismissed dialog push", () =>
             {

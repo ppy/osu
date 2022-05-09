@@ -372,12 +372,12 @@ namespace osu.Game.Overlays.Volume
 
             switch (e.Action)
             {
-                case GlobalAction.SelectPrevious:
+                case GlobalAction.SelectPreviousGroup:
                     State = SelectionState.Selected;
                     adjust(1, false);
                     return true;
 
-                case GlobalAction.SelectNext:
+                case GlobalAction.SelectNextGroup:
                     State = SelectionState.Selected;
                     adjust(-1, false);
                     return true;

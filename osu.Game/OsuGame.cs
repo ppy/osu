@@ -69,7 +69,7 @@ namespace osu.Game
     /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
     /// for initial components that are generally retrieved via DI.
     /// </summary>
-    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner
+    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager
     {
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
@@ -188,6 +188,7 @@ namespace osu.Game
         private readonly string[] args;
 
         private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
+        private readonly List<OverlayContainer> externalOverlays = new List<OverlayContainer>();
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
@@ -199,6 +200,10 @@ namespace osu.Game
 
             SentryLogger = new SentryLogger(this);
         }
+
+        #region IOverlayManager
+
+        IBindable<OverlayActivation> IOverlayManager.OverlayActivationMode => OverlayActivationMode;
 
         private void updateBlockingOverlayFade() =>
             ScreenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
@@ -242,18 +247,50 @@ namespace osu.Game
         {
         }
 
-        public void AddBlockingOverlay(OverlayContainer overlay)
+        IDisposable IOverlayManager.RegisterBlockingOverlay(OverlayContainer overlayContainer)
+        {
+            if (overlayContainer.Parent != null)
+                throw new ArgumentException($@"Overlays registered via {nameof(IOverlayManager.RegisterBlockingOverlay)} should not be added to the scene graph.");
+
+            if (externalOverlays.Contains(overlayContainer))
+                throw new ArgumentException($@"{overlayContainer} has already been registered via {nameof(IOverlayManager.RegisterBlockingOverlay)} once.");
+
+            externalOverlays.Add(overlayContainer);
+            overlayContent.Add(overlayContainer);
+
+            if (overlayContainer is OsuFocusedOverlayContainer focusedOverlayContainer)
+                focusedOverlays.Add(focusedOverlayContainer);
+
+            return new InvokeOnDisposal(() => unregisterBlockingOverlay(overlayContainer));
+        }
+
+        void IOverlayManager.ShowBlockingOverlay(OverlayContainer overlay)
         {
             if (!visibleBlockingOverlays.Contains(overlay))
                 visibleBlockingOverlays.Add(overlay);
             updateBlockingOverlayFade();
         }
 
-        public void RemoveBlockingOverlay(OverlayContainer overlay) => Schedule(() =>
+        void IOverlayManager.HideBlockingOverlay(OverlayContainer overlay) => Schedule(() =>
         {
             visibleBlockingOverlays.Remove(overlay);
             updateBlockingOverlayFade();
         });
+
+        /// <summary>
+        /// Unregisters a blocking <see cref="OverlayContainer"/> that was not created by <see cref="OsuGame"/> itself.
+        /// </summary>
+        private void unregisterBlockingOverlay(OverlayContainer overlayContainer)
+        {
+            externalOverlays.Remove(overlayContainer);
+
+            if (overlayContainer is OsuFocusedOverlayContainer focusedOverlayContainer)
+                focusedOverlays.Remove(focusedOverlayContainer);
+
+            overlayContainer.Expire();
+        }
+
+        #endregion
 
         /// <summary>
         /// Close all game-wide overlays.
@@ -1224,6 +1261,7 @@ namespace osu.Game
                 horizontalOffset += (Content.ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - Content.DrawWidth) * SIDE_OVERLAY_OFFSET_RATIO;
 
             ScreenOffsetContainer.X = horizontalOffset;
+            overlayContent.X = horizontalOffset * 1.2f;
 
             MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }

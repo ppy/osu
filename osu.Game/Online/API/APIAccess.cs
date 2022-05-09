@@ -458,7 +458,7 @@ namespace osu.Game.Online.API
         public GuestUser()
         {
             Username = @"Guest";
-            Id = 1;
+            Id = SYSTEM_USER_ID;
         }
     }
 

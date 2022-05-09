@@ -486,7 +486,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     Vector2 originalPosition = movementBlueprintOriginalPositions[i];
                     var testPosition = originalPosition + distanceTravelled;
 
-                    var positionalResult = snapProvider.SnapScreenSpacePositionToValidPosition(testPosition);
+                    var positionalResult = snapProvider.FindSnappedPosition(testPosition);
 
                     if (positionalResult.ScreenSpacePosition == testPosition) continue;
 
@@ -505,7 +505,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 movePosition = movementBlueprintOriginalPositions.First() + distanceTravelled;
 
             // Retrieve a snapped position.
-            var result = snapProvider?.SnapScreenSpacePositionToValidTime(movePosition);
+            var result = snapProvider?.FindSnappedPositionAndTime(movePosition);
 
             if (result == null)
             {

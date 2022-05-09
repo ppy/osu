@@ -13,7 +13,6 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -36,7 +35,6 @@ namespace osu.Game.Rulesets.Edit
     /// Responsible for providing snapping and generally gluing components together.
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
-    [Cached(Type = typeof(IPlacementHandler))]
     public abstract class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
     {
@@ -115,8 +113,9 @@ namespace osu.Game.Rulesets.Edit
                                               .WithChild(BlueprintContainer = CreateBlueprintContainer())
                     }
                 },
-                new LeftToolboxFlow
+                new ExpandingToolboxContainer(80, 200)
                 {
+                    Padding = new MarginPadding { Left = 10 },
                     Children = new Drawable[]
                     {
                         new EditorToolboxGroup("工具盒 (1-9)")
@@ -362,7 +361,7 @@ namespace osu.Game.Rulesets.Edit
         /// <returns>The most relevant <see cref="Playfield"/>.</returns>
         protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             double? targetTime = null;
@@ -382,26 +381,13 @@ namespace osu.Game.Rulesets.Edit
         }
 
         #endregion
-
-        private class LeftToolboxFlow : ExpandingButtonContainer
-        {
-            public LeftToolboxFlow()
-                : base(80, 200)
-            {
-                RelativeSizeAxes = Axes.Y;
-                Padding = new MarginPadding { Right = 10 };
-
-                FillFlow.Spacing = new Vector2(10);
-            }
-        }
     }
 
     /// <summary>
     /// A non-generic definition of a HitObject composer class.
     /// Generally used to access certain methods without requiring a generic type for <see cref="HitObjectComposer{T}" />.
     /// </summary>
-    [Cached(typeof(HitObjectComposer))]
-    [Cached(typeof(IPositionSnapProvider))]
+    [Cached]
     public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
         protected HitObjectComposer()
@@ -428,9 +414,9 @@ namespace osu.Game.Rulesets.Edit
 
         #region IPositionSnapProvider
 
-        public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
+        public abstract SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition);
 
-        public virtual SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+        public virtual SnapResult FindSnappedPosition(Vector2 screenSpacePosition) =>
             new SnapResult(screenSpacePosition, null);
 
         #endregion

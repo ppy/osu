@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using System.Threading;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -23,7 +22,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => @"紧随";
         public override string Acronym => @"ST";
-        public override IconUsage? Icon => FontAwesome.Solid.PenFancy;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => @"不要断滑条哦";
         public override double ScoreMultiplier => 1.0;
@@ -109,6 +107,18 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     switch (e.Type)
                     {
+                        case SliderEventType.Tick:
+                            AddNested(new SliderTick
+                            {
+                                SpanIndex = e.SpanIndex,
+                                SpanStartTime = e.SpanStartTime,
+                                StartTime = e.Time,
+                                Position = Position + Path.PositionAt(e.PathProgress),
+                                StackHeight = StackHeight,
+                                Scale = Scale,
+                            });
+                            break;
+
                         case SliderEventType.Head:
                             AddNested(HeadCircle = new SliderHeadCircle
                             {
