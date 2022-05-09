@@ -107,6 +107,18 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     switch (e.Type)
                     {
+                        case SliderEventType.Tick:
+                            AddNested(new SliderTick
+                            {
+                                SpanIndex = e.SpanIndex,
+                                SpanStartTime = e.SpanStartTime,
+                                StartTime = e.Time,
+                                Position = Position + Path.PositionAt(e.PathProgress),
+                                StackHeight = StackHeight,
+                                Scale = Scale,
+                            });
+                            break;
+
                         case SliderEventType.Head:
                             AddNested(HeadCircle = new SliderHeadCircle
                             {
