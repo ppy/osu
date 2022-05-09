@@ -191,8 +191,6 @@ namespace osu.Game.Overlays
                 channelManager.CurrentChannel.Value = channel;
             }
 
-            selectorActive.Value = false;
-
             channel.HighlightedMessage.Value = message;
 
             Show();
@@ -267,6 +265,8 @@ namespace osu.Game.Overlays
 
                 return;
             }
+
+            selectorActive.Value = false;
 
             LoadComponentAsync(new DrawableChannel(newChannel), loaded =>
             {
