@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.UserInterface
                                     },
                                     descriptionText = new OsuTextFlowContainer(t =>
                                     {
-                                        t.Font = OsuFont.Default.With(size: 12);
+                                        t.Font = OsuFont.Default.With(size: 15);
                                     })
                                     {
                                         RelativeSizeAxes = Axes.X,

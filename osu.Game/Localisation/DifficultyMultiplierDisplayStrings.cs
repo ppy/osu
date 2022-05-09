@@ -12,7 +12,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Difficulty Multiplier"
         /// </summary>
-        public static LocalisableString DifficultyMultiplier => new TranslatableString(getKey(@"difficulty_multiplier"), @"Difficulty Multiplier");
+        public static LocalisableString DifficultyMultiplier => new TranslatableString(getKey(@"llin_difficulty_multiplier"), @"难度倍率");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
