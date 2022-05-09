@@ -106,22 +106,69 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Check the provided combination of mods are valid for a local gameplay session.
+        /// Checks that all <see cref="Mod"/>s in a combination are valid for a local gameplay session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
-        /// <param name="invalidMods">Invalid mods, if any were found. Can be null if all mods were valid.</param>
+        /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidForGameplay(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
             mods = mods.ToArray();
 
-            // exclude multi mods from compatibility checks.
-            // the loop below automatically marks all multi mods as not valid for gameplay anyway.
-            CheckCompatibleSet(mods.Where(m => !(m is MultiMod)), out invalidMods);
+            // checking compatibility of multi mods would try to flatten them and return incompatible mods.
+            // in gameplay context, we never want MultiMod selected in the first place, therefore check against it first.
+            if (!checkValid(mods, m => !(m is MultiMod), out invalidMods))
+                return false;
+
+            if (!CheckCompatibleSet(mods, out invalidMods))
+                return false;
+
+            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation, out invalidMods);
+        }
+
+        /// <summary>
+        /// Checks that all <see cref="Mod"/>s in a combination are valid as "required mods" in a multiplayer match session.
+        /// </summary>
+        /// <param name="mods">The mods to check.</param>
+        /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
+        /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
+        public static bool CheckValidRequiredModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
+        {
+            mods = mods.ToArray();
+
+            // checking compatibility of multi mods would try to flatten them and return incompatible mods.
+            // in gameplay context, we never want MultiMod selected in the first place, therefore check against it first.
+            if (!checkValid(mods, m => !(m is MultiMod), out invalidMods))
+                return false;
+
+            if (!CheckCompatibleSet(mods, out invalidMods))
+                return false;
+
+            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForMultiplayer, out invalidMods);
+        }
+
+        /// <summary>
+        /// Checks that all <see cref="Mod"/>s in a combination are valid as "free mods" in a multiplayer match session.
+        /// </summary>
+        /// <remarks>
+        /// Note that this does not check compatibility between mods,
+        /// given that the passed mods are expected to be the ones to be allowed for the multiplayer match,
+        /// not to be confused with the list of mods the user currently has selected for the multiplayer match.
+        /// </remarks>
+        /// <param name="mods">The mods to check.</param>
+        /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
+        /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
+        public static bool CheckValidFreeModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
+            => checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForMultiplayerAsFreeMod && !(m is MultiMod), out invalidMods);
+
+        private static bool checkValid(IEnumerable<Mod> mods, Predicate<Mod> valid, [NotNullWhen(false)] out List<Mod>? invalidMods)
+        {
+            mods = mods.ToArray();
+            invalidMods = null;
 
             foreach (var mod in mods)
             {
-                if (mod.Type == ModType.System || !mod.HasImplementation || mod is MultiMod)
+                if (!valid(mod))
                 {
                     invalidMods ??= new List<Mod>();
                     invalidMods.Add(mod);

@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -501,6 +502,22 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
             AddUntilStep("Wait for game exit", () => Game.ScreenStack.CurrentScreen == null);
             AddStep("test dispose doesn't crash", () => Game.Dispose());
+        }
+
+        [Test]
+        public void TestRapidBackButtonExit()
+        {
+            AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
+
+            AddStep("press escape twice rapidly", () =>
+            {
+                InputManager.Key(Key.Escape);
+                InputManager.Key(Key.Escape);
+            });
+
+            pushEscape();
+
+            AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog != null);
         }
 
         private Func<Player> playToResults()
