@@ -156,6 +156,8 @@ namespace osu.Game.Overlays
 
         private void updateExpandedState(ValueChangedEvent<bool> expanded)
         {
+            // clearing transforms is necessary to avoid a previous height transform
+            // potentially continuing to get processed while content has changed to autosize.
             content.ClearTransforms();
 
             if (expanded.NewValue)
