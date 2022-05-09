@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual.Online
                 channelManager.CurrentChannel.Value = joinedChannel;
             });
             AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
-            AddAssert("Channel is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            AddUntilStep("Channel is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
         }
 
         [Test]
@@ -174,7 +174,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Listing is visible", () => listingIsVisible);
             AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
-            AddAssert("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            AddUntilStep("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
         }
 
         [Test]
@@ -273,7 +273,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel1));
-            AddAssert("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            AddUntilStep("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
         }
 
         [Test]
@@ -296,7 +296,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel2));
-            AddAssert("Channel 2 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel2);
+            AddUntilStep("Channel 2 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel2);
         }
 
         [Test]
@@ -320,7 +320,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Leave channel 2", () => channelManager.LeaveChannel(testChannel2));
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel2));
-            AddAssert("Channel 2 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel2);
+            AddUntilStep("Channel 2 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel2);
         }
 
         [Test]
@@ -340,7 +340,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel1));
-            AddAssert("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            AddUntilStep("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
         }
 
         [Test]
@@ -361,7 +361,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Set null channel", () => channelManager.CurrentChannel.Value = null);
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel1));
-            AddAssert("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            AddUntilStep("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
         }
 
         [Test]
