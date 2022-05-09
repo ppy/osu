@@ -4,12 +4,11 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
-using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Overlays.Settings;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -17,45 +16,39 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneSettingsToolboxGroup : OsuManualInputManagerTestScene
     {
-        public TestSceneSettingsToolboxGroup()
+        private SettingsToolboxGroup group;
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            ExampleContainer container;
-
-            Add(new PlayerSettingsOverlay
+            Child = group = new SettingsToolboxGroup("example")
             {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                State = { Value = Visibility.Visible }
-            });
-
-            Add(container = new ExampleContainer());
-
-            AddStep(@"Add button", () => container.Add(new TriangleButton
-            {
-                RelativeSizeAxes = Axes.X,
-                Text = @"Button",
-            }));
-
-            AddStep(@"Add checkbox", () => container.Add(new PlayerCheckbox
-            {
-                LabelText = "Checkbox",
-            }));
-
-            AddStep(@"Add textbox", () => container.Add(new FocusedTextBox
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = 30,
-                PlaceholderText = "Textbox",
-                HoldFocus = false,
-            }));
-        }
+                Children = new Drawable[]
+                {
+                    new RoundedButton
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Text = @"Button",
+                        Enabled = { Value = true },
+                    },
+                    new OsuCheckbox
+                    {
+                        LabelText = @"Checkbox",
+                    },
+                    new OutlinedTextBox
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 30,
+                        PlaceholderText = @"Textbox",
+                    }
+                },
+            };
+        });
 
         [Test]
         public void TestClickExpandButtonMultipleTimes()
         {
-            SettingsToolboxGroup group = null;
-
-            AddAssert("group expanded by default", () => (group = this.ChildrenOfType<SettingsToolboxGroup>().First()).Expanded.Value);
+            AddAssert("group expanded by default", () => group.Expanded.Value);
             AddStep("click expand button multiple times", () =>
             {
                 InputManager.MoveMouseTo(group.ChildrenOfType<IconButton>().Single());
@@ -64,14 +57,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Scheduler.AddDelayed(() => InputManager.Click(MouseButton.Left), 300);
             });
             AddAssert("group contracted", () => !group.Expanded.Value);
-        }
-
-        private class ExampleContainer : PlayerSettingsGroup
-        {
-            public ExampleContainer()
-                : base("example")
-            {
-            }
         }
     }
 }
