@@ -3,6 +3,7 @@
     "path": "osu.sln",
     "projects": [
       "osu.Desktop\\osu.Desktop.csproj",
+      "osu.Desktop.Tests\\osu.Desktop.Tests.csproj",
       "osu.Game.Benchmarks\\osu.Game.Benchmarks.csproj",
       "osu.Game.Rulesets.Catch.Tests\\osu.Game.Rulesets.Catch.Tests.csproj",
       "osu.Game.Rulesets.Catch\\osu.Game.Rulesets.Catch.csproj",
