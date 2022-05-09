@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Threading;
 using osu.Game.Audio;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Skinning
 {

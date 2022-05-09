@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -253,12 +254,12 @@ namespace osu.Game.Tests.Visual.Navigation
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
-            AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
 
-            // BackButton handles hover using its child button, so this checks whether or not any of BackButton's children are hovered.
-            AddUntilStep("Back button is hovered", () => Game.ChildrenOfType<BackButton>().First().Children.Any(c => c.IsHovered));
+            AddStep("Move mouse to dimmed area", () => InputManager.MoveMouseTo(new Vector2(
+                songSelect.ScreenSpaceDrawQuad.TopLeft.X + 1,
+                songSelect.ScreenSpaceDrawQuad.TopLeft.Y + songSelect.ScreenSpaceDrawQuad.Height / 2)));
+            AddStep("Click left mouse button", () => InputManager.Click(MouseButton.Left));
 
-            AddStep("Click back button", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("Overlay was hidden", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
             exitViaBackButtonAndConfirm();
         }
@@ -503,6 +504,22 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("test dispose doesn't crash", () => Game.Dispose());
         }
 
+        [Test]
+        public void TestRapidBackButtonExit()
+        {
+            AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
+
+            AddStep("press escape twice rapidly", () =>
+            {
+                InputManager.Key(Key.Escape);
+                InputManager.Key(Key.Escape);
+            });
+
+            pushEscape();
+
+            AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog != null);
+        }
+
         private Func<Player> playToResults()
         {
             Player player = null;
@@ -551,7 +568,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
         public class TestPlaySongSelect : PlaySongSelect
         {
-            public ModSelectOverlay ModSelectOverlay => ModSelect;
+            public ModSelectScreen ModSelectOverlay => ModSelect;
 
             public BeatmapOptionsOverlay BeatmapOptionsOverlay => BeatmapOptions;
 

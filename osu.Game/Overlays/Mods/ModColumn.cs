@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
@@ -39,7 +41,7 @@ namespace osu.Game.Overlays.Mods
         private Func<Mod, bool>? filter;
 
         /// <summary>
-        /// Function determining whether each mod in the column should be displayed.
+        /// A function determining whether each mod in the column should be displayed.
         /// A return value of <see langword="true"/> means that the mod is not filtered and therefore its corresponding panel should be displayed.
         /// A return value of <see langword="false"/> means that the mod is filtered out and therefore its corresponding panel should be hidden.
         /// </summary>
@@ -49,11 +51,21 @@ namespace osu.Game.Overlays.Mods
             set
             {
                 filter = value;
-                updateFilter();
+                updateState();
             }
         }
 
+        /// <summary>
+        /// Determines whether this column should accept user input.
+        /// </summary>
         public Bindable<bool> Active = new BindableBool(true);
+
+        private readonly Bindable<bool> allFiltered = new BindableBool();
+
+        /// <summary>
+        /// True if all of the panels in this column have been filtered out by the current <see cref="Filter"/>.
+        /// </summary>
+        public IBindable<bool> AllFiltered => allFiltered;
 
         /// <summary>
         /// List of mods marked as selected in this column.
@@ -186,7 +198,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             new Drawable[]
                                             {
-                                                new NestedVerticalScrollContainer
+                                                new OsuScrollContainer(Direction.Vertical)
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                     ClampExtension = 100,
@@ -220,7 +232,6 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.CentreLeft,
                     Scale = new Vector2(0.8f),
                     RelativeSizeAxes = Axes.X,
-                    LabelText = "Enable All",
                     Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)
                 });
                 panelFlow.Padding = new MarginPadding
@@ -249,9 +260,8 @@ namespace osu.Game.Overlays.Mods
         private void load(OsuGameBase game, OverlayColourProvider colourProvider, OsuColour colours)
         {
             availableMods.BindTo(game.AvailableMods);
-            // this `BindValueChanged` callback is intentionally here, to ensure that local available mods are constructed as early as possible.
-            // this is needed to make sure no external changes to mods are dropped while mod panels are asynchronously loading.
-            availableMods.BindValueChanged(_ => updateLocalAvailableMods(), true);
+            updateLocalAvailableMods(asyncLoadContent: false);
+            availableMods.BindValueChanged(_ => updateLocalAvailableMods(asyncLoadContent: true));
 
             headerBackground.Colour = accentColour = colours.ForModType(ModType);
 
@@ -265,7 +275,20 @@ namespace osu.Game.Overlays.Mods
             contentBackground.Colour = colourProvider.Background4;
         }
 
-        private void updateLocalAvailableMods()
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            toggleAllCheckbox?.Current.BindValueChanged(_ => updateToggleAllText(), true);
+        }
+
+        private void updateToggleAllText()
+        {
+            Debug.Assert(toggleAllCheckbox != null);
+            toggleAllCheckbox.LabelText = toggleAllCheckbox.Current.Value ? CommonStrings.DeselectAll : CommonStrings.SelectAll;
+        }
+
+        private void updateLocalAvailableMods(bool asyncLoadContent)
         {
             var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(ModType) ?? Array.Empty<Mod>())
                                   .Select(m => m.DeepClone())
@@ -275,32 +298,24 @@ namespace osu.Game.Overlays.Mods
                 return;
 
             localAvailableMods = newMods;
-            Scheduler.AddOnce(loadPanels);
+
+            if (asyncLoadContent)
+                asyncLoadPanels();
+            else
+                onPanelsLoaded(createPanels());
         }
 
         private CancellationTokenSource? cancellationTokenSource;
 
-        private void loadPanels()
+        private void asyncLoadPanels()
         {
             cancellationTokenSource?.Cancel();
 
-            var panels = localAvailableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)));
+            var panels = createPanels();
 
             Task? loadTask;
 
-            latestLoadTask = loadTask = LoadComponentsAsync(panels, loaded =>
-            {
-                panelFlow.ChildrenEnumerable = loaded;
-
-                updateActiveState();
-                updateToggleAllState();
-                updateFilter();
-
-                foreach (var panel in panelFlow)
-                {
-                    panel.Active.BindValueChanged(_ => panelStateChanged(panel));
-                }
-            }, (cancellationTokenSource = new CancellationTokenSource()).Token);
+            latestLoadTask = loadTask = LoadComponentsAsync(panels, onPanelsLoaded, (cancellationTokenSource = new CancellationTokenSource()).Token);
             loadTask.ContinueWith(_ =>
             {
                 if (loadTask == latestLoadTask)
@@ -308,10 +323,39 @@ namespace osu.Game.Overlays.Mods
             });
         }
 
-        private void updateActiveState()
+        private IEnumerable<ModPanel> createPanels()
+        {
+            var panels = localAvailableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)));
+            return panels;
+        }
+
+        private void onPanelsLoaded(IEnumerable<ModPanel> loaded)
+        {
+            panelFlow.ChildrenEnumerable = loaded;
+
+            updateState();
+
+            foreach (var panel in panelFlow)
+            {
+                panel.Active.BindValueChanged(_ => panelStateChanged(panel));
+            }
+        }
+
+        private void updateState()
         {
             foreach (var panel in panelFlow)
+            {
                 panel.Active.Value = SelectedMods.Contains(panel.Mod);
+                panel.ApplyFilter(Filter);
+            }
+
+            allFiltered.Value = panelFlow.All(panel => panel.Filtered.Value);
+
+            if (toggleAllCheckbox != null && !SelectionAnimationRunning)
+            {
+                toggleAllCheckbox.Alpha = panelFlow.Any(panel => !panel.Filtered.Value) ? 1 : 0;
+                toggleAllCheckbox.Current.Value = panelFlow.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
+            }
         }
 
         /// <summary>
@@ -323,15 +367,16 @@ namespace osu.Game.Overlays.Mods
 
         private void panelStateChanged(ModPanel panel)
         {
-            updateToggleAllState();
+            if (externalSelectionUpdateInProgress)
+                return;
 
             var newSelectedMods = panel.Active.Value
                 ? SelectedMods.Append(panel.Mod)
                 : SelectedMods.Except(panel.Mod.Yield());
 
             SelectedMods = newSelectedMods.ToArray();
-            if (!externalSelectionUpdateInProgress)
-                SelectionChangedByUser?.Invoke();
+            updateState();
+            SelectionChangedByUser?.Invoke();
         }
 
         /// <summary>
@@ -364,7 +409,7 @@ namespace osu.Game.Overlays.Mods
             }
 
             SelectedMods = newSelection;
-            updateActiveState();
+            updateState();
 
             externalSelectionUpdateInProgress = false;
         }
@@ -378,7 +423,7 @@ namespace osu.Game.Overlays.Mods
 
         private readonly Queue<Action> pendingSelectionOperations = new Queue<Action>();
 
-        protected bool SelectionAnimationRunning => pendingSelectionOperations.Count > 0;
+        internal bool SelectionAnimationRunning => pendingSelectionOperations.Count > 0;
 
         protected override void Update()
         {
@@ -400,15 +445,6 @@ namespace osu.Game.Overlays.Mods
                     // this will cause the next action to be immediately performed.
                     selectionDelay = initial_multiple_selection_delay;
                 }
-            }
-        }
-
-        private void updateToggleAllState()
-        {
-            if (toggleAllCheckbox != null && !SelectionAnimationRunning)
-            {
-                toggleAllCheckbox.Alpha = panelFlow.Any(panel => !panel.Filtered.Value) ? 1 : 0;
-                toggleAllCheckbox.Current.Value = panelFlow.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
             }
         }
 
@@ -503,18 +539,6 @@ namespace osu.Game.Overlays.Mods
                 else
                     column.DeselectAll();
             }
-        }
-
-        #endregion
-
-        #region Filtering support
-
-        private void updateFilter()
-        {
-            foreach (var modPanel in panelFlow)
-                modPanel.ApplyFilter(Filter);
-
-            updateToggleAllState();
         }
 
         #endregion

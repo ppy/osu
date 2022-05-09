@@ -1,4 +1,4 @@
-<!-- Contains required properties for osu!framework projects. -->
+﻿<!-- Contains required properties for osu!framework projects. -->
 <Project>
   <PropertyGroup Label="C#">
     <LangVersion>8.0</LangVersion>

@@ -47,6 +47,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+
+            BeginPlacement();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

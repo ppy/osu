@@ -13,27 +13,35 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
+using osu.Framework.Lists;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSelectScreen : ShearedOverlayContainer
+    public abstract class ModSelectScreen : ShearedOverlayContainer, ISamplePlaybackDisabler
     {
-        protected override OverlayColourScheme ColourScheme => OverlayColourScheme.Green;
+        protected const int BUTTON_WIDTH = 200;
 
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private Func<Mod, bool> isValidMod = m => true;
 
+        /// <summary>
+        /// A function determining whether each mod in the column should be displayed.
+        /// A return value of <see langword="true"/> means that the mod is not filtered and therefore its corresponding panel should be displayed.
+        /// A return value of <see langword="false"/> means that the mod is filtered out and therefore its corresponding panel should be hidden.
+        /// </summary>
         public Func<Mod, bool> IsValidMod
         {
             get => isValidMod;
@@ -47,29 +55,38 @@ namespace osu.Game.Overlays.Mods
         }
 
         /// <summary>
-        /// Whether configurable <see cref="Mod"/>s can be configured by the local user.
-        /// </summary>
-        protected virtual bool AllowCustomisation => true;
-
-        /// <summary>
         /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
         /// </summary>
         protected virtual bool ShowTotalMultiplier => true;
 
         protected virtual ModColumn CreateModColumn(ModType modType, Key[]? toggleKeys = null) => new ModColumn(modType, false, toggleKeys);
 
+        protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
+
+        protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => createDefaultFooterButtons();
+
         private readonly BindableBool customisationVisible = new BindableBool();
 
-        private DifficultyMultiplierDisplay? multiplierDisplay;
         private ModSettingsArea modSettingsArea = null!;
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
+        private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
+        private ShearedButton backButton = null!;
+
+        private DifficultyMultiplierDisplay? multiplierDisplay;
+
+        private ShearedToggleButton? customisationButton;
+
+        protected ModSelectScreen(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
+            : base(colourScheme)
+        {
+        }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
-            Header.Title = "Mod Select";
-            Header.Description = "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.";
+            Header.Title = ModSelectScreenStrings.ModSelectTitle;
+            Header.Description = ModSelectScreenStrings.ModSelectDescription;
 
             AddRange(new Drawable[]
             {
@@ -94,6 +111,7 @@ namespace osu.Game.Overlays.Mods
                     Padding = new MarginPadding
                     {
                         Top = (ShowTotalMultiplier ? DifficultyMultiplierDisplay.HEIGHT : 0) + PADDING,
+                        Bottom = PADDING
                     },
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
@@ -111,7 +129,6 @@ namespace osu.Game.Overlays.Mods
                                 Shear = new Vector2(SHEAR, 0),
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
-                                Spacing = new Vector2(10, 0),
                                 Margin = new MarginPadding { Horizontal = 70 },
                                 Children = new[]
                                 {
@@ -144,30 +161,34 @@ namespace osu.Game.Overlays.Mods
                 });
             }
 
-            if (AllowCustomisation)
+            FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>
             {
-                Footer.Add(new ShearedToggleButton(200)
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Horizontal,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                Padding = new MarginPadding
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Margin = new MarginPadding { Vertical = PADDING, Left = 70 },
-                    Text = "Mod Customisation",
-                    Active = { BindTarget = customisationVisible }
-                });
-            }
-        }
-
-        private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
-            => new ColumnDimContainer(CreateModColumn(modType, toggleKeys))
-            {
-                AutoSizeAxes = Axes.X,
-                RelativeSizeAxes = Axes.Y,
-                RequestScroll = column => columnScroll.ScrollIntoView(column, extraScroll: 140)
+                    Vertical = PADDING,
+                    Horizontal = 70
+                },
+                Spacing = new Vector2(10),
+                ChildrenEnumerable = CreateFooterButtons().Prepend(backButton = new ShearedButton(BUTTON_WIDTH)
+                {
+                    Text = CommonStrings.Back,
+                    Action = Hide,
+                    DarkerColour = colours.Pink2,
+                    LighterColour = colours.Pink1
+                })
             };
+        }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            State.BindValueChanged(_ => samplePlaybackDisabled.Value = State.Value == Visibility.Hidden, true);
 
             ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
 
@@ -186,7 +207,65 @@ namespace osu.Game.Overlays.Mods
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
             updateAvailableMods();
+
+            // Start scrolled slightly to the right to give the user a sense that
+            // there is more horizontal content available.
+            ScheduleAfterChildren(() =>
+            {
+                columnScroll.ScrollTo(200, false);
+                columnScroll.ScrollToStart();
+            });
         }
+
+        /// <summary>
+        /// Select all visible mods in all columns.
+        /// </summary>
+        protected void SelectAll()
+        {
+            foreach (var column in columnFlow.Columns)
+                column.SelectAll();
+        }
+
+        /// <summary>
+        /// Deselect all visible mods in all columns.
+        /// </summary>
+        protected void DeselectAll()
+        {
+            foreach (var column in columnFlow.Columns)
+                column.DeselectAll();
+        }
+
+        private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
+        {
+            var column = CreateModColumn(modType, toggleKeys).With(column =>
+            {
+                column.Filter = IsValidMod;
+                // spacing applied here rather than via `columnFlow.Spacing` to avoid uneven gaps when some of the columns are hidden.
+                column.Margin = new MarginPadding { Right = 10 };
+            });
+
+            return new ColumnDimContainer(column)
+            {
+                AutoSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Y,
+                RequestScroll = col => columnScroll.ScrollIntoView(col, extraScroll: 140),
+            };
+        }
+
+        private ShearedButton[] createDefaultFooterButtons()
+            => new[]
+            {
+                customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
+                {
+                    Text = ModSelectScreenStrings.ModCustomisation,
+                    Active = { BindTarget = customisationVisible }
+                },
+                new ShearedButton(BUTTON_WIDTH)
+                {
+                    Text = CommonStrings.DeselectAll,
+                    Action = DeselectAll
+                }
+            };
 
         private void updateMultiplier()
         {
@@ -209,7 +288,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
         {
-            if (!AllowCustomisation)
+            if (customisationButton == null)
                 return;
 
             bool anyCustomisableMod = false;
@@ -243,6 +322,12 @@ namespace osu.Game.Overlays.Mods
 
             MainAreaContent.FadeColour(customisationVisible.Value ? Colour4.Gray : Colour4.White, transition_duration, Easing.InOutCubic);
 
+            foreach (var button in footerButtonFlow)
+            {
+                if (button != customisationButton)
+                    button.Enabled.Value = !customisationVisible.Value;
+            }
+
             float modAreaHeight = customisationVisible.Value ? ModSettingsArea.HEIGHT : 0;
 
             modSettingsArea.ResizeHeightTo(modAreaHeight, transition_duration, Easing.InOutCubic);
@@ -264,13 +349,17 @@ namespace osu.Game.Overlays.Mods
         {
             var candidateSelection = columnFlow.Columns.SelectMany(column => column.SelectedMods).ToArray();
 
-            if (candidateSelection.SequenceEqual(SelectedMods.Value))
+            // the following guard intends to check cases where we've already replaced potentially-external mod references with our own and avoid endless recursion.
+            // TODO: replace custom comparer with System.Collections.Generic.ReferenceEqualityComparer when fully on .NET 6
+            if (candidateSelection.SequenceEqual(SelectedMods.Value, new FuncEqualityComparer<Mod>(ReferenceEquals)))
                 return;
 
             SelectedMods.Value = ComputeNewModsFromSelection(SelectedMods.Value, candidateSelection);
         }
 
-        protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
+        #region Transition handling
+
+        private const float distance = 700;
 
         protected override void PopIn()
         {
@@ -283,13 +372,26 @@ namespace osu.Game.Overlays.Mods
                 .FadeIn(fade_in_duration / 2, Easing.OutQuint)
                 .ScaleTo(1, fade_in_duration, Easing.OutElastic);
 
+            int nonFilteredColumnCount = 0;
+
             for (int i = 0; i < columnFlow.Count; i++)
             {
-                columnFlow[i].Column
-                             .TopLevelContent
-                             .Delay(i * 30)
-                             .MoveToY(0, fade_in_duration, Easing.OutQuint)
-                             .FadeIn(fade_in_duration, Easing.OutQuint);
+                var column = columnFlow[i].Column;
+
+                double delay = column.AllFiltered.Value ? 0 : nonFilteredColumnCount * 30;
+                double duration = column.AllFiltered.Value ? 0 : fade_in_duration;
+                float startingYPosition = 0;
+                if (!column.AllFiltered.Value)
+                    startingYPosition = nonFilteredColumnCount % 2 == 0 ? -distance : distance;
+
+                column.TopLevelContent
+                      .MoveToY(startingYPosition)
+                      .Delay(delay)
+                      .MoveToY(0, duration, Easing.OutQuint)
+                      .FadeIn(duration, Easing.OutQuint);
+
+                if (!column.AllFiltered.Value)
+                    nonFilteredColumnCount += 1;
             }
         }
 
@@ -303,30 +405,83 @@ namespace osu.Game.Overlays.Mods
                 .FadeOut(fade_out_duration / 2, Easing.OutQuint)
                 .ScaleTo(0.75f, fade_out_duration, Easing.OutQuint);
 
+            int nonFilteredColumnCount = 0;
+
             for (int i = 0; i < columnFlow.Count; i++)
             {
-                const float distance = 700;
-
                 var column = columnFlow[i].Column;
+
+                double duration = column.AllFiltered.Value ? 0 : fade_out_duration;
+                float newYPosition = 0;
+                if (!column.AllFiltered.Value)
+                    newYPosition = nonFilteredColumnCount % 2 == 0 ? -distance : distance;
 
                 column.FlushPendingSelections();
                 column.TopLevelContent
-                      .MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint)
-                      .FadeOut(fade_out_duration, Easing.OutQuint);
+                      .MoveToY(newYPosition, duration, Easing.OutQuint)
+                      .FadeOut(duration, Easing.OutQuint);
+
+                if (!column.AllFiltered.Value)
+                    nonFilteredColumnCount += 1;
             }
         }
+
+        #endregion
+
+        #region Input handling
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == GlobalAction.Back && customisationVisible.Value)
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
             {
-                customisationVisible.Value = false;
-                return true;
+                case GlobalAction.Back:
+                    // Pressing the back binding should only go back one step at a time.
+                    hideOverlay(false);
+                    return true;
+
+                // This is handled locally here because this overlay is being registered at the game level
+                // and therefore takes away keyboard focus from the screen stack.
+                case GlobalAction.ToggleModSelection:
+                case GlobalAction.Select:
+                {
+                    // Pressing toggle or select should completely hide the overlay in one shot.
+                    hideOverlay(true);
+                    return true;
+                }
             }
 
             return base.OnPressed(e);
+
+            void hideOverlay(bool immediate)
+            {
+                if (customisationVisible.Value)
+                {
+                    Debug.Assert(customisationButton != null);
+                    customisationButton.TriggerClick();
+
+                    if (!immediate)
+                        return;
+                }
+
+                backButton.TriggerClick();
+            }
         }
 
+        #endregion
+
+        #region Sample playback control
+
+        private readonly Bindable<bool> samplePlaybackDisabled = new BindableBool(true);
+        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
+
+        #endregion
+
+        /// <summary>
+        /// Manages horizontal scrolling of mod columns, along with the "active" states of each column based on visibility.
+        /// </summary>
         internal class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
         {
             public ColumnScrollContainer()
@@ -365,6 +520,9 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        /// <summary>
+        /// Manages padding and layout of mod columns.
+        /// </summary>
         internal class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
         {
             public IEnumerable<ModColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
@@ -401,11 +559,21 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        /// <summary>
+        /// Encapsulates a column and provides dim and input blocking based on an externally managed "active" state.
+        /// </summary>
         internal class ColumnDimContainer : Container
         {
             public ModColumn Column { get; }
 
+            /// <summary>
+            /// Tracks whether this column is in an interactive state. Generally only the case when the column is on-screen.
+            /// </summary>
             public readonly Bindable<bool> Active = new BindableBool();
+
+            /// <summary>
+            /// Invoked when the column is clicked while not active, requesting a scroll to be performed to bring it on-screen.
+            /// </summary>
             public Action<ColumnDimContainer>? RequestScroll { get; set; }
 
             [Resolved]
@@ -420,15 +588,20 @@ namespace osu.Game.Overlays.Mods
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Active.BindValueChanged(_ => updateDim(), true);
+                Active.BindValueChanged(_ => updateState());
+                Column.AllFiltered.BindValueChanged(_ => updateState(), true);
                 FinishTransforms();
             }
 
-            private void updateDim()
+            protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || Column.SelectionAnimationRunning;
+
+            private void updateState()
             {
                 Colour4 targetColour;
 
-                if (Active.Value)
+                Column.Alpha = Column.AllFiltered.Value ? 0 : 1;
+
+                if (Column.Active.Value)
                     targetColour = Colour4.White;
                 else
                     targetColour = IsHovered ? colours.GrayC : colours.Gray8;
@@ -447,17 +620,20 @@ namespace osu.Game.Overlays.Mods
             protected override bool OnHover(HoverEvent e)
             {
                 base.OnHover(e);
-                updateDim();
+                updateState();
                 return Active.Value;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 base.OnHoverLost(e);
-                updateDim();
+                updateState();
             }
         }
 
+        /// <summary>
+        /// A container which blocks and handles input, managing the "return from customisation" state change.
+        /// </summary>
         private class ClickToReturnContainer : Container
         {
             public BindableBool HandleMouse { get; } = new BindableBool();
