@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
-        /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
+        /// Calculates the strain value of a <see cref="DifficultyHitObject"/> in the <see cref="DifficultyHitObjectIterator"/>. This value is affected by previously processed objects.
         /// </summary>
         protected abstract double StrainValueOf(DifficultyHitObjectIterator iterator);
 

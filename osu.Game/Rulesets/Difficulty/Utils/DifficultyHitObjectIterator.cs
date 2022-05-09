@@ -8,6 +8,10 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
+    /// <summary>
+    /// Wraps a list of <see cref="DifficultyHitObject"/>s.
+    /// Provides access to the current object in time in difficulty calculation, as well as it's preceding and succeeding objects using relative indices.
+    /// </summary>
     public class DifficultyHitObjectIterator : IEnumerator
     {
         private readonly List<DifficultyHitObject> difficultyHitObjects;

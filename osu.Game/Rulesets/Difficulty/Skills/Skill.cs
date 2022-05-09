@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/>.
         /// </summary>
-        /// <param name="iterator">The <see cref="DifficultyHitObject"/> to process.</param>
+        /// <param name="iterator">An iterator that allows access to the current <see cref="DifficultyHitObject"/> at a point in time.</param>
         protected abstract void Process(DifficultyHitObjectIterator iterator);
 
         /// <summary>

@@ -38,12 +38,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
-        /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
+        /// Returns the strain value at the current <see cref="DifficultyHitObject"/> in the <see cref="DifficultyHitObjectIterator"/>. This value is calculated with or without respect to previous objects.
         /// </summary>
         protected abstract double StrainValueAt(DifficultyHitObjectIterator iterator);
 
         /// <summary>
-        /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
+        /// Process the current <see cref="DifficultyHitObject"/> in the <see cref="DifficultyHitObjectIterator"/> and update current strain values accordingly.
         /// </summary>
         protected sealed override void Process(DifficultyHitObjectIterator iterator)
         {

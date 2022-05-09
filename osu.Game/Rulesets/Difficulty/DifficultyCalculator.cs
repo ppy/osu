@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Difficulty
         }
 
         /// <summary>
-        /// Retrieves the <see cref="DifficultyHitObject"/>s to calculate against.
+        /// Retrieves the <see cref="DifficultyHitObjectIterator"/> with a sorted list of <see cref="DifficultyHitObject"/>s to calculate against.
         /// </summary>
         private DifficultyHitObjectIterator getDifficultyHitObjectIterator() => new DifficultyHitObjectIterator(SortObjects(CreateDifficultyHitObjects(Beatmap, clockRate)));
 
@@ -264,11 +264,11 @@ namespace osu.Game.Rulesets.Difficulty
         protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
 
         /// <summary>
-        /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
+        /// Creates a list of <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
-        /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
+        /// <returns>The list of <see cref="DifficultyHitObject"/>s.</returns>
         protected abstract List<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate);
 
         /// <summary>
