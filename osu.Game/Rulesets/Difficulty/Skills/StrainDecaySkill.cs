@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
@@ -34,12 +35,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
         }
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => CurrentStrain * strainDecay(time - current.Previous[0].StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObjectIterator iterator) => CurrentStrain * strainDecay(time - iterator.Previous(0).StartTime);
 
-        protected override double StrainValueAt(DifficultyHitObject current)
+        protected override double StrainValueAt(DifficultyHitObjectIterator iterator)
         {
-            CurrentStrain *= strainDecay(current.DeltaTime);
-            CurrentStrain += StrainValueOf(current) * SkillMultiplier;
+            CurrentStrain *= strainDecay(iterator.Current.DeltaTime);
+            CurrentStrain += StrainValueOf(iterator) * SkillMultiplier;
 
             return CurrentStrain;
         }
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
         /// </summary>
-        protected abstract double StrainValueOf(DifficultyHitObject current);
+        protected abstract double StrainValueOf(DifficultyHitObjectIterator iterator);
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
     }

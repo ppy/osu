@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -42,9 +42,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        private double calculateRhythmBonus(DifficultyHitObject current)
+        private double calculateRhythmBonus(DifficultyHitObjectIterator iterator)
         {
-            if (current.BaseObject is Spinner)
+            if (iterator.Current.BaseObject is Spinner)
                 return 0;
 
             int previousIslandSize = 0;
@@ -55,19 +55,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             bool firstDeltaSwitch = false;
 
-            int historyLength = Math.Min(max_history_length, current.Previous.Count);
+            int historyLength = Math.Min(max_history_length, iterator.Position);
 
             int rhythmStart = 0;
-            while (rhythmStart < historyLength - 2 && current.StartTime - current.Previous[rhythmStart].StartTime < history_time_max)
+            while (rhythmStart < historyLength - 2 && iterator.Current.StartTime - iterator.Previous(rhythmStart).StartTime < history_time_max)
                 rhythmStart++;
 
             for (int i = rhythmStart; i > 0; i--)
             {
-                OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous[i - 1];
-                OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous[i];
-                OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)current.Previous[i + 1];
+                OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)iterator.Previous(i - 1);
+                OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)iterator.Previous(i);
+                OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)iterator.Previous(i + 1);
 
-                double currHistoricalDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max; // scales note 0 to 1 from history to now
+                double currHistoricalDecay = (history_time_max - (iterator.Current.StartTime - currObj.StartTime)) / history_time_max; // scales note 0 to 1 from history to now
 
                 currHistoricalDecay = Math.Min((double)(historyLength - i) / historyLength, currHistoricalDecay); // either we're limited by time or limited by object count.
 
@@ -91,10 +91,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     }
                     else
                     {
-                        if (current.Previous[i - 1].BaseObject is Slider) // bpm change is into slider, this is easy acc window
+                        if (iterator.Previous(i - 1).BaseObject is Slider) // bpm change is into slider, this is easy acc window
                             effectiveRatio *= 0.125;
 
-                        if (current.Previous[i].BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
+                        if (iterator.Previous(i).BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
                             effectiveRatio *= 0.25;
 
                         if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
@@ -130,14 +130,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
         }
 
-        private double strainValueOf(DifficultyHitObject current)
+        private double strainValueOf(DifficultyHitObjectIterator iterator)
         {
-            if (current.BaseObject is Spinner)
+            if (iterator.Current.BaseObject is Spinner)
                 return 0;
 
             // derive strainTime for calculation
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuPrevObj = current.Previous.Count > 0 ? (OsuDifficultyHitObject)current.Previous[0] : null;
+            var osuCurrObj = (OsuDifficultyHitObject)iterator.Current;
+            var osuPrevObj = iterator.Position > 0 ? (OsuDifficultyHitObject)iterator.Previous(0) : null;
 
             double strainTime = osuCurrObj.StrainTime;
             double greatWindowFull = greatWindow * 2;
@@ -165,14 +165,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain * currentRhythm) * strainDecay(time - current.Previous[0].StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObjectIterator iterator) => currentStrain * strainDecay(time - iterator.Previous(0).StartTime);
 
-        protected override double StrainValueAt(DifficultyHitObject current)
+        protected override double StrainValueAt(DifficultyHitObjectIterator iterator)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += strainValueOf(current) * skillMultiplier;
+            currentStrain *= strainDecay(iterator.Current.DeltaTime);
+            currentStrain += strainValueOf(iterator) * skillMultiplier;
 
-            currentRhythm = calculateRhythmBonus(current);
+            currentRhythm = calculateRhythmBonus(iterator);
 
             return currentStrain * currentRhythm;
         }

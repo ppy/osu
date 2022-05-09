@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -32,14 +32,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplier => 23.25;
         private double strainDecayBase => 0.15;
 
-        private double strainValueOf(DifficultyHitObject current)
+        private double strainValueOf(DifficultyHitObjectIterator iterator)
         {
-            if (current.BaseObject is Spinner || current.Previous.Count <= 1 || current.Previous[0].BaseObject is Spinner)
+            if (iterator.Current.BaseObject is Spinner || iterator.Position <= 1 || iterator.Previous(0).BaseObject is Spinner)
                 return 0;
 
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuLastObj = (OsuDifficultyHitObject)current.Previous[0];
-            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous[1];
+            var osuCurrObj = (OsuDifficultyHitObject)iterator.Current;
+            var osuLastObj = (OsuDifficultyHitObject)iterator.Previous(0);
+            var osuLastLastObj = (OsuDifficultyHitObject)iterator.Previous(1);
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
@@ -150,12 +150,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous[0].StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObjectIterator iterator) => currentStrain * strainDecay(time - iterator.Previous(0).StartTime);
 
-        protected override double StrainValueAt(DifficultyHitObject current)
+        protected override double StrainValueAt(DifficultyHitObjectIterator iterator)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += strainValueOf(current) * skillMultiplier;
+            currentStrain *= strainDecay(iterator.Current.DeltaTime);
+            currentStrain += strainValueOf(iterator) * skillMultiplier;
 
             return currentStrain;
         }

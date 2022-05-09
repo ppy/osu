@@ -63,19 +63,14 @@ namespace osu.Game.Rulesets.Difficulty
             if (!Beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
 
-            List<DifficultyHitObject> hitObjects = getDifficultyHitObjects().ToList();
+            var iterator = getDifficultyHitObjectIterator();
 
-            for (int i = 0; i < hitObjects.Count; i++)
+            while (iterator.MoveNext())
             {
-                var last = i > 0 ? hitObjects[i - 1] : null;
-                var current = hitObjects[i];
-
-                current.PreviousBacking = new ObjectLink<DifficultyHitObject>(current, last?.PreviousBacking);
-
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.ProcessInternal(current);
+                    skill.ProcessInternal(iterator);
                 }
             }
 
@@ -109,23 +104,18 @@ namespace osu.Game.Rulesets.Difficulty
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
 
-            List<DifficultyHitObject> hitObjects = getDifficultyHitObjects().ToList();
+            var iterator = getDifficultyHitObjectIterator();
 
-            for (int i = 0; i < hitObjects.Count; i++)
+            while (iterator.MoveNext())
             {
-                var last = i > 0 ? hitObjects[i - 1] : null;
-                var current = hitObjects[i];
-
-                current.PreviousBacking = new ObjectLink<DifficultyHitObject>(current, last?.PreviousBacking);
-
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.ProcessInternal(current);
+                    skill.ProcessInternal(iterator);
                 }
 
-                progressiveBeatmap.HitObjects.Add(current.BaseObject);
-                attribs.Add(new TimedDifficultyAttributes(current.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+                progressiveBeatmap.HitObjects.Add(iterator.Current.BaseObject);
+                attribs.Add(new TimedDifficultyAttributes(iterator.Current.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
 
             return attribs;
@@ -157,7 +147,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Retrieves the <see cref="DifficultyHitObject"/>s to calculate against.
         /// </summary>
-        private IEnumerable<DifficultyHitObject> getDifficultyHitObjects() => SortObjects(CreateDifficultyHitObjects(Beatmap, clockRate));
+        private DifficultyHitObjectIterator getDifficultyHitObjectIterator() => new DifficultyHitObjectIterator(SortObjects(CreateDifficultyHitObjects(Beatmap, clockRate)));
 
         /// <summary>
         /// Performs required tasks before every calculation.
@@ -184,8 +174,11 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="input">The <see cref="DifficultyHitObject"/>s to sort.</param>
         /// <returns>The sorted <see cref="DifficultyHitObject"/>s.</returns>
-        protected virtual IEnumerable<DifficultyHitObject> SortObjects(IEnumerable<DifficultyHitObject> input)
-            => input.OrderBy(h => h.BaseObject.StartTime);
+        protected virtual List<DifficultyHitObject> SortObjects(List<DifficultyHitObject> input)
+        {
+            input.Sort((x, y) => x.StartTime.CompareTo(y.StartTime));
+            return input;
+        }
 
         /// <summary>
         /// Creates all <see cref="Mod"/> combinations which adjust the <see cref="Beatmaps.Beatmap"/> difficulty.
@@ -276,7 +269,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
-        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate);
+        protected abstract List<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate);
 
         /// <summary>
         /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.

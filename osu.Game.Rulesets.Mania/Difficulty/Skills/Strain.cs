@@ -3,8 +3,8 @@
 
 using System;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 
@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             overallStrain = 1;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainValueOf(DifficultyHitObjectIterator iterator)
         {
-            var maniaCurrent = (ManiaDifficultyHitObject)current;
+            var maniaCurrent = (ManiaDifficultyHitObject)iterator.Current;
             double endTime = maniaCurrent.EndTime;
             int column = maniaCurrent.BaseObject.Column;
             double closestEndTime = Math.Abs(endTime - maniaCurrent.LastObject.StartTime); // Lowest value we can assume with the current information
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
                 closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - holdEndTimes[i]));
 
                 // Decay individual strains
-                individualStrains[i] = applyDecay(individualStrains[i], current.DeltaTime, individual_decay_base);
+                individualStrains[i] = applyDecay(individualStrains[i], iterator.Current.DeltaTime, individual_decay_base);
             }
 
             holdEndTimes[column] = endTime;
@@ -79,14 +79,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             individualStrains[column] += 2.0 * holdFactor;
             individualStrain = individualStrains[column];
 
-            overallStrain = applyDecay(overallStrain, current.DeltaTime, overall_decay_base) + (1 + holdAddition) * holdFactor;
+            overallStrain = applyDecay(overallStrain, iterator.Current.DeltaTime, overall_decay_base) + (1 + holdAddition) * holdFactor;
 
             return individualStrain + overallStrain - CurrentStrain;
         }
 
-        protected override double CalculateInitialStrain(double offset, DifficultyHitObject current)
-            => applyDecay(individualStrain, offset - current.Previous[0].StartTime, individual_decay_base)
-               + applyDecay(overallStrain, offset - current.Previous[0].StartTime, overall_decay_base);
+        protected override double CalculateInitialStrain(double offset, DifficultyHitObjectIterator iterator)
+            => applyDecay(individualStrain, offset - iterator.Previous(0).StartTime, individual_decay_base)
+               + applyDecay(overallStrain, offset - iterator.Previous(0).StartTime, overall_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);

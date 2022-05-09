@@ -226,7 +226,7 @@ namespace osu.Game.Tests.NonVisual
                 throw new NotImplementedException();
             }
 
-            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+            protected override List<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
             {
                 throw new NotImplementedException();
             }

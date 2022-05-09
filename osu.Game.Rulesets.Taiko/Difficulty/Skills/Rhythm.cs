@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
@@ -53,10 +52,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainValueOf(DifficultyHitObjectIterator iterator)
         {
             // drum rolls and swells are exempt.
-            if (!(current.BaseObject is Hit))
+            if (!(iterator.Current.BaseObject is Hit))
             {
                 resetRhythmAndStrain();
                 return 0.0;
@@ -64,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             currentStrain *= strain_decay;
 
-            TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
+            TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)iterator.Current;
             notesSinceRhythmChange += 1;
 
             // rhythm difficulty zero (due to rhythm not changing) => no rhythm strain.

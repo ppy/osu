@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             new TaikoModHardRock(),
         };
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        protected override List<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             List<TaikoDifficultyHitObject> taikoDifficultyHitObjects = new List<TaikoDifficultyHitObject>();
 
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
 
             new StaminaCheeseDetector(taikoDifficultyHitObjects).FindCheese();
-            return taikoDifficultyHitObjects;
+            return taikoDifficultyHitObjects.Cast<DifficultyHitObject>().ToList();
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)

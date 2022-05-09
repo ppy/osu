@@ -56,18 +56,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             };
         }
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        protected override List<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             var sortedObjects = beatmap.HitObjects.ToArray();
-
             LegacySortHelper<HitObject>.Sort(sortedObjects, Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
 
+            List<DifficultyHitObject> difficultyObjects = new List<DifficultyHitObject>();
+
             for (int i = 1; i < sortedObjects.Length; i++)
-                yield return new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate);
+                difficultyObjects.Add(new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate));
+
+            return difficultyObjects;
         }
 
         // Sorting is done in CreateDifficultyHitObjects, since the full list of hitobjects is required.
-        protected override IEnumerable<DifficultyHitObject> SortObjects(IEnumerable<DifficultyHitObject> input) => input;
+        protected override List<DifficultyHitObject> SortObjects(List<DifficultyHitObject> input) => input;
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
         {

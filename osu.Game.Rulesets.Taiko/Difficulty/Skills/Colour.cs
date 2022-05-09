@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
@@ -45,22 +44,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainValueOf(DifficultyHitObjectIterator iterator)
         {
             // changing from/to a drum roll or a swell does not constitute a colour change.
             // hits spaced more than a second apart are also exempt from colour strain.
-            if (!(current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000))
+            if (!(iterator.Current.LastObject is Hit && iterator.Current.BaseObject is Hit && iterator.Current.DeltaTime < 1000))
             {
                 monoHistory.Clear();
 
-                var currentHit = current.BaseObject as Hit;
+                var currentHit = iterator.Current.BaseObject as Hit;
                 currentMonoLength = currentHit != null ? 1 : 0;
                 previousHitType = currentHit?.Type;
 
                 return 0.0;
             }
 
-            var taikoCurrent = (TaikoDifficultyHitObject)current;
+            var taikoCurrent = (TaikoDifficultyHitObject)iterator.Current;
 
             double objectStrain = 0.0;
 

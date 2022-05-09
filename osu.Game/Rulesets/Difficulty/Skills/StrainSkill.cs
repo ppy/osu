@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
@@ -39,25 +40,25 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
         /// </summary>
-        protected abstract double StrainValueAt(DifficultyHitObject current);
+        protected abstract double StrainValueAt(DifficultyHitObjectIterator iterator);
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        protected sealed override void Process(DifficultyHitObject current)
+        protected sealed override void Process(DifficultyHitObjectIterator iterator)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
-            if (current.Previous.Count == 0)
-                currentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
+            if (iterator.Position == 0)
+                currentSectionEnd = Math.Ceiling(iterator.Current.StartTime / SectionLength) * SectionLength;
 
-            while (current.StartTime > currentSectionEnd)
+            while (iterator.Current.StartTime > currentSectionEnd)
             {
                 saveCurrentPeak();
-                startNewSectionFrom(currentSectionEnd, current);
+                startNewSectionFrom(currentSectionEnd, iterator);
                 currentSectionEnd += SectionLength;
             }
 
-            currentSectionPeak = Math.Max(StrainValueAt(current), currentSectionPeak);
+            currentSectionPeak = Math.Max(StrainValueAt(iterator), currentSectionPeak);
         }
 
         /// <summary>
@@ -72,21 +73,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Sets the initial strain level for a new section.
         /// </summary>
         /// <param name="time">The beginning of the new section in milliseconds.</param>
-        /// <param name="current"></param>
-        private void startNewSectionFrom(double time, DifficultyHitObject current)
+        /// <param name="iterator"></param>
+        private void startNewSectionFrom(double time, DifficultyHitObjectIterator iterator)
         {
             // The maximum strain of the new section is not zero by default
             // This means we need to capture the strain level at the beginning of the new section, and use that as the initial peak level.
-            currentSectionPeak = CalculateInitialStrain(time, current);
+            currentSectionPeak = CalculateInitialStrain(time, iterator);
         }
 
         /// <summary>
         /// Retrieves the peak strain at a point in time.
         /// </summary>
         /// <param name="time">The time to retrieve the peak strain at.</param>
-        /// <param name="current"></param>
+        /// <param name="iterator"></param>
         /// <returns>The peak strain.</returns>
-        protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
+        protected abstract double CalculateInitialStrain(double time, DifficultyHitObjectIterator iterator);
 
         /// <summary>
         /// Returns a live enumerable of the peak strains for each <see cref="SectionLength"/> section of the beatmap,

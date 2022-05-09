@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -27,12 +27,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private double strainValueOf(DifficultyHitObject current)
+        private double strainValueOf(DifficultyHitObjectIterator iterator)
         {
-            if (current.BaseObject is Spinner)
+            if (iterator.Current.BaseObject is Spinner)
                 return 0;
 
-            var osuCurrent = (OsuDifficultyHitObject)current;
+            var osuCurrent = (OsuDifficultyHitObject)iterator.Current;
             var osuHitObject = (OsuHitObject)(osuCurrent.BaseObject);
 
             double scalingFactor = 52.0 / osuHitObject.Radius;
@@ -43,12 +43,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             OsuDifficultyHitObject lastObj = osuCurrent;
 
-            int historyLength = Math.Min(max_history_length, current.Previous.Count);
+            int historyLength = Math.Min(max_history_length, iterator.Position);
 
             // This is iterating backwards in time from the current object.
             for (int i = 0; i < historyLength; i++)
             {
-                var currentObj = (OsuDifficultyHitObject)current.Previous[i];
+                var currentObj = (OsuDifficultyHitObject)iterator.Previous(i);
                 var currentHitObject = (OsuHitObject)(currentObj.BaseObject);
 
                 if (!(currentObj.BaseObject is Spinner))
@@ -75,12 +75,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous[0].StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObjectIterator iterator) => currentStrain * strainDecay(time - iterator.Previous(0).StartTime);
 
-        protected override double StrainValueAt(DifficultyHitObject current)
+        protected override double StrainValueAt(DifficultyHitObjectIterator iterator)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += strainValueOf(current) * skillMultiplier;
+            currentStrain *= strainDecay(iterator.Current.DeltaTime);
+            currentStrain += strainValueOf(iterator) * skillMultiplier;
 
             return currentStrain;
         }

@@ -57,14 +57,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             hand = rightHand ? 1 : 0;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainValueOf(DifficultyHitObjectIterator iterator)
         {
-            if (!(current.BaseObject is Hit))
+            if (!(iterator.Current.BaseObject is Hit))
             {
                 return 0.0;
             }
 
-            TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
+            TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)iterator.Current;
 
             if (hitObject.ObjectIndex % 2 == hand)
             {

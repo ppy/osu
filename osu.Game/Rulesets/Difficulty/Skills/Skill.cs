@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
@@ -27,16 +28,16 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             this.mods = mods;
         }
 
-        internal void ProcessInternal(DifficultyHitObject current)
+        internal void ProcessInternal(DifficultyHitObjectIterator iterator)
         {
-            Process(current);
+            Process(iterator);
         }
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/>.
         /// </summary>
-        /// <param name="current">The <see cref="DifficultyHitObject"/> to process.</param>
-        protected abstract void Process(DifficultyHitObject current);
+        /// <param name="iterator">The <see cref="DifficultyHitObject"/> to process.</param>
+        protected abstract void Process(DifficultyHitObjectIterator iterator);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
