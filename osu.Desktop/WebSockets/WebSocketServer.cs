@@ -4,29 +4,30 @@
 using System;
 using System.Buffers;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Extensions;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Online.WebSockets
+namespace osu.Desktop.WebSockets
 {
     public abstract class WebSocketServer : CompositeDrawable
     {
         /// <summary>
         /// Whether this is current listening.
         /// </summary>
-        public bool IsListening => listener?.IsListening ?? false;
+        public bool IsListening { get; private set; }
 
         /// <summary>
-        /// Gets the host name to listen on.
+        /// Gets the address to listen on.
         /// </summary>
-        public virtual string HostName => @"localhost";
+        public virtual string Address => @"localhost";
 
         /// <summary>
         /// Gets the endpoint to listen on.
@@ -43,25 +44,28 @@ namespace osu.Game.Online.WebSockets
         /// </summary>
         public int Connected => connections.Count;
 
-        private HttpListener listener;
         private int nextClientId = -1;
+        private IWebHost webHost;
         private readonly ConcurrentDictionary<int, WebSocketConnection> connections = new ConcurrentDictionary<int, WebSocketConnection>();
 
         /// <summary>
         /// Starts the websocket server to listen for incoming connections.
         /// </summary>
-        public void Start()
+        public async Task Start()
         {
-            if (listener != null || !HttpListener.IsSupported)
+            if (IsListening)
                 return;
 
-            string path = Endpoint ?? string.Empty;
-            path = path.EndsWith('/') ? path : path + '/';
+            webHost ??= new WebHostBuilder()
+                .UseUrls(@$"http://{Address}:{Port}")
+                .UseKestrel()
+                .Configure(configureWebHost)
+                .Build();
 
-            listener = new HttpListener();
-            listener.Prefixes.Add(@$"http://{HostName}:{Port}/{path}");
-            listener.Start();
-            listener.BeginGetContext(handleRequest, null);
+            var cts = new CancellationTokenSource(10000);
+            await webHost.StartAsync(cts.Token).ConfigureAwait(false);
+
+            IsListening = true;
         }
 
         /// <summary>
@@ -69,18 +73,18 @@ namespace osu.Game.Online.WebSockets
         /// </summary>
         public async Task Close()
         {
-            if (listener == null)
+            if (!IsListening)
                 return;
 
-            listener.Stop();
-
             var disposeTasks = connections.Values.Select(c => c.DisposeAsync().AsTask());
-            await Task.WhenAll(disposeTasks);
+            await Task.WhenAll(disposeTasks).ConfigureAwait(false);
 
             connections.Clear();
 
-            listener.Close();
-            listener = null;
+            var cts = new CancellationTokenSource(10000);
+            await webHost.StopAsync(cts.Token).ConfigureAwait(false);
+
+            IsListening = false;
         }
 
         /// <summary>
@@ -107,41 +111,31 @@ namespace osu.Game.Online.WebSockets
                 connection.Send(message);
         }
 
-        private void handleRequest(IAsyncResult result)
+        private void configureWebHost(IApplicationBuilder app)
         {
-            if (!IsListening)
+            string basePath = Endpoint.StartsWith('/') ? Endpoint : '/' + Endpoint;
+            app.UsePathBase(basePath);
+            app.UseWebSockets();
+            app.Run(handleRequest);
+        }
+
+        private async Task handleRequest(HttpContext context)
+        {
+            if (!context.WebSockets.IsWebSocketRequest)
+            {
+                context.Response.StatusCode = 400;
                 return;
-
-            try
-            {
-                var context = listener.EndGetContext(result);
-
-                listener.BeginGetContext(handleRequest, listener);
-
-                if (!context.Request.IsWebSocketRequest)
-                {
-                    context.Response.StatusCode = 400;
-                    context.Response.Close();
-                    return;
-                }
-
-                var request = context
-                    .AcceptWebSocketAsync(null)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-
-                var connection = new WebSocketConnection(Interlocked.Increment(ref nextClientId), request.WebSocket);
-                connection.OnStart += onConnectionStart;
-                connection.OnClose += onConnectionClose;
-                connection.OnReady += onConnectionReady;
-                connection.OnMessage += onConnectionMessage;
-
-                connection.Start();
             }
-            catch (HttpListenerException)
-            {
-            }
+
+            var webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
+
+            var connection = new WebSocketConnection(Interlocked.Increment(ref nextClientId), webSocket);
+            connection.OnStart += onConnectionStart;
+            connection.OnClose += onConnectionClose;
+            connection.OnReady += onConnectionReady;
+            connection.OnMessage += onConnectionMessage;
+
+            await connection.Start().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -212,7 +206,7 @@ namespace osu.Game.Online.WebSockets
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            Task.Run(() => Close());
+            Task.Run(() => Close()).ContinueWith(t => webHost.Dispose());
         }
 
         protected class WebSocketConnection : IAsyncDisposable
@@ -228,6 +222,7 @@ namespace osu.Game.Online.WebSockets
             private bool hasStarted;
             private Task processTask;
             private readonly WebSocket socket;
+            private readonly TaskCompletionSource completionSource = new TaskCompletionSource();
             private readonly IMemoryOwner<byte> buffer = MemoryPool<byte>.Shared.Rent();
             private readonly CancellationTokenSource cts = new CancellationTokenSource();
             private readonly ConcurrentQueue<Message> queue = new ConcurrentQueue<Message>();
@@ -238,7 +233,7 @@ namespace osu.Game.Online.WebSockets
                 this.socket = socket;
             }
 
-            public void Start()
+            public async Task Start()
             {
                 if (hasStarted)
                     return;
@@ -247,6 +242,8 @@ namespace osu.Game.Online.WebSockets
                 processTask = Task.Factory.StartNew(() => Task.WhenAll(receive(cts.Token), send(cts.Token)), cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
                 hasStarted = true;
+
+                await completionSource.Task.ConfigureAwait(false);
             }
 
             public void Send(string data)
@@ -291,9 +288,9 @@ namespace osu.Game.Online.WebSockets
                     {
                         var msg = await socket.ReceiveAsync(buffer.Memory, token).ConfigureAwait(false);
 
-                         if (msg.MessageType == WebSocketMessageType.Close && socket.State == WebSocketState.CloseReceived)
+                        if (msg.MessageType == WebSocketMessageType.Close && socket.State == WebSocketState.CloseReceived)
                         {
-                            await disposeAsync(false);
+                            await disposeAsync(false).ConfigureAwait(false);
                             break;
                         }
                         else
@@ -310,7 +307,7 @@ namespace osu.Game.Online.WebSockets
 
             public async ValueTask DisposeAsync()
             {
-                await disposeAsync(true);
+                await disposeAsync(true).ConfigureAwait(false);
             }
 
             private async Task disposeAsync(bool requested)
@@ -321,13 +318,26 @@ namespace osu.Game.Online.WebSockets
                 OnClose?.Invoke(this, requested);
 
                 if (requested)
-                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                {
+                    try
+                    {
+                        var closeCancellationToken = new CancellationTokenSource(10000);
+                        await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, closeCancellationToken.Token).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+                }
                 else
-                    await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                {
+                    await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None).ConfigureAwait(false);
+                }
 
                 cts.Cancel();
 
-                await processTask;
+                await processTask.ConfigureAwait(false);
+
+                completionSource.SetResult();
 
                 cts.Dispose();
                 buffer.Dispose();

@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.IO.Serialization;
 
-namespace osu.Game.Online.WebSockets
+namespace osu.Game.Online.Broadcasts
 {
     [JsonObject(MemberSerialization.OptIn)]
     public abstract class GameStateBroadcaster : Component
@@ -24,7 +24,7 @@ namespace osu.Game.Online.WebSockets
         public abstract T Message { get; }
 
         [Resolved]
-        private GameStateBroadcastServer server { get; set; }
+        private IGameStateBroadcastServer server { get; set; }
 
         public sealed override void Broadcast()
         {
