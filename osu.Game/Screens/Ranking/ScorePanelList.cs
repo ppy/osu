@@ -85,7 +85,6 @@ namespace osu.Game.Screens.Ranking
             InternalChild = scroll = new Scroll
             {
                 RelativeSizeAxes = Axes.Both,
-                HandleScroll = () => expandedPanel?.IsHovered != true, // handle horizontal scroll only when not hovering the expanded panel.
                 Child = flow = new Flow
                 {
                     Anchor = Anchor.Centre,
@@ -359,11 +358,6 @@ namespace osu.Game.Screens.Ranking
             /// </summary>
             public float? InstantScrollTarget;
 
-            /// <summary>
-            /// Whether this container should handle scroll trigger events.
-            /// </summary>
-            public Func<bool> HandleScroll;
-
             protected override void UpdateAfterChildren()
             {
                 if (InstantScrollTarget != null)
@@ -374,10 +368,6 @@ namespace osu.Game.Screens.Ranking
 
                 base.UpdateAfterChildren();
             }
-
-            public override bool HandlePositionalInput => HandleScroll();
-
-            public override bool HandleNonPositionalInput => HandleScroll();
         }
     }
 }
