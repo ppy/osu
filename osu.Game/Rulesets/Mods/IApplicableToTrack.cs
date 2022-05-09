@@ -10,6 +10,13 @@ namespace osu.Game.Rulesets.Mods
     /// </summary>
     public interface IApplicableToTrack : IApplicableMod
     {
+        /// <summary>
+        /// Use this method to apply any adjustments applicable for this mod to the supplied <paramref name="track"/>.
+        /// </summary>
+        /// <remarks>
+        /// This method is the only valid point at which adjustments can be added safely.
+        /// Storing the supplied <paramref name="track"/> reference and adding adjustments at a later date is not supported and will lead to incorrect operation.
+        /// </remarks>
         void ApplyToTrack(ITrack track);
     }
 }
