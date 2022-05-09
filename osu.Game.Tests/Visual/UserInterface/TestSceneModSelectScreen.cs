@@ -481,6 +481,38 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("3 columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 3);
         }
 
+        [Test]
+        public void TestCorrectAudioAdjustmentDeapplication()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("allow track adjustments", () => MusicController.AllowTrackAdjustments = true);
+
+            AddStep("set wind up", () => modSelectScreen.SelectedMods.Value = new[] { new ModWindUp() });
+            AddStep("open customisation menu", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedToggleButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("frequency above 1", () => MusicController.CurrentTrack.AggregateFrequency.Value > 1);
+            AddAssert("tempo is 1", () => MusicController.CurrentTrack.AggregateTempo.Value == 1);
+
+            AddStep("turn off pitch adjustment", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SettingsCheckbox>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("frequency is 1", () => MusicController.CurrentTrack.AggregateFrequency.Value == 1);
+            AddAssert("tempo above 1", () => MusicController.CurrentTrack.AggregateTempo.Value > 1);
+
+            AddStep("reset mods", () => modSelectScreen.SelectedMods.SetDefault());
+            AddAssert("frequency is 1", () => MusicController.CurrentTrack.AggregateFrequency.Value == 1);
+            AddAssert("tempo is 1", () => MusicController.CurrentTrack.AggregateTempo.Value == 1);
+
+            AddStep("disallow track adjustments", () => MusicController.AllowTrackAdjustments = false);
+        }
+
         private void waitForColumnLoad() => AddUntilStep("all column content loaded",
             () => modSelectScreen.ChildrenOfType<ModColumn>().Any() && modSelectScreen.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
 
