@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Layout;
 using osu.Framework.Lists;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -125,11 +124,14 @@ namespace osu.Game.Overlays.Mods
                             ScrollbarOverlapsContent = false,
                             Child = columnFlow = new ColumnFlowContainer
                             {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
                                 Direction = FillDirection.Horizontal,
                                 Shear = new Vector2(SHEAR, 0),
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
                                 Margin = new MarginPadding { Horizontal = 70 },
+                                Padding = new MarginPadding { Bottom = 10 },
                                 Children = new[]
                                 {
                                     createModColumnContent(ModType.DifficultyReduction, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P }),
@@ -521,18 +523,11 @@ namespace osu.Game.Overlays.Mods
         }
 
         /// <summary>
-        /// Manages padding and layout of mod columns.
+        /// Manages layout of mod columns.
         /// </summary>
         internal class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
         {
             public IEnumerable<ModColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
-
-            private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
-
-            public ColumnFlowContainer()
-            {
-                AddLayout(drawSizeLayout);
-            }
 
             public override void Add(ColumnDimContainer dimContainer)
             {
@@ -540,22 +535,6 @@ namespace osu.Game.Overlays.Mods
 
                 Debug.Assert(dimContainer != null);
                 dimContainer.Column.Shear = Vector2.Zero;
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                if (!drawSizeLayout.IsValid)
-                {
-                    Padding = new MarginPadding
-                    {
-                        Left = DrawHeight * SHEAR,
-                        Bottom = 10
-                    };
-
-                    drawSizeLayout.Validate();
-                }
             }
         }
 
