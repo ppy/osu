@@ -55,7 +55,10 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
             AddMoveStep(end_time, 0);
             AddClickStep(MouseButton.Left);
+
             AddMoveStep(start_time, 0);
+            AddAssert("duration is positive", () => ((BananaShower)CurrentBlueprint.HitObject).Duration > 0);
+
             AddClickStep(MouseButton.Right);
             AddAssert("start time is correct", () => Precision.AlmostEquals(LastObject.HitObject.StartTime, start_time));
             AddAssert("end time is correct", () => Precision.AlmostEquals(LastObject.HitObject.GetEndTime(), end_time));
