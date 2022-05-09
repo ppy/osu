@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Sets the initial strain level for a new section.
         /// </summary>
         /// <param name="time">The beginning of the new section in milliseconds.</param>
-        /// <param name="iterator"></param>
+        /// <param name="iterator">The iterator which is used to retrieve the current <see cref="DifficultyHitObject" /> in time.</param>
         private void startNewSectionFrom(double time, DifficultyHitObjectIterator iterator)
         {
             // The maximum strain of the new section is not zero by default
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Retrieves the peak strain at a point in time.
         /// </summary>
         /// <param name="time">The time to retrieve the peak strain at.</param>
-        /// <param name="iterator"></param>
+        /// <param name="iterator">The iterator which is used to retrieve the current <see cref="DifficultyHitObject" /> in time.</param>
         /// <returns>The peak strain.</returns>
         protected abstract double CalculateInitialStrain(double time, DifficultyHitObjectIterator iterator);
 
