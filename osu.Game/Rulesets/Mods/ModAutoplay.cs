@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Mods
         public bool RestartOnFail => false;
 
         public override bool UserPlayable => false;
+        public override bool ValidForMultiplayer => false;
+        public override bool ValidForMultiplayerAsFreeMod => false;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail) };
 
