@@ -10,9 +10,9 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class UserModSelectScreen : ModSelectScreen
+    public class UserModSelectOverlay : ModSelectOverlay
     {
-        public UserModSelectScreen(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
+        public UserModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
         {
         }
