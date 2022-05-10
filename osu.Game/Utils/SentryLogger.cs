@@ -71,8 +71,22 @@ namespace osu.Game.Utils
                 // but all unhandled exceptions still arrive via this pathway. we just need to mark them as unhandled for tagging purposes.
                 // easiest solution is to check the message matches what the framework logs this as.
                 // see https://github.com/ppy/osu-framework/blob/f932f8df053f0011d755c95ad9a2ed61b94d136b/osu.Framework/Platform/GameHost.cs#L336
-                bool wasHandled = entry.Message != @"An unhandled exception has occurred.";
-                exception.Data[Mechanism.HandledKey] = wasHandled;
+                bool wasUnhandled = entry.Message == @"An unhandled error has occurred.";
+                bool wasUnobserved = entry.Message == @"An unobserved error has occurred.";
+
+                if (wasUnobserved)
+                {
+                    // see https://github.com/getsentry/sentry-dotnet/blob/c6a660b1affc894441c63df2695a995701671744/src/Sentry/Integrations/TaskUnobservedTaskExceptionIntegration.cs#L39
+                    exception.Data[Mechanism.MechanismKey] = @"UnobservedTaskException";
+                }
+
+                if (wasUnhandled)
+                {
+                    // see https://github.com/getsentry/sentry-dotnet/blob/main/src/Sentry/Integrations/AppDomainUnhandledExceptionIntegration.cs#L38-L39
+                    exception.Data[Mechanism.MechanismKey] = @"AppDomain.UnhandledException";
+                }
+
+                exception.Data[Mechanism.HandledKey] = !wasUnhandled;
 
                 SentrySdk.CaptureEvent(new SentryEvent(exception)
                 {
