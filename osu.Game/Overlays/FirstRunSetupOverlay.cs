@@ -91,7 +91,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Bottom = 20, },
-                    Child = new GridContainer()
+                    Child = new GridContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
