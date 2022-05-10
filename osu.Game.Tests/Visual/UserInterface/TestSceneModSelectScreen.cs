@@ -482,7 +482,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestCorrectAudioAdjustmentDeapplication()
+        public void TestCorrectAudioAdjustmentAfterPitchAdjustChange()
         {
             createScreen();
             changeRuleset(0);
