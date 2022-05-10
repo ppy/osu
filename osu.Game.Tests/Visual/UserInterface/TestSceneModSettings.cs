@@ -5,20 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.UI;
+using osu.Game.Tests.Mods;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -27,15 +22,15 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private TestModSelectOverlay modSelect;
 
-        private readonly Mod testCustomisableMod = new TestModCustomisable1();
+        private readonly Mod testCustomisableMod = new TestCustomisableModRuleset.TestModCustomisable1();
 
-        private readonly Mod testCustomisableAutoOpenMod = new TestModCustomisable2();
+        private readonly Mod testCustomisableAutoOpenMod = new TestCustomisableModRuleset.TestModCustomisable2();
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
             SelectedMods.Value = Array.Empty<Mod>();
-            Ruleset.Value = CreateTestRulesetInfo();
+            Ruleset.Value = TestCustomisableModRuleset.CreateTestRulesetInfo();
         });
 
         [Test]
@@ -168,71 +163,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public void SetModSettingsWidth(float newWidth) =>
                 ModSettingsContainer.Parent.Width = newWidth;
-        }
-
-        public static RulesetInfo CreateTestRulesetInfo() => new TestCustomisableModRuleset().RulesetInfo;
-
-        public class TestCustomisableModRuleset : Ruleset
-        {
-            public override IEnumerable<Mod> GetModsFor(ModType type)
-            {
-                if (type == ModType.Conversion)
-                {
-                    return new Mod[]
-                    {
-                        new TestModCustomisable1(),
-                        new TestModCustomisable2()
-                    };
-                }
-
-                return Array.Empty<Mod>();
-            }
-
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
-
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
-
-            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
-
-            public override string Description { get; } = "test";
-            public override string ShortName { get; } = "tst";
-        }
-
-        private class TestModCustomisable1 : TestModCustomisable
-        {
-            public override string Name => "Customisable Mod 1";
-
-            public override string Acronym => "CM1";
-        }
-
-        private class TestModCustomisable2 : TestModCustomisable
-        {
-            public override string Name => "Customisable Mod 2";
-
-            public override string Acronym => "CM2";
-
-            public override bool RequiresConfiguration => true;
-        }
-
-        private abstract class TestModCustomisable : Mod, IApplicableMod
-        {
-            public override double ScoreMultiplier => 1.0;
-
-            public override string Description => "This is a customisable test mod.";
-
-            public override ModType Type => ModType.Conversion;
-
-            [SettingSource("Sample float", "Change something for a mod")]
-            public BindableFloat SliderBindable { get; } = new BindableFloat
-            {
-                MinValue = 0,
-                MaxValue = 10,
-                Default = 5,
-                Value = 7
-            };
-
-            [SettingSource("Sample bool", "Clicking this changes a setting")]
-            public BindableBool TickBindable { get; } = new BindableBool();
         }
     }
 }
