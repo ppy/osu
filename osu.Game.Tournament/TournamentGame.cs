@@ -40,7 +40,7 @@ namespace osu.Game.Tournament
         private Bindable<WindowMode> windowMode;
         private LoadingSpinner loadingSpinner;
 
-        protected override int SoftHandledExceptions => DebugUtils.IsDebugBuild ? 0 : 1;
+        protected override int ExceptionsBeforeCrash => DebugUtils.IsDebugBuild ? 0 : 1;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig, GameHost host)

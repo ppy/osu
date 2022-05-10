@@ -182,15 +182,20 @@ namespace osu.Game
         protected DatabaseContextFactory EFContextFactory { get; private set; }
 
         /// <summary>
-        /// Number of exceptions to allow before aborting execution.
+        /// Number of unhandled exceptions to allow before aborting execution.
         /// </summary>
-        protected virtual int SoftHandledExceptions => 0;
+        /// <remarks>
+        /// When an unhandled exception is encountered, an internal count will be decremented.
+        /// If the count hits zero, the game will crash.
+        /// Each second, the count is incremented until reaching the value specified.
+        /// </remarks>
+        protected virtual int ExceptionsBeforeCrash => 0;
 
         public OsuGameBase()
         {
             Name = @"osu!";
 
-            allowableExceptions = SoftHandledExceptions;
+            allowableExceptions = ExceptionsBeforeCrash;
         }
 
         [BackgroundDependencyLoader]
