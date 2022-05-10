@@ -171,8 +171,7 @@ namespace osu.Game.Overlays
 
             config.BindWith(OsuSetting.ShowFirstRunSetup, showFirstRunSetup);
 
-            // TODO: uncomment when happy with the whole flow.
-            // if (showFirstRunSetup.Value) Show();
+            if (showFirstRunSetup.Value) Show();
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -304,8 +303,7 @@ namespace osu.Game.Overlays
             }
             else
             {
-                // TODO: uncomment when happy with the whole flow.
-                // showFirstRunSetup.Value = false;
+                showFirstRunSetup.Value = false;
                 currentStepIndex = null;
                 Hide();
             }
