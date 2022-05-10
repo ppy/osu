@@ -4,7 +4,10 @@
 using System;
 using System.IO;
 using System.Net;
+using JetBrains.Annotations;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Game.Online.API.Requests.Responses;
 using Sentry;
 
 namespace osu.Game.Utils
@@ -17,6 +20,9 @@ namespace osu.Game.Utils
         private SentryClient sentry;
         private Scope sentryScope;
         private Exception lastException;
+
+        [UsedImplicitly]
+        private readonly IBindable<APIUser> localUser;
 
         public SentryLogger(OsuGame game)
         {
@@ -34,6 +40,16 @@ namespace osu.Game.Utils
             sentryScope = new Scope(options);
 
             Logger.NewEntry += processLogEntry;
+
+            localUser = game.API.LocalUser.GetBoundCopy();
+            localUser.BindValueChanged(user =>
+            {
+                sentryScope.User = new User
+                {
+                    Username = user.NewValue.Username,
+                    Id = user.NewValue.Id.ToString(),
+                };
+            });
         }
 
         private void processLogEntry(LogEntry entry)
@@ -50,6 +66,7 @@ namespace osu.Game.Utils
                 if (lastException != null && lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace, StringComparison.Ordinal)) return;
 
                 lastException = exception;
+
                 sentry.CaptureEvent(new SentryEvent(exception)
                 {
                     Message = entry.Message,
