@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
-using osu.Framework.Development;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -39,8 +38,6 @@ namespace osu.Game.Tournament
         private Bindable<Size> windowSize;
         private Bindable<WindowMode> windowMode;
         private LoadingSpinner loadingSpinner;
-
-        protected override int ExceptionsBeforeCrash => DebugUtils.IsDebugBuild ? 0 : 1;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig, GameHost host)
