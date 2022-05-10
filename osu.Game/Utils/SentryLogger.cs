@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
-using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Online.API.Requests.Responses;
@@ -19,10 +21,9 @@ namespace osu.Game.Utils
     {
         private SentryClient sentry;
         private Scope sentryScope;
-        private Exception lastException;
+        private Exception? lastException;
 
-        [UsedImplicitly]
-        private readonly IBindable<APIUser> localUser;
+        private IBindable<APIUser>? localUser;
 
         public SentryLogger(OsuGame game)
         {
@@ -40,16 +41,21 @@ namespace osu.Game.Utils
             sentryScope = new Scope(options);
 
             Logger.NewEntry += processLogEntry;
+        }
 
-            localUser = game.API.LocalUser.GetBoundCopy();
-            localUser.BindValueChanged(user =>
+        public void AttachUser(IBindable<APIUser> user)
+        {
+            Debug.Assert(localUser == null);
+
+            localUser = user.GetBoundCopy();
+            localUser.BindValueChanged(u =>
             {
                 sentryScope.User = new User
                 {
-                    Username = user.NewValue.Username,
-                    Id = user.NewValue.Id.ToString(),
+                    Username = u.NewValue.Username,
+                    Id = u.NewValue.Id.ToString(),
                 };
-            });
+            }, true);
         }
 
         private void processLogEntry(LogEntry entry)
@@ -137,8 +143,6 @@ namespace osu.Game.Utils
         protected virtual void Dispose(bool isDisposing)
         {
             Logger.NewEntry -= processLogEntry;
-            sentry = null;
-            sentryScope = null;
         }
 
         #endregion
