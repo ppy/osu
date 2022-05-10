@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             Content.Children = new Drawable[]
             {
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 24))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Text = FirstRunSetupOverlayStrings.BehaviourDescription,
                     RelativeSizeAxes = Axes.X,

@@ -46,11 +46,11 @@ namespace osu.Game.Overlays.FirstRunSetup
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(LegacyImportManager? legacyImportManager)
         {
-            Vector2 buttonSize = new Vector2(500, 60);
+            Vector2 buttonSize = new Vector2(400, 50);
 
             Content.Children = new Drawable[]
             {
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.Description,
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Height = 30,
                     Children = new Drawable[]
                     {
-                        currentlyLoadedBeatmaps = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold))
+                        currentlyLoadedBeatmaps = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: HEADER_FONT_SIZE, weight: FontWeight.SemiBold))
                         {
                             Colour = OverlayColourProvider.Content2,
                             TextAnchor = Anchor.Centre,
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                         },
                     }
                 },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.TutorialDescription,
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Text = FirstRunSetupBeatmapScreenStrings.TutorialButton,
                     Action = downloadTutorial
                 },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.BundledDescription,
@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Text = FirstRunSetupBeatmapScreenStrings.BundledButton,
                     Action = downloadBundled
                 },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = "If you have an existing osu! install, you can also choose to import your existing beatmap collection.",
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                         }));
                     }
                 },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.ObtainMoreBeatmaps,
