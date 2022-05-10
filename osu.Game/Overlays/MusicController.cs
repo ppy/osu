@@ -377,6 +377,8 @@ namespace osu.Game.Overlays
             }
         }
 
+        private readonly AudioAdjustments modTrackAdjustments = new AudioAdjustments();
+
         /// <summary>
         /// Resets the adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowTrackAdjustments"/> is <c>true</c>.
         /// </summary>
@@ -385,15 +387,27 @@ namespace osu.Game.Overlays
         /// </remarks>
         public void ResetTrackAdjustments()
         {
+            // todo: we probably want a helper method rather than this.
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Balance);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Frequency);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
 
-            if (allowTrackAdjustments)
+            modTrackAdjustments.RemoveAllAdjustments(AdjustableProperty.Balance);
+            modTrackAdjustments.RemoveAllAdjustments(AdjustableProperty.Frequency);
+            modTrackAdjustments.RemoveAllAdjustments(AdjustableProperty.Tempo);
+            modTrackAdjustments.RemoveAllAdjustments(AdjustableProperty.Volume);
+
+            var applicableToTrack = mods.Value.OfType<IApplicableToTrack>();
+
+            if (!allowTrackAdjustments || !applicableToTrack.Any())
+                CurrentTrack.UnbindAdjustments(modTrackAdjustments);
+            else
             {
-                foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
-                    mod.ApplyToTrack(CurrentTrack);
+                CurrentTrack.BindAdjustments(modTrackAdjustments);
+
+                foreach (var mod in applicableToTrack)
+                    mod.ApplyToTrack(modTrackAdjustments);
             }
         }
     }
