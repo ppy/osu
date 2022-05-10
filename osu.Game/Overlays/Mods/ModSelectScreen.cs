@@ -192,6 +192,8 @@ namespace osu.Game.Overlays.Mods
 
             State.BindValueChanged(_ => samplePlaybackDisabled.Value = State.Value == Visibility.Hidden, true);
 
+            // This is an optimisation to prevent refreshing the available settings controls when it can be
+            // reasonably assumed that the settings panel is never to be displayed (e.g. FreeModSelectScreen).
             if (customisationButton != null)
                 ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
 
