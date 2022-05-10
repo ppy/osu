@@ -20,8 +20,6 @@ namespace osu.Game.Utils
     /// </summary>
     public class SentryLogger : IDisposable
     {
-        private Exception? lastException;
-
         private IBindable<APIUser>? localUser;
 
         private readonly IDisposable? sentrySession;
@@ -68,11 +66,6 @@ namespace osu.Game.Utils
             if (exception != null)
             {
                 if (!shouldSubmitException(exception)) return;
-
-                // since we let unhandled exceptions go ignored at times, we want to ensure they don't get submitted on subsequent reports.
-                if (lastException != null && lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace, StringComparison.Ordinal)) return;
-
-                lastException = exception;
 
                 // framework does some weird exception redirection which means sentry does not see unhandled exceptions using its automatic methods.
                 // but all unhandled exceptions still arrive via this pathway. we just need to mark them as unhandled for tagging purposes.
