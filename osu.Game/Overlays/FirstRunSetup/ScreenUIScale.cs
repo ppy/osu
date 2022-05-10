@@ -125,6 +125,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private class SampleScreenContainer : CompositeDrawable
         {
+            private readonly OsuScreen screen;
             // Minimal isolation from main game.
 
             [Cached]
@@ -144,6 +145,12 @@ namespace osu.Game.Overlays.FirstRunSetup
             public override bool PropagatePositionalInputSubTree => false;
             public override bool PropagateNonPositionalInputSubTree => false;
 
+            public SampleScreenContainer(OsuScreen screen)
+            {
+                this.screen = screen;
+                RelativeSizeAxes = Axes.Both;
+            }
+
             [BackgroundDependencyLoader]
             private void load(AudioManager audio, TextureStore textures, RulesetStore rulesets)
             {
@@ -151,13 +158,8 @@ namespace osu.Game.Overlays.FirstRunSetup
                 Beatmap.Value.LoadTrack();
 
                 Ruleset.Value = rulesets.AvailableRulesets.First();
-            }
 
-            public SampleScreenContainer(Screen screen)
-            {
                 OsuScreenStack stack;
-                RelativeSizeAxes = Axes.Both;
-
                 OsuLogo logo;
 
                 Padding = new MarginPadding(5);
@@ -191,7 +193,8 @@ namespace osu.Game.Overlays.FirstRunSetup
                     },
                 };
 
-                stack.Push(screen);
+                // intentionally load synchronously so it is included in the initial load of the first run screen.
+                stack.PushSynchronously(screen);
             }
         }
     }
