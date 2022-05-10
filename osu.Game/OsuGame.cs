@@ -176,7 +176,7 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
-        protected override int SoftHandledExceptions => DebugUtils.IsDebugBuild ? 0 : 1;
+        protected override int ExceptionsBeforeCrash => DebugUtils.IsDebugBuild ? 0 : 1;
 
         public OsuGame(string[] args = null)
         {
