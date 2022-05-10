@@ -29,6 +29,13 @@ namespace osu.Game.Screens
             ScreenExited += ScreenChanged;
         }
 
+        public void PushSynchronously(OsuScreen screen)
+        {
+            LoadComponent(screen);
+
+            Push(screen);
+        }
+
         private void screenPushed(IScreen prev, IScreen next)
         {
             if (LoadState < LoadState.Ready)
