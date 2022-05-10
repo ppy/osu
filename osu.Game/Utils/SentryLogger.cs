@@ -19,26 +19,24 @@ namespace osu.Game.Utils
     /// </summary>
     public class SentryLogger : IDisposable
     {
-        private SentryClient sentry;
-        private Scope sentryScope;
         private Exception? lastException;
 
         private IBindable<APIUser>? localUser;
 
+        private readonly IDisposable? sentrySession;
+
         public SentryLogger(OsuGame game)
         {
-            if (!game.IsDeployedBuild) return;
-
-            var options = new SentryOptions
+            sentrySession = SentrySdk.Init(options =>
             {
-                Dsn = "https://ad9f78529cef40ac874afb95a9aca04e@sentry.ppy.sh/2",
-                AutoSessionTracking = true,
-                IsEnvironmentUser = false,
-                Release = game.Version
-            };
+                // Not setting the dsn will completely disable sentry.
+                if (game.IsDeployedBuild)
+                    options.Dsn = "https://ad9f78529cef40ac874afb95a9aca04e@sentry.ppy.sh/2";
 
-            sentry = new SentryClient(options);
-            sentryScope = new Scope(options);
+                options.AutoSessionTracking = true;
+                options.IsEnvironmentUser = false;
+                options.Release = game.Version;
+            });
 
             Logger.NewEntry += processLogEntry;
         }
@@ -50,11 +48,11 @@ namespace osu.Game.Utils
             localUser = user.GetBoundCopy();
             localUser.BindValueChanged(u =>
             {
-                sentryScope.User = new User
+                SentrySdk.ConfigureScope(scope => scope.User = new User
                 {
                     Username = u.NewValue.Username,
                     Id = u.NewValue.Id.ToString(),
-                };
+                });
             }, true);
         }
 
@@ -73,14 +71,14 @@ namespace osu.Game.Utils
 
                 lastException = exception;
 
-                sentry.CaptureEvent(new SentryEvent(exception)
+                SentrySdk.CaptureEvent(new SentryEvent(exception)
                 {
                     Message = entry.Message,
                     Level = getSentryLevel(entry.Level),
-                }, sentryScope);
+                });
             }
             else
-                sentryScope.AddBreadcrumb(DateTimeOffset.Now, entry.Message, entry.Target.ToString(), "navigation");
+                SentrySdk.AddBreadcrumb(entry.Message, entry.Target.ToString(), "navigation");
         }
 
         private SentryLevel? getSentryLevel(LogLevel entryLevel)
@@ -143,6 +141,7 @@ namespace osu.Game.Utils
         protected virtual void Dispose(bool isDisposing)
         {
             Logger.NewEntry -= processLogEntry;
+            sentrySession?.Dispose();
         }
 
         #endregion
