@@ -125,7 +125,7 @@ namespace osu.Game
 
         protected MusicController MusicController { get; private set; }
 
-        protected IAPIProvider API { get; set; }
+        protected internal IAPIProvider API { get; protected set; }
 
         protected Storage Storage { get; set; }
 
