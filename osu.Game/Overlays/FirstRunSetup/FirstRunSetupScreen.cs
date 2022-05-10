@@ -33,23 +33,29 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new OsuScrollContainer(Direction.Vertical)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollbarOverlapsContent = false,
-                    Children = new Drawable[]
+                    Masking = false,
+                    Child = new Container
                     {
-                        new OsuSpriteText
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = 30 },
+                        Children = new Drawable[]
                         {
-                            Text = this.GetLocalisableDescription(),
-                            Font = OsuFont.Default.With(size: header_size),
-                            Colour = OverlayColourProvider.Light1,
+                            new OsuSpriteText
+                            {
+                                Text = this.GetLocalisableDescription(),
+                                Font = OsuFont.Default.With(size: header_size),
+                                Colour = OverlayColourProvider.Light1,
+                            },
+                            Content = new FillFlowContainer
+                            {
+                                Y = header_size + spacing,
+                                Spacing = new Vector2(spacing),
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                            }
                         },
-                        Content = new FillFlowContainer
-                        {
-                            Y = header_size + spacing,
-                            Spacing = new Vector2(spacing),
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                        }
                     },
                 }
             };
