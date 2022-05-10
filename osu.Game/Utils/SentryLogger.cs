@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Online.API.Requests.Responses;
 using Sentry;
+using Sentry.Protocol;
 
 namespace osu.Game.Utils
 {
@@ -72,6 +73,13 @@ namespace osu.Game.Utils
                 if (lastException != null && lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace, StringComparison.Ordinal)) return;
 
                 lastException = exception;
+
+                // framework does some weird exception redirection which means sentry does not see unhandled exceptions using its automatic methods.
+                // but all unhandled exceptions still arrive via this pathway. we just need to mark them as unhandled for tagging purposes.
+                // easiest solution is to check the message matches what the framework logs this as.
+                // see https://github.com/ppy/osu-framework/blob/f932f8df053f0011d755c95ad9a2ed61b94d136b/osu.Framework/Platform/GameHost.cs#L336
+                bool wasHandled = entry.Message != @"An unhandled exception has occurred.";
+                exception.Data[Mechanism.HandledKey] = wasHandled;
 
                 SentrySdk.CaptureEvent(new SentryEvent(exception)
                 {
