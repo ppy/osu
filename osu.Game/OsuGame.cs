@@ -258,8 +258,6 @@ namespace osu.Game
         {
             dependencies.CacheAs(this);
 
-            dependencies.Cache(SentryLogger);
-
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
             // bind config int to database RulesetInfo
