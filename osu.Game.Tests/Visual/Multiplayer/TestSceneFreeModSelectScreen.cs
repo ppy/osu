@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneFreeModSelectScreen : MultiplayerTestScene
     {
-        private FreeModSelectScreen freeModSelectScreen;
+        private FreeModSelectOverlay freeModSelectOverlay;
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
         [BackgroundDependencyLoader]
@@ -40,8 +40,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddToggleStep("toggle visibility", visible =>
             {
-                if (freeModSelectScreen != null)
-                    freeModSelectScreen.State.Value = visible ? Visibility.Visible : Visibility.Hidden;
+                if (freeModSelectOverlay != null)
+                    freeModSelectOverlay.State.Value = visible ? Visibility.Visible : Visibility.Hidden;
             });
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createFreeModSelect();
 
-            AddStep("select difficulty adjust", () => freeModSelectScreen.SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            AddStep("select difficulty adjust", () => freeModSelectOverlay.SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
             AddWaitStep("wait some", 3);
             AddAssert("customisation area not expanded", () => this.ChildrenOfType<ModSettingsArea>().Single().Height == 0);
         }
@@ -72,18 +72,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().Last());
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("all mods deselected", () => !freeModSelectScreen.SelectedMods.Value.Any());
+            AddUntilStep("all mods deselected", () => !freeModSelectOverlay.SelectedMods.Value.Any());
         }
 
         private void createFreeModSelect()
         {
-            AddStep("create free mod select screen", () => Child = freeModSelectScreen = new FreeModSelectScreen
+            AddStep("create free mod select screen", () => Child = freeModSelectOverlay = new FreeModSelectOverlay
             {
                 State = { Value = Visibility.Visible }
             });
             AddUntilStep("all column content loaded",
-                () => freeModSelectScreen.ChildrenOfType<ModColumn>().Any()
-                      && freeModSelectScreen.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
+                () => freeModSelectOverlay.ChildrenOfType<ModColumn>().Any()
+                      && freeModSelectOverlay.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
         }
 
         private bool assertAllAvailableModsSelected()
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             foreach (var availableMod in allAvailableMods)
             {
-                if (freeModSelectScreen.SelectedMods.Value.All(selectedMod => selectedMod.GetType() != availableMod.GetType()))
+                if (freeModSelectOverlay.SelectedMods.Value.All(selectedMod => selectedMod.GetType() != availableMod.GetType()))
                     return false;
             }
 

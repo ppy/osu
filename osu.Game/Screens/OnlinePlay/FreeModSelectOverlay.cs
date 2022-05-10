@@ -13,7 +13,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class FreeModSelectScreen : ModSelectScreen
+    public class FreeModSelectOverlay : ModSelectOverlay
     {
         protected override bool ShowTotalMultiplier => false;
 
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay
             set => base.IsValidMod = m => m.UserPlayable && value.Invoke(m);
         }
 
-        public FreeModSelectScreen()
+        public FreeModSelectOverlay()
             : base(OverlayColourScheme.Plum)
         {
             IsValidMod = _ => true;

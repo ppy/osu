@@ -27,7 +27,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSelectScreen : ShearedOverlayContainer, ISamplePlaybackDisabler
+    public abstract class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler
     {
         protected const int BUTTON_WIDTH = 200;
 
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Mods
 
         private ShearedToggleButton? customisationButton;
 
-        protected ModSelectScreen(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
+        protected ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
         {
         }
