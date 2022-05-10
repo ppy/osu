@@ -50,10 +50,35 @@ namespace osu.Game.Utils
                 if (lastException != null && lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace, StringComparison.Ordinal)) return;
 
                 lastException = exception;
-                sentry.CaptureEvent(new SentryEvent(exception) { Message = entry.Message }, sentryScope);
+                sentry.CaptureEvent(new SentryEvent(exception)
+                {
+                    Message = entry.Message,
+                    Level = getSentryLevel(entry.Level),
+                }, sentryScope);
             }
             else
                 sentryScope.AddBreadcrumb(DateTimeOffset.Now, entry.Message, entry.Target.ToString(), "navigation");
+        }
+
+        private SentryLevel? getSentryLevel(LogLevel entryLevel)
+        {
+            switch (entryLevel)
+            {
+                case LogLevel.Debug:
+                    return SentryLevel.Debug;
+
+                case LogLevel.Verbose:
+                    return SentryLevel.Info;
+
+                case LogLevel.Important:
+                    return SentryLevel.Warning;
+
+                case LogLevel.Error:
+                    return SentryLevel.Error;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(entryLevel), entryLevel, null);
+            }
         }
 
         private bool shouldSubmitException(Exception exception)
