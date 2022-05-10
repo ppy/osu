@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -71,7 +70,7 @@ namespace osu.Game.Rulesets.Mods
             InverseMuting.BindValueChanged(i => MuteComboCount.MinValue = i.NewValue ? 1 : 0, true);
         }
 
-        public void ApplyToTrack(ITrack track)
+        public void ApplyToTrack(IAdjustableAudioComponent track)
         {
             track.AddAdjustment(AdjustableProperty.Volume, mainVolumeAdjust);
         }
