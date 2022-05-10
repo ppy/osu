@@ -192,7 +192,8 @@ namespace osu.Game.Overlays.Mods
 
             State.BindValueChanged(_ => samplePlaybackDisabled.Value = State.Value == Visibility.Hidden, true);
 
-            ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
+            if (customisationButton != null)
+                ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
 
             SelectedMods.BindValueChanged(val =>
             {
