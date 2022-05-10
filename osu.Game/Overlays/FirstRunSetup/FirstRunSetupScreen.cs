@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             base.OnEntering(e);
             this
-                .FadeInFromZero(500)
+                .FadeInFromZero(100)
                 .MoveToX(offset)
                 .MoveToX(0, 500, Easing.OutQuint);
         }
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             base.OnResuming(e);
             this
-                .FadeInFromZero(500)
+                .FadeInFromZero(100)
                 .MoveToX(0, 500, Easing.OutQuint);
         }
 
