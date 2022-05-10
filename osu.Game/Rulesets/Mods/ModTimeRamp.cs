@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
@@ -62,7 +61,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.TriggerChange();
         }
 
-        public void ApplyToSample(DrawableSample sample)
+        public void ApplyToSample(IAdjustableAudioComponent sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
