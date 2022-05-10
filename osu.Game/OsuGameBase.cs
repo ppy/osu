@@ -189,13 +189,13 @@ namespace osu.Game
         /// If the count hits zero, the game will crash.
         /// Each second, the count is incremented until reaching the value specified.
         /// </remarks>
-        protected virtual int ExceptionsBeforeCrash => 0;
+        protected virtual int UnhandledExceptionsBeforeCrash => DebugUtils.IsDebugBuild ? 0 : 1;
 
         public OsuGameBase()
         {
             Name = @"osu!";
 
-            allowableExceptions = ExceptionsBeforeCrash;
+            allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
 
         [BackgroundDependencyLoader]
