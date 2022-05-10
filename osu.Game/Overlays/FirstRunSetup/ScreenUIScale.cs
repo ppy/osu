@@ -35,6 +35,8 @@ namespace osu.Game.Overlays.FirstRunSetup
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            const float screen_width = 640;
+
             Content.Children = new Drawable[]
             {
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
@@ -54,7 +56,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.None,
-                    Size = new Vector2(960, 960 / 16f * 9 / 2),
+                    Size = new Vector2(screen_width, screen_width / 16f * 9 / 2),
                     Children = new Drawable[]
                     {
                         new GridContainer
