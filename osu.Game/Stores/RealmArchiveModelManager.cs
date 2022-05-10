@@ -49,7 +49,7 @@ namespace osu.Game.Stores
                 // (ie. if an async import finished very recently).
                 Realm.Realm.Write(realm =>
                 {
-                    var managed = Realm.Realm.Find<TModel>(item.ID);
+                    var managed = realm.Find<TModel>(item.ID);
                     operation(managed);
 
                     item.Files.Clear();
