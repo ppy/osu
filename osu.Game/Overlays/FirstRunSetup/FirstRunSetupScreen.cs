@@ -19,13 +19,16 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         protected FillFlowContainer Content { get; private set; }
 
+        protected const float CONTENT_FONT_SIZE = 16;
+
+        protected const float HEADER_FONT_SIZE = 24;
+
         [Resolved]
         protected OverlayColourProvider OverlayColourProvider { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float header_size = 40;
             const float spacing = 20;
 
             InternalChildren = new Drawable[]
@@ -44,12 +47,12 @@ namespace osu.Game.Overlays.FirstRunSetup
                             new OsuSpriteText
                             {
                                 Text = this.GetLocalisableDescription(),
-                                Font = OsuFont.Default.With(size: header_size),
+                                Font = OsuFont.TorusAlternate.With(size: HEADER_FONT_SIZE),
                                 Colour = OverlayColourProvider.Light1,
                             },
                             Content = new FillFlowContainer
                             {
-                                Y = header_size + spacing,
+                                Y = HEADER_FONT_SIZE + spacing,
                                 Spacing = new Vector2(spacing),
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
