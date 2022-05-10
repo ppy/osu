@@ -95,10 +95,31 @@ namespace osu.Game.Utils
                 });
             }
             else
-                SentrySdk.AddBreadcrumb(entry.Message, entry.Target.ToString(), "navigation");
+                SentrySdk.AddBreadcrumb(entry.Message, entry.Target.ToString(), "navigation", level: getBreadcrumbLevel(entry.Level));
         }
 
-        private SentryLevel? getSentryLevel(LogLevel entryLevel)
+        private BreadcrumbLevel getBreadcrumbLevel(LogLevel entryLevel)
+        {
+            switch (entryLevel)
+            {
+                case LogLevel.Debug:
+                    return BreadcrumbLevel.Debug;
+
+                case LogLevel.Verbose:
+                    return BreadcrumbLevel.Info;
+
+                case LogLevel.Important:
+                    return BreadcrumbLevel.Warning;
+
+                case LogLevel.Error:
+                    return BreadcrumbLevel.Error;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(entryLevel), entryLevel, null);
+            }
+        }
+
+        private SentryLevel getSentryLevel(LogLevel entryLevel)
         {
             switch (entryLevel)
             {
