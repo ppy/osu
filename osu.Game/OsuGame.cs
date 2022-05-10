@@ -258,7 +258,7 @@ namespace osu.Game
         {
             dependencies.CacheAs(this);
 
-            dependencies.Cache(SentryLogger);
+            SentryLogger.AttachUser(API.LocalUser);
 
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
