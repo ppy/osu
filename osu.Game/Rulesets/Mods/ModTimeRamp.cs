@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Audio;
 using osu.Game.Beatmaps;
@@ -46,7 +45,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        private ITrack track;
+        private IAdjustableAudioComponent track;
 
         protected ModTimeRamp()
         {
@@ -55,7 +54,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
-        public void ApplyToTrack(ITrack track)
+        public void ApplyToTrack(IAdjustableAudioComponent track)
         {
             this.track = track;
 
