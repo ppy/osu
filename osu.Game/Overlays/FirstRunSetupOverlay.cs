@@ -62,7 +62,7 @@ namespace osu.Game.Overlays
             typeof(ScreenBehaviour),
         };
 
-        private Container stackContainer = null!;
+        private Container screenContent = null!;
 
         private Bindable<OverlayActivation>? overlayActivationMode;
 
@@ -86,36 +86,51 @@ namespace osu.Game.Overlays
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding
+                    Padding = new MarginPadding { Bottom = 20, },
+                    Child = new GridContainer()
                     {
-                        Horizontal = 70 * 1.2f,
-                        Bottom = 20,
-                    },
-                    Child = new InputBlockingContainer
-                    {
-                        Masking = true,
-                        CornerRadius = 14,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        ColumnDimensions = new[]
                         {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = ColourProvider.Background6,
-                            },
-                            stackContainer = new Container
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding
-                                {
-                                    Vertical = 20,
-                                    Horizontal = 70,
-                                },
-                            }
+                            new Dimension(),
+                            new Dimension(minSize: 640, maxSize: 800),
+                            new Dimension(),
                         },
-                    },
+                        Content = new[]
+                        {
+                            new[]
+                            {
+                                Empty(),
+                                new InputBlockingContainer
+                                {
+                                    Masking = true,
+                                    CornerRadius = 14,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = ColourProvider.Background6,
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding
+                                            {
+                                                Vertical = 20,
+                                                Horizontal = 20,
+                                            },
+                                            Child = screenContent = new Container { RelativeSizeAxes = Axes.Both, },
+                                        },
+                                    },
+                                },
+                                Empty(),
+                            },
+                        }
+                    }
                 },
             });
 
@@ -268,7 +283,7 @@ namespace osu.Game.Overlays
         {
             Debug.Assert(currentStepIndex == null);
 
-            stackContainer.Child = stack = new ScreenStack
+            screenContent.Child = stack = new ScreenStack
             {
                 RelativeSizeAxes = Axes.Both,
             };
