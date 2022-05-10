@@ -118,11 +118,7 @@ namespace osu.Game.Overlays
                                         new Container
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding
-                                            {
-                                                Vertical = 20,
-                                                Horizontal = 20,
-                                            },
+                                            Padding = new MarginPadding { Vertical = 20 },
                                             Child = screenContent = new Container { RelativeSizeAxes = Axes.Both, },
                                         },
                                     },
