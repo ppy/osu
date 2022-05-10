@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -68,6 +69,9 @@ namespace osu.Game.Overlays
 
         private Container content = null!;
 
+        private LoadingSpinner loading = null!;
+        private ScheduledDelegate? loadingShowDelegate;
+
         public FirstRunSetupOverlay()
             : base(OverlayColourScheme.Purple)
         {
@@ -115,6 +119,7 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = ColourProvider.Background6,
                                         },
+                                        loading = new LoadingSpinner(),
                                         new Container
                                         {
                                             RelativeSizeAxes = Axes.Both,
@@ -310,7 +315,16 @@ namespace osu.Game.Overlays
 
             if (currentStepIndex < steps.Length)
             {
-                stack.Push((Screen)Activator.CreateInstance(steps[currentStepIndex.Value]));
+                var nextScreen = (Screen)Activator.CreateInstance(steps[currentStepIndex.Value]);
+
+                loadingShowDelegate = Scheduler.AddDelayed(() => loading.Show(), 200);
+                nextScreen.OnLoadComplete += _ =>
+                {
+                    loadingShowDelegate?.Cancel();
+                    loading.Hide();
+                };
+
+                stack.Push(nextScreen);
             }
             else
             {
