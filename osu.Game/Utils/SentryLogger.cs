@@ -25,6 +25,8 @@ namespace osu.Game.Utils
             var options = new SentryOptions
             {
                 Dsn = "https://ad9f78529cef40ac874afb95a9aca04e@sentry.ppy.sh/2",
+                AutoSessionTracking = true,
+                IsEnvironmentUser = false,
                 Release = game.Version
             };
 
