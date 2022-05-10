@@ -393,21 +393,11 @@ namespace osu.Game.Overlays
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
 
-            var applicableToTrack = mods.Value.OfType<IApplicableToTrack>();
-
-            if (!allowTrackAdjustments || !applicableToTrack.Any())
-            {
-                if (modTrackAdjustments != null)
-                {
-                    CurrentTrack.UnbindAdjustments(modTrackAdjustments);
-                    modTrackAdjustments = null;
-                }
-            }
-            else
+            if (allowTrackAdjustments)
             {
                 CurrentTrack.BindAdjustments(modTrackAdjustments = new AudioAdjustments());
 
-                foreach (var mod in applicableToTrack)
+                foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(modTrackAdjustments);
             }
         }
