@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            applyRateAdjustment(track.CurrentTime);
+            applyRateAdjustment(playfield.Clock.CurrentTime);
         }
 
         /// <summary>
