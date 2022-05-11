@@ -64,13 +64,6 @@ namespace osu.Game.Overlays.Mods
         }
 
         /// <summary>
-        /// A function determining whether each mod in the column should be displayed.
-        /// A return value of <see langword="true"/> means that the mod is not filtered and therefore its corresponding panel should be displayed.
-        /// A return value of <see langword="false"/> means that the mod is filtered out and therefore its corresponding panel should be hidden.
-        /// </summary>
-        public Func<Mod, bool>? Filter { get; set; } // TODO: remove later
-
-        /// <summary>
         /// Determines whether this column should accept user input.
         /// </summary>
         public Bindable<bool> Active = new BindableBool(true);
