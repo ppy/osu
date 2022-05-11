@@ -11,6 +11,7 @@ using System.Net;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Framework.Statistics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -126,6 +127,10 @@ namespace osu.Game.Utils
                             }
                         };
                     });
+
+                    scope.Contexts[@"global statistics"] = GlobalStatistics.GetStatistics()
+                                                                           .GroupBy(s => s.Group)
+                                                                           .ToDictionary(g => g.Key, items => items.ToDictionary(i => i.Name, g => g.DisplayValue));
 
                     scope.Contexts[@"beatmap"] = new
                     {
