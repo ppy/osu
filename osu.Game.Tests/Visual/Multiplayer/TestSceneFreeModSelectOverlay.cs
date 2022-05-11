@@ -17,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneFreeModSelectScreen : MultiplayerTestScene
+    public class TestSceneFreeModSelectOverlay : MultiplayerTestScene
     {
         private FreeModSelectOverlay freeModSelectOverlay;
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();

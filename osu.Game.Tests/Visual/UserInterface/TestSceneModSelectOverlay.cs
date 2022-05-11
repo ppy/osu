@@ -24,7 +24,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneModSelectScreen : OsuManualInputManagerTestScene
+    public class TestSceneModSelectOverlay : OsuManualInputManagerTestScene
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
