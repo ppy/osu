@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "jetbrains.resharper.globaltools": {
-      "version": "2022.1.0-eap10",
+      "version": "2022.1.1",
       "commands": [
         "jb"
       ]

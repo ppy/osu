@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
@@ -64,6 +65,13 @@ namespace osu.Game.Tests.Visual.Editing
                     }
                 });
             });
+        }
+
+        [Test]
+        public void TestPopoverHasFocus()
+        {
+            clickDifficultyPiece(0);
+            velocityPopoverHasFocus();
         }
 
         [Test]
@@ -133,6 +141,15 @@ namespace osu.Game.Tests.Visual.Editing
             InputManager.Click(MouseButton.Left);
         });
 
+        private void velocityPopoverHasFocus() => AddUntilStep("velocity popover textbox focused", () =>
+        {
+            var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
+            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
+            var textbox = slider?.ChildrenOfType<OsuTextBox>().Single();
+
+            return textbox?.HasFocus == true;
+        });
+
         private void velocityPopoverHasSingleValue(double velocity) => AddUntilStep($"velocity popover has {velocity}", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
@@ -151,6 +168,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void dismissPopover()
         {
+            AddStep("unfocus textbox", () => InputManager.Key(Key.Escape));
             AddStep("dismiss popover", () => InputManager.Key(Key.Escape));
             AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().Any(popover => popover.IsPresent));
         }
