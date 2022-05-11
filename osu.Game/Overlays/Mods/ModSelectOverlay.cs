@@ -22,6 +22,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
 
@@ -47,9 +48,7 @@ namespace osu.Game.Overlays.Mods
             set
             {
                 isValidMod = value ?? throw new ArgumentNullException(nameof(value));
-
-                if (IsLoaded)
-                    updateAvailableMods();
+                filterMods();
             }
         }
 
@@ -63,6 +62,9 @@ namespace osu.Game.Overlays.Mods
         protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
 
         protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => createDefaultFooterButtons();
+
+        private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
+        private readonly Dictionary<ModType, IReadOnlyList<ModState>> localAvailableMods = new Dictionary<ModType, IReadOnlyList<ModState>>();
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
@@ -82,7 +84,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuGameBase game, OsuColour colours)
         {
             Header.Title = ModSelectOverlayStrings.ModSelectTitle;
             Header.Description = ModSelectOverlayStrings.ModSelectDescription;
@@ -184,11 +186,15 @@ namespace osu.Game.Overlays.Mods
                     LighterColour = colours.Pink1
                 })
             };
+
+            availableMods.BindTo(game.AvailableMods);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            availableMods.BindValueChanged(_ => createLocalMods(), true);
 
             State.BindValueChanged(_ => samplePlaybackDisabled.Value = State.Value == Visibility.Hidden, true);
 
@@ -210,8 +216,6 @@ namespace osu.Game.Overlays.Mods
             }
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
-
-            updateAvailableMods();
 
             // Start scrolled slightly to the right to give the user a sense that
             // there is more horizontal content available.
@@ -272,6 +276,31 @@ namespace osu.Game.Overlays.Mods
                 }
             };
 
+        private void createLocalMods()
+        {
+            localAvailableMods.Clear();
+
+            foreach (var (modType, mods) in availableMods.Value)
+            {
+                var modStates = mods.SelectMany(ModUtils.FlattenMod)
+                                    .Select(mod => new ModState(mod.DeepClone()))
+                                    .ToArray();
+
+                localAvailableMods[modType] = modStates;
+            }
+
+            filterMods();
+
+            foreach (var column in columnFlow.Columns)
+                column.AvailableMods = localAvailableMods.GetValueOrDefault(column.ModType, Array.Empty<ModState>());
+        }
+
+        private void filterMods()
+        {
+            foreach (var modState in localAvailableMods.Values.SelectMany(m => m))
+                modState.Filtered.Value = !modState.Mod.HasImplementation || !IsValidMod.Invoke(modState.Mod);
+        }
+
         private void updateMultiplier()
         {
             if (multiplierDisplay == null)
@@ -283,12 +312,6 @@ namespace osu.Game.Overlays.Mods
                 multiplier *= mod.ScoreMultiplier;
 
             multiplierDisplay.Current.Value = multiplier;
-        }
-
-        private void updateAvailableMods()
-        {
-            foreach (var column in columnFlow.Columns)
-                column.Filter = m => m.HasImplementation && isValidMod.Invoke(m);
         }
 
         private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
