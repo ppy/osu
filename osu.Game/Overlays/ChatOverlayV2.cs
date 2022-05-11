@@ -100,7 +100,6 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     Width = side_bar_width,
                     Padding = new MarginPadding { Top = top_bar_height },
-                    SelectorActive = { BindTarget = selectorActive },
                 },
                 new Container
                 {
@@ -157,20 +156,10 @@ namespace osu.Game.Overlays
             channelManager.JoinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
             channelManager.AvailableChannels.BindCollectionChanged(availableChannelsChanged, true);
 
-            channelList.OnRequestSelect += channel =>
-            {
-                // Manually selecting a channel should dismiss the selector
-                selectorActive.Value = false;
-                channelManager.CurrentChannel.Value = channel;
-            };
+            channelList.OnRequestSelect += channel => channelManager.CurrentChannel.Value = channel;
             channelList.OnRequestLeave += channel => channelManager.LeaveChannel(channel);
 
-            channelListing.OnRequestJoin += channel =>
-            {
-                channelManager.JoinChannel(channel);
-                // Manually joining a channel should keep the selector open
-                selectorActive.Value = true;
-            };
+            channelListing.OnRequestJoin += channel => channelManager.JoinChannel(channel, false);
             channelListing.OnRequestLeave += channel => channelManager.LeaveChannel(channel);
 
             textBar.OnSearchTermsChanged += searchTerms => channelListing.SearchTerm = searchTerms;
@@ -257,21 +246,9 @@ namespace osu.Game.Overlays
 
             loading.Show();
 
-            // Channel is null when leaving the currently selected channel
             if (newChannel == null)
             {
-                // Don't need to autoswitch if the selector is visible
-                if (selectorActive.Value)
-                    return;
-
-                // Find another channel to switch to
-                newChannel = channelManager.JoinedChannels.FirstOrDefault(c => c != channel.OldValue);
-
-                if (newChannel == null)
-                    selectorActive.Value = true;
-                else
-                    currentChannel.Value = newChannel;
-
+                selectorActive.Value = true;
                 return;
             }
 
