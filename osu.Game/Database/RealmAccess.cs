@@ -348,6 +348,26 @@ namespace osu.Game.Database
         /// Write changes to realm.
         /// </summary>
         /// <param name="action">The work to run.</param>
+        public T Write<T>(Func<Realm, T> action)
+        {
+            if (ThreadSafety.IsUpdateThread)
+            {
+                total_writes_update.Value++;
+                return Realm.Write(action);
+            }
+            else
+            {
+                total_writes_async.Value++;
+
+                using (var realm = getRealmInstance())
+                    return realm.Write(action);
+            }
+        }
+
+        /// <summary>
+        /// Write changes to realm.
+        /// </summary>
+        /// <param name="action">The work to run.</param>
         public void Write(Action<Realm> action)
         {
             if (ThreadSafety.IsUpdateThread)
