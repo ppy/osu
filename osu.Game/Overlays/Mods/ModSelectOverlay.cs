@@ -84,8 +84,8 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Header.Title = ModSelectScreenStrings.ModSelectTitle;
-            Header.Description = ModSelectScreenStrings.ModSelectDescription;
+            Header.Title = ModSelectOverlayStrings.ModSelectTitle;
+            Header.Description = ModSelectOverlayStrings.ModSelectDescription;
 
             AddRange(new Drawable[]
             {
@@ -193,7 +193,7 @@ namespace osu.Game.Overlays.Mods
             State.BindValueChanged(_ => samplePlaybackDisabled.Value = State.Value == Visibility.Hidden, true);
 
             // This is an optimisation to prevent refreshing the available settings controls when it can be
-            // reasonably assumed that the settings panel is never to be displayed (e.g. FreeModSelectScreen).
+            // reasonably assumed that the settings panel is never to be displayed (e.g. FreeModSelectOverlay).
             if (customisationButton != null)
                 ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
 
@@ -262,7 +262,7 @@ namespace osu.Game.Overlays.Mods
             {
                 customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
                 {
-                    Text = ModSelectScreenStrings.ModCustomisation,
+                    Text = ModSelectOverlayStrings.ModCustomisation,
                     Active = { BindTarget = customisationVisible }
                 },
                 new ShearedButton(BUTTON_WIDTH)

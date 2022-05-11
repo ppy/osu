@@ -24,7 +24,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneModSelectScreen : OsuManualInputManagerTestScene
+    public class TestSceneModSelectOverlay : OsuManualInputManagerTestScene
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
@@ -222,7 +222,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestSettingsNotCrossPolluting()
         {
             Bindable<IReadOnlyList<Mod>> selectedMods2 = null;
-            ModSelectOverlay modSelectScreen2 = null;
+            ModSelectOverlay modSelectOverlay2 = null;
 
             createScreen();
             AddStep("select diff adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
@@ -235,7 +235,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create second overlay", () =>
             {
-                Add(modSelectScreen2 = new UserModSelectOverlay().With(d =>
+                Add(modSelectOverlay2 = new UserModSelectOverlay().With(d =>
                 {
                     d.Origin = Anchor.TopCentre;
                     d.Anchor = Anchor.TopCentre;
@@ -243,7 +243,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }));
             });
 
-            AddStep("show", () => modSelectScreen2.Show());
+            AddStep("show", () => modSelectOverlay2.Show());
 
             AddAssert("ensure first is unchanged", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 8);
             AddAssert("ensure second is default", () => selectedMods2.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == null);

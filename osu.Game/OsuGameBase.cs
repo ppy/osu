@@ -86,6 +86,8 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
+        internal const string BUILD_SUFFIX = "lazer";
+
         public virtual string Version
         {
             get
@@ -94,7 +96,7 @@ namespace osu.Game
                     return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
                 var version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
+                return $@"{version.Major}.{version.Minor}.{version.Build}-{BUILD_SUFFIX}";
             }
         }
 

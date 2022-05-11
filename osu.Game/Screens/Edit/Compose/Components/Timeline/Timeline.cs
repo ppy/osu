@@ -270,12 +270,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (base.OnMouseDown(e))
-            {
                 beginUserDrag();
-                return true;
-            }
 
-            return false;
+            return true;
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
