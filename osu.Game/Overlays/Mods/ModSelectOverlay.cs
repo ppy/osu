@@ -192,9 +192,10 @@ namespace osu.Game.Overlays.Mods
 
         protected override void LoadComplete()
         {
-            base.LoadComplete();
-
+            // this is called before base call so that the mod state is populated early, and the transition in `PopIn()` can play out properly.
             availableMods.BindValueChanged(_ => createLocalMods(), true);
+
+            base.LoadComplete();
 
             State.BindValueChanged(_ => samplePlaybackDisabled.Value = State.Value == Visibility.Hidden, true);
 
