@@ -6,14 +6,18 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Skinning;
 using Sentry;
 using Sentry.Protocol;
 
@@ -101,13 +105,27 @@ namespace osu.Game.Utils
                     Level = getSentryLevel(entry.Level),
                 }, scope =>
                 {
+                    var beatmap = game.Dependencies.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo;
+
                     scope.Contexts[@"config"] = new
                     {
                         Game = game.Dependencies.Get<OsuConfigManager>().GetLoggableState()
                         // TODO: add framework config here. needs some consideration on how to expose.
                     };
 
-                    var beatmap = game.Dependencies.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo;
+                    game.Dependencies.Get<RealmAccess>().Run(realm =>
+                    {
+                        scope.Contexts[@"realm"] = new
+                        {
+                            Counts = new
+                            {
+                                BeatmapSets = realm.All<BeatmapSetInfo>().Count(),
+                                Beatmaps = realm.All<BeatmapInfo>().Count(),
+                                Files = realm.All<RealmFile>().Count(),
+                                Skins = realm.All<SkinInfo>().Count(),
+                            }
+                        };
+                    });
 
                     scope.Contexts[@"beatmap"] = new
                     {
