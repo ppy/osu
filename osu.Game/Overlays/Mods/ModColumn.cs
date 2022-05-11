@@ -50,6 +50,14 @@ namespace osu.Game.Overlays.Mods
 
                 availableMods = value;
 
+                foreach (var mod in availableMods)
+                {
+                    mod.Active.BindValueChanged(_ => updateState());
+                    mod.Filtered.BindValueChanged(_ => updateState());
+                }
+
+                updateState();
+
                 if (IsLoaded)
                     asyncLoadPanels();
             }
