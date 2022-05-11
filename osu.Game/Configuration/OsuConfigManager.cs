@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -162,6 +164,20 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
             SetDefault(OsuSetting.EditorHitAnimations, false);
+        }
+
+        public IDictionary<OsuSetting, string> GetLoggableState() =>
+            new Dictionary<OsuSetting, string>(ConfigStore.Where(kvp => !keyContainsPrivateInformation(kvp.Key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString()));
+
+        private static bool keyContainsPrivateInformation(OsuSetting argKey)
+        {
+            switch (argKey)
+            {
+                case OsuSetting.Token:
+                    return true;
+            }
+
+            return false;
         }
 
         public OsuConfigManager(Storage storage)
