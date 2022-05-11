@@ -65,6 +65,7 @@ namespace osu.Game.Overlays.Mods
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
         private readonly Dictionary<ModType, IReadOnlyList<ModState>> localAvailableMods = new Dictionary<ModType, IReadOnlyList<ModState>>();
+        private IEnumerable<ModState> allLocalAvailableMods => localAvailableMods.SelectMany(pair => pair.Value);
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
@@ -294,7 +295,7 @@ namespace osu.Game.Overlays.Mods
 
         private void filterMods()
         {
-            foreach (var modState in localAvailableMods.Values.SelectMany(m => m))
+            foreach (var modState in allLocalAvailableMods)
                 modState.Filtered.Value = !modState.Mod.HasImplementation || !IsValidMod.Invoke(modState.Mod);
         }
 
@@ -372,7 +373,7 @@ namespace osu.Game.Overlays.Mods
 
             var newSelection = new List<Mod>();
 
-            foreach (var modState in localAvailableMods.SelectMany(pair => pair.Value))
+            foreach (var modState in allLocalAvailableMods)
             {
                 var matchingSelectedMod = SelectedMods.Value.SingleOrDefault(selected => selected.GetType() == modState.Mod.GetType());
 
@@ -399,10 +400,9 @@ namespace osu.Game.Overlays.Mods
             if (externalSelectionUpdateInProgress)
                 return;
 
-            var candidateSelection = localAvailableMods.SelectMany(pair => pair.Value)
-                                                       .Where(modState => modState.Active.Value)
-                                                       .Select(modState => modState.Mod)
-                                                       .ToArray();
+            var candidateSelection = allLocalAvailableMods.Where(modState => modState.Active.Value)
+                                                          .Select(modState => modState.Mod)
+                                                          .ToArray();
 
             // the following guard intends to check cases where we've already replaced potentially-external mod references with our own and avoid endless recursion.
             // TODO: replace custom comparer with System.Collections.Generic.ReferenceEqualityComparer when fully on .NET 6
