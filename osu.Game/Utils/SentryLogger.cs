@@ -7,9 +7,12 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using Sentry;
 using Sentry.Protocol;
 
@@ -24,8 +27,11 @@ namespace osu.Game.Utils
 
         private readonly IDisposable? sentrySession;
 
+        private readonly OsuGame game;
+
         public SentryLogger(OsuGame game)
         {
+            this.game = game;
             sentrySession = SentrySdk.Init(options =>
             {
                 // Not setting the dsn will completely disable sentry.
@@ -92,6 +98,18 @@ namespace osu.Game.Utils
                 {
                     Message = entry.Message,
                     Level = getSentryLevel(entry.Level),
+                }, scope =>
+                {
+                    scope.Contexts[@"config"] = new
+                    {
+                        Game = game.Dependencies.Get<OsuConfigManager>().GetLoggableState()
+                        // TODO: add framework config here. needs some consideration on how to expose.
+                    };
+                    scope.Contexts[@"clocks"] = new
+                    {
+                        Audio = game.Dependencies.Get<MusicController>().CurrentTrack.CurrentTime,
+                        Game = game.Clock.CurrentTime,
+                    };
                 });
             }
             else
