@@ -34,7 +34,7 @@ namespace osu.Game.Utils
 
                 options.AutoSessionTracking = true;
                 options.IsEnvironmentUser = false;
-                options.Release = game.Version;
+                options.Release = game.Version.Replace($@"-{OsuGameBase.BUILD_SUFFIX}", string.Empty);
             });
 
             Logger.NewEntry += processLogEntry;
