@@ -49,7 +49,9 @@ namespace osu.Game.Overlays.Mods
                 Debug.Assert(value.All(mod => mod.Mod.Type == ModType));
 
                 availableMods = value;
-                asyncLoadPanels();
+
+                if (IsLoaded)
+                    asyncLoadPanels();
             }
         }
 
@@ -249,6 +251,7 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             toggleAllCheckbox?.Current.BindValueChanged(_ => updateToggleAllText(), true);
+            asyncLoadPanels();
         }
 
         private void updateToggleAllText()
