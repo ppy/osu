@@ -26,18 +26,25 @@ namespace osu.Game.Graphics.Containers
 
             foreach (Drawable child in Children)
             {
-                child.Rotation = -parentRotation;
+                bool parentIsFlippedOneWay = parentScale.X < 0 ^ parentScale.Y < 0;
+                child.Rotation = parentIsFlippedOneWay ? parentRotation : -parentRotation;
 
                 int parentRotationInQuarterTurns = (int)Math.Floor(parentRotation / 90);
                 if (parentRotationInQuarterTurns % 2 != 0)
-                    child.Scale = new Vector2(parentScale.Y, parentScale.X);
+                {
+                    if (parentIsFlippedOneWay)
+                        child.Rotation += 180;
+                    child.Scale = new Vector2(Math.Sign(parentScale.Y), Math.Sign(parentScale.X));
+                }
                 else
-                    child.Scale = parentScale;
+                {
+                    child.Scale = new Vector2(Math.Sign(parentScale.X), Math.Sign(parentScale.Y));
+                }
 
                 int previousParentRotationInQuarterTurns = (int)Math.Floor(previousParentRotation / 90);
                 int rotationsNeeded = parentRotationInQuarterTurns - previousParentRotationInQuarterTurns;
                 if (rotationsNeeded < 0)
-                    rotationsNeeded += 4;
+                    rotationsNeeded = 4 + rotationsNeeded % 4;
 
                 switch (rotationsNeeded)
                 {
