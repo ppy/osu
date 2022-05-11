@@ -34,6 +34,8 @@ namespace osu.Game.Utils
 
                 options.AutoSessionTracking = true;
                 options.IsEnvironmentUser = false;
+                // The reported release needs to match release tags on github in order for sentry
+                // to automatically associate and track against releases.
                 options.Release = game.Version.Replace($@"-{OsuGameBase.BUILD_SUFFIX}", string.Empty);
             });
 
