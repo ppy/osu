@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Select
         [Resolved(CanBeNull = true)]
         private LegacyImportManager legacyImportManager { get; set; }
 
-        protected ModSelectScreen ModSelect { get; private set; }
+        protected ModSelectOverlay ModSelect { get; private set; }
 
         protected Sample SampleConfirm { get; private set; }
 
@@ -333,7 +333,7 @@ namespace osu.Game.Screens.Select
             (new FooterButtonOptions(), BeatmapOptions)
         };
 
-        protected virtual ModSelectScreen CreateModSelectOverlay() => new UserModSelectScreen();
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay();
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {
