@@ -20,6 +20,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Lists;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -83,20 +84,20 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && Active.Value;
 
-        protected virtual ModPanel CreateModPanel(Mod mod) => new ModPanel(mod);
+        protected virtual ModPanel CreateModPanel(ModState mod) => new ModPanel(mod);
 
         private readonly Key[]? toggleKeys;
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
         /// <summary>
-        /// All mods that are available for the current ruleset in this particular column.
+        /// Contains information about state of all mods that are available for the current ruleset in this particular column.
         /// </summary>
         /// <remarks>
         /// Note that the mod instances in this list are owned solely by this column
         /// (as in, they are locally-managed clones, to ensure proper isolation from any other external instances).
         /// </remarks>
-        private IReadOnlyList<Mod> localAvailableMods = Array.Empty<Mod>();
+        private IReadOnlyList<ModState> localAvailableMods = Array.Empty<ModState>();
 
         private readonly TextFlowContainer headerText;
         private readonly Box headerBackground;
@@ -291,10 +292,10 @@ namespace osu.Game.Overlays.Mods
         private void updateLocalAvailableMods(bool asyncLoadContent)
         {
             var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(ModType) ?? Array.Empty<Mod>())
-                                  .Select(m => m.DeepClone())
+                                  .Select(m => new ModState(m.DeepClone()))
                                   .ToList();
 
-            if (newMods.SequenceEqual(localAvailableMods))
+            if (newMods.SequenceEqual(localAvailableMods, new FuncEqualityComparer<ModState>((x, y) => ReferenceEquals(x.Mod, y.Mod))))
                 return;
 
             localAvailableMods = newMods;
@@ -393,18 +394,18 @@ namespace osu.Game.Overlays.Mods
 
             var newSelection = new List<Mod>();
 
-            foreach (var mod in localAvailableMods)
+            foreach (var modState in localAvailableMods)
             {
-                var matchingSelectedMod = mods.SingleOrDefault(selected => selected.GetType() == mod.GetType());
+                var matchingSelectedMod = mods.SingleOrDefault(selected => selected.GetType() == modState.GetType());
 
                 if (matchingSelectedMod != null)
                 {
-                    mod.CopyFrom(matchingSelectedMod);
-                    newSelection.Add(mod);
+                    modState.Mod.CopyFrom(matchingSelectedMod);
+                    newSelection.Add(modState.Mod);
                 }
                 else
                 {
-                    mod.ResetSettingsToDefaults();
+                    modState.Mod.ResetSettingsToDefaults();
                 }
             }
 
