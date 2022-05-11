@@ -43,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private readonly MultiplayerRoomUser[] users;
 
+        private readonly Bindable<bool> leaderboardExpanded = new BindableBool();
+
         private LoadingLayer loadingDisplay;
         private FillFlowContainer leaderboardFlow;
 
@@ -76,13 +78,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Spacing = new Vector2(5)
             });
 
+            HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());
+            LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
+
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
             LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(GameplayState.Ruleset.RulesetInfo, ScoreProcessor, users), l =>
             {
                 if (!LoadedBeatmapSuccessfully)
                     return;
 
-                ((IBindable<bool>)leaderboard.Expanded).BindTo(HUDOverlay.ShowHud);
+                leaderboard.Expanded.BindTo(leaderboardExpanded);
 
                 leaderboardFlow.Insert(0, l);
 
@@ -99,7 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             LoadComponentAsync(new GameplayChatDisplay(Room)
             {
-                Expanded = { BindTarget = HUDOverlay.ShowHud },
+                Expanded = { BindTarget = leaderboardExpanded },
             }, chat => leaderboardFlow.Insert(2, chat));
 
             HUDOverlay.Add(loadingDisplay = new LoadingLayer(true) { Depth = float.MaxValue });
@@ -151,6 +156,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.ChangeState(MultiplayerUserState.ReadyForGameplay);
             }
         }
+
+        private void updateLeaderboardExpandedState() =>
+            leaderboardExpanded.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
 
         private void failAndBail(string message = null)
         {
