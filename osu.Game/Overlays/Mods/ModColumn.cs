@@ -20,13 +20,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Lists;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -38,6 +36,23 @@ namespace osu.Game.Overlays.Mods
         public readonly Container TopLevelContent;
 
         public readonly ModType ModType;
+
+        private IReadOnlyList<ModState> availableMods = Array.Empty<ModState>();
+
+        /// <summary>
+        /// Sets the list of mods to show in this column.
+        /// </summary>
+        public IReadOnlyList<ModState> AvailableMods
+        {
+            get => availableMods;
+            set
+            {
+                Debug.Assert(value.All(mod => mod.Mod.Type == ModType));
+
+                availableMods = value;
+                asyncLoadPanels();
+            }
+        }
 
         private Func<Mod, bool>? filter;
 
@@ -87,17 +102,6 @@ namespace osu.Game.Overlays.Mods
         protected virtual ModPanel CreateModPanel(ModState mod) => new ModPanel(mod);
 
         private readonly Key[]? toggleKeys;
-
-        private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
-
-        /// <summary>
-        /// Contains information about state of all mods that are available for the current ruleset in this particular column.
-        /// </summary>
-        /// <remarks>
-        /// Note that the mod instances in this list are owned solely by this column
-        /// (as in, they are locally-managed clones, to ensure proper isolation from any other external instances).
-        /// </remarks>
-        private IReadOnlyList<ModState> localAvailableMods = Array.Empty<ModState>();
 
         private readonly TextFlowContainer headerText;
         private readonly Box headerBackground;
@@ -258,12 +262,8 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
-            availableMods.BindTo(game.AvailableMods);
-            updateLocalAvailableMods(asyncLoadContent: false);
-            availableMods.BindValueChanged(_ => updateLocalAvailableMods(asyncLoadContent: true));
-
             headerBackground.Colour = accentColour = colours.ForModType(ModType);
 
             if (toggleAllCheckbox != null)
@@ -289,30 +289,13 @@ namespace osu.Game.Overlays.Mods
             toggleAllCheckbox.LabelText = toggleAllCheckbox.Current.Value ? CommonStrings.DeselectAll : CommonStrings.SelectAll;
         }
 
-        private void updateLocalAvailableMods(bool asyncLoadContent)
-        {
-            var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(ModType) ?? Array.Empty<Mod>())
-                                  .Select(m => new ModState(m.DeepClone()))
-                                  .ToList();
-
-            if (newMods.SequenceEqual(localAvailableMods, new FuncEqualityComparer<ModState>((x, y) => ReferenceEquals(x.Mod, y.Mod))))
-                return;
-
-            localAvailableMods = newMods;
-
-            if (asyncLoadContent)
-                asyncLoadPanels();
-            else
-                onPanelsLoaded(createPanels());
-        }
-
         private CancellationTokenSource? cancellationTokenSource;
 
         private void asyncLoadPanels()
         {
             cancellationTokenSource?.Cancel();
 
-            var panels = createPanels();
+            var panels = availableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)));
 
             Task? loadTask;
 
@@ -322,12 +305,6 @@ namespace osu.Game.Overlays.Mods
                 if (loadTask == latestLoadTask)
                     latestLoadTask = null;
             });
-        }
-
-        private IEnumerable<ModPanel> createPanels()
-        {
-            var panels = localAvailableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)));
-            return panels;
         }
 
         private void onPanelsLoaded(IEnumerable<ModPanel> loaded)
@@ -394,7 +371,7 @@ namespace osu.Game.Overlays.Mods
 
             var newSelection = new List<Mod>();
 
-            foreach (var modState in localAvailableMods)
+            foreach (var modState in this.availableMods)
             {
                 var matchingSelectedMod = mods.SingleOrDefault(selected => selected.GetType() == modState.GetType());
 
@@ -554,10 +531,10 @@ namespace osu.Game.Overlays.Mods
             int index = Array.IndexOf(toggleKeys, e.Key);
             if (index < 0) return false;
 
-            var panel = panelFlow.ElementAtOrDefault(index);
-            if (panel == null || panel.Filtered.Value) return false;
+            var modState = availableMods.ElementAtOrDefault(index);
+            if (modState == null || modState.Filtered.Value) return false;
 
-            panel.Active.Toggle();
+            modState.Active.Toggle();
             return true;
         }
 
