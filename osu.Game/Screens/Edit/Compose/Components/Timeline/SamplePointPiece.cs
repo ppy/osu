@@ -126,6 +126,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 volume.Current.BindValueChanged(val => updateVolumeFor(relevantObjects, val.NewValue));
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(volume));
+            }
+
             private static string? getCommonBank(SampleControlPoint[] relevantControlPoints) => relevantControlPoints.Select(point => point.SampleBank).Distinct().Count() == 1 ? relevantControlPoints.First().SampleBank : null;
             private static int? getCommonVolume(SampleControlPoint[] relevantControlPoints) => relevantControlPoints.Select(point => point.SampleVolume).Distinct().Count() == 1 ? (int?)relevantControlPoints.First().SampleVolume : null;
 
