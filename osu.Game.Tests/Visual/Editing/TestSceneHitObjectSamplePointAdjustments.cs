@@ -173,11 +173,11 @@ namespace osu.Game.Tests.Visual.Editing
             samplePopoverHasSingleBank("normal");
         }
 
-        private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} difficulty piece", () =>
+        private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
         {
-            var difficultyPiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
+            var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
 
-            InputManager.MoveMouseTo(difficultyPiece);
+            InputManager.MoveMouseTo(samplePiece);
             InputManager.Click(MouseButton.Left);
         });
 
@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void dismissPopover()
         {
             AddStep("dismiss popover", () => InputManager.Key(Key.Escape));
-            AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().Any(popover => popover.IsPresent));
+            AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Any(popover => popover.IsPresent));
         }
 
         private void setVolumeViaPopover(int volume) => AddStep($"set volume {volume} via popover", () =>
