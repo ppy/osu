@@ -10,6 +10,7 @@ using System.Net;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -105,6 +106,15 @@ namespace osu.Game.Utils
                         Game = game.Dependencies.Get<OsuConfigManager>().GetLoggableState()
                         // TODO: add framework config here. needs some consideration on how to expose.
                     };
+
+                    var beatmap = game.Dependencies.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo;
+
+                    scope.Contexts[@"beatmap"] = new
+                    {
+                        Name = beatmap.ToString(),
+                        beatmap.OnlineID,
+                    };
+
                     scope.Contexts[@"clocks"] = new
                     {
                         Audio = game.Dependencies.Get<MusicController>().CurrentTrack.CurrentTime,
