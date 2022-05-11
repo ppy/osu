@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void assertHasFreeModButton(Type type, bool hasButton = true)
         {
             AddAssert($"{type.ReadableName()} {(hasButton ? "displayed" : "not displayed")} in freemod overlay",
-                () => this.ChildrenOfType<FreeModSelectScreen>()
+                () => this.ChildrenOfType<FreeModSelectOverlay>()
                           .Single()
                           .ChildrenOfType<ModPanel>()
                           .Where(panel => !panel.Filtered.Value)
