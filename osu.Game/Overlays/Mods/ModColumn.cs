@@ -296,8 +296,8 @@ namespace osu.Game.Overlays.Mods
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
-                toggleAllCheckbox.Alpha = panelFlow.Any(panel => !panel.Filtered.Value) ? 1 : 0;
-                toggleAllCheckbox.Current.Value = panelFlow.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
+                toggleAllCheckbox.Alpha = availableMods.Any(panel => !panel.Filtered.Value) ? 1 : 0;
+                toggleAllCheckbox.Current.Value = availableMods.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
             }
         }
 
@@ -342,7 +342,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in panelFlow.Where(b => !b.Active.Value && !b.Filtered.Value))
+            foreach (var button in availableMods.Where(b => !b.Active.Value && !b.Filtered.Value))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = true);
         }
 
@@ -353,7 +353,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in panelFlow.Where(b => b.Active.Value && !b.Filtered.Value))
+            foreach (var button in availableMods.Where(b => b.Active.Value && !b.Filtered.Value))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
         }
 
