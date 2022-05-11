@@ -84,8 +84,8 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Header.Title = ModSelectScreenStrings.ModSelectTitle;
-            Header.Description = ModSelectScreenStrings.ModSelectDescription;
+            Header.Title = ModSelectOverlayStrings.ModSelectTitle;
+            Header.Description = ModSelectOverlayStrings.ModSelectDescription;
 
             AddRange(new Drawable[]
             {
@@ -262,7 +262,7 @@ namespace osu.Game.Overlays.Mods
             {
                 customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
                 {
-                    Text = ModSelectScreenStrings.ModCustomisation,
+                    Text = ModSelectOverlayStrings.ModCustomisation,
                     Active = { BindTarget = customisationVisible }
                 },
                 new ShearedButton(BUTTON_WIDTH)
