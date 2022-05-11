@@ -966,6 +966,8 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(musicController.CurrentTrack);
+            foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrackMixer>())
+                mod.ApplyToTrackMixer(musicController.TrackMixer);
 
             updateGameplayState();
 

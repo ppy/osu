@@ -7,6 +7,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -54,6 +55,19 @@ namespace osu.Game.Overlays
 
         [Resolved]
         private RealmAccess realm { get; set; }
+
+        private readonly DrawableAudioMixer trackMixer;
+
+        /// <summary>
+        /// Get the local audio mixer layered on top of <see cref="CurrentTrack"/>.
+        /// This mixer allows components (like mods) to apply audio filters to the current track without interfering with the global track mixer.
+        /// </summary>
+        public IAudioMixer TrackMixer => trackMixer;
+
+        public MusicController()
+        {
+            AddInternal(trackMixer = new DrawableAudioMixer { Name = $"{nameof(MusicController)} {nameof(TrackMixer)}" });
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -328,7 +342,7 @@ namespace osu.Game.Overlays
 
                 if (queuedTrack == CurrentTrack)
                 {
-                    AddInternal(queuedTrack);
+                    trackMixer.Add(queuedTrack);
                     queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
                 }
                 else
@@ -389,11 +403,14 @@ namespace osu.Game.Overlays
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Frequency);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
+            trackMixer.Effects.Clear();
 
             if (allowTrackAdjustments)
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(CurrentTrack);
+                foreach (var mod in mods.Value.OfType<IApplicableToTrackMixer>())
+                    mod.ApplyToTrackMixer(trackMixer);
             }
         }
     }
