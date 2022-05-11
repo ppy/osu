@@ -369,6 +369,9 @@ namespace osu.Game.Overlays.Mods
 
         private void updateFromExternalSelection()
         {
+            if (externalSelectionUpdateInProgress)
+                return;
+
             externalSelectionUpdateInProgress = true;
 
             var newSelection = new List<Mod>();
