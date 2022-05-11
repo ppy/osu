@@ -18,6 +18,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Input;
 
@@ -479,6 +480,21 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("show", () => modSelectOverlay.Show());
             AddUntilStep("3 columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 3);
+        }
+
+        [Test]
+        public void TestColumnHidingOnRulesetChange()
+        {
+            createScreen();
+
+            changeRuleset(0);
+            AddAssert("5 columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 5);
+
+            AddStep("change to ruleset without all mod types", () => Ruleset.Value = TestCustomisableModRuleset.CreateTestRulesetInfo());
+            AddUntilStep("1 column visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 1);
+
+            changeRuleset(0);
+            AddAssert("5 columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 5);
         }
 
         private void waitForColumnLoad() => AddUntilStep("all column content loaded",
