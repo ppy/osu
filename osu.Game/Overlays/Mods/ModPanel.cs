@@ -28,9 +28,11 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModPanel : OsuClickableContainer
     {
-        public Mod Mod { get; }
-        public BindableBool Active { get; } = new BindableBool();
-        public BindableBool Filtered { get; } = new BindableBool();
+        public Mod Mod => modState.Mod;
+        public BindableBool Active => modState.Active;
+        public BindableBool Filtered => modState.Filtered;
+
+        private readonly ModState modState;
 
         protected readonly Box Background;
         protected readonly Container SwitchContainer;
@@ -57,7 +59,7 @@ namespace osu.Game.Overlays.Mods
 
         public ModPanel(Mod mod)
         {
-            Mod = mod;
+            modState = new ModState(mod);
 
             RelativeSizeAxes = Axes.X;
             Height = 42;
