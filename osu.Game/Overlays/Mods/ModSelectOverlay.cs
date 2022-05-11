@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Lists;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
@@ -406,11 +405,6 @@ namespace osu.Game.Overlays.Mods
             var candidateSelection = allLocalAvailableMods.Where(modState => modState.Active.Value)
                                                           .Select(modState => modState.Mod)
                                                           .ToArray();
-
-            // the following guard intends to check cases where we've already replaced potentially-external mod references with our own and avoid endless recursion.
-            // TODO: replace custom comparer with System.Collections.Generic.ReferenceEqualityComparer when fully on .NET 6
-            if (candidateSelection.SequenceEqual(SelectedMods.Value, new FuncEqualityComparer<Mod>(ReferenceEquals)))
-                return;
 
             SelectedMods.Value = ComputeNewModsFromSelection(SelectedMods.Value, candidateSelection);
         }
