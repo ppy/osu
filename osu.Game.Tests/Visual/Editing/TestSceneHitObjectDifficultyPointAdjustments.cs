@@ -168,6 +168,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void dismissPopover()
         {
+            AddStep("unfocus textbox", () => InputManager.Key(Key.Escape));
             AddStep("dismiss popover", () => InputManager.Key(Key.Escape));
             AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().Any(popover => popover.IsPresent));
         }
