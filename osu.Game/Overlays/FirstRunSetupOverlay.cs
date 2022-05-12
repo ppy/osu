@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -62,11 +63,14 @@ namespace osu.Game.Overlays
             typeof(ScreenBehaviour),
         };
 
-        private Container stackContainer = null!;
+        private Container screenContent = null!;
 
         private Bindable<OverlayActivation>? overlayActivationMode;
 
         private Container content = null!;
+
+        private LoadingSpinner loading = null!;
+        private ScheduledDelegate? loadingShowDelegate;
 
         public FirstRunSetupOverlay()
             : base(OverlayColourScheme.Purple)
@@ -86,36 +90,48 @@ namespace osu.Game.Overlays
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding
+                    Padding = new MarginPadding { Bottom = 20, },
+                    Child = new GridContainer
                     {
-                        Horizontal = 70 * 1.2f,
-                        Bottom = 20,
-                    },
-                    Child = new InputBlockingContainer
-                    {
-                        Masking = true,
-                        CornerRadius = 14,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        ColumnDimensions = new[]
                         {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = ColourProvider.Background6,
-                            },
-                            stackContainer = new Container
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding
-                                {
-                                    Vertical = 20,
-                                    Horizontal = 70,
-                                },
-                            }
+                            new Dimension(),
+                            new Dimension(minSize: 640, maxSize: 800),
+                            new Dimension(),
                         },
-                    },
+                        Content = new[]
+                        {
+                            new[]
+                            {
+                                Empty(),
+                                new InputBlockingContainer
+                                {
+                                    Masking = true,
+                                    CornerRadius = 14,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = ColourProvider.Background6,
+                                        },
+                                        loading = new LoadingSpinner(),
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Vertical = 20 },
+                                            Child = screenContent = new Container { RelativeSizeAxes = Axes.Both, },
+                                        },
+                                    },
+                                },
+                                Empty(),
+                            },
+                        }
+                    }
                 },
             });
 
@@ -171,8 +187,7 @@ namespace osu.Game.Overlays
 
             config.BindWith(OsuSetting.ShowFirstRunSetup, showFirstRunSetup);
 
-            // TODO: uncomment when happy with the whole flow.
-            // if (showFirstRunSetup.Value) Show();
+            if (showFirstRunSetup.Value) Show();
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -269,7 +284,7 @@ namespace osu.Game.Overlays
         {
             Debug.Assert(currentStepIndex == null);
 
-            stackContainer.Child = stack = new ScreenStack
+            screenContent.Child = stack = new ScreenStack
             {
                 RelativeSizeAxes = Axes.Both,
             };
@@ -300,12 +315,20 @@ namespace osu.Game.Overlays
 
             if (currentStepIndex < steps.Length)
             {
-                stack.Push((Screen)Activator.CreateInstance(steps[currentStepIndex.Value]));
+                var nextScreen = (Screen)Activator.CreateInstance(steps[currentStepIndex.Value]);
+
+                loadingShowDelegate = Scheduler.AddDelayed(() => loading.Show(), 200);
+                nextScreen.OnLoadComplete += _ =>
+                {
+                    loadingShowDelegate?.Cancel();
+                    loading.Hide();
+                };
+
+                stack.Push(nextScreen);
             }
             else
             {
-                // TODO: uncomment when happy with the whole flow.
-                // showFirstRunSetup.Value = false;
+                showFirstRunSetup.Value = false;
                 currentStepIndex = null;
                 Hide();
             }

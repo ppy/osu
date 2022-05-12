@@ -384,7 +384,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         /// <remarks>
         /// This method exists to be able to receive mod instances that come from potentially-external sources and to copy the changes across to this column's state.
-        /// <see cref="ModSelectScreen"/> uses this to substitute any external mod references in <see cref="ModSelectScreen.SelectedMods"/>
+        /// <see cref="ModSelectOverlay"/> uses this to substitute any external mod references in <see cref="ModSelectOverlay.SelectedMods"/>
         /// to references that are owned by this column.
         /// </remarks>
         internal void SetSelection(IReadOnlyList<Mod> mods)

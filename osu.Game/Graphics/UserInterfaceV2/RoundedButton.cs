@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -29,8 +28,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour colours)
         {
-            if (BackgroundColour == Color4.White)
-                BackgroundColour = overlayColourProvider?.Highlight1 ?? colours.Blue3;
+            DefaultBackgroundColour = overlayColourProvider?.Highlight1 ?? colours.Blue3;
         }
 
         protected override void LoadComplete()
