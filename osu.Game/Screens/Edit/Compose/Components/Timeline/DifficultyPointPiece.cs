@@ -122,6 +122,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     beatmap.EndChange();
                 });
             }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(sliderVelocitySlider));
+            }
         }
     }
 }
