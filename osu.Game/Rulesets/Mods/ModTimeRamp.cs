@@ -4,9 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
@@ -46,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        private ITrack track;
+        private IAdjustableAudioComponent track;
 
         protected ModTimeRamp()
         {
@@ -55,7 +53,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
-        public void ApplyToTrack(ITrack track)
+        public void ApplyToTrack(IAdjustableAudioComponent track)
         {
             this.track = track;
 
@@ -63,7 +61,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.TriggerChange();
         }
 
-        public void ApplyToSample(DrawableSample sample)
+        public void ApplyToSample(IAdjustableAudioComponent sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
@@ -90,7 +88,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            applyRateAdjustment(track.CurrentTime);
+            applyRateAdjustment(playfield.Clock.CurrentTime);
         }
 
         /// <summary>

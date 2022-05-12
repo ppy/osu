@@ -1008,7 +1008,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
             public IWorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
-            public new ModSelectScreen ModSelect => base.ModSelect;
+            public new ModSelectOverlay ModSelect => base.ModSelect;
 
             public new void PresentScore(ScoreInfo score) => base.PresentScore(score);
 

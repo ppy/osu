@@ -25,7 +25,6 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly Bindable<Channel> selected = new Bindable<Channel>();
 
-        private OsuSpriteText selectorText;
         private OsuSpriteText selectedText;
         private OsuSpriteText leaveText;
         private ChannelList channelList;
@@ -45,19 +44,10 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         new Dimension(GridSizeMode.Absolute, 20),
                         new Dimension(GridSizeMode.Absolute, 20),
-                        new Dimension(GridSizeMode.Absolute, 20),
                         new Dimension(),
                     },
                     Content = new[]
                     {
-                        new Drawable[]
-                        {
-                            selectorText = new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                            },
-                        },
                         new Drawable[]
                         {
                             selectedText = new OsuSpriteText
@@ -89,7 +79,6 @@ namespace osu.Game.Tests.Visual.Online
 
                 channelList.OnRequestSelect += channel =>
                 {
-                    channelList.SelectorActive.Value = false;
                     selected.Value = channel;
                 };
 
@@ -100,12 +89,6 @@ namespace osu.Game.Tests.Visual.Online
                     selected.Value = null;
                     channelList.RemoveChannel(channel);
                 };
-
-                channelList.SelectorActive.BindValueChanged(change =>
-                {
-                    selectorText.Text = $"Channel Selector Active: {change.NewValue}";
-                    selected.Value = null;
-                }, true);
 
                 selected.BindValueChanged(change =>
                 {
