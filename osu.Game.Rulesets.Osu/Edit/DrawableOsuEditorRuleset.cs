@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -46,15 +47,23 @@ namespace osu.Game.Rulesets.Osu.Edit
                 HitPolicy = new AnyOrderHitPolicy();
             }
 
+            private readonly WeakList<DrawableHitObject> drawableHitObjects = new WeakList<DrawableHitObject>();
+
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
                 hitAnimations = config.GetBindable<bool>(OsuSetting.EditorHitAnimations);
+                hitAnimations.BindValueChanged(_ =>
+                {
+                    foreach (var d in drawableHitObjects) d.RefreshStateTransforms();
+                });
             }
 
             protected override void OnNewDrawableHitObject(DrawableHitObject d)
             {
                 d.ApplyCustomUpdateState += updateState;
+
+                drawableHitObjects.Add(d);
             }
 
             private void updateState(DrawableHitObject hitObject, ArmedState state)
