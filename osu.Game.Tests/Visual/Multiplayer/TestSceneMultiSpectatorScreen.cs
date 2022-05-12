@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -15,13 +16,14 @@ using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
-using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps.IO;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -349,14 +351,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         /// <summary>
-        /// Tests spectating with a beatmap that has a high lead-in value.
+        /// Tests spectating with a beatmap that has a high <see cref="BeatmapInfo.AudioLeadIn"/> value.
         /// </summary>
         [Test]
-        public void TestLeadIn()
+        public void TestAudioLeadIn() => testLeadIn(b => b.BeatmapInfo.AudioLeadIn = 2000);
+
+        /// <summary>
+        /// Tests spectating with a beatmap that has a storyboard element with a negative start time (i.e. intro storyboard element).
+        /// </summary>
+        [Test]
+        public void TestIntroStoryboardElement() => testLeadIn(b =>
+        {
+            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            sprite.TimelineGroup.Alpha.Add(Easing.None, -2000, 0, 0, 1);
+            b.Storyboard.GetLayer("Background").Add(sprite);
+        });
+
+        private void testLeadIn(Action<WorkingBeatmap> applyToBeatmap = null)
         {
             start(PLAYER_1_ID);
 
-            loadSpectateScreen(false, 2000);
+            loadSpectateScreen(false, applyToBeatmap);
 
             // to ensure negative gameplay start time does not affect spectator, send frames exactly after StartGameplay().
             // (similar to real spectating sessions in which the first frames get sent between StartGameplay() and player load complete)
@@ -370,14 +385,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertRunning(PLAYER_1_ID);
         }
 
-        private void loadSpectateScreen(bool waitForPlayerLoad = true, double? leadIn = null)
+        private void loadSpectateScreen(bool waitForPlayerLoad = true, Action<WorkingBeatmap> applyToBeatmap = null)
         {
-            AddStep(!leadIn.HasValue ? "load screen" : $"load screen (lead-in = {leadIn}ms)", () =>
+            AddStep("load screen", () =>
             {
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(importedBeatmap);
                 Ruleset.Value = importedBeatmap.Ruleset;
 
-                LoadScreen(spectatorScreen = new TestMultiSpectatorScreen(SelectedRoom.Value, playingUsers.ToArray(), leadIn));
+                applyToBeatmap?.Invoke(Beatmap.Value);
+
+                LoadScreen(spectatorScreen = new MultiSpectatorScreen(SelectedRoom.Value, playingUsers.ToArray()));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
@@ -460,22 +477,5 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId);
 
         private int[] getPlayerIds(int count) => Enumerable.Range(PLAYER_1_ID, count).ToArray();
-
-        private class TestMultiSpectatorScreen : MultiSpectatorScreen
-        {
-            private readonly double? leadIn;
-
-            public TestMultiSpectatorScreen(Room room, MultiplayerRoomUser[] users, double? leadIn = null)
-                : base(room, users)
-            {
-                this.leadIn = leadIn;
-            }
-
-            protected override MasterGameplayClockContainer CreateMasterGameplayClockContainer(WorkingBeatmap beatmap)
-            {
-                beatmap.BeatmapInfo.AudioLeadIn = leadIn ?? 0;
-                return base.CreateMasterGameplayClockContainer(beatmap);
-            }
-        }
     }
 }
