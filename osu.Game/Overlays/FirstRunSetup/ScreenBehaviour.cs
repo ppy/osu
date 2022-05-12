@@ -9,7 +9,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
@@ -22,11 +22,11 @@ namespace osu.Game.Overlays.FirstRunSetup
         private SearchContainer<SettingsSection> searchContainer;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             Content.Children = new Drawable[]
             {
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 24))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Text = FirstRunSetupOverlayStrings.BehaviourDescription,
                     RelativeSizeAxes = Axes.X,
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     {
                         new[]
                         {
-                            new TriangleButton
+                            new RoundedButton
                             {
                                 Anchor = Anchor.TopLeft,
                                 Origin = Anchor.TopLeft,
@@ -59,10 +59,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                                 Action = applyStandard,
                             },
                             Empty(),
-                            new DangerousTriangleButton
+                            new RoundedButton
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
+                                BackgroundColour = colours.Pink3,
                                 Text = FirstRunSetupOverlayStrings.ClassicDefaults,
                                 RelativeSizeAxes = Axes.X,
                                 Action = applyClassic

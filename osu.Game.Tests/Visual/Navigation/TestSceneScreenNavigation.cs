@@ -568,7 +568,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
         public class TestPlaySongSelect : PlaySongSelect
         {
-            public ModSelectScreen ModSelectOverlay => ModSelect;
+            public ModSelectOverlay ModSelectOverlay => ModSelect;
 
             public BeatmapOptionsOverlay BeatmapOptionsOverlay => BeatmapOptions;
 

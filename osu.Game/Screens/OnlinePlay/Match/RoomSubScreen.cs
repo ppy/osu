@@ -81,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public readonly Room Room;
         private readonly bool allowEdit;
 
-        private ModSelectScreen userModsSelectOverlay;
+        private ModSelectOverlay userModsSelectOverlay;
 
         [CanBeNull]
         private IDisposable userModsSelectOverlayRegistration;
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 }
             };
 
-            LoadComponent(userModsSelectOverlay = new UserModSelectScreen(OverlayColourScheme.Plum)
+            LoadComponent(userModsSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Plum)
             {
                 SelectedMods = { BindTarget = UserMods },
                 IsValidMod = _ => false
