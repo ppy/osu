@@ -50,8 +50,6 @@ namespace osu.Game.Overlays
         private const float side_bar_width = 190;
         private const float chat_bar_height = 60;
 
-        private readonly BindableBool selectorActive = new BindableBool();
-
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
@@ -136,7 +134,6 @@ namespace osu.Game.Overlays
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Padding = new MarginPadding { Left = side_bar_width },
-                    ShowSearch = { BindTarget = selectorActive },
                 },
             };
         }
@@ -144,8 +141,6 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            loading.Show();
 
             config.BindWith(OsuSetting.ChatDisplayHeight, chatHeight);
 
@@ -164,8 +159,6 @@ namespace osu.Game.Overlays
 
             textBar.OnSearchTermsChanged += searchTerms => channelListing.SearchTerm = searchTerms;
             textBar.OnChatMessageCommitted += handleChatMessage;
-
-            selectorActive.BindValueChanged(v => channelListing.State.Value = v.NewValue ? Visibility.Visible : Visibility.Hidden, true);
         }
 
         /// <summary>
@@ -244,22 +237,25 @@ namespace osu.Game.Overlays
         {
             Channel? newChannel = channel.NewValue;
 
-            loading.Show();
-
             if (newChannel == null)
             {
-                selectorActive.Value = true;
-                return;
+                // null channel denotes that we should be showing the listing.
+                channelListing.State.Value = Visibility.Visible;
+                textBar.ShowSearch.Value = true;
             }
-
-            selectorActive.Value = false;
-
-            LoadComponentAsync(new DrawableChannel(newChannel), loaded =>
+            else
             {
-                currentChannelContainer.Clear();
-                currentChannelContainer.Add(loaded);
-                loading.Hide();
-            });
+                channelListing.State.Value = Visibility.Hidden;
+                textBar.ShowSearch.Value = false;
+
+                loading.Show();
+                LoadComponentAsync(new DrawableChannel(newChannel), loaded =>
+                {
+                    currentChannelContainer.Clear();
+                    currentChannelContainer.Add(loaded);
+                    loading.Hide();
+                });
+            }
         }
 
         private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
