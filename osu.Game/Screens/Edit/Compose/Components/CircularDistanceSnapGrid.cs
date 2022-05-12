@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -76,13 +77,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             Vector2 travelVector = (position - StartPosition);
 
+            // We need a non-zero travel vector in order to find a valid direction.
             if (travelVector == Vector2.Zero)
-                return (StartPosition, StartTime);
+                travelVector = new Vector2(0, -1);
 
             float travelLength = travelVector.Length;
 
             // FindSnappedDistance will always round down, but we want to potentially round upwards.
             travelLength += DistanceBetweenTicks / 2;
+
+            // We never want to snap towards zero.
+            if (travelLength < DistanceBetweenTicks)
+                travelLength = DistanceBetweenTicks;
 
             // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
             // to allow for snapping at a non-multiplied ratio.
