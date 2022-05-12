@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -85,19 +86,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             setDistances(clockRate);
         }
 
-        public double Opacity(double mapTime, bool hidden)
+        public double OpacityAt(double time, bool hidden)
         {
-            double ms = BaseObject.StartTime - mapTime;
-            if (ms < 0)
+            if (time > BaseObject.StartTime)
+            {
+                // Consider a hitobject as being invisible when its start time is passed.
+                // In reality the hitobject will be visible beyond its start time up until its hittable window has passed,
+                // but this is an approximation and such a case is unlikely to be hit where this function is used.
                 return 0.0;
+            }
 
-            double preemptTime = BaseObject.TimePreempt;
-            double fadeInTime = BaseObject.TimeFadeIn;
+            double fadeInStartTime = BaseObject.StartTime - BaseObject.TimePreempt;
+            double fadeInDuration = BaseObject.TimeFadeIn;
 
             if (hidden)
-                return Math.Clamp(Math.Min((1.0 - ms / preemptTime) * 2.5, (ms / preemptTime - 0.3) * (1.0 / 0.3)), 0.0, 1.0);
-            else
-                return Math.Clamp((preemptTime - ms) / fadeInTime, 0.0, 1.0);
+            {
+                // Taken from OsuModHidden.
+                double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeIn;
+                double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
+
+                return Math.Min
+                (
+                    Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0),
+                    1.0 - Math.Clamp((time - fadeOutStartTime) / fadeOutDuration, 0.0, 1.0)
+                );
+            }
+
+            return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
         }
 
         private void setDistances(double clockRate)
