@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Chat
         private Container searchIconContainer = null!;
         private ChatTextBox chatTextBox = null!;
 
-        private const float chatting_text_width = 240;
+        private const float chatting_text_width = 220;
         private const float search_icon_width = 40;
 
         [BackgroundDependencyLoader]

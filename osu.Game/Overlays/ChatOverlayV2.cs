@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
         private LoadingLayer loading = null!;
         private ChannelListing channelListing = null!;
         private ChatTextBar textBar = null!;
-        private Container<DrawableChannel> currentChannelContainer = null!;
+        private Container<ChatOverlayDrawableChannel> currentChannelContainer = null!;
 
         private readonly BindableFloat chatHeight = new BindableFloat();
 
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.Both,
                             Colour = colourProvider.Background4,
                         },
-                        currentChannelContainer = new Container<DrawableChannel>
+                        currentChannelContainer = new Container<ChatOverlayDrawableChannel>
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
@@ -249,7 +249,7 @@ namespace osu.Game.Overlays
                 textBar.ShowSearch.Value = false;
 
                 loading.Show();
-                LoadComponentAsync(new DrawableChannel(newChannel), loaded =>
+                LoadComponentAsync(new ChatOverlayDrawableChannel(newChannel), loaded =>
                 {
                     currentChannelContainer.Clear();
                     currentChannelContainer.Add(loaded);
