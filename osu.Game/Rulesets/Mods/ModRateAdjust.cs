@@ -3,9 +3,7 @@
 
 using System;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Audio;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -15,12 +13,12 @@ namespace osu.Game.Rulesets.Mods
 
         public abstract BindableNumber<double> SpeedChange { get; }
 
-        public virtual void ApplyToTrack(ITrack track)
+        public virtual void ApplyToTrack(IAdjustableAudioComponent track)
         {
             track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
         }
 
-        public virtual void ApplyToSample(DrawableSample sample)
+        public virtual void ApplyToSample(IAdjustableAudioComponent sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
