@@ -56,9 +56,9 @@ namespace osu.Game.Rulesets.Mania.Edit
         protected override Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) =>
             Playfield.GetColumnByPosition(screenSpacePosition);
 
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
-            var result = base.FindSnappedPositionAndTime(screenSpacePosition);
+            var result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
 
             switch (ScrollingInfo.Direction.Value)
             {
