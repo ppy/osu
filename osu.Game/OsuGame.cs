@@ -14,6 +14,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -1203,8 +1204,8 @@ namespace osu.Game
             {
                 scope.Contexts[@"screen stack"] = new
                 {
-                    Current = newScreen.GetType().Name,
-                    Previous = current.GetType().Name,
+                    Current = newScreen?.GetType().ReadableName(),
+                    Previous = current?.GetType().ReadableName(),
                 };
             });
 
