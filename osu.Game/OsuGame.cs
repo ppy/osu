@@ -14,6 +14,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -56,6 +57,8 @@ using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Graphics;
+using Sentry;
+using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Game
 {
@@ -1197,6 +1200,15 @@ namespace osu.Game
 
         private void screenChanged(IScreen current, IScreen newScreen)
         {
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.Contexts[@"screen stack"] = new
+                {
+                    Current = newScreen?.GetType().ReadableName(),
+                    Previous = current?.GetType().ReadableName(),
+                };
+            });
+
             switch (newScreen)
             {
                 case IntroScreen intro:

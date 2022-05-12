@@ -6,10 +6,19 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Framework.Statistics;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
+using osu.Game.Skinning;
 using Sentry;
 using Sentry.Protocol;
 
@@ -24,8 +33,11 @@ namespace osu.Game.Utils
 
         private readonly IDisposable? sentrySession;
 
+        private readonly OsuGame game;
+
         public SentryLogger(OsuGame game)
         {
+            this.game = game;
             sentrySession = SentrySdk.Init(options =>
             {
                 // Not setting the dsn will completely disable sentry.
@@ -94,6 +106,45 @@ namespace osu.Game.Utils
                 {
                     Message = entry.Message,
                     Level = getSentryLevel(entry.Level),
+                }, scope =>
+                {
+                    var beatmap = game.Dependencies.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo;
+
+                    scope.Contexts[@"config"] = new
+                    {
+                        Game = game.Dependencies.Get<OsuConfigManager>().GetLoggableState()
+                        // TODO: add framework config here. needs some consideration on how to expose.
+                    };
+
+                    game.Dependencies.Get<RealmAccess>().Run(realm =>
+                    {
+                        scope.Contexts[@"realm"] = new
+                        {
+                            Counts = new
+                            {
+                                BeatmapSets = realm.All<BeatmapSetInfo>().Count(),
+                                Beatmaps = realm.All<BeatmapInfo>().Count(),
+                                Files = realm.All<RealmFile>().Count(),
+                                Skins = realm.All<SkinInfo>().Count(),
+                            }
+                        };
+                    });
+
+                    scope.Contexts[@"global statistics"] = GlobalStatistics.GetStatistics()
+                                                                           .GroupBy(s => s.Group)
+                                                                           .ToDictionary(g => g.Key, items => items.ToDictionary(i => i.Name, g => g.DisplayValue));
+
+                    scope.Contexts[@"beatmap"] = new
+                    {
+                        Name = beatmap.ToString(),
+                        beatmap.OnlineID,
+                    };
+
+                    scope.Contexts[@"clocks"] = new
+                    {
+                        Audio = game.Dependencies.Get<MusicController>().CurrentTrack.CurrentTime,
+                        Game = game.Clock.CurrentTime,
+                    };
                 });
             }
             else
