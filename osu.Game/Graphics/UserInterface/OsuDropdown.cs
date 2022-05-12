@@ -184,14 +184,12 @@ namespace osu.Game.Graphics.UserInterface
 
                 protected override void UpdateBackgroundColour()
                 {
-                    if (!IsPreSelected && !IsSelected)
-                    {
-                        Background.FadeOut(600, Easing.OutQuint);
-                        return;
-                    }
-
-                    Background.FadeIn(100, Easing.OutQuint);
                     Background.FadeColour(IsPreSelected ? BackgroundColourHover : BackgroundColourSelected, 100, Easing.OutQuint);
+
+                    if (IsPreSelected || IsSelected)
+                        Background.FadeIn(100, Easing.OutQuint);
+                    else
+                        Background.FadeOut(600, Easing.OutQuint);
                 }
 
                 protected override void UpdateForegroundColour()

@@ -68,7 +68,9 @@ namespace osu.Game.Screens.Play
 
         internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
-        private bool holdingForHUD;
+        public IBindable<bool> HoldingForHUD => holdingForHUD;
+
+        private readonly BindableBool holdingForHUD = new BindableBool();
 
         private readonly SkinnableTargetContainer mainComponents;
 
@@ -144,7 +146,8 @@ namespace osu.Game.Screens.Play
             hideTargets.ForEach(d => d.Hide());
         }
 
-        public override void Hide() => throw new InvalidOperationException($"{nameof(HUDOverlay)} should not be hidden as it will remove the ability of a user to quit. Use {nameof(ShowHud)} instead.");
+        public override void Hide() =>
+            throw new InvalidOperationException($"{nameof(HUDOverlay)} should not be hidden as it will remove the ability of a user to quit. Use {nameof(ShowHud)} instead.");
 
         protected override void LoadComplete()
         {
@@ -152,6 +155,7 @@ namespace osu.Game.Screens.Play
 
             ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING)));
 
+            holdingForHUD.BindValueChanged(_ => updateVisibility());
             IsPlaying.BindValueChanged(_ => updateVisibility());
             configVisibilityMode.BindValueChanged(_ => updateVisibility(), true);
 
@@ -204,7 +208,7 @@ namespace osu.Game.Screens.Play
             if (ShowHud.Disabled)
                 return;
 
-            if (holdingForHUD)
+            if (holdingForHUD.Value)
             {
                 ShowHud.Value = true;
                 return;
@@ -287,8 +291,7 @@ namespace osu.Game.Screens.Play
             switch (e.Action)
             {
                 case GlobalAction.HoldForHUD:
-                    holdingForHUD = true;
-                    updateVisibility();
+                    holdingForHUD.Value = true;
                     return true;
 
                 case GlobalAction.ToggleInGameInterface:
@@ -318,8 +321,7 @@ namespace osu.Game.Screens.Play
             switch (e.Action)
             {
                 case GlobalAction.HoldForHUD:
-                    holdingForHUD = false;
-                    updateVisibility();
+                    holdingForHUD.Value = false;
                     break;
             }
         }

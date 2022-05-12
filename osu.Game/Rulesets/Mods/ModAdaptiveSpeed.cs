@@ -5,9 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -79,7 +77,7 @@ namespace osu.Game.Rulesets.Mods
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
         private const double rate_change_on_miss = 0.95d;
 
-        private ITrack track;
+        private IAdjustableAudioComponent track;
         private double targetRate = 1d;
 
         /// <summary>
@@ -141,7 +139,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.BindValueChanged(adjustPitchChanged);
         }
 
-        public void ApplyToTrack(ITrack track)
+        public void ApplyToTrack(IAdjustableAudioComponent track)
         {
             this.track = track;
 
@@ -151,7 +149,7 @@ namespace osu.Game.Rulesets.Mods
             recentRates.AddRange(Enumerable.Repeat(InitialRate.Value, recent_rate_count));
         }
 
-        public void ApplyToSample(DrawableSample sample)
+        public void ApplyToSample(IAdjustableAudioComponent sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
@@ -210,7 +208,6 @@ namespace osu.Game.Rulesets.Mods
         private void adjustPitchChanged(ValueChangedEvent<bool> adjustPitchSetting)
         {
             track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
-
             track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
         }
 

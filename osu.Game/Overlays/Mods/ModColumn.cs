@@ -13,7 +13,6 @@ using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -25,7 +24,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -38,20 +36,30 @@ namespace osu.Game.Overlays.Mods
 
         public readonly ModType ModType;
 
-        private Func<Mod, bool>? filter;
+        private IReadOnlyList<ModState> availableMods = Array.Empty<ModState>();
 
         /// <summary>
-        /// A function determining whether each mod in the column should be displayed.
-        /// A return value of <see langword="true"/> means that the mod is not filtered and therefore its corresponding panel should be displayed.
-        /// A return value of <see langword="false"/> means that the mod is filtered out and therefore its corresponding panel should be hidden.
+        /// Sets the list of mods to show in this column.
         /// </summary>
-        public Func<Mod, bool>? Filter
+        public IReadOnlyList<ModState> AvailableMods
         {
-            get => filter;
+            get => availableMods;
             set
             {
-                filter = value;
+                Debug.Assert(value.All(mod => mod.Mod.Type == ModType));
+
+                availableMods = value;
+
+                foreach (var mod in availableMods)
+                {
+                    mod.Active.BindValueChanged(_ => updateState());
+                    mod.Filtered.BindValueChanged(_ => updateState());
+                }
+
                 updateState();
+
+                if (IsLoaded)
+                    asyncLoadPanels();
             }
         }
 
@@ -60,43 +68,11 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public Bindable<bool> Active = new BindableBool(true);
 
-        private readonly Bindable<bool> allFiltered = new BindableBool();
-
-        /// <summary>
-        /// True if all of the panels in this column have been filtered out by the current <see cref="Filter"/>.
-        /// </summary>
-        public IBindable<bool> AllFiltered => allFiltered;
-
-        /// <summary>
-        /// List of mods marked as selected in this column.
-        /// </summary>
-        /// <remarks>
-        /// Note that the mod instances returned by this property are owned solely by this column
-        /// (as in, they are locally-managed clones, to ensure proper isolation from any other external instances).
-        /// </remarks>
-        public IReadOnlyList<Mod> SelectedMods { get; private set; } = Array.Empty<Mod>();
-
-        /// <summary>
-        /// Invoked when a mod panel has been selected interactively by the user.
-        /// </summary>
-        public event Action? SelectionChangedByUser;
-
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && Active.Value;
 
-        protected virtual ModPanel CreateModPanel(Mod mod) => new ModPanel(mod);
+        protected virtual ModPanel CreateModPanel(ModState mod) => new ModPanel(mod);
 
         private readonly Key[]? toggleKeys;
-
-        private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
-
-        /// <summary>
-        /// All mods that are available for the current ruleset in this particular column.
-        /// </summary>
-        /// <remarks>
-        /// Note that the mod instances in this list are owned solely by this column
-        /// (as in, they are locally-managed clones, to ensure proper isolation from any other external instances).
-        /// </remarks>
-        private IReadOnlyList<Mod> localAvailableMods = Array.Empty<Mod>();
 
         private readonly TextFlowContainer headerText;
         private readonly Box headerBackground;
@@ -257,12 +233,8 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
-            availableMods.BindTo(game.AvailableMods);
-            updateLocalAvailableMods(asyncLoadContent: false);
-            availableMods.BindValueChanged(_ => updateLocalAvailableMods(asyncLoadContent: true));
-
             headerBackground.Colour = accentColour = colours.ForModType(ModType);
 
             if (toggleAllCheckbox != null)
@@ -280,6 +252,7 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             toggleAllCheckbox?.Current.BindValueChanged(_ => updateToggleAllText(), true);
+            asyncLoadPanels();
         }
 
         private void updateToggleAllText()
@@ -288,34 +261,21 @@ namespace osu.Game.Overlays.Mods
             toggleAllCheckbox.LabelText = toggleAllCheckbox.Current.Value ? CommonStrings.DeselectAll : CommonStrings.SelectAll;
         }
 
-        private void updateLocalAvailableMods(bool asyncLoadContent)
-        {
-            var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(ModType) ?? Array.Empty<Mod>())
-                                  .Select(m => m.DeepClone())
-                                  .ToList();
-
-            if (newMods.SequenceEqual(localAvailableMods))
-                return;
-
-            localAvailableMods = newMods;
-
-            if (asyncLoadContent)
-                asyncLoadPanels();
-            else
-                onPanelsLoaded(createPanels());
-        }
-
         private CancellationTokenSource? cancellationTokenSource;
 
         private void asyncLoadPanels()
         {
             cancellationTokenSource?.Cancel();
 
-            var panels = createPanels();
+            var panels = availableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)));
 
             Task? loadTask;
 
-            latestLoadTask = loadTask = LoadComponentsAsync(panels, onPanelsLoaded, (cancellationTokenSource = new CancellationTokenSource()).Token);
+            latestLoadTask = loadTask = LoadComponentsAsync(panels, loaded =>
+            {
+                panelFlow.ChildrenEnumerable = loaded;
+                updateState();
+            }, (cancellationTokenSource = new CancellationTokenSource()).Token);
             loadTask.ContinueWith(_ =>
             {
                 if (loadTask == latestLoadTask)
@@ -323,95 +283,15 @@ namespace osu.Game.Overlays.Mods
             });
         }
 
-        private IEnumerable<ModPanel> createPanels()
-        {
-            var panels = localAvailableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)));
-            return panels;
-        }
-
-        private void onPanelsLoaded(IEnumerable<ModPanel> loaded)
-        {
-            panelFlow.ChildrenEnumerable = loaded;
-
-            updateState();
-
-            foreach (var panel in panelFlow)
-            {
-                panel.Active.BindValueChanged(_ => panelStateChanged(panel));
-            }
-        }
-
         private void updateState()
         {
-            foreach (var panel in panelFlow)
-            {
-                panel.Active.Value = SelectedMods.Contains(panel.Mod);
-                panel.ApplyFilter(Filter);
-            }
-
-            allFiltered.Value = panelFlow.All(panel => panel.Filtered.Value);
+            Alpha = availableMods.All(mod => mod.Filtered.Value) ? 0 : 1;
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
-                toggleAllCheckbox.Alpha = panelFlow.Any(panel => !panel.Filtered.Value) ? 1 : 0;
-                toggleAllCheckbox.Current.Value = panelFlow.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
+                toggleAllCheckbox.Alpha = availableMods.Any(panel => !panel.Filtered.Value) ? 1 : 0;
+                toggleAllCheckbox.Current.Value = availableMods.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
             }
-        }
-
-        /// <summary>
-        /// This flag helps to determine the source of changes to <see cref="SelectedMods"/>.
-        /// If the value is false, then <see cref="SelectedMods"/> are changing due to a user selection on the UI.
-        /// If the value is true, then <see cref="SelectedMods"/> are changing due to an external <see cref="SetSelection"/> call.
-        /// </summary>
-        private bool externalSelectionUpdateInProgress;
-
-        private void panelStateChanged(ModPanel panel)
-        {
-            if (externalSelectionUpdateInProgress)
-                return;
-
-            var newSelectedMods = panel.Active.Value
-                ? SelectedMods.Append(panel.Mod)
-                : SelectedMods.Except(panel.Mod.Yield());
-
-            SelectedMods = newSelectedMods.ToArray();
-            updateState();
-            SelectionChangedByUser?.Invoke();
-        }
-
-        /// <summary>
-        /// Adjusts the set of selected mods in this column to match the passed in <paramref name="mods"/>.
-        /// </summary>
-        /// <remarks>
-        /// This method exists to be able to receive mod instances that come from potentially-external sources and to copy the changes across to this column's state.
-        /// <see cref="ModSelectScreen"/> uses this to substitute any external mod references in <see cref="ModSelectScreen.SelectedMods"/>
-        /// to references that are owned by this column.
-        /// </remarks>
-        internal void SetSelection(IReadOnlyList<Mod> mods)
-        {
-            externalSelectionUpdateInProgress = true;
-
-            var newSelection = new List<Mod>();
-
-            foreach (var mod in localAvailableMods)
-            {
-                var matchingSelectedMod = mods.SingleOrDefault(selected => selected.GetType() == mod.GetType());
-
-                if (matchingSelectedMod != null)
-                {
-                    mod.CopyFrom(matchingSelectedMod);
-                    newSelection.Add(mod);
-                }
-                else
-                {
-                    mod.ResetSettingsToDefaults();
-                }
-            }
-
-            SelectedMods = newSelection;
-            updateState();
-
-            externalSelectionUpdateInProgress = false;
         }
 
         #region Bulk select / deselect
@@ -455,7 +335,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in panelFlow.Where(b => !b.Active.Value && !b.Filtered.Value))
+            foreach (var button in availableMods.Where(b => !b.Active.Value && !b.Filtered.Value))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = true);
         }
 
@@ -466,7 +346,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in panelFlow.Where(b => b.Active.Value && !b.Filtered.Value))
+            foreach (var button in availableMods.Where(b => b.Active.Value && !b.Filtered.Value))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
         }
 
@@ -553,10 +433,10 @@ namespace osu.Game.Overlays.Mods
             int index = Array.IndexOf(toggleKeys, e.Key);
             if (index < 0) return false;
 
-            var panel = panelFlow.ElementAtOrDefault(index);
-            if (panel == null || panel.Filtered.Value) return false;
+            var modState = availableMods.ElementAtOrDefault(index);
+            if (modState == null || modState.Filtered.Value) return false;
 
-            panel.Active.Toggle();
+            modState.Active.Toggle();
             return true;
         }
 

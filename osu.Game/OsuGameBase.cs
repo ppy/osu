@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -85,6 +86,8 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
+        internal const string BUILD_SUFFIX = "lazer";
+
         public virtual string Version
         {
             get
@@ -93,7 +96,7 @@ namespace osu.Game
                     return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
                 var version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
+                return $@"{version.Major}.{version.Minor}.{version.Build}-{BUILD_SUFFIX}";
             }
         }
 
@@ -180,9 +183,21 @@ namespace osu.Game
         /// </summary>
         protected DatabaseContextFactory EFContextFactory { get; private set; }
 
+        /// <summary>
+        /// Number of unhandled exceptions to allow before aborting execution.
+        /// </summary>
+        /// <remarks>
+        /// When an unhandled exception is encountered, an internal count will be decremented.
+        /// If the count hits zero, the game will crash.
+        /// Each second, the count is incremented until reaching the value specified.
+        /// </remarks>
+        protected virtual int UnhandledExceptionsBeforeCrash => DebugUtils.IsDebugBuild ? 0 : 1;
+
         public OsuGameBase()
         {
             Name = @"osu!";
+
+            allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
 
         [BackgroundDependencyLoader]
@@ -408,6 +423,8 @@ namespace osu.Game
             LocalConfig ??= UseDevelopmentServer
                 ? new DevelopmentOsuConfigManager(Storage)
                 : new OsuConfigManager(Storage);
+
+            host.ExceptionThrown += onExceptionThrown;
         }
 
         /// <summary>
@@ -505,6 +522,23 @@ namespace osu.Game
             AvailableMods.Value = dict;
         }
 
+        private int allowableExceptions;
+
+        /// <summary>
+        /// Allows a maximum of one unhandled exception, per second of execution.
+        /// </summary>
+        private bool onExceptionThrown(Exception _)
+        {
+            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
+
+            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
+
+            // restore the stock of allowable exceptions after a short delay.
+            Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
+
+            return continueExecution;
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -514,6 +548,9 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             realm?.Dispose();
+
+            if (Host != null)
+                Host.ExceptionThrown -= onExceptionThrown;
         }
     }
 }
