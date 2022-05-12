@@ -28,9 +28,11 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModPanel : OsuClickableContainer
     {
-        public Mod Mod { get; }
-        public BindableBool Active { get; } = new BindableBool();
-        public BindableBool Filtered { get; } = new BindableBool();
+        public Mod Mod => modState.Mod;
+        public BindableBool Active => modState.Active;
+        public BindableBool Filtered => modState.Filtered;
+
+        private readonly ModState modState;
 
         protected readonly Box Background;
         protected readonly Container SwitchContainer;
@@ -55,9 +57,9 @@ namespace osu.Game.Overlays.Mods
         private Sample? sampleOff;
         private Sample? sampleOn;
 
-        public ModPanel(Mod mod)
+        public ModPanel(ModState modState)
         {
-            Mod = mod;
+            this.modState = modState;
 
             RelativeSizeAxes = Axes.X;
             Height = 42;
@@ -79,7 +81,7 @@ namespace osu.Game.Overlays.Mods
                 SwitchContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Child = new ModSwitchSmall(mod)
+                    Child = new ModSwitchSmall(Mod)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -115,7 +117,7 @@ namespace osu.Game.Overlays.Mods
                                 {
                                     new OsuSpriteText
                                     {
-                                        Text = mod.Name,
+                                        Text = Mod.Name,
                                         Font = OsuFont.TorusAlternate.With(size: 18, weight: FontWeight.SemiBold),
                                         Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                         Margin = new MarginPadding
@@ -125,7 +127,7 @@ namespace osu.Game.Overlays.Mods
                                     },
                                     new OsuSpriteText
                                     {
-                                        Text = mod.Description,
+                                        Text = Mod.Description,
                                         Font = OsuFont.Default.With(size: 12),
                                         RelativeSizeAxes = Axes.X,
                                         Truncate = true,
@@ -139,6 +141,11 @@ namespace osu.Game.Overlays.Mods
             };
 
             Action = Active.Toggle;
+        }
+
+        public ModPanel(Mod mod)
+            : this(new ModState(mod))
+        {
         }
 
         [BackgroundDependencyLoader(true)]
