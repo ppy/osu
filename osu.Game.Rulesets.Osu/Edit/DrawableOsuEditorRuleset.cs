@@ -50,6 +50,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             private void load(OsuConfigManager config)
             {
                 hitAnimations = config.GetBindable<bool>(OsuSetting.EditorHitAnimations);
+                hitAnimations.BindValueChanged(_ =>
+                {
+                    foreach (var d in HitObjectContainer.AliveObjects)
+                        d.RefreshStateTransforms();
+                });
             }
 
             protected override void OnNewDrawableHitObject(DrawableHitObject d)
