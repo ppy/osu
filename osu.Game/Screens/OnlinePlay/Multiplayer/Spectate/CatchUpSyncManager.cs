@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Framework.Timing;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -76,14 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
                 // Ensure all player clocks are stopped until the start succeeds.
                 foreach (var clock in playerClocks)
-                {
-                    if (clock.IsRunning)
-                    {
-                        Logger.Log($"{GetType().Name}.Update(): Found running clock while sync manager is stopped, stopping clock.");
-                        clock.Stop();
-                    }
-                }
-
+                    clock.Stop();
                 return;
             }
 
