@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Mods
             {
             }
 
-            protected override ModPanel CreateModPanel(Mod mod) => new IncompatibilityDisplayingModPanel(mod);
+            protected override ModPanel CreateModPanel(ModState modState) => new IncompatibilityDisplayingModPanel(modState);
         }
     }
 }

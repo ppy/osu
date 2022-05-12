@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Lists;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
@@ -22,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
 
@@ -47,9 +47,7 @@ namespace osu.Game.Overlays.Mods
             set
             {
                 isValidMod = value ?? throw new ArgumentNullException(nameof(value));
-
-                if (IsLoaded)
-                    updateAvailableMods();
+                filterMods();
             }
         }
 
@@ -63,6 +61,10 @@ namespace osu.Game.Overlays.Mods
         protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
 
         protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => createDefaultFooterButtons();
+
+        private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
+        private readonly Dictionary<ModType, IReadOnlyList<ModState>> localAvailableMods = new Dictionary<ModType, IReadOnlyList<ModState>>();
+        private IEnumerable<ModState> allLocalAvailableMods => localAvailableMods.SelectMany(pair => pair.Value);
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
@@ -82,7 +84,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuGameBase game, OsuColour colours)
         {
             Header.Title = ModSelectOverlayStrings.ModSelectTitle;
             Header.Description = ModSelectOverlayStrings.ModSelectDescription;
@@ -184,10 +186,15 @@ namespace osu.Game.Overlays.Mods
                     LighterColour = colours.Pink1
                 })
             };
+
+            availableMods.BindTo(game.AvailableMods);
         }
 
         protected override void LoadComplete()
         {
+            // this is called before base call so that the mod state is populated early, and the transition in `PopIn()` can play out properly.
+            availableMods.BindValueChanged(_ => createLocalMods(), true);
+
             base.LoadComplete();
 
             State.BindValueChanged(_ => samplePlaybackDisabled.Value = State.Value == Visibility.Hidden, true);
@@ -201,17 +208,10 @@ namespace osu.Game.Overlays.Mods
             {
                 updateMultiplier();
                 updateCustomisation(val);
-                updateSelectionFromBindable();
+                updateFromExternalSelection();
             }, true);
 
-            foreach (var column in columnFlow.Columns)
-            {
-                column.SelectionChangedByUser += updateBindableFromSelection;
-            }
-
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
-
-            updateAvailableMods();
 
             // Start scrolled slightly to the right to give the user a sense that
             // there is more horizontal content available.
@@ -244,7 +244,6 @@ namespace osu.Game.Overlays.Mods
         {
             var column = CreateModColumn(modType, toggleKeys).With(column =>
             {
-                column.Filter = IsValidMod;
                 // spacing applied here rather than via `columnFlow.Spacing` to avoid uneven gaps when some of the columns are hidden.
                 column.Margin = new MarginPadding { Right = 10 };
             });
@@ -272,6 +271,34 @@ namespace osu.Game.Overlays.Mods
                 }
             };
 
+        private void createLocalMods()
+        {
+            localAvailableMods.Clear();
+
+            foreach (var (modType, mods) in availableMods.Value)
+            {
+                var modStates = mods.SelectMany(ModUtils.FlattenMod)
+                                    .Select(mod => new ModState(mod.DeepClone()))
+                                    .ToArray();
+
+                foreach (var modState in modStates)
+                    modState.Active.BindValueChanged(_ => updateFromInternalSelection());
+
+                localAvailableMods[modType] = modStates;
+            }
+
+            filterMods();
+
+            foreach (var column in columnFlow.Columns)
+                column.AvailableMods = localAvailableMods.GetValueOrDefault(column.ModType, Array.Empty<ModState>());
+        }
+
+        private void filterMods()
+        {
+            foreach (var modState in allLocalAvailableMods)
+                modState.Filtered.Value = !modState.Mod.HasImplementation || !IsValidMod.Invoke(modState.Mod);
+        }
+
         private void updateMultiplier()
         {
             if (multiplierDisplay == null)
@@ -283,12 +310,6 @@ namespace osu.Game.Overlays.Mods
                 multiplier *= mod.ScoreMultiplier;
 
             multiplierDisplay.Current.Value = multiplier;
-        }
-
-        private void updateAvailableMods()
-        {
-            foreach (var column in columnFlow.Columns)
-                column.Filter = m => m.HasImplementation && isValidMod.Invoke(m);
         }
 
         private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
@@ -339,25 +360,52 @@ namespace osu.Game.Overlays.Mods
             TopLevelContent.MoveToY(-modAreaHeight, transition_duration, Easing.InOutCubic);
         }
 
-        private void updateSelectionFromBindable()
-        {
-            // `SelectedMods` may contain mod references that come from external sources.
-            // to ensure isolation, first pull in the potentially-external change into the mod columns...
-            foreach (var column in columnFlow.Columns)
-                column.SetSelection(SelectedMods.Value);
+        /// <summary>
+        /// This flag helps to determine the source of changes to <see cref="SelectedMods"/>.
+        /// If the value is false, then <see cref="SelectedMods"/> are changing due to a user selection on the UI.
+        /// If the value is true, then <see cref="SelectedMods"/> are changing due to an external <see cref="SelectedMods"/> change.
+        /// </summary>
+        private bool externalSelectionUpdateInProgress;
 
-            // and then, when done, replace the potentially-external mod references in `SelectedMods` with ones we own.
-            updateBindableFromSelection();
+        private void updateFromExternalSelection()
+        {
+            if (externalSelectionUpdateInProgress)
+                return;
+
+            externalSelectionUpdateInProgress = true;
+
+            var newSelection = new List<Mod>();
+
+            foreach (var modState in allLocalAvailableMods)
+            {
+                var matchingSelectedMod = SelectedMods.Value.SingleOrDefault(selected => selected.GetType() == modState.Mod.GetType());
+
+                if (matchingSelectedMod != null)
+                {
+                    modState.Mod.CopyFrom(matchingSelectedMod);
+                    modState.Active.Value = true;
+                    newSelection.Add(modState.Mod);
+                }
+                else
+                {
+                    modState.Mod.ResetSettingsToDefaults();
+                    modState.Active.Value = false;
+                }
+            }
+
+            SelectedMods.Value = newSelection;
+
+            externalSelectionUpdateInProgress = false;
         }
 
-        private void updateBindableFromSelection()
+        private void updateFromInternalSelection()
         {
-            var candidateSelection = columnFlow.Columns.SelectMany(column => column.SelectedMods).ToArray();
-
-            // the following guard intends to check cases where we've already replaced potentially-external mod references with our own and avoid endless recursion.
-            // TODO: replace custom comparer with System.Collections.Generic.ReferenceEqualityComparer when fully on .NET 6
-            if (candidateSelection.SequenceEqual(SelectedMods.Value, new FuncEqualityComparer<Mod>(ReferenceEquals)))
+            if (externalSelectionUpdateInProgress)
                 return;
+
+            var candidateSelection = allLocalAvailableMods.Where(modState => modState.Active.Value)
+                                                          .Select(modState => modState.Mod)
+                                                          .ToArray();
 
             SelectedMods.Value = ComputeNewModsFromSelection(SelectedMods.Value, candidateSelection);
         }
@@ -383,10 +431,12 @@ namespace osu.Game.Overlays.Mods
             {
                 var column = columnFlow[i].Column;
 
-                double delay = column.AllFiltered.Value ? 0 : nonFilteredColumnCount * 30;
-                double duration = column.AllFiltered.Value ? 0 : fade_in_duration;
+                bool allFiltered = column.AvailableMods.All(modState => modState.Filtered.Value);
+
+                double delay = allFiltered ? 0 : nonFilteredColumnCount * 30;
+                double duration = allFiltered ? 0 : fade_in_duration;
                 float startingYPosition = 0;
-                if (!column.AllFiltered.Value)
+                if (!allFiltered)
                     startingYPosition = nonFilteredColumnCount % 2 == 0 ? -distance : distance;
 
                 column.TopLevelContent
@@ -395,7 +445,7 @@ namespace osu.Game.Overlays.Mods
                       .MoveToY(0, duration, Easing.OutQuint)
                       .FadeIn(duration, Easing.OutQuint);
 
-                if (!column.AllFiltered.Value)
+                if (!allFiltered)
                     nonFilteredColumnCount += 1;
             }
         }
@@ -416,9 +466,11 @@ namespace osu.Game.Overlays.Mods
             {
                 var column = columnFlow[i].Column;
 
-                double duration = column.AllFiltered.Value ? 0 : fade_out_duration;
+                bool allFiltered = column.AvailableMods.All(modState => modState.Filtered.Value);
+
+                double duration = allFiltered ? 0 : fade_out_duration;
                 float newYPosition = 0;
-                if (!column.AllFiltered.Value)
+                if (!allFiltered)
                     newYPosition = nonFilteredColumnCount % 2 == 0 ? -distance : distance;
 
                 column.FlushPendingSelections();
@@ -426,7 +478,7 @@ namespace osu.Game.Overlays.Mods
                       .MoveToY(newYPosition, duration, Easing.OutQuint)
                       .FadeOut(duration, Easing.OutQuint);
 
-                if (!column.AllFiltered.Value)
+                if (!allFiltered)
                     nonFilteredColumnCount += 1;
             }
         }
@@ -570,8 +622,8 @@ namespace osu.Game.Overlays.Mods
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Active.BindValueChanged(_ => updateState());
-                Column.AllFiltered.BindValueChanged(_ => updateState(), true);
+
+                Active.BindValueChanged(_ => updateState(), true);
                 FinishTransforms();
             }
 
@@ -580,8 +632,6 @@ namespace osu.Game.Overlays.Mods
             private void updateState()
             {
                 Colour4 targetColour;
-
-                Column.Alpha = Column.AllFiltered.Value ? 0 : 1;
 
                 if (Column.Active.Value)
                     targetColour = Colour4.White;
