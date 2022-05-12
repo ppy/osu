@@ -19,6 +19,11 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
 
+        public IncompatibilityDisplayingModPanel(ModState modState)
+            : base(modState)
+        {
+        }
+
         public IncompatibilityDisplayingModPanel(Mod mod)
             : base(mod)
         {
