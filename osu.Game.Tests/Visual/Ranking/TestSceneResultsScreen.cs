@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.Ranking
             score.Accuracy = accuracy;
             score.Rank = rank;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen(score)));
+            loadResultsScreen(() => screen = createResultsScreen(score));
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay present", () => screen.RetryOverlay != null);
         }
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             UnrankedSoloResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createUnrankedSoloResultsScreen()));
+            loadResultsScreen(() => screen = createUnrankedSoloResultsScreen());
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay present", () => screen.RetryOverlay != null);
         }
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            loadResultsScreen(() => screen = createResultsScreen());
             AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddStep("click expanded panel", () =>
@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            loadResultsScreen(() => screen = createResultsScreen());
             AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddStep("click expanded panel", () =>
@@ -201,7 +201,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            loadResultsScreen(() => screen = createResultsScreen());
             AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             ScorePanel expandedPanel = null;
@@ -231,7 +231,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             var tcs = new TaskCompletionSource<bool>();
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(), tcs.Task)));
+            loadResultsScreen(() => screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(), tcs.Task));
 
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
 
@@ -255,7 +255,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            loadResultsScreen(() => screen = createResultsScreen());
             AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddAssert("download button is disabled", () => !screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
@@ -276,7 +276,7 @@ namespace osu.Game.Tests.Visual.Ranking
             var ruleset = new RulesetWithNoPerformanceCalculator();
             var score = TestResources.CreateTestScoreInfo(ruleset.RulesetInfo);
 
-            AddStep("load results", () => Child = new TestResultsContainer(createResultsScreen(score)));
+            loadResultsScreen(() => createResultsScreen(score));
             AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddAssert("PP displayed as 0", () =>
@@ -284,6 +284,22 @@ namespace osu.Game.Tests.Visual.Ranking
                 var performance = this.ChildrenOfType<PerformanceStatistic>().Single();
                 var counter = performance.ChildrenOfType<StatisticCounter>().Single();
                 return counter.Current.Value == 0;
+            });
+        }
+
+        private void loadResultsScreen(Func<ResultsScreen> createResults)
+        {
+            ResultsScreen results = null;
+
+            AddStep("load results", () => Child = new TestResultsContainer(results = createResults()));
+
+            // expanded panel should be centered the moment results screen is loaded
+            // but can potentially be scrolled away on certain specific load scenarios.
+            // see: https://github.com/ppy/osu/issues/18226
+            AddUntilStep("expanded panel in centre of screen", () =>
+            {
+                var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
+                return Precision.AlmostEquals(expandedPanel.ScreenSpaceDrawQuad.Centre.X, results.ScreenSpaceDrawQuad.Centre.X, 1);
             });
         }
 
