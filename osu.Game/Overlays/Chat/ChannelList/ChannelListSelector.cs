@@ -73,6 +73,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
             currentChannel.BindValueChanged(channel =>
             {
+                // This logic should be handled by the chat overlay rather than this component.
+                // Selected state should be moved to an abstract class and shared with ChannelListItem.
                 if (channel.NewValue == null)
                 {
                     text.FadeColour(colourProvider.Content1, 300, Easing.OutQuint);
