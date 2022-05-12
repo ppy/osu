@@ -18,6 +18,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
     public class HitCircleOverlapMarker : BlueprintPiece<HitCircle>
     {
+        /// <summary>
+        /// Hit objects are intentionally made to fade out at a constant slower rate than in gameplay.
+        /// This allows a mapper to gain better historical context and use recent hitobjects as reference / snap points.
+        /// </summary>
+        public const double FADE_OUT_EXTENSION = 700;
+
         private readonly Circle circle;
         private readonly RingPiece ring;
 
@@ -64,16 +70,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
             if ((hitObject is IHasComboInformation combo))
                 ring.BorderColour = combo.GetComboColour(skin);
 
-            bool hasReachedObject = editorClock.CurrentTime >= hitObject.StartTime;
-            float interpolation = Interpolation.ValueAt(editorClock.CurrentTime, 0, 1f, hitObject.StartTime, hitObject.StartTime + DrawableOsuEditorRuleset.EDITOR_HIT_OBJECT_FADE_OUT_EXTENSION, Easing.In);
-            float interpolation2 = MathHelper.Clamp(Interpolation.ValueAt(editorClock.CurrentTime, 0, 1f, hitObject.StartTime, hitObject.StartTime + DrawableOsuEditorRuleset.EDITOR_HIT_OBJECT_FADE_OUT_EXTENSION / 2, Easing.OutQuint), 0, 1);
-            float interpolation3 = Interpolation.ValueAt(editorClock.CurrentTime, 0, 1f, hitObject.StartTime, hitObject.StartTime + DrawableOsuEditorRuleset.EDITOR_HIT_OBJECT_FADE_OUT_EXTENSION);
+            double editorTime = editorClock.CurrentTime;
+            double hitObjectTime = hitObject.StartTime;
+            bool hasReachedObject = editorTime >= hitObjectTime;
 
             if (hasReachedObject)
             {
-                circle.Scale = new Vector2(1 - 0.05f * interpolation3);
-                ring.Scale = new Vector2(1 + 0.1f * interpolation2);
-                Alpha = 0.9f * (1 - (interpolation));
+                float alpha = Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION, Easing.In);
+                float circleScale = Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION);
+                float ringScale = MathHelper.Clamp(Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION / 2, Easing.OutQuint), 0, 1);
+
+                circle.Scale = new Vector2(1 - 0.05f * circleScale);
+                ring.Scale = new Vector2(1 + 0.1f * ringScale);
+                Alpha = 0.9f * (1 - alpha);
             }
             else
                 Alpha = 0;
