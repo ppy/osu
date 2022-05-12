@@ -186,6 +186,10 @@ namespace osu.Game.Tests.OnlinePlay
             public double FramesPerSecond => 0;
 
             public FrameTimeInfo TimeInfo => default;
+
+            public void MarkReady()
+            {
+            }
         }
 
         private class TestManualClock : ManualClock, IAdjustableClock

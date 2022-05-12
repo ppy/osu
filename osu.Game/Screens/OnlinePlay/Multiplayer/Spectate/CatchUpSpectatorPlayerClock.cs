@@ -28,9 +28,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public bool IsRunning { get; private set; }
 
+        private bool isReady;
+
         public void Reset() => CurrentTime = 0;
 
-        public void Start() => IsRunning = true;
+        public void Start()
+        {
+            if (!isReady)
+                throw new InvalidOperationException(@"Attempting to start spectator clock while not ready for use yet.");
+
+            IsRunning = true;
+        }
 
         public void Stop() => IsRunning = false;
 
@@ -80,6 +88,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public double FramesPerSecond { get; private set; }
 
         public FrameTimeInfo TimeInfo => new FrameTimeInfo { Elapsed = ElapsedFrameTime, Current = CurrentTime };
+
+        public void MarkReady() => isReady = true;
 
         public Bindable<bool> WaitingOnFrames { get; } = new Bindable<bool>(true);
 

@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
@@ -163,7 +164,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             base.LoadComplete();
 
+            Logger.Log($"{GetType().Name}.LoadComplete(): Resetting {nameof(MasterGameplayClockContainer)}.");
             masterClockContainer.Reset();
+
+            Logger.Log($"{GetType().Name}.LoadComplete(): Current master elapsed = {masterClockContainer.GameplayClock.ElapsedFrameTime}.");
 
             syncManager.ReadyToStart += onReadyToStart;
             syncManager.MasterState.BindValueChanged(onMasterStateChanged, true);
@@ -197,7 +201,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                                         .DefaultIfEmpty(0)
                                         .Min();
 
+            Logger.Log($"{GetType().Name}.onReadyToStart(): Setting start time of {nameof(MasterGameplayClockContainer)} to {startTime}ms.");
             masterClockContainer.StartTime = startTime;
+
+            Logger.Log($"{GetType().Name}.onReadyToStart(): Resetting and starting {nameof(MasterGameplayClockContainer)}.");
             masterClockContainer.Reset(true);
 
             // Although the clock has been started, this flag is set to allow for later synchronisation state changes to also be able to start it.
@@ -210,11 +217,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
                 case MasterClockState.Synchronised:
                     if (canStartMasterClock)
+                    {
+                        Logger.Log($"{GetType().Name}.onMasterStateChanged(): Master clock synchronised, starting master.");
                         masterClockContainer.Start();
+                    }
 
                     break;
 
                 case MasterClockState.TooFarAhead:
+                    Logger.Log($"{GetType().Name}.onMasterStateChanged(): Master clock too far ahead, stopping master.");
                     masterClockContainer.Stop();
                     break;
             }

@@ -12,6 +12,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     public interface ISpectatorPlayerClock : IFrameBasedClock, IAdjustableClock
     {
         /// <summary>
+        /// Marks this clock as ready for use by an <see cref="ISyncManager"/>.
+        /// </summary>
+        void MarkReady();
+
+        /// <summary>
         /// Whether this clock is waiting on frames to continue playback.
         /// </summary>
         Bindable<bool> WaitingOnFrames { get; }
