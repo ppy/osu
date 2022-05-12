@@ -21,7 +21,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 
         protected override bool AlwaysShowWhenSelected => true;
 
-        protected override bool ShouldBeAlive => base.ShouldBeAlive || editorClock.CurrentTime - Item.GetEndTime() < HitCircleOverlapMarker.FADE_OUT_EXTENSION;
+        protected override bool ShouldBeAlive => base.ShouldBeAlive
+                                                 || (editorClock.CurrentTime >= Item.StartTime && editorClock.CurrentTime - Item.GetEndTime() < HitCircleOverlapMarker.FADE_OUT_EXTENSION);
 
         protected OsuSelectionBlueprint(T hitObject)
             : base(hitObject)
