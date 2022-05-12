@@ -270,7 +270,6 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
-                                            new HitAnimationsMenuItem(config.GetBindable<bool>(OsuSetting.EditorHitAnimations))
                                         }
                                     }
                                 }
