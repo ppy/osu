@@ -113,7 +113,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         public void TestCursorInCentre()
         {
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position)));
-            assertSnappedDistance(0);
+            assertSnappedDistance(beat_length);
+        }
+
+        [Test]
+        public void TestCursorAlmostInCentre()
+        {
+            AddStep("move mouse to almost centre", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position) + new Vector2(1)));
+            assertSnappedDistance(beat_length);
         }
 
         [Test]
