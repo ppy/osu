@@ -420,10 +420,11 @@ namespace osu.Game.Online.Chat
         /// Joins a channel if it has not already been joined. Must be called from the update thread.
         /// </summary>
         /// <param name="channel">The channel to join.</param>
+        /// <param name="setCurrent">Set the channel to join as the current channel if the current channel is null.</param>
         /// <returns>The joined channel. Note that this may not match the parameter channel as it is a backed object.</returns>
-        public Channel JoinChannel(Channel channel) => joinChannel(channel, true);
+        public Channel JoinChannel(Channel channel, bool setCurrent = true) => joinChannel(channel, true, setCurrent);
 
-        private Channel joinChannel(Channel channel, bool fetchInitialMessages = false)
+        private Channel joinChannel(Channel channel, bool fetchInitialMessages = false, bool setCurrent = true)
         {
             if (channel == null) return null;
 
@@ -439,7 +440,7 @@ namespace osu.Game.Online.Chat
                     case ChannelType.Multiplayer:
                         // join is implicit. happens when you join a multiplayer game.
                         // this will probably change in the future.
-                        joinChannel(channel, fetchInitialMessages);
+                        joinChannel(channel, fetchInitialMessages, setCurrent);
                         return channel;
 
                     case ChannelType.PM:
@@ -460,7 +461,7 @@ namespace osu.Game.Online.Chat
 
                     default:
                         var req = new JoinChannelRequest(channel);
-                        req.Success += () => joinChannel(channel, fetchInitialMessages);
+                        req.Success += () => joinChannel(channel, fetchInitialMessages, setCurrent);
                         req.Failure += ex => LeaveChannel(channel);
                         api.Queue(req);
                         return channel;
@@ -472,7 +473,8 @@ namespace osu.Game.Online.Chat
                     this.fetchInitialMessages(channel);
             }
 
-            CurrentChannel.Value ??= channel;
+            if (setCurrent)
+                CurrentChannel.Value ??= channel;
 
             return channel;
         }

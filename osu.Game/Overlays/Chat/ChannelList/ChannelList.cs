@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -19,10 +18,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
 {
     public class ChannelList : Container
     {
-        public Action<Channel>? OnRequestSelect;
+        public Action<Channel?>? OnRequestSelect;
         public Action<Channel>? OnRequestLeave;
-
-        public readonly BindableBool SelectorActive = new BindableBool();
 
         private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
@@ -56,7 +53,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                             new ChannelListSelector
                             {
                                 Margin = new MarginPadding { Bottom = 10 },
-                                SelectorActive = { BindTarget = SelectorActive },
+                                Action = () => OnRequestSelect?.Invoke(null),
                             },
                             privateChannelFlow = new ChannelListItemFlow("DIRECT MESSAGES"),
                         },
@@ -73,7 +70,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
             ChannelListItem item = new ChannelListItem(channel);
             item.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
             item.OnRequestLeave += chan => OnRequestLeave?.Invoke(chan);
-            item.SelectorActive.BindTarget = SelectorActive;
 
             ChannelListItemFlow flow = getFlowForChannel(channel);
             channelMap.Add(channel, item);

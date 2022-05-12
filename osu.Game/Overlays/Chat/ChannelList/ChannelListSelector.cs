@@ -12,16 +12,18 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
     public class ChannelListSelector : OsuClickableContainer
     {
-        public readonly BindableBool SelectorActive = new BindableBool();
-
         private Box hoverBox = null!;
         private Box selectBox = null!;
         private OsuSpriteText text = null!;
+
+        [Resolved]
+        private Bindable<Channel> currentChannel { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -69,9 +71,11 @@ namespace osu.Game.Overlays.Chat.ChannelList
         {
             base.LoadComplete();
 
-            SelectorActive.BindValueChanged(selector =>
+            currentChannel.BindValueChanged(channel =>
             {
-                if (selector.NewValue)
+                // This logic should be handled by the chat overlay rather than this component.
+                // Selected state should be moved to an abstract class and shared with ChannelListItem.
+                if (channel.NewValue == null)
                 {
                     text.FadeColour(colourProvider.Content1, 300, Easing.OutQuint);
                     selectBox.FadeIn(300, Easing.OutQuint);
@@ -82,8 +86,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     selectBox.FadeOut(200, Easing.OutQuint);
                 }
             }, true);
-
-            Action = () => SelectorActive.Value = true;
         }
 
         protected override bool OnHover(HoverEvent e)
