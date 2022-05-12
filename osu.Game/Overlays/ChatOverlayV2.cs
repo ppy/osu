@@ -39,8 +39,9 @@ namespace osu.Game.Overlays
         private ChatTextBar textBar = null!;
         private Container<ChatOverlayDrawableChannel> currentChannelContainer = null!;
 
-        private readonly BindableFloat chatHeight = new BindableFloat();
+        private readonly Dictionary<Channel, ChatOverlayDrawableChannel> loadedChannels = new Dictionary<Channel, ChatOverlayDrawableChannel>();
 
+        private readonly BindableFloat chatHeight = new BindableFloat();
         private bool isDraggingTopBar;
         private float dragStartChatHeight;
 
@@ -173,7 +174,7 @@ namespace osu.Game.Overlays
             if (currentChannel.Value?.Id != channel.Id)
             {
                 if (!channel.Joined.Value)
-                    channel = channelManager.JoinChannel(channel);
+                    channel = channelManager.JoinChannel(channel, false);
 
                 channelManager.CurrentChannel.Value = channel;
             }
@@ -248,13 +249,26 @@ namespace osu.Game.Overlays
                 channelListing.State.Value = Visibility.Hidden;
                 textBar.ShowSearch.Value = false;
 
-                loading.Show();
-                LoadComponentAsync(new ChatOverlayDrawableChannel(newChannel), loaded =>
+                if (loadedChannels.ContainsKey(newChannel))
                 {
-                    currentChannelContainer.Clear();
-                    currentChannelContainer.Add(loaded);
-                    loading.Hide();
-                });
+                    currentChannelContainer.Clear(false);
+                    currentChannelContainer.Add(loadedChannels[newChannel]);
+                }
+                else
+                {
+                    loading.Show();
+
+                    // Ensure the drawable channel is stored before async load to prevent double loading
+                    ChatOverlayDrawableChannel drawableChannel = new ChatOverlayDrawableChannel(newChannel);
+                    loadedChannels.Add(newChannel, drawableChannel);
+
+                    LoadComponentAsync(drawableChannel, loaded =>
+                    {
+                        currentChannelContainer.Clear(false);
+                        currentChannelContainer.Add(loaded);
+                        loading.Hide();
+                    });
+                }
             }
         }
 
@@ -264,14 +278,21 @@ namespace osu.Game.Overlays
             {
                 case NotifyCollectionChangedAction.Add:
                     IEnumerable<Channel> joinedChannels = filterChannels(args.NewItems);
+
                     foreach (var channel in joinedChannels)
                         channelList.AddChannel(channel);
+
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     IEnumerable<Channel> leftChannels = filterChannels(args.OldItems);
+
                     foreach (var channel in leftChannels)
+                    {
                         channelList.RemoveChannel(channel);
+                        loadedChannels.Remove(channel);
+                    }
+
                     break;
             }
         }
