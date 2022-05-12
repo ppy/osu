@@ -349,15 +349,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         /// <summary>
-        /// Tests spectating with a gameplay start time set to a negative value.
-        /// Simulating beatmaps with high <see cref="BeatmapInfo.AudioLeadIn"/> or negative time storyboard elements.
+        /// Tests spectating with a beatmap that has a high lead-in value.
         /// </summary>
         [Test]
-        public void TestNegativeGameplayStartTime()
+        public void TestLeadIn()
         {
             start(PLAYER_1_ID);
 
-            loadSpectateScreen(false, -500);
+            loadSpectateScreen(false, 2000);
 
             // to ensure negative gameplay start time does not affect spectator, send frames exactly after StartGameplay().
             // (similar to real spectating sessions in which the first frames get sent between StartGameplay() and player load complete)
@@ -371,14 +370,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertRunning(PLAYER_1_ID);
         }
 
-        private void loadSpectateScreen(bool waitForPlayerLoad = true, double? gameplayStartTime = null)
+        private void loadSpectateScreen(bool waitForPlayerLoad = true, double? leadIn = null)
         {
-            AddStep(!gameplayStartTime.HasValue ? "load screen" : $"load screen (start = {gameplayStartTime}ms)", () =>
+            AddStep(!leadIn.HasValue ? "load screen" : $"load screen (lead-in = {leadIn}ms)", () =>
             {
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(importedBeatmap);
                 Ruleset.Value = importedBeatmap.Ruleset;
 
-                LoadScreen(spectatorScreen = new TestMultiSpectatorScreen(SelectedRoom.Value, playingUsers.ToArray(), gameplayStartTime));
+                LoadScreen(spectatorScreen = new TestMultiSpectatorScreen(SelectedRoom.Value, playingUsers.ToArray(), leadIn));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
@@ -464,16 +463,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private class TestMultiSpectatorScreen : MultiSpectatorScreen
         {
-            private readonly double? startTime;
+            private readonly double? leadIn;
 
-            public TestMultiSpectatorScreen(Room room, MultiplayerRoomUser[] users, double? startTime = null)
+            public TestMultiSpectatorScreen(Room room, MultiplayerRoomUser[] users, double? leadIn = null)
                 : base(room, users)
             {
-                this.startTime = startTime;
+                this.leadIn = leadIn;
             }
 
             protected override MasterGameplayClockContainer CreateMasterGameplayClockContainer(WorkingBeatmap beatmap)
-                => new MasterGameplayClockContainer(beatmap, 0) { StartTime = startTime ?? 0 };
+            {
+                beatmap.BeatmapInfo.AudioLeadIn = leadIn ?? 0;
+                return base.CreateMasterGameplayClockContainer(beatmap);
+            }
         }
     }
 }
