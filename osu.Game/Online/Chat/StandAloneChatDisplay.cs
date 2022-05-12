@@ -155,7 +155,8 @@ namespace osu.Game.Online.Chat
         {
             public Func<Message, ChatLine> CreateChatLineAction;
 
-            private Colour4 daySepColour;
+            [Resolved]
+            private OsuColour colours { get; set; }
 
             public StandAloneDrawableChannel(Channel channel)
                 : base(channel)
@@ -163,10 +164,9 @@ namespace osu.Game.Online.Chat
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
                 ChatLineFlow.Padding = new MarginPadding { Horizontal = 0 };
-                daySepColour = colours.Yellow;
             }
 
             protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
@@ -174,7 +174,7 @@ namespace osu.Game.Online.Chat
             protected override Drawable CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
             {
                 TextSize = 14,
-                Colour = daySepColour,
+                Colour = colours.Yellow,
                 LineHeight = 1,
                 Padding = new MarginPadding { Horizontal = 10 },
                 Margin = new MarginPadding { Vertical = 5 },
