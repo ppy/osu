@@ -57,6 +57,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
             }
 
+            public override void Reset(bool startClock = false)
+            {
+                // Similar to below, we also don't want to start clock on reset.
+                // ReSharper disable once RedundantArgumentDefaultValue - removing the "redundant" default value triggers BaseMethodCallWithDefaultParameter
+                base.Reset(false);
+            }
+
             protected override void Update()
             {
                 // The SourceClock here is always a CatchUpSpectatorPlayerClock.

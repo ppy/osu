@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Play
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
         /// </summary>
         /// <param name="startClock">Whether to start the clock immediately, if not already started.</param>
-        public void Reset(bool startClock = false)
+        public virtual void Reset(bool startClock = false)
         {
             // Manually stop the source in order to not affect the IsPaused state.
             AdjustableSource.Stop();
