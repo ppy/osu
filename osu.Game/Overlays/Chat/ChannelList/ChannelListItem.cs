@@ -31,8 +31,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         public readonly BindableBool Unread = new BindableBool();
 
-        public readonly BindableBool SelectorActive = new BindableBool();
-
         private Box hoverBox = null!;
         private Box selectBox = null!;
         private OsuSpriteText text = null!;
@@ -127,7 +125,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
             base.LoadComplete();
 
             selectedChannel.BindValueChanged(_ => updateState(), true);
-            SelectorActive.BindValueChanged(_ => updateState(), true);
             Unread.BindValueChanged(_ => updateState(), true);
         }
 
@@ -163,7 +160,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private void updateState()
         {
-            bool selected = selectedChannel.Value == Channel && !SelectorActive.Value;
+            bool selected = selectedChannel.Value == Channel;
 
             if (selected)
                 selectBox.FadeIn(300, Easing.OutQuint);
