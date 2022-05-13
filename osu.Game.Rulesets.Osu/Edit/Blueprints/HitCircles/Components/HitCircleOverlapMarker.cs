@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
@@ -54,12 +53,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 
         [Resolved]
         private ISkinSource skin { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            circle.BorderColour = colours.Yellow;
-        }
 
         public override void UpdateFrom(HitCircle hitObject)
         {
