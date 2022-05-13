@@ -264,6 +264,14 @@ namespace osu.Game.Overlays
 
                     LoadComponentAsync(drawableChannel, loaded =>
                     {
+                        // Ensure the current channel hasn't changed by the time the load completes
+                        if (currentChannel.Value != newChannel)
+                            return;
+
+                        // Ensure the cached reference hasn't been removed from leaving the channel
+                        if (!loadedChannels.ContainsKey(newChannel))
+                            return;
+
                         currentChannelContainer.Clear(false);
                         currentChannelContainer.Add(loaded);
                         loading.Hide();
