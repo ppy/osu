@@ -8,6 +8,7 @@
 [![GitHub release](https://img.shields.io/github/release/ppy/osu.svg)](https://github.com/ppy/osu/releases/latest)
 [![CodeFactor](https://www.codefactor.io/repository/github/ppy/osu/badge)](https://www.codefactor.io/repository/github/ppy/osu)
 [![dev chat](https://discordapp.com/api/guilds/188630481301012481/widget.png?style=shield)](https://discord.gg/ppy)
+[![Crowdin](https://d322cqt584bo4o.cloudfront.net/osu-web/localized.svg)](https://crowdin.com/project/osu-web)
 
 A free-to-win rhythm game. Rhythm is just a *click* away!
 
@@ -103,6 +104,8 @@ JetBrains ReSharper InspectCode is also used for wider rule sets. You can run it
 When it comes to contributing to the project, the two main things you can do to help out are reporting issues and submitting pull requests. Based on past experiences, we have prepared a [list of contributing guidelines](CONTRIBUTING.md) that should hopefully ease you into our collaboration process and answer the most frequently-asked questions.
 
 Note that while we already have certain standards in place, nothing is set in stone. If you have an issue with the way code is structured, with any libraries we are using, or with any processes involved with contributing, *please* bring it up. We welcome all feedback so we can make contributing to this project as painless as possible.
+
+If you wish to help with localisation efforts, head over to [crowdin](https://crowdin.com/project/osu-web).
 
 For those interested, we love to reward quality contributions via [bounties](https://docs.google.com/spreadsheets/d/1jNXfj_S3Pb5PErA-czDdC9DUu4IgUbe1Lt8E7CYUJuE/view?&rm=minimal#gid=523803337), paid out via PayPal or osu!supporter tags. Don't hesitate to [request a bounty](https://docs.google.com/forms/d/e/1FAIpQLSet_8iFAgPMG526pBZ2Kic6HSh7XPM3fE8xPcnWNkMzINDdYg/viewform) for your work on this project.
 
