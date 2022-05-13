@@ -241,6 +241,7 @@ namespace osu.Game.Overlays
             if (newChannel == null)
             {
                 // null channel denotes that we should be showing the listing.
+                currentChannelContainer.Clear(false);
                 channelListing.State.Value = Visibility.Visible;
                 textBar.ShowSearch.Value = true;
             }
@@ -298,7 +299,13 @@ namespace osu.Game.Overlays
                     foreach (var channel in leftChannels)
                     {
                         channelList.RemoveChannel(channel);
-                        loadedChannels.Remove(channel);
+                        if (loadedChannels.ContainsKey(channel))
+                        {
+                            ChatOverlayDrawableChannel loaded = loadedChannels[channel];
+                            loadedChannels.Remove(channel);
+                            // DrawableChannel removed from cache must be manually disposed
+                            loaded.Dispose();
+                        }
                     }
 
                     break;
