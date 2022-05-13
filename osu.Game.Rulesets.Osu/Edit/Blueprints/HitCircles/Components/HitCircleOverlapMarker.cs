@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
         /// </summary>
         public const double FADE_OUT_EXTENSION = 700;
 
-        private readonly Circle circle;
         private readonly RingPiece ring;
 
         [Resolved]
@@ -37,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 
             InternalChildren = new Drawable[]
             {
-                circle = new Circle
+                new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
