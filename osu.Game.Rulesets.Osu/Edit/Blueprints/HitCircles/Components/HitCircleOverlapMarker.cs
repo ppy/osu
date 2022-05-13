@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 
             Scale = new Vector2(hitObject.Scale);
 
-            if ((hitObject is IHasComboInformation combo))
+            if (hitObject is IHasComboInformation combo)
                 ring.BorderColour = combo.GetComboColour(skin);
 
             double editorTime = editorClock.CurrentTime;
