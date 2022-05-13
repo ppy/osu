@@ -77,10 +77,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
             if (hasReachedObject)
             {
                 float alpha = Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION, Easing.In);
-                float circleScale = Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION);
                 float ringScale = MathHelper.Clamp(Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION / 2, Easing.OutQuint), 0, 1);
 
-                circle.Scale = new Vector2(1 - 0.05f * circleScale);
                 ring.Scale = new Vector2(1 + 0.1f * ringScale);
                 Alpha = 0.9f * (1 - alpha);
             }
