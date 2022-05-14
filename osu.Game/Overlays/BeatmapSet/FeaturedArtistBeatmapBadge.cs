@@ -16,6 +16,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             BadgeText = BeatmapsetsStrings.FeaturedArtistBadgeLabel;
             BadgeColour = colours.Blue1;
+            // todo: add linking support to allow redirecting featured artist badge to corresponding track.
         }
     }
 }
