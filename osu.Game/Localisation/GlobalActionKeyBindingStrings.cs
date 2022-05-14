@@ -207,7 +207,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Toggle Mod Select"
         /// </summary>
-        public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle Mod Select");
+        public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle mod select");
+
+        /// <summary>
+        /// "Deselect all mods"
+        /// </summary>
+        public static LocalisableString DeselectAllMods => new TranslatableString(getKey(@"deselect_all_mods"), @"Deselect all mods");
 
         /// <summary>
         /// "Random"

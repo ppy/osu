@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
@@ -53,6 +54,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("select difficulty adjust", () => freeModSelectOverlay.SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
             AddWaitStep("wait some", 3);
             AddAssert("customisation area not expanded", () => this.ChildrenOfType<ModSettingsArea>().Single().Height == 0);
+        }
+
+        [Test]
+        public void TestSelectDeselectAllViaKeyboard()
+        {
+            createFreeModSelect();
+
+            AddStep("press ctrl+a", () => InputManager.Keys(PlatformAction.SelectAll));
+            AddUntilStep("all mods selected", assertAllAvailableModsSelected);
+
+            AddStep("press backspace", () => InputManager.Key(Key.BackSpace));
+            AddUntilStep("all mods deselected", () => !freeModSelectOverlay.SelectedMods.Value.Any());
         }
 
         [Test]

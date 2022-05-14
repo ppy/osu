@@ -56,11 +56,32 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected virtual bool ShowTotalMultiplier => true;
 
+        /// <summary>
+        /// Whether per-mod customisation controls are visible.
+        /// </summary>
+        protected virtual bool AllowCustomisation => true;
+
         protected virtual ModColumn CreateModColumn(ModType modType, Key[]? toggleKeys = null) => new ModColumn(modType, false, toggleKeys);
 
         protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
 
-        protected virtual IEnumerable<ShearedButton> CreateFooterButtons() => createDefaultFooterButtons();
+        protected virtual IEnumerable<ShearedButton> CreateFooterButtons()
+        {
+            if (AllowCustomisation)
+            {
+                yield return customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
+                {
+                    Text = ModSelectOverlayStrings.ModCustomisation,
+                    Active = { BindTarget = customisationVisible }
+                };
+            }
+
+            yield return deselectAllButton = new ShearedButton(BUTTON_WIDTH)
+            {
+                Text = CommonStrings.DeselectAll,
+                Action = DeselectAll
+            };
+        }
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
         private readonly Dictionary<ModType, IReadOnlyList<ModState>> localAvailableMods = new Dictionary<ModType, IReadOnlyList<ModState>>();
@@ -77,6 +98,7 @@ namespace osu.Game.Overlays.Mods
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
         private ShearedToggleButton? customisationButton;
+        private ShearedButton? deselectAllButton;
 
         protected ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
@@ -201,7 +223,7 @@ namespace osu.Game.Overlays.Mods
 
             // This is an optimisation to prevent refreshing the available settings controls when it can be
             // reasonably assumed that the settings panel is never to be displayed (e.g. FreeModSelectOverlay).
-            if (customisationButton != null)
+            if (AllowCustomisation)
                 ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
 
             SelectedMods.BindValueChanged(val =>
@@ -255,21 +277,6 @@ namespace osu.Game.Overlays.Mods
                 RequestScroll = col => columnScroll.ScrollIntoView(col, extraScroll: 140),
             };
         }
-
-        private ShearedButton[] createDefaultFooterButtons()
-            => new[]
-            {
-                customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
-                {
-                    Text = ModSelectOverlayStrings.ModCustomisation,
-                    Active = { BindTarget = customisationVisible }
-                },
-                new ShearedButton(BUTTON_WIDTH)
-                {
-                    Text = CommonStrings.DeselectAll,
-                    Action = DeselectAll
-                }
-            };
 
         private void createLocalMods()
         {
@@ -508,6 +515,10 @@ namespace osu.Game.Overlays.Mods
                     hideOverlay(true);
                     return true;
                 }
+
+                case GlobalAction.DeselectAllMods:
+                    deselectAllButton?.TriggerClick();
+                    return true;
             }
 
             return base.OnPressed(e);
