@@ -365,18 +365,18 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TextBoxRetainsFocus()
+        public void TestTextBoxRetainsFocus()
         {
             AddStep("Show overlay", () => chatOverlay.Show());
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
             AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click drawable channel", () => clickDrawable(currentDrawableChannel));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
             AddStep("Click selector", () => clickDrawable(chatOverlay.ChildrenOfType<ChannelListSelector>().Single()));
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
             AddStep("Click listing", () => clickDrawable(chatOverlay.ChildrenOfType<ChannelListing>().Single()));
-            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
-            AddStep("Click drawable channel", () => clickDrawable(currentDrawableChannel));
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
             AddStep("Click channel list", () => clickDrawable(chatOverlay.ChildrenOfType<ChannelList>().Single()));
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
