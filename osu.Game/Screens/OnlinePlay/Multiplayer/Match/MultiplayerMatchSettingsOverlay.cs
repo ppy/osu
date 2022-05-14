@@ -197,26 +197,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 },
                                                                 new Section("Queue mode")
                                                                 {
-                                                                    Child = new Container
+                                                                    Child = QueueModeDropdown = new OsuEnumDropdown<QueueMode>
                                                                     {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Height = 40,
-                                                                        Child = QueueModeDropdown = new OsuEnumDropdown<QueueMode>
-                                                                        {
-                                                                            RelativeSizeAxes = Axes.X
-                                                                        }
+                                                                        RelativeSizeAxes = Axes.X
                                                                     }
                                                                 },
                                                                 new Section("Auto start")
                                                                 {
-                                                                    Child = new Container
+                                                                    Child = startModeDropdown = new OsuEnumDropdown<StartMode>
                                                                     {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Height = 40,
-                                                                        Child = startModeDropdown = new OsuEnumDropdown<StartMode>
-                                                                        {
-                                                                            RelativeSizeAxes = Axes.X
-                                                                        }
+                                                                        RelativeSizeAxes = Axes.X
                                                                     }
                                                                 }
                                                             },
