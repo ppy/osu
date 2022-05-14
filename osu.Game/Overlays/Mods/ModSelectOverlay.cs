@@ -508,6 +508,10 @@ namespace osu.Game.Overlays.Mods
                     hideOverlay(true);
                     return true;
                 }
+
+                case GlobalAction.DeselectAllMods:
+                    DeselectAll();
+                    return true;
             }
 
             return base.OnPressed(e);
