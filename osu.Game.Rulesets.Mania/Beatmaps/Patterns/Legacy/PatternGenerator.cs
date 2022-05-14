@@ -5,8 +5,8 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
@@ -23,14 +23,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <summary>
         /// The random number generator to use.
         /// </summary>
-        protected readonly FastRandom Random;
+        protected readonly LegacyRandom Random;
 
         /// <summary>
         /// The beatmap which <see cref="HitObject"/> is being converted from.
         /// </summary>
         protected readonly IBeatmap OriginalBeatmap;
 
-        protected PatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
+        protected PatternGenerator(LegacyRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
             : base(hitObject, beatmap, previousPattern)
         {
             if (random == null) throw new ArgumentNullException(nameof(random));

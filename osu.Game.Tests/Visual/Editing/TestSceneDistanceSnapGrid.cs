@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
@@ -20,12 +21,16 @@ namespace osu.Game.Tests.Visual.Editing
     public class TestSceneDistanceSnapGrid : EditorClockTestScene
     {
         private const double beat_length = 100;
+        private const int beat_snap_distance = 10;
+
         private static readonly Vector2 grid_position = new Vector2(512, 384);
+
+        private TestDistanceSnapGrid grid;
 
         [Cached(typeof(EditorBeatmap))]
         private readonly EditorBeatmap editorBeatmap;
 
-        [Cached(typeof(IPositionSnapProvider))]
+        [Cached(typeof(IDistanceSnapProvider))]
         private readonly SnapProvider snapProvider = new SnapProvider();
 
         public TestSceneDistanceSnapGrid()
@@ -38,6 +43,7 @@ namespace osu.Game.Tests.Visual.Editing
                 }
             });
             editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
+            editorBeatmap.Difficulty.SliderMultiplier = 1;
         }
 
         [SetUp]
@@ -50,7 +56,7 @@ namespace osu.Game.Tests.Visual.Editing
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.SlateGray
                 },
-                new TestDistanceSnapGrid()
+                grid = new TestDistanceSnapGrid()
             };
         });
 
@@ -67,9 +73,22 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep($"set beat divisor = {divisor}", () => BeatDivisor.Value = divisor);
         }
 
-        [Test]
-        public void TestLimitedDistance()
+        [TestCase(1.0)]
+        [TestCase(2.0)]
+        [TestCase(0.5)]
+        public void TestDistanceSpacing(double multiplier)
         {
+            AddStep($"set distance spacing = {multiplier}", () => snapProvider.DistanceSpacingMultiplier.Value = multiplier);
+            AddAssert("distance spacing matches multiplier", () => grid.DistanceBetweenTicks == beat_snap_distance * multiplier);
+        }
+
+        [TestCase(1.0)]
+        [TestCase(2.0)]
+        [TestCase(0.5)]
+        public void TestLimitedDistance(double multiplier)
+        {
+            const int end_time = 100;
+
             AddStep("create limited grid", () =>
             {
                 Children = new Drawable[]
@@ -79,14 +98,19 @@ namespace osu.Game.Tests.Visual.Editing
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.SlateGray
                     },
-                    new TestDistanceSnapGrid(100)
+                    grid = new TestDistanceSnapGrid(end_time)
                 };
             });
+
+            AddStep($"set distance spacing = {multiplier}", () => snapProvider.DistanceSpacingMultiplier.Value = multiplier);
+            AddStep("check correct interval count", () => Assert.That((end_time / grid.DistanceBetweenTicks) * multiplier, Is.EqualTo(grid.MaxIntervals)));
         }
 
         private class TestDistanceSnapGrid : DistanceSnapGrid
         {
-            public new float DistanceSpacing => base.DistanceSpacing;
+            public new float DistanceBetweenTicks => base.DistanceBetweenTicks;
+
+            public new int MaxIntervals => base.MaxIntervals;
 
             public TestDistanceSnapGrid(double? endTime = null)
                 : base(new HitObject(), grid_position, 0, endTime)
@@ -104,7 +128,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 int indexFromPlacement = 0;
 
-                for (float s = StartPosition.X + DistanceSpacing; s <= DrawWidth && indexFromPlacement < MaxIntervals; s += DistanceSpacing, indexFromPlacement++)
+                for (float s = StartPosition.X + DistanceBetweenTicks; s <= DrawWidth && indexFromPlacement < MaxIntervals; s += DistanceBetweenTicks, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
@@ -117,7 +141,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 indexFromPlacement = 0;
 
-                for (float s = StartPosition.X - DistanceSpacing; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceSpacing, indexFromPlacement++)
+                for (float s = StartPosition.X - DistanceBetweenTicks; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceBetweenTicks, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
@@ -130,7 +154,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 indexFromPlacement = 0;
 
-                for (float s = StartPosition.Y + DistanceSpacing; s <= DrawHeight && indexFromPlacement < MaxIntervals; s += DistanceSpacing, indexFromPlacement++)
+                for (float s = StartPosition.Y + DistanceBetweenTicks; s <= DrawHeight && indexFromPlacement < MaxIntervals; s += DistanceBetweenTicks, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
@@ -143,7 +167,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 indexFromPlacement = 0;
 
-                for (float s = StartPosition.Y - DistanceSpacing; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceSpacing, indexFromPlacement++)
+                for (float s = StartPosition.Y - DistanceBetweenTicks; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceBetweenTicks, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
@@ -159,22 +183,26 @@ namespace osu.Game.Tests.Visual.Editing
                 => (Vector2.Zero, 0);
         }
 
-        private class SnapProvider : IPositionSnapProvider
+        private class SnapProvider : IDistanceSnapProvider
         {
-            public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+            public SnapResult FindSnappedPosition(Vector2 screenSpacePosition) =>
                 new SnapResult(screenSpacePosition, null);
 
-            public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
+            public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
 
-            public float GetBeatSnapDistanceAt(HitObject referenceObject) => 10;
+            public Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1);
+
+            IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
+
+            public float GetBeatSnapDistanceAt(HitObject referenceObject) => beat_snap_distance;
 
             public float DurationToDistance(HitObject referenceObject, double duration) => (float)duration;
 
             public double DistanceToDuration(HitObject referenceObject, float distance) => distance;
 
-            public double GetSnappedDurationFromDistance(HitObject referenceObject, float distance) => 0;
+            public double FindSnappedDuration(HitObject referenceObject, float distance) => 0;
 
-            public float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance) => 0;
+            public float FindSnappedDistance(HitObject referenceObject, float distance) => 0;
         }
     }
 }

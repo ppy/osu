@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Music
             Collection = collectionDropdown.Current.Value?.Collection
         };
 
-        public class FilterTextBox : SearchTextBox
+        public class FilterTextBox : BasicSearchTextBox
         {
             protected override bool AllowCommit => true;
 

@@ -244,7 +244,7 @@ namespace osu.Game.Screens.Select.Carousel
                 }
 
                 if (hideRequested != null)
-                    items.Add(new OsuMenuItem(CommonStrings.ButtonsHide, MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
+                    items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
 
                 return items.ToArray();
             }

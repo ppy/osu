@@ -45,11 +45,16 @@ namespace osu.Game.Stores
             // This method should be removed as soon as all the surrounding pieces support non-detached operations.
             if (!item.IsManaged)
             {
-                var managed = Realm.Realm.Find<TModel>(item.ID);
-                managed.Realm.Write(() => operation(managed));
+                // Importantly, begin the realm write *before* re-fetching, else the update realm may not be in a consistent state
+                // (ie. if an async import finished very recently).
+                Realm.Realm.Write(realm =>
+                {
+                    var managed = realm.Find<TModel>(item.ID);
+                    operation(managed);
 
-                item.Files.Clear();
-                item.Files.AddRange(managed.Files.Detach());
+                    item.Files.Clear();
+                    item.Files.AddRange(managed.Files.Detach());
+                });
             }
             else
                 operation(item);
@@ -165,7 +170,9 @@ namespace osu.Game.Stores
 
         public bool Delete(TModel item)
         {
-            return Realm.Run(realm =>
+            // Importantly, begin the realm write *before* re-fetching, else the update realm may not be in a consistent state
+            // (ie. if an async import finished very recently).
+            return Realm.Write(realm =>
             {
                 if (!item.IsManaged)
                     item = realm.Find<TModel>(item.ID);
@@ -173,14 +180,16 @@ namespace osu.Game.Stores
                 if (item?.DeletePending != false)
                     return false;
 
-                realm.Write(r => item.DeletePending = true);
+                item.DeletePending = true;
                 return true;
             });
         }
 
         public void Undelete(TModel item)
         {
-            Realm.Run(realm =>
+            // Importantly, begin the realm write *before* re-fetching, else the update realm may not be in a consistent state
+            // (ie. if an async import finished very recently).
+            Realm.Write(realm =>
             {
                 if (!item.IsManaged)
                     item = realm.Find<TModel>(item.ID);
@@ -188,7 +197,7 @@ namespace osu.Game.Stores
                 if (item?.DeletePending != true)
                     return;
 
-                realm.Write(r => item.DeletePending = false);
+                item.DeletePending = false;
             });
         }
 

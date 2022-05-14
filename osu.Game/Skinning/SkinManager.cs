@@ -143,12 +143,15 @@ namespace osu.Game.Skinning
         /// Ensure that the current skin is in a state it can accept user modifications.
         /// This will create a copy of any internal skin and being tracking in the database if not already.
         /// </summary>
-        public void EnsureMutableSkin()
+        /// <returns>
+        /// Whether a new skin was created to allow for mutation.
+        /// </returns>
+        public bool EnsureMutableSkin()
         {
-            CurrentSkinInfo.Value.PerformRead(s =>
+            return CurrentSkinInfo.Value.PerformRead(s =>
             {
                 if (!s.Protected)
-                    return;
+                    return false;
 
                 string[] existingSkinNames = realm.Run(r => r.All<SkinInfo>()
                                                              .Where(skin => !skin.DeletePending)
@@ -160,7 +163,7 @@ namespace osu.Game.Skinning
                 {
                     Creator = s.Creator,
                     InstantiationInfo = s.InstantiationInfo,
-                    Name = NamingUtils.GetNextBestName(existingSkinNames, $"{s.Name} (modified)")
+                    Name = NamingUtils.GetNextBestName(existingSkinNames, $@"{s.Name} (modified)")
                 };
 
                 var result = skinModelManager.Import(skinInfo);
@@ -171,7 +174,10 @@ namespace osu.Game.Skinning
                     // currently this only happens on save.
                     result.PerformRead(skin => Save(skin.CreateInstance(this)));
                     CurrentSkinInfo.Value = result;
+                    return true;
                 }
+
+                return false;
             });
         }
 

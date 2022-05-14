@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuHitObjectComposer : HitObjectComposer<OsuHitObject>
+    public class OsuHitObjectComposer : DistancedHitObjectComposer<OsuHitObject>
     {
         public OsuHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -59,11 +59,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             LayerBelowRuleset.AddRange(new Drawable[]
             {
-                new PlayfieldBorder
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Corners }
-                },
                 distanceSnapGridContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both
@@ -128,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
         }
 
-        public override SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPosition(Vector2 screenSpacePosition)
         {
             if (snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
                 return snapResult;
@@ -136,9 +131,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             return new SnapResult(screenSpacePosition, null);
         }
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
-            var positionSnap = SnapScreenSpacePositionToValidPosition(screenSpacePosition);
+            var positionSnap = FindSnappedPosition(screenSpacePosition);
             if (positionSnap.ScreenSpacePosition != screenSpacePosition)
                 return positionSnap;
 
@@ -154,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return new SnapResult(rectangularPositionSnapGrid.ToScreenSpace(pos), null, PlayfieldAtScreenSpacePosition(screenSpacePosition));
             }
 
-            return base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
+            return base.FindSnappedPositionAndTime(screenSpacePosition);
         }
 
         private bool snapToVisibleBlueprints(Vector2 screenSpacePosition, out SnapResult snapResult)

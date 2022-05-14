@@ -2,16 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Screens.Edit;
 
 namespace osu.Game.Tests.Visual
 {
     public abstract class SelectionBlueprintTestScene : OsuManualInputManagerTestScene
     {
+        [Cached]
+        private readonly EditorClock editorClock = new EditorClock();
+
         protected override Container<Drawable> Content => content ?? base.Content;
         private readonly Container content;
 

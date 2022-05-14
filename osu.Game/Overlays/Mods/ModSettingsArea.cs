@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -21,7 +22,7 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSettingsArea : CompositeDrawable
     {
-        public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>();
+        public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public const float HEIGHT = 250;
 
@@ -43,7 +44,6 @@ namespace osu.Game.Overlays.Mods
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
-                BorderThickness = 2,
                 Children = new Drawable[]
                 {
                     background = new Box
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Mods
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            SelectedMods.BindValueChanged(_ => updateMods());
+            SelectedMods.BindValueChanged(_ => updateMods(), true);
         }
 
         private void updateMods()
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Mods
                         new[] { Empty() },
                         new Drawable[]
                         {
-                            new NestedVerticalScrollContainer
+                            new OsuScrollContainer(Direction.Vertical)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 ClampExtension = 100,

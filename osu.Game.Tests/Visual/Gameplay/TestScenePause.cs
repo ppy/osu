@@ -85,7 +85,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
             pauseAndConfirm();
+            AddAssert("player not playing", () => !Player.LocalUserPlaying.Value);
+
             resumeAndConfirm();
+            AddUntilStep("player playing", () => Player.LocalUserPlaying.Value);
         }
 
         [Test]

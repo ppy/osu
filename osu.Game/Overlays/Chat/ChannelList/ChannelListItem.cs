@@ -25,13 +25,11 @@ namespace osu.Game.Overlays.Chat.ChannelList
         public event Action<Channel>? OnRequestSelect;
         public event Action<Channel>? OnRequestLeave;
 
+        public readonly Channel Channel;
+
         public readonly BindableInt Mentions = new BindableInt();
 
         public readonly BindableBool Unread = new BindableBool();
-
-        public readonly BindableBool SelectorActive = new BindableBool();
-
-        private readonly Channel channel;
 
         private Box hoverBox = null!;
         private Box selectBox = null!;
@@ -46,7 +44,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         public ChannelListItem(Channel channel)
         {
-            this.channel = channel;
+            Channel = channel;
         }
 
         [BackgroundDependencyLoader]
@@ -92,7 +90,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Text = channel.Name,
+                                    Text = Channel.Name,
                                     Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
                                     Colour = colourProvider.Light3,
                                     Margin = new MarginPadding { Bottom = 2 },
@@ -111,7 +109,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding { Right = 3 },
-                                    Action = () => OnRequestLeave?.Invoke(channel),
+                                    Action = () => OnRequestLeave?.Invoke(Channel),
                                 }
                             }
                         },
@@ -119,20 +117,15 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 },
             };
 
-            Action = () => OnRequestSelect?.Invoke(channel);
+            Action = () => OnRequestSelect?.Invoke(Channel);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            selectedChannel.BindValueChanged(_ => updateSelectState(), true);
-            SelectorActive.BindValueChanged(_ => updateSelectState(), true);
-
-            Unread.BindValueChanged(change =>
-            {
-                text.FadeColour(change.NewValue ? colourProvider.Content1 : colourProvider.Light3, 300, Easing.OutQuint);
-            }, true);
+            selectedChannel.BindValueChanged(_ => updateState(), true);
+            Unread.BindValueChanged(_ => updateState(), true);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -151,10 +144,10 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private Drawable createIcon()
         {
-            if (channel.Type != ChannelType.PM)
+            if (Channel.Type != ChannelType.PM)
                 return Drawable.Empty();
 
-            return new UpdateableAvatar(channel.Users.First(), isInteractive: false)
+            return new UpdateableAvatar(Channel.Users.First(), isInteractive: false)
             {
                 Size = new Vector2(20),
                 Margin = new MarginPadding { Right = 5 },
@@ -165,12 +158,19 @@ namespace osu.Game.Overlays.Chat.ChannelList
             };
         }
 
-        private void updateSelectState()
+        private void updateState()
         {
-            if (selectedChannel.Value == channel && !SelectorActive.Value)
+            bool selected = selectedChannel.Value == Channel;
+
+            if (selected)
                 selectBox.FadeIn(300, Easing.OutQuint);
             else
                 selectBox.FadeOut(200, Easing.OutQuint);
+
+            if (Unread.Value || selected)
+                text.FadeColour(colourProvider.Content1, 300, Easing.OutQuint);
+            else
+                text.FadeColour(colourProvider.Light3, 200, Easing.OutQuint);
         }
     }
 }

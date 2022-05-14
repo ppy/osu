@@ -10,6 +10,21 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.Common";
 
         /// <summary>
+        /// "Back"
+        /// </summary>
+        public static LocalisableString Back => new TranslatableString(getKey(@"back"), @"Back");
+
+        /// <summary>
+        /// "Next"
+        /// </summary>
+        public static LocalisableString Next => new TranslatableString(getKey(@"next"), @"Next");
+
+        /// <summary>
+        /// "Finish"
+        /// </summary>
+        public static LocalisableString Finish => new TranslatableString(getKey(@"finish"), @"Finish");
+
+        /// <summary>
         /// "Enabled"
         /// </summary>
         public static LocalisableString Enabled => new TranslatableString(getKey(@"enabled"), @"Enabled");
@@ -43,6 +58,16 @@ namespace osu.Game.Localisation
         /// "Importing..."
         /// </summary>
         public static LocalisableString Importing => new TranslatableString(getKey(@"importing"), @"Importing...");
+
+        /// <summary>
+        /// "Deselect All"
+        /// </summary>
+        public static LocalisableString DeselectAll => new TranslatableString(getKey(@"deselect_all"), @"Deselect All");
+
+        /// <summary>
+        /// "Select All"
+        /// </summary>
+        public static LocalisableString SelectAll => new TranslatableString(getKey(@"select_all"), @"Select All");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

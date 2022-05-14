@@ -12,15 +12,21 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
     public class ChannelListSelector : OsuClickableContainer
     {
-        public readonly BindableBool SelectorActive = new BindableBool();
-
         private Box hoverBox = null!;
         private Box selectBox = null!;
+        private OsuSpriteText text = null!;
+
+        [Resolved]
+        private Bindable<Channel> currentChannel { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -46,11 +52,11 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Left = 18, Right = 10 },
-                    Child = new OsuSpriteText
+                    Child = text = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Text = "Add More Channels",
+                        Text = "Add more channels",
                         Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
                         Colour = colourProvider.Light3,
                         Margin = new MarginPadding { Bottom = 2 },
@@ -65,15 +71,21 @@ namespace osu.Game.Overlays.Chat.ChannelList
         {
             base.LoadComplete();
 
-            SelectorActive.BindValueChanged(selector =>
+            currentChannel.BindValueChanged(channel =>
             {
-                if (selector.NewValue)
+                // This logic should be handled by the chat overlay rather than this component.
+                // Selected state should be moved to an abstract class and shared with ChannelListItem.
+                if (channel.NewValue == null)
+                {
+                    text.FadeColour(colourProvider.Content1, 300, Easing.OutQuint);
                     selectBox.FadeIn(300, Easing.OutQuint);
+                }
                 else
+                {
+                    text.FadeColour(colourProvider.Light3, 200, Easing.OutQuint);
                     selectBox.FadeOut(200, Easing.OutQuint);
+                }
             }, true);
-
-            Action = () => SelectorActive.Value = true;
         }
 
         protected override bool OnHover(HoverEvent e)
