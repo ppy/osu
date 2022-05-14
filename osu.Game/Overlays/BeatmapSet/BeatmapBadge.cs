@@ -32,26 +32,22 @@ namespace osu.Game.Overlays.BeatmapSet
             set => badgeLabel.Colour = value;
         }
 
-        private OsuSpriteText badgeLabel = null!;
+        private readonly Box background;
+        private readonly OsuSpriteText badgeLabel;
 
         protected BeatmapBadge()
         {
             AutoSizeAxes = Axes.Both;
-        }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, OverlayColourProvider? colourProvider)
-        {
             InternalChild = new CircularContainer
             {
                 Masking = true,
                 AutoSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new Box
+                    background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider?.Background5 ?? colours.Gray2,
                     },
                     badgeLabel = new OsuSpriteText
                     {
@@ -60,6 +56,12 @@ namespace osu.Game.Overlays.BeatmapSet
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, OverlayColourProvider? colourProvider)
+        {
+            background.Colour = colourProvider?.Background5 ?? colours.Gray2;
         }
     }
 }
