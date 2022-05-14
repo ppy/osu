@@ -4,11 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
@@ -23,11 +25,21 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => @"Alternate";
         public override string Acronym => @"AL";
-        public override string Description => @"Don't use the same key twice in a row!";
+        public override string Description => @"Don't use the same key multiple times in a row!";
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax) };
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
+
+        [SettingSource("Alternate after", "The maximum times the same key can be pressed")]
+        public BindableNumber<int> MaxTimes { get; } = new BindableInt
+        {
+            MinValue = 1,
+            MaxValue = 10,
+            Default = 1,
+            Value = 1,
+            Precision = 1
+        };
 
         private const double flash_duration = 1000;
 
@@ -40,6 +52,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private PeriodTracker nonGameplayPeriods;
 
         private OsuAction? lastActionPressed;
+        private int numActions;
         private DrawableRuleset<OsuHitObject> ruleset;
 
         private IFrameStableClock gameplayClock;
@@ -89,7 +102,20 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 // User alternated correctly.
                 lastActionPressed = action;
+                numActions = 0;
                 return true;
+            }
+
+            if (lastActionPressed == action)
+            {
+                // If same action, increment counter.
+                numActions++;
+
+                if (numActions < MaxTimes.Value)
+                {
+                    // Number of repeated actions is less than the maximum, so ignore.
+                    return true;
+                }
             }
 
             ruleset.Cursor.FlashColour(Colour4.Red, flash_duration, Easing.OutQuint);
