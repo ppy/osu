@@ -425,7 +425,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("select DT + HD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden() });
             AddAssert("DT + HD selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
 
-            AddStep("press bakcspace", () =>
+            AddStep("press backspace", () =>
             {
                 InputManager.Key(Key.BackSpace);
             });
