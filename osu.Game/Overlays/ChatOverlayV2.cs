@@ -242,12 +242,12 @@ namespace osu.Game.Overlays
             {
                 // null channel denotes that we should be showing the listing.
                 currentChannelContainer.Clear(false);
-                channelListing.State.Value = Visibility.Visible;
+                channelListing.Show();
                 textBar.ShowSearch.Value = true;
             }
             else
             {
-                channelListing.State.Value = Visibility.Hidden;
+                channelListing.Hide();
                 textBar.ShowSearch.Value = false;
 
                 if (loadedChannels.ContainsKey(newChannel))
@@ -299,6 +299,7 @@ namespace osu.Game.Overlays
                     foreach (var channel in leftChannels)
                     {
                         channelList.RemoveChannel(channel);
+
                         if (loadedChannels.ContainsKey(channel))
                         {
                             ChatOverlayDrawableChannel loaded = loadedChannels[channel];
