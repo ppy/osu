@@ -14,7 +14,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public abstract class BeatmapBadgePill : CompositeDrawable
+    public abstract class BeatmapBadge : CompositeDrawable
     {
         [Resolved]
         protected OsuColour Colours { get; private set; } = null!;
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         // todo: add linking support, to allow redirecting featured artist badge to corresponding track and spotlight badge to wiki page.
 
-        protected BeatmapBadgePill()
+        protected BeatmapBadge()
         {
             AutoSizeAxes = Axes.Both;
         }

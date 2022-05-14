@@ -9,9 +9,9 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class SpotlightBeatmapPill : BeatmapBadgePill
+    public class ExplicitContentBeatmapBadge : BeatmapBadge
     {
-        public override LocalisableString BadgeText => BeatmapsetsStrings.SpotlightBadgeLabel;
-        public override Colour4 BadgeColour => Colours.Pink1;
+        public override LocalisableString BadgeText => BeatmapsetsStrings.NsfwBadgeLabel;
+        public override Colour4 BadgeColour => Colours.Orange2;
     }
 }

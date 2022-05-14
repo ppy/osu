@@ -252,7 +252,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             if (BeatmapSet.FeaturedInSpotlight)
             {
-                titleBadgeArea.Add(new SpotlightBeatmapPill
+                titleBadgeArea.Add(new SpotlightBeatmapBadge
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -262,7 +262,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             if (BeatmapSet.HasExplicitContent)
             {
-                titleBadgeArea.Add(new ExplicitContentBeatmapPill
+                titleBadgeArea.Add(new ExplicitContentBeatmapBadge
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -272,7 +272,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             if (BeatmapSet.TrackId != null)
             {
-                artistContainer.Content[0][1] = new FeaturedArtistBeatmapPill
+                artistContainer.Content[0][1] = new FeaturedArtistBeatmapBadge
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,

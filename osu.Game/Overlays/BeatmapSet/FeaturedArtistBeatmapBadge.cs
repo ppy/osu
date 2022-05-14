@@ -9,7 +9,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class FeaturedArtistBeatmapPill : BeatmapBadgePill
+    public class FeaturedArtistBeatmapBadge : BeatmapBadge
     {
         public override LocalisableString BadgeText => BeatmapsetsStrings.FeaturedArtistBadgeLabel;
         public override Colour4 BadgeColour => Colours.Blue1;
