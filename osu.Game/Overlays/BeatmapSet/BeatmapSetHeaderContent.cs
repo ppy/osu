@@ -39,8 +39,11 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box coverGradient;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
+
         private readonly ExplicitContentBeatmapPill explicitContentPill;
+        private readonly SpotlightBeatmapPill spotlightPill;
         private readonly FeaturedArtistBeatmapPill featuredArtistPill;
+
         private readonly FillFlowContainer downloadButtonsContainer;
         private readonly BeatmapAvailability beatmapAvailability;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
@@ -127,6 +130,13 @@ namespace osu.Game.Overlays.BeatmapSet
                                                 Margin = new MarginPadding { Left = 5, Bottom = 4 }, // To better lineup with the font
                                             },
                                             explicitContentPill = new ExplicitContentBeatmapPill
+                                            {
+                                                Alpha = 0f,
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Margin = new MarginPadding { Left = 10, Bottom = 4 },
+                                            },
+                                            spotlightPill = new SpotlightBeatmapPill
                                             {
                                                 Alpha = 0f,
                                                 Anchor = Anchor.BottomLeft,
@@ -258,6 +268,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     artist.Text = new RomanisableString(setInfo.NewValue.ArtistUnicode, setInfo.NewValue.Artist);
 
                     explicitContentPill.Alpha = setInfo.NewValue.HasExplicitContent ? 1 : 0;
+                    spotlightPill.Alpha = setInfo.NewValue.FeaturedInSpotlight ? 1 : 0;
                     featuredArtistPill.Alpha = setInfo.NewValue.TrackId != null ? 1 : 0;
 
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
