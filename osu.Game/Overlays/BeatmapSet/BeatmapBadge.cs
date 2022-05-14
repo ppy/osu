@@ -34,8 +34,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private OsuSpriteText badgeLabel = null!;
 
-        // todo: add linking support, to allow redirecting featured artist badge to corresponding track and spotlight badge to wiki page.
-
         protected BeatmapBadge()
         {
             AutoSizeAxes = Axes.Both;
