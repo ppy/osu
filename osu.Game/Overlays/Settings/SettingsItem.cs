@@ -98,13 +98,17 @@ namespace osu.Game.Overlays.Settings
             set => controlWithCurrent.Current = value;
         }
 
+        [Resolved]
+        private LocalisationManager localisation { get; set; }
+
         public virtual IEnumerable<string> FilterTerms
         {
             get
             {
                 var keywords = new List<string>(Keywords ?? Array.Empty<string>())
                 {
-                    LabelText.ToString()
+                    localisation.GetLocalisedBindableString(LabelText).Value,
+                    localisation.GetLocalisedBindableString(TooltipText).Value
                 };
 
                 if (HasClassicDefault)

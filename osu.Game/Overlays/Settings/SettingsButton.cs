@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
@@ -20,13 +21,15 @@ namespace osu.Game.Overlays.Settings
 
         public LocalisableString TooltipText { get; set; }
 
+        [Resolved]
+        private LocalisationManager localisation { get; set; }
+
         public override IEnumerable<string> FilterTerms
         {
             get
             {
                 if (TooltipText != default)
-                    // TODO: this won't work as intended once the tooltip text is translated.
-                    return base.FilterTerms.Append(TooltipText.ToString());
+                    return base.FilterTerms.Append(localisation.GetLocalisedBindableString(TooltipText).Value);
 
                 return base.FilterTerms;
             }
