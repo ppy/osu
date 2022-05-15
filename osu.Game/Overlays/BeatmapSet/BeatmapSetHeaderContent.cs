@@ -39,8 +39,11 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box coverGradient;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
-        private readonly ExplicitContentBeatmapPill explicitContentPill;
-        private readonly FeaturedArtistBeatmapPill featuredArtistPill;
+
+        private readonly ExplicitContentBeatmapBadge explicitContent;
+        private readonly SpotlightBeatmapBadge spotlight;
+        private readonly FeaturedArtistBeatmapBadge featuredArtist;
+
         private readonly FillFlowContainer downloadButtonsContainer;
         private readonly BeatmapAvailability beatmapAvailability;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
@@ -126,7 +129,14 @@ namespace osu.Game.Overlays.BeatmapSet
                                                 Origin = Anchor.BottomLeft,
                                                 Margin = new MarginPadding { Left = 5, Bottom = 4 }, // To better lineup with the font
                                             },
-                                            explicitContentPill = new ExplicitContentBeatmapPill
+                                            explicitContent = new ExplicitContentBeatmapBadge
+                                            {
+                                                Alpha = 0f,
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Margin = new MarginPadding { Left = 10, Bottom = 4 },
+                                            },
+                                            spotlight = new SpotlightBeatmapBadge
                                             {
                                                 Alpha = 0f,
                                                 Anchor = Anchor.BottomLeft,
@@ -146,7 +156,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             {
                                                 Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true),
                                             },
-                                            featuredArtistPill = new FeaturedArtistBeatmapPill
+                                            featuredArtist = new FeaturedArtistBeatmapBadge
                                             {
                                                 Alpha = 0f,
                                                 Anchor = Anchor.BottomLeft,
@@ -257,8 +267,9 @@ namespace osu.Game.Overlays.BeatmapSet
                     title.Text = new RomanisableString(setInfo.NewValue.TitleUnicode, setInfo.NewValue.Title);
                     artist.Text = new RomanisableString(setInfo.NewValue.ArtistUnicode, setInfo.NewValue.Artist);
 
-                    explicitContentPill.Alpha = setInfo.NewValue.HasExplicitContent ? 1 : 0;
-                    featuredArtistPill.Alpha = setInfo.NewValue.TrackId != null ? 1 : 0;
+                    explicitContent.Alpha = setInfo.NewValue.HasExplicitContent ? 1 : 0;
+                    spotlight.Alpha = setInfo.NewValue.FeaturedInSpotlight ? 1 : 0;
+                    featuredArtist.Alpha = setInfo.NewValue.TrackId != null ? 1 : 0;
 
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
                     onlineStatusPill.Status = setInfo.NewValue.Status;

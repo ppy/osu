@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             Height = height;
 
             FillFlowContainer leftIconArea = null!;
-            GridContainer titleContainer = null!;
+            FillFlowContainer titleBadgeArea = null!;
             GridContainer artistContainer = null!;
 
             Child = content.With(c =>
@@ -93,7 +93,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        titleContainer = new GridContainer
+                                        new GridContainer
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
@@ -108,7 +108,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             },
                                             Content = new[]
                                             {
-                                                new[]
+                                                new Drawable[]
                                                 {
                                                     new OsuSpriteText
                                                     {
@@ -117,7 +117,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                         RelativeSizeAxes = Axes.X,
                                                         Truncate = true
                                                     },
-                                                    Empty()
+                                                    titleBadgeArea = new FillFlowContainer
+                                                    {
+                                                        Anchor = Anchor.BottomRight,
+                                                        Origin = Anchor.BottomRight,
+                                                        AutoSizeAxes = Axes.Both,
+                                                        Direction = FillDirection.Horizontal,
+                                                    }
                                                 }
                                             }
                                         },
@@ -244,19 +250,29 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             if (BeatmapSet.HasStoryboard)
                 leftIconArea.Add(new IconPill(FontAwesome.Solid.Image) { IconSize = new Vector2(20) });
 
-            if (BeatmapSet.HasExplicitContent)
+            if (BeatmapSet.FeaturedInSpotlight)
             {
-                titleContainer.Content[0][1] = new ExplicitContentBeatmapPill
+                titleBadgeArea.Add(new SpotlightBeatmapBadge
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Margin = new MarginPadding { Left = 5 }
-                };
+                });
+            }
+
+            if (BeatmapSet.HasExplicitContent)
+            {
+                titleBadgeArea.Add(new ExplicitContentBeatmapBadge
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Margin = new MarginPadding { Left = 5 }
+                });
             }
 
             if (BeatmapSet.TrackId != null)
             {
-                artistContainer.Content[0][1] = new FeaturedArtistBeatmapPill
+                artistContainer.Content[0][1] = new FeaturedArtistBeatmapBadge
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
