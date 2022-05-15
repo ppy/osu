@@ -76,6 +76,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double staminaPenalty = simpleColourPenalty(staminaRating, colourRating);
             staminaRating *= staminaPenalty;
 
+            if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0 && colourRating < 0.05)
+            {
+                staminaPenalty *= 0.25;
+            }
+
             double combinedRating = locallyCombinedDifficulty(colour, rhythm, stamina, staminaPenalty);
             double separatedRating = norm(1.5, colourRating, rhythmRating, staminaRating);
             double starRating = 1.4 * separatedRating + 0.5 * combinedRating;
