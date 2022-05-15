@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         private Box hoverBox = null!;
         private Box selectBox = null!;
         private OsuSpriteText text = null!;
-        private ChannelListItemCloseButton close = null!;
+        private Drawable close = null!;
 
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
@@ -97,20 +97,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     RelativeSizeAxes = Axes.X,
                                     Truncate = true,
                                 },
-                                new ChannelListItemMentionPill
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Margin = new MarginPadding { Right = 3 },
-                                    Mentions = { BindTarget = Mentions },
-                                },
-                                close = new ChannelListItemCloseButton
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Margin = new MarginPadding { Right = 3 },
-                                    Action = () => OnRequestLeave?.Invoke(Channel),
-                                }
+                                createMentionPill(),
+                                close = createCloseButton(),
                             }
                         },
                     },
@@ -131,14 +119,20 @@ namespace osu.Game.Overlays.Chat.ChannelList
         protected override bool OnHover(HoverEvent e)
         {
             hoverBox.FadeIn(300, Easing.OutQuint);
-            close.FadeIn(300, Easing.OutQuint);
+
+            if (!isSelector)
+                close.FadeIn(300, Easing.OutQuint);
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             hoverBox.FadeOut(200, Easing.OutQuint);
-            close.FadeOut(200, Easing.OutQuint);
+
+            if (!isSelector)
+                close.FadeOut(200, Easing.OutQuint);
+
             base.OnHoverLost(e);
         }
 
@@ -158,9 +152,37 @@ namespace osu.Game.Overlays.Chat.ChannelList
             };
         }
 
+        private Drawable createMentionPill()
+        {
+            if (isSelector)
+                return Drawable.Empty();
+
+            return new ChannelListItemMentionPill
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Margin = new MarginPadding { Right = 3 },
+                Mentions = { BindTarget = Mentions },
+            };
+        }
+
+        private Drawable createCloseButton()
+        {
+            if (isSelector)
+                return Drawable.Empty();
+
+            return new ChannelListItemCloseButton
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Margin = new MarginPadding { Right = 3 },
+                Action = () => OnRequestLeave?.Invoke(Channel),
+            };
+        }
+
         private void updateState()
         {
-            bool selected = selectedChannel.Value == Channel;
+            bool selected = selectedChannel.Value == Channel || (isSelector && selectedChannel.Value == null);
 
             if (selected)
                 selectBox.FadeIn(300, Easing.OutQuint);
@@ -172,5 +194,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             else
                 text.FadeColour(colourProvider.Light3, 200, Easing.OutQuint);
         }
+
+        private bool isSelector => Channel is DummySelectorChannel;
     }
 }
