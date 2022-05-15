@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -414,6 +414,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             waitForColumnLoad();
 
             AddAssert("unimplemented mod panel is filtered", () => getPanelForMod(typeof(TestUnimplementedMod)).Filtered.Value);
+        }
+
+        [Test]
+        public void TestDeselectAllViaKey()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select DT + HD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden() });
+            AddAssert("DT + HD selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
+
+            AddStep("press backspace", () => InputManager.Key(Key.BackSpace));
+            AddUntilStep("all mods deselected", () => !SelectedMods.Value.Any());
         }
 
         [Test]
