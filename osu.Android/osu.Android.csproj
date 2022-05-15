@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\osu.Android.props"/>
+  <Import Project="..\osu.Android.props" />
   <PropertyGroup>
     <TargetFramework>net6.0-android</TargetFramework>
     <OutputType>Exe</OutputType>
