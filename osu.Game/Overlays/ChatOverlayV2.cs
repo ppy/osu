@@ -154,7 +154,7 @@ namespace osu.Game.Overlays
             channelList.OnRequestSelect += channel => channelManager.CurrentChannel.Value = channel;
             channelList.OnRequestLeave += channel => channelManager.LeaveChannel(channel);
 
-            channelListing.OnRequestJoin += channel => channelManager.JoinChannel(channel, false);
+            channelListing.OnRequestJoin += channel => channelManager.JoinChannel(channel);
             channelListing.OnRequestLeave += channel => channelManager.LeaveChannel(channel);
 
             textBar.OnSearchTermsChanged += searchTerms => channelListing.SearchTerm = searchTerms;
@@ -237,7 +237,7 @@ namespace osu.Game.Overlays
         {
             Channel? newChannel = channel.NewValue;
 
-            if (newChannel == null)
+            if (newChannel == null || newChannel is DummySelectorChannel)
             {
                 // null channel denotes that we should be showing the listing.
                 channelListing.State.Value = Visibility.Visible;
@@ -291,6 +291,15 @@ namespace osu.Game.Overlays
                 channelManager.PostCommand(message.Substring(1));
             else
                 channelManager.PostMessage(message);
+        }
+    }
+
+    public class DummySelectorChannel : Channel
+    {
+        public DummySelectorChannel()
+        {
+            Name = "Add more channels";
+            Type = ChannelType.System;
         }
     }
 }

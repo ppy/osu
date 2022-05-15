@@ -372,7 +372,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
-            AddStep("Click selector", () => clickDrawable(chatOverlay.ChildrenOfType<ChannelListSelector>().Single()));
+            AddStep("Click selector", () => clickDrawable(channelSelectorButton));
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
             AddStep("Click listing", () => clickDrawable(chatOverlay.ChildrenOfType<ChannelListing>().Single()));
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
@@ -406,6 +406,9 @@ namespace osu.Game.Tests.Visual.Online
 
         private ChatOverlayTopBar chatOverlayTopBar =>
             chatOverlay.ChildrenOfType<ChatOverlayTopBar>().Single();
+
+        private ChannelListItem channelSelectorButton =>
+            chatOverlay.ChildrenOfType<ChannelListItem>().Single(item => item.Channel is DummySelectorChannel);
 
         private void clickDrawable(Drawable d)
         {
