@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -10,29 +9,28 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
-    class SingleKeyStamina
+    /// <summary>
+    /// Stamina of a single key, calculated based on repetition speed.
+    /// </summary>
+    public class SingleKeyStamina
     {
         private double previousHitTime = -1;
 
-        private double strainValueOf(DifficultyHitObject current)
+        /// <summary>
+        /// Similar to <see cref="StrainDecaySkill.StrainValueOf(DifficultyHitObject)"/>
+        /// </summary>
+        public double StrainValueOf(DifficultyHitObject current)
         {
             if (previousHitTime == -1)
             {
                 previousHitTime = current.StartTime;
                 return 0;
             }
-            else
-            {
-                double objectStrain = 0.5;
-                objectStrain += speedBonus(current.StartTime - previousHitTime);
-                previousHitTime = current.StartTime;
-                return objectStrain;
-            }
-        }
 
-        public double StrainValueAt(DifficultyHitObject current)
-        {
-            return strainValueOf(current);
+            double objectStrain = 0.5;
+            objectStrain += speedBonus(current.StartTime - previousHitTime);
+            previousHitTime = current.StartTime;
+            return objectStrain;
         }
 
         /// <summary>
@@ -41,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// <param name="notePairDuration">The duration between the current and previous note hit using the same key.</param>
         private double speedBonus(double notePairDuration)
         {
-            return 175 / Math.Pow(notePairDuration + 100, 1);
+            return 175 / (notePairDuration + 100);
         }
     }
 
@@ -56,7 +54,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.4;
 
-        private SingleKeyStamina[] keyStamina = new SingleKeyStamina[4]
+        /// <summary>
+        /// Stamina of each individual keys, calculated based on repetition speed.
+        /// </summary>
+        private readonly SingleKeyStamina[] keyStamina =
         {
             new SingleKeyStamina(),
             new SingleKeyStamina(),
@@ -64,7 +65,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             new SingleKeyStamina()
         };
 
+        /// <summary>
+        /// Current index to <see cref="keyStamina" /> for a don hit.
+        /// </summary>
         private int donIndex = 1;
+
+        /// <summary>
+        /// Current index to <see cref="keyStamina" /> for a kat hit.
+        /// </summary>
         private int katIndex = 3;
 
         /// <summary>
@@ -76,23 +84,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
         }
 
+        /// <summary>
+        /// Get the next <see cref="SingleKeyStamina"/> to use for the given <see cref="TaikoDifficultyHitObject"/>.
+        /// </summary>
+        /// <param name="current">The current <see cref="TaikoDifficultyHitObject"/>.</param>
         private SingleKeyStamina getNextSingleKeyStamina(TaikoDifficultyHitObject current)
         {
+            // Alternate key for the same color.
             if (current.HitType == HitType.Centre)
             {
                 donIndex = donIndex == 0 ? 1 : 0;
                 return keyStamina[donIndex];
             }
-            else
-            {
-                katIndex = katIndex == 2 ? 3 : 2;
-                return keyStamina[katIndex];
-            }
-        }
 
-        private double sigmoid(double val, double center, double width)
-        {
-            return Math.Tanh(Math.E * -(val - center) / width);
+            katIndex = katIndex == 2 ? 3 : 2;
+            return keyStamina[katIndex];
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -103,9 +109,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             }
 
             TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
-            double objectStrain = getNextSingleKeyStamina(hitObject).StrainValueAt(hitObject);
-
-            return objectStrain;
+            return getNextSingleKeyStamina(hitObject).StrainValueOf(hitObject);
         }
     }
 }
