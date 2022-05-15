@@ -7,7 +7,7 @@
     <AssemblyName>osu.Game.Rulesets.Mania.Tests.Android</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\osu.Game.Rulesets.Mania.Tests\*.cs">
+    <Compile Include="..\osu.Game.Rulesets.Mania.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <!-- TargetPath is relative to RootNamespace,

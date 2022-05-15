@@ -7,7 +7,7 @@
     <AssemblyName>osu.Game.Rulesets.Taiko.Tests.Android</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\osu.Game.Rulesets.Taiko.Tests\*.cs">
+    <Compile Include="..\osu.Game.Rulesets.Taiko.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <!-- TargetPath is relative to RootNamespace,

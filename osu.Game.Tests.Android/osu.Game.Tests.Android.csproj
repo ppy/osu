@@ -10,32 +10,7 @@
     <NoWarn>$(NoWarn);CA2007</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\osu.Game.Tests\**\Beatmaps\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Remove="..\osu.Game.Tests\Beatmaps\Formats\OsuJsonDecoderTest.cs" />
-    <Compile Include="..\osu.Game.Tests\**\Chat\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Database\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\NonVisual\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Scores\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\ScrollAlgorithms\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Visual\**\*.cs" Exclude="..\osu.Game.Tests\Visual\Beatmaps\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Resources\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\*.cs">
+    <Compile Include="..\osu.Game.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <!-- TargetPath is relative to RootNamespace,
