@@ -145,6 +145,7 @@ namespace osu.Game.Utils
 
                     scope.Contexts[@"ruleset"] = new
                     {
+                        ruleset.ShortName,
                         ruleset.Name,
                         ruleset.InstantiationInfo,
                         ruleset.OnlineID
@@ -155,6 +156,8 @@ namespace osu.Game.Utils
                         Audio = game.Dependencies.Get<MusicController>().CurrentTrack.CurrentTime,
                         Game = game.Clock.CurrentTime,
                     };
+
+                    scope.SetTag(@"ruleset", ruleset.ShortName);
                 });
             }
             else
