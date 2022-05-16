@@ -28,6 +28,8 @@ namespace osu.Game.Overlays.FirstRunSetup
     [LocalisableDescription(typeof(FirstRunSetupOverlayStrings), nameof(FirstRunSetupOverlayStrings.ImportTitle))]
     public class ScreenImportFromStable : FirstRunSetupScreen
     {
+        private static readonly Vector2 button_size = new Vector2(400, 50);
+
         private ProgressRoundedButton importButton = null!;
         private RoundedButton locateStableButton = null!;
 
@@ -46,8 +48,6 @@ namespace osu.Game.Overlays.FirstRunSetup
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load()
         {
-            Vector2 buttonSize = new Vector2(400, 50);
-
             Content.Children = new Drawable[]
             {
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
@@ -63,14 +63,14 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Colour = OverlayColourProvider.Content2,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    TextAnchor = Anchor.Centre,
                 },
                 locateStableButton = new RoundedButton
                 {
-                    Size = buttonSize,
+                    Size = button_size,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    BackgroundColour = colours.Blue3,
-                    Text = "Locate osu!(stable) install",
+                    Text = "Change location",
                     Action = locateStable,
                 },
                 new ImportCheckbox("Beatmaps", StableContent.Beatmaps),
@@ -79,10 +79,9 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new ImportCheckbox("Collections", StableContent.Collections),
                 importButton = new ProgressRoundedButton
                 {
-                    Size = buttonSize,
+                    Size = button_size,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    BackgroundColour = colours.Blue3,
                     Text = FirstRunSetupOverlayStrings.ImportContentFromStable,
                     Action = runImport
                 },
@@ -112,7 +111,10 @@ namespace osu.Game.Overlays.FirstRunSetup
             {
                 foreach (var c in contentCheckboxes)
                     c.Current.Disabled = true;
+                currentStablePath.FadeColour(colours.Red1, 500, Easing.OutQuint);
                 currentStablePath.Text = "No installation found";
+
+                importButton.Enabled.Value = false;
                 return;
             }
 
@@ -122,8 +124,10 @@ namespace osu.Game.Overlays.FirstRunSetup
                 c.UpdateCount();
             }
 
-            currentStablePath.Text = storage.GetFullPath(string.Empty);
+            currentStablePath.FadeColour(OverlayColourProvider.Content2);
+            currentStablePath.Text = $"Found installation: {storage.GetFullPath(string.Empty)}";
             stablePathUpdateCancellation = new CancellationTokenSource();
+            importButton.Enabled.Value = true;
         }
 
         private void runImport()
@@ -138,13 +142,12 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             legacyImportManager.ImportFromStableAsync(importableContent, false).ContinueWith(t => Schedule(() =>
             {
-                locateStableButton.Enabled.Value = true;
-
                 if (t.IsCompletedSuccessfully)
                     importButton.Complete();
                 else
                 {
                     importButton.Enabled.Value = true;
+                    locateStableButton.Enabled.Value = true;
                     importButton.Abort();
                 }
             }));
@@ -253,9 +256,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                                             {
                                                 Anchor = Anchor.CentreLeft,
                                                 Origin = Anchor.CentreLeft,
-                                                Width = 300,
+                                                RelativeSizeAxes = Axes.X,
+                                                Width = 0.45f,
+                                                Height = button_size.Y,
                                                 Margin = new MarginPadding(10),
-                                                Colour = colours.Pink2,
+                                                BackgroundColour = colours.Pink2,
                                                 Text = CommonStrings.ButtonsCancel,
                                                 Action = this.Exit
                                             },
@@ -263,7 +268,9 @@ namespace osu.Game.Overlays.FirstRunSetup
                                             {
                                                 Anchor = Anchor.CentreRight,
                                                 Origin = Anchor.CentreRight,
-                                                Width = 300,
+                                                RelativeSizeAxes = Axes.X,
+                                                Width = 0.45f,
+                                                Height = button_size.Y,
                                                 Margin = new MarginPadding(10),
                                                 Text = MaintenanceSettingsStrings.SelectDirectory,
                                                 Action = () =>
