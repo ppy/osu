@@ -49,6 +49,29 @@ namespace osu.Game.Database
 
         public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
+        public async Task<int> GetImportCount(StableContent content)
+        {
+            var stableStorage = await getStableStorage().ConfigureAwait(false);
+
+            switch (content)
+            {
+                case StableContent.Beatmaps:
+                    return await new LegacyBeatmapImporter(beatmaps).GetAvailableCount(stableStorage);
+
+                case StableContent.Skins:
+                    return await new LegacySkinImporter(skins).GetAvailableCount(stableStorage);
+
+                case StableContent.Collections:
+                    return await collections.GetAvailableCount(stableStorage);
+
+                case StableContent.Scores:
+                    return await new LegacyScoreImporter(scores).GetAvailableCount(stableStorage);
+
+                default:
+                    throw new ArgumentException($"Only one {nameof(StableContent)} flag should be specified.");
+            }
+        }
+
         public async Task ImportFromStableAsync(StableContent content)
         {
             var stableStorage = await getStableStorage().ConfigureAwait(false);
