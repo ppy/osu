@@ -18,6 +18,7 @@ using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using Sentry;
 using Sentry.Protocol;
@@ -109,6 +110,7 @@ namespace osu.Game.Utils
                 }, scope =>
                 {
                     var beatmap = game.Dependencies.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo;
+                    var ruleset = game.Dependencies.Get<IBindable<RulesetInfo>>().Value;
 
                     scope.Contexts[@"config"] = new
                     {
@@ -137,7 +139,15 @@ namespace osu.Game.Utils
                     scope.Contexts[@"beatmap"] = new
                     {
                         Name = beatmap.ToString(),
+                        Ruleset = beatmap.Ruleset.InstantiationInfo,
                         beatmap.OnlineID,
+                    };
+
+                    scope.Contexts[@"ruleset"] = new
+                    {
+                        ruleset.Name,
+                        ruleset.InstantiationInfo,
+                        ruleset.OnlineID
                     };
 
                     scope.Contexts[@"clocks"] = new
