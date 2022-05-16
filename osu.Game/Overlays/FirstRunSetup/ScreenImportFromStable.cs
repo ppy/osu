@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -24,11 +25,6 @@ namespace osu.Game.Overlays.FirstRunSetup
     {
         private ProgressRoundedButton importButton = null!;
 
-        private SettingsCheckbox checkboxSkins = null!;
-        private SettingsCheckbox checkboxBeatmaps = null!;
-        private SettingsCheckbox checkboxScores = null!;
-        private SettingsCheckbox checkboxCollections = null!;
-
         private OsuTextFlowContainer currentStablePath = null!;
 
         [Resolved]
@@ -38,6 +34,8 @@ namespace osu.Game.Overlays.FirstRunSetup
         private LegacyImportManager legacyImportManager { get; set; } = null!;
 
         private CancellationTokenSource? stablePathUpdateCancellation;
+
+        private IEnumerable<ImportCheckbox> contentCheckboxes => Content.Children.OfType<ImportCheckbox>();
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load()
@@ -69,26 +67,10 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Text = "Locate osu!(stable) install",
                     Action = locateStable,
                 },
-                checkboxBeatmaps = new SettingsCheckbox
-                {
-                    LabelText = "Beatmaps",
-                    Current = { Value = true }
-                },
-                checkboxScores = new SettingsCheckbox
-                {
-                    LabelText = "Scores",
-                    Current = { Value = true }
-                },
-                checkboxSkins = new SettingsCheckbox
-                {
-                    LabelText = "Skins",
-                    Current = { Value = true }
-                },
-                checkboxCollections = new SettingsCheckbox
-                {
-                    LabelText = "Collections",
-                    Current = { Value = true }
-                },
+                new ImportCheckbox("Beatmaps", StableContent.Beatmaps),
+                new ImportCheckbox("Scores", StableContent.Scores),
+                new ImportCheckbox("Skins", StableContent.Skins),
+                new ImportCheckbox("Collections", StableContent.Collections),
                 importButton = new ProgressRoundedButton
                 {
                     Size = buttonSize,
@@ -119,46 +101,20 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             if (storage == null)
             {
-                foreach (var c in Content.Children.OfType<SettingsCheckbox>())
+                foreach (var c in contentCheckboxes)
                     c.Current.Disabled = true;
                 currentStablePath.Text = "No installation found";
                 return;
             }
 
-            foreach (var c in Content.Children.OfType<SettingsCheckbox>())
+            foreach (var c in contentCheckboxes)
+            {
                 c.Current.Disabled = false;
+                c.UpdateCount();
+            }
 
             currentStablePath.Text = storage.GetFullPath(string.Empty);
             stablePathUpdateCancellation = new CancellationTokenSource();
-
-            legacyImportManager.GetImportCount(StableContent.Beatmaps, stablePathUpdateCancellation.Token).ContinueWith(task => Schedule(() =>
-            {
-                if (task.IsCanceled)
-                    return;
-
-                checkboxBeatmaps.LabelText = $"Beatmaps ({task.GetResultSafely()} items)";
-            }));
-            legacyImportManager.GetImportCount(StableContent.Scores, stablePathUpdateCancellation.Token).ContinueWith(task => Schedule(() =>
-            {
-                if (task.IsCanceled)
-                    return;
-
-                checkboxScores.LabelText = $"Scores ({task.GetResultSafely()} items)";
-            }));
-            legacyImportManager.GetImportCount(StableContent.Skins, stablePathUpdateCancellation.Token).ContinueWith(task => Schedule(() =>
-            {
-                if (task.IsCanceled)
-                    return;
-
-                checkboxSkins.LabelText = $"Skins ({task.GetResultSafely()} items)";
-            }));
-            legacyImportManager.GetImportCount(StableContent.Collections, stablePathUpdateCancellation.Token).ContinueWith(task => Schedule(() =>
-            {
-                if (task.IsCanceled)
-                    return;
-
-                checkboxCollections.LabelText = $"Collections ({task.GetResultSafely()} items)";
-            }));
         }
 
         private void runImport()
@@ -167,22 +123,58 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             StableContent importableContent = 0;
 
-            if (checkboxBeatmaps.Current.Value) importableContent |= StableContent.Beatmaps;
-            if (checkboxScores.Current.Value) importableContent |= StableContent.Scores;
-            if (checkboxSkins.Current.Value) importableContent |= StableContent.Skins;
-            if (checkboxCollections.Current.Value) importableContent |= StableContent.Collections;
+            foreach (var c in contentCheckboxes.Where(c => c.Current.Value))
+                importableContent |= c.StableContent;
 
-            legacyImportManager.ImportFromStableAsync(importableContent, false)
-                               .ContinueWith(t => Schedule(() =>
-                               {
-                                   if (t.IsCompletedSuccessfully)
-                                       importButton.Complete();
-                                   else
-                                   {
-                                       importButton.Enabled.Value = true;
-                                       importButton.Abort();
-                                   }
-                               }));
+            legacyImportManager.ImportFromStableAsync(importableContent, false).ContinueWith(t => Schedule(() =>
+            {
+                if (t.IsCompletedSuccessfully)
+                    importButton.Complete();
+                else
+                {
+                    importButton.Enabled.Value = true;
+                    importButton.Abort();
+                }
+            }));
+        }
+
+        private class ImportCheckbox : SettingsCheckbox
+        {
+            public readonly StableContent StableContent;
+
+            private readonly LocalisableString title;
+
+            [Resolved]
+            private LegacyImportManager legacyImportManager { get; set; } = null!;
+
+            private CancellationTokenSource? countUpdateCancellation;
+
+            public ImportCheckbox(LocalisableString title, StableContent stableContent)
+            {
+                this.title = title;
+
+                StableContent = stableContent;
+
+                Current.Value = true;
+
+                LabelText = title;
+            }
+
+            public void UpdateCount()
+            {
+                LabelText = LocalisableString.Interpolate($"{title} (calculating...)");
+
+                countUpdateCancellation?.Cancel();
+                countUpdateCancellation = new CancellationTokenSource();
+
+                legacyImportManager.GetImportCount(StableContent, countUpdateCancellation.Token).ContinueWith(task => Schedule(() =>
+                {
+                    if (task.IsCanceled)
+                        return;
+
+                    LabelText = LocalisableString.Interpolate($"{title} ({task.GetResultSafely()} items)");
+                }));
+            }
         }
     }
 }
