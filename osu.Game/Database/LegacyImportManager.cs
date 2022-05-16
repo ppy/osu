@@ -50,6 +50,8 @@ namespace osu.Game.Database
 
         public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
+        public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, desktopGameHost);
+
         public async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
         {
             var stableStorage = GetCurrentStableStorage();
@@ -91,7 +93,8 @@ namespace osu.Game.Database
                 Schedule(() => dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource)));
                 string stablePath = await taskCompletionSource.Task.ConfigureAwait(false);
 
-                stableStorage = cachedStorage = new StableStorage(stablePath, desktopGameHost);
+                UpdateStorage(stablePath);
+                stableStorage = GetCurrentStableStorage();
             }
 
             var importTasks = new List<Task>();
