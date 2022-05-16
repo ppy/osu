@@ -127,6 +127,8 @@ namespace osu.Game.Utils
                                 BeatmapSets = realm.All<BeatmapSetInfo>().Count(),
                                 Beatmaps = realm.All<BeatmapInfo>().Count(),
                                 Files = realm.All<RealmFile>().Count(),
+                                Rulesets = realm.All<RulesetInfo>().Count(),
+                                RulesetsAvailable = realm.All<RulesetInfo>().Count(r => r.Available),
                                 Skins = realm.All<SkinInfo>().Count(),
                             }
                         };
