@@ -76,6 +76,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double staminaPenalty = simpleColourPenalty(staminaRating, colourRating);
             staminaRating *= staminaPenalty;
 
+            //TODO : This is a temporary fix for the stamina rating of converts, due to their low colour variance.
             if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0 && colourRating < 0.05)
             {
                 staminaPenalty *= 0.25;

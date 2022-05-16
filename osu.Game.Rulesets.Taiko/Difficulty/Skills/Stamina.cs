@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// </summary>
     public class SingleKeyStamina
     {
-        private double previousHitTime = -1;
+        private double previousHitTime;
 
         /// <summary>
         /// Similar to <see cref="StrainDecaySkill.StrainValueOf(DifficultyHitObject)"/>
