@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             }
 
             double objectStrain = 0.5;
-            objectStrain += speedBonus(current.StartTime - previousHitTime);
+            objectStrain += speedBonus(current.StartTime - previousHitTime.Value);
             previousHitTime = current.StartTime;
             return objectStrain;
         }
