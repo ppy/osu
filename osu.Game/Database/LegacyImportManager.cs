@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -49,9 +50,14 @@ namespace osu.Game.Database
 
         public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
-        public async Task<int> GetImportCount(StableContent content)
+        public async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
         {
-            var stableStorage = await getStableStorage().ConfigureAwait(false);
+            var stableStorage = GetCurrentStableStorage();
+
+            if (stableStorage == null)
+                return 0;
+
+            cancellationToken.ThrowIfCancellationRequested();
 
             switch (content)
             {
@@ -72,9 +78,22 @@ namespace osu.Game.Database
             }
         }
 
-        public async Task ImportFromStableAsync(StableContent content)
+        public async Task ImportFromStableAsync(StableContent content, bool interactiveLocateIfNotFound = true)
         {
-            var stableStorage = await getStableStorage().ConfigureAwait(false);
+            var stableStorage = GetCurrentStableStorage();
+
+            if (stableStorage == null)
+            {
+                if (!interactiveLocateIfNotFound)
+                    return;
+
+                var taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+                Schedule(() => dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource)));
+                string stablePath = await taskCompletionSource.Task.ConfigureAwait(false);
+
+                stableStorage = cachedStorage = new StableStorage(stablePath, desktopGameHost);
+            }
+
             var importTasks = new List<Task>();
 
             Task beatmapImportTask = Task.CompletedTask;
@@ -93,7 +112,7 @@ namespace osu.Game.Database
             await Task.WhenAll(importTasks.ToArray()).ConfigureAwait(false);
         }
 
-        private async Task<StableStorage> getStableStorage()
+        public StableStorage GetCurrentStableStorage()
         {
             if (cachedStorage != null)
                 return cachedStorage;
@@ -102,11 +121,7 @@ namespace osu.Game.Database
             if (stableStorage != null)
                 return cachedStorage = stableStorage;
 
-            var taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Schedule(() => dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource)));
-            string stablePath = await taskCompletionSource.Task.ConfigureAwait(false);
-
-            return cachedStorage = new StableStorage(stablePath, desktopGameHost);
+            return null;
         }
     }
 
