@@ -118,7 +118,7 @@ namespace osu.Game.Graphics
 
                 if (filename == null) return;
 
-                using (var stream = storage.GetStream(filename, FileAccess.Write))
+                using (var stream = storage.CreateFileSafely(filename))
                 {
                     switch (screenshotFormat.Value)
                     {
