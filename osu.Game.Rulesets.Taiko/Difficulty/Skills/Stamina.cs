@@ -14,14 +14,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// </summary>
     public class SingleKeyStamina
     {
-        private double previousHitTime;
+        private double? previousHitTime;
 
         /// <summary>
         /// Similar to <see cref="StrainDecaySkill.StrainValueOf(DifficultyHitObject)"/>
         /// </summary>
         public double StrainValueOf(DifficultyHitObject current)
         {
-            if (previousHitTime == -1)
+            if (previousHitTime == null)
             {
                 previousHitTime = current.StartTime;
                 return 0;
