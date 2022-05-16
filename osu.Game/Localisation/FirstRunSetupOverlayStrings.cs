@@ -74,6 +74,16 @@ We recommend you give the new defaults a try, but if you'd like to have things f
         /// </summary>
         public static LocalisableString ClassicDefaults => new TranslatableString(getKey(@"classic_defaults"), @"Classic defaults");
 
+        /// <summary>
+        /// "Welcome"
+        /// </summary>
+        public static LocalisableString ImportTitle => new TranslatableString(getKey(@"import_title"), @"Import");
+
+        /// <summary>
+        /// "Import content from stable"
+        /// </summary>
+        public static LocalisableString ImportContentFromStable => new TranslatableString(getKey(@"import_content_from_stable"), @"Import content from osu!(stable)");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
