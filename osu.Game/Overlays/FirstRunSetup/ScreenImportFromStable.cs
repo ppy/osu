@@ -4,6 +4,7 @@
 #nullable enable
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Database;
@@ -28,8 +29,8 @@ namespace osu.Game.Overlays.FirstRunSetup
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private LegacyImportManager? legacyImportManager { get; set; }
+        [Resolved]
+        private LegacyImportManager legacyImportManager { get; set; } = null!;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load()
@@ -76,6 +77,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Action = runImport
                 },
             };
+
+            legacyImportManager.GetImportCount(StableContent.Beatmaps).ContinueWith(task => Schedule(() => checkboxBeatmaps.LabelText += $" ({task.GetResultSafely()} items)"));
+            legacyImportManager.GetImportCount(StableContent.Scores).ContinueWith(task => Schedule(() => checkboxScores.LabelText += $" ({task.GetResultSafely()} items)"));
+            legacyImportManager.GetImportCount(StableContent.Skins).ContinueWith(task => Schedule(() => checkboxSkins.LabelText += $" ({task.GetResultSafely()} items)"));
+            legacyImportManager.GetImportCount(StableContent.Collections).ContinueWith(task => Schedule(() => checkboxCollections.LabelText += $" ({task.GetResultSafely()} items)"));
         }
 
         private void runImport()
@@ -89,7 +95,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             if (checkboxSkins.Current.Value) importableContent |= StableContent.Skins;
             if (checkboxCollections.Current.Value) importableContent |= StableContent.Collections;
 
-            legacyImportManager?.ImportFromStableAsync(importableContent)
+            legacyImportManager.ImportFromStableAsync(importableContent)
                                .ContinueWith(t => Schedule(() =>
                                {
                                    if (t.IsCompletedSuccessfully)
