@@ -4,19 +4,24 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osuTK;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
@@ -24,6 +29,7 @@ namespace osu.Game.Overlays.FirstRunSetup
     public class ScreenImportFromStable : FirstRunSetupScreen
     {
         private ProgressRoundedButton importButton = null!;
+        private RoundedButton locateStableButton = null!;
 
         private OsuTextFlowContainer currentStablePath = null!;
 
@@ -58,7 +64,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },
-                new RoundedButton
+                locateStableButton = new RoundedButton
                 {
                     Size = buttonSize,
                     Anchor = Anchor.TopCentre,
@@ -85,12 +91,15 @@ namespace osu.Game.Overlays.FirstRunSetup
             updateStablePath();
         }
 
-        private void locateStable()
+        private void locateStable() => this.Push(new LocateStableScreen());
+
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            legacyImportManager.ImportFromStableAsync(0).ContinueWith(task =>
-            {
+            base.OnResuming(e);
+
+            if (e.Last is LocateStableScreen)
+                // stable storage may have changed.
                 Schedule(updateStablePath);
-            });
         }
 
         private void updateStablePath()
@@ -120,6 +129,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         private void runImport()
         {
             importButton.Enabled.Value = false;
+            locateStableButton.Enabled.Value = false;
 
             StableContent importableContent = 0;
 
@@ -128,6 +138,8 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             legacyImportManager.ImportFromStableAsync(importableContent, false).ContinueWith(t => Schedule(() =>
             {
+                locateStableButton.Enabled.Value = true;
+
                 if (t.IsCompletedSuccessfully)
                     importButton.Complete();
                 else
@@ -174,6 +186,118 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                     LabelText = LocalisableString.Interpolate($"{title} ({task.GetResultSafely()} items)");
                 }));
+            }
+        }
+
+        private class LocateStableScreen : FirstRunSetupScreen
+        {
+            private RoundedButton selectionButton = null!;
+
+            private OsuDirectorySelector directorySelector = null!;
+
+            protected bool IsValidDirectory(DirectoryInfo? info) => info?.GetFiles("osu!.*.cfg").Any() ?? false;
+
+            public LocalisableString HeaderText => "Please select your osu!stable install location";
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                // Don't want the scroll content provided by `FirstRunSetupScreen` so we don't use `Content`.
+                InternalChild = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = CONTENT_PADDING },
+                    Children = new Drawable[]
+                    {
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            RowDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(),
+                                new Dimension(GridSizeMode.AutoSize),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new OsuTextFlowContainer(cp =>
+                                    {
+                                        cp.Font = OsuFont.Default.With(size: 24);
+                                    })
+                                    {
+                                        Text = HeaderText,
+                                        TextAnchor = Anchor.TopCentre,
+                                        Margin = new MarginPadding(10),
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                    }
+                                },
+                                new Drawable[]
+                                {
+                                    directorySelector = new OsuDirectorySelector
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                    }
+                                },
+                                new Drawable[]
+                                {
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Children = new Drawable[]
+                                        {
+                                            new RoundedButton
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Width = 300,
+                                                Margin = new MarginPadding(10),
+                                                Colour = colours.Pink2,
+                                                Text = CommonStrings.ButtonsCancel,
+                                                Action = this.Exit
+                                            },
+                                            selectionButton = new RoundedButton
+                                            {
+                                                Anchor = Anchor.CentreRight,
+                                                Origin = Anchor.CentreRight,
+                                                Width = 300,
+                                                Margin = new MarginPadding(10),
+                                                Text = MaintenanceSettingsStrings.SelectDirectory,
+                                                Action = () =>
+                                                {
+                                                    legacyImportManager.UpdateStorage(directorySelector.CurrentPath.Value.FullName);
+                                                    this.Exit();
+                                                }
+                                            },
+                                        }
+                                    },
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+
+            [Resolved]
+            private LegacyImportManager legacyImportManager { get; set; } = null!;
+
+            protected override void LoadComplete()
+            {
+                if (legacyImportManager.GetCurrentStableStorage() is StableStorage storage)
+                    directorySelector.CurrentPath.Value = new DirectoryInfo(storage.GetFullPath(string.Empty));
+
+                directorySelector.CurrentPath.BindValueChanged(e => selectionButton.Enabled.Value = e.NewValue != null && IsValidDirectory(e.NewValue), true);
+                base.LoadComplete();
+            }
+
+            public override void OnSuspending(ScreenTransitionEvent e)
+            {
+                base.OnSuspending(e);
+
+                this.FadeOut(250);
             }
         }
     }
