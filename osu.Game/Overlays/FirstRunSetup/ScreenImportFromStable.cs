@@ -34,10 +34,10 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private ProgressRoundedButton importButton = null!;
 
+        private OsuTextFlowContainer progressText = null!;
+
         [Resolved]
         private LegacyImportManager legacyImportManager { get; set; } = null!;
-
-        private CancellationTokenSource? stablePathUpdateCancellation;
 
         private StableLocatorLabelledTextBox stableLocatorTextBox = null!;
 
@@ -70,8 +70,17 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Size = button_size,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = FirstRunSetupOverlayStrings.ImportContentFromStable,
+                    Text = FirstRunSetupOverlayStrings.ImportContentFromPreviousVersion,
                     Action = runImport
+                },
+                progressText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
+                {
+                    Colour = OverlayColourProvider.Content1,
+                    Text =
+                        "Your import will continue in the background. Check on its progress in the notifications sidebar!",
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Alpha = 0,
                 },
             };
 
@@ -80,17 +89,14 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private void updateStablePath()
         {
-            stablePathUpdateCancellation?.Cancel();
-
             var storage = legacyImportManager.GetCurrentStableStorage();
 
             if (storage == null)
             {
-                foreach (var c in contentCheckboxes)
-                    c.Current.Disabled = true;
+                allowInteraction(false);
 
+                stableLocatorTextBox.Current.Disabled = false;
                 stableLocatorTextBox.Current.Value = string.Empty;
-                importButton.Enabled.Value = false;
                 return;
             }
 
@@ -100,16 +106,15 @@ namespace osu.Game.Overlays.FirstRunSetup
                 c.UpdateCount();
             }
 
+            allowInteraction(true);
             stableLocatorTextBox.Current.Value = storage.GetFullPath(string.Empty);
-
-            stablePathUpdateCancellation = new CancellationTokenSource();
             importButton.Enabled.Value = true;
         }
 
         private void runImport()
         {
-            importButton.Enabled.Value = false;
-            stableLocatorTextBox.Current.Disabled = true;
+            allowInteraction(false);
+            progressText.FadeIn(1000, Easing.OutQuint);
 
             StableContent importableContent = 0;
 
@@ -118,15 +123,24 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             legacyImportManager.ImportFromStableAsync(importableContent, false).ContinueWith(t => Schedule(() =>
             {
+                progressText.FadeOut(500, Easing.OutQuint);
+
                 if (t.IsCompletedSuccessfully)
                     importButton.Complete();
                 else
                 {
-                    importButton.Enabled.Value = true;
-                    stableLocatorTextBox.Current.Disabled = false;
+                    allowInteraction(true);
                     importButton.Abort();
                 }
             }));
+        }
+
+        private void allowInteraction(bool allow)
+        {
+            importButton.Enabled.Value = allow;
+            stableLocatorTextBox.Current.Disabled = !allow;
+            foreach (var c in contentCheckboxes)
+                c.Current.Disabled = !allow;
         }
 
         private class ImportCheckbox : SettingsCheckbox

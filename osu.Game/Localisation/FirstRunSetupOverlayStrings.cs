@@ -80,9 +80,9 @@ We recommend you give the new defaults a try, but if you'd like to have things f
         public static LocalisableString ImportTitle => new TranslatableString(getKey(@"import_title"), @"Import");
 
         /// <summary>
-        /// "Import content from stable"
+        /// "Import content from previous version"
         /// </summary>
-        public static LocalisableString ImportContentFromStable => new TranslatableString(getKey(@"import_content_from_stable"), @"Import content from osu!(stable)");
+        public static LocalisableString ImportContentFromPreviousVersion => new TranslatableString(getKey(@"import_content_from_previous_version"), @"Import content from previous version");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
