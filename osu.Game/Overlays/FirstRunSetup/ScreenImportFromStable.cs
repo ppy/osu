@@ -3,25 +3,27 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
-using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
+using osu.Game.Screens.Edit.Setup;
 using osuTK;
-using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
@@ -31,17 +33,13 @@ namespace osu.Game.Overlays.FirstRunSetup
         private static readonly Vector2 button_size = new Vector2(400, 50);
 
         private ProgressRoundedButton importButton = null!;
-        private RoundedButton locateStableButton = null!;
-
-        private OsuTextFlowContainer currentStablePath = null!;
-
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
         private LegacyImportManager legacyImportManager { get; set; } = null!;
 
         private CancellationTokenSource? stablePathUpdateCancellation;
+
+        private StableLocatorLabelledTextBox stableLocatorTextBox = null!;
 
         private IEnumerable<ImportCheckbox> contentCheckboxes => Content.Children.OfType<ImportCheckbox>();
 
@@ -58,20 +56,10 @@ namespace osu.Game.Overlays.FirstRunSetup
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
-                currentStablePath = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: HEADER_FONT_SIZE, weight: FontWeight.SemiBold))
+                stableLocatorTextBox = new StableLocatorLabelledTextBox
                 {
-                    Colour = OverlayColourProvider.Content2,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    TextAnchor = Anchor.Centre,
-                },
-                locateStableButton = new RoundedButton
-                {
-                    Size = button_size,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Text = "Change location",
-                    Action = locateStable,
+                    Label = "previous osu! install",
+                    PlaceholderText = "Click to locate a previous osu! install"
                 },
                 new ImportCheckbox("Beatmaps", StableContent.Beatmaps),
                 new ImportCheckbox("Scores", StableContent.Scores),
@@ -87,18 +75,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 },
             };
 
-            updateStablePath();
-        }
-
-        private void locateStable() => this.Push(new LocateStableScreen());
-
-        public override void OnResuming(ScreenTransitionEvent e)
-        {
-            base.OnResuming(e);
-
-            if (e.Last is LocateStableScreen)
-                // stable storage may have changed.
-                Schedule(updateStablePath);
+            stableLocatorTextBox.Current.BindValueChanged(_ => updateStablePath(), true);
         }
 
         private void updateStablePath()
@@ -111,9 +88,8 @@ namespace osu.Game.Overlays.FirstRunSetup
             {
                 foreach (var c in contentCheckboxes)
                     c.Current.Disabled = true;
-                currentStablePath.FadeColour(colours.Red1, 500, Easing.OutQuint);
-                currentStablePath.Text = "No installation found";
 
+                stableLocatorTextBox.Current.Value = string.Empty;
                 importButton.Enabled.Value = false;
                 return;
             }
@@ -124,8 +100,8 @@ namespace osu.Game.Overlays.FirstRunSetup
                 c.UpdateCount();
             }
 
-            currentStablePath.FadeColour(OverlayColourProvider.Content2);
-            currentStablePath.Text = $"Found installation: {storage.GetFullPath(string.Empty)}";
+            stableLocatorTextBox.Current.Value = storage.GetFullPath(string.Empty);
+
             stablePathUpdateCancellation = new CancellationTokenSource();
             importButton.Enabled.Value = true;
         }
@@ -133,7 +109,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         private void runImport()
         {
             importButton.Enabled.Value = false;
-            locateStableButton.Enabled.Value = false;
+            stableLocatorTextBox.Current.Disabled = true;
 
             StableContent importableContent = 0;
 
@@ -147,7 +123,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 else
                 {
                     importButton.Enabled.Value = true;
-                    locateStableButton.Enabled.Value = true;
+                    stableLocatorTextBox.Current.Disabled = false;
                     importButton.Abort();
                 }
             }));
@@ -192,119 +168,85 @@ namespace osu.Game.Overlays.FirstRunSetup
             }
         }
 
-        private class LocateStableScreen : FirstRunSetupScreen
+        internal class StableLocatorLabelledTextBox : LabelledTextBoxWithPopover, ICanAcceptFiles
         {
-            private RoundedButton selectionButton = null!;
-
-            private OsuDirectorySelector directorySelector = null!;
-
-            protected bool IsValidDirectory(DirectoryInfo? info) => info?.GetFiles("osu!.*.cfg").Any() ?? false;
-
-            public LocalisableString HeaderText => "Please select your osu!stable install location";
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                // Don't want the scroll content provided by `FirstRunSetupScreen` so we don't use `Content`.
-                InternalChild = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = CONTENT_PADDING },
-                    Children = new Drawable[]
-                    {
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            RowDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.AutoSize),
-                                new Dimension(),
-                                new Dimension(GridSizeMode.AutoSize),
-                            },
-                            Content = new[]
-                            {
-                                new Drawable[]
-                                {
-                                    new OsuTextFlowContainer(cp =>
-                                    {
-                                        cp.Font = OsuFont.Default.With(size: 24);
-                                    })
-                                    {
-                                        Text = HeaderText,
-                                        TextAnchor = Anchor.TopCentre,
-                                        Margin = new MarginPadding(10),
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                    }
-                                },
-                                new Drawable[]
-                                {
-                                    directorySelector = new OsuDirectorySelector
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                    }
-                                },
-                                new Drawable[]
-                                {
-                                    new Container
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Children = new Drawable[]
-                                        {
-                                            new RoundedButton
-                                            {
-                                                Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.CentreLeft,
-                                                RelativeSizeAxes = Axes.X,
-                                                Width = 0.45f,
-                                                Height = button_size.Y,
-                                                Margin = new MarginPadding(10),
-                                                BackgroundColour = colours.Pink2,
-                                                Text = CommonStrings.ButtonsCancel,
-                                                Action = this.Exit
-                                            },
-                                            selectionButton = new RoundedButton
-                                            {
-                                                Anchor = Anchor.CentreRight,
-                                                Origin = Anchor.CentreRight,
-                                                RelativeSizeAxes = Axes.X,
-                                                Width = 0.45f,
-                                                Height = button_size.Y,
-                                                Margin = new MarginPadding(10),
-                                                Text = MaintenanceSettingsStrings.SelectDirectory,
-                                                Action = () =>
-                                                {
-                                                    legacyImportManager.UpdateStorage(directorySelector.CurrentPath.Value.FullName);
-                                                    this.Exit();
-                                                }
-                                            },
-                                        }
-                                    },
-                                }
-                            }
-                        }
-                    }
-                };
-            }
-
             [Resolved]
             private LegacyImportManager legacyImportManager { get; set; } = null!;
 
+            // TODO: test
+            public IEnumerable<string> HandledExtensions { get; } = new[] { string.Empty };
+
+            private readonly Bindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
+
+            [Resolved]
+            private OsuGameBase game { get; set; } = null!;
+
             protected override void LoadComplete()
             {
-                if (legacyImportManager.GetCurrentStableStorage() is StableStorage storage)
-                    directorySelector.CurrentPath.Value = new DirectoryInfo(storage.GetFullPath(string.Empty));
-
-                directorySelector.CurrentPath.BindValueChanged(e => selectionButton.Enabled.Value = e.NewValue != null && IsValidDirectory(e.NewValue), true);
                 base.LoadComplete();
+
+                game.RegisterImportHandler(this);
+
+                currentDirectory.BindValueChanged(onDirectorySelected);
+
+                string? fullPath = legacyImportManager.GetCurrentStableStorage()?.GetFullPath(string.Empty);
+                if (fullPath != null)
+                    currentDirectory.Value = new DirectoryInfo(fullPath);
             }
 
-            public override void OnSuspending(ScreenTransitionEvent e)
+            private void onDirectorySelected(ValueChangedEvent<DirectoryInfo> directory)
             {
-                base.OnSuspending(e);
+                if (directory.NewValue == null || directory.OldValue == null)
+                {
+                    Current.Value = string.Empty;
+                    return;
+                }
 
-                this.FadeOut(250);
+                // DirectorySelectors can trigger a noop value changed, but `DirectoryInfo` equality doesn't catch this.
+                if (directory.OldValue.FullName == directory.NewValue.FullName)
+                    return;
+
+                if (directory.NewValue?.GetFiles(@"osu!.*.cfg").Any() ?? false)
+                {
+                    this.HidePopover();
+
+                    string path = directory.NewValue.FullName;
+
+                    legacyImportManager.UpdateStorage(path);
+                    Current.Value = path;
+                }
+            }
+
+            Task ICanAcceptFiles.Import(params string[] paths)
+            {
+                Schedule(() => currentDirectory.Value = new DirectoryInfo(paths.First()));
+                return Task.CompletedTask;
+            }
+
+            Task ICanAcceptFiles.Import(params ImportTask[] tasks) => throw new NotImplementedException();
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                game.UnregisterImportHandler(this);
+            }
+
+            public override Popover GetPopover() => new DirectoryChooserPopover(currentDirectory);
+
+            private class DirectoryChooserPopover : OsuPopover
+            {
+                public DirectoryChooserPopover(Bindable<DirectoryInfo> currentDirectory)
+                {
+                    Child = new Container
+                    {
+                        Size = new Vector2(600, 400),
+                        Child = new OsuDirectorySelector(currentDirectory.Value?.FullName)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            CurrentPath = { BindTarget = currentDirectory }
+                        },
+                    };
+                }
             }
         }
     }
