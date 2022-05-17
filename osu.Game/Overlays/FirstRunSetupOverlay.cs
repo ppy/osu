@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays
 
             MainAreaContent.AddRange(new Drawable[]
             {
-                content = new Container
+                content = new PopoverContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
