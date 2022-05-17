@@ -146,6 +146,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                 StableContent = stableContent;
 
+                Current.Default = true;
                 Current.Value = true;
 
                 LabelText = title;
