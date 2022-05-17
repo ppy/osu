@@ -37,13 +37,13 @@ namespace osu.Game.Database
         [Resolved]
         private CollectionManager collections { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
         [Resolved]
         private IDialogOverlay dialogOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved(canBeNull: true)]
         private DesktopGameHost desktopGameHost { get; set; }
 
         private StableStorage cachedStorage;
@@ -52,7 +52,7 @@ namespace osu.Game.Database
 
         public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, desktopGameHost);
 
-        public async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
+        public virtual async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
         {
             var stableStorage = GetCurrentStableStorage();
 
@@ -120,7 +120,7 @@ namespace osu.Game.Database
             if (cachedStorage != null)
                 return cachedStorage;
 
-            var stableStorage = game.GetStorageForStableInstall();
+            var stableStorage = game?.GetStorageForStableInstall();
             if (stableStorage != null)
                 return cachedStorage = stableStorage;
 
