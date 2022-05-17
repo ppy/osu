@@ -428,7 +428,6 @@ namespace osu.Game.Overlays.Mods
             base.PopIn();
 
             multiplierDisplay?
-                .Delay(fade_in_duration / 5)
                 .FadeIn(fade_in_duration, Easing.OutQuint)
                 .MoveToY(0, fade_in_duration, Easing.OutQuint);
 
