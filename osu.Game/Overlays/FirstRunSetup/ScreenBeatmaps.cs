@@ -14,8 +14,6 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osuTK;
@@ -127,7 +125,10 @@ namespace osu.Game.Overlays.FirstRunSetup
                             if (t.IsCompletedSuccessfully)
                                 importBeatmapsButton.Complete();
                             else
+                            {
                                 importBeatmapsButton.Enabled.Value = true;
+                                importBeatmapsButton.Abort();
+                            }
                         }));
                     }
                 },
@@ -212,46 +213,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                     downloadBundledButton.Complete();
                 else
                     downloadBundledButton.SetProgress(progress, true);
-            }
-        }
-
-        private class ProgressRoundedButton : RoundedButton
-        {
-            [Resolved]
-            private OsuColour colours { get; set; } = null!;
-
-            private ProgressBar progressBar = null!;
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                Add(progressBar = new ProgressBar(false)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingParameters.Additive,
-                    FillColour = BackgroundColour,
-                    Alpha = 0.5f,
-                    Depth = float.MinValue
-                });
-            }
-
-            public void Complete()
-            {
-                Enabled.Value = false;
-
-                Background.FadeColour(colours.Green, 500, Easing.OutQuint);
-                progressBar.FillColour = colours.Green;
-
-                this.TransformBindableTo(progressBar.Current, 1, 500, Easing.OutQuint);
-            }
-
-            public void SetProgress(double progress, bool animated)
-            {
-                if (!Enabled.Value)
-                    return;
-
-                this.TransformBindableTo(progressBar.Current, progress, animated ? 500 : 0, Easing.OutQuint);
             }
         }
     }
