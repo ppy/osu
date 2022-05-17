@@ -211,14 +211,14 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             private void onDirectorySelected(ValueChangedEvent<DirectoryInfo> directory)
             {
-                if (directory.NewValue == null || directory.OldValue == null)
+                if (directory.NewValue == null)
                 {
                     Current.Value = string.Empty;
                     return;
                 }
 
                 // DirectorySelectors can trigger a noop value changed, but `DirectoryInfo` equality doesn't catch this.
-                if (directory.OldValue.FullName == directory.NewValue.FullName)
+                if (directory.OldValue?.FullName == directory.NewValue.FullName)
                     return;
 
                 if (directory.NewValue?.GetFiles(@"osu!.*.cfg").Any() ?? false)
