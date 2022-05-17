@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Judgements
                     return -DEFAULT_MAX_HEALTH_INCREASE;
 
                 case HitResult.Meh:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.05;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.05;
 
                 case HitResult.Ok:
                     return DEFAULT_MAX_HEALTH_INCREASE * 0.5;
