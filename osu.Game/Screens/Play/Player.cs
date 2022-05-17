@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Play
             if (Beatmap.Value is DummyWorkingBeatmap)
                 return;
 
-            IBeatmap playableBeatmap = loadPlayableBeatmap(gameplayMods);
+            IBeatmap playableBeatmap = LoadPlayableBeatmap(gameplayMods);
 
             if (playableBeatmap == null)
                 return;
@@ -483,7 +483,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private IBeatmap loadPlayableBeatmap(Mod[] gameplayMods)
+        protected virtual IBeatmap LoadPlayableBeatmap(Mod[] gameplayMods, bool useGlobalRuleset = true)
         {
             IBeatmap playable;
 
@@ -492,7 +492,7 @@ namespace osu.Game.Screens.Play
                 if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                var rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
+                var rulesetInfo = useGlobalRuleset ? Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset : Beatmap.Value.BeatmapInfo.Ruleset;
                 ruleset = rulesetInfo.CreateInstance();
 
                 if (ruleset == null)

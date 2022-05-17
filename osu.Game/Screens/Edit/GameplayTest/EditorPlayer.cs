@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit.GameplayTest
@@ -26,6 +27,11 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
             => new MasterGameplayClockContainer(beatmap, gameplayStart) { StartTime = editorState.Time };
+
+        protected override IBeatmap LoadPlayableBeatmap(Mod[] gameplayMods, bool useGlobalRuleset = true)
+        {
+            return base.LoadPlayableBeatmap(gameplayMods, false);
+        }
 
         protected override void LoadComplete()
         {
