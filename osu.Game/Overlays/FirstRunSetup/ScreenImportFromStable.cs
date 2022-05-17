@@ -27,7 +27,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
-    [LocalisableDescription(typeof(FirstRunSetupOverlayStrings), nameof(FirstRunSetupOverlayStrings.ImportTitle))]
+    [LocalisableDescription(typeof(FirstRunOverlayImportFromStableScreenStrings), nameof(FirstRunOverlayImportFromStableScreenStrings.Header))]
     public class ScreenImportFromStable : FirstRunSetupScreen
     {
         private static readonly Vector2 button_size = new Vector2(400, 50);
@@ -51,15 +51,14 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
-                    Text =
-                        "If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will create a copy, and not affect your existing installation.",
+                    Text = FirstRunOverlayImportFromStableScreenStrings.Description,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
                 stableLocatorTextBox = new StableLocatorLabelledTextBox
                 {
-                    Label = "previous osu! install",
-                    PlaceholderText = "Click to locate a previous osu! install"
+                    Label = FirstRunOverlayImportFromStableScreenStrings.LocateDirectoryLabel,
+                    PlaceholderText = FirstRunOverlayImportFromStableScreenStrings.LocateDirectoryPlaceholder
                 },
                 new ImportCheckbox("Beatmaps", StableContent.Beatmaps),
                 new ImportCheckbox("Scores", StableContent.Scores),
@@ -70,14 +69,13 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Size = button_size,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = FirstRunSetupOverlayStrings.ImportContentFromPreviousVersion,
+                    Text = FirstRunOverlayImportFromStableScreenStrings.ImportButton,
                     Action = runImport
                 },
                 progressText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
-                    Text =
-                        "Your import will continue in the background. Check on its progress in the notifications sidebar!",
+                    Text = FirstRunOverlayImportFromStableScreenStrings.ImportInProgress,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Alpha = 0,
@@ -168,7 +166,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             public void UpdateCount()
             {
-                LabelText = LocalisableString.Interpolate($"{title} (calculating...)");
+                LabelText = LocalisableString.Interpolate($"{title} ({FirstRunOverlayImportFromStableScreenStrings.Calculating})");
 
                 countUpdateCancellation?.Cancel();
                 countUpdateCancellation = new CancellationTokenSource();
@@ -178,7 +176,9 @@ namespace osu.Game.Overlays.FirstRunSetup
                     if (task.IsCanceled)
                         return;
 
-                    LabelText = LocalisableString.Interpolate($"{title} ({task.GetResultSafely()} items)");
+                    int count = task.GetResultSafely();
+
+                    LabelText = LocalisableString.Interpolate($"{title} ({FirstRunOverlayImportFromStableScreenStrings.Items(count)})");
                 }));
             }
         }
