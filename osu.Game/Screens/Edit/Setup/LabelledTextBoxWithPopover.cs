@@ -39,6 +39,9 @@ namespace osu.Game.Screens.Edit.Setup
 
             protected override void OnFocus(FocusEvent e)
             {
+                if (Current.Disabled)
+                    return;
+
                 OnFocused?.Invoke();
                 base.OnFocus(e);
 
