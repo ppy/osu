@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         private Box hoverBox = null!;
         private Box selectBox = null!;
         private OsuSpriteText text = null!;
-        private Drawable close = null!;
+        private Drawable? close;
 
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
@@ -119,9 +119,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         protected override bool OnHover(HoverEvent e)
         {
             hoverBox.FadeIn(300, Easing.OutQuint);
-
-            if (!isSelector)
-                close.FadeIn(300, Easing.OutQuint);
+            close?.FadeIn(300, Easing.OutQuint);
 
             return base.OnHover(e);
         }
@@ -129,17 +127,15 @@ namespace osu.Game.Overlays.Chat.ChannelList
         protected override void OnHoverLost(HoverLostEvent e)
         {
             hoverBox.FadeOut(200, Easing.OutQuint);
-
-            if (!isSelector)
-                close.FadeOut(200, Easing.OutQuint);
+            close?.FadeOut(200, Easing.OutQuint);
 
             base.OnHoverLost(e);
         }
 
-        private Drawable createIcon()
+        private UpdateableAvatar? createIcon()
         {
             if (Channel.Type != ChannelType.PM)
-                return Drawable.Empty();
+                return null;
 
             return new UpdateableAvatar(Channel.Users.First(), isInteractive: false)
             {
@@ -152,10 +148,10 @@ namespace osu.Game.Overlays.Chat.ChannelList
             };
         }
 
-        private Drawable createMentionPill()
+        private ChannelListItemMentionPill? createMentionPill()
         {
             if (isSelector)
-                return Drawable.Empty();
+                return null;
 
             return new ChannelListItemMentionPill
             {
@@ -166,10 +162,10 @@ namespace osu.Game.Overlays.Chat.ChannelList
             };
         }
 
-        private Drawable createCloseButton()
+        private ChannelListItemCloseButton? createCloseButton()
         {
             if (isSelector)
-                return Drawable.Empty();
+                return null;
 
             return new ChannelListItemCloseButton
             {
