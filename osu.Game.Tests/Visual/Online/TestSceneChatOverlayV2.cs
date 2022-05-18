@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -31,7 +33,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneChatOverlayV2 : OsuManualInputManagerTestScene
     {
-        private ChatOverlayV2 chatOverlay;
+        private TestChatOverlayV2 chatOverlay;
         private ChannelManager channelManager;
 
         private APIUser testUser;
@@ -61,7 +63,7 @@ namespace osu.Game.Tests.Visual.Online
                 Children = new Drawable[]
                 {
                     channelManager,
-                    chatOverlay = new ChatOverlayV2 { RelativeSizeAxes = Axes.Both },
+                    chatOverlay = new TestChatOverlayV2 { RelativeSizeAxes = Axes.Both },
                 },
             };
         });
@@ -386,6 +388,34 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("TextBox is not focused", () => InputManager.FocusedDrawable == null);
         }
 
+        [Test]
+        public void TestSlowLoadingChannel()
+        {
+            AddStep("Show overlay (slow-loading)", () =>
+            {
+                chatOverlay.Show();
+                chatOverlay.SlowLoading = true;
+            });
+            AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            AddAssert("Channel 1 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel1).LoadState == LoadState.Loading);
+
+            AddStep("Join channel 2", () => channelManager.JoinChannel(testChannel2));
+            AddStep("Select channel 2", () => clickDrawable(getChannelListItem(testChannel2)));
+            AddAssert("Channel 2 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel2).LoadState == LoadState.Loading);
+
+            AddStep("Finish channel 1 load", () => chatOverlay.GetSlowLoadingChannel(testChannel1).LoadEvent.Set());
+            AddAssert("Channel 1 ready", () => chatOverlay.GetSlowLoadingChannel(testChannel1).LoadState == LoadState.Ready);
+            AddAssert("Channel 1 not displayed", () => !channelIsVisible);
+
+            AddStep("Finish channel 2 load", () => chatOverlay.GetSlowLoadingChannel(testChannel2).LoadEvent.Set());
+            AddAssert("Channel 2 loaded", () => chatOverlay.GetSlowLoadingChannel(testChannel2).IsLoaded);
+            AddAssert("Channel 2 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel2);
+
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddAssert("Channel 1 loaded", () => chatOverlay.GetSlowLoadingChannel(testChannel1).IsLoaded);
+            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+        }
+
         private bool listingIsVisible =>
             chatOverlay.ChildrenOfType<ChannelListing>().Single().State.Value == Visibility.Visible;
 
@@ -432,5 +462,35 @@ namespace osu.Game.Tests.Visual.Online
             Topic = $"We talk about the number {id} here",
             Type = ChannelType.Public,
         };
+
+        private class TestChatOverlayV2 : ChatOverlayV2
+        {
+            public bool SlowLoading { get; set; }
+
+            public SlowLoadingDrawableChannel GetSlowLoadingChannel(Channel channel) => DrawableChannels.OfType<SlowLoadingDrawableChannel>().Single(c => c.Channel == channel);
+
+            protected override ChatOverlayDrawableChannel CreateDrawableChannel(Channel newChannel)
+            {
+                return SlowLoading
+                    ? new SlowLoadingDrawableChannel(newChannel)
+                    : new ChatOverlayDrawableChannel(newChannel);
+            }
+        }
+
+        private class SlowLoadingDrawableChannel : ChatOverlayDrawableChannel
+        {
+            public readonly ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
+
+            public SlowLoadingDrawableChannel([NotNull] Channel channel)
+                : base(channel)
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadEvent.Wait(10000);
+            }
+        }
     }
 }
