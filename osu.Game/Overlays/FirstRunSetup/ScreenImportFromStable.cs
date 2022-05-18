@@ -60,10 +60,10 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Label = FirstRunOverlayImportFromStableScreenStrings.LocateDirectoryLabel,
                     PlaceholderText = FirstRunOverlayImportFromStableScreenStrings.LocateDirectoryPlaceholder
                 },
-                new ImportCheckbox("Beatmaps", StableContent.Beatmaps),
-                new ImportCheckbox("Scores", StableContent.Scores),
-                new ImportCheckbox("Skins", StableContent.Skins),
-                new ImportCheckbox("Collections", StableContent.Collections),
+                new ImportCheckbox(CommonStrings.Beatmaps, StableContent.Beatmaps),
+                new ImportCheckbox(CommonStrings.Scores, StableContent.Scores),
+                new ImportCheckbox(CommonStrings.Skins, StableContent.Skins),
+                new ImportCheckbox(CommonStrings.Collections, StableContent.Collections),
                 importButton = new ProgressRoundedButton
                 {
                     Size = button_size,
