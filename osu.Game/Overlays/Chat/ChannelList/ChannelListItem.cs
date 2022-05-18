@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         private Box hoverBox = null!;
         private Box selectBox = null!;
         private OsuSpriteText text = null!;
-        private Drawable? close;
+        private ChannelListItemCloseButton? close;
 
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         },
                         Content = new[]
                         {
-                            new[]
+                            new Drawable?[]
                             {
                                 createIcon(),
                                 text = new OsuSpriteText
