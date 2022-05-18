@@ -133,44 +133,6 @@ namespace osu.Game.Stores
         }
 
         /// <summary>
-        /// Delete videos from a list of items.
-        /// This will post notifications tracking progress.
-        /// </summary>
-        public void DeleteVideos(List<TModel> items, bool silent = false)
-        {
-            if (items.Count == 0) return;
-
-            var notification = new ProgressNotification
-            {
-                Progress = 0,
-                Text = $"Preparing to delete all {HumanisedModelName} videos...",
-                CompletionText = $"Deleted all {HumanisedModelName} videos!",
-                State = ProgressNotificationState.Active,
-            };
-            if (!silent)
-                PostNotification?.Invoke(notification);
-
-            int i = 0;
-
-            foreach (var b in items)
-            {
-                if (notification.State == ProgressNotificationState.Cancelled)
-                    // user requested abort
-                    return;
-
-                notification.Text = $"Deleting videos from {HumanisedModelName}s ({++i} of {items.Count})";
-
-                var video = b.Files.FirstOrDefault(f => f.Filename.EndsWith(".mp4") || f.Filename.EndsWith(".avi") || f.Filename.EndsWith(".mov") || f.Filename.EndsWith(".flv"));
-                if (video != null)
-                    DeleteFile(b, video);
-
-                notification.Progress = (float)i / items.Count;
-            }
-
-            notification.State = ProgressNotificationState.Completed;
-        }
-
-        /// <summary>
         /// Restore multiple items that were previously deleted.
         /// This will post notifications tracking progress.
         /// </summary>
