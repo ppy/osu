@@ -188,7 +188,6 @@ namespace osu.Game.Overlays.FirstRunSetup
             [Resolved]
             private LegacyImportManager legacyImportManager { get; set; } = null!;
 
-            // TODO: test
             public IEnumerable<string> HandledExtensions { get; } = new[] { string.Empty };
 
             private readonly Bindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
