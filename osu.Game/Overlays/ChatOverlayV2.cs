@@ -263,18 +263,18 @@ namespace osu.Game.Overlays
                     ChatOverlayDrawableChannel drawableChannel = new ChatOverlayDrawableChannel(newChannel);
                     loadedChannels.Add(newChannel, drawableChannel);
 
-                    LoadComponentAsync(drawableChannel, loaded =>
+                    LoadComponentAsync(drawableChannel, loadedDrawable =>
                     {
                         // Ensure the current channel hasn't changed by the time the load completes
-                        if (currentChannel.Value != newChannel)
+                        if (currentChannel.Value != loadedDrawable.Channel)
                             return;
 
                         // Ensure the cached reference hasn't been removed from leaving the channel
-                        if (!loadedChannels.ContainsKey(newChannel))
+                        if (!loadedChannels.ContainsKey(loadedDrawable.Channel))
                             return;
 
                         currentChannelContainer.Clear(false);
-                        currentChannelContainer.Add(loaded);
+                        currentChannelContainer.Add(loadedDrawable);
                         loading.Hide();
                     });
                 }
