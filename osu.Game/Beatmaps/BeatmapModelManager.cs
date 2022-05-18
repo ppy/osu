@@ -34,6 +34,8 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
+        private static readonly string[] video_extensions = { ".mp4", ".mov", ".avi", ".flv" };
+
         public BeatmapModelManager(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
             : base(realm, storage, onlineLookupQueue)
         {
@@ -144,7 +146,7 @@ namespace osu.Game.Beatmaps
 
                 notification.Text = $"Deleting videos from {HumanisedModelName}s ({++i} of {items.Count})";
 
-                var video = b.Files.FirstOrDefault(f => f.Filename.EndsWith(".mp4") || f.Filename.EndsWith(".avi") || f.Filename.EndsWith(".mov") || f.Filename.EndsWith(".flv"));
+                var video = b.Files.FirstOrDefault(f => video_extensions.Any(ex => f.Filename.EndsWith(ex, StringComparison.Ordinal)));
                 if (video != null)
                     DeleteFile(b, video);
 
