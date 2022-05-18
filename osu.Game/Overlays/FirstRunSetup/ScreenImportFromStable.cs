@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             if (storage == null)
             {
-                allowInteraction(false);
+                toggleInteraction(false);
 
                 stableLocatorTextBox.Current.Disabled = false;
                 stableLocatorTextBox.Current.Value = string.Empty;
@@ -104,14 +104,14 @@ namespace osu.Game.Overlays.FirstRunSetup
                 c.UpdateCount();
             }
 
-            allowInteraction(true);
+            toggleInteraction(true);
             stableLocatorTextBox.Current.Value = storage.GetFullPath(string.Empty);
             importButton.Enabled.Value = true;
         }
 
         private void runImport()
         {
-            allowInteraction(false);
+            toggleInteraction(false);
             progressText.FadeIn(1000, Easing.OutQuint);
 
             StableContent importableContent = 0;
@@ -127,13 +127,13 @@ namespace osu.Game.Overlays.FirstRunSetup
                     importButton.Complete();
                 else
                 {
-                    allowInteraction(true);
+                    toggleInteraction(true);
                     importButton.Abort();
                 }
             }));
         }
 
-        private void allowInteraction(bool allow)
+        private void toggleInteraction(bool allow)
         {
             importButton.Enabled.Value = allow;
             stableLocatorTextBox.Current.Disabled = !allow;
