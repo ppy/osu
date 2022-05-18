@@ -41,6 +41,8 @@ namespace osu.Game.Overlays
 
         private readonly Dictionary<Channel, ChatOverlayDrawableChannel> loadedChannels = new Dictionary<Channel, ChatOverlayDrawableChannel>();
 
+        protected IEnumerable<DrawableChannel> DrawableChannels => loadedChannels.Values;
+
         private readonly BindableFloat chatHeight = new BindableFloat();
         private bool isDraggingTopBar;
         private float dragStartChatHeight;
@@ -260,7 +262,7 @@ namespace osu.Game.Overlays
                     loading.Show();
 
                     // Ensure the drawable channel is stored before async load to prevent double loading
-                    ChatOverlayDrawableChannel drawableChannel = new ChatOverlayDrawableChannel(newChannel);
+                    ChatOverlayDrawableChannel drawableChannel = CreateDrawableChannel(newChannel);
                     loadedChannels.Add(newChannel, drawableChannel);
 
                     LoadComponentAsync(drawableChannel, loadedDrawable =>
@@ -280,6 +282,8 @@ namespace osu.Game.Overlays
                 }
             }
         }
+
+        protected virtual ChatOverlayDrawableChannel CreateDrawableChannel(Channel newChannel) => new ChatOverlayDrawableChannel(newChannel);
 
         private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
