@@ -863,5 +863,40 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
             }
         }
+
+        [Test]
+        public void TestLegacyAdjacentImplicitCatmullSegmentsAreMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("adjacent-catmull-segments.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(6));
+                Assert.That(controlPoints.Single(c => c.Type != null).Type, Is.EqualTo(PathType.Catmull));
+            }
+        }
+
+        [Test]
+        public void TestNonLegacyAdjacentImplicitCatmullSegmentsAreNotMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder(LegacyBeatmapEncoder.FIRST_LAZER_VERSION) { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("adjacent-catmull-segments.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(4));
+                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[1].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[2].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[3].Type, Is.Null);
+            }
+        }
     }
 }
