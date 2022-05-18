@@ -197,6 +197,7 @@ namespace osu.Game.Online.Chat
 
                     createNewPrivateMessageRequest.Failure += exception =>
                     {
+                        handlePostException(exception);
                         target.ReplaceMessage(message, null);
                         dequeueAndRun();
                     };
