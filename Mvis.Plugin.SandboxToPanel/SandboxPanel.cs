@@ -1,3 +1,5 @@
+using M.Resources.Localisation.LLin;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.Sandbox.Components;
 using Mvis.Plugin.Sandbox.Config;
 using Mvis.Plugin.Sandbox.UI;
@@ -10,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 using osuTK;
 
 namespace Mvis.Plugin.Sandbox
@@ -77,11 +80,154 @@ namespace Mvis.Plugin.Sandbox
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new SandboxConfigManager(storage);
 
-        public override PluginSettingsSubSection CreateSettingsSubSection()
-            => new SandboxSettings(this);
-
         public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
             => new RulesetPanelSidebarSection(this);
+
+        private SettingsEntry[] entries;
+
+        public override SettingsEntry[] GetSettingEntries()
+        {
+            var config = (SandboxConfigManager)PluginManager.GetConfigManager(this);
+
+            entries ??= new SettingsEntry[]
+            {
+                new BooleanSettingsEntry
+                {
+                    Name = LLinGenericStrings.EnablePlugin,
+                    Bindable = config.GetBindable<bool>(SandboxSetting.EnableRulesetPanel)
+                },
+                new NumberSettingsEntry<float>
+                {
+                    Name = StpStrings.AlphaOnIdle,
+                    Bindable = config.GetBindable<float>(SandboxSetting.IdleAlpha)
+                },
+                new BooleanSettingsEntry
+                {
+                    Name = StpStrings.ShowParticles,
+                    Bindable = config.GetBindable<bool>(SandboxSetting.ShowParticles)
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.ParticleCount,
+                    //////////TransferValueOnCommit = true,
+                    Bindable = config.GetBindable<int>(SandboxSetting.ParticleCount),
+                    KeyboardStep = 1,
+                },
+                new BooleanSettingsEntry
+                {
+                    Name = StpStrings.ShowBeatmapInfo,
+                    Bindable = config.GetBindable<bool>(SandboxSetting.ShowBeatmapInfo)
+                },
+                new EnumSettingsEntry<VisualizerLayout>
+                {
+                    Name = StpStrings.VisualizerLayoutType,
+                    Bindable = config.GetBindable<VisualizerLayout>(SandboxSetting.VisualizerLayout)
+                },
+                new SpecratorSettingsEntry
+                {
+                    Name = "Type A设置"
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.Radius,
+                    KeyboardStep = 1,
+                    Bindable = config.GetBindable<int>(SandboxSetting.Radius)
+                },
+                new EnumSettingsEntry<CircularBarType>
+                {
+                    Name = StpStrings.BarType,
+                    Bindable = config.GetBindable<CircularBarType>(SandboxSetting.CircularBarType)
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.Rotation,
+                    KeyboardStep = 1,
+                    Bindable = config.GetBindable<int>(SandboxSetting.Rotation)
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.DecayTime,
+                    Bindable = config.GetBindable<int>(SandboxSetting.DecayA),
+                    KeyboardStep = 1
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.HeightMultiplier,
+                    Bindable = config.GetBindable<int>(SandboxSetting.MultiplierA),
+                    KeyboardStep = 1
+                },
+                new BooleanSettingsEntry
+                {
+                    Name = StpStrings.Symmetry,
+                    Bindable = config.GetBindable<bool>(SandboxSetting.Symmetry)
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.Smoothness,
+                    Bindable = config.GetBindable<int>(SandboxSetting.SmoothnessA),
+                    KeyboardStep = 1
+                },
+                new NumberSettingsEntry<double>
+                {
+                    Name = StpStrings.BarWidth,
+                    Bindable = config.GetBindable<double>(SandboxSetting.BarWidthA),
+                    KeyboardStep = 0.1f
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.VisualizerAmount,
+                    Bindable = config.GetBindable<int>(SandboxSetting.VisualizerAmount),
+                    KeyboardStep = 1,
+                    ////////TransferValueOnCommit = true
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.BarsPerVisual,
+                    Bindable = config.GetBindable<int>(SandboxSetting.BarsPerVisual),
+                    KeyboardStep = 1,
+                    ////////TransferValueOnCommit = true
+                },
+                new SpecratorSettingsEntry
+                {
+                    Name = "Type B设置"
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.DecayTime,
+                    Bindable = config.GetBindable<int>(SandboxSetting.DecayB),
+                    KeyboardStep = 1
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.HeightMultiplier,
+                    Bindable = config.GetBindable<int>(SandboxSetting.MultiplierB),
+                    KeyboardStep = 1
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.Smoothness,
+                    Bindable = config.GetBindable<int>(SandboxSetting.SmoothnessB),
+                    KeyboardStep = 1
+                },
+                new NumberSettingsEntry<double>
+                {
+                    Name = StpStrings.BarWidth,
+                    Bindable = config.GetBindable<double>(SandboxSetting.BarWidthB)
+                },
+                new NumberSettingsEntry<int>
+                {
+                    Name = StpStrings.BarCount,
+                    Bindable = config.GetBindable<int>(SandboxSetting.BarCountB)
+                },
+                new EnumSettingsEntry<LinearBarType>
+                {
+                    Name = StpStrings.BarType,
+                    Bindable = config.GetBindable<LinearBarType>(SandboxSetting.LinearBarType)
+                },
+            };
+
+            return entries;
+        }
 
         protected override Drawable CreateContent() => new Container
         {

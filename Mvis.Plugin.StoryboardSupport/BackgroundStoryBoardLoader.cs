@@ -1,7 +1,7 @@
 using System;
+using M.Resources.Localisation.LLin;
 using Mvis.Plugin.StoryboardSupport.Config;
 using Mvis.Plugin.StoryboardSupport.Storyboard;
-using Mvis.Plugin.StoryboardSupport.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,6 +13,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 using osu.Game.Screens.Play;
 
 namespace Mvis.Plugin.StoryboardSupport
@@ -124,7 +125,23 @@ namespace Mvis.Plugin.StoryboardSupport
 
         public override IPluginConfigManager CreateConfigManager(Storage storage) => new SbLoaderConfigManager(storage);
 
-        public override PluginSettingsSubSection CreateSettingsSubSection() => new StoryboardSettings(this);
+        private SettingsEntry[] entries;
+
+        public override SettingsEntry[] GetSettingEntries()
+        {
+            var config = (SbLoaderConfigManager)PluginManager.GetConfigManager(this);
+
+            entries ??= new SettingsEntry[]
+            {
+                new BooleanSettingsEntry
+                {
+                    Name = LLinGenericStrings.EnablePlugin,
+                    Bindable = config.GetBindable<bool>(SbLoaderSettings.EnableStoryboard)
+                }
+            };
+
+            return entries;
+        }
 
         protected override bool PostInit()
         {

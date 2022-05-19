@@ -1,3 +1,5 @@
+using M.Resources.Localisation.LLin;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.Yasp.Config;
 using Mvis.Plugin.Yasp.UI;
 using osu.Framework.Allocation;
@@ -16,6 +18,7 @@ using osu.Game.Screens.LLin.Misc;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 using osuTK;
 using osuTK.Graphics;
 
@@ -33,11 +36,32 @@ namespace Mvis.Plugin.Yasp
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new YaspConfigManager(storage);
 
-        public override PluginSettingsSubSection CreateSettingsSubSection()
-            => new YaspSettingsSubSection(this);
-
         public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
             => new YaspSidebarSection(this);
+
+        private SettingsEntry[] entries;
+
+        public override SettingsEntry[] GetSettingEntries()
+        {
+            var config = (YaspConfigManager)PluginManager.GetConfigManager(this);
+
+            entries ??= new SettingsEntry[]
+            {
+                new NumberSettingsEntry<float>
+                {
+                    Name = YaspStrings.Scale,
+                    Bindable = config.GetBindable<float>(YaspSettings.Scale),
+                    DisplayAsPercentage = true,
+                },
+                new BooleanSettingsEntry
+                {
+                    Name = LLinGenericStrings.EnablePlugin,
+                    Bindable = config.GetBindable<bool>(YaspSettings.EnablePlugin)
+                }
+            };
+
+            return entries;
+        }
 
         public override int Version => 9;
 

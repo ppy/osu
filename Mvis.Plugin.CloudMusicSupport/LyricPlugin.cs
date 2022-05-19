@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using M.DBus.Tray;
+using M.Resources.Localisation.LLin;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.DBus;
 using Mvis.Plugin.CloudMusicSupport.Helper;
@@ -17,6 +19,7 @@ using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
 namespace Mvis.Plugin.CloudMusicSupport
 {
@@ -30,8 +33,78 @@ namespace Mvis.Plugin.CloudMusicSupport
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new LyricConfigManager(storage);
 
-        public override PluginSettingsSubSection CreateSettingsSubSection()
-            => new LyricSettingsSubSection(this);
+        private SettingsEntry[] entries;
+
+        public override SettingsEntry[] GetSettingEntries()
+        {
+            var config = (LyricConfigManager)PluginManager.GetConfigManager(this);
+
+            entries ??= new SettingsEntry[]
+            {
+                new BooleanSettingsEntry
+                {
+                    Name = LLinGenericStrings.EnablePlugin,
+                    Bindable = config.GetBindable<bool>(LyricSettings.EnablePlugin)
+                },
+                new BooleanSettingsEntry
+                {
+                    Name = CloudMusicStrings.SaveLyricOnDownloadedMain,
+                    Bindable = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish),
+                    Description = CloudMusicStrings.SaveLyricOnDownloadedSub
+                },
+                new BooleanSettingsEntry
+                {
+                    Name = CloudMusicStrings.DisableShader,
+                    Bindable = config.GetBindable<bool>(LyricSettings.NoExtraShadow)
+                },
+                new NumberSettingsEntry<float>
+                {
+                    Name = CloudMusicStrings.LyricFadeInDuration,
+                    Bindable = config.GetBindable<float>(LyricSettings.LyricFadeInDuration)
+                },
+                new NumberSettingsEntry<float>
+                {
+                    Name = CloudMusicStrings.LyricFadeOutDuration,
+                    Bindable = config.GetBindable<float>(LyricSettings.LyricFadeOutDuration)
+                },
+                new BooleanSettingsEntry
+                {
+                    Name = CloudMusicStrings.LyricAutoScrollMain,
+                    Bindable = config.GetBindable<bool>(LyricSettings.AutoScrollToCurrent)
+                },
+                new ListSettingsEntry<Anchor>
+                {
+                    Name = CloudMusicStrings.LocationDirection,
+                    Bindable = config.GetBindable<Anchor>(LyricSettings.LyricDirection),
+                    Values = new[]
+                    {
+                        Anchor.TopLeft,
+                        Anchor.TopCentre,
+                        Anchor.TopRight,
+                        Anchor.CentreLeft,
+                        Anchor.Centre,
+                        Anchor.CentreRight,
+                        Anchor.BottomLeft,
+                        Anchor.BottomCentre,
+                        Anchor.BottomRight,
+                    }
+                },
+                new NumberSettingsEntry<float>
+                {
+                    Name = CloudMusicStrings.PositionX,
+                    Bindable = config.GetBindable<float>(LyricSettings.LyricPositionX),
+                    DisplayAsPercentage = true
+                },
+                new NumberSettingsEntry<float>
+                {
+                    Name = CloudMusicStrings.PositionY,
+                    Bindable = config.GetBindable<float>(LyricSettings.LyricPositionY),
+                    DisplayAsPercentage = true
+                }
+            };
+
+            return entries;
+        }
 
         public override PluginSidebarPage CreateSidebarPage()
             => new LyricSidebarSectionContainer(this);

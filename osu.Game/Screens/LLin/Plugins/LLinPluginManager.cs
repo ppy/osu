@@ -41,8 +41,8 @@ namespace osu.Game.Screens.LLin.Plugins
         internal Action<LLinPlugin> OnPluginAdd;
         internal Action<LLinPlugin> OnPluginUnLoad;
 
-        public int PluginVersion => 9;
-        public int MinimumPluginVersion => 8;
+        public int PluginVersion => 10;
+        public int MinimumPluginVersion => 9;
         private const bool experimental = false;
 
         public readonly IProvideAudioControlPlugin DefaultAudioController = new OsuMusicControllerWrapper();
@@ -163,6 +163,8 @@ namespace osu.Game.Screens.LLin.Plugins
 
             avaliablePlugins.Add(pl);
             OnPluginAdd?.Invoke(pl);
+
+            pl.PluginManager = this;
             return true;
         }
 
