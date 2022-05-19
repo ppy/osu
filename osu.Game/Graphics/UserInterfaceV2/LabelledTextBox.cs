@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -25,7 +26,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => Component.ReadOnly = value;
         }
 
-        public string PlaceholderText
+        public LocalisableString PlaceholderText
         {
             set => Component.PlaceholderText = value;
         }
