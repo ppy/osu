@@ -192,14 +192,14 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             private readonly Bindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
 
-            [Resolved]
-            private OsuGameBase game { get; set; } = null!;
+            [Resolved(canBeNull: true)] // Can't really be null but required to handle potential of disposal before DI completes.
+            private OsuGameBase? game { get; set; }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                game.RegisterImportHandler(this);
+                game?.RegisterImportHandler(this);
 
                 currentDirectory.BindValueChanged(onDirectorySelected);
 
@@ -242,7 +242,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
-                game.UnregisterImportHandler(this);
+                game?.UnregisterImportHandler(this);
             }
 
             public override Popover GetPopover() => new DirectoryChooserPopover(currentDirectory);
