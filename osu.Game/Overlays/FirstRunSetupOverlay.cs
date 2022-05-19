@@ -62,8 +62,6 @@ namespace osu.Game.Overlays
 
         private Container screenContent = null!;
 
-        private Bindable<OverlayActivation>? overlayActivationMode;
-
         private Container content = null!;
 
         private LoadingSpinner loading = null!;
@@ -225,16 +223,9 @@ namespace osu.Game.Overlays
             // if we are valid for display, only do so after reaching the main menu.
             performer.PerformFromScreen(screen =>
             {
-                MainMenu menu = (MainMenu)screen;
-
-                // Eventually I'd like to replace this with a better method that doesn't access the screen.
-                // Either this dialog would be converted to its own screen, or at very least be "hosted" by a screen pushed to the main menu.
-                // Alternatively, another method of disabling notifications could be added to `INotificationOverlay`.
-                if (menu != null)
-                {
-                    overlayActivationMode = menu.OverlayActivationMode.GetBoundCopy();
-                    overlayActivationMode.Value = OverlayActivation.UserTriggered;
-                }
+                // Hides the toolbar for us.
+                if (screen is MainMenu menu)
+                    menu.ReturnToOsuLogo();
 
                 base.Show();
             }, new[] { typeof(MainMenu) });
@@ -256,13 +247,6 @@ namespace osu.Game.Overlays
             base.PopOut();
 
             content.ScaleTo(0.99f, 400, Easing.OutQuint);
-
-            if (overlayActivationMode != null)
-            {
-                // If this is non-null we are guaranteed to have come from the main menu.
-                overlayActivationMode.Value = OverlayActivation.All;
-                overlayActivationMode = null;
-            }
 
             if (currentStepIndex != null)
             {
