@@ -1,12 +1,13 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.LLin;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Settings.Sections.Mf
+namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
 {
     public class ColourPreviewer : Container
     {
@@ -23,9 +24,17 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         private Box c2;
         private OsuSpriteText hueText;
 
+        private readonly BindableFloat iR = new BindableFloat();
+        private readonly BindableFloat iG = new BindableFloat();
+        private readonly BindableFloat iB = new BindableFloat();
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(MConfigManager config)
         {
+            config.BindWith(MSetting.MvisInterfaceRed, iR);
+            config.BindWith(MSetting.MvisInterfaceGreen, iG);
+            config.BindWith(MSetting.MvisInterfaceBlue, iB);
+
             Height = 75;
             RelativeSizeAxes = Axes.X;
             Padding = new MarginPadding { Horizontal = 15 };
@@ -120,9 +129,18 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             };
         }
 
-        public void UpdateColor(float r, float g, float b)
+        protected override void LoadComplete()
         {
-            provider.UpdateHueColor(r, g, b);
+            base.LoadComplete();
+
+            iR.BindValueChanged(_ => updateColor());
+            iG.BindValueChanged(_ => updateColor());
+            iB.BindValueChanged(_ => updateColor(), true);
+        }
+
+        private void updateColor()
+        {
+            provider.UpdateHueColor(iR.Value, iG.Value, iB.Value);
 
             bg5.Colour = provider.Background5;
             bg4.Colour = provider.Background4;

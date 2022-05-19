@@ -36,9 +36,6 @@ namespace osu.Game.Screens.LLin.SideBar.Settings
             RelativeSizeAxes = Axes.Both;
             Add(fillFlow);
 
-            AddSection(new BaseSettings());
-            AddSection(new AudioSettings());
-
             foreach (var pl in pluginManager.GetAllPlugins(false))
             {
 #pragma warning disable CS0618
@@ -47,7 +44,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings
 
                 if (pluginSidebarSection != null)
                     AddSection(pluginSidebarSection);
-                else if (pl.GetSettingEntries().Length > 0)
+                else if (pl.GetSettingEntries()?.Length > 0)
                     AddSection(new NewPluginSettingsSection(pl));
             }
 

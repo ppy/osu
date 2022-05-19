@@ -41,7 +41,8 @@ namespace osu.Game.Screens.LLin.Plugins.Config
         {
             foreach (var se in plugin.GetSettingEntries())
             {
-                Add(se.ToLLinSettingsItem());
+                var item = se.ToLLinSettingsItem();
+                if (item != null) Add(se.ToLLinSettingsItem());
             }
         }
     }

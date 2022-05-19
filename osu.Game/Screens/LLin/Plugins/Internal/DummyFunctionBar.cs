@@ -10,6 +10,8 @@ namespace osu.Game.Screens.LLin.Plugins.Internal
         public DummyFunctionBar()
         {
             Name = "无";
+            Description = "默认底栏";
+            Author = "mf-osu";
         }
 
         protected override Drawable CreateContent()

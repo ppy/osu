@@ -1,3 +1,4 @@
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,6 +11,7 @@ using osu.Game.Screens.LLin.SideBar.Tabs;
 
 namespace osu.Game.Screens.LLin.SideBar.Settings.Sections
 {
+    [Obsolete("此设置页面已弃用")]
     public class BaseSettings : Section
     {
         private readonly BindableFloat iR = new BindableFloat();

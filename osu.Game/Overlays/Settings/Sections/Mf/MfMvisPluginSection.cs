@@ -29,11 +29,11 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     continue;
                 }
 
-                if (pl.GetSettingEntries().Length > 0)
+                if (pl.GetSettingEntries()?.Length > 0)
                     Add(new PluginSettingsSubsection(pl));
             }
         }
 
-        public override LocalisableString Header => "M-vis播放器 - 插件";
+        public override LocalisableString Header => "LLin播放器 - 设置和插件";
     }
 }

@@ -24,7 +24,6 @@ namespace osu.Game.Overlays
                 AddSection(new LinuxSection());
             }
 
-            AddSection(new MfMvisSection());
             AddSection(new MfMvisPluginSection());
             AddSection(new DangerousZone());
         }

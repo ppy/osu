@@ -37,6 +37,7 @@ namespace osu.Game.Screens.LLin.Plugins
 
         public virtual IPluginConfigManager CreateConfigManager(Storage storage) => null;
 
+        [CanBeNull]
         public virtual SettingsEntry[] GetSettingEntries() => Array.Empty<SettingsEntry>();
 
         /// <summary>
@@ -80,6 +81,8 @@ namespace osu.Game.Screens.LLin.Plugins
         public string Description = "插件描述";
         public string Author = "插件作者";
         public string Website = "???";
+
+        public bool HideFromPluginManagement { get; internal set; } = false;
 
         public abstract int Version { get; }
 
