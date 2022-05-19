@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private void updateState()
         {
-            bool selected = selectedChannel.Value == Channel || (isSelector && selectedChannel.Value == null);
+            bool selected = selectedChannel.Value == Channel;
 
             if (selected)
                 selectBox.FadeIn(300, Easing.OutQuint);
