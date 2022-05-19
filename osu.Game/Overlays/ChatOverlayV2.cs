@@ -62,6 +62,9 @@ namespace osu.Game.Overlays
         [Cached]
         private readonly Bindable<Channel> currentChannel = new Bindable<Channel>();
 
+        private readonly IBindableList<Channel> availableChannels = new BindableList<Channel>();
+        private readonly IBindableList<Channel> joinedChannels = new BindableList<Channel>();
+
         public ChatOverlayV2()
         {
             Height = default_chat_height;
@@ -147,9 +150,13 @@ namespace osu.Game.Overlays
             chatHeight.BindValueChanged(height => { Height = height.NewValue; }, true);
 
             currentChannel.BindTo(channelManager.CurrentChannel);
-            channelManager.CurrentChannel.BindValueChanged(currentChannelChanged, true);
-            channelManager.JoinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
-            channelManager.AvailableChannels.BindCollectionChanged(availableChannelsChanged, true);
+            currentChannel.BindValueChanged(currentChannelChanged, true);
+
+            joinedChannels.BindTo(channelManager.JoinedChannels);
+            joinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
+
+            availableChannels.BindTo(channelManager.AvailableChannels);
+            availableChannels.BindCollectionChanged(availableChannelsChanged, true);
 
             channelList.OnRequestSelect += channel => channelManager.CurrentChannel.Value = channel;
             channelList.OnRequestLeave += channel => channelManager.LeaveChannel(channel);
@@ -263,8 +270,8 @@ namespace osu.Game.Overlays
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    IEnumerable<Channel> joinedChannels = filterChannels(args.NewItems);
-                    foreach (var channel in joinedChannels)
+                    IEnumerable<Channel> newChannels = filterChannels(args.NewItems);
+                    foreach (var channel in newChannels)
                         channelList.AddChannel(channel);
                     break;
 
