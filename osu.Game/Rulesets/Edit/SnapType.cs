@@ -8,8 +8,9 @@ namespace osu.Game.Rulesets.Edit
     [Flags]
     public enum SnapType
     {
-        NearbyObjects = 0,
-        Grids = 1,
+        None = 0,
+        NearbyObjects = 1 << 0,
+        Grids = 1 << 1,
         All = NearbyObjects | Grids,
     }
 }
