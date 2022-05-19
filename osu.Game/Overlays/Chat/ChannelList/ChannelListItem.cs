@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays.Chat.Listing;
 using osu.Game.Users.Drawables;
 using osuTK;
 
@@ -191,6 +192,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 text.FadeColour(colourProvider.Light3, 200, Easing.OutQuint);
         }
 
-        private bool isSelector => Channel is DummySelectorChannel;
+        private bool isSelector => Channel is ChannelListing.ChannelListingChannel;
     }
 }

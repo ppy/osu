@@ -244,7 +244,7 @@ namespace osu.Game.Overlays
         {
             Channel? newChannel = channel.NewValue;
 
-            if (newChannel == null || newChannel is DummySelectorChannel)
+            if (newChannel == null || newChannel is ChannelListing.ChannelListingChannel)
             {
                 // null channel denotes that we should be showing the listing.
                 channelListing.State.Value = Visibility.Visible;
@@ -298,15 +298,6 @@ namespace osu.Game.Overlays
                 channelManager.PostCommand(message.Substring(1));
             else
                 channelManager.PostMessage(message);
-        }
-    }
-
-    public class DummySelectorChannel : Channel
-    {
-        public DummySelectorChannel()
-        {
-            Name = "Add more channels";
-            Type = ChannelType.System;
         }
     }
 }
