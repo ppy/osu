@@ -22,9 +22,9 @@ namespace osu.Game.Overlays.Chat.ChannelList
         public Action<Channel>? OnRequestSelect;
         public Action<Channel>? OnRequestLeave;
 
-        private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
+        public readonly ChannelListing.ChannelListingChannel ChannelListingChannel = new ChannelListing.ChannelListingChannel();
 
-        private readonly ChannelListing.ChannelListingChannel channelListingChannel = new ChannelListing.ChannelListingChannel();
+        private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
         private ChannelListItemFlow publicChannelFlow = null!;
         private ChannelListItemFlow privateChannelFlow = null!;
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         Children = new Drawable[]
                         {
                             publicChannelFlow = new ChannelListItemFlow("CHANNELS"),
-                            selector = new ChannelListItem(channelListingChannel)
+                            selector = new ChannelListItem(ChannelListingChannel)
                             {
                                 Margin = new MarginPadding { Bottom = 10 },
                             },

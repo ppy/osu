@@ -244,9 +244,15 @@ namespace osu.Game.Overlays
         {
             Channel? newChannel = channel.NewValue;
 
-            if (newChannel == null || newChannel is ChannelListing.ChannelListingChannel)
+            // null channel denotes that we should be showing the listing.
+            if (newChannel == null)
             {
-                // null channel denotes that we should be showing the listing.
+                currentChannel.Value = channelList.ChannelListingChannel;
+                return;
+            }
+
+            if (newChannel is ChannelListing.ChannelListingChannel)
+            {
                 channelListing.State.Value = Visibility.Visible;
                 textBar.ShowSearch.Value = true;
             }
