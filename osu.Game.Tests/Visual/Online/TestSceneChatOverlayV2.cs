@@ -408,7 +408,7 @@ namespace osu.Game.Tests.Visual.Online
             chatOverlay.ChildrenOfType<ChatOverlayTopBar>().Single();
 
         private ChannelListItem channelSelectorButton =>
-            chatOverlay.ChildrenOfType<ChannelListItem>().Single(item => item.Channel is DummySelectorChannel);
+            chatOverlay.ChildrenOfType<ChannelListItem>().Single(item => item.Channel is ChannelListing.ChannelListingChannel);
 
         private void clickDrawable(Drawable d)
         {

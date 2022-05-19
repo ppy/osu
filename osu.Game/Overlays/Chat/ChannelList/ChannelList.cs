@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
@@ -23,7 +24,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
-        private readonly DummySelectorChannel dummySelectorChannel = new DummySelectorChannel();
+        private readonly ChannelListing.ChannelListingChannel channelListingChannel = new ChannelListing.ChannelListingChannel();
 
         private ChannelListItemFlow publicChannelFlow = null!;
         private ChannelListItemFlow privateChannelFlow = null!;
@@ -53,7 +54,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         Children = new Drawable[]
                         {
                             publicChannelFlow = new ChannelListItemFlow("CHANNELS"),
-                            selector = new ChannelListItem(dummySelectorChannel)
+                            selector = new ChannelListItem(channelListingChannel)
                             {
                                 Margin = new MarginPadding { Bottom = 10 },
                             },
