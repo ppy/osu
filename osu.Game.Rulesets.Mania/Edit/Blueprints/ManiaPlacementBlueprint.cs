@@ -55,24 +55,25 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.UpdateTimeAndPosition(result);
 
-            var playfield = (Column)result.Playfield;
-
-            // Apply an offset to better align with the visual grid.
-            // This should only be applied during placement, as during selection / drag operations the movement is relative
-            // to the initial point of interaction rather than the grid.
-            switch (playfield.ScrollingInfo.Direction.Value)
+            if (result.Playfield is Column col)
             {
-                case ScrollingDirection.Down:
-                    result.ScreenSpacePosition -= new Vector2(0, getNoteHeight(playfield) / 2);
-                    break;
+                // Apply an offset to better align with the visual grid.
+                // This should only be applied during placement, as during selection / drag operations the movement is relative
+                // to the initial point of interaction rather than the grid.
+                switch (col.ScrollingInfo.Direction.Value)
+                {
+                    case ScrollingDirection.Down:
+                        result.ScreenSpacePosition -= new Vector2(0, getNoteHeight(col) / 2);
+                        break;
 
-                case ScrollingDirection.Up:
-                    result.ScreenSpacePosition += new Vector2(0, getNoteHeight(playfield) / 2);
-                    break;
+                    case ScrollingDirection.Up:
+                        result.ScreenSpacePosition += new Vector2(0, getNoteHeight(col) / 2);
+                        break;
+                }
+
+                if (PlacementActive == PlacementState.Waiting)
+                    Column = col;
             }
-
-            if (PlacementActive == PlacementState.Waiting)
-                Column = playfield;
         }
 
         private float getNoteHeight(Column resultPlayfield) =>
