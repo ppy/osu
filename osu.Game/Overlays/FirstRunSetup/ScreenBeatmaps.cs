@@ -25,7 +25,6 @@ namespace osu.Game.Overlays.FirstRunSetup
     public class ScreenBeatmaps : FirstRunSetupScreen
     {
         private ProgressRoundedButton downloadBundledButton = null!;
-        private ProgressRoundedButton importBeatmapsButton = null!;
         private ProgressRoundedButton downloadTutorialButton = null!;
 
         private OsuTextFlowContainer currentlyLoadedBeatmaps = null!;
@@ -41,8 +40,8 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private IDisposable? beatmapSubscription;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(LegacyImportManager? legacyImportManager)
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Vector2 buttonSize = new Vector2(400, 50);
 
@@ -102,35 +101,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                     BackgroundColour = colours.Blue3,
                     Text = FirstRunSetupBeatmapScreenStrings.BundledButton,
                     Action = downloadBundled
-                },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
-                {
-                    Colour = OverlayColourProvider.Content1,
-                    Text = "If you have an existing osu! install, you can also choose to import your existing beatmap collection.",
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y
-                },
-                importBeatmapsButton = new ProgressRoundedButton
-                {
-                    Size = buttonSize,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    BackgroundColour = colours.Blue3,
-                    Text = MaintenanceSettingsStrings.ImportBeatmapsFromStable,
-                    Action = () =>
-                    {
-                        importBeatmapsButton.Enabled.Value = false;
-                        legacyImportManager?.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() =>
-                        {
-                            if (t.IsCompletedSuccessfully)
-                                importBeatmapsButton.Complete();
-                            else
-                            {
-                                importBeatmapsButton.Enabled.Value = true;
-                                importBeatmapsButton.Abort();
-                            }
-                        }));
-                    }
                 },
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {

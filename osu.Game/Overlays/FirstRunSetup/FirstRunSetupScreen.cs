@@ -21,6 +21,8 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         protected const float CONTENT_FONT_SIZE = 16;
 
+        protected const float CONTENT_PADDING = 30;
+
         protected const float HEADER_FONT_SIZE = 24;
 
         [Resolved]
@@ -41,7 +43,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding { Horizontal = 30 },
+                        Padding = new MarginPadding { Horizontal = CONTENT_PADDING },
                         Children = new Drawable[]
                         {
                             new OsuSpriteText
