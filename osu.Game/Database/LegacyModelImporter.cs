@@ -40,7 +40,7 @@ namespace osu.Game.Database
             Importer = importer;
         }
 
-        public Task<int> GetAvailableCount(StableStorage stableStorage) => Task.Run(() => GetStableImportPaths(stableStorage).Count());
+        public Task<int> GetAvailableCount(StableStorage stableStorage) => Task.Run(() => GetStableImportPaths(PrepareStableStorage(stableStorage)).Count());
 
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {
