@@ -19,6 +19,7 @@ using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
 namespace Mvis.Plugin.CloudMusicSupport
@@ -48,12 +49,14 @@ namespace Mvis.Plugin.CloudMusicSupport
                 },
                 new BooleanSettingsEntry
                 {
+                    Icon = FontAwesome.Solid.Save,
                     Name = CloudMusicStrings.SaveLyricOnDownloadedMain,
                     Bindable = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish),
                     Description = CloudMusicStrings.SaveLyricOnDownloadedSub
                 },
                 new BooleanSettingsEntry
                 {
+                    Icon = FontAwesome.Solid.FillDrip,
                     Name = CloudMusicStrings.DisableShader,
                     Bindable = config.GetBindable<bool>(LyricSettings.NoExtraShadow)
                 },
@@ -74,6 +77,7 @@ namespace Mvis.Plugin.CloudMusicSupport
                 },
                 new ListSettingsEntry<Anchor>
                 {
+                    Icon = FontAwesome.Solid.Anchor,
                     Name = CloudMusicStrings.LocationDirection,
                     Bindable = config.GetBindable<Anchor>(LyricSettings.LyricDirection),
                     Values = new[]
@@ -108,9 +112,6 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         public override PluginSidebarPage CreateSidebarPage()
             => new LyricSidebarSectionContainer(this);
-
-        public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
-            => new LyricSidebarSection(this);
 
         public override int Version => 9;
 

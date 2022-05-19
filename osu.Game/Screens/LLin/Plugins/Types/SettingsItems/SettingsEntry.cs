@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Settings;
+using osu.Game.Screens.LLin.SideBar.Settings.Items;
 
 namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
 {
@@ -41,6 +44,8 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             }
         }
 
+        public IconUsage Icon = FontAwesome.Regular.QuestionCircle;
+
         protected bool AllowChangeName;
         protected bool AllowChangeDescription;
 
@@ -51,7 +56,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
         public abstract Drawable ToLLinSettingsItem();
     }
 
-    public class SpecratorSettingsEntry : SettingsEntry
+    public class SeparatorSettingsEntry : SettingsEntry
     {
         public override Drawable ToSettingsItem()
         {
@@ -65,7 +70,11 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
 
         public override Drawable ToLLinSettingsItem()
         {
-            throw new NotImplementedException();
+            return new SettingsSeparatorPiece
+            {
+                Description = Name,
+                Icon = this.Icon
+            };
         }
     }
 
@@ -75,9 +84,14 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
         public bool DisplayAsPercentage = false;
         public float KeyboardStep = 0.1f;
 
+        public NumberSettingsEntry()
+        {
+            Icon = FontAwesome.Solid.SlidersH;
+        }
+
         public override Drawable ToSettingsItem()
         {
-            return new SettingsSlider<T>
+            return new Overlays.Settings.SettingsSlider<T>
             {
                 Current = (Bindable<T>)Bindable,
                 LabelText = Name,
@@ -89,12 +103,24 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
 
         public override Drawable ToLLinSettingsItem()
         {
-            throw new NotImplementedException();
+            return new SettingsSliderPiece<T>
+            {
+                Description = Name,
+                TooltipText = Description,
+                Bindable = (Bindable<T>)this.Bindable,
+                Icon = this.Icon,
+                DisplayAsPercentage = this.DisplayAsPercentage
+            };
         }
     }
 
     public class BooleanSettingsEntry : SettingsEntry
     {
+        public BooleanSettingsEntry()
+        {
+            Icon = FontAwesome.Solid.ToggleOn;
+        }
+
         public override Drawable ToSettingsItem()
         {
             return new SettingsCheckbox
@@ -107,13 +133,24 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
 
         public override Drawable ToLLinSettingsItem()
         {
-            throw new NotImplementedException();
+            return new SettingsTogglePiece
+            {
+                Description = Name,
+                TooltipText = Description,
+                Bindable = (Bindable<bool>)this.Bindable,
+                Icon = this.Icon
+            };
         }
     }
 
     public class ListSettingsEntry<T> : SettingsEntry
     {
         public IEnumerable<T> Values;
+
+        public ListSettingsEntry()
+        {
+            Icon = FontAwesome.Solid.List;
+        }
 
         public override Drawable ToSettingsItem()
         {
@@ -127,13 +164,25 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
 
         public override Drawable ToLLinSettingsItem()
         {
-            throw new NotImplementedException();
+            return new SettingsListPiece<T>
+            {
+                Description = Name,
+                TooltipText = Description,
+                Bindable = (Bindable<T>)this.Bindable,
+                Icon = this.Icon,
+                Values = this.Values.ToList()
+            };
         }
     }
 
     public class StringSettingsEntry<T> : SettingsEntry
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
+        public StringSettingsEntry()
+        {
+            Icon = FontAwesome.Solid.TextWidth;
+        }
+
         public override Drawable ToSettingsItem()
         {
             return new SettingsTextBox
@@ -153,6 +202,11 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
     public class EnumSettingsEntry<T> : SettingsEntry
         where T : struct, Enum
     {
+        public EnumSettingsEntry()
+        {
+            Icon = FontAwesome.Solid.List;
+        }
+
         public override Drawable ToSettingsItem()
         {
             return new SettingsEnumDropdown<T>
@@ -165,7 +219,13 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
 
         public override Drawable ToLLinSettingsItem()
         {
-            throw new NotImplementedException();
+            return new SettingsEnumPiece<T>
+            {
+                Description = Name,
+                TooltipText = Description,
+                Bindable = (Bindable<T>)this.Bindable,
+                Icon = this.Icon
+            };
         }
     }
 }

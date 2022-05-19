@@ -94,7 +94,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Direction = FillDirection.Vertical,
-                    Margin = new MarginPadding(10),
+                    Padding = new MarginPadding(10),
                     Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {

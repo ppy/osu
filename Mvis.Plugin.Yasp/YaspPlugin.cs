@@ -1,7 +1,6 @@
 using M.Resources.Localisation.LLin;
 using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.Yasp.Config;
-using Mvis.Plugin.Yasp.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -9,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -36,9 +36,6 @@ namespace Mvis.Plugin.Yasp
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new YaspConfigManager(storage);
 
-        public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
-            => new YaspSidebarSection(this);
-
         private SettingsEntry[] entries;
 
         public override SettingsEntry[] GetSettingEntries()
@@ -49,6 +46,7 @@ namespace Mvis.Plugin.Yasp
             {
                 new NumberSettingsEntry<float>
                 {
+                    Icon = FontAwesome.Solid.ExpandArrowsAlt,
                     Name = YaspStrings.Scale,
                     Bindable = config.GetBindable<float>(YaspSettings.Scale),
                     DisplayAsPercentage = true,

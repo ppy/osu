@@ -2,7 +2,6 @@ using M.Resources.Localisation.LLin;
 using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.Sandbox.Components;
 using Mvis.Plugin.Sandbox.Config;
-using Mvis.Plugin.Sandbox.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -80,9 +79,6 @@ namespace Mvis.Plugin.Sandbox
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new SandboxConfigManager(storage);
 
-        public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
-            => new RulesetPanelSidebarSection(this);
-
         private SettingsEntry[] entries;
 
         public override SettingsEntry[] GetSettingEntries()
@@ -123,7 +119,7 @@ namespace Mvis.Plugin.Sandbox
                     Name = StpStrings.VisualizerLayoutType,
                     Bindable = config.GetBindable<VisualizerLayout>(SandboxSetting.VisualizerLayout)
                 },
-                new SpecratorSettingsEntry
+                new SeparatorSettingsEntry
                 {
                     Name = "Type A设置"
                 },
@@ -187,7 +183,7 @@ namespace Mvis.Plugin.Sandbox
                     KeyboardStep = 1,
                     ////////TransferValueOnCommit = true
                 },
-                new SpecratorSettingsEntry
+                new SeparatorSettingsEntry
                 {
                     Name = "Type B设置"
                 },

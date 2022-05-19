@@ -32,6 +32,7 @@ namespace osu.Game.Screens.LLin.Plugins
         /// 为Mvis侧边栏创建设置页面
         /// </summary>
         /// <returns>创建的设置页面</returns>
+        [Obsolete("请使用GetSettingEntries")]
         public virtual PluginSidebarSettingsSection CreateSidebarSettingsSection() => null;
 
         public virtual IPluginConfigManager CreateConfigManager(Storage storage) => null;
