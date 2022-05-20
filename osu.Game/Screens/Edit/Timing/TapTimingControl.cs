@@ -15,7 +15,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -105,9 +104,11 @@ namespace osu.Game.Screens.Edit.Timing
         private class Metronome : BeatSyncedContainer
         {
             private Container swing;
-            private Box weight;
+
             private OsuSpriteText bpm;
-            private Box stick;
+
+            private Drawable weight;
+            private Drawable stick;
 
             [Resolved]
             private OverlayColourProvider overlayColourProvider { get; set; }
@@ -116,33 +117,41 @@ namespace osu.Game.Screens.Edit.Timing
             private void load()
             {
                 Margin = new MarginPadding(10);
+
+                const float taper = 10;
+
+                var triangleSize = new Vector2(80, 120);
+
                 AutoSizeAxes = Axes.Both;
+
+                const float stick_vertical_offset = -23;
 
                 InternalChildren = new Drawable[]
                 {
-                    new Triangle
+                    new Container
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(80, 120),
-                        Colour = overlayColourProvider.Background2,
-                    },
-                    bpm = new OsuSpriteText
-                    {
-                        Colour = overlayColourProvider.Content1,
+                        Masking = true,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
+                        Size = new Vector2(triangleSize.X * 1.2f, triangleSize.Y - taper),
+                        Child = new Triangle
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Size = triangleSize,
+                            Colour = overlayColourProvider.Background3,
+                        },
                     },
                     swing = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Y = -25,
+                        Y = stick_vertical_offset,
                         Height = 0.8f,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Children = new Drawable[]
+                        Children = new[]
                         {
-                            stick = new Box
+                            stick = new Circle
                             {
                                 RelativeSizeAxes = Axes.Y,
                                 Colour = overlayColourProvider.Colour2,
@@ -150,24 +159,64 @@ namespace osu.Game.Screens.Edit.Timing
                                 Origin = Anchor.BottomCentre,
                                 Width = 4,
                             },
-                            weight = new Box
+                            weight = new Container
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.Centre,
                                 Colour = overlayColourProvider.Colour1,
-                                Size = new Vector2(15),
+                                Size = new Vector2(10),
+                                Rotation = 180,
                                 RelativePositionAxes = Axes.Y,
                                 Y = 0.4f,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Shear = new Vector2(0.2f, 0),
+                                    },
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Shear = new Vector2(-0.2f, 0),
+                                    },
+                                }
                             },
                         }
                     },
                     new Circle
                     {
-                        Y = -25,
+                        Y = stick_vertical_offset,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.Centre,
                         Colour = overlayColourProvider.Colour0,
-                        Size = new Vector2(10)
+                        Size = new Vector2(8)
+                    },
+                    new Container
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        Height = 0.3f,
+                        Children = new Drawable[]
+                        {
+                            new Triangle
+                            {
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                Size = triangleSize,
+                                Colour = overlayColourProvider.Background2,
+                                Alpha = 0.8f
+                            },
+                        }
+                    },
+                    bpm = new OsuSpriteText
+                    {
+                        Colour = overlayColourProvider.Content1,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Y = -3,
                     },
                 };
             }
@@ -194,7 +243,7 @@ namespace osu.Game.Screens.Edit.Timing
 
                     bpmRatio = (float)Interpolation.ApplyEasing(Easing.OutQuad, Math.Clamp((timingPoint.BPM - 30) / 480, 0, 1));
 
-                    weight.MoveToY((float)Interpolation.Lerp(0, 0.9f, bpmRatio), 600, Easing.OutQuint);
+                    weight.MoveToY((float)Interpolation.Lerp(0.07f, 0.9f, bpmRatio), 600, Easing.OutQuint);
                 }
 
                 if (BeatSyncClock?.IsRunning != true && isSwinging)
@@ -215,7 +264,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                float angle = (float)Interpolation.Lerp(25, 4, bpmRatio);
+                float angle = (float)Interpolation.Lerp(30, 5, bpmRatio);
 
                 if (!IsBeatSyncedWithTrack)
                     return;
