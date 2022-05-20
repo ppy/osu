@@ -150,6 +150,8 @@ namespace osu.Game.Screens.Menu
         [Resolved(canBeNull: true)]
         private IPerformFromScreenRunner performer { get; set; }
 
+        public void ReturnToOsuLogo() => Buttons.State = ButtonSystemState.Initial;
+
         private void confirmAndExit()
         {
             if (exitConfirmed) return;

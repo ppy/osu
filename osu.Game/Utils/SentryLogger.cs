@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
@@ -160,6 +161,8 @@ namespace osu.Game.Utils
                     };
 
                     scope.SetTag(@"ruleset", ruleset.ShortName);
+                    scope.SetTag(@"os", $"{RuntimeInfo.OS} ({Environment.OSVersion})");
+                    scope.SetTag(@"processor count", Environment.ProcessorCount.ToString());
                 });
             }
             else
