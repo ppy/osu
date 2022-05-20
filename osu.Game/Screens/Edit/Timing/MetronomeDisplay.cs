@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -29,6 +30,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; }
+
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -205,14 +209,14 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            interpolatedBpm.BindValueChanged(bpm => bpmText.Text = bpm.NewValue.ToString());
+            interpolatedBpm.BindValueChanged(bpm => bpmText.Text = bpm.NewValue.ToString(CultureInfo.CurrentCulture));
         }
 
         protected override void Update()
         {
             base.Update();
 
-            timingPoint = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(BeatSyncClock.CurrentTime);
+            timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(BeatSyncClock.CurrentTime);
 
             if (beatLength != timingPoint.BeatLength)
             {
@@ -223,7 +227,7 @@ namespace osu.Game.Screens.Edit.Timing
                 float bpmRatio = (float)Interpolation.ApplyEasing(Easing.OutQuad, Math.Clamp((timingPoint.BPM - 30) / 480, 0, 1));
 
                 weight.MoveToY((float)Interpolation.Lerp(0.1f, 0.83f, bpmRatio), 600, Easing.OutQuint);
-                this.TransformBindableTo(interpolatedBpm, (int)timingPoint.BPM, 600, Easing.OutQuint);
+                this.TransformBindableTo(interpolatedBpm, (int)Math.Round(timingPoint.BPM), 600, Easing.OutQuint);
             }
 
             if (BeatSyncClock?.IsRunning != true && isSwinging)
