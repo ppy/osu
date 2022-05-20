@@ -67,8 +67,12 @@ namespace osu.Game.IO
         public override IEnumerable<string> GetFiles(string path, string pattern = "*") =>
             ToLocalRelative(UnderlyingStorage.GetFiles(MutatePath(path), pattern));
 
+        public override Stream CreateFileSafely(string path) => UnderlyingStorage.CreateFileSafely(path);
+
         public override Stream GetStream(string path, FileAccess access = FileAccess.Read, FileMode mode = FileMode.OpenOrCreate) =>
             UnderlyingStorage.GetStream(MutatePath(path), access, mode);
+
+        public override void Move(string from, string to) => UnderlyingStorage.Move(from, to);
 
         public override bool OpenFileExternally(string filename) => UnderlyingStorage.OpenFileExternally(MutatePath(filename));
 
