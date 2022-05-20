@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
@@ -99,7 +100,6 @@ namespace osu.Game.Screens.Edit.Timing
                             Name = @"Weight",
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.Centre,
-                            Colour = overlayColourProvider.Colour0,
                             Size = new Vector2(10),
                             Rotation = 180,
                             RelativePositionAxes = Axes.Y,
@@ -110,13 +110,24 @@ namespace osu.Game.Screens.Edit.Timing
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Shear = new Vector2(0.2f, 0),
+                                    Colour = overlayColourProvider.Colour1,
                                     EdgeSmoothness = new Vector2(1),
                                 },
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Shear = new Vector2(-0.2f, 0),
+                                    Colour = overlayColourProvider.Colour1,
                                     EdgeSmoothness = new Vector2(1),
+                                },
+                                new Circle
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Colour = ColourInfo.GradientVertical(overlayColourProvider.Colour1, overlayColourProvider.Colour0),
+                                    RelativeSizeAxes = Axes.Y,
+                                    Width = 1,
+                                    Height = 0.9f
                                 },
                             }
                         },
