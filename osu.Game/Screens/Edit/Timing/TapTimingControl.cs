@@ -119,6 +119,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 const float taper = 25;
                 const float swing_vertical_offset = -23;
+                const float lower_cover_height = 32;
 
                 var triangleSize = new Vector2(90, 120 + taper);
 
@@ -147,6 +148,17 @@ namespace osu.Game.Screens.Edit.Timing
                                 Colour = overlayColourProvider.Background3,
                             },
                         },
+                    },
+                    new Circle
+                    {
+                        Name = "Centre marker",
+                        Colour = overlayColourProvider.Background5,
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 2,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Y = -(lower_cover_height + 3),
+                        Height = 0.65f,
                     },
                     swing = new Container
                     {
@@ -228,9 +240,9 @@ namespace osu.Game.Screens.Edit.Timing
                         Name = @"Lower cover",
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        RelativeSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.X,
                         Masking = true,
-                        Height = 0.28f,
+                        Height = lower_cover_height,
                         Children = new Drawable[]
                         {
                             new Triangle
