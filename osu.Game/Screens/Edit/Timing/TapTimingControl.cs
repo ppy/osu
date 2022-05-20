@@ -140,6 +140,7 @@ namespace osu.Game.Screens.Edit.Timing
                             new Triangle
                             {
                                 Name = @"Main body",
+                                EdgeSmoothness = new Vector2(1),
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
                                 Size = triangleSize,
@@ -171,7 +172,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 Name = @"Weight",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.Centre,
-                                Colour = overlayColourProvider.Colour1,
+                                Colour = overlayColourProvider.Colour0,
                                 Size = new Vector2(10),
                                 Rotation = 180,
                                 RelativePositionAxes = Axes.Y,
@@ -182,11 +183,13 @@ namespace osu.Game.Screens.Edit.Timing
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Shear = new Vector2(0.2f, 0),
+                                        EdgeSmoothness = new Vector2(1),
                                     },
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Shear = new Vector2(-0.2f, 0),
+                                        EdgeSmoothness = new Vector2(1),
                                     },
                                 }
                             },
@@ -236,6 +239,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 Origin = Anchor.BottomCentre,
                                 Size = triangleSize,
                                 Colour = overlayColourProvider.Background2,
+                                EdgeSmoothness = new Vector2(1),
                                 Alpha = 0.8f
                             },
                         }
