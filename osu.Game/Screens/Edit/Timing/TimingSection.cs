@@ -19,6 +19,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             Flow.AddRange(new Drawable[]
             {
+                new TapTimingControl(),
                 bpmTextEntry = new BPMTextBox(),
                 timeSignature = new LabelledTimeSignature
                 {
@@ -96,5 +97,6 @@ namespace osu.Game.Screens.Edit.Timing
         }
 
         private static double beatLengthToBpm(double beatLength) => 60000 / beatLength;
+
     }
 }
