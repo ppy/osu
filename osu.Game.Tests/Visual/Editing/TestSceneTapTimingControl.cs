@@ -36,8 +36,35 @@ namespace osu.Game.Tests.Visual.Editing
 
         public TestSceneTapTimingControl()
         {
-            editorBeatmap = new EditorBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
+            var playableBeatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
+
+            // Ensure time doesn't end while testing
+            playableBeatmap.BeatmapInfo.Length = 1200000;
+
+            editorBeatmap = new EditorBeatmap(playableBeatmap);
+
             selectedGroup.Value = editorBeatmap.ControlPointInfo.Groups.First();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
+            Beatmap.Disabled = true;
+
+            Children = new Drawable[]
+            {
+                new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Y,
+                    Width = 400,
+                    Scale = new Vector2(1.5f),
+                    Child = control = new TapTimingControl(),
+                }
+            };
         }
 
         [Test]
@@ -65,24 +92,19 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestBasic()
         {
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
-            Beatmap.Disabled = true;
-
-            Child = new Container
+            AddStep("set low bpm", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                AutoSizeAxes = Axes.Y,
-                Width = 400,
-                Scale = new Vector2(1.5f),
-                Child = control = new TapTimingControl(),
-            };
+                editorBeatmap.ControlPointInfo.TimingPoints.First().BeatLength = 1000;
+            });
+
+            AddStep("click tap button", () =>
+            {
+                control.ChildrenOfType<RoundedButton>()
+                       .First(b => b.Text == "Tap to beat")
+                       .TriggerClick();
+            });
+
+            AddSliderStep("BPM", 30, 400, 60, bpm => editorBeatmap.ControlPointInfo.TimingPoints.First().BeatLength = 60000f / bpm);
         }
 
         protected override void Dispose(bool isDisposing)
