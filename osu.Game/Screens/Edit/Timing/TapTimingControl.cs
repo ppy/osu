@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -105,7 +106,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             private Container swing;
 
-            private OsuSpriteText bpm;
+            private OsuSpriteText bpmText;
 
             private Drawable weight;
             private Drawable stick;
@@ -116,7 +117,7 @@ namespace osu.Game.Screens.Edit.Timing
             [BackgroundDependencyLoader]
             private void load()
             {
-                const float taper = 30;
+                const float taper = 25;
                 const float swing_vertical_offset = -23;
 
                 var triangleSize = new Vector2(90, 120 + taper);
@@ -226,7 +227,7 @@ namespace osu.Game.Screens.Edit.Timing
                         Origin = Anchor.BottomCentre,
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
-                        Height = 0.3f,
+                        Height = 0.28f,
                         Children = new Drawable[]
                         {
                             new Triangle
@@ -239,7 +240,7 @@ namespace osu.Game.Screens.Edit.Timing
                             },
                         }
                     },
-                    bpm = new OsuSpriteText
+                    bpmText = new OsuSpriteText
                     {
                         Name = @"BPM display",
                         Colour = overlayColourProvider.Content1,
@@ -254,8 +255,16 @@ namespace osu.Game.Screens.Edit.Timing
 
             private TimingControlPoint timingPoint;
 
-            private float bpmRatio;
             private bool isSwinging;
+
+            private readonly BindableInt interpolatedBpm = new BindableInt();
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                interpolatedBpm.BindValueChanged(bpm => bpmText.Text = bpm.NewValue.ToString());
+            }
 
             protected override void Update()
             {
@@ -266,13 +275,13 @@ namespace osu.Game.Screens.Edit.Timing
                 if (beatLength != timingPoint.BeatLength)
                 {
                     beatLength = timingPoint.BeatLength;
-                    bpm.Text = $"{timingPoint.BPM:F0}";
 
                     EarlyActivationMilliseconds = timingPoint.BeatLength / 2;
 
-                    bpmRatio = (float)Interpolation.ApplyEasing(Easing.OutQuad, Math.Clamp((timingPoint.BPM - 30) / 480, 0, 1));
+                    float bpmRatio = (float)Interpolation.ApplyEasing(Easing.OutQuad, Math.Clamp((timingPoint.BPM - 30) / 480, 0, 1));
 
-                    weight.MoveToY((float)Interpolation.Lerp(0.07f, 0.9f, bpmRatio), 600, Easing.OutQuint);
+                    weight.MoveToY((float)Interpolation.Lerp(0.1f, 0.83f, bpmRatio), 600, Easing.OutQuint);
+                    this.TransformBindableTo(interpolatedBpm, (int)timingPoint.BPM, 600, Easing.OutQuint);
                 }
 
                 if (BeatSyncClock?.IsRunning != true && isSwinging)
@@ -293,7 +302,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                float angle = (float)Interpolation.Lerp(30, 5, bpmRatio);
+                const float angle = 27.5f;
 
                 if (!IsBeatSyncedWithTrack)
                     return;
