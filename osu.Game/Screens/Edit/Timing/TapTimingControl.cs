@@ -116,26 +116,27 @@ namespace osu.Game.Screens.Edit.Timing
             [BackgroundDependencyLoader]
             private void load()
             {
+                const float taper = 30;
+                const float swing_vertical_offset = -23;
+
+                var triangleSize = new Vector2(90, 120 + taper);
+
                 Margin = new MarginPadding(10);
 
-                const float taper = 10;
-
-                var triangleSize = new Vector2(80, 120);
-
                 AutoSizeAxes = Axes.Both;
-
-                const float stick_vertical_offset = -23;
 
                 InternalChildren = new Drawable[]
                 {
                     new Container
                     {
+                        Name = @"Taper adjust",
                         Masking = true,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         Size = new Vector2(triangleSize.X * 1.2f, triangleSize.Y - taper),
                         Child = new Triangle
                         {
+                            Name = @"Main body",
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                             Size = triangleSize,
@@ -144,15 +145,17 @@ namespace osu.Game.Screens.Edit.Timing
                     },
                     swing = new Container
                     {
+                        Name = @"Swing",
                         RelativeSizeAxes = Axes.Both,
-                        Y = stick_vertical_offset,
-                        Height = 0.8f,
+                        Y = swing_vertical_offset,
+                        Height = 0.80f,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         Children = new[]
                         {
                             stick = new Circle
                             {
+                                Name = @"Stick",
                                 RelativeSizeAxes = Axes.Y,
                                 Colour = overlayColourProvider.Colour2,
                                 Anchor = Anchor.BottomCentre,
@@ -161,6 +164,7 @@ namespace osu.Game.Screens.Edit.Timing
                             },
                             weight = new Container
                             {
+                                Name = @"Weight",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.Centre,
                                 Colour = overlayColourProvider.Colour1,
@@ -186,7 +190,8 @@ namespace osu.Game.Screens.Edit.Timing
                     },
                     new Circle
                     {
-                        Y = stick_vertical_offset,
+                        Name = @"Swing connection point",
+                        Y = swing_vertical_offset,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.Centre,
                         Colour = overlayColourProvider.Colour0,
@@ -194,6 +199,7 @@ namespace osu.Game.Screens.Edit.Timing
                     },
                     new Container
                     {
+                        Name = @"Lower cover",
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         RelativeSizeAxes = Axes.Both,
@@ -213,6 +219,7 @@ namespace osu.Game.Screens.Edit.Timing
                     },
                     bpm = new OsuSpriteText
                     {
+                        Name = @"BPM display",
                         Colour = overlayColourProvider.Content1,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
