@@ -415,9 +415,9 @@ namespace osu.Game.Screens.Select
                 foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                     rate = mod.ApplyToRate(0, rate);
 
-                int bpmMax = (int)Math.Round(beatmap.ControlPointInfo.BPMMaximum * rate);
-                int bpmMin = (int)Math.Round(beatmap.ControlPointInfo.BPMMinimum * rate);
-                int mostCommonBPM = (int)Math.Round(60000 / beatmap.GetMostCommonBeatLength() * rate);
+                int bpmMax = (int)Math.Round(Math.Round(beatmap.ControlPointInfo.BPMMaximum) * rate);
+                int bpmMin = (int)Math.Round(Math.Round(beatmap.ControlPointInfo.BPMMinimum) * rate);
+                int mostCommonBPM = (int)Math.Round(Math.Round(60000 / beatmap.GetMostCommonBeatLength()) * rate);
 
                 string labelText = bpmMin == bpmMax
                     ? $"{bpmMin}"
