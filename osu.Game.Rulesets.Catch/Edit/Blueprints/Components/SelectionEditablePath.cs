@@ -27,15 +27,15 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         [CanBeNull]
         private IEditorChangeHandler changeHandler { get; set; }
 
-        public SelectionEditablePath(Func<float, double> positionToDistance)
-            : base(positionToDistance)
+        public SelectionEditablePath(Func<float, double> positionToTime)
+            : base(positionToTime)
         {
         }
 
         public void AddVertex(Vector2 relativePosition)
         {
-            double distance = Math.Max(0, PositionToDistance(relativePosition.Y));
-            int index = AddVertex(distance, relativePosition.X);
+            double time = Math.Max(0, PositionToTime(relativePosition.Y));
+            int index = AddVertex(time, relativePosition.X);
             selectOnly(index);
         }
 
@@ -83,9 +83,9 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         protected override void OnDrag(DragEvent e)
         {
             Vector2 mousePosition = ToRelativePosition(e.ScreenSpaceMousePosition);
-            double distanceDelta = PositionToDistance(mousePosition.Y) - PositionToDistance(dragStartPosition.Y);
+            double timeDelta = PositionToTime(mousePosition.Y) - PositionToTime(dragStartPosition.Y);
             float xDelta = mousePosition.X - dragStartPosition.X;
-            MoveSelectedVertices(distanceDelta, xDelta);
+            MoveSelectedVertices(timeDelta, xDelta);
         }
 
         protected override void OnDragEnd(DragEndEvent e)

@@ -39,8 +39,11 @@ namespace osu.Game.Overlays
         private ChatTextBar textBar = null!;
         private Container<ChatOverlayDrawableChannel> currentChannelContainer = null!;
 
-        private readonly BindableFloat chatHeight = new BindableFloat();
+        private readonly Dictionary<Channel, ChatOverlayDrawableChannel> loadedChannels = new Dictionary<Channel, ChatOverlayDrawableChannel>();
 
+        protected IEnumerable<DrawableChannel> DrawableChannels => loadedChannels.Values;
+
+        private readonly BindableFloat chatHeight = new BindableFloat();
         private bool isDraggingTopBar;
         private float dragStartChatHeight;
 
@@ -173,7 +176,7 @@ namespace osu.Game.Overlays
             if (currentChannel.Value?.Id != channel.Id)
             {
                 if (!channel.Joined.Value)
-                    channel = channelManager.JoinChannel(channel);
+                    channel = channelManager.JoinChannel(channel, false);
 
                 channelManager.CurrentChannel.Value = channel;
             }
@@ -240,23 +243,47 @@ namespace osu.Game.Overlays
             if (newChannel == null)
             {
                 // null channel denotes that we should be showing the listing.
-                channelListing.State.Value = Visibility.Visible;
+                currentChannelContainer.Clear(false);
+                channelListing.Show();
                 textBar.ShowSearch.Value = true;
             }
             else
             {
-                channelListing.State.Value = Visibility.Hidden;
+                channelListing.Hide();
                 textBar.ShowSearch.Value = false;
 
-                loading.Show();
-                LoadComponentAsync(new ChatOverlayDrawableChannel(newChannel), loaded =>
+                if (loadedChannels.ContainsKey(newChannel))
                 {
-                    currentChannelContainer.Clear();
-                    currentChannelContainer.Add(loaded);
-                    loading.Hide();
-                });
+                    currentChannelContainer.Clear(false);
+                    currentChannelContainer.Add(loadedChannels[newChannel]);
+                }
+                else
+                {
+                    loading.Show();
+
+                    // Ensure the drawable channel is stored before async load to prevent double loading
+                    ChatOverlayDrawableChannel drawableChannel = CreateDrawableChannel(newChannel);
+                    loadedChannels.Add(newChannel, drawableChannel);
+
+                    LoadComponentAsync(drawableChannel, loadedDrawable =>
+                    {
+                        // Ensure the current channel hasn't changed by the time the load completes
+                        if (currentChannel.Value != loadedDrawable.Channel)
+                            return;
+
+                        // Ensure the cached reference hasn't been removed from leaving the channel
+                        if (!loadedChannels.ContainsKey(loadedDrawable.Channel))
+                            return;
+
+                        currentChannelContainer.Clear(false);
+                        currentChannelContainer.Add(loadedDrawable);
+                        loading.Hide();
+                    });
+                }
             }
         }
+
+        protected virtual ChatOverlayDrawableChannel CreateDrawableChannel(Channel newChannel) => new ChatOverlayDrawableChannel(newChannel);
 
         private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
@@ -264,14 +291,28 @@ namespace osu.Game.Overlays
             {
                 case NotifyCollectionChangedAction.Add:
                     IEnumerable<Channel> joinedChannels = filterChannels(args.NewItems);
+
                     foreach (var channel in joinedChannels)
                         channelList.AddChannel(channel);
+
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     IEnumerable<Channel> leftChannels = filterChannels(args.OldItems);
+
                     foreach (var channel in leftChannels)
+                    {
                         channelList.RemoveChannel(channel);
+
+                        if (loadedChannels.ContainsKey(channel))
+                        {
+                            ChatOverlayDrawableChannel loaded = loadedChannels[channel];
+                            loadedChannels.Remove(channel);
+                            // DrawableChannel removed from cache must be manually disposed
+                            loaded.Dispose();
+                        }
+                    }
+
                     break;
             }
         }

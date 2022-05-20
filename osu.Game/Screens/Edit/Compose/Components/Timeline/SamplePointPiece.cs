@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private void updateBankPlaceholderText(IEnumerable<HitObject> objects)
             {
                 string? commonBank = getCommonBank(objects.Select(h => h.SampleControlPoint).ToArray());
-                bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : null;
+                bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : string.Empty;
             }
 
             private void updateVolumeFor(IEnumerable<HitObject> objects, int? newVolume)
