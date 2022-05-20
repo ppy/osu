@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddUntilStep($"displayed bpm is {target}", () =>
             {
-                var label = this.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Single(l => l.Statistic.Name == "BPM");
+                var label = infoWedge.DisplayedContent.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Single(l => l.Statistic.Name == "BPM");
                 return label.Statistic.Content == target;
             });
         }
