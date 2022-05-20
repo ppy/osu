@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Graphics.Containers
@@ -79,20 +80,31 @@ namespace osu.Game.Graphics.Containers
         }
 
         [Resolved]
-        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
 
         [Resolved(canBeNull: true)]
         protected GameplayClock GameplayClock { get; private set; }
+
+        [Resolved(canBeNull: true)]
+        protected EditorBeatmap EditorBeatmap { get; private set; }
+
+        [Resolved(canBeNull: true)]
+        protected EditorClock EditorClock { get; private set; }
+
+        protected IBeatmap Beatmap => EditorBeatmap ?? beatmap?.Value.Beatmap;
 
         protected IClock BeatSyncClock
         {
             get
             {
+                if (EditorClock != null)
+                    return EditorClock;
+
                 if (GameplayClock != null)
                     return GameplayClock;
 
-                if (Beatmap.Value.TrackLoaded)
-                    return Beatmap.Value.Track;
+                if (beatmap.Value.TrackLoaded)
+                    return beatmap.Value.Track;
 
                 return null;
             }
@@ -101,7 +113,6 @@ namespace osu.Game.Graphics.Containers
         protected override void Update()
         {
             ITrack track = null;
-            IBeatmap beatmap = null;
 
             TimingControlPoint timingPoint;
             EffectControlPoint effectPoint;
@@ -113,10 +124,9 @@ namespace osu.Game.Graphics.Containers
 
             double currentTrackTime = clock.CurrentTime + EarlyActivationMilliseconds;
 
-            if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
+            if (this.beatmap.Value.TrackLoaded && this.beatmap.Value.BeatmapLoaded)
             {
-                track = Beatmap.Value.Track;
-                beatmap = Beatmap.Value.Beatmap;
+                track = this.beatmap.Value.Track;
             }
 
             IsBeatSyncedWithTrack = beatmap != null && clock.IsRunning && track?.Length > 0;
@@ -125,8 +135,8 @@ namespace osu.Game.Graphics.Containers
             {
                 Debug.Assert(beatmap != null);
 
-                timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
-                effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
+                timingPoint = Beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
+                effectPoint = Beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
             }
             else
             {
