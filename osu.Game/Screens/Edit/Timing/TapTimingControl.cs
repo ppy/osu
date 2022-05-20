@@ -133,14 +133,17 @@ namespace osu.Game.Screens.Edit.Timing
                         Masking = true,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Size = new Vector2(triangleSize.X * 1.2f, triangleSize.Y - taper),
-                        Child = new Triangle
+                        Size = new Vector2(triangleSize.X, triangleSize.Y - taper),
+                        Children = new Drawable[]
                         {
-                            Name = @"Main body",
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Size = triangleSize,
-                            Colour = overlayColourProvider.Background3,
+                            new Triangle
+                            {
+                                Name = @"Main body",
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                Size = triangleSize,
+                                Colour = overlayColourProvider.Background3,
+                            },
                         },
                     },
                     swing = new Container
@@ -187,6 +190,25 @@ namespace osu.Game.Screens.Edit.Timing
                                 }
                             },
                         }
+                    },
+                    new Container
+                    {
+                        Name = @"Taper adjust",
+                        Masking = true,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Size = new Vector2(triangleSize.X, triangleSize.Y - taper),
+                        Children = new Drawable[]
+                        {
+                            new Circle
+                            {
+                                Name = @"Locking wedge",
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.Centre,
+                                Colour = overlayColourProvider.Background1,
+                                Size = new Vector2(8),
+                            }
+                        },
                     },
                     new Circle
                     {
