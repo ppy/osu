@@ -258,24 +258,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 };
             }
 
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                Beatmap.BindValueChanged(_ =>
-                {
-                    timingPointCount.Value = 0;
-                    currentTimingPoint.Value = 0;
-                    beatCount.Value = 0;
-                    currentBeat.Value = 0;
-                    beatsPerMinute.Value = 0;
-                    adjustedBeatLength.Value = 0;
-                    timeUntilNextBeat.Value = 0;
-                    timeSinceLastBeat.Value = 0;
-                }, true);
-            }
-
-            private List<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.ToList();
+            private List<TimingControlPoint> timingPoints => Beatmap.ControlPointInfo.TimingPoints.ToList();
 
             private TimingControlPoint getNextTimingPoint(TimingControlPoint current)
             {
