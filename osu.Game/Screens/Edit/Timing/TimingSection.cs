@@ -97,6 +97,5 @@ namespace osu.Game.Screens.Edit.Timing
         }
 
         private static double beatLengthToBpm(double beatLength) => 60000 / beatLength;
-
     }
 }
