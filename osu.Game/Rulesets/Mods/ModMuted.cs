@@ -79,11 +79,11 @@ namespace osu.Game.Rulesets.Mods
         {
             if (EnableMetronome.Value)
             {
-                Metronome metronome;
+                MetronomeBeat metronomeBeat;
 
-                drawableRuleset.Overlays.Add(metronome = new Metronome(drawableRuleset.Beatmap.HitObjects.First().StartTime));
+                drawableRuleset.Overlays.Add(metronomeBeat = new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
 
-                metronome.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
+                metronomeBeat.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
             }
 
             if (AffectsHitSounds.Value)

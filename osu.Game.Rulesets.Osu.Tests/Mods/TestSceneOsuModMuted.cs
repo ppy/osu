@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 MuteComboCount = { Value = 0 },
             },
             PassCondition = () => Beatmap.Value.Track.AggregateVolume.Value == 0.0 &&
-                                  Player.ChildrenOfType<Metronome>().SingleOrDefault()?.AggregateVolume.Value == 1.0,
+                                  Player.ChildrenOfType<MetronomeBeat>().SingleOrDefault()?.AggregateVolume.Value == 1.0,
         });
 
         /// <summary>

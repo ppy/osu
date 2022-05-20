@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("click tap button", () =>
             {
                 control.ChildrenOfType<RoundedButton>()
-                       .First(b => b.Text == "Tap to beat")
+                       .Last()
                        .TriggerClick();
             });
 
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("click reset button", () =>
             {
                 control.ChildrenOfType<RoundedButton>()
-                       .First(b => b.Text == "Reset")
+                       .First()
                        .TriggerClick();
             });
 
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("click tap button", () =>
             {
                 control.ChildrenOfType<RoundedButton>()
-                       .First(b => b.Text == "Tap to beat")
+                       .Last()
                        .TriggerClick();
             });
 
