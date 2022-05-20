@@ -168,15 +168,20 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkDisplayedBPM($"{bpm * 2}");
         }
 
-        [TestCase(120, 125, "120-125 (mostly 120)")]
-        [TestCase(120, 120.6, "120-121 (mostly 120)")]
-        [TestCase(120, 120.4, "120")]
-        public void TestVaryingBPM(double commonBpm, double otherBpm, string expectedDisplay)
+        [TestCase(120, 125, null, "120-125 (mostly 120)")]
+        [TestCase(120, 120.6, null, "120-121 (mostly 120)")]
+        [TestCase(120, 120.4, null, "120")]
+        [TestCase(120, 120.6, "DT", "180-182 (mostly 180)")]
+        [TestCase(120, 120.4, "DT", "180")]
+        public void TestVaryingBPM(double commonBpm, double otherBpm, string mod, string expectedDisplay)
         {
             IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
             beatmap.ControlPointInfo.Add(100, new TimingControlPoint { BeatLength = 60 * 1000 / otherBpm });
             beatmap.ControlPointInfo.Add(200, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
+
+            if (mod != null)
+                AddStep($"select {mod}", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateModFromAcronym(mod) });
 
             selectBeatmap(beatmap);
             checkDisplayedBPM(expectedDisplay);
