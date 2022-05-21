@@ -133,10 +133,10 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the track has been transferred to the <paramref name="target"/>.</returns>
         public virtual bool TryTransferTrack([NotNull] WorkingBeatmap target)
         {
-            if (BeatmapInfo?.AudioEquals(target.BeatmapInfo) != true || track.IsDummyDevice)
+            if (BeatmapInfo?.AudioEquals(target.BeatmapInfo) != true || Track.IsDummyDevice)
                 return false;
 
-            target.track = track;
+            target.track = Track;
             return true;
         }
 
