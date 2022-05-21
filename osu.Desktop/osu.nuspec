@@ -18,5 +18,6 @@
       <file src="**.exe" target="lib\net45\" exclude="**vshost**"/>
       <file src="**.dll" target="lib\net45\"/>
       <file src="**.config" target="lib\net45\"/>
+      <file src="**.json" target="lib\net45\"/>
     </files>
 </package>
