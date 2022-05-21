@@ -242,7 +242,7 @@ namespace osu.Game.Database
             storage.Delete(Filename);
 
             using (var inputStream = storage.GetStream(recoveryFilename))
-            using (var outputStream = storage.GetStream(Filename, FileAccess.Write, FileMode.Create))
+            using (var outputStream = storage.CreateFileSafely(Filename))
                 inputStream.CopyTo(outputStream);
 
             storage.Delete(recoveryFilename);

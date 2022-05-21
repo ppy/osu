@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -118,7 +117,7 @@ namespace osu.Game.Graphics
 
                 if (filename == null) return;
 
-                using (var stream = storage.GetStream(filename, FileAccess.Write))
+                using (var stream = storage.CreateFileSafely(filename))
                 {
                     switch (screenshotFormat.Value)
                     {
