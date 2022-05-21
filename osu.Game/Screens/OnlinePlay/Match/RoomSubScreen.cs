@@ -485,6 +485,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                     TriggerClick();
                     return true;
                 }
+
                 return false;
             }
 
