@@ -80,7 +80,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     matchingFilter &= criteria.Ruleset == null || r.Room.PlaylistItemStats.Value?.RulesetIDs.Any(id => id == criteria.Ruleset.OnlineID) != false;
 
                     if (!string.IsNullOrEmpty(criteria.SearchString))
-                        matchingFilter &= r.FilterTerms.Any(term => term.Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
+                    {
+                        // Room name isn't translatable, so ToString() is used here for simplicity.
+                        matchingFilter &= r.FilterTerms.Any(term => term.ToString().Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
+                    }
 
                     r.MatchingFilter = matchingFilter;
                 }

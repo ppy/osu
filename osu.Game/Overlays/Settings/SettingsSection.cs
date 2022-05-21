@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings
         public abstract LocalisableString Header { get; }
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
-        public virtual IEnumerable<string> FilterTerms => new[] { Header.ToString() };
+        public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Header };
 
         public const int ITEM_SPACING = 14;
 

@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Tests.Screens
         [BackgroundDependencyLoader]
         private void load(Storage storage)
         {
-            using (var stream = storage.GetStream("drawings.txt", FileAccess.Write))
+            using (var stream = storage.CreateFileSafely("drawings.txt"))
             using (var writer = new StreamWriter(stream))
             {
                 writer.WriteLine("KR : South Korea : KOR");
