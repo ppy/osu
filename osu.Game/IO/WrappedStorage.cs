@@ -11,7 +11,7 @@ namespace osu.Game.IO
     /// <summary>
     /// A storage which wraps another storage and delegates implementation, potentially mutating the lookup path.
     /// </summary>
-    public class WrappedStorage : NativeStorage // TODO: Revert to Storage inheritance after https://github.com/ppy/osu-framework/pull/5189
+    public class WrappedStorage : Storage
     {
         protected Storage UnderlyingStorage { get; private set; }
 
