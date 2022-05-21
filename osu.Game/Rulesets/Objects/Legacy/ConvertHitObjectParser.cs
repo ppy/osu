@@ -336,8 +336,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             while (++endIndex < vertices.Length - endPointLength)
             {
-                // Keep incrementing while an implicit segment doesn't need to be started
+                // Keep incrementing while an implicit segment doesn't need to be started.
                 if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
+                    continue;
+
+                // Adjacent legacy Catmull segments should be treated as a single segment.
+                if (FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION && type == PathType.Catmull)
                     continue;
 
                 // The last control point of each segment is not allowed to start a new implicit segment.

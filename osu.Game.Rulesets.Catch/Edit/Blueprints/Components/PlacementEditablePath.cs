@@ -15,15 +15,15 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         /// </summary>
         private JuiceStreamPathVertex lastVertex;
 
-        public PlacementEditablePath(Func<float, double> positionToDistance)
-            : base(positionToDistance)
+        public PlacementEditablePath(Func<float, double> positionToTime)
+            : base(positionToTime)
         {
         }
 
         public void AddNewVertex()
         {
             var endVertex = Vertices[^1];
-            int index = AddVertex(endVertex.Distance, endVertex.X);
+            int index = AddVertex(endVertex.Time, endVertex.X);
 
             for (int i = 0; i < VertexCount; i++)
             {
@@ -41,9 +41,9 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         public void MoveLastVertex(Vector2 screenSpacePosition)
         {
             Vector2 position = ToRelativePosition(screenSpacePosition);
-            double distanceDelta = PositionToDistance(position.Y) - lastVertex.Distance;
+            double timeDelta = PositionToTime(position.Y) - lastVertex.Time;
             float xDelta = position.X - lastVertex.X;
-            MoveSelectedVertices(distanceDelta, xDelta);
+            MoveSelectedVertices(timeDelta, xDelta);
         }
     }
 }
