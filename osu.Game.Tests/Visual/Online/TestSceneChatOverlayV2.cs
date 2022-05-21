@@ -397,6 +397,7 @@ namespace osu.Game.Tests.Visual.Online
                 chatOverlay.SlowLoading = true;
             });
             AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddAssert("Channel 1 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel1).LoadState == LoadState.Loading);
 
             AddStep("Join channel 2", () => channelManager.JoinChannel(testChannel2));
