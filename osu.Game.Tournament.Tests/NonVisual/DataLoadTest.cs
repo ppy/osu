@@ -28,7 +28,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                         // ReSharper disable once AccessToDisposedClosure
                         var storage = host.Storage.GetStorageForDirectory(Path.Combine("tournaments", "default"));
 
-                        using (var stream = storage.GetStream("bracket.json", FileAccess.Write, FileMode.Create))
+                        using (var stream = storage.CreateFileSafely("bracket.json"))
                         using (var writer = new StreamWriter(stream))
                         {
                             writer.Write(@"{
