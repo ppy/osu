@@ -243,7 +243,7 @@ namespace osu.Game
                 {
                     if (source != null)
                     {
-                        using (var destination = Storage.GetStream(Path.Combine(backup_folder, $"collection.{migration}.db"), FileAccess.Write, FileMode.CreateNew))
+                        using (var destination = Storage.CreateFileSafely(Path.Combine(backup_folder, $"collection.{migration}.db")))
                             source.CopyTo(destination);
                     }
                 }

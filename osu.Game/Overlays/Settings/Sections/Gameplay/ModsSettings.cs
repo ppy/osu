@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
     {
         protected override LocalisableString Header => GameplaySettingsStrings.ModsHeader;
 
-        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "mod" });
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "mod" });
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
