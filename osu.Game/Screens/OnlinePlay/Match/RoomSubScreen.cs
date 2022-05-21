@@ -478,7 +478,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         public class UserModSelectButton : PurpleTriangleButton, IKeyBindingHandler<GlobalAction>
         {
-            public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
                 if (e.Action == GlobalAction.ToggleModSelection && !e.Repeat)
                 {
@@ -489,7 +489,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 return false;
             }
 
-            public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
         }
 
         protected override void Dispose(bool isDisposing)
