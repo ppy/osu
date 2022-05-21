@@ -179,6 +179,48 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestModSelectKeyWithAllowedMods()
+        {
+            AddStep("add playlist item with allowed mod", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
+                });
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddStep("press toggle mod select key", () => InputManager.Key(osuTK.Input.Key.F1));
+
+            AddUntilStep("mod select contents loaded",
+                () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
+        }
+
+        [Test]
+        public void TestModSelectKeyWithNoAllowedMods()
+        {
+            AddStep("add playlist item with no allowed mods", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                });
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddStep("press toggle mod select key", () => InputManager.Key(osuTK.Input.Key.F1));
+
+            AddAssert("mod select contents not loaded",
+                () => !(this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded)));
+        }
+
+        [Test]
         public void TestNextPlaylistItemSelectedAfterCompletion()
         {
             AddStep("add two playlist items", () =>
