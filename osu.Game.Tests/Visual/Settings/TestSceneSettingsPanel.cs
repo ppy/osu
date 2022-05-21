@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Settings
                                                                                 .OfType<ISettingsItem>()
                                                                                 .OfType<IFilterable>()
                                                                                 .Where(f => !(f is IHasFilterableChildren))
-                                                                                .All(f => f.FilterTerms.Any(t => t.Contains("scaling")))
+                                                                                .All(f => f.FilterTerms.Any(t => t.ToString().Contains("scaling")))
                                                                      ));
 
             AddAssert("ensure section is current", () => settings.CurrentSection.Value is GraphicsSection);

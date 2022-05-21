@@ -20,13 +20,12 @@ namespace osu.Game.Overlays.Settings
 
         public LocalisableString TooltipText { get; set; }
 
-        public override IEnumerable<string> FilterTerms
+        public override IEnumerable<LocalisableString> FilterTerms
         {
             get
             {
                 if (TooltipText != default)
-                    // TODO: this won't work as intended once the tooltip text is translated.
-                    return base.FilterTerms.Append(TooltipText.ToString());
+                    return base.FilterTerms.Append(TooltipText);
 
                 return base.FilterTerms;
             }
