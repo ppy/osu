@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.Chat.Listing
         public readonly Channel Channel;
 
         public bool FilteringActive { get; set; }
-        public IEnumerable<string> FilterTerms => new[] { Channel.Name, Channel.Topic ?? string.Empty };
+        public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Channel.Name, Channel.Topic ?? string.Empty };
         public bool MatchingFilter { set => this.FadeTo(value ? 1f : 0f, 100); }
 
         private Box hoverBox = null!;

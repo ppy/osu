@@ -1207,6 +1207,8 @@ namespace osu.Game
                     Current = newScreen?.GetType().ReadableName(),
                     Previous = current?.GetType().ReadableName(),
                 };
+
+                scope.SetTag(@"screen", newScreen?.GetType().ReadableName() ?? @"none");
             });
 
             switch (newScreen)

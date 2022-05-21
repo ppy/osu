@@ -20,11 +20,6 @@ namespace osu.Game.Rulesets.Catch.Objects
     /// However, the <see cref="SliderPath"/> representation is difficult to work with.
     /// This <see cref="JuiceStreamPath"/> represents the path in a more convenient way, a polyline connecting list of <see cref="JuiceStreamPathVertex"/>s.
     /// </para>
-    /// <para>
-    /// The path can be regarded as a function from the closed interval <c>[Vertices[0].Distance, Vertices[^1].Distance]</c> to the x position, given by <see cref="PositionAtDistance"/>.
-    /// To ensure the path is convertible to a <see cref="SliderPath"/>, the slope of the function must not be more than <c>1</c> everywhere,
-    /// and this slope condition is always maintained as an invariant.
-    /// </para>
     /// </summary>
     public class JuiceStreamPath
     {
@@ -46,9 +41,9 @@ namespace osu.Game.Rulesets.Catch.Objects
         public int InvalidationID { get; private set; } = 1;
 
         /// <summary>
-        /// The difference between first vertex's <see cref="JuiceStreamPathVertex.Distance"/> and last vertex's <see cref="JuiceStreamPathVertex.Distance"/>.
+        /// The difference between first vertex's <see cref="JuiceStreamPathVertex.Time"/> and last vertex's <see cref="JuiceStreamPathVertex.Time"/>.
         /// </summary>
-        public double Distance => vertices[^1].Distance - vertices[0].Distance;
+        public double Duration => vertices[^1].Time - vertices[0].Time;
 
         /// <remarks>
         /// This list should always be non-empty.
@@ -59,15 +54,15 @@ namespace osu.Game.Rulesets.Catch.Objects
         };
 
         /// <summary>
-        /// Compute the x-position of the path at the given <paramref name="distance"/>.
+        /// Compute the x-position of the path at the given <paramref name="time"/>.
         /// </summary>
         /// <remarks>
-        /// When the given distance is outside of the path, the x position at the corresponding endpoint is returned,
+        /// When the given time is outside of the path, the x position at the corresponding endpoint is returned,
         /// </remarks>
-        public float PositionAtDistance(double distance)
+        public float PositionAtTime(double time)
         {
-            int index = vertexIndexAtDistance(distance);
-            return positionAtDistance(distance, index);
+            int index = vertexIndexAtTime(time);
+            return positionAtTime(time, index);
         }
 
         /// <summary>
@@ -81,19 +76,19 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         /// <summary>
-        /// Insert a vertex at given <paramref name="distance"/>.
-        /// The <see cref="PositionAtDistance"/> is used as the position of the new vertex.
+        /// Insert a vertex at given <paramref name="time"/>.
+        /// The <see cref="PositionAtTime"/> is used as the position of the new vertex.
         /// Thus, the set of points of the path is not changed (up to floating-point precision).
         /// </summary>
         /// <returns>The index of the new vertex.</returns>
-        public int InsertVertex(double distance)
+        public int InsertVertex(double time)
         {
-            if (!double.IsFinite(distance))
-                throw new ArgumentOutOfRangeException(nameof(distance));
+            if (!double.IsFinite(time))
+                throw new ArgumentOutOfRangeException(nameof(time));
 
-            int index = vertexIndexAtDistance(distance);
-            float x = positionAtDistance(distance, index);
-            vertices.Insert(index, new JuiceStreamPathVertex(distance, x));
+            int index = vertexIndexAtTime(time);
+            float x = positionAtTime(time, index);
+            vertices.Insert(index, new JuiceStreamPathVertex(time, x));
 
             invalidate();
             return index;
@@ -101,7 +96,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         /// <summary>
         /// Move the vertex of given <paramref name="index"/> to the given position <paramref name="newX"/>.
-        /// When the distances between vertices are too small for the new vertex positions, the adjacent vertices are moved towards <paramref name="newX"/>.
         /// </summary>
         public void SetVertexPosition(int index, float newX)
         {
@@ -111,32 +105,17 @@ namespace osu.Game.Rulesets.Catch.Objects
             if (!float.IsFinite(newX))
                 throw new ArgumentOutOfRangeException(nameof(newX));
 
-            var newVertex = new JuiceStreamPathVertex(vertices[index].Distance, newX);
-
-            for (int i = index - 1; i >= 0 && !canConnect(vertices[i], newVertex); i--)
-            {
-                float clampedX = clampToConnectablePosition(newVertex, vertices[i]);
-                vertices[i] = new JuiceStreamPathVertex(vertices[i].Distance, clampedX);
-            }
-
-            for (int i = index + 1; i < vertices.Count; i++)
-            {
-                float clampedX = clampToConnectablePosition(newVertex, vertices[i]);
-                vertices[i] = new JuiceStreamPathVertex(vertices[i].Distance, clampedX);
-            }
-
-            vertices[index] = newVertex;
+            vertices[index] = new JuiceStreamPathVertex(vertices[index].Time, newX);
 
             invalidate();
         }
 
         /// <summary>
-        /// Add a new vertex at given <paramref name="distance"/> and position.
-        /// Adjacent vertices are moved when necessary in the same way as <see cref="SetVertexPosition"/>.
+        /// Add a new vertex at given <paramref name="time"/> and position.
         /// </summary>
-        public void Add(double distance, float x)
+        public void Add(double time, float x)
         {
-            int index = InsertVertex(distance);
+            int index = InsertVertex(time);
             SetVertexPosition(index, x);
         }
 
@@ -163,22 +142,22 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         /// <summary>
-        /// Recreate this path by using difference set of vertices at given distances.
-        /// In addition to the given <paramref name="sampleDistances"/>, the first vertex and the last vertex are always added to the new path.
-        /// New vertices use the positions on the original path. Thus, <see cref="PositionAtDistance"/>s at <paramref name="sampleDistances"/> are preserved.
+        /// Recreate this path by using difference set of vertices at given time points.
+        /// In addition to the given <paramref name="sampleTimes"/>, the first vertex and the last vertex are always added to the new path.
+        /// New vertices use the positions on the original path. Thus, <see cref="PositionAtTime"/>s at <paramref name="sampleTimes"/> are preserved.
         /// </summary>
-        public void ResampleVertices(IEnumerable<double> sampleDistances)
+        public void ResampleVertices(IEnumerable<double> sampleTimes)
         {
             var sampledVertices = new List<JuiceStreamPathVertex>();
 
-            foreach (double distance in sampleDistances)
+            foreach (double time in sampleTimes)
             {
-                if (!double.IsFinite(distance))
-                    throw new ArgumentOutOfRangeException(nameof(sampleDistances));
+                if (!double.IsFinite(time))
+                    throw new ArgumentOutOfRangeException(nameof(sampleTimes));
 
-                double clampedDistance = Math.Clamp(distance, vertices[0].Distance, vertices[^1].Distance);
-                float x = PositionAtDistance(clampedDistance);
-                sampledVertices.Add(new JuiceStreamPathVertex(clampedDistance, x));
+                double clampedTime = Math.Clamp(time, vertices[0].Time, vertices[^1].Time);
+                float x = PositionAtTime(clampedTime);
+                sampledVertices.Add(new JuiceStreamPathVertex(clampedTime, x));
             }
 
             sampledVertices.Sort();
@@ -196,37 +175,62 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// <remarks>
         /// Duplicated vertices are automatically removed.
         /// </remarks>
-        public void ConvertFromSliderPath(SliderPath sliderPath)
+        public void ConvertFromSliderPath(SliderPath sliderPath, double velocity)
         {
             var sliderPathVertices = new List<Vector2>();
             sliderPath.GetPathToProgress(sliderPathVertices, 0, 1);
 
-            double distance = 0;
+            double time = 0;
 
             vertices.Clear();
             vertices.Add(new JuiceStreamPathVertex(0, sliderPathVertices.FirstOrDefault().X));
 
             for (int i = 1; i < sliderPathVertices.Count; i++)
             {
-                distance += Vector2.Distance(sliderPathVertices[i - 1], sliderPathVertices[i]);
+                time += Vector2.Distance(sliderPathVertices[i - 1], sliderPathVertices[i]) / velocity;
 
-                if (!Precision.AlmostEquals(vertices[^1].Distance, distance))
-                    vertices.Add(new JuiceStreamPathVertex(distance, sliderPathVertices[i].X));
+                if (!Precision.AlmostEquals(vertices[^1].Time, time))
+                    Add(time, sliderPathVertices[i].X);
             }
 
             invalidate();
         }
 
         /// <summary>
+        /// Computes the minimum slider velocity required to convert this path to a <see cref="SliderPath"/>.
+        /// </summary>
+        public double ComputeRequiredVelocity()
+        {
+            double maximumSlope = 0;
+
+            for (int i = 1; i < vertices.Count; i++)
+            {
+                double xDifference = Math.Abs((double)vertices[i].X - vertices[i - 1].X);
+                double timeDifference = vertices[i].Time - vertices[i - 1].Time;
+
+                // A short segment won't affect the resulting path much anyways so ignore it to avoid divide-by-zero.
+                if (Precision.AlmostEquals(timeDifference, 0))
+                    continue;
+
+                maximumSlope = Math.Max(maximumSlope, xDifference / timeDifference);
+            }
+
+            return maximumSlope;
+        }
+
+        /// <summary>
         /// Convert the path of this <see cref="JuiceStreamPath"/> to a <see cref="SliderPath"/> and write the result to <paramref name="sliderPath"/>.
         /// The resulting slider is "folded" to make it vertically contained in the playfield `(0..<see cref="OSU_PLAYFIELD_HEIGHT"/>)` assuming the slider start position is <paramref name="sliderStartY"/>.
+        ///
+        /// The velocity of the converted slider is assumed to be <paramref name="velocity"/>.
+        /// To preserve the path, <paramref name="velocity"/> should be at least the value returned by <see cref="ComputeRequiredVelocity"/>.
         /// </summary>
-        public void ConvertToSliderPath(SliderPath sliderPath, float sliderStartY)
+        public void ConvertToSliderPath(SliderPath sliderPath, float sliderStartY, double velocity)
         {
             const float margin = 1;
 
             // Note: these two variables and `sliderPath` are modified by the local functions.
-            double currentDistance = 0;
+            double currentTime = 0;
             Vector2 lastPosition = new Vector2(vertices[0].X, 0);
 
             sliderPath.ControlPoints.Clear();
@@ -237,10 +241,10 @@ namespace osu.Game.Rulesets.Catch.Objects
                 sliderPath.ControlPoints[^1].Type = PathType.Linear;
 
                 float deltaX = vertices[i].X - lastPosition.X;
-                double length = vertices[i].Distance - currentDistance;
+                double length = (vertices[i].Time - currentTime) * velocity;
 
                 // Should satisfy `deltaX^2 + deltaY^2 = length^2`.
-                // By invariants, the expression inside the `sqrt` is (almost) non-negative.
+                // The expression inside the `sqrt` is (almost) non-negative if the slider velocity is large enough.
                 double deltaY = Math.Sqrt(Math.Max(0, length * length - (double)deltaX * deltaX));
 
                 // When `deltaY` is small, one segment is always enough.
@@ -280,59 +284,38 @@ namespace osu.Game.Rulesets.Catch.Objects
             {
                 Vector2 nextPosition = new Vector2(nextX, nextY);
                 sliderPath.ControlPoints.Add(new PathControlPoint(nextPosition));
-                currentDistance += Vector2.Distance(lastPosition, nextPosition);
+                currentTime += Vector2.Distance(lastPosition, nextPosition) / velocity;
                 lastPosition = nextPosition;
             }
         }
 
         /// <summary>
-        /// Find the index at which a new vertex with <paramref name="distance"/> can be inserted.
+        /// Find the index at which a new vertex with <paramref name="time"/> can be inserted.
         /// </summary>
-        private int vertexIndexAtDistance(double distance)
+        private int vertexIndexAtTime(double time)
         {
-            // The position of `(distance, Infinity)` is uniquely determined because infinite positions are not allowed.
-            int i = vertices.BinarySearch(new JuiceStreamPathVertex(distance, float.PositiveInfinity));
+            // The position of `(time, Infinity)` is uniquely determined because infinite positions are not allowed.
+            int i = vertices.BinarySearch(new JuiceStreamPathVertex(time, float.PositiveInfinity));
             return i < 0 ? ~i : i;
         }
 
         /// <summary>
-        /// Compute the position at the given <paramref name="distance"/>, assuming <paramref name="index"/> is the vertex index returned by <see cref="vertexIndexAtDistance"/>.
+        /// Compute the position at the given <paramref name="time"/>, assuming <paramref name="index"/> is the vertex index returned by <see cref="vertexIndexAtTime"/>.
         /// </summary>
-        private float positionAtDistance(double distance, int index)
+        private float positionAtTime(double time, int index)
         {
             if (index <= 0)
                 return vertices[0].X;
             if (index >= vertices.Count)
                 return vertices[^1].X;
 
-            double length = vertices[index].Distance - vertices[index - 1].Distance;
-            if (Precision.AlmostEquals(length, 0))
+            double duration = vertices[index].Time - vertices[index - 1].Time;
+            if (Precision.AlmostEquals(duration, 0))
                 return vertices[index].X;
 
             float deltaX = vertices[index].X - vertices[index - 1].X;
 
-            return (float)(vertices[index - 1].X + deltaX * ((distance - vertices[index - 1].Distance) / length));
-        }
-
-        /// <summary>
-        /// Check the two vertices can connected directly while satisfying the slope condition.
-        /// </summary>
-        private bool canConnect(JuiceStreamPathVertex vertex1, JuiceStreamPathVertex vertex2, float allowance = 0)
-        {
-            double xDistance = Math.Abs((double)vertex2.X - vertex1.X);
-            float length = (float)Math.Abs(vertex2.Distance - vertex1.Distance);
-            return xDistance <= length + allowance;
-        }
-
-        /// <summary>
-        /// Move the position of <paramref name="movableVertex"/> towards the position of <paramref name="fixedVertex"/>
-        /// until the vertex pair satisfies the condition <see cref="canConnect"/>.
-        /// </summary>
-        /// <returns>The resulting position of <paramref name="movableVertex"/>.</returns>
-        private float clampToConnectablePosition(JuiceStreamPathVertex fixedVertex, JuiceStreamPathVertex movableVertex)
-        {
-            float length = (float)Math.Abs(movableVertex.Distance - fixedVertex.Distance);
-            return Math.Clamp(movableVertex.X, fixedVertex.X - length, fixedVertex.X + length);
+            return (float)(vertices[index - 1].X + deltaX * ((time - vertices[index - 1].Time) / duration));
         }
 
         private void invalidate() => InvalidationID++;

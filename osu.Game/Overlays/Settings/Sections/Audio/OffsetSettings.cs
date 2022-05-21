@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override LocalisableString Header => AudioSettingsStrings.OffsetHeader;
 
-        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "universal", "uo", "timing" });
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "universal", "uo", "timing" });
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

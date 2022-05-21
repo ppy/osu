@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -98,13 +99,13 @@ namespace osu.Game.Overlays.Settings
             set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms
+        public virtual IEnumerable<LocalisableString> FilterTerms
         {
             get
             {
-                var keywords = new List<string>(Keywords ?? Array.Empty<string>())
+                var keywords = new List<LocalisableString>(Keywords?.Select(k => (LocalisableString)k) ?? Array.Empty<LocalisableString>())
                 {
-                    LabelText.ToString()
+                    LabelText
                 };
 
                 if (HasClassicDefault)
