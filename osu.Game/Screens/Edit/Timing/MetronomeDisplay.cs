@@ -6,6 +6,7 @@ using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -209,7 +210,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            interpolatedBpm.BindValueChanged(bpm => bpmText.Text = bpm.NewValue.ToString(CultureInfo.CurrentCulture));
+            interpolatedBpm.BindValueChanged(bpm => bpmText.Text = bpm.NewValue.ToLocalisableString());
         }
 
         protected override void Update()
