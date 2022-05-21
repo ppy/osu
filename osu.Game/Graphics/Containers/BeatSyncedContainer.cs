@@ -124,9 +124,9 @@ namespace osu.Game.Graphics.Containers
 
             double currentTrackTime = clock.CurrentTime + EarlyActivationMilliseconds;
 
-            if (this.beatmap.Value.TrackLoaded && this.beatmap.Value.BeatmapLoaded)
+            if (beatmap.Value.TrackLoaded && beatmap.Value.BeatmapLoaded)
             {
-                track = this.beatmap.Value.Track;
+                track = beatmap.Value.Track;
             }
 
             IsBeatSyncedWithTrack = beatmap != null && clock.IsRunning && track?.Length > 0;
