@@ -428,9 +428,8 @@ namespace osu.Game.Overlays.Mods
             base.PopIn();
 
             multiplierDisplay?
-                .Delay(fade_in_duration * 0.65f)
-                .FadeIn(fade_in_duration / 2, Easing.OutQuint)
-                .ScaleTo(1, fade_in_duration, Easing.OutElastic);
+                .FadeIn(fade_in_duration, Easing.OutQuint)
+                .MoveToY(0, fade_in_duration, Easing.OutQuint);
 
             int nonFilteredColumnCount = 0;
 
@@ -465,7 +464,7 @@ namespace osu.Game.Overlays.Mods
 
             multiplierDisplay?
                 .FadeOut(fade_out_duration / 2, Easing.OutQuint)
-                .ScaleTo(0.75f, fade_out_duration, Easing.OutQuint);
+                .MoveToY(-distance, fade_out_duration / 2, Easing.OutQuint);
 
             int nonFilteredColumnCount = 0;
 
