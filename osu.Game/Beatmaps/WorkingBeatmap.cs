@@ -130,7 +130,7 @@ namespace osu.Game.Beatmaps
         /// Used as an optimisation to avoid reload / track swap across difficulties in the same beatmap set.
         /// </summary>
         /// <param name="target">The target working beatmap to transfer this track to.</param>
-        /// <returns>Whether the track is valid and has been transferred to this working beatmap.</returns>
+        /// <returns>Whether the track has been transferred to the <paramref name="target"/>.</returns>
         public virtual bool TryTransferTrack([NotNull] WorkingBeatmap target)
         {
             if (BeatmapInfo?.AudioEquals(target.BeatmapInfo) != true)
