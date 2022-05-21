@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Menu
 
             private readonly float[] audioData = new float[256];
 
-            private readonly QuadBatch<TexturedVertex2D> vertexBatch = new QuadBatch<TexturedVertex2D>(100);
+            private readonly QuadBatch<TexturedVertex2D> vertexBatch = new QuadBatch<TexturedVertex2D>(100, 10);
 
             public VisualisationDrawNode(LogoVisualisation source)
                 : base(source)

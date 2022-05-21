@@ -278,7 +278,7 @@ namespace osu.Game.Graphics.Backgrounds
                 if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
                 {
                     vertexBatch?.Dispose();
-                    vertexBatch = new QuadBatch<TexturedVertex2D>(Source.AimCount);
+                    vertexBatch = new QuadBatch<TexturedVertex2D>(Source.AimCount, 1);
                 }
 
                 using (var usage = vertexBatch.BeginUsage(this, vertices))

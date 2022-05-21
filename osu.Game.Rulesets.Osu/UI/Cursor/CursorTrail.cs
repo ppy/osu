@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private Vector2 size;
             private Vector2 originPosition;
 
-            private readonly QuadBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites);
+            private readonly QuadBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites, 1);
 
             public TrailDrawNode(CursorTrail source)
                 : base(source)
