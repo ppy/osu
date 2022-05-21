@@ -11,7 +11,7 @@ namespace osu.Game.IO
     /// <summary>
     /// A storage which wraps another storage and delegates implementation, potentially mutating the lookup path.
     /// </summary>
-    public class WrappedStorage : Storage
+    public class WrappedStorage : NativeStorage // TODO: Revert to Storage inheritance after https://github.com/ppy/osu-framework/pull/5189
     {
         protected Storage UnderlyingStorage { get; private set; }
 
@@ -66,8 +66,6 @@ namespace osu.Game.IO
 
         public override IEnumerable<string> GetFiles(string path, string pattern = "*") =>
             ToLocalRelative(UnderlyingStorage.GetFiles(MutatePath(path), pattern));
-
-        public override Stream CreateFileSafely(string path) => UnderlyingStorage.CreateFileSafely(MutatePath(path));
 
         public override Stream GetStream(string path, FileAccess access = FileAccess.Read, FileMode mode = FileMode.OpenOrCreate) =>
             UnderlyingStorage.GetStream(MutatePath(path), access, mode);
