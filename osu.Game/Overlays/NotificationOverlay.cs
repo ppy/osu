@@ -15,7 +15,8 @@ using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
+using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Overlays
 {
@@ -61,7 +62,7 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.X,
                             Children = new[]
                             {
-                                new NotificationSection(@"Notifications", @"Clear All")
+                                new NotificationSection(AccountsStrings.NotificationsTitle, "Clear All")
                                 {
                                     AcceptTypes = new[] { typeof(SimpleNotification) }
                                 },

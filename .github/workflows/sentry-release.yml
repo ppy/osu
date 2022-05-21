@@ -1,0 +1,26 @@
+name: Add Release to Sentry
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  sentry_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ppy
+          SENTRY_PROJECT: osu
+          SENTRY_URL: https://sentry.ppy.sh/
+        with:
+          environment: production
+          version: ${{ github.ref }}

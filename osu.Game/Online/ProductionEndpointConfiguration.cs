@@ -10,8 +10,8 @@ namespace osu.Game.Online
             WebsiteRootUrl = APIEndpointUrl = @"https://osu.ppy.sh";
             APIClientSecret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
             APIClientID = "5";
-            SpectatorEndpointUrl = "https://spectator.ppy.sh/spectator";
-            MultiplayerEndpointUrl = "https://spectator.ppy.sh/multiplayer";
+            SpectatorEndpointUrl = "https://spectator2.ppy.sh/spectator";
+            MultiplayerEndpointUrl = "https://spectator2.ppy.sh/multiplayer";
         }
     }
 }

@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour colours)
         {
-            BackgroundColour = overlayColourProvider?.Highlight1 ?? colours.Blue3;
+            DefaultBackgroundColour = overlayColourProvider?.Highlight1 ?? colours.Blue3;
         }
 
         protected override void LoadComplete()

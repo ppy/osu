@@ -9,7 +9,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osuTK.Graphics;
+using osu.Framework.Layout;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -41,17 +42,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             InternalChild = Box = CreateBox();
         }
 
-        protected virtual Drawable CreateBox() => new Container
-        {
-            Masking = true,
-            BorderColour = Color4.White,
-            BorderThickness = SelectionBox.BORDER_RADIUS,
-            Child = new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0.1f
-            }
-        };
+        protected virtual Drawable CreateBox() => new BoxWithBorders();
 
         private RectangleF? dragRectangle;
 
@@ -111,5 +102,75 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public override void Show() => State = Visibility.Visible;
 
         public event Action<Visibility> StateChanged;
+
+        public class BoxWithBorders : CompositeDrawable
+        {
+            private readonly LayoutValue cache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
+
+            public BoxWithBorders()
+            {
+                AddLayout(cache);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (!cache.IsValid)
+                {
+                    createContent();
+                    cache.Validate();
+                }
+            }
+
+            private void createContent()
+            {
+                if (DrawSize == Vector2.Zero)
+                {
+                    ClearInternal();
+                    return;
+                }
+
+                // Make lines the same width independent of display resolution.
+                float lineThickness = DrawWidth > 0
+                    ? DrawWidth / ScreenSpaceDrawQuad.Width * 2
+                    : DrawHeight / ScreenSpaceDrawQuad.Height * 2;
+
+                Padding = new MarginPadding(-lineThickness / 2);
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = lineThickness,
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = lineThickness,
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = lineThickness,
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = lineThickness,
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.1f
+                    }
+                };
+            }
+        }
     }
 }

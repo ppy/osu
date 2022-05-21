@@ -19,6 +19,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -29,8 +30,10 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
@@ -49,7 +52,6 @@ using osuTK.Input;
 namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
-    [Cached(typeof(ISamplePlaybackDisabler))]
     [Cached]
     public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler
     {
@@ -252,7 +254,7 @@ namespace osu.Game.Screens.Edit
                                     {
                                         Items = createFileMenuItems()
                                     },
-                                    new MenuItem("Edit")
+                                    new MenuItem(CommonStrings.ButtonsEdit)
                                     {
                                         Items = new[]
                                         {
@@ -269,7 +271,6 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
-                                            new HitAnimationsMenuItem(config.GetBindable<bool>(OsuSetting.EditorHitAnimations))
                                         }
                                     }
                                 }
@@ -474,6 +475,44 @@ namespace osu.Game.Screens.Edit
                 case Key.Right:
                     seek(e, 1);
                     return true;
+
+                // Track traversal keys.
+                // Matching osu-stable implementations.
+                case Key.Z:
+                    // Seek to first object time, or track start if already there.
+                    double? firstObjectTime = editorBeatmap.HitObjects.FirstOrDefault()?.StartTime;
+
+                    if (firstObjectTime == null || clock.CurrentTime == firstObjectTime)
+                        clock.Seek(0);
+                    else
+                        clock.Seek(firstObjectTime.Value);
+                    return true;
+
+                case Key.X:
+                    // Restart playback from beginning of track.
+                    clock.Seek(0);
+                    clock.Start();
+                    return true;
+
+                case Key.C:
+                    // Pause or resume.
+                    if (clock.IsRunning)
+                        clock.Stop();
+                    else
+                        clock.Start();
+                    return true;
+
+                case Key.V:
+                    // Seek to last object time, or track end if already there.
+                    // Note that in osu-stable subsequent presses when at track end won't return to last object.
+                    // This has intentionally been changed to make it more useful.
+                    double? lastObjectTime = editorBeatmap.HitObjects.LastOrDefault()?.GetEndTime();
+
+                    if (lastObjectTime == null || clock.CurrentTime == lastObjectTime)
+                        clock.Seek(clock.TrackLength);
+                    else
+                        clock.Seek(lastObjectTime.Value);
+                    return true;
             }
 
             return base.OnKeyDown(e);
@@ -559,16 +598,16 @@ namespace osu.Game.Screens.Edit
         {
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             dimBackground();
             resetTrack(true);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
             dimBackground();
         }
 
@@ -584,7 +623,7 @@ namespace osu.Game.Screens.Edit
             });
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             if (!ExitConfirmed)
             {
@@ -612,12 +651,12 @@ namespace osu.Game.Screens.Edit
 
             refetchBeatmap();
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
             clock.Stop();
             refetchBeatmap();
         }

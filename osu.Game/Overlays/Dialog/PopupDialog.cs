@@ -100,10 +100,6 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
-        // We always want dialogs to show their appear animation, so we request they start hidden.
-        // Normally this would not be required, but is here due to the manual Show() call that occurs before LoadComplete().
-        protected override bool StartHidden => true;
-
         protected PopupDialog()
         {
             RelativeSizeAxes = Axes.Both;
@@ -272,7 +268,7 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopOut()
         {
-            if (!actionInvoked && content.IsPresent)
+            if (!actionInvoked)
                 // In the case a user did not choose an action before a hide was triggered, press the last button.
                 // This is presumed to always be a sane default "cancel" action.
                 buttonsContainer.Last().TriggerClick();

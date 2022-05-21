@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             {
                 scrollingPath = new ScrollingPath(),
                 nestedOutlineContainer = new NestedOutlineContainer(),
-                editablePath = new PlacementEditablePath(positionToDistance)
+                editablePath = new PlacementEditablePath(positionToTime)
             };
         }
 
@@ -47,6 +47,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+
+            BeginPlacement();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -119,10 +121,10 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             lastEditablePathId = editablePath.PathId;
         }
 
-        private double positionToDistance(float relativeYPosition)
+        private double positionToTime(float relativeYPosition)
         {
             double time = HitObjectContainer.TimeAtPosition(relativeYPosition, HitObject.StartTime);
-            return (time - HitObject.StartTime) * HitObject.Velocity;
+            return time - HitObject.StartTime;
         }
     }
 }

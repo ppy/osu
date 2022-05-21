@@ -30,6 +30,8 @@ namespace osu.Game.Overlays.Settings
         /// </summary>
         public object SettingSourceObject { get; internal set; }
 
+        public const string CLASSIC_DEFAULT_SEARCH_TERM = @"has-classic-default";
+
         private IHasCurrentValue<T> controlWithCurrent => Control as IHasCurrentValue<T>;
 
         protected override Container<Drawable> Content => FlowContent;
@@ -96,18 +98,71 @@ namespace osu.Game.Overlays.Settings
             set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
+        public virtual IEnumerable<string> FilterTerms
+        {
+            get
+            {
+                var keywords = new List<string>(Keywords ?? Array.Empty<string>())
+                {
+                    LabelText.ToString()
+                };
+
+                if (HasClassicDefault)
+                    keywords.Add(CLASSIC_DEFAULT_SEARCH_TERM);
+
+                return keywords;
+            }
+        }
 
         public IEnumerable<string> Keywords { get; set; }
 
+        private bool matchingFilter = true;
+
         public bool MatchingFilter
         {
-            set => Alpha = value ? 1 : 0;
+            get => matchingFilter;
+            set
+            {
+                bool wasPresent = IsPresent;
+
+                matchingFilter = value;
+
+                if (IsPresent != wasPresent)
+                    Invalidate(Invalidation.Presence);
+            }
         }
+
+        public override bool IsPresent => base.IsPresent && MatchingFilter;
 
         public bool FilteringActive { get; set; }
 
         public event Action SettingChanged;
+
+        private T classicDefault;
+
+        public bool HasClassicDefault { get; private set; }
+
+        /// <summary>
+        /// A "classic" default value for this setting.
+        /// </summary>
+        public T ClassicDefault
+        {
+            set
+            {
+                classicDefault = value;
+                HasClassicDefault = true;
+            }
+        }
+
+        public void ApplyClassicDefault()
+        {
+            if (!HasClassicDefault)
+                throw new InvalidOperationException($"Cannot apply a classic default to a setting which doesn't have one defined via {nameof(ClassicDefault)}.");
+
+            Current.Value = classicDefault;
+        }
+
+        public void ApplyDefault() => Current.SetDefault();
 
         protected SettingsItem()
         {

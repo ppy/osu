@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -52,13 +53,13 @@ namespace osu.Game.Overlays.Mods
             Height = HEIGHT;
             AutoSizeAxes = Axes.X;
 
-            InternalChild = new Container
+            InternalChild = new InputBlockingContainer
             {
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
                 Masking = true,
                 CornerRadius = ModPanel.CORNER_RADIUS,
-                Shear = new Vector2(ModPanel.SHEAR_X, 0),
+                Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0),
                 Children = new Drawable[]
                 {
                     underlayBackground = new Box
@@ -98,8 +99,8 @@ namespace osu.Game.Overlays.Mods
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Margin = new MarginPadding { Horizontal = 18 },
-                                            Shear = new Vector2(-ModPanel.SHEAR_X, 0),
-                                            Text = "Difficulty Multiplier",
+                                            Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                            Text = DifficultyMultiplierDisplayStrings.DifficultyMultiplier,
                                             Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
                                         }
                                     }
@@ -109,7 +110,7 @@ namespace osu.Game.Overlays.Mods
                                     AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Shear = new Vector2(-ModPanel.SHEAR_X, 0),
+                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(2, 0),
                                     Children = new Drawable[]

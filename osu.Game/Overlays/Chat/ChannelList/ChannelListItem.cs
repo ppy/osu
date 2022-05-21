@@ -25,16 +25,16 @@ namespace osu.Game.Overlays.Chat.ChannelList
         public event Action<Channel>? OnRequestSelect;
         public event Action<Channel>? OnRequestLeave;
 
+        public readonly Channel Channel;
+
         public readonly BindableInt Mentions = new BindableInt();
 
         public readonly BindableBool Unread = new BindableBool();
 
-        private readonly Channel channel;
-
-        private Box? hoverBox;
-        private Box? selectBox;
-        private OsuSpriteText? text;
-        private ChannelListItemCloseButton? close;
+        private Box hoverBox = null!;
+        private Box selectBox = null!;
+        private OsuSpriteText text = null!;
+        private ChannelListItemCloseButton close = null!;
 
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         public ChannelListItem(Channel channel)
         {
-            this.channel = channel;
+            Channel = channel;
         }
 
         [BackgroundDependencyLoader]
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Text = channel.Name,
+                                    Text = Channel.Name,
                                     Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
                                     Colour = colourProvider.Light3,
                                     Margin = new MarginPadding { Bottom = 2 },
@@ -109,7 +109,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding { Right = 3 },
-                                    Action = () => OnRequestLeave?.Invoke(channel),
+                                    Action = () => OnRequestLeave?.Invoke(Channel),
                                 }
                             }
                         },
@@ -117,47 +117,37 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 },
             };
 
-            Action = () => OnRequestSelect?.Invoke(channel);
+            Action = () => OnRequestSelect?.Invoke(Channel);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            selectedChannel.BindValueChanged(change =>
-            {
-                if (change.NewValue == channel)
-                    selectBox?.FadeIn(300, Easing.OutQuint);
-                else
-                    selectBox?.FadeOut(200, Easing.OutQuint);
-            }, true);
-
-            Unread.BindValueChanged(change =>
-            {
-                text!.FadeColour(change.NewValue ? colourProvider.Content1 : colourProvider.Light3, 300, Easing.OutQuint);
-            }, true);
+            selectedChannel.BindValueChanged(_ => updateState(), true);
+            Unread.BindValueChanged(_ => updateState(), true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            hoverBox?.FadeIn(300, Easing.OutQuint);
-            close?.FadeIn(300, Easing.OutQuint);
+            hoverBox.FadeIn(300, Easing.OutQuint);
+            close.FadeIn(300, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            hoverBox?.FadeOut(200, Easing.OutQuint);
-            close?.FadeOut(200, Easing.OutQuint);
+            hoverBox.FadeOut(200, Easing.OutQuint);
+            close.FadeOut(200, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
         private Drawable createIcon()
         {
-            if (channel.Type != ChannelType.PM)
+            if (Channel.Type != ChannelType.PM)
                 return Drawable.Empty();
 
-            return new UpdateableAvatar(channel.Users.First(), isInteractive: false)
+            return new UpdateableAvatar(Channel.Users.First(), isInteractive: false)
             {
                 Size = new Vector2(20),
                 Margin = new MarginPadding { Right = 5 },
@@ -166,6 +156,21 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 CornerRadius = 10,
                 Masking = true,
             };
+        }
+
+        private void updateState()
+        {
+            bool selected = selectedChannel.Value == Channel;
+
+            if (selected)
+                selectBox.FadeIn(300, Easing.OutQuint);
+            else
+                selectBox.FadeOut(200, Easing.OutQuint);
+
+            if (Unread.Value || selected)
+                text.FadeColour(colourProvider.Content1, 300, Easing.OutQuint);
+            else
+                text.FadeColour(colourProvider.Light3, 200, Easing.OutQuint);
         }
     }
 }

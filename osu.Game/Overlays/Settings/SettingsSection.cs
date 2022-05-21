@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -38,14 +39,27 @@ namespace osu.Game.Overlays.Settings
         private const int header_size = 24;
         private const int border_size = 4;
 
+        private bool matchingFilter = true;
+
         public bool MatchingFilter
         {
-            set => this.FadeTo(value ? 1 : 0);
+            get => matchingFilter;
+            set
+            {
+                bool wasPresent = IsPresent;
+
+                matchingFilter = value;
+
+                if (IsPresent != wasPresent)
+                    Invalidate(Invalidation.Presence);
+            }
         }
+
+        public override bool IsPresent => base.IsPresent && MatchingFilter;
 
         public bool FilteringActive { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private SettingsPanel settingsPanel { get; set; }
 
         protected SettingsSection()
@@ -118,7 +132,7 @@ namespace osu.Game.Overlays.Settings
                 },
             });
 
-            selectedSection = settingsPanel.CurrentSection.GetBoundCopy();
+            selectedSection = settingsPanel?.CurrentSection.GetBoundCopy() ?? new Bindable<SettingsSection>(this);
             selectedSection.BindValueChanged(_ => updateContentFade(), true);
         }
 
@@ -139,7 +153,10 @@ namespace osu.Game.Overlays.Settings
         protected override bool OnClick(ClickEvent e)
         {
             if (!isCurrentSection)
+            {
+                Debug.Assert(settingsPanel != null);
                 settingsPanel.SectionsContainer.ScrollTo(this);
+            }
 
             return base.OnClick(e);
         }
