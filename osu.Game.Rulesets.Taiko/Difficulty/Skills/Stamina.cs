@@ -66,11 +66,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
 
-            if (hitObject.ObjectIndex % 2 == hand)
+            if (hitObject.Position % 2 == hand)
             {
                 double objectStrain = 1;
 
-                if (hitObject.ObjectIndex == 1)
+                if (hitObject.Position == 1)
                     return 1;
 
                 notePairDurationHistory.Enqueue(hitObject.DeltaTime + offhandObjectDuration);

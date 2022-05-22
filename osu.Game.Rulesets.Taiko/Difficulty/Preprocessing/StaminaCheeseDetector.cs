@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -34,9 +35,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <summary>
         /// The list of all <see cref="TaikoDifficultyHitObject"/>s in the map.
         /// </summary>
-        private readonly List<TaikoDifficultyHitObject> hitObjects;
+        private readonly List<DifficultyHitObject> hitObjects;
 
-        public StaminaCheeseDetector(List<TaikoDifficultyHitObject> hitObjects)
+        public StaminaCheeseDetector(List<DifficultyHitObject> hitObjects)
         {
             this.hitObjects = hitObjects;
         }
@@ -62,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="patternLength">The length of a single repeating pattern to consider (triplets/quadruplets).</param>
         private void findRolls(int patternLength)
         {
-            var history = new LimitedCapacityQueue<TaikoDifficultyHitObject>(2 * patternLength);
+            var history = new LimitedCapacityQueue<DifficultyHitObject>(2 * patternLength);
 
             // for convenience, we're tracking the index of the item *before* our suspected repeat's start,
             // as that index can be simply subtracted from the current index to get the number of elements in between
@@ -97,11 +98,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <summary>
         /// Determines whether the objects stored in <paramref name="history"/> contain a repetition of a pattern of length <paramref name="patternLength"/>.
         /// </summary>
-        private static bool containsPatternRepeat(LimitedCapacityQueue<TaikoDifficultyHitObject> history, int patternLength)
+        private static bool containsPatternRepeat(LimitedCapacityQueue<DifficultyHitObject> history, int patternLength)
         {
             for (int j = 0; j < patternLength; j++)
             {
-                if (history[j].HitType != history[j + patternLength].HitType)
+                if (((TaikoDifficultyHitObject)history[j]).HitType != ((TaikoDifficultyHitObject)history[j + patternLength]).HitType)
                     return false;
             }
 
@@ -120,7 +121,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             for (int i = parity; i < hitObjects.Count; i += 2)
             {
-                if (hitObjects[i].HitType == type)
+                if (((TaikoDifficultyHitObject)hitObjects[i]).HitType == type)
                     tlLength += 2;
                 else
                     tlLength = -2;
@@ -139,7 +140,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         private void markObjectsAsCheese(int start, int end)
         {
             for (int i = start; i <= end; i++)
-                hitObjects[i].StaminaCheese = true;
+                ((TaikoDifficultyHitObject)hitObjects[i]).StaminaCheese = true;
         }
     }
 }
