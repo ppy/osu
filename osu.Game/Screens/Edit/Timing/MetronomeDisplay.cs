@@ -31,9 +31,6 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; }
 
-        [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -216,7 +213,10 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.Update();
 
-            timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(BeatSyncClock.CurrentTime);
+            if (BeatSyncSource.ControlPoints == null || BeatSyncSource.Clock == null)
+                return;
+
+            timingPoint = BeatSyncSource.ControlPoints.TimingPointAt(BeatSyncSource.Clock.CurrentTime);
 
             if (beatLength != timingPoint.BeatLength)
             {
@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Edit.Timing
                 this.TransformBindableTo(interpolatedBpm, (int)Math.Round(timingPoint.BPM), 600, Easing.OutQuint);
             }
 
-            if (BeatSyncClock?.IsRunning != true && isSwinging)
+            if (BeatSyncSource.Clock?.IsRunning != true && isSwinging)
             {
                 swing.ClearTransforms(true);
 
@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Edit.Timing
             float currentAngle = swing.Rotation;
             float targetAngle = currentAngle > 0 ? -angle : angle;
 
-            swing.RotateTo(targetAngle, beatLength, Easing.InOutQuad);
+            swing.RotateTo(targetAngle, beatLength, Easing.InOutSine);
 
             if (currentAngle != 0 && Math.Abs(currentAngle - targetAngle) > angle * 1.8f && isSwinging)
             {
