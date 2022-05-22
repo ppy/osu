@@ -373,6 +373,13 @@ namespace osu.Game.Tests.Visual
 
             protected override Track GetBeatmapTrack() => track;
 
+            public override bool TryTransferTrack(WorkingBeatmap target)
+            {
+                // Our track comes from a local track store that's disposed on finalizer,
+                // therefore it's unsafe to transfer it to another working beatmap.
+                return false;
+            }
+
             public class TrackVirtualStore : AudioCollectionManager<Track>, ITrackStore
             {
                 private readonly IFrameBasedClock referenceClock;
