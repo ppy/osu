@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
     public class OsuDifficultyHitObject : DifficultyHitObject
     {
-        private const int normalised_radius = 50; // Change radius to 50 to make 100 the diameter. Easier for mental maths.
+        private const int normalised_radius = 50;
         private const int min_delta_time = 25;
         private const float maximum_slider_radius = normalised_radius * 2.4f;
         private const float assumed_slider_radius = normalised_radius * 1.8f;
@@ -74,10 +75,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastLastObject, HitObject lastObject, double clockRate)
-            : base(hitObject, lastObject, clockRate)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int position)
+            : base(hitObject, lastObject, clockRate, objects, position)
         {
-            this.lastLastObject = (OsuHitObject)lastLastObject;
+            lastLastObject = position > 1 ? (OsuHitObject)Previous(1).BaseObject : null;
             this.lastObject = (OsuHitObject)lastObject;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.

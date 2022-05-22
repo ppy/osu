@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
-        protected override int HistoryLength => 32;
-
         private readonly double greatWindow;
 
         public Speed(Mod[] mods, double hitWindowGreat)
@@ -55,20 +53,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             bool firstDeltaSwitch = false;
 
+            int historicalNoteCount = Math.Min(current.Position, 32);
+
             int rhythmStart = 0;
 
-            while (rhythmStart < Previous.Count - 2 && current.StartTime - Previous[rhythmStart].StartTime < history_time_max)
+            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - current.Previous(rhythmStart).StartTime < history_time_max)
                 rhythmStart++;
 
             for (int i = rhythmStart; i > 0; i--)
             {
-                OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)Previous[i - 1];
-                OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)Previous[i];
-                OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)Previous[i + 1];
+                OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
+                OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous(i);
+                OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)current.Previous(i + 1);
 
                 double currHistoricalDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max; // scales note 0 to 1 from history to now
 
-                currHistoricalDecay = Math.Min((double)(Previous.Count - i) / Previous.Count, currHistoricalDecay); // either we're limited by time or limited by object count.
+                currHistoricalDecay = Math.Min((double)(historicalNoteCount - i) / historicalNoteCount, currHistoricalDecay); // either we're limited by time or limited by object count.
 
                 double currDelta = currObj.StrainTime;
                 double prevDelta = prevObj.StrainTime;
@@ -90,10 +90,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     }
                     else
                     {
-                        if (Previous[i - 1].BaseObject is Slider) // bpm change is into slider, this is easy acc window
+                        if (current.Previous(i - 1).BaseObject is Slider) // bpm change is into slider, this is easy acc window
                             effectiveRatio *= 0.125;
 
-                        if (Previous[i].BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
+                        if (current.Previous(i).BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
                             effectiveRatio *= 0.25;
 
                         if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // derive strainTime for calculation
             var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuPrevObj = Previous.Count > 0 ? (OsuDifficultyHitObject)Previous[0] : null;
+            var osuPrevObj = current.Position > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
 
             double strainTime = osuCurrObj.StrainTime;
             double greatWindowFull = greatWindow * 2;
@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
-        protected override double CalculateInitialStrain(double time) => (currentStrain * currentRhythm) * strainDecay(time - Previous[0].StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain * currentRhythm) * strainDecay(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {

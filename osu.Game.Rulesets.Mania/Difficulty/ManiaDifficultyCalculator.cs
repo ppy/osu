@@ -62,8 +62,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             LegacySortHelper<HitObject>.Sort(sortedObjects, Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
 
+            List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+
             for (int i = 1; i < sortedObjects.Length; i++)
-                yield return new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate);
+                objects.Add(new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects, i - 1));
+
+            return objects;
         }
 
         // Sorting is done in CreateDifficultyHitObjects, since the full list of hitobjects is required.

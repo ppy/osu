@@ -47,13 +47,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
-            List<TaikoDifficultyHitObject> taikoDifficultyHitObjects = new List<TaikoDifficultyHitObject>();
+            List<DifficultyHitObject> taikoDifficultyHitObjects = new List<DifficultyHitObject>();
 
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
                 taikoDifficultyHitObjects.Add(
                     new TaikoDifficultyHitObject(
-                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, i
+                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, taikoDifficultyHitObjects, i - 2
                     )
                 );
             }
