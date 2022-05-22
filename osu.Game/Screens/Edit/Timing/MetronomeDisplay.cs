@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Edit.Timing
             float currentAngle = swing.Rotation;
             float targetAngle = currentAngle > 0 ? -angle : angle;
 
-            swing.RotateTo(targetAngle, beatLength, Easing.InOutSine);
+            swing.RotateTo(targetAngle, beatLength, Easing.InOutQuad);
 
             if (currentAngle != 0 && Math.Abs(currentAngle - targetAngle) > angle * 1.8f && isSwinging)
             {
