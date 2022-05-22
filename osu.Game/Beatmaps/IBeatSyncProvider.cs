@@ -15,7 +15,7 @@ namespace osu.Game.Beatmaps
     /// Provides various data sources which allow for synchronising visuals to a known beat.
     /// Primarily intended for use with <see cref="BeatSyncedContainer"/>.
     /// </summary>
-    [Cached(typeof(IBeatSyncProvider))]
+    [Cached]
     public interface IBeatSyncProvider
     {
         ControlPointInfo? ControlPoints { get; }
