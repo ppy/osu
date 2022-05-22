@@ -267,7 +267,7 @@ namespace osu.Game.Overlays
 
             TrackChangeDirection direction = TrackChangeDirection.None;
 
-            bool audioEquals = newWorking?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
+            bool audioEquals = newWorking?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) == true;
 
             if (current != null)
             {
@@ -290,15 +290,8 @@ namespace osu.Game.Overlays
 
             current = newWorking;
 
-            if (!audioEquals || CurrentTrack.IsDummyDevice)
-            {
+            if (lastWorking == null || !lastWorking.TryTransferTrack(current))
                 changeTrack();
-            }
-            else
-            {
-                // transfer still valid track to new working beatmap
-                current.TransferTrack(lastWorking.Track);
-            }
 
             TrackChanged?.Invoke(current, direction);
 
