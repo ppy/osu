@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -28,6 +29,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -194,10 +196,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for join", () => RoomJoined);
 
-            AddStep("press toggle mod select key", () => InputManager.Key(osuTK.Input.Key.F1));
+            AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
 
-            AddUntilStep("mod select contents loaded",
-                () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
+            AddUntilStep("mod select shown", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
         }
 
         [Test]
@@ -214,10 +215,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for join", () => RoomJoined);
 
-            AddStep("press toggle mod select key", () => InputManager.Key(osuTK.Input.Key.F1));
+            AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
 
-            AddAssert("mod select contents not loaded",
-                () => !(this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded)));
+            AddWaitStep("wait some", 3);
+            AddAssert("mod select not shown", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Hidden);
         }
 
         [Test]
