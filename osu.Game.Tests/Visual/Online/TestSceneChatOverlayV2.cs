@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Online
                 Children = new Drawable[]
                 {
                     channelManager,
-                    chatOverlay = new TestChatOverlayV2 { RelativeSizeAxes = Axes.Both },
+                    chatOverlay = new TestChatOverlayV2(),
                 },
             };
         });
