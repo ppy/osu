@@ -20,26 +20,27 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.4;
 
-        /// <summary>
-        /// Stamina of each individual keys, calculated based on repetition speed.
-        /// </summary>
-        private readonly SingleKeyStamina[] keyStamina =
+        private readonly SingleKeyStamina[] centreKeyStamina =
         {
             new SingleKeyStamina(),
-            new SingleKeyStamina(),
+            new SingleKeyStamina()
+        };
+
+        private readonly SingleKeyStamina[] rimKeyStamina =
+        {
             new SingleKeyStamina(),
             new SingleKeyStamina()
         };
 
         /// <summary>
-        /// Current index to <see cref="keyStamina" /> for a don hit.
+        /// Current index into <see cref="centreKeyStamina" /> for a centre hit.
         /// </summary>
-        private int donIndex = 1;
+        private int centreKeyIndex;
 
         /// <summary>
-        /// Current index to <see cref="keyStamina" /> for a kat hit.
+        /// Current index into <see cref="rimKeyStamina" /> for a rim hit.
         /// </summary>
-        private int katIndex = 3;
+        private int rimKeyIndex;
 
         /// <summary>
         /// Creates a <see cref="Stamina"/> skill.
@@ -59,12 +60,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             // Alternate key for the same color.
             if (current.HitType == HitType.Centre)
             {
-                donIndex = donIndex == 0 ? 1 : 0;
-                return keyStamina[donIndex];
+                centreKeyIndex = (centreKeyIndex + 1) % 2;
+                return centreKeyStamina[centreKeyIndex];
             }
 
-            katIndex = katIndex == 2 ? 3 : 2;
-            return keyStamina[katIndex];
+            rimKeyIndex = (rimKeyIndex + 1) % 2;
+            return rimKeyStamina[rimKeyIndex];
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
