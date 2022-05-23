@@ -522,6 +522,9 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
             AddStep("click left mouse button", () => InputManager.Click(MouseButton.Left));
             AddAssert("now playing is hidden", () => nowPlayingOverlay.State.Value == Visibility.Hidden);
+
+            // move the mouse firmly inside game bounds to avoid interfering with other tests.
+            AddStep("center cursor", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
         }
 
         [Test]
