@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
     /// </summary>
     public class DifficultyHitObject
     {
-        private readonly List<DifficultyHitObject> difficultyHitObjects;
+        private readonly IReadOnlyList<DifficultyHitObject> difficultyHitObjects;
 
         /// <summary>
         /// The position of this <see cref="DifficultyHitObject"/> in the <see cref="difficultyHitObjects"/> list.
