@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,8 +17,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
 {
     public class EditorMenuBar : OsuMenu
     {
-        public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
-
         public EditorMenuBar()
             : base(Direction.Horizontal, true)
         {
@@ -28,25 +25,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
             MaskingContainer.CornerRadius = 0;
             ItemsContainer.Padding = new MarginPadding { Left = 100 };
             BackgroundColour = Color4Extensions.FromHex("111");
-
-            ScreenSelectionTabControl tabControl;
-            AddRangeInternal(new Drawable[]
-            {
-                tabControl = new ScreenSelectionTabControl
-                {
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    X = -15
-                }
-            });
-
-            Mode.BindTo(tabControl.Current);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Mode.TriggerChange();
         }
 
         protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();

@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Online.Chat
         }
 
         [Test]
-        public void TestContainsUsernameBetweenInterpunction()
+        public void TestContainsUsernameBetweenPunctuation()
         {
             Assert.IsTrue(MessageNotifier.CheckContainsUsername("Hello 'test'-message", "Test"));
         }

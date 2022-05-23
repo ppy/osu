@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Online.Rooms
 {
@@ -11,10 +12,10 @@ namespace osu.Game.Online.Rooms
 
         Playlists,
 
-        [Description("Head to head")]
+        [LocalisableDescription(typeof(MatchesStrings), nameof(MatchesStrings.MatchTeamTypesHeadToHead))]
         HeadToHead,
 
-        [Description("Team VS")]
+        [LocalisableDescription(typeof(MatchesStrings), nameof(MatchesStrings.MatchTeamTypesTeamVs))]
         TeamVersus,
     }
 }

@@ -14,7 +14,7 @@ using osu.Game.Overlays.Notifications;
 namespace osu.Game.Database
 {
     public abstract class ModelDownloader<TModel, T> : IModelDownloader<T>
-        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>, T
+        where TModel : class, IHasGuidPrimaryKey, ISoftDelete, IEquatable<TModel>, T
         where T : class
     {
         public Action<Notification> PostNotification { protected get; set; }

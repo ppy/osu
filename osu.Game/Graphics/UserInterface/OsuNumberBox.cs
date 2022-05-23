@@ -7,6 +7,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuNumberBox : OsuTextBox
     {
+        protected override bool AllowIme => false;
+
         protected override bool CanAddCharacter(char character) => character.IsAsciiDigit();
     }
 }

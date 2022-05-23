@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
-        public BeatmapMetadata Metadata => BeatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+        public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
         public Waveform Waveform => waveform.Value;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Beatmaps
             this.audioManager = audioManager;
 
             BeatmapInfo = beatmapInfo;
-            BeatmapSetInfo = beatmapInfo.BeatmapSet;
+            BeatmapSetInfo = beatmapInfo.BeatmapSet ?? new BeatmapSetInfo();
 
             waveform = new Lazy<Waveform>(GetWaveform);
             storyboard = new Lazy<Storyboard>(GetStoryboard);
@@ -126,11 +126,19 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Transfer a valid audio track into this working beatmap. Used as an optimisation to avoid reload / track swap
-        /// across difficulties in the same beatmap set.
+        /// Attempts to transfer the audio track to a target working beatmap, if valid for transferring.
+        /// Used as an optimisation to avoid reload / track swap across difficulties in the same beatmap set.
         /// </summary>
-        /// <param name="track">The track to transfer.</param>
-        public void TransferTrack([NotNull] Track track) => this.track = track ?? throw new ArgumentNullException(nameof(track));
+        /// <param name="target">The target working beatmap to transfer this track to.</param>
+        /// <returns>Whether the track has been transferred to the <paramref name="target"/>.</returns>
+        public virtual bool TryTransferTrack([NotNull] WorkingBeatmap target)
+        {
+            if (BeatmapInfo?.AudioEquals(target.BeatmapInfo) != true || Track.IsDummyDevice)
+                return false;
+
+            target.track = Track;
+            return true;
+        }
 
         /// <summary>
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
@@ -151,24 +159,7 @@ namespace osu.Game.Beatmaps
         {
             const double excess_length = 1000;
 
-            var lastObject = Beatmap?.HitObjects.LastOrDefault();
-
-            double length;
-
-            switch (lastObject)
-            {
-                case null:
-                    length = emptyLength;
-                    break;
-
-                case IHasDuration endTime:
-                    length = endTime.EndTime + excess_length;
-                    break;
-
-                default:
-                    length = lastObject.StartTime + excess_length;
-                    break;
-            }
+            double length = (BeatmapInfo?.Length + excess_length) ?? emptyLength;
 
             return audioManager.Tracks.GetVirtual(length);
         }
@@ -185,7 +176,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return loadBeatmapAsync().Result;
+                    return loadBeatmapAsync().GetResultSafely();
                 }
                 catch (AggregateException ae)
                 {

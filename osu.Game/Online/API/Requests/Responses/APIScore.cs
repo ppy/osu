@@ -86,7 +86,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// <returns></returns>
         public ScoreInfo CreateScoreInfo(RulesetStore rulesets, BeatmapInfo beatmap = null)
         {
-            var ruleset = rulesets.GetRuleset(RulesetID);
+            var ruleset = rulesets.GetRuleset(RulesetID) ?? throw new InvalidOperationException();
 
             var rulesetInstance = ruleset.CreateInstance();
 
@@ -99,13 +99,12 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
-                BeatmapInfo = beatmap,
+                BeatmapInfo = beatmap ?? new BeatmapInfo(),
                 User = User,
                 Accuracy = Accuracy,
                 OnlineID = OnlineID,
                 Date = Date,
                 PP = PP,
-                RulesetID = RulesetID,
                 Hash = HasReplay ? "online" : string.Empty, // todo: temporary?
                 Rank = Rank,
                 Ruleset = ruleset,

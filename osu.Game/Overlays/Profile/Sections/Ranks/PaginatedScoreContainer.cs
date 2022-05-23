@@ -23,8 +23,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             : base(user, headerText)
         {
             this.type = type;
-
-            ItemsPerPage = 5;
         }
 
         [BackgroundDependencyLoader]
@@ -46,6 +44,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 case ScoreType.Recent:
                     return user.ScoresRecentCount;
 
+                case ScoreType.Pinned:
+                    return user.ScoresPinnedCount;
+
                 default:
                     return 0;
             }
@@ -53,14 +54,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         protected override void OnItemsReceived(List<APIScore> items)
         {
-            if (VisiblePages == 0)
+            if (CurrentPage == null || CurrentPage?.Offset == 0)
                 drawableItemIndex = 0;
 
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<APIScore>> CreateRequest() =>
-            new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
+        protected override APIRequest<List<APIScore>> CreateRequest(PaginationParameters pagination) =>
+            new GetUserScoresRequest(User.Value.Id, type, pagination);
 
         private int drawableItemIndex;
 

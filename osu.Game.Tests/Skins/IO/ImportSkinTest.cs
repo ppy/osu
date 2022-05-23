@@ -8,8 +8,10 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Skinning;
@@ -110,6 +112,27 @@ namespace osu.Game.Tests.Skins.IO
         });
 
         [Test]
+        public Task TestImportExportedSkinFilename() => runSkinTest(async osu =>
+        {
+            MemoryStream exportStream = new MemoryStream();
+
+            var import1 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOskWithIni("name 1", "author 1"), "custom.osk"));
+            assertCorrectMetadata(import1, "name 1 [custom]", "author 1", osu);
+
+            import1.PerformRead(s =>
+            {
+                new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportModelTo(s, exportStream);
+            });
+
+            string exportFilename = import1.GetDisplayString();
+
+            var import2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(exportStream, $"{exportFilename}.osk"));
+            assertCorrectMetadata(import2, "name 1 [custom]", "author 1", osu);
+
+            assertImportedOnce(import1, import2);
+        });
+
+        [Test]
         public Task TestSameMetadataNameSameFolderName() => runSkinTest(async osu =>
         {
             var import1 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOskWithIni("name 1", "author 1"), "my custom skin 1"));
@@ -187,7 +210,7 @@ namespace osu.Game.Tests.Skins.IO
 
             var imported = skinManager.Import(new ImportTask(exportStream, "exported.osk"));
 
-            imported.Result.PerformRead(s =>
+            imported.GetResultSafely().PerformRead(s =>
             {
                 Assert.IsFalse(s.Protected);
                 Assert.AreNotEqual(originalSkinId, s.ID);
@@ -222,7 +245,7 @@ namespace osu.Game.Tests.Skins.IO
 
             var imported = skinManager.Import(new ImportTask(exportStream, "exported.osk"));
 
-            imported.Result.PerformRead(s =>
+            imported.GetResultSafely().PerformRead(s =>
             {
                 Assert.IsFalse(s.Protected);
                 Assert.AreNotEqual(originalSkinId, s.ID);
@@ -234,7 +257,7 @@ namespace osu.Game.Tests.Skins.IO
 
         #endregion
 
-        private void assertCorrectMetadata(ILive<SkinInfo> import1, string name, string creator, OsuGameBase osu)
+        private void assertCorrectMetadata(Live<SkinInfo> import1, string name, string creator, OsuGameBase osu)
         {
             import1.PerformRead(i =>
             {
@@ -249,7 +272,7 @@ namespace osu.Game.Tests.Skins.IO
             });
         }
 
-        private void assertImportedBoth(ILive<SkinInfo> import1, ILive<SkinInfo> import2)
+        private void assertImportedBoth(Live<SkinInfo> import1, Live<SkinInfo> import2)
         {
             import1.PerformRead(i1 => import2.PerformRead(i2 =>
             {
@@ -259,7 +282,7 @@ namespace osu.Game.Tests.Skins.IO
             }));
         }
 
-        private void assertImportedOnce(ILive<SkinInfo> import1, ILive<SkinInfo> import2)
+        private void assertImportedOnce(Live<SkinInfo> import1, Live<SkinInfo> import2)
         {
             import1.PerformRead(i1 => import2.PerformRead(i2 =>
             {
@@ -319,7 +342,7 @@ namespace osu.Game.Tests.Skins.IO
 
         private async Task runSkinTest(Func<OsuGameBase, Task> action, [CallerMemberName] string callingMethodName = @"")
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: callingMethodName))
             {
                 try
                 {
@@ -333,7 +356,7 @@ namespace osu.Game.Tests.Skins.IO
             }
         }
 
-        private async Task<ILive<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ArchiveReader archive = null)
+        private async Task<Live<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ArchiveReader archive = null)
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
             return await skinManager.Import(archive);

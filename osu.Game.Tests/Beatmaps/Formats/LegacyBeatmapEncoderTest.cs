@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private class TestLegacySkin : LegacySkin
         {
             public TestLegacySkin(IResourceStore<byte[]> storage, string fileName)
-                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, storage, null, fileName)
+                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, null, storage, fileName)
             {
             }
         }
@@ -195,7 +195,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
         private IBeatmap convert(IBeatmap beatmap)
         {
-            switch (beatmap.BeatmapInfo.RulesetID)
+            switch (beatmap.BeatmapInfo.Ruleset.OnlineID)
             {
                 case 0:
                     beatmap.BeatmapInfo.Ruleset = new OsuRuleset().RulesetInfo;

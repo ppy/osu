@@ -4,14 +4,13 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Database;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
@@ -28,9 +27,6 @@ namespace osu.Game.Online.Multiplayer
         public override IBindable<bool> IsConnected { get; } = new BindableBool();
 
         private HubConnection? connection => connector?.CurrentConnection;
-
-        [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         public OnlineMultiplayerClient(EndpointConfiguration endpoints)
         {
@@ -58,7 +54,8 @@ namespace osu.Game.Online.Multiplayer
                     connection.On<MultiplayerRoomSettings>(nameof(IMultiplayerClient.SettingsChanged), ((IMultiplayerClient)this).SettingsChanged);
                     connection.On<int, MultiplayerUserState>(nameof(IMultiplayerClient.UserStateChanged), ((IMultiplayerClient)this).UserStateChanged);
                     connection.On(nameof(IMultiplayerClient.LoadRequested), ((IMultiplayerClient)this).LoadRequested);
-                    connection.On(nameof(IMultiplayerClient.MatchStarted), ((IMultiplayerClient)this).MatchStarted);
+                    connection.On(nameof(IMultiplayerClient.GameplayStarted), ((IMultiplayerClient)this).GameplayStarted);
+                    connection.On(nameof(IMultiplayerClient.LoadAborted), ((IMultiplayerClient)this).LoadAborted);
                     connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
                     connection.On<int, IEnumerable<APIMod>>(nameof(IMultiplayerClient.UserModsChanged), ((IMultiplayerClient)this).UserModsChanged);
                     connection.On<int, BeatmapAvailability>(nameof(IMultiplayerClient.UserBeatmapAvailabilityChanged), ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged);
@@ -79,6 +76,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.FromCanceled<MultiplayerRoom>(new CancellationToken(true));
 
+            Debug.Assert(connection != null);
+
             return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty);
         }
 
@@ -86,6 +85,8 @@ namespace osu.Game.Online.Multiplayer
         {
             if (!IsConnected.Value)
                 return Task.FromCanceled(new CancellationToken(true));
+
+            Debug.Assert(connection != null);
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
         }
@@ -95,6 +96,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.InvokeAsync(nameof(IMultiplayerServer.TransferHost), userId);
         }
 
@@ -102,6 +105,8 @@ namespace osu.Game.Online.Multiplayer
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.KickUser), userId);
         }
@@ -111,6 +116,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeSettings), settings);
         }
 
@@ -118,6 +125,8 @@ namespace osu.Game.Online.Multiplayer
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeState), newState);
         }
@@ -127,6 +136,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeBeatmapAvailability), newBeatmapAvailability);
         }
 
@@ -134,6 +145,8 @@ namespace osu.Game.Online.Multiplayer
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeUserMods), newMods);
         }
@@ -143,6 +156,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.InvokeAsync(nameof(IMultiplayerServer.SendMatchRequest), request);
         }
 
@@ -150,6 +165,8 @@ namespace osu.Game.Online.Multiplayer
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.StartMatch));
         }
@@ -159,6 +176,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.InvokeAsync(nameof(IMultiplayerServer.AbortGameplay));
         }
 
@@ -166,6 +185,8 @@ namespace osu.Game.Online.Multiplayer
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.AddPlaylistItem), item);
         }
@@ -175,6 +196,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.InvokeAsync(nameof(IMultiplayerServer.EditPlaylistItem), item);
         }
 
@@ -183,12 +206,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.RemovePlaylistItem), playlistItemId);
-        }
+            Debug.Assert(connection != null);
 
-        public override Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default)
-        {
-            return beatmapLookupCache.GetBeatmapAsync(beatmapId, cancellationToken);
+            return connection.InvokeAsync(nameof(IMultiplayerServer.RemovePlaylistItem), playlistItemId);
         }
 
         protected override void Dispose(bool isDisposing)

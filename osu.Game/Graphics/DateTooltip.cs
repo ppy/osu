@@ -56,7 +56,7 @@ namespace osu.Game.Graphics
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.GreySeafoamDarker;
+            background.Colour = colours.GreySeaFoamDarker;
             timeText.Colour = colours.BlueLighter;
         }
 

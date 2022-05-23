@@ -15,6 +15,8 @@ namespace osu.Game.Beatmaps
 
         public int BeatmapSetInfoID { get; set; }
 
+        public EFBeatmapSetInfo BeatmapSetInfo { get; set; }
+
         public int FileInfoID { get; set; }
 
         public FileInfo FileInfo { get; set; }
@@ -22,6 +24,6 @@ namespace osu.Game.Beatmaps
         [Required]
         public string Filename { get; set; }
 
-        public IFileInfo File => FileInfo;
+        IFileInfo INamedFileUsage.File => FileInfo;
     }
 }

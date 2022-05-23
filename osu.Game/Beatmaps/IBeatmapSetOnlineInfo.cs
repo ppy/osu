@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps
         DateTimeOffset? LastUpdated { get; }
 
         /// <summary>
-        /// The status of this beatmap set.
+        /// The "ranked" status of this beatmap set.
         /// </summary>
         BeatmapOnlineStatus Status { get; }
 

@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Play
 
         private readonly DrawableRuleset drawableRuleset;
         private readonly BindableDouble trackFreq = new BindableDouble(1);
+        private readonly BindableDouble volumeAdjustment = new BindableDouble(0.5);
 
         private Container filters;
 
@@ -125,6 +126,7 @@ namespace osu.Game.Screens.Play
             failSample.Play();
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
+            track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             applyToPlayfield(drawableRuleset.Playfield);
             drawableRuleset.Playfield.HitObjectContainer.FadeOut(duration / 2);
@@ -153,6 +155,8 @@ namespace osu.Game.Screens.Play
         {
             if (resetTrackFrequency)
                 track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+
+            track?.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             if (filters.Parent == null)
                 return;

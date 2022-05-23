@@ -9,8 +9,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.Platform;
-using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Editors;
@@ -30,7 +28,7 @@ namespace osu.Game.Tournament.Screens.Ladder
         protected Container Content;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, Storage storage)
+        private void load()
         {
             normalPathColour = Color4Extensions.FromHex("#66D1FF");
             losersPathColour = Color4Extensions.FromHex("#FFC700");

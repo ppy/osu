@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -10,14 +11,11 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Security;
-using osu.Desktop.Overlays;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Logging;
-using osu.Framework.Screens;
-using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
 using osu.Framework.Threading;
@@ -27,13 +25,9 @@ namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
-        private readonly bool noVersionOverlay;
-        private VersionManager versionManager;
-
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
-            noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
         }
 
         public override StableStorage GetStorageForStableInstall()
@@ -103,6 +97,8 @@ namespace osu.Desktop
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
+                    Debug.Assert(OperatingSystem.IsWindows());
+
                     return new SquirrelUpdateManager();
 
                 default:
@@ -114,32 +110,12 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            if (!noVersionOverlay)
-                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
-
             LoadComponentAsync(new DiscordRichPresence(), Add);
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
-        }
-
-        protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
-        {
-            base.ScreenChanged(lastScreen, newScreen);
-
-            switch (newScreen)
-            {
-                case IntroScreen _:
-                case MainMenu _:
-                    versionManager?.Show();
-                    break;
-
-                default:
-                    versionManager?.Hide();
-                    break;
-            }
         }
 
         public override void SetHost(GameHost host)

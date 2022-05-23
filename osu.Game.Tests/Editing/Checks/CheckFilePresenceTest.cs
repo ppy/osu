@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestBackgroundSetAndNotInFiles()
         {
-            beatmap.BeatmapInfo.BeatmapSet.Files.Clear();
+            beatmap.BeatmapInfo.BeatmapSet?.Files.Clear();
 
             var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
             var issues = check.Run(context).ToList();

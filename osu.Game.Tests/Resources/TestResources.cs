@@ -80,7 +80,10 @@ namespace osu.Game.Tests.Resources
         public static BeatmapSetInfo CreateTestBeatmapSetInfo(int? difficultyCount = null, RulesetInfo[] rulesets = null)
         {
             int j = 0;
-            RulesetInfo getRuleset() => rulesets?[j++ % rulesets.Length] ?? new OsuRuleset().RulesetInfo;
+
+            rulesets ??= new[] { new OsuRuleset().RulesetInfo };
+
+            RulesetInfo getRuleset() => rulesets?[j++ % rulesets.Length];
 
             int setId = Interlocked.Increment(ref importId);
 
@@ -89,7 +92,7 @@ namespace osu.Game.Tests.Resources
                 // Create random metadata, then we can check if sorting works based on these
                 Artist = "Some Artist " + RNG.Next(0, 9),
                 Title = $"Some Song (set id {setId}) {Guid.NewGuid()}",
-                AuthorString = "Some Guy " + RNG.Next(0, 9),
+                Author = { Username = "Some Guy " + RNG.Next(0, 9) },
             };
 
             var beatmapSet = new BeatmapSetInfo
@@ -97,7 +100,6 @@ namespace osu.Game.Tests.Resources
                 OnlineID = setId,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 DateAdded = DateTimeOffset.UtcNow,
-                Metadata = metadata
             };
 
             foreach (var b in getBeatmaps(difficultyCount ?? RNG.Next(1, 20)))
@@ -131,10 +133,10 @@ namespace osu.Game.Tests.Resources
                         StarRating = diff,
                         Length = length,
                         BPM = bpm,
+                        Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
                         Ruleset = rulesetInfo,
-                        RulesetID = rulesetInfo.ID ?? -1,
                         Metadata = metadata,
-                        BaseDifficulty = new BeatmapDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = diff,
                         }
@@ -166,7 +168,6 @@ namespace osu.Game.Tests.Resources
             },
             BeatmapInfo = beatmap,
             Ruleset = beatmap.Ruleset,
-            RulesetID = beatmap.Ruleset.ID ?? 0,
             Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
             TotalScore = 2845370,
             Accuracy = 0.95,

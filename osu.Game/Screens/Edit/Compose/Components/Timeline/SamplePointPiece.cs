@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Timing;
@@ -39,7 +38,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             volume.BindValueChanged(volume => updateText());
             bank.BindValueChanged(bank => updateText(), true);
@@ -76,9 +75,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             [BackgroundDependencyLoader]
             private void load()
             {
+                FillFlowContainer flow;
+
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer
+                    flow = new FillFlowContainer
                     {
                         Width = 200,
                         Direction = FillDirection.Vertical,
@@ -94,6 +95,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         }
                     }
                 };
+
+                bank.TabbableContentContainer = flow;
+                volume.TabbableContentContainer = flow;
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
@@ -122,6 +126,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 volume.Current.BindValueChanged(val => updateVolumeFor(relevantObjects, val.NewValue));
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(volume));
+            }
+
             private static string? getCommonBank(SampleControlPoint[] relevantControlPoints) => relevantControlPoints.Select(point => point.SampleBank).Distinct().Count() == 1 ? relevantControlPoints.First().SampleBank : null;
             private static int? getCommonVolume(SampleControlPoint[] relevantControlPoints) => relevantControlPoints.Select(point => point.SampleVolume).Distinct().Count() == 1 ? (int?)relevantControlPoints.First().SampleVolume : null;
 
@@ -144,7 +154,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private void updateBankPlaceholderText(IEnumerable<HitObject> objects)
             {
                 string? commonBank = getCommonBank(objects.Select(h => h.SampleControlPoint).ToArray());
-                bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : null;
+                bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : string.Empty;
             }
 
             private void updateVolumeFor(IEnumerable<HitObject> objects, int? newVolume)

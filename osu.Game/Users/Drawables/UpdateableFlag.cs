@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,6 +23,12 @@ namespace osu.Game.Users.Drawables
         /// Whether to show a place holder on null country.
         /// </summary>
         public bool ShowPlaceholderOnNull = true;
+
+        /// <summary>
+        /// Perform an action in addition to showing the country ranking.
+        /// This should be used to perform auxiliary tasks and not as a primary action for clicking a flag (to maintain a consistent UX).
+        /// </summary>
+        public Action Action;
 
         public UpdateableFlag(Country country = null)
         {
@@ -52,6 +59,7 @@ namespace osu.Game.Users.Drawables
 
         protected override bool OnClick(ClickEvent e)
         {
+            Action?.Invoke();
             rankingsOverlay?.ShowCountry(Country);
             return true;
         }

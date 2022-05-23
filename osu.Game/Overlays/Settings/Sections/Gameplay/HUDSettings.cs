@@ -25,11 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = GameplaySettingsStrings.ShowDifficultyGraph,
-                    Current = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
-                },
-                new SettingsCheckbox
-                {
+                    ClassicDefault = false,
                     LabelText = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
                     Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
                     Keywords = new[] { "hp", "bar" }
@@ -37,7 +33,8 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.AlwaysShowKeyOverlay,
-                    Current = config.GetBindable<bool>(OsuSetting.KeyOverlay)
+                    Current = config.GetBindable<bool>(OsuSetting.KeyOverlay),
+                    Keywords = new[] { "counter" },
                 },
             };
         }

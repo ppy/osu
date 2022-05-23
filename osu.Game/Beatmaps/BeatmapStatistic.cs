@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Beatmaps
 {
@@ -14,6 +15,6 @@ namespace osu.Game.Beatmaps
         public Func<Drawable> CreateIcon;
 
         public string Content;
-        public string Name;
+        public LocalisableString Name;
     }
 }

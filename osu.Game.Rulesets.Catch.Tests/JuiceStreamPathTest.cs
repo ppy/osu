@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -37,14 +36,14 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     case 0:
                     {
-                        double distance = rng.NextDouble() * scale * 2 - scale;
+                        double time = rng.NextDouble() * scale * 2 - scale;
                         if (integralValues)
-                            distance = Math.Round(distance);
+                            time = Math.Round(time);
 
-                        float oldX = path.PositionAtDistance(distance);
-                        int index = path.InsertVertex(distance);
+                        float oldX = path.PositionAtTime(time);
+                        int index = path.InsertVertex(time);
                         Assert.That(path.Vertices.Count, Is.EqualTo(vertexCount + 1));
-                        Assert.That(path.Vertices[index].Distance, Is.EqualTo(distance));
+                        Assert.That(path.Vertices[index].Time, Is.EqualTo(time));
                         Assert.That(path.Vertices[index].X, Is.EqualTo(oldX));
                         break;
                     }
@@ -52,20 +51,20 @@ namespace osu.Game.Rulesets.Catch.Tests
                     case 1:
                     {
                         int index = rng.Next(path.Vertices.Count);
-                        double distance = path.Vertices[index].Distance;
+                        double time = path.Vertices[index].Time;
                         float newX = (float)(rng.NextDouble() * scale * 2 - scale);
                         if (integralValues)
                             newX = MathF.Round(newX);
 
                         path.SetVertexPosition(index, newX);
                         Assert.That(path.Vertices.Count, Is.EqualTo(vertexCount));
-                        Assert.That(path.Vertices[index].Distance, Is.EqualTo(distance));
+                        Assert.That(path.Vertices[index].Time, Is.EqualTo(time));
                         Assert.That(path.Vertices[index].X, Is.EqualTo(newX));
                         break;
                     }
                 }
 
-                assertInvariants(path.Vertices, checkSlope);
+                assertInvariants(path.Vertices);
             }
         }
 
@@ -76,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             path.Add(10, 5);
             path.Add(20, -5);
 
-            int removeCount = path.RemoveVertices((v, i) => v.Distance == 10 && i == 1);
+            int removeCount = path.RemoveVertices((v, i) => v.Time == 10 && i == 1);
             Assert.That(removeCount, Is.EqualTo(1));
             Assert.That(path.Vertices, Is.EqualTo(new[]
             {
@@ -131,8 +130,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             }));
         }
 
-        [Test]
-        public void TestRandomConvertFromSliderPath()
+        [TestCase(10)]
+        [TestCase(0.1)]
+        public void TestRandomConvertFromSliderPath(double velocity)
         {
             var rng = new Random(1);
             var path = new JuiceStreamPath();
@@ -162,28 +162,28 @@ namespace osu.Game.Rulesets.Catch.Tests
                 else
                     sliderPath.ExpectedDistance.Value = null;
 
-                path.ConvertFromSliderPath(sliderPath);
-                Assert.That(path.Vertices[0].Distance, Is.EqualTo(0));
-                Assert.That(path.Distance, Is.EqualTo(sliderPath.Distance).Within(1e-3));
-                assertInvariants(path.Vertices, true);
+                path.ConvertFromSliderPath(sliderPath, velocity);
+                Assert.That(path.Vertices[0].Time, Is.EqualTo(0));
+                Assert.That(path.Duration * velocity, Is.EqualTo(sliderPath.Distance).Within(1e-3));
+                assertInvariants(path.Vertices);
 
-                double[] sampleDistances = Enumerable.Range(0, 10)
-                                                     .Select(_ => rng.NextDouble() * sliderPath.Distance)
-                                                     .ToArray();
+                double[] sampleTimes = Enumerable.Range(0, 10)
+                                                 .Select(_ => rng.NextDouble() * sliderPath.Distance / velocity)
+                                                 .ToArray();
 
-                foreach (double distance in sampleDistances)
+                foreach (double time in sampleTimes)
                 {
-                    float expected = sliderPath.PositionAt(distance / sliderPath.Distance).X;
-                    Assert.That(path.PositionAtDistance(distance), Is.EqualTo(expected).Within(1e-3));
+                    float expected = sliderPath.PositionAt(time * velocity / sliderPath.Distance).X;
+                    Assert.That(path.PositionAtTime(time), Is.EqualTo(expected).Within(1e-3));
                 }
 
-                path.ResampleVertices(sampleDistances);
-                assertInvariants(path.Vertices, true);
+                path.ResampleVertices(sampleTimes);
+                assertInvariants(path.Vertices);
 
-                foreach (double distance in sampleDistances)
+                foreach (double time in sampleTimes)
                 {
-                    float expected = sliderPath.PositionAt(distance / sliderPath.Distance).X;
-                    Assert.That(path.PositionAtDistance(distance), Is.EqualTo(expected).Within(1e-3));
+                    float expected = sliderPath.PositionAt(time * velocity / sliderPath.Distance).X;
+                    Assert.That(path.PositionAtTime(time), Is.EqualTo(expected).Within(1e-3));
                 }
             }
         }
@@ -201,17 +201,17 @@ namespace osu.Game.Rulesets.Catch.Tests
 
                 do
                 {
-                    double distance = rng.NextDouble() * 1e3;
+                    double time = rng.NextDouble() * 1e3;
                     float x = (float)(rng.NextDouble() * 1e3);
-                    path.Add(distance, x);
+                    path.Add(time, x);
                 } while (rng.Next(5) != 0);
 
                 float sliderStartY = (float)(rng.NextDouble() * JuiceStreamPath.OSU_PLAYFIELD_HEIGHT);
 
-                path.ConvertToSliderPath(sliderPath, sliderStartY);
-                Assert.That(sliderPath.Distance, Is.EqualTo(path.Distance).Within(1e-3));
-                Assert.That(sliderPath.ControlPoints[0].Position.X, Is.EqualTo(path.Vertices[0].X));
-                assertInvariants(path.Vertices, true);
+                double requiredVelocity = path.ComputeRequiredVelocity();
+                double velocity = Math.Clamp(requiredVelocity, 1, 100);
+
+                path.ConvertToSliderPath(sliderPath, sliderStartY, velocity);
 
                 foreach (var point in sliderPath.ControlPoints)
                 {
@@ -219,11 +219,18 @@ namespace osu.Game.Rulesets.Catch.Tests
                     Assert.That(sliderStartY + point.Position.Y, Is.InRange(0, JuiceStreamPath.OSU_PLAYFIELD_HEIGHT));
                 }
 
+                Assert.That(sliderPath.ControlPoints[0].Position.X, Is.EqualTo(path.Vertices[0].X));
+
+                // The path is preserved only if required velocity is used.
+                if (velocity < requiredVelocity) continue;
+
+                Assert.That(sliderPath.Distance / velocity, Is.EqualTo(path.Duration).Within(1e-3));
+
                 for (int i = 0; i < 10; i++)
                 {
-                    double distance = rng.NextDouble() * path.Distance;
-                    float expected = path.PositionAtDistance(distance);
-                    Assert.That(sliderPath.PositionAt(distance / sliderPath.Distance).X, Is.EqualTo(expected).Within(1e-3));
+                    double time = rng.NextDouble() * path.Duration;
+                    float expected = path.PositionAtTime(time);
+                    Assert.That(sliderPath.PositionAt(time * velocity / sliderPath.Distance).X, Is.EqualTo(expected).Within(3e-3));
                 }
             }
         }
@@ -244,7 +251,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             path.Add(20, 0);
             checkNewId();
 
-            path.RemoveVertices((v, _) => v.Distance == 20);
+            path.RemoveVertices((v, _) => v.Time == 20);
             checkNewId();
 
             path.ResampleVertices(new double[] { 5, 10, 15 });
@@ -253,7 +260,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             path.Clear();
             checkNewId();
 
-            path.ConvertFromSliderPath(new SliderPath());
+            path.ConvertFromSliderPath(new SliderPath(), 1);
             checkNewId();
 
             void checkNewId()
@@ -263,25 +270,19 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
         }
 
-        private void assertInvariants(IReadOnlyList<JuiceStreamPathVertex> vertices, bool checkSlope)
+        private void assertInvariants(IReadOnlyList<JuiceStreamPathVertex> vertices)
         {
             Assert.That(vertices, Is.Not.Empty);
 
             for (int i = 0; i < vertices.Count; i++)
             {
-                Assert.That(double.IsFinite(vertices[i].Distance));
+                Assert.That(double.IsFinite(vertices[i].Time));
                 Assert.That(float.IsFinite(vertices[i].X));
             }
 
             for (int i = 1; i < vertices.Count; i++)
             {
-                Assert.That(vertices[i].Distance, Is.GreaterThanOrEqualTo(vertices[i - 1].Distance));
-
-                if (!checkSlope) continue;
-
-                float xDiff = Math.Abs(vertices[i].X - vertices[i - 1].X);
-                double distanceDiff = vertices[i].Distance - vertices[i - 1].Distance;
-                Assert.That(xDiff, Is.LessThanOrEqualTo(distanceDiff).Within(Precision.FLOAT_EPSILON));
+                Assert.That(vertices[i].Time, Is.GreaterThanOrEqualTo(vertices[i - 1].Time));
             }
         }
     }

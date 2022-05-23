@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Edit
             if (beatmapSkin is Skin skin)
                 BeatmapSkin = new EditorBeatmapSkin(skin);
 
-            beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset?.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
+            beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);

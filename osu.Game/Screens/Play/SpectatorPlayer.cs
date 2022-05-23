@@ -72,12 +72,13 @@ namespace osu.Game.Screens.Play
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;
                 convertedFrame.Time = frame.Time;
+                convertedFrame.Header = frame.Header;
 
                 score.Replay.Frames.Add(convertedFrame);
             }
 
             if (isFirstBundle && score.Replay.Frames.Count > 0)
-                NonFrameStableSeek(score.Replay.Frames[0].Time);
+                SetGameplayStartTime(score.Replay.Frames[0].Time);
         }
 
         protected override Score CreateScore(IBeatmap beatmap) => score;
@@ -90,11 +91,11 @@ namespace osu.Game.Screens.Play
             DrawableRuleset?.SetReplayScore(score);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             SpectatorClient.OnNewFrames -= userSentFrames;
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         protected override void Dispose(bool isDisposing)

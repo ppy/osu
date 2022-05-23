@@ -50,7 +50,7 @@ namespace osu.Game.Tournament.Screens.Setup
                     {
                         new Box
                         {
-                            Colour = colours.GreySeafoamDark,
+                            Colour = colours.GreySeaFoamDark,
                             RelativeSizeAxes = Axes.Both,
                         },
                         new GridContainer

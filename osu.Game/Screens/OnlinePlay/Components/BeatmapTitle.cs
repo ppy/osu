@@ -68,14 +68,14 @@ namespace osu.Game.Screens.OnlinePlay.Components
             }
             else
             {
-                var metadataInfo = beatmap.Value.Metadata;
+                var metadataInfo = beatmap.Metadata;
 
                 string artistUnicode = string.IsNullOrEmpty(metadataInfo.ArtistUnicode) ? metadataInfo.Artist : metadataInfo.ArtistUnicode;
                 string titleUnicode = string.IsNullOrEmpty(metadataInfo.TitleUnicode) ? metadataInfo.Title : metadataInfo.TitleUnicode;
 
                 var title = new RomanisableString($"{artistUnicode} - {titleUnicode}".Trim(), $"{metadataInfo.Artist} - {metadataInfo.Title}".Trim());
 
-                textFlow.AddLink(title, LinkAction.OpenBeatmap, beatmap.Value.OnlineID.ToString(), "Open beatmap");
+                textFlow.AddLink(title, LinkAction.OpenBeatmap, beatmap.OnlineID.ToString(), "Open beatmap");
             }
         }
     }

@@ -5,9 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -27,6 +30,14 @@ namespace osu.Game.Tests.Visual.Online
         private BeatmapListingOverlay overlay;
 
         private BeatmapListingSearchControl searchControl => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single();
+
+        private OsuConfigManager localConfig;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(localConfig = new OsuConfigManager(LocalStorage));
+        }
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -60,6 +71,8 @@ namespace osu.Game.Tests.Visual.Online
                     Id = API.LocalUser.Value.Id + 1,
                 };
             });
+
+            AddStep("reset size", () => localConfig.SetValue(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal));
         }
 
         [Test]
@@ -105,6 +118,39 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("hide", () => InputManager.Key(Key.Escape));
             AddUntilStep("is hidden", () => overlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestCorrectOldContentExpiration()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
+            assertAllCardsOfType<BeatmapCardNormal>(100);
+
+            AddStep("show more results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 30).ToArray()));
+            assertAllCardsOfType<BeatmapCardNormal>(30);
+        }
+
+        [Test]
+        public void TestCardSizeSwitching([Values] bool viaConfig)
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
+            assertAllCardsOfType<BeatmapCardNormal>(100);
+
+            setCardSize(BeatmapCardSize.Extra, viaConfig);
+            assertAllCardsOfType<BeatmapCardExtra>(100);
+
+            setCardSize(BeatmapCardSize.Normal, viaConfig);
+            assertAllCardsOfType<BeatmapCardNormal>(100);
+
+            AddStep("fetch for 0 beatmaps", () => fetchFor());
+            AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
+
+            setCardSize(BeatmapCardSize.Extra, viaConfig);
+            AddAssert("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
         }
 
         [Test]
@@ -259,6 +305,33 @@ namespace osu.Game.Tests.Visual.Online
             noPlaceholderShown();
         }
 
+        [Test]
+        public void TestExpandedCardContentNotClipped()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("show result with many difficulties", () =>
+            {
+                var beatmapSet = CreateAPIBeatmapSet(Ruleset.Value);
+                beatmapSet.Beatmaps = Enumerable.Repeat(beatmapSet.Beatmaps.First(), 100).ToArray();
+                fetchFor(beatmapSet);
+            });
+            assertAllCardsOfType<BeatmapCardNormal>(1);
+
+            AddStep("hover extra info row", () =>
+            {
+                var difficultyArea = this.ChildrenOfType<BeatmapCardExtraInfoRow>().Single();
+                InputManager.MoveMouseTo(difficultyArea);
+            });
+            AddUntilStep("wait for expanded", () => this.ChildrenOfType<BeatmapCardNormal>().Single().Expanded.Value);
+            AddAssert("expanded content not clipped", () =>
+            {
+                var cardContainer = this.ChildrenOfType<ReverseChildIDFillFlowContainer<BeatmapCard>>().Single().Parent;
+                var expandedContent = this.ChildrenOfType<ExpandedContentScrollContainer>().Single();
+                return expandedContent.ScreenSpaceDrawQuad.GetVertices().ToArray().All(v => cardContainer.ScreenSpaceDrawQuad.Contains(v));
+            });
+        }
+
         private static int searchCount;
 
         private void fetchFor(params APIBeatmapSet[] beatmaps)
@@ -298,6 +371,28 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddUntilStep("\"supporter required\" placeholder not shown", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any(d => d.IsPresent));
             AddUntilStep("\"no maps found\" placeholder not shown", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
+        }
+
+        private void setCardSize(BeatmapCardSize cardSize, bool viaConfig) => AddStep($"set card size to {cardSize}", () =>
+        {
+            if (viaConfig)
+                localConfig.SetValue(OsuSetting.BeatmapListingCardSize, cardSize);
+            else
+                overlay.ChildrenOfType<BeatmapListingCardSizeTabControl>().Single().Current.Value = cardSize;
+        });
+
+        private void assertAllCardsOfType<T>(int expectedCount)
+            where T : BeatmapCard =>
+            AddUntilStep($"all loaded beatmap cards are {typeof(T)}", () =>
+            {
+                int loadedCorrectCount = this.ChildrenOfType<BeatmapCard>().Count(card => card.IsLoaded && card.GetType() == typeof(T));
+                return loadedCorrectCount > 0 && loadedCorrectCount == expectedCount;
+            });
+
+        protected override void Dispose(bool isDisposing)
+        {
+            localConfig?.Dispose();
+            base.Dispose(isDisposing);
         }
     }
 }

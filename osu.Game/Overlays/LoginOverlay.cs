@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
             panel.Bounding = true;
             this.FadeIn(transition_time, Easing.OutQuint);
 
-            GetContainingInputManager().ChangeFocus(panel);
+            ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(panel));
         }
 
         protected override void PopOut()

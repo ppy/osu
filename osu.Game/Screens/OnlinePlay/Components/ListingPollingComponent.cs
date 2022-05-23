@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             });
         }
 
-        private GetRoomsRequest pollReq;
+        private GetRoomsRequest lastPollRequest;
 
         protected override Task Poll()
         {
@@ -45,10 +45,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             var tcs = new TaskCompletionSource<bool>();
 
-            pollReq?.Cancel();
-            pollReq = new GetRoomsRequest(Filter.Value.Status, Filter.Value.Category);
+            lastPollRequest?.Cancel();
 
-            pollReq.Success += result =>
+            var req = new GetRoomsRequest(Filter.Value.Status, Filter.Value.Category);
+
+            req.Success += result =>
             {
                 foreach (var existing in RoomManager.Rooms.ToArray())
                 {
@@ -66,10 +67,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 tcs.SetResult(true);
             };
 
-            pollReq.Failure += _ => tcs.SetResult(false);
+            req.Failure += _ => tcs.SetResult(false);
 
-            API.Queue(pollReq);
+            API.Queue(req);
 
+            lastPollRequest = req;
             return tcs.Task;
         }
     }

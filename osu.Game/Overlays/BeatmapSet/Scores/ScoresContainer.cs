@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -64,6 +65,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 scoreTable.ClearScores();
                 scoreTable.Hide();
 
+                loading.Hide();
+                loading.FinishTransforms();
+
                 if (value?.Scores.Any() != true)
                     return;
 
@@ -74,19 +78,24 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 // TODO: temporary. should be removed once `OrderByTotalScore` can accept `IScoreInfo`.
                 var beatmapInfo = new BeatmapInfo
                 {
+#pragma warning disable 618
                     MaxCombo = apiBeatmap.MaxCombo,
-                    Status = apiBeatmap.Status
+#pragma warning restore 618
+                    Status = apiBeatmap.Status,
+                    MD5Hash = apiBeatmap.MD5Hash
                 };
 
                 scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
-                            .ContinueWith(ordered => Schedule(() =>
+                            .ContinueWith(task => Schedule(() =>
                             {
                                 if (loadCancellationSource.IsCancellationRequested)
                                     return;
 
-                                var topScore = ordered.Result.First();
+                                var scores = task.GetResultSafely();
 
-                                scoreTable.DisplayScores(ordered.Result, apiBeatmap.Status.GrantsPerformancePoints());
+                                var topScore = scores.First();
+
+                                scoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());
                                 scoreTable.Show();
 
                                 var userScore = value.UserScore;
@@ -244,7 +253,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             noScoresPlaceholder.Hide();
 
-            if (Beatmap.Value == null || Beatmap.Value.OnlineID <= 0 || (Beatmap.Value?.BeatmapSet as IBeatmapSetOnlineInfo)?.Status <= BeatmapOnlineStatus.Pending)
+            if (Beatmap.Value == null || Beatmap.Value.OnlineID <= 0 || (Beatmap.Value.BeatmapSet as IBeatmapSetOnlineInfo)?.Status <= BeatmapOnlineStatus.Pending)
             {
                 Scores = null;
                 Hide();
@@ -255,9 +264,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 Scores = null;
                 notSupporterPlaceholder.Show();
-
-                loading.Hide();
-                loading.FinishTransforms();
                 return;
             }
 
@@ -269,9 +275,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope.Value, modSelector.SelectedMods);
             getScoresRequest.Success += scores =>
             {
-                loading.Hide();
-                loading.FinishTransforms();
-
                 Scores = scores;
 
                 if (!scores.Scores.Any())

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -13,7 +14,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 
@@ -27,11 +27,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         private IAPIProvider api;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osu, IAPIProvider api, RulesetStore rulesets)
+        private void load(OsuGameBase osu, IAPIProvider api)
         {
             this.api = api;
 
-            testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu).Result;
+            testBeatmap = BeatmapImportHelper.LoadOszIntoOsu(osu).GetResultSafely();
         }
 
         [Test]

@@ -4,7 +4,6 @@
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
@@ -22,7 +21,7 @@ namespace osu.Game.Tournament.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load()
         {
             if (team == null) return;
 

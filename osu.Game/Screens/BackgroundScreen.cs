@@ -48,7 +48,7 @@ namespace osu.Game.Screens
             Scale = new Vector2(1 + x_movement_amount / DrawSize.X * 2);
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
             if (animateOnEnter)
             {
@@ -59,16 +59,16 @@ namespace osu.Game.Screens
                 this.MoveToX(0, TRANSITION_LENGTH, Easing.InOutQuart);
             }
 
-            base.OnEntering(last);
+            base.OnEntering(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             this.MoveToX(-x_movement_amount, TRANSITION_LENGTH, Easing.InOutQuart);
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             if (IsLoaded)
             {
@@ -76,14 +76,14 @@ namespace osu.Game.Screens
                 this.MoveToX(x_movement_amount, TRANSITION_LENGTH, Easing.OutExpo);
             }
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
             if (IsLoaded)
                 this.MoveToX(0, TRANSITION_LENGTH, Easing.OutExpo);
-            base.OnResuming(last);
+            base.OnResuming(e);
         }
     }
 }

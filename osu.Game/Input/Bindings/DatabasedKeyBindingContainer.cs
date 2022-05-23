@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using Realms;
 
 namespace osu.Game.Input.Bindings
 {
@@ -23,10 +24,9 @@ namespace osu.Game.Input.Bindings
         private readonly int? variant;
 
         private IDisposable realmSubscription;
-        private IQueryable<RealmKeyBinding> realmKeyBindings;
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
 
@@ -49,22 +49,43 @@ namespace osu.Game.Input.Bindings
 
         protected override void LoadComplete()
         {
-            string rulesetName = ruleset?.ShortName;
-
-            realmKeyBindings = realmFactory.Context.All<RealmKeyBinding>()
-                                           .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
-
-            realmSubscription = realmKeyBindings
-                .QueryAsyncWithNotifications((sender, changes, error) =>
-                {
-                    // first subscription ignored as we are handling this in LoadComplete.
-                    if (changes == null)
-                        return;
-
-                    ReloadMappings();
-                });
+            realmSubscription = realm.RegisterForNotifications(queryRealmKeyBindings, (sender, changes, error) =>
+            {
+                // The first fire of this is a bit redundant as this is being called in base.LoadComplete,
+                // but this is safest in case the subscription is restored after a context recycle.
+                reloadMappings(sender.AsQueryable());
+            });
 
             base.LoadComplete();
+        }
+
+        protected override void ReloadMappings() => reloadMappings(queryRealmKeyBindings(realm.Realm));
+
+        private IQueryable<RealmKeyBinding> queryRealmKeyBindings(Realm realm)
+        {
+            string rulesetName = ruleset?.ShortName;
+            return realm.All<RealmKeyBinding>()
+                        .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
+        }
+
+        private void reloadMappings(IQueryable<RealmKeyBinding> realmKeyBindings)
+        {
+            var defaults = DefaultKeyBindings.ToList();
+
+            List<RealmKeyBinding> newBindings = realmKeyBindings.Detach()
+                                                                // this ordering is important to ensure that we read entries from the database in the order
+                                                                // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
+                                                                // have been eaten by the music controller due to query order.
+                                                                .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.ActionInt)).ToList();
+
+            // In the case no bindings were found in the database, presume this usage is for a non-databased ruleset.
+            // This actually should never be required and can be removed if it is ever deemed to cause a problem.
+            // See https://github.com/ppy/osu/issues/8805 for original reasoning, which is no longer valid as we use ShortName
+            // for lookups these days.
+            if (newBindings.Count == 0)
+                KeyBindings = defaults;
+            else
+                KeyBindings = newBindings;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -72,25 +93,6 @@ namespace osu.Game.Input.Bindings
             base.Dispose(isDisposing);
 
             realmSubscription?.Dispose();
-        }
-
-        protected override void ReloadMappings()
-        {
-            var defaults = DefaultKeyBindings.ToList();
-
-            if (ruleset != null && !ruleset.ID.HasValue)
-                // some tests instantiate a ruleset which is not present in the database.
-                // in these cases we still want key bindings to work, but matching to database instances would result in none being present,
-                // so let's populate the defaults directly.
-                KeyBindings = defaults;
-            else
-            {
-                KeyBindings = realmKeyBindings.Detach()
-                                              // this ordering is important to ensure that we read entries from the database in the order
-                                              // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
-                                              // have been eaten by the music controller due to query order.
-                                              .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.ActionInt)).ToList();
-            }
         }
     }
 }

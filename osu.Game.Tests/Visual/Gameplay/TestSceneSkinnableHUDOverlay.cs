@@ -10,11 +10,13 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Tests.Beatmaps;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -24,10 +26,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         private HUDOverlay hudOverlay;
 
         [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
+        [Cached]
+        private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
+
+        [Cached]
+        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
 
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 

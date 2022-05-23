@@ -29,7 +29,13 @@ namespace osu.Game.Tests.Visual.Editing
 
         public TestSceneSetupScreen()
         {
-            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap
+            {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo
+                }
+            });
         }
 
         [Test]

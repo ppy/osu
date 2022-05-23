@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
 
             // If the file is set, also make sure it still exists.
-            string storagePath = context.Beatmap.BeatmapInfo.BeatmapSet.GetPathForFile(filename);
+            string storagePath = context.Beatmap.BeatmapInfo.BeatmapSet?.GetPathForFile(filename);
             if (storagePath != null)
                 yield break;
 

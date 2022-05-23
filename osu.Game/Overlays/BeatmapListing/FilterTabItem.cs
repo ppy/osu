@@ -44,7 +44,14 @@ namespace osu.Game.Overlays.BeatmapListing
             });
 
             Enabled.Value = true;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             updateState();
+            FinishTransforms(true);
         }
 
         protected override bool OnHover(HoverEvent e)

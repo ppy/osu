@@ -27,11 +27,14 @@ namespace osu.Game.Beatmaps
         private readonly WeakList<BeatmapManagerWorkingBeatmap> workingCache = new WeakList<BeatmapManagerWorkingBeatmap>();
 
         /// <summary>
+        /// Beatmap files may specify this filename to denote that they don't have an audio track.
+        /// </summary>
+        private const string virtual_track_filename = @"virtual";
+
+        /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
         public readonly WorkingBeatmap DefaultBeatmap;
-
-        public BeatmapModelManager BeatmapManager { private get; set; }
 
         private readonly AudioManager audioManager;
         private readonly IResourceStore<byte[]> resources;
@@ -42,7 +45,8 @@ namespace osu.Game.Beatmaps
         [CanBeNull]
         private readonly GameHost host;
 
-        public WorkingBeatmapCache(ITrackStore trackStore, AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null, GameHost host = null)
+        public WorkingBeatmapCache(ITrackStore trackStore, AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null,
+                                   GameHost host = null)
         {
             DefaultBeatmap = defaultBeatmap;
 
@@ -76,13 +80,6 @@ namespace osu.Game.Beatmaps
 
         public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
-            // if there are no files, presume the full beatmap info has not yet been fetched from the database.
-            if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
-            {
-                int lookupId = beatmapInfo.ID;
-                beatmapInfo = BeatmapManager.QueryBeatmap(b => b.ID == lookupId);
-            }
-
             if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 
@@ -93,12 +90,12 @@ namespace osu.Game.Beatmaps
                 if (working != null)
                     return working;
 
-                beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
+                beatmapInfo = beatmapInfo.Detach();
 
                 workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
 
                 // best effort; may be higher than expected.
-                GlobalStatistics.Get<int>(nameof(Beatmaps), $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
+                GlobalStatistics.Get<int>("Beatmaps", $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
 
                 return working;
             }
@@ -109,7 +106,7 @@ namespace osu.Game.Beatmaps
         TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
-        RealmContextFactory IStorageResourceProvider.RealmContextFactory => null;
+        RealmAccess IStorageResourceProvider.RealmAccess => null;
         IResourceStore<byte[]> IStorageResourceProvider.Files => files;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);
@@ -166,6 +163,9 @@ namespace osu.Game.Beatmaps
                 if (string.IsNullOrEmpty(Metadata?.AudioFile))
                     return null;
 
+                if (Metadata.AudioFile == virtual_track_filename)
+                    return null;
+
                 try
                 {
                     return resources.Tracks.Get(BeatmapSetInfo.GetPathForFile(Metadata.AudioFile));
@@ -180,6 +180,9 @@ namespace osu.Game.Beatmaps
             protected override Waveform GetWaveform()
             {
                 if (string.IsNullOrEmpty(Metadata?.AudioFile))
+                    return null;
+
+                if (Metadata.AudioFile == virtual_track_filename)
                     return null;
 
                 try
@@ -197,6 +200,9 @@ namespace osu.Game.Beatmaps
             protected override Storyboard GetStoryboard()
             {
                 Storyboard storyboard;
+
+                if (BeatmapInfo.Path == null)
+                    return new Storyboard();
 
                 try
                 {
@@ -231,7 +237,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return new LegacyBeatmapSkin(BeatmapInfo, resources.Files, resources);
+                    return new LegacyBeatmapSkin(BeatmapInfo, resources);
                 }
                 catch (Exception e)
                 {

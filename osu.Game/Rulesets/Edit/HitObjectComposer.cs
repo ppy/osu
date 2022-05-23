@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -35,7 +36,6 @@ namespace osu.Game.Rulesets.Edit
     /// Responsible for providing snapping and generally gluing components together.
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
-    [Cached(Type = typeof(IPlacementHandler))]
     public abstract class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
     {
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+            Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
             try
             {
@@ -98,14 +98,11 @@ namespace osu.Game.Rulesets.Edit
 
             dependencies.CacheAs(Playfield);
 
-            const float toolbar_width = 200;
-
             InternalChildren = new Drawable[]
             {
                 new Container
                 {
                     Name = "Content",
-                    Padding = new MarginPadding { Left = toolbar_width },
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
@@ -117,20 +114,16 @@ namespace osu.Game.Rulesets.Edit
                                               .WithChild(BlueprintContainer = CreateBlueprintContainer())
                     }
                 },
-                new FillFlowContainer
+                new ExpandingToolboxContainer(80, 200)
                 {
-                    Name = "Sidebar",
-                    RelativeSizeAxes = Axes.Y,
-                    Width = toolbar_width,
-                    Padding = new MarginPadding { Right = 10 },
-                    Spacing = new Vector2(10),
+                    Padding = new MarginPadding { Left = 10 },
                     Children = new Drawable[]
                     {
-                        new ToolboxGroup("toolbox (1-9)")
+                        new EditorToolboxGroup("toolbox (1-9)")
                         {
                             Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
                         },
-                        new ToolboxGroup("toggles (Q~P)")
+                        new EditorToolboxGroup("toggles (Q~P)")
                         {
                             Child = togglesCollection = new FillFlowContainer
                             {
@@ -369,61 +362,26 @@ namespace osu.Game.Rulesets.Edit
         /// <returns>The most relevant <see cref="Playfield"/>.</returns>
         protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             double? targetTime = null;
 
-            if (playfield is ScrollingPlayfield scrollingPlayfield)
+            if (snapType.HasFlagFast(SnapType.Grids))
             {
-                targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
+                if (playfield is ScrollingPlayfield scrollingPlayfield)
+                {
+                    targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
 
-                // apply beat snapping
-                targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
+                    // apply beat snapping
+                    targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
 
-                // convert back to screen space
-                screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+                    // convert back to screen space
+                    screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+                }
             }
 
             return new SnapResult(screenSpacePosition, targetTime, playfield);
-        }
-
-        public override float GetBeatSnapDistanceAt(HitObject referenceObject)
-        {
-            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * referenceObject.DifficultyControlPoint.SliderVelocity / BeatSnapProvider.BeatDivisor);
-        }
-
-        public override float DurationToDistance(HitObject referenceObject, double duration)
-        {
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
-            return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceObject));
-        }
-
-        public override double DistanceToDuration(HitObject referenceObject, float distance)
-        {
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
-            return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
-        }
-
-        public override double GetSnappedDurationFromDistance(HitObject referenceObject, float distance)
-            => BeatSnapProvider.SnapTime(referenceObject.StartTime + DistanceToDuration(referenceObject, distance), referenceObject.StartTime) - referenceObject.StartTime;
-
-        public override float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance)
-        {
-            double startTime = referenceObject.StartTime;
-
-            double actualDuration = startTime + DistanceToDuration(referenceObject, distance);
-
-            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, startTime);
-
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(startTime);
-
-            // we don't want to exceed the actual duration and snap to a point in the future.
-            // as we are snapping to beat length via SnapTime (which will round-to-nearest), check for snapping in the forward direction and reverse it.
-            if (snappedEndTime > actualDuration + 1)
-                snappedEndTime -= beatLength;
-
-            return DurationToDistance(referenceObject, snappedEndTime - startTime);
         }
 
         #endregion
@@ -433,8 +391,7 @@ namespace osu.Game.Rulesets.Edit
     /// A non-generic definition of a HitObject composer class.
     /// Generally used to access certain methods without requiring a generic type for <see cref="HitObjectComposer{T}" />.
     /// </summary>
-    [Cached(typeof(HitObjectComposer))]
-    [Cached(typeof(IPositionSnapProvider))]
+    [Cached]
     public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
         protected HitObjectComposer()
@@ -461,20 +418,7 @@ namespace osu.Game.Rulesets.Edit
 
         #region IPositionSnapProvider
 
-        public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
-
-        public virtual SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
-            new SnapResult(screenSpacePosition, null);
-
-        public abstract float GetBeatSnapDistanceAt(HitObject referenceObject);
-
-        public abstract float DurationToDistance(HitObject referenceObject, double duration);
-
-        public abstract double DistanceToDuration(HitObject referenceObject, float distance);
-
-        public abstract double GetSnappedDurationFromDistance(HitObject referenceObject, float distance);
-
-        public abstract float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance);
+        public abstract SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All);
 
         #endregion
     }

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu;
@@ -37,9 +36,10 @@ namespace osu.Game.Tests.Visual.Editing
             });
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
             // ensure that music controller does not change this beatmap due to it
             // completing naturally as part of the test.

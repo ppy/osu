@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BaseDifficulty = new BeatmapDifficulty
+                    Difficulty = new BeatmapDifficulty
                     {
                         OverallDifficulty = value,
                         CircleSize = value,

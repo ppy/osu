@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeafoamDark
+                        Colour = colours.GreySeaFoamDark
                     },
                     new GridContainer
                     {
@@ -124,9 +124,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             base.LoadComplete();
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             this.FadeOut(250);
         }

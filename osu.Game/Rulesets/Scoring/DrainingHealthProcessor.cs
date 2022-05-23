@@ -27,17 +27,17 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The minimum health target at an HP drain rate of 0.
         /// </summary>
-        private const double min_health_target = 0.95;
+        private const double min_health_target = 0.99;
 
         /// <summary>
         /// The minimum health target at an HP drain rate of 5.
         /// </summary>
-        private const double mid_health_target = 0.70;
+        private const double mid_health_target = 0.9;
 
         /// <summary>
         /// The minimum health target at an HP drain rate of 10.
         /// </summary>
-        private const double max_health_target = 0.30;
+        private const double max_health_target = 0.4;
 
         private IBeatmap beatmap;
 

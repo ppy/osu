@@ -127,9 +127,9 @@ namespace osu.Game.Tests.Visual
             where T : Drawable
         {
             if (typeof(T) == typeof(Button))
-                AddUntilStep($"wait for {typeof(T).Name} enabled", () => (this.ChildrenOfType<T>().Single() as Button)?.Enabled.Value == true);
+                AddUntilStep($"wait for {typeof(T).Name} enabled", () => (this.ChildrenOfType<T>().Single() as ClickableContainer)?.Enabled.Value == true);
             else
-                AddUntilStep($"wait for {typeof(T).Name} enabled", () => this.ChildrenOfType<T>().Single().ChildrenOfType<Button>().Single().Enabled.Value);
+                AddUntilStep($"wait for {typeof(T).Name} enabled", () => this.ChildrenOfType<T>().Single().ChildrenOfType<ClickableContainer>().Single().Enabled.Value);
 
             AddStep($"click {typeof(T).Name}", () =>
             {
