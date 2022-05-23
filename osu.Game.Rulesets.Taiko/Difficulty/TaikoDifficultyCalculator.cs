@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     {
         private const double rhythm_skill_multiplier = 0.014;
         private const double colour_skill_multiplier = 0.01;
-        private const double stamina_skill_multiplier = 0.02;
+        private const double stamina_skill_multiplier = 0.021;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -33,8 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             new Colour(mods),
             new Rhythm(mods),
-            new Stamina(mods, true),
-            new Stamina(mods, false),
+            new Stamina(mods)
         };
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
@@ -58,7 +57,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 );
             }
 
-            new StaminaCheeseDetector(taikoDifficultyHitObjects).FindCheese();
             return taikoDifficultyHitObjects;
         }
 
@@ -69,17 +67,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             var colour = (Colour)skills[0];
             var rhythm = (Rhythm)skills[1];
-            var staminaRight = (Stamina)skills[2];
-            var staminaLeft = (Stamina)skills[3];
+            var stamina = (Stamina)skills[2];
 
             double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
-            double staminaRating = (staminaRight.DifficultyValue() + staminaLeft.DifficultyValue()) * stamina_skill_multiplier;
+            double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
 
             double staminaPenalty = simpleColourPenalty(staminaRating, colourRating);
             staminaRating *= staminaPenalty;
 
-            double combinedRating = locallyCombinedDifficulty(colour, rhythm, staminaRight, staminaLeft, staminaPenalty);
+            //TODO : This is a temporary fix for the stamina rating of converts, due to their low colour variance.
+            if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0 && colourRating < 0.05)
+            {
+                staminaPenalty *= 0.25;
+            }
+
+            double combinedRating = locallyCombinedDifficulty(colour, rhythm, stamina, staminaPenalty);
             double separatedRating = norm(1.5, colourRating, rhythmRating, staminaRating);
             double starRating = 1.4 * separatedRating + 0.5 * combinedRating;
             starRating = rescale(starRating);
@@ -127,20 +130,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// For each section, the peak strains of all separate skills are combined into a single peak strain for the section.
         /// The resulting partial rating of the beatmap is a weighted sum of the combined peaks (higher peaks are weighted more).
         /// </remarks>
-        private double locallyCombinedDifficulty(Colour colour, Rhythm rhythm, Stamina staminaRight, Stamina staminaLeft, double staminaPenalty)
+        private double locallyCombinedDifficulty(Colour colour, Rhythm rhythm, Stamina stamina, double staminaPenalty)
         {
             List<double> peaks = new List<double>();
 
             var colourPeaks = colour.GetCurrentStrainPeaks().ToList();
             var rhythmPeaks = rhythm.GetCurrentStrainPeaks().ToList();
-            var staminaRightPeaks = staminaRight.GetCurrentStrainPeaks().ToList();
-            var staminaLeftPeaks = staminaLeft.GetCurrentStrainPeaks().ToList();
+            var staminaPeaks = stamina.GetCurrentStrainPeaks().ToList();
 
             for (int i = 0; i < colourPeaks.Count; i++)
             {
                 double colourPeak = colourPeaks[i] * colour_skill_multiplier;
                 double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
-                double staminaPeak = (staminaRightPeaks[i] + staminaLeftPeaks[i]) * stamina_skill_multiplier * staminaPenalty;
+                double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier * staminaPenalty;
 
                 double peak = norm(2, colourPeak, rhythmPeak, staminaPeak);
 
