@@ -259,7 +259,7 @@ namespace osu.Game.Tournament
 
         public void PopulateUser(APIUser user, Action success = null, Action failure = null, bool immediate = false)
         {
-            var req = new GetUserRequest(user.Id, Ruleset.Value);
+            var req = new GetUserRequest(user.Id, ladder.Ruleset.Value);
 
             if (immediate)
             {
