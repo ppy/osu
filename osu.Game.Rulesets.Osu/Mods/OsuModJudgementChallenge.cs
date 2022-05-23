@@ -5,44 +5,52 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Overlays.Settings;
 
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModJudgementChallenge : ModJudgementChallenge
     {
-        [SettingSource("Maximum misses", "Maximum number of misses before fail.", SettingControlType = typeof(SettingsNumberBox))]
-        public Bindable<int?> MaxMiss { get; } = new Bindable<int?>
+        [SettingSource("Maximum misses", "Maximum number of misses before fail.", SettingControlType = typeof(SettingsSlider<int, JudgementMaxSlider>))]
+        public BindableNumber<int> MaxMiss { get; } = new BindableInt
         {
-            Default = null,
-            Value = null
+            Default = 26,
+            Value = 26,
+            MinValue = 0,
+            MaxValue = 26
         };
 
-        [SettingSource("Maximum \"meh\" hits", "Maximum number of \"meh\" hits before fail.", SettingControlType = typeof(SettingsNumberBox))]
-        public Bindable<int?> MaxMeh { get; } = new Bindable<int?>
+        [SettingSource("Maximum \"meh\" hits", "Maximum number of \"meh\" hits before fail.", SettingControlType = typeof(SettingsSlider<int, JudgementMaxSlider>))]
+        public BindableNumber<int> MaxMeh { get; } = new BindableInt
         {
-            Default = null,
-            Value = null
+            Default = 26,
+            Value = 26,
+            MinValue = 0,
+            MaxValue = 26
         };
 
-        [SettingSource("Maximum \"ok\" hits", "Maximum number of \"ok\" hits before fail.", SettingControlType = typeof(SettingsNumberBox))]
-        public Bindable<int?> MaxOk { get; } = new Bindable<int?>
+        [SettingSource("Maximum \"ok\" hits", "Maximum number of \"ok\" hits before fail.", SettingControlType = typeof(SettingsSlider<int, JudgementMaxSlider>))]
+        public BindableNumber<int> MaxOk { get; } = new BindableInt
         {
-            Default = null,
-            Value = null
+            Default = 26,
+            Value = 26,
+            MinValue = 0,
+            MaxValue = 26
         };
 
-        [SettingSource("Maximum \"good\" hits", "Maximum number of \"good\" hits before fail.", SettingControlType = typeof(SettingsNumberBox))]
-        public Bindable<int?> MaxGood { get; } = new Bindable<int?>
+        [SettingSource("Maximum \"good\" hits", "Maximum number of \"good\" hits before fail.", SettingControlType = typeof(SettingsSlider<int, JudgementMaxSlider>))]
+        public BindableNumber<int> MaxGood { get; } = new BindableInt
         {
-            Default = null,
-            Value = null
+            Default = 26,
+            Value = 26,
+            MinValue = 0,
+            MaxValue = 26
         };
 
-        protected override IDictionary<HitResult, Bindable<int?>> HitResultMaximumCounts => hitResultsMaximumCount;
-        private Dictionary<HitResult, Bindable<int?>> hitResultsMaximumCount = new Dictionary<HitResult, Bindable<int?>>();
+        protected override IDictionary<HitResult, BindableNumber<int>> HitResultMaximumCounts => hitResultsMaximumCount;
+        private Dictionary<HitResult, BindableNumber<int>> hitResultsMaximumCount = new Dictionary<HitResult, BindableNumber<int>>();
 
         public OsuModJudgementChallenge()
         {
