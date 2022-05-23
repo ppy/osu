@@ -144,6 +144,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 // Make sure the player clock is running if it can.
                 if (!clock.WaitingOnFrames.Value)
                     clock.Start();
+                else
+                    clock.Stop();
 
                 if (clock.IsCatchingUp)
                 {
