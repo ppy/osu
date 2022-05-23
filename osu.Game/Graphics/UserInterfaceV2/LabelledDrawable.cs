@@ -41,7 +41,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected const float CONTENT_PADDING_VERTICAL = 10;
         protected const float CONTENT_PADDING_HORIZONTAL = 15;
-        protected const float CORNER_RADIUS = 15;
+
+        public const float CORNER_RADIUS = 15;
 
         /// <summary>
         /// The component that is being displayed.

@@ -65,6 +65,9 @@ namespace osu.Game.Overlays
         [Cached]
         private readonly Bindable<Channel> currentChannel = new Bindable<Channel>();
 
+        private readonly IBindableList<Channel> availableChannels = new BindableList<Channel>();
+        private readonly IBindableList<Channel> joinedChannels = new BindableList<Channel>();
+
         public ChatOverlayV2()
         {
             Height = default_chat_height;
@@ -150,14 +153,18 @@ namespace osu.Game.Overlays
             chatHeight.BindValueChanged(height => { Height = height.NewValue; }, true);
 
             currentChannel.BindTo(channelManager.CurrentChannel);
-            channelManager.CurrentChannel.BindValueChanged(currentChannelChanged, true);
-            channelManager.JoinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
-            channelManager.AvailableChannels.BindCollectionChanged(availableChannelsChanged, true);
+            currentChannel.BindValueChanged(currentChannelChanged, true);
+
+            joinedChannels.BindTo(channelManager.JoinedChannels);
+            joinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
+
+            availableChannels.BindTo(channelManager.AvailableChannels);
+            availableChannels.BindCollectionChanged(availableChannelsChanged, true);
 
             channelList.OnRequestSelect += channel => channelManager.CurrentChannel.Value = channel;
             channelList.OnRequestLeave += channel => channelManager.LeaveChannel(channel);
 
-            channelListing.OnRequestJoin += channel => channelManager.JoinChannel(channel, false);
+            channelListing.OnRequestJoin += channel => channelManager.JoinChannel(channel);
             channelListing.OnRequestLeave += channel => channelManager.LeaveChannel(channel);
 
             textBar.OnSearchTermsChanged += searchTerms => channelListing.SearchTerm = searchTerms;
@@ -176,7 +183,7 @@ namespace osu.Game.Overlays
             if (currentChannel.Value?.Id != channel.Id)
             {
                 if (!channel.Joined.Value)
-                    channel = channelManager.JoinChannel(channel, false);
+                    channel = channelManager.JoinChannel(channel);
 
                 channelManager.CurrentChannel.Value = channel;
             }
@@ -240,9 +247,15 @@ namespace osu.Game.Overlays
         {
             Channel? newChannel = channel.NewValue;
 
+            // null channel denotes that we should be showing the listing.
             if (newChannel == null)
             {
-                // null channel denotes that we should be showing the listing.
+                currentChannel.Value = channelList.ChannelListingChannel;
+                return;
+            }
+
+            if (newChannel is ChannelListing.ChannelListingChannel)
+            {
                 currentChannelContainer.Clear(false);
                 channelListing.Show();
                 textBar.ShowSearch.Value = true;
@@ -290,9 +303,9 @@ namespace osu.Game.Overlays
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    IEnumerable<Channel> joinedChannels = filterChannels(args.NewItems);
+                    IEnumerable<Channel> newChannels = filterChannels(args.NewItems);
 
-                    foreach (var channel in joinedChannels)
+                    foreach (var channel in newChannels)
                         channelList.AddChannel(channel);
 
                     break;

@@ -11,14 +11,14 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class Metronome : BeatSyncedContainer, IAdjustableAudioComponent
+    public class MetronomeBeat : BeatSyncedContainer, IAdjustableAudioComponent
     {
         private readonly double firstHitTime;
 
         private readonly PausableSkinnableSound sample;
 
         /// <param name="firstHitTime">Start time of the first hit object, used for providing a count down.</param>
-        public Metronome(double firstHitTime)
+        public MetronomeBeat(double firstHitTime)
         {
             this.firstHitTime = firstHitTime;
             AllowMistimedEventFiring = false;
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mods
             int timeSignature = timingPoint.TimeSignature.Numerator;
 
             // play metronome from one measure before the first object.
-            if (BeatSyncClock.CurrentTime < firstHitTime - timingPoint.BeatLength * timeSignature)
+            if (BeatSyncSource.Clock?.CurrentTime < firstHitTime - timingPoint.BeatLength * timeSignature)
                 return;
 
             sample.Frequency.Value = beatIndex % timeSignature == 0 ? 1 : 0.5f;

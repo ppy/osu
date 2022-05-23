@@ -13,18 +13,22 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
     public class ChannelList : Container
     {
-        public Action<Channel?>? OnRequestSelect;
+        public Action<Channel>? OnRequestSelect;
         public Action<Channel>? OnRequestLeave;
+
+        public readonly ChannelListing.ChannelListingChannel ChannelListingChannel = new ChannelListing.ChannelListingChannel();
 
         private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
         private ChannelListItemFlow publicChannelFlow = null!;
         private ChannelListItemFlow privateChannelFlow = null!;
+        private ChannelListItem selector = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -50,16 +54,17 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         Children = new Drawable[]
                         {
                             publicChannelFlow = new ChannelListItemFlow("CHANNELS"),
-                            new ChannelListSelector
+                            selector = new ChannelListItem(ChannelListingChannel)
                             {
                                 Margin = new MarginPadding { Bottom = 10 },
-                                Action = () => OnRequestSelect?.Invoke(null),
                             },
                             privateChannelFlow = new ChannelListItemFlow("DIRECT MESSAGES"),
                         },
                     },
                 },
             };
+
+            selector.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
         }
 
         public void AddChannel(Channel channel)
