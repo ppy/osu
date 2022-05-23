@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Mods
 
         private bool playIsPerfect = true;
 
-
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
             if (JudgementIsFlawed(result))

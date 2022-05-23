@@ -32,6 +32,7 @@ namespace osu.Game.Rulesets.Mods
         /// Intended to be used with mod <see cref="SettingSourceAttribute"/> bindables.
         /// </summary>
         protected abstract IDictionary<HitResult, Bindable<int?>> HitResultMaximumCounts { get; }
+
         private readonly Dictionary<HitResult, int> hitResultCounts = new Dictionary<HitResult, int>();
         private int nonBestCount = 0;
 

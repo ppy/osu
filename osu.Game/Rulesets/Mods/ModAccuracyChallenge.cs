@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Mods
             incrementInternalScoresFromJudgementResult(result);
             if (!AllowChallengeFailureAtHitObject(result.HitObject))
                 return false;
+
             return accuracy < MinimumAccuracy.Value / 100;
         }
 
@@ -42,6 +43,7 @@ namespace osu.Game.Rulesets.Mods
         {
             if (!result.Type.IsScorable() || result.Type.IsBonus())
                 return;
+
             baseScore += result.Type.IsHit() ? result.Judgement.NumericResultFor(result) : 0;
             maxBaseScore += result.Judgement.MaxNumericResult;
         }

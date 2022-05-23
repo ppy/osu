@@ -40,12 +40,14 @@ namespace osu.Game.Rulesets.Mods
                     for (int i = 0; i < beatmap.HitObjects.Count - 1; i++)
                     {
                         double inBetweenTime = (beatmap.HitObjects.ElementAtOrDefault(i).GetEndTime() + beatmap.HitObjects.ElementAtOrDefault(i + 1).StartTime) / 2;
+
                         foreach (BreakPeriod breakPeriod in beatmap.Breaks)
                         {
                             if (breakPeriod.Contains(inBetweenTime))
                                 HitObjectsBeforeBreaks.Add(beatmap.HitObjects.ElementAtOrDefault(i));
                         }
                     }
+
                     break;
             }
         }
@@ -61,14 +63,18 @@ namespace osu.Game.Rulesets.Mods
             switch (CheckingInterval.Value)
             {
                 case ChallengeCheckInterval.AtBreak:
-                    if (!HitObjectsBeforeBreaks.Contains(hitObject)) return false;
+                    if (!HitObjectsBeforeBreaks.Contains(hitObject))
+                        return false;
+
                     break;
 
                 case ChallengeCheckInterval.AtEnd:
                     if (hitObject != LastHitObjectInBeatmap)
                         return false;
+
                     break;
             }
+
             return true;
         }
 
