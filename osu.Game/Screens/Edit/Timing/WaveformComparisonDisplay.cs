@@ -34,6 +34,9 @@ namespace osu.Game.Screens.Edit.Timing
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+        [Resolved]
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
         [Resolved]
@@ -46,7 +49,10 @@ namespace osu.Game.Screens.Edit.Timing
 
         private int lastDisplayedBeatIndex;
 
-        private double offsetZeroTime => selectedGroup.Value?.Time ?? 0;
+        private double selectedGroupStartTime;
+        private double selectedGroupEndTime;
+
+        private readonly BindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
         public WaveformComparisonDisplay()
         {
@@ -88,20 +94,45 @@ namespace osu.Game.Screens.Edit.Timing
 
             AddInternal(beatIndexText = new OsuSpriteText
             {
-                Margin = new MarginPadding(5),
+                Anchor = Anchor.CentreLeft,
+                Margin = new MarginPadding(4),
             });
 
-            selectedGroup.BindValueChanged(selectedGroupChanged, true);
+            selectedGroup.BindValueChanged(_ => updateTimingGroup(), true);
+
+            ((IBindableList<ControlPointGroup>)controlPointGroups).BindTo(editorBeatmap.ControlPointInfo.Groups);
+            controlPointGroups.BindCollectionChanged((_, __) => updateTimingGroup());
+
             beatLength.BindValueChanged(_ => showFrom(lastDisplayedBeatIndex), true);
         }
 
-        private void selectedGroupChanged(ValueChangedEvent<ControlPointGroup?> group)
+        private void updateTimingGroup()
         {
-            timingPoint = selectedGroup.Value?.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault()
-                          ?? new TimingControlPoint();
-
             beatLength.UnbindBindings();
+
+            selectedGroupStartTime = 0;
+            selectedGroupEndTime = beatmap.Value.Track.Length;
+
+            var tcp = selectedGroup.Value?.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
+
+            if (tcp == null)
+            {
+                timingPoint = new TimingControlPoint();
+                return;
+            }
+
+            timingPoint = tcp;
             beatLength.BindTo(timingPoint.BeatLengthBindable);
+
+            selectedGroupStartTime = selectedGroup.Value?.Time ?? 0;
+
+            var nextGroup = editorBeatmap.ControlPointInfo.TimingPoints
+                                         .SkipWhile(g => g != tcp)
+                                         .Skip(1)
+                                         .FirstOrDefault();
+
+            if (nextGroup != null)
+                selectedGroupEndTime = nextGroup.Time;
         }
 
         protected override bool OnHover(HoverEvent e) => true;
@@ -122,7 +153,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             if (!IsHovered)
             {
-                int beatOffset = (int)Math.Max(0, ((editorClock.CurrentTime - offsetZeroTime) / timingPoint.BeatLength));
+                int beatOffset = (int)Math.Floor((editorClock.CurrentTimeAccurate - selectedGroupStartTime) / timingPoint.BeatLength);
 
                 showFrom(beatOffset);
             }
@@ -137,11 +168,17 @@ namespace osu.Game.Screens.Edit.Timing
 
             beatIndexText.Text = beatIndex.ToString();
 
+            // Start displaying from before the current beat
+            beatIndex -= total_waveforms / 2;
+
             foreach (var waveform in InternalChildren.OfType<WaveformGraph>())
             {
                 // offset to the required beat index.
-                float offset = (float)(offsetZeroTime + (beatIndex * timingPoint.BeatLength - (visible_width / 2))) / trackLength * scale;
+                double time = selectedGroupStartTime + beatIndex * timingPoint.BeatLength;
 
+                float offset = (float)(time - visible_width / 2) / trackLength * scale;
+
+                waveform.Alpha = time < selectedGroupStartTime || time > selectedGroupEndTime ? 0.2f : 1;
                 waveform.X = -offset;
                 waveform.Scale = new Vector2(scale, 1);
 
