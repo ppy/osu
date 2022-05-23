@@ -20,21 +20,21 @@ namespace osu.Game.Rulesets.Osu.Mods
             Value = null
         };
 
-        [SettingSource("Maximum mehs", "Maximum number of \"meh\" hits before fail.", SettingControlType = typeof(SettingsNumberBox))]
+        [SettingSource("Maximum \"meh\" hits", "Maximum number of \"meh\" hits before fail.", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> MaxMeh { get; } = new Bindable<int?>
         {
             Default = null,
             Value = null
         };
 
-        [SettingSource("Maximum oks", "Maximum number of \"ok\" hits before fail.", SettingControlType = typeof(SettingsNumberBox))]
+        [SettingSource("Maximum \"ok\" hits", "Maximum number of \"ok\" hits before fail.", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> MaxOk { get; } = new Bindable<int?>
         {
             Default = null,
             Value = null
         };
 
-        [SettingSource("Maximum goods", "Maximum number of \"good\" hits before fail.", SettingControlType = typeof(SettingsNumberBox))]
+        [SettingSource("Maximum \"good\" hits", "Maximum number of \"good\" hits before fail.", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> MaxGood { get; } = new Bindable<int?>
         {
             Default = null,
