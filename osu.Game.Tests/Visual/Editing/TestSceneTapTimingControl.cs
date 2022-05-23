@@ -4,15 +4,15 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
@@ -22,9 +22,9 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public class TestSceneTapTimingControl : EditorClockTestScene
     {
-        [Cached(typeof(EditorBeatmap))]
-        [Cached(typeof(IBeatSnapProvider))]
-        private readonly EditorBeatmap editorBeatmap;
+        private EditorBeatmap editorBeatmap => editorBeatmapContainer?.EditorBeatmap;
+
+        private TestSceneHitObjectComposer.EditorBeatmapContainer editorBeatmapContainer;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -33,38 +33,48 @@ namespace osu.Game.Tests.Visual.Editing
         private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
 
         private TapTimingControl control;
+        private OsuSpriteText timingInfo;
 
-        public TestSceneTapTimingControl()
+        [Resolved]
+        private AudioManager audio { get; set; }
+
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            var playableBeatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
+            AddStep("create beatmap", () =>
+            {
+                Beatmap.Value = new WaveformTestBeatmap(audio);
+            });
 
-            // Ensure time doesn't end while testing
-            playableBeatmap.BeatmapInfo.Length = 1200000;
+            AddStep("Create component", () =>
+            {
+                Child = editorBeatmapContainer = new TestSceneHitObjectComposer.EditorBeatmapContainer(Beatmap.Value)
+                {
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Y,
+                            Width = 400,
+                            Scale = new Vector2(1.5f),
+                            Child = control = new TapTimingControl(),
+                        },
+                        timingInfo = new OsuSpriteText(),
+                    }
+                };
 
-            editorBeatmap = new EditorBeatmap(playableBeatmap);
-
-            selectedGroup.Value = editorBeatmap.ControlPointInfo.Groups.First();
+                selectedGroup.Value = editorBeatmap.ControlPointInfo.Groups.First();
+            });
         }
 
-        protected override void LoadComplete()
+        protected override void Update()
         {
-            base.LoadComplete();
+            base.Update();
 
-            Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
-            Beatmap.Disabled = true;
-
-            Children = new Drawable[]
-            {
-                new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Y,
-                    Width = 400,
-                    Scale = new Vector2(1.5f),
-                    Child = control = new TapTimingControl(),
-                }
-            };
+            if (selectedGroup.Value != null)
+                timingInfo.Text = $"offset: {selectedGroup.Value.Time:N2} bpm: {selectedGroup.Value.ControlPoints.OfType<TimingControlPoint>().First().BPM:N2}";
         }
 
         [Test]
@@ -104,7 +114,13 @@ namespace osu.Game.Tests.Visual.Editing
                        .TriggerClick();
             });
 
-            AddSliderStep("BPM", 30, 400, 60, bpm => editorBeatmap.ControlPointInfo.TimingPoints.First().BeatLength = 60000f / bpm);
+            AddSliderStep("BPM", 30, 400, 128, bpm =>
+            {
+                if (editorBeatmap == null)
+                    return;
+
+                editorBeatmap.ControlPointInfo.TimingPoints.First().BeatLength = 60000f / bpm;
+            });
         }
 
         protected override void Dispose(bool isDisposing)
