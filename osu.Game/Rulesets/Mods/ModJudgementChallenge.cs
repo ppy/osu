@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Gavel;
         public override string Description => "Fail the beatmap if your judgements go above specified values.";
 
-        [SettingSource("Maximum non-best judgements", "Maximum number of non-best judgements before fail (disregards judgement type).", 1)]
+        [SettingSource("Maximum non-best judgements", "Maximum number of non-best judgements before fail (disregards judgement type).", 1, SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> MaxNonBest { get; } = new Bindable<int?>
         {
             Default = null,
