@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mods
         protected abstract IDictionary<HitResult, Bindable<int?>> HitResultMaximumCounts { get; }
 
         private readonly Dictionary<HitResult, int> hitResultCounts = new Dictionary<HitResult, int>();
-        private int nonBestCount = 0;
+        private int nonBestCount;
 
         protected ModJudgementChallenge()
         {

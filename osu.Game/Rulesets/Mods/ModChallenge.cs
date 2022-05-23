@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mods
         {
             Continuously,
             AtBreak,
-            AtEnd, // doesn't make sense to be compatible with `ModEasyWithExtraLives` if you're checking the last hitobject
+            AtEnd,
         }
     }
 }
