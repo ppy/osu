@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
@@ -83,7 +84,7 @@ namespace osu.Game.Beatmaps
             requestedUserId = api.LocalUser.Value.Id;
 
             // only query API for built-in rulesets
-            rulesets.AvailableRulesets.Where(ruleset => ruleset.OnlineID >= 0 && ruleset.OnlineID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID).ForEach(rulesetInfo =>
+            rulesets.AvailableRulesets.Where(ruleset => ruleset.IsLegacyRuleset()).ForEach(rulesetInfo =>
             {
                 var req = new GetUserRequest(api.LocalUser.Value.Id, rulesetInfo);
 

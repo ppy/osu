@@ -70,9 +70,11 @@ namespace osu.Game.IO
         public override Stream GetStream(string path, FileAccess access = FileAccess.Read, FileMode mode = FileMode.OpenOrCreate) =>
             UnderlyingStorage.GetStream(MutatePath(path), access, mode);
 
-        public override void OpenFileExternally(string filename) => UnderlyingStorage.OpenFileExternally(MutatePath(filename));
+        public override void Move(string from, string to) => UnderlyingStorage.Move(MutatePath(from), MutatePath(to));
 
-        public override void PresentFileExternally(string filename) => UnderlyingStorage.PresentFileExternally(MutatePath(filename));
+        public override bool OpenFileExternally(string filename) => UnderlyingStorage.OpenFileExternally(MutatePath(filename));
+
+        public override bool PresentFileExternally(string filename) => UnderlyingStorage.PresentFileExternally(MutatePath(filename));
 
         public override Storage GetStorageForDirectory(string path)
         {

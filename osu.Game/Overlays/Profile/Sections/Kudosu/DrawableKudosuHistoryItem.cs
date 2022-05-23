@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         [BackgroundDependencyLoader]
         private void load()
         {
-            date.Colour = colours.GreySeafoamLighter;
+            date.Colour = colours.GreySeaFoamLighter;
             var formattedSource = MessageFormatter.FormatText(getString(historyItem));
             linkFlowContainer.AddLinks(formattedSource.Text, formattedSource.Links);
         }

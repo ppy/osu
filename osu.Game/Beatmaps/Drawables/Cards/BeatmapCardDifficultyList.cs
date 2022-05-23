@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             bool firstGroup = true;
 
-            foreach (var group in beatmapSetInfo.Beatmaps.GroupBy(beatmap => beatmap.Ruleset.OnlineID).OrderBy(group => group.Key))
+            foreach (var group in beatmapSetInfo.Beatmaps.GroupBy(beatmap => beatmap.Ruleset).OrderBy(group => group.Key))
             {
                 if (!firstGroup)
                 {

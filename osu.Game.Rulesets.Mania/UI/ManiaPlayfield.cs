@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override bool Remove(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Remove(h);
 
-        public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
+        public void Add(BarLine barLine) => stages.ForEach(s => s.Add(barLine));
 
         /// <summary>
         /// Retrieves a column from a screen-space position.

@@ -6,18 +6,24 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
+using osu.Game.Storyboards.Drawables;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Background
@@ -130,6 +136,46 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         [Test]
+        public void TestBeatmapBackgroundWithStoryboardClockAlwaysUsesCurrentTrack()
+        {
+            BackgroundScreenBeatmap nestedScreen = null;
+            WorkingBeatmap originalWorking = null;
+
+            setSupporter(true);
+            setSourceMode(BackgroundSource.BeatmapWithStoryboard);
+
+            AddStep("change beatmap", () => originalWorking = Beatmap.Value = createTestWorkingBeatmapWithStoryboard());
+            AddAssert("background changed", () => screen.CheckLastLoadChange() == true);
+            AddUntilStep("wait for beatmap background to be loaded", () => getCurrentBackground()?.GetType() == typeof(BeatmapBackgroundWithStoryboard));
+
+            AddStep("start music", () => MusicController.Play());
+            AddUntilStep("storyboard clock running", () => screen.ChildrenOfType<DrawableStoryboard>().SingleOrDefault()?.Clock.IsRunning == true);
+
+            // of note, this needs to be a type that doesn't match BackgroundScreenDefault else it is silently not pushed by the background stack.
+            AddStep("push new background to stack", () => stack.Push(nestedScreen = new BackgroundScreenBeatmap(Beatmap.Value)));
+            AddUntilStep("wait for screen to load", () => nestedScreen.IsLoaded && nestedScreen.IsCurrentScreen());
+
+            // we're testing a case where scheduling may be used to avoid issues, so ensure the scheduler is no longer running.
+            AddUntilStep("wait for top level not alive", () => !screen.IsAlive);
+
+            AddStep("stop music", () => MusicController.Stop());
+            AddStep("change beatmap", () => Beatmap.Value = createTestWorkingBeatmapWithStoryboard());
+            AddStep("change beatmap back", () => Beatmap.Value = originalWorking);
+            AddStep("restart music", () => MusicController.Play());
+
+            AddAssert("top level background hasn't changed yet", () => screen.CheckLastLoadChange() == null);
+
+            AddStep("pop screen back to top level", () => screen.MakeCurrent());
+
+            AddStep("top level screen is current", () => screen.IsCurrentScreen());
+            AddAssert("top level background reused existing", () => screen.CheckLastLoadChange() == false);
+            AddUntilStep("storyboard clock running", () => screen.ChildrenOfType<DrawableStoryboard>().Single().Clock.IsRunning);
+
+            AddStep("stop music", () => MusicController.Stop());
+            AddStep("restore default beatmap", () => Beatmap.SetDefault());
+        }
+
+        [Test]
         public void TestBackgroundTypeSwitch()
         {
             setSupporter(true);
@@ -198,6 +244,7 @@ namespace osu.Game.Tests.Visual.Background
             });
 
         private WorkingBeatmap createTestWorkingBeatmapWithUniqueBackground() => new UniqueBackgroundTestWorkingBeatmap(Audio);
+        private WorkingBeatmap createTestWorkingBeatmapWithStoryboard() => new TestWorkingBeatmapWithStoryboard(Audio);
 
         private class TestBackgroundScreenDefault : BackgroundScreenDefault
         {
@@ -231,6 +278,51 @@ namespace osu.Game.Tests.Visual.Background
             }
 
             protected override Texture GetBackground() => new Texture(1, 1);
+        }
+
+        private class TestWorkingBeatmapWithStoryboard : TestWorkingBeatmap
+        {
+            public TestWorkingBeatmapWithStoryboard(AudioManager audioManager)
+                : base(new Beatmap(), createStoryboard(), audioManager)
+            {
+            }
+
+            protected override Track GetBeatmapTrack() => new TrackVirtual(100000);
+
+            private static Storyboard createStoryboard()
+            {
+                var storyboard = new Storyboard();
+                storyboard.Layers.Last().Add(new TestStoryboardElement());
+                return storyboard;
+            }
+
+            private class TestStoryboardElement : IStoryboardElementWithDuration
+            {
+                public string Path => string.Empty;
+                public bool IsDrawable => true;
+                public double StartTime => double.MinValue;
+                public double EndTime => double.MaxValue;
+
+                public Drawable CreateDrawable() => new DrawableTestStoryboardElement();
+            }
+
+            private class DrawableTestStoryboardElement : OsuSpriteText
+            {
+                public override bool RemoveWhenNotAlive => false;
+
+                public DrawableTestStoryboardElement()
+                {
+                    Anchor = Origin = Anchor.Centre;
+                    Font = OsuFont.Default.With(size: 32);
+                    Text = "(not started)";
+                }
+
+                protected override void Update()
+                {
+                    base.Update();
+                    Text = Time.Current.ToString("N2");
+                }
+            }
         }
 
         private void setCustomSkin()

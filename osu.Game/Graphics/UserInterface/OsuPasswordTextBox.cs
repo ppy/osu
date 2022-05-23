@@ -29,6 +29,10 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool AllowClipboardExport => false;
 
+        protected override bool AllowWordNavigation => false;
+
+        protected override bool AllowIme => false;
+
         private readonly CapsWarning warning;
 
         [Resolved]

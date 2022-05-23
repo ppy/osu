@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Timing
                 }
 
                 Columns = createHeaders();
-                Content = value.Select((g, i) => createContent(i, g)).ToArray().ToRectangular();
+                Content = value.Select(createContent).ToArray().ToRectangular();
             }
         }
 
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Timing
             return columns.ToArray();
         }
 
-        private Drawable[] createContent(int index, ControlPointGroup group)
+        private Drawable[] createContent(ControlPointGroup group)
         {
             return new Drawable[]
             {

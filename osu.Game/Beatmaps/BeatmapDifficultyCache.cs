@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -135,7 +136,7 @@ namespace osu.Game.Beatmaps
             var localRulesetInfo = rulesetInfo as RulesetInfo;
 
             // Difficulty can only be computed if the beatmap and ruleset are locally available.
-            if (localBeatmapInfo?.IsManaged != true || localRulesetInfo == null)
+            if (localBeatmapInfo == null || localRulesetInfo == null)
             {
                 // If not, fall back to the existing star difficulty (e.g. from an online source).
                 return Task.FromResult<StarDifficulty?>(new StarDifficulty(beatmapInfo.StarRating, (beatmapInfo as IBeatmapOnlineInfo)?.MaxCombo ?? 0));
@@ -261,13 +262,18 @@ namespace osu.Game.Beatmaps
             // GetDifficultyAsync will fall back to existing data from IBeatmapInfo if not locally available
             // (contrary to GetAsync)
             GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, mods, cancellationToken)
-                .ContinueWith(t =>
+                .ContinueWith(task =>
                 {
                     // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
                     Schedule(() =>
                     {
-                        if (!cancellationToken.IsCancellationRequested && t.Result != null)
-                            bindable.Value = t.Result;
+                        if (cancellationToken.IsCancellationRequested)
+                            return;
+
+                        var starDifficulty = task.GetResultSafely();
+
+                        if (starDifficulty != null)
+                            bindable.Value = starDifficulty.Value;
                     });
                 }, cancellationToken);
         }

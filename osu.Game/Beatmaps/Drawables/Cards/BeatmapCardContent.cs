@@ -3,16 +3,13 @@
 
 #nullable enable
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Framework.Threading;
-using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK;
@@ -155,55 +152,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 Colour = Colour4.Black.Opacity(Expanded.Value ? 0.3f : 0f),
                 Hollow = true,
             }, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-        }
-
-        private class ExpandedContentScrollContainer : OsuScrollContainer
-        {
-            public ExpandedContentScrollContainer()
-            {
-                ScrollbarVisible = false;
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                Height = Math.Min(Content.DrawHeight, 400);
-            }
-
-            private bool allowScroll => !Precision.AlmostEquals(DrawSize, Content.DrawSize);
-
-            protected override bool OnDragStart(DragStartEvent e)
-            {
-                if (!allowScroll)
-                    return false;
-
-                return base.OnDragStart(e);
-            }
-
-            protected override void OnDrag(DragEvent e)
-            {
-                if (!allowScroll)
-                    return;
-
-                base.OnDrag(e);
-            }
-
-            protected override void OnDragEnd(DragEndEvent e)
-            {
-                if (!allowScroll)
-                    return;
-
-                base.OnDragEnd(e);
-            }
-
-            protected override bool OnScroll(ScrollEvent e)
-            {
-                if (!allowScroll)
-                    return false;
-
-                return base.OnScroll(e);
-            }
         }
     }
 }

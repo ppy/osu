@@ -64,6 +64,16 @@ namespace osu.Game.Tournament
             Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
             dependencies.CacheAs(new StableInfo(storage));
+        }
+
+        protected override void LoadComplete()
+        {
+            MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
+
+            // we don't want to show the menu cursor as it would appear on stream output.
+            MenuCursorContainer.Cursor.Alpha = 0;
+
+            base.LoadComplete();
 
             Task.Run(readBracket);
         }
@@ -81,8 +91,13 @@ namespace osu.Game.Tournament
 
                 ladder ??= new LadderInfo();
 
-                ladder.Ruleset.Value = RulesetStore.GetRuleset(ladder.Ruleset.Value?.ShortName)
-                                       ?? RulesetStore.AvailableRulesets.First();
+                var resolvedRuleset = ladder.Ruleset.Value != null
+                    ? RulesetStore.GetRuleset(ladder.Ruleset.Value.ShortName)
+                    : RulesetStore.AvailableRulesets.First();
+
+                // Must set to null initially to avoid the following re-fetch hitting `ShortName` based equality check.
+                ladder.Ruleset.Value = null;
+                ladder.Ruleset.Value = resolvedRuleset;
 
                 bool addedInfo = false;
 
@@ -244,7 +259,7 @@ namespace osu.Game.Tournament
 
         public void PopulateUser(APIUser user, Action success = null, Action failure = null, bool immediate = false)
         {
-            var req = new GetUserRequest(user.Id, Ruleset.Value);
+            var req = new GetUserRequest(user.Id, ladder.Ruleset.Value);
 
             if (immediate)
             {
@@ -281,16 +296,6 @@ namespace osu.Game.Tournament
             }
         }
 
-        protected override void LoadComplete()
-        {
-            MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
-
-            // we don't want to show the menu cursor as it would appear on stream output.
-            MenuCursorContainer.Cursor.Alpha = 0;
-
-            base.LoadComplete();
-        }
-
         protected virtual void SaveChanges()
         {
             if (!bracketLoadTaskCompletionSource.Task.IsCompletedSuccessfully)
@@ -316,7 +321,7 @@ namespace osu.Game.Tournament
                     Converters = new JsonConverter[] { new JsonPointConverter() }
                 });
 
-            using (var stream = storage.GetStream(BRACKET_FILENAME, FileAccess.Write, FileMode.Create))
+            using (var stream = storage.CreateFileSafely(BRACKET_FILENAME))
             using (var sw = new StreamWriter(stream))
                 sw.Write(serialisedLadder);
         }

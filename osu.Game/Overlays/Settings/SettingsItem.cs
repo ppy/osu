@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -11,6 +12,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
@@ -23,6 +25,13 @@ namespace osu.Game.Overlays.Settings
         protected abstract Drawable CreateControl();
 
         protected Drawable Control { get; }
+
+        /// <summary>
+        /// The source component if this <see cref="SettingsItem{T}"/> was created via <see cref="SettingSourceAttribute"/>.
+        /// </summary>
+        public object SettingSourceObject { get; internal set; }
+
+        public const string CLASSIC_DEFAULT_SEARCH_TERM = @"has-classic-default";
 
         private IHasCurrentValue<T> controlWithCurrent => Control as IHasCurrentValue<T>;
 
@@ -90,18 +99,71 @@ namespace osu.Game.Overlays.Settings
             set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
+        public virtual IEnumerable<LocalisableString> FilterTerms
+        {
+            get
+            {
+                var keywords = new List<LocalisableString>(Keywords?.Select(k => (LocalisableString)k) ?? Array.Empty<LocalisableString>())
+                {
+                    LabelText
+                };
+
+                if (HasClassicDefault)
+                    keywords.Add(CLASSIC_DEFAULT_SEARCH_TERM);
+
+                return keywords;
+            }
+        }
 
         public IEnumerable<string> Keywords { get; set; }
 
+        private bool matchingFilter = true;
+
         public bool MatchingFilter
         {
-            set => Alpha = value ? 1 : 0;
+            get => matchingFilter;
+            set
+            {
+                bool wasPresent = IsPresent;
+
+                matchingFilter = value;
+
+                if (IsPresent != wasPresent)
+                    Invalidate(Invalidation.Presence);
+            }
         }
+
+        public override bool IsPresent => base.IsPresent && MatchingFilter;
 
         public bool FilteringActive { get; set; }
 
         public event Action SettingChanged;
+
+        private T classicDefault;
+
+        public bool HasClassicDefault { get; private set; }
+
+        /// <summary>
+        /// A "classic" default value for this setting.
+        /// </summary>
+        public T ClassicDefault
+        {
+            set
+            {
+                classicDefault = value;
+                HasClassicDefault = true;
+            }
+        }
+
+        public void ApplyClassicDefault()
+        {
+            if (!HasClassicDefault)
+                throw new InvalidOperationException($"Cannot apply a classic default to a setting which doesn't have one defined via {nameof(ClassicDefault)}.");
+
+            Current.Value = classicDefault;
+        }
+
+        public void ApplyDefault() => Current.SetDefault();
 
         protected SettingsItem()
         {

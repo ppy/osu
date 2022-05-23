@@ -32,14 +32,14 @@ namespace osu.Game.Overlays
 
         protected override bool DimMainContent => false; // dimming is handled by main overlay
 
-        private class BackButton : SidebarButton
+        public class BackButton : SidebarButton
         {
             private Container content;
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Size = new Vector2(Sidebar.DEFAULT_WIDTH);
+                Size = new Vector2(SettingsSidebar.DEFAULT_WIDTH);
 
                 AddRange(new Drawable[]
                 {

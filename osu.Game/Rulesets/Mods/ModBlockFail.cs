@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
-            overlay.ShowHealthbar.BindTo(showHealthBar);
+            overlay.ShowHealthBar.BindTo(showHealthBar);
         }
     }
 }

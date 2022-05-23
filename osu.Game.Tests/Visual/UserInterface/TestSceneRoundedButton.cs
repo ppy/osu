@@ -1,44 +1,40 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneRoundedButton : OsuTestScene
+    public class TestSceneRoundedButton : ThemeComparisonTestScene
     {
-        [Test]
-        public void TestBasic()
+        private readonly BindableBool enabled = new BindableBool(true);
+
+        protected override Drawable CreateContent() => new RoundedButton
         {
-            RoundedButton button = null;
+            Width = 400,
+            Text = "Test button",
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Enabled = { BindTarget = enabled },
+        };
 
-            AddStep("create button", () => Child = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Colour4.DarkGray
-                    },
-                    button = new RoundedButton
-                    {
-                        Width = 400,
-                        Text = "Test button",
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Action = () => { }
-                    }
-                }
-            });
+        [Test]
+        public void TestDisabled()
+        {
+            AddToggleStep("toggle disabled", disabled => enabled.Value = !disabled);
+        }
 
-            AddToggleStep("toggle disabled", disabled => button.Action = disabled ? (Action)null : () => { });
+        [Test]
+        public void TestBackgroundColour()
+        {
+            AddStep("set red scheme", () => CreateThemedContent(OverlayColourScheme.Red));
+            AddAssert("first button has correct colour", () => Cell(0, 1).ChildrenOfType<RoundedButton>().First().BackgroundColour == new OverlayColourProvider(OverlayColourScheme.Red).Highlight1);
         }
     }
 }

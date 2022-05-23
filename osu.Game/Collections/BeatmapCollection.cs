@@ -25,7 +25,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The beatmaps contained by the collection.
         /// </summary>
-        public readonly BindableList<IBeatmapInfo> Beatmaps = new BindableList<IBeatmapInfo>();
+        public readonly BindableList<BeatmapInfo> Beatmaps = new BindableList<BeatmapInfo>();
 
         /// <summary>
         /// The date when this collection was last modified.

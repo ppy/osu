@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
 
@@ -18,6 +20,8 @@ namespace osu.Game.Screens.Play
         public Container OverlayLayerContainer { get; private set; }
 
         private readonly Storyboard storyboard;
+        private readonly IReadOnlyList<Mod> mods;
+
         private DrawableStoryboard drawableStoryboard;
 
         /// <summary>
@@ -28,9 +32,10 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         public IBindable<bool> HasStoryboardEnded = new BindableBool(true);
 
-        public DimmableStoryboard(Storyboard storyboard)
+        public DimmableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods)
         {
             this.storyboard = storyboard;
+            this.mods = mods;
         }
 
         [BackgroundDependencyLoader]
@@ -57,7 +62,7 @@ namespace osu.Game.Screens.Play
             if (!ShowStoryboard.Value && !IgnoreUserSettings.Value)
                 return;
 
-            drawableStoryboard = storyboard.CreateDrawable();
+            drawableStoryboard = storyboard.CreateDrawable(mods);
             HasStoryboardEnded.BindTo(drawableStoryboard.HasStoryboardEnded);
 
             if (async)

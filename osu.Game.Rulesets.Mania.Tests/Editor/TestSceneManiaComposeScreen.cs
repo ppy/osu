@@ -31,10 +31,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("setup compose screen", () =>
             {
-                var editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 }))
+                var editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
                 {
                     BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
-                };
+                });
 
                 Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
 

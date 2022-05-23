@@ -65,7 +65,11 @@ namespace osu.Game.Online.Rooms
 
         public ScoreInfo CreateScoreInfo(RulesetStore rulesets, PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
         {
-            var rulesetInstance = playlistItem.Ruleset.Value.CreateInstance();
+            var ruleset = rulesets.GetRuleset(playlistItem.RulesetID);
+            if (ruleset == null)
+                throw new InvalidOperationException($"Couldn't create score with unknown ruleset: {playlistItem.RulesetID}");
+
+            var rulesetInstance = ruleset.CreateInstance();
 
             var scoreInfo = new ScoreInfo
             {
@@ -73,9 +77,7 @@ namespace osu.Game.Online.Rooms
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
                 BeatmapInfo = beatmap,
-                BeatmapInfoID = playlistItem.BeatmapID,
-                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID),
-                RulesetID = playlistItem.RulesetID,
+                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID) ?? throw new InvalidOperationException(),
                 Statistics = Statistics,
                 User = User,
                 Accuracy = Accuracy,

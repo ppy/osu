@@ -197,6 +197,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
             }
 
+            public override void OnKilled()
+            {
+                base.OnKilled();
+
+                if (Time.Current > ParentHitObject.HitObject.GetEndTime() && !Judged)
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+            }
+
             public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
         }
     }

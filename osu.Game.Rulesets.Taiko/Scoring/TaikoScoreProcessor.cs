@@ -7,8 +7,15 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 {
     internal class TaikoScoreProcessor : ScoreProcessor
     {
+        public TaikoScoreProcessor()
+            : base(new TaikoRuleset())
+        {
+        }
+
         protected override double DefaultAccuracyPortion => 0.75;
 
         protected override double DefaultComboPortion => 0.25;
+
+        protected override double ClassicScoreMultiplier => 22;
     }
 }

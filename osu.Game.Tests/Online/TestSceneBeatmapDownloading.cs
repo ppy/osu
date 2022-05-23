@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Tests.Visual;
@@ -20,13 +21,19 @@ namespace osu.Game.Tests.Online
         private static readonly BeatmapSetInfo test_db_model = new BeatmapSetInfo
         {
             OnlineID = 1,
-            Metadata = new BeatmapMetadata
+            Beatmaps =
             {
-                Artist = "test author",
-                Title = "test title",
-                Author = new APIUser
+                new BeatmapInfo
                 {
-                    Username = "mapper"
+                    Metadata = new BeatmapMetadata
+                    {
+                        Artist = "test author",
+                        Title = "test title",
+                        Author = new RealmUser
+                        {
+                            Username = "mapper"
+                        }
+                    }
                 }
             }
         };

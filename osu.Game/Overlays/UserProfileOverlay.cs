@@ -41,7 +41,7 @@ namespace osu.Game.Overlays
 
         public void ShowUser(IUser user)
         {
-            if (user == APIUser.SYSTEM_USER)
+            if (user.OnlineID == APIUser.SYSTEM_USER_ID)
                 return;
 
             Show();

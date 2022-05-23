@@ -72,6 +72,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 Username = "peppy",
             },
             BeatmapInfo = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
+            Ruleset = new OsuRuleset().RulesetInfo,
             Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
             TotalScore = 2845370,
             Accuracy = accuracy,

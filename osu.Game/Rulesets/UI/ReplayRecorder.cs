@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.UI
 
         public int RecordFrameRate = 60;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
@@ -48,14 +48,13 @@ namespace osu.Game.Rulesets.UI
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
-
-            spectatorClient?.BeginPlaying(gameplayState, target);
+            spectatorClient.BeginPlaying(gameplayState, target);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            spectatorClient?.EndPlaying();
+            spectatorClient?.EndPlaying(gameplayState);
         }
 
         protected override void Update()

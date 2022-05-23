@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
     public class TimingRowAttribute : RowAttribute
     {
         private readonly BindableNumber<double> beatLength;
-        private readonly Bindable<TimeSignatures> timeSignature;
+        private readonly Bindable<TimeSignature> timeSignature;
         private OsuSpriteText text;
 
         public TimingRowAttribute(TimingControlPoint timing)

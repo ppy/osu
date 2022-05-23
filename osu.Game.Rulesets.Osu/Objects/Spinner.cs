@@ -1,7 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -65,13 +69,28 @@ namespace osu.Game.Rulesets.Osu.Objects
                 double startTime = StartTime + (float)(i + 1) / totalSpins * Duration;
 
                 AddNested(i < SpinsRequired
-                    ? new SpinnerTick { StartTime = startTime }
-                    : new SpinnerBonusTick { StartTime = startTime });
+                    ? new SpinnerTick { StartTime = startTime, Position = Position }
+                    : new SpinnerBonusTick { StartTime = startTime, Position = Position });
             }
         }
 
         public override Judgement CreateJudgement() => new OsuJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        public override IList<HitSampleInfo> AuxiliarySamples => CreateSpinningSamples();
+
+        public HitSampleInfo[] CreateSpinningSamples()
+        {
+            var referenceSample = Samples.FirstOrDefault();
+
+            if (referenceSample == null)
+                return Array.Empty<HitSampleInfo>();
+
+            return new[]
+            {
+                SampleControlPoint.ApplyTo(referenceSample).With("spinnerspin")
+            };
+        }
     }
 }

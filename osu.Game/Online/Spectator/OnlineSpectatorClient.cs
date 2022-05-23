@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
@@ -51,21 +52,27 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), state);
         }
 
-        protected override Task SendFramesInternal(FrameDataBundle data)
+        protected override Task SendFramesInternal(FrameDataBundle bundle)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
+            Debug.Assert(connection != null);
+
+            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), bundle);
         }
 
         protected override Task EndPlayingInternal(SpectatorState state)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), state);
         }
@@ -75,6 +82,8 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
         }
 
@@ -82,6 +91,8 @@ namespace osu.Game.Online.Spectator
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.SendAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
         }

@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
             automaticDownload.Current.BindValueChanged(_ => checkForAutomaticDownload());
         }
 
-        protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
+        protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState)
         {
             clearDisplay();
             showBeatmapPanel(spectatorState);
@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Play
             scheduleStart(spectatorGameplayState);
         }
 
-        protected override void EndGameplay(int userId)
+        protected override void EndGameplay(int userId, SpectatorState state)
         {
             scheduledStart?.Cancel();
             immediateSpectatorGameplayState = null;
@@ -249,10 +249,10 @@ namespace osu.Game.Screens.Play
             beatmapDownloader.Download(beatmapSet);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             previewTrackManager.StopAnyPlaying(this);
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
     }
 }

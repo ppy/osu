@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("set name", () => SelectedRoom.Value.Name.Value = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } }));
+            AddStep("set beatmap", () => SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
             AddStep("clear name", () => SelectedRoom.Value.Name.Value = "");
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo));
 
                 RoomManager.CreateRequested = r =>
                 {
@@ -87,18 +87,18 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             const string not_found_prefix = "beatmaps not found:";
 
-            string errorMesage = null;
+            string errorMessage = null;
 
             AddStep("setup", () =>
             {
                 var beatmap = CreateBeatmap(Ruleset.Value).BeatmapInfo;
 
                 SelectedRoom.Value.Name.Value = "Test Room";
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = beatmap } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(beatmap));
 
-                errorMesage = $"{not_found_prefix} {beatmap.OnlineID}";
+                errorMessage = $"{not_found_prefix} {beatmap.OnlineID}";
 
-                RoomManager.CreateRequested = _ => errorMesage;
+                RoomManager.CreateRequested = _ => errorMessage;
             });
 
             AddAssert("error not displayed", () => !settings.ErrorText.IsPresent);
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("create room", () => settings.ApplyButton.Action.Invoke());
 
             AddAssert("error displayed", () => settings.ErrorText.IsPresent);
-            AddAssert("error has custom text", () => settings.ErrorText.Text != errorMesage);
+            AddAssert("error has custom text", () => settings.ErrorText.Text != errorMessage);
             AddAssert("playlist item marked invalid", () => !SelectedRoom.Value.Playlist[0].Valid.Value);
         }
 
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("setup", () =>
             {
                 SelectedRoom.Value.Name.Value = "Test Room";
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo));
 
                 RoomManager.CreateRequested = _ => failText;
             });

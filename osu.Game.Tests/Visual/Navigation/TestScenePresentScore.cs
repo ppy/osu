@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
@@ -15,6 +16,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -27,37 +29,38 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddStep("import beatmap", () =>
             {
-                var difficulty = new BeatmapDifficulty();
-                var metadata = new BeatmapMetadata
-                {
-                    Artist = "SomeArtist",
-                    AuthorString = "SomeAuthor",
-                    Title = "import"
-                };
-
                 beatmap = Game.BeatmapManager.Import(new BeatmapSetInfo
                 {
                     Hash = Guid.NewGuid().ToString(),
                     OnlineID = 1,
-                    Metadata = metadata,
                     Beatmaps =
                     {
                         new BeatmapInfo
                         {
                             OnlineID = 1 * 1024,
-                            Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            Metadata = new BeatmapMetadata
+                            {
+                                Artist = "SomeArtist",
+                                Author = { Username = "SomeAuthor" },
+                                Title = "import"
+                            },
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                         new BeatmapInfo
                         {
                             OnlineID = 1 * 2048,
-                            Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            Metadata = new BeatmapMetadata
+                            {
+                                Artist = "SomeArtist",
+                                Author = { Username = "SomeAuthor" },
+                                Title = "import"
+                            },
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                     }
-                }).Result.Value;
+                })?.Value;
             });
         }
 
@@ -65,11 +68,11 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestFromMainMenu([Values] ScorePresentType type)
         {
             var firstImport = importScore(1);
-            var secondimport = importScore(3);
+            var secondImport = importScore(3);
 
             presentAndConfirm(firstImport, type);
             returnToMenu();
-            presentAndConfirm(secondimport, type);
+            presentAndConfirm(secondImport, type);
             returnToMenu();
             returnToMenu();
         }
@@ -78,11 +81,11 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestFromMainMenuDifferentRuleset([Values] ScorePresentType type)
         {
             var firstImport = importScore(1);
-            var secondimport = importScore(3, new ManiaRuleset().RulesetInfo);
+            var secondImport = importScore(3, new ManiaRuleset().RulesetInfo);
 
             presentAndConfirm(firstImport, type);
             returnToMenu();
-            presentAndConfirm(secondimport, type);
+            presentAndConfirm(secondImport, type);
             returnToMenu();
             returnToMenu();
         }
@@ -90,21 +93,27 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFromSongSelect([Values] ScorePresentType type)
         {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
             var firstImport = importScore(1);
             presentAndConfirm(firstImport, type);
 
-            var secondimport = importScore(3);
-            presentAndConfirm(secondimport, type);
+            var secondImport = importScore(3);
+            presentAndConfirm(secondImport, type);
         }
 
         [Test]
         public void TestFromSongSelectDifferentRuleset([Values] ScorePresentType type)
         {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
             var firstImport = importScore(1);
             presentAndConfirm(firstImport, type);
 
-            var secondimport = importScore(3, new ManiaRuleset().RulesetInfo);
-            presentAndConfirm(secondimport, type);
+            var secondImport = importScore(3, new ManiaRuleset().RulesetInfo);
+            presentAndConfirm(secondImport, type);
         }
 
         private void returnToMenu()
@@ -130,8 +139,9 @@ namespace osu.Game.Tests.Visual.Navigation
                     Hash = Guid.NewGuid().ToString(),
                     OnlineID = i,
                     BeatmapInfo = beatmap.Beatmaps.First(),
-                    Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
-                }).Result.Value;
+                    Ruleset = ruleset ?? new OsuRuleset().RulesetInfo,
+                    User = new GuestUser(),
+                }).Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);

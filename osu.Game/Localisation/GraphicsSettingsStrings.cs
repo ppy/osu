@@ -55,6 +55,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Resolution => new TranslatableString(getKey(@"resolution"), @"Resolution");
 
         /// <summary>
+        /// "Display"
+        /// </summary>
+        public static LocalisableString Display => new TranslatableString(getKey(@"display"), @"Display");
+
+        /// <summary>
         /// "UI scaling"
         /// </summary>
         public static LocalisableString UIScaling => new TranslatableString(getKey(@"ui_scaling"), @"UI scaling");

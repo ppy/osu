@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
+using Humanizer;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -48,6 +51,126 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         });
 
         [Test]
+        public void TestSelection()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(1);
+            assertSelected(0);
+
+            AddStep("click right mouse", () => InputManager.Click(MouseButton.Right));
+            assertSelectionCount(1);
+            assertSelected(0);
+
+            moveMouseToControlPoint(3);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(1);
+            assertSelected(3);
+
+            AddStep("press control", () => InputManager.PressKey(Key.ControlLeft));
+            moveMouseToControlPoint(2);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(2);
+            assertSelected(2);
+            assertSelected(3);
+
+            moveMouseToControlPoint(0);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(3);
+            assertSelected(0);
+            assertSelected(2);
+            assertSelected(3);
+
+            AddStep("click right mouse", () => InputManager.Click(MouseButton.Right));
+            assertSelectionCount(3);
+            assertSelected(0);
+            assertSelected(2);
+            assertSelected(3);
+
+            AddStep("release control", () => InputManager.ReleaseKey(Key.ControlLeft));
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(1);
+            assertSelected(0);
+
+            moveMouseToRelativePosition(new Vector2(350, 0));
+            AddStep("ctrl+click to create new point", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            assertSelectionCount(1);
+            assertSelected(3);
+
+            AddStep("release ctrl+click", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            assertSelectionCount(1);
+            assertSelected(3);
+        }
+
+        [Test]
+        public void TestNewControlPointCreation()
+        {
+            moveMouseToRelativePosition(new Vector2(350, 0));
+            AddStep("ctrl+click to create new point", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddAssert("slider has 6 control points", () => slider.Path.ControlPoints.Count == 6);
+            AddStep("release ctrl+click", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            // ensure that the next drag doesn't attempt to move the placement that just finished.
+            moveMouseToRelativePosition(new Vector2(0, 50));
+            AddStep("press left mouse", () => InputManager.PressButton(MouseButton.Left));
+            moveMouseToRelativePosition(new Vector2(0, 100));
+            AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            assertControlPointPosition(3, new Vector2(350, 0));
+
+            moveMouseToRelativePosition(new Vector2(400, 75));
+            AddStep("ctrl+click to create new point", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddAssert("slider has 7 control points", () => slider.Path.ControlPoints.Count == 7);
+            moveMouseToRelativePosition(new Vector2(350, 75));
+            AddStep("release ctrl+click", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            assertControlPointPosition(5, new Vector2(350, 75));
+
+            // ensure that the next drag doesn't attempt to move the placement that just finished.
+            moveMouseToRelativePosition(new Vector2(0, 50));
+            AddStep("press left mouse", () => InputManager.PressButton(MouseButton.Left));
+            moveMouseToRelativePosition(new Vector2(0, 100));
+            AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            assertControlPointPosition(5, new Vector2(350, 75));
+        }
+
+        private void assertSelectionCount(int count) =>
+            AddAssert($"{count} control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == count);
+
+        private void assertSelected(int index) =>
+            AddAssert($"{(index + 1).ToOrdinalWords()} control point piece selected",
+                () => this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[index]).IsSelected.Value);
+
+        private void moveMouseToRelativePosition(Vector2 relativePosition) =>
+            AddStep($"move mouse to {relativePosition}", () =>
+            {
+                Vector2 position = slider.Position + relativePosition;
+                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
+            });
+
+        [Test]
         public void TestDragControlPoint()
         {
             moveMouseToControlPoint(1);
@@ -58,6 +181,83 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             assertControlPointPosition(1, new Vector2(150, 50));
             assertControlPointType(0, PathType.PerfectCurve);
+        }
+
+        [Test]
+        public void TestDragMultipleControlPoints()
+        {
+            moveMouseToControlPoint(2);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("hold control", () => InputManager.PressKey(Key.LControl));
+
+            moveMouseToControlPoint(3);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            moveMouseToControlPoint(4);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            moveMouseToControlPoint(2);
+            AddStep("hold left mouse", () => InputManager.PressButton(MouseButton.Left));
+
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+
+            addMovementStep(new Vector2(450, 50));
+            AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+
+            assertControlPointPosition(2, new Vector2(450, 50));
+            assertControlPointType(2, PathType.PerfectCurve);
+
+            assertControlPointPosition(3, new Vector2(550, 50));
+
+            assertControlPointPosition(4, new Vector2(550, 200));
+
+            AddStep("release control", () => InputManager.ReleaseKey(Key.LControl));
+        }
+
+        [Test]
+        public void TestDragMultipleControlPointsIncludingHead()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("hold control", () => InputManager.PressKey(Key.LControl));
+
+            moveMouseToControlPoint(3);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            moveMouseToControlPoint(4);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            moveMouseToControlPoint(3);
+            AddStep("hold left mouse", () => InputManager.PressButton(MouseButton.Left));
+
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+
+            addMovementStep(new Vector2(550, 50));
+            AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+
+            // note: if the head is part of the selection being moved, the entire slider is moved.
+            // the unselected nodes will therefore change position relative to the slider head.
+
+            AddAssert("slider moved", () => Precision.AlmostEquals(slider.Position, new Vector2(256, 192) + new Vector2(150, 50)));
+
+            assertControlPointPosition(0, Vector2.Zero);
+            assertControlPointType(0, PathType.PerfectCurve);
+
+            assertControlPointPosition(1, new Vector2(0, 100));
+
+            assertControlPointPosition(2, new Vector2(150, -50));
+
+            assertControlPointPosition(3, new Vector2(400, 0));
+
+            assertControlPointPosition(4, new Vector2(400, 150));
+
+            AddStep("release control", () => InputManager.ReleaseKey(Key.LControl));
         }
 
         [Test]

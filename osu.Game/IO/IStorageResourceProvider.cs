@@ -28,7 +28,7 @@ namespace osu.Game.IO
         /// <summary>
         /// Access realm.
         /// </summary>
-        RealmContextFactory RealmContextFactory { get; }
+        RealmAccess RealmAccess { get; }
 
         /// <summary>
         /// Create a texture loader store based on an underlying data store.

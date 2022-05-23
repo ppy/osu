@@ -13,6 +13,10 @@ namespace osu.Game.Scoring
 
         public bool IsManaged => ID > 0;
 
+        public int ScoreInfoID { get; set; }
+
+        public EFScoreInfo ScoreInfo { get; set; }
+
         public int FileInfoID { get; set; }
 
         public FileInfo FileInfo { get; set; }

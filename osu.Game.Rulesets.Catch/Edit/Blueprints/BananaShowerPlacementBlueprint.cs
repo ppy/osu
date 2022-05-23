@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects;
@@ -13,9 +14,19 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
     {
         private readonly TimeSpanOutline outline;
 
+        private double placementStartTime;
+        private double placementEndTime;
+
         public BananaShowerPlacementBlueprint()
         {
             InternalChild = outline = new TimeSpanOutline();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            BeginPlacement();
         }
 
         protected override void Update()
@@ -38,13 +49,6 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
                 case PlacementState.Active:
                     if (e.Button != MouseButton.Right) break;
 
-                    // If the duration is negative, swap the start and the end time to make the duration positive.
-                    if (HitObject.Duration < 0)
-                    {
-                        HitObject.StartTime = HitObject.EndTime;
-                        HitObject.Duration = -HitObject.Duration;
-                    }
-
                     EndPlacement(HitObject.Duration > 0);
                     return true;
             }
@@ -61,13 +65,16 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             switch (PlacementActive)
             {
                 case PlacementState.Waiting:
-                    HitObject.StartTime = time;
+                    placementStartTime = placementEndTime = time;
                     break;
 
                 case PlacementState.Active:
-                    HitObject.EndTime = time;
+                    placementEndTime = time;
                     break;
             }
+
+            HitObject.StartTime = Math.Min(placementStartTime, placementEndTime);
+            HitObject.EndTime = Math.Max(placementStartTime, placementEndTime);
         }
     }
 }

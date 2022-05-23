@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
@@ -32,6 +33,11 @@ namespace osu.Game.Screens.Edit.Timing
             set => slider.KeyboardStep = value;
         }
 
+        public CompositeDrawable TabbableContentContainer
+        {
+            set => textBox.TabbableContentContainer = value;
+        }
+
         private readonly BindableWithCurrent<T?> current = new BindableWithCurrent<T?>();
 
         public Bindable<T?> Current
@@ -41,7 +47,7 @@ namespace osu.Game.Screens.Edit.Timing
         }
 
         private readonly SettingsSlider<T> slider;
-        private readonly LabelledTextBox textbox;
+        private readonly LabelledTextBox textBox;
 
         /// <summary>
         /// Creates an <see cref="IndeterminateSliderWithTextBoxInput{T}"/>.
@@ -66,7 +72,7 @@ namespace osu.Game.Screens.Edit.Timing
                     Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        textbox = new LabelledTextBox
+                        textBox = new LabelledTextBox
                         {
                             Label = labelText,
                         },
@@ -80,7 +86,7 @@ namespace osu.Game.Screens.Edit.Timing
                 },
             };
 
-            textbox.OnCommit += (t, isNew) =>
+            textBox.OnCommit += (t, isNew) =>
             {
                 if (!isNew) return;
 
@@ -102,6 +108,14 @@ namespace osu.Game.Screens.Edit.Timing
             Current.BindValueChanged(_ => updateState(), true);
         }
 
+        public override bool AcceptsFocus => true;
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+            GetContainingInputManager().ChangeFocus(textBox);
+        }
+
         private void updateState()
         {
             if (Current.Value is T nonNullValue)
@@ -110,13 +124,13 @@ namespace osu.Game.Screens.Edit.Timing
 
                 // use the value from the slider to ensure that any precision/min/max set on it via the initial indeterminate value have been applied correctly.
                 decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
-                textbox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
-                textbox.PlaceholderText = string.Empty;
+                textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
+                textBox.PlaceholderText = string.Empty;
             }
             else
             {
-                textbox.Text = null;
-                textbox.PlaceholderText = "(multiple)";
+                textBox.Text = null;
+                textBox.PlaceholderText = "(multiple)";
             }
         }
     }

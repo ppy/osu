@@ -16,14 +16,14 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override LocalisableString Header => AudioSettingsStrings.OffsetHeader;
 
-        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "universal", "uo", "timing" });
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "universal", "uo", "timing" });
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<double, OffsetSlider>
+                new SettingsSlider<double, TimeSlider>
                 {
                     LabelText = AudioSettingsStrings.AudioOffset,
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
@@ -34,11 +34,6 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     Text = AudioSettingsStrings.OffsetWizard
                 }
             };
-        }
-
-        private class OffsetSlider : OsuSliderBar<double>
-        {
-            public override LocalisableString TooltipText => Current.Value.ToString(@"0ms");
         }
     }
 }

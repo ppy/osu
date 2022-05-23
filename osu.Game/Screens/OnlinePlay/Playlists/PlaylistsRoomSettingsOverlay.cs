@@ -392,7 +392,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                     foreach (var item in Playlist)
                     {
-                        if (invalidBeatmapIDs.Contains(item.BeatmapID))
+                        if (invalidBeatmapIDs.Contains(item.Beatmap.OnlineID))
                             item.MarkInvalid();
                     }
                 }

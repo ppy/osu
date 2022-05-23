@@ -128,6 +128,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             if (showPerformancePoints)
                 columns.Add(new TableColumn(BeatmapsetsStrings.ShowScoreboardHeaderspp, Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
 
+            columns.Add(new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersTime, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)));
             columns.Add(new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersMods, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)));
 
             return columns.ToArray();
@@ -172,7 +173,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Text = score.MaxCombo.ToLocalisableString(@"0\x"),
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = score.MaxCombo == score.BeatmapInfo?.MaxCombo ? highAccuracyColour : Color4.White
+#pragma warning disable 618
+                    Colour = score.MaxCombo == score.BeatmapInfo.MaxCombo ? highAccuracyColour : Color4.White
+#pragma warning restore 618
                 }
             };
 
@@ -201,6 +204,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Font = OsuFont.GetFont(size: text_size)
                 });
             }
+
+            content.Add(new ScoreboardTime(score.Date, text_size)
+            {
+                Margin = new MarginPadding { Right = 10 }
+            });
 
             content.Add(new FillFlowContainer
             {

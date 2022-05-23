@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
@@ -14,6 +15,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
     {
         private const float height = 28;
         private const float transition_duration = 100;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private Container drawableRuleset;
 
@@ -56,11 +60,14 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private void updateBeatmap()
         {
             var item = Playlist.FirstOrDefault();
+            var ruleset = item == null ? null : rulesets.GetRuleset(item.RulesetID)?.CreateInstance();
 
-            if (item?.Beatmap != null)
+            if (item?.Beatmap != null && ruleset != null)
             {
+                var mods = item.RequiredMods.Select(m => m.ToMod(ruleset)).ToArray();
+
                 drawableRuleset.FadeIn(transition_duration);
-                drawableRuleset.Child = new DifficultyIcon(item.Beatmap.Value, item.Ruleset.Value, item.RequiredMods) { Size = new Vector2(height) };
+                drawableRuleset.Child = new DifficultyIcon(item.Beatmap, ruleset.RulesetInfo, mods) { Size = new Vector2(height) };
             }
             else
                 drawableRuleset.FadeOut(transition_duration);

@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load(IScrollingInfo scrollingInfo)
         {
-            const float angle_variangle = 15; // should be less than 45
+            const float angle_variance = 15; // should be less than 45
             const float roundness = 80;
             const float initial_height = 10;
 
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     Masking = true,
                     Size = new Vector2(0.01f, initial_height),
                     Blending = BlendingParameters.Additive,
-                    Rotation = RNG.NextSingle(-angle_variangle, angle_variangle),
+                    Rotation = RNG.NextSingle(-angle_variance, angle_variance),
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     Masking = true,
                     Size = new Vector2(0.01f, initial_height),
                     Blending = BlendingParameters.Additive,
-                    Rotation = RNG.NextSingle(-angle_variangle, angle_variangle),
+                    Rotation = RNG.NextSingle(-angle_variance, angle_variance),
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,

@@ -145,6 +145,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         private bool isBreak() => Player.IsBreakTime.Value;
 
-        private bool cursorAlphaAlmostEquals(float alpha) => Precision.AlmostEquals(Player.DrawableRuleset.Cursor.Alpha, alpha);
+        private bool cursorAlphaAlmostEquals(float alpha) => Precision.AlmostEquals(Player.DrawableRuleset.Cursor.Alpha, alpha, 0.1f);
     }
 }

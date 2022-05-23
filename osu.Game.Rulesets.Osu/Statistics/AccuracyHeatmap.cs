@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
             pointGrid.Content = points;
 
-            if (score.HitEvents == null || score.HitEvents.Count == 0)
+            if (score.HitEvents.Count == 0)
                 return;
 
             // Todo: This should probably not be done like this.

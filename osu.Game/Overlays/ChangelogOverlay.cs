@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -35,7 +34,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             Header.Build.BindTarget = Current;
 

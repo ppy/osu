@@ -3,102 +3,97 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Extensions;
+using osu.Game.Models;
+using Realms;
+
+#nullable enable
 
 namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
-    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
+    [MapTo("BeatmapSet")]
+    public class BeatmapSetInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
     {
-        public int ID { get; set; }
+        [PrimaryKey]
+        public Guid ID { get; set; }
 
-        public bool IsManaged => ID > 0;
-
-        private int? onlineID;
-
-        [Column("OnlineBeatmapSetID")]
-        public int? OnlineID
-        {
-            get => onlineID;
-            set => onlineID = value > 0 ? value : null;
-        }
+        [Indexed]
+        public int OnlineID { get; set; } = -1;
 
         public DateTimeOffset DateAdded { get; set; }
 
-        public BeatmapMetadata Metadata { get; set; }
-
-        [NotNull]
-        public List<BeatmapInfo> Beatmaps { get; } = new List<BeatmapInfo>();
-
-        public BeatmapOnlineStatus Status { get; set; } = BeatmapOnlineStatus.None;
-
-        public List<BeatmapSetFileInfo> Files { get; } = new List<BeatmapSetFileInfo>();
-
-        /// <summary>
-        /// The maximum star difficulty of all beatmaps in this set.
-        /// </summary>
         [JsonIgnore]
-        public double MaxStarDifficulty => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.StarRating);
+        public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
 
-        /// <summary>
-        /// The maximum playable length in milliseconds of all beatmaps in this set.
-        /// </summary>
-        [JsonIgnore]
-        public double MaxLength => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.Length);
+        public IList<BeatmapInfo> Beatmaps { get; } = null!;
 
-        /// <summary>
-        /// The maximum BPM of all beatmaps in this set.
-        /// </summary>
-        [JsonIgnore]
-        public double MaxBPM => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.BPM);
+        public IList<RealmNamedFileUsage> Files { get; } = null!;
 
-        [NotMapped]
+        [Ignored]
+        public BeatmapOnlineStatus Status
+        {
+            get => (BeatmapOnlineStatus)StatusInt;
+            set => StatusInt = (int)value;
+        }
+
+        [MapTo(nameof(Status))]
+        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
+
         public bool DeletePending { get; set; }
 
-        public string Hash { get; set; }
+        public string Hash { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Whether deleting this beatmap set should be prohibited (due to it being a system requirement to be present).
+        /// </summary>
+        public bool Protected { get; set; }
+
+        public double MaxStarDifficulty => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.StarRating);
+
+        public double MaxLength => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.Length);
+
+        public double MaxBPM => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.BPM);
+
+        public BeatmapSetInfo(IEnumerable<BeatmapInfo>? beatmaps = null)
+            : this()
+        {
+            ID = Guid.NewGuid();
+            if (beatmaps != null)
+                Beatmaps.AddRange(beatmaps);
+        }
+
+        [UsedImplicitly] // Realm
+        private BeatmapSetInfo()
+        {
+        }
 
         /// <summary>
         /// Returns the storage path for the file in this beatmapset with the given filename, if any exists, otherwise null.
         /// The path returned is relative to the user file storage.
         /// </summary>
         /// <param name="filename">The name of the file to get the storage path of.</param>
-        public string GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.GetStoragePath();
+        public string? GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
 
-        public override string ToString() => Metadata?.ToString() ?? base.ToString();
-
-        public bool Protected { get; set; }
-
-        public bool Equals(BeatmapSetInfo other)
+        public bool Equals(BeatmapSetInfo? other)
         {
             if (ReferenceEquals(this, other)) return true;
             if (other == null) return false;
 
-            if (ID != 0 && other.ID != 0)
-                return ID == other.ID;
-
-            return false;
+            return ID == other.ID;
         }
 
-        public bool Equals(IBeatmapSetInfo other) => other is BeatmapSetInfo b && Equals(b);
+        public override string ToString() => Metadata.GetDisplayString();
 
-        #region Implementation of IHasOnlineID
+        public bool Equals(IBeatmapSetInfo? other) => other is BeatmapSetInfo b && Equals(b);
 
-        int IHasOnlineID<int>.OnlineID => OnlineID ?? -1;
-
-        #endregion
-
-        #region Implementation of IBeatmapSetInfo
-
-        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata ?? Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
-        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
-        #endregion
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
     }
 }

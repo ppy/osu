@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
@@ -108,10 +109,7 @@ namespace osu.Desktop
                 presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
 
             // update ruleset
-            int onlineID = ruleset.Value.OnlineID;
-            bool isLegacyRuleset = onlineID >= 0 && onlineID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID;
-
-            presence.Assets.SmallImageKey = isLegacyRuleset ? $"mode_{onlineID}" : "mode_custom";
+            presence.Assets.SmallImageKey = ruleset.Value.IsLegacyRuleset() ? $"mode_{ruleset.Value.OnlineID}" : "mode_custom";
             presence.Assets.SmallImageText = ruleset.Value.Name;
 
             client.SetPresence(presence);

@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             TriggerOperationStarted();
             Action?.Invoke();
-            TriggerOperatoinEnded();
+            TriggerOperationEnded();
             return true;
         }
 

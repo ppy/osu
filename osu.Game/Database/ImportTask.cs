@@ -4,14 +4,16 @@
 #nullable enable
 
 using System.IO;
+using osu.Framework.Extensions;
 using osu.Game.IO.Archives;
+using osu.Game.Stores;
 using osu.Game.Utils;
 using SharpCompress.Common;
 
 namespace osu.Game.Database
 {
     /// <summary>
-    /// An encapsulated import task to be imported to an <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
+    /// An encapsulated import task to be imported to an <see cref="RealmArchiveModelManager{TModel}"/>.
     /// </summary>
     public class ImportTask
     {
@@ -62,9 +64,7 @@ namespace osu.Game.Database
             if (!(stream is MemoryStream memoryStream))
             {
                 // This isn't used in any current path. May need to reconsider for performance reasons (ie. if we don't expect the incoming stream to be copied out).
-                byte[] buffer = new byte[stream.Length];
-                stream.Read(buffer, 0, (int)stream.Length);
-                memoryStream = new MemoryStream(buffer);
+                memoryStream = new MemoryStream(stream.ReadAllBytesToArray());
             }
 
             if (ZipUtils.IsZipArchive(memoryStream))

@@ -1,45 +1,63 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Graphics;
+using osu.Game.Screens.Edit.Compose.Components;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
     public class BindableBeatDivisor : BindableInt
     {
-        public static readonly int[] VALID_DIVISORS = { 1, 2, 3, 4, 6, 8, 12, 16 };
+        public static readonly int[] PREDEFINED_DIVISORS = { 1, 2, 3, 4, 6, 8, 12, 16 };
+
+        public Bindable<BeatDivisorPresetCollection> ValidDivisors { get; } = new Bindable<BeatDivisorPresetCollection>(BeatDivisorPresetCollection.COMMON);
 
         public BindableBeatDivisor(int value = 1)
             : base(value)
         {
+            ValidDivisors.BindValueChanged(_ => updateBindableProperties(), true);
+            BindValueChanged(_ => ensureValidDivisor());
         }
 
-        public void Next() => Value = VALID_DIVISORS[Math.Min(VALID_DIVISORS.Length - 1, Array.IndexOf(VALID_DIVISORS, Value) + 1)];
-
-        public void Previous() => Value = VALID_DIVISORS[Math.Max(0, Array.IndexOf(VALID_DIVISORS, Value) - 1)];
-
-        public override int Value
+        private void updateBindableProperties()
         {
-            get => base.Value;
-            set
-            {
-                if (!VALID_DIVISORS.Contains(value))
-                {
-                    // If it doesn't match, value will be 0, but will be clamped to the valid range via DefaultMinValue
-                    value = Array.FindLast(VALID_DIVISORS, d => d < value);
-                }
+            ensureValidDivisor();
 
-                base.Value = value;
-            }
+            MinValue = ValidDivisors.Value.Presets.Min();
+            MaxValue = ValidDivisors.Value.Presets.Max();
         }
 
-        protected override int DefaultMinValue => VALID_DIVISORS.First();
-        protected override int DefaultMaxValue => VALID_DIVISORS.Last();
+        private void ensureValidDivisor()
+        {
+            if (!ValidDivisors.Value.Presets.Contains(Value))
+                Value = 1;
+        }
+
+        public void Next()
+        {
+            var presets = ValidDivisors.Value.Presets;
+            Value = presets.Cast<int?>().SkipWhile(preset => preset != Value).ElementAtOrDefault(1) ?? presets[0];
+        }
+
+        public void Previous()
+        {
+            var presets = ValidDivisors.Value.Presets;
+            Value = presets.Cast<int?>().TakeWhile(preset => preset != Value).LastOrDefault() ?? presets[^1];
+        }
+
         protected override int DefaultPrecision => 1;
+
+        public override void BindTo(Bindable<int> them)
+        {
+            // bind to valid divisors first (if applicable) to ensure correct transfer of the actual divisor.
+            if (them is BindableBeatDivisor otherBeatDivisor)
+                ValidDivisors.BindTo(otherBeatDivisor.ValidDivisors);
+
+            base.BindTo(them);
+        }
 
         protected override Bindable<int> CreateInstance() => new BindableBeatDivisor();
 
@@ -92,7 +110,7 @@ namespace osu.Game.Screens.Edit
         {
             int beat = index % beatDivisor;
 
-            foreach (int divisor in BindableBeatDivisor.VALID_DIVISORS)
+            foreach (int divisor in PREDEFINED_DIVISORS)
             {
                 if ((beat * divisor) % beatDivisor == 0)
                     return divisor;

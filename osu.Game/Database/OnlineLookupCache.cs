@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Game.Online.API;
 
 namespace osu.Game.Database
@@ -58,7 +59,7 @@ namespace osu.Game.Database
                     if (!task.IsCompletedSuccessfully)
                         return null;
 
-                    return task.Result;
+                    return task.GetResultSafely();
                 }, token));
             }
 

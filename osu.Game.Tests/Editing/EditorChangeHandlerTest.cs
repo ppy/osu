@@ -2,7 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 
@@ -158,7 +159,13 @@ namespace osu.Game.Tests.Editing
 
         private (EditorChangeHandler, EditorBeatmap) createChangeHandler()
         {
-            var beatmap = new EditorBeatmap(new Beatmap());
+            var beatmap = new EditorBeatmap(new OsuBeatmap
+            {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                },
+            });
 
             var changeHandler = new EditorChangeHandler(beatmap);
 

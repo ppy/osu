@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Models;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
@@ -157,10 +160,10 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestSelectMultipleScores()
         {
             var firstScore = TestResources.CreateTestScoreInfo();
-            var secondScore = TestResources.CreateTestScoreInfo();
+            firstScore.RealmUser = new RealmUser { Username = "A" };
 
-            firstScore.UserString = "A";
-            secondScore.UserString = "B";
+            var secondScore = TestResources.CreateTestScoreInfo();
+            secondScore.RealmUser = new RealmUser { Username = "B" };
 
             createListStep(() => new ScorePanelList());
 
@@ -178,7 +181,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddStep("select second score", () =>
             {
-                InputManager.MoveMouseTo(list.ChildrenOfType<ScorePanel>().Single(p => p.Score == secondScore));
+                InputManager.MoveMouseTo(list.ChildrenOfType<ScorePanel>().Single(p => p.Score.Equals(secondScore)));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -207,13 +210,19 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestKeyboardNavigation()
         {
             var lowestScore = TestResources.CreateTestScoreInfo();
-            lowestScore.MaxCombo = 100;
+            lowestScore.OnlineID = 3;
+            lowestScore.TotalScore = 0;
+            lowestScore.Statistics = new Dictionary<HitResult, int>();
 
             var middleScore = TestResources.CreateTestScoreInfo();
-            middleScore.MaxCombo = 200;
+            middleScore.OnlineID = 2;
+            middleScore.TotalScore = 0;
+            middleScore.Statistics = new Dictionary<HitResult, int>();
 
             var highestScore = TestResources.CreateTestScoreInfo();
-            highestScore.MaxCombo = 300;
+            highestScore.OnlineID = 1;
+            highestScore.TotalScore = 0;
+            highestScore.Statistics = new Dictionary<HitResult, int>();
 
             createListStep(() => new ScorePanelList());
 
@@ -303,6 +312,6 @@ namespace osu.Game.Tests.Visual.Ranking
             => AddUntilStep("first panel centred", () => Precision.AlmostEquals(list.ChildrenOfType<ScorePanel>().First().ScreenSpaceDrawQuad.Centre.X, list.ScreenSpaceDrawQuad.Centre.X, 1));
 
         private void assertScoreState(ScoreInfo score, bool expanded)
-            => AddUntilStep($"score expanded = {expanded}", () => (list.ChildrenOfType<ScorePanel>().Single(p => p.Score == score).State == PanelState.Expanded) == expanded);
+            => AddUntilStep($"score expanded = {expanded}", () => (list.ChildrenOfType<ScorePanel>().Single(p => p.Score.Equals(score)).State == PanelState.Expanded) == expanded);
     }
 }

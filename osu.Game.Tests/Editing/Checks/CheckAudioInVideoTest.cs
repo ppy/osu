@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestMissingFile()
         {
-            beatmap.BeatmapInfo.BeatmapSet.Files.Clear();
+            beatmap.BeatmapInfo.BeatmapSet?.Files.Clear();
 
             var issues = check.Run(getContext(null)).ToList();
 

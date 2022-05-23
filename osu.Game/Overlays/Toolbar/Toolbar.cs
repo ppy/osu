@@ -58,8 +58,11 @@ namespace osu.Game.Overlays.Toolbar
             AlwaysPresent = false;
         }
 
+        [Resolved]
+        private Bindable<RulesetInfo> ruleset { get; set; }
+
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset)
+        private void load(OsuGame osuGame)
         {
             Children = new Drawable[]
             {
@@ -101,16 +104,21 @@ namespace osu.Game.Overlays.Toolbar
                         //    Icon = FontAwesome.Solid.search
                         //},
                         userButton = new ToolbarUserButton(),
+                        new ToolbarClock(),
                         new ToolbarNotificationButton(),
                     }
                 }
             };
 
-            // Bound after the selector is added to the hierarchy to give it a chance to load the available rulesets
-            rulesetSelector.Current.BindTo(parentRuleset);
-
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            rulesetSelector.Current.BindTo(ruleset);
         }
 
         public class ToolbarBackground : Container

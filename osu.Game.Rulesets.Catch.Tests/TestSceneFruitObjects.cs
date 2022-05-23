@@ -37,20 +37,20 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("show hyperdash droplet", () => SetContents(_ => createDrawableDroplet(true)));
         }
 
-        private Drawable createDrawableFruit(int indexInBeatmap, bool hyperdash = false) =>
+        private Drawable createDrawableFruit(int indexInBeatmap, bool hyperDash = false) =>
             new TestDrawableCatchHitObjectSpecimen(new DrawableFruit(new Fruit
             {
                 IndexInBeatmap = indexInBeatmap,
-                HyperDashBindable = { Value = hyperdash }
+                HyperDashBindable = { Value = hyperDash }
             }));
 
         private Drawable createDrawableBanana() =>
             new TestDrawableCatchHitObjectSpecimen(new DrawableBanana(new Banana()));
 
-        private Drawable createDrawableDroplet(bool hyperdash = false) =>
+        private Drawable createDrawableDroplet(bool hyperDash = false) =>
             new TestDrawableCatchHitObjectSpecimen(new DrawableDroplet(new Droplet
             {
-                HyperDashBindable = { Value = hyperdash }
+                HyperDashBindable = { Value = hyperDash }
             }));
 
         private Drawable createDrawableTinyDroplet() => new TestDrawableCatchHitObjectSpecimen(new DrawableTinyDroplet(new TinyDroplet()));

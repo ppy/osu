@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public new ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)base.HitObjectContainer;
 
         [Resolved]
-        protected IScrollingInfo ScrollingInfo { get; private set; }
+        public IScrollingInfo ScrollingInfo { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load()

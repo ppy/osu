@@ -6,10 +6,18 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -39,6 +47,24 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestScoreWithoutStatistics()
         {
             loadPanel(TestResources.CreateTestScoreInfo());
+        }
+
+        [Test]
+        public void TestScoreInRulesetWhereAllStatsRequireHitEvents()
+        {
+            loadPanel(TestResources.CreateTestScoreInfo(new TestRulesetAllStatsRequireHitEvents().RulesetInfo));
+        }
+
+        [Test]
+        public void TestScoreInRulesetWhereNoStatsRequireHitEvents()
+        {
+            loadPanel(TestResources.CreateTestScoreInfo(new TestRulesetNoStatsRequireHitEvents().RulesetInfo));
+        }
+
+        [Test]
+        public void TestScoreInMixedRuleset()
+        {
+            loadPanel(TestResources.CreateTestScoreInfo(new TestRulesetMixed().RulesetInfo));
         }
 
         [Test]
@@ -74,6 +100,135 @@ namespace osu.Game.Tests.Visual.Ranking
             }
 
             return hitEvents;
+        }
+
+        private class TestRuleset : Ruleset
+        {
+            public override IEnumerable<Mod> GetModsFor(ModType type)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override string Description => string.Empty;
+
+            public override string ShortName => string.Empty;
+
+            protected static Drawable CreatePlaceholderStatistic(string message) => new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                Masking = true,
+                CornerRadius = 20,
+                Height = 250,
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = OsuColour.Gray(0.5f),
+                        Alpha = 0.5f
+                    },
+                    new OsuSpriteText
+                    {
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
+                        Text = message,
+                        Margin = new MarginPadding { Left = 20 }
+                    }
+                }
+            };
+        }
+
+        private class TestRulesetAllStatsRequireHitEvents : TestRuleset
+        {
+            public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+            {
+                return new[]
+                {
+                    new StatisticRow
+                    {
+                        Columns = new[]
+                        {
+                            new StatisticItem("Statistic Requiring Hit Events 1",
+                                () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true)
+                        }
+                    },
+                    new StatisticRow
+                    {
+                        Columns = new[]
+                        {
+                            new StatisticItem("Statistic Requiring Hit Events 2",
+                                () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true)
+                        }
+                    }
+                };
+            }
+        }
+
+        private class TestRulesetNoStatsRequireHitEvents : TestRuleset
+        {
+            public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+            {
+                return new[]
+                {
+                    new StatisticRow
+                    {
+                        Columns = new[]
+                        {
+                            new StatisticItem("Statistic Not Requiring Hit Events 1",
+                                () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events"))
+                        }
+                    },
+                    new StatisticRow
+                    {
+                        Columns = new[]
+                        {
+                            new StatisticItem("Statistic Not Requiring Hit Events 2",
+                                () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events"))
+                        }
+                    }
+                };
+            }
+        }
+
+        private class TestRulesetMixed : TestRuleset
+        {
+            public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+            {
+                return new[]
+                {
+                    new StatisticRow
+                    {
+                        Columns = new[]
+                        {
+                            new StatisticItem("Statistic Requiring Hit Events",
+                                () => CreatePlaceholderStatistic("Placeholder statistic. Requires hit events"), true)
+                        }
+                    },
+                    new StatisticRow
+                    {
+                        Columns = new[]
+                        {
+                            new StatisticItem("Statistic Not Requiring Hit Events",
+                                () => CreatePlaceholderStatistic("Placeholder statistic. Does not require hit events"))
+                        }
+                    }
+                };
+            }
         }
     }
 }

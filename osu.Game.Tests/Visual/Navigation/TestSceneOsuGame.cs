@@ -12,11 +12,9 @@ using osu.Framework.Platform;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -25,7 +23,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
-using osu.Game.Utils;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -35,11 +32,10 @@ namespace osu.Game.Tests.Visual.Navigation
         private IReadOnlyList<Type> requiredGameDependencies => new[]
         {
             typeof(OsuGame),
-            typeof(SentryLogger),
             typeof(OsuLogo),
             typeof(IdleTracker),
             typeof(OnScreenDisplay),
-            typeof(NotificationOverlay),
+            typeof(INotificationOverlay),
             typeof(BeatmapListingOverlay),
             typeof(DashboardOverlay),
             typeof(NewsOverlay),
@@ -51,14 +47,13 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(LoginOverlay),
             typeof(MusicController),
             typeof(AccountCreationOverlay),
-            typeof(DialogOverlay),
+            typeof(IDialogOverlay),
             typeof(ScreenshotManager)
         };
 
         private IReadOnlyList<Type> requiredGameBaseDependencies => new[]
         {
             typeof(OsuGameBase),
-            typeof(DatabaseContextFactory),
             typeof(Bindable<RulesetInfo>),
             typeof(IBindable<RulesetInfo>),
             typeof(Bindable<IReadOnlyList<Mod>>),
@@ -69,10 +64,9 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(ISkinSource),
             typeof(IAPIProvider),
             typeof(RulesetStore),
-            typeof(FileStore),
             typeof(ScoreManager),
             typeof(BeatmapManager),
-            typeof(RulesetConfigCache),
+            typeof(IRulesetConfigCache),
             typeof(OsuColour),
             typeof(IBindable<WorkingBeatmap>),
             typeof(Bindable<WorkingBeatmap>),

@@ -18,7 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             this.room = room;
         }
 
-        private GetRoomRequest pollReq;
+        private GetRoomRequest lastPollRequest;
 
         protected override Task Poll()
         {
@@ -30,19 +30,22 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             var tcs = new TaskCompletionSource<bool>();
 
-            pollReq?.Cancel();
-            pollReq = new GetRoomRequest(room.RoomID.Value.Value);
+            lastPollRequest?.Cancel();
 
-            pollReq.Success += result =>
+            var req = new GetRoomRequest(room.RoomID.Value.Value);
+
+            req.Success += result =>
             {
                 result.RemoveExpiredPlaylistItems();
                 RoomManager.AddOrUpdateRoom(result);
                 tcs.SetResult(true);
             };
 
-            pollReq.Failure += _ => tcs.SetResult(false);
+            req.Failure += _ => tcs.SetResult(false);
 
-            API.Queue(pollReq);
+            API.Queue(req);
+
+            lastPollRequest = req;
 
             return tcs.Task;
         }

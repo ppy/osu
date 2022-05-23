@@ -16,9 +16,13 @@ namespace osu.Game.Tests.NonVisual.Filtering
     {
         private BeatmapInfo getExampleBeatmap() => new BeatmapInfo
         {
-            Ruleset = new RulesetInfo { OnlineID = 5 },
+            Ruleset = new RulesetInfo
+            {
+                ShortName = "osu",
+                OnlineID = 0
+            },
             StarRating = 4.0d,
-            BaseDifficulty = new BeatmapDifficulty
+            Difficulty = new BeatmapDifficulty
             {
                 ApproachRate = 5.0f,
                 DrainRate = 3.0f,
@@ -30,7 +34,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 ArtistUnicode = "check unicode too",
                 Title = "Title goes here",
                 TitleUnicode = "Title goes here",
-                AuthorString = "The Author",
+                Author = { Username = "The Author" },
                 Source = "unit tests",
                 Tags = "look for tags too",
             },
@@ -57,7 +61,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { OnlineID = 6 }
+                Ruleset = new RulesetInfo { ShortName = "catch" }
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -71,6 +75,20 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var criteria = new FilterCriteria
             {
                 Ruleset = new RulesetInfo { OnlineID = 6 },
+                AllowConvertedBeatmaps = true
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.IsFalse(carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaMatchingConvertedBeatmapsForCustomRulesets()
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Ruleset = new RulesetInfo { OnlineID = -1 },
                 AllowConvertedBeatmaps = true
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);

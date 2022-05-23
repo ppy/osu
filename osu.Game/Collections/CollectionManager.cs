@@ -50,9 +50,14 @@ namespace osu.Game.Collections
             this.storage = storage;
         }
 
+        [Resolved(canBeNull: true)]
+        private DatabaseContextFactory efContextFactory { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
+            efContextFactory?.WaitForMigrationCompletion();
+
             Collections.CollectionChanged += collectionsChanged;
 
             if (storage.Exists(database_backup_name))
@@ -105,6 +110,18 @@ namespace osu.Game.Collections
         });
 
         public Action<Notification> PostNotification { protected get; set; }
+
+        public Task<int> GetAvailableCount(StableStorage stableStorage)
+        {
+            if (!stableStorage.Exists(database_name))
+                return Task.FromResult(0);
+
+            return Task.Run(() =>
+            {
+                using (var stream = stableStorage.GetStream(database_name))
+                    return readCollections(stream).Count;
+            });
+        }
 
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.

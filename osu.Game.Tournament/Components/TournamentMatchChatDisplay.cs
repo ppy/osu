@@ -45,7 +45,7 @@ namespace osu.Game.Tournament.Components
 
                     if (manager == null)
                     {
-                        AddInternal(manager = new ChannelManager());
+                        AddInternal(manager = new ChannelManager { HighPollRate = { Value = true } });
                         Channel.BindTo(manager.CurrentChannel);
                     }
 

@@ -17,7 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         public PlaylistItemBackground(PlaylistItem? playlistItem)
         {
-            Beatmap = playlistItem?.Beatmap.Value;
+            Beatmap = playlistItem?.Beatmap;
         }
 
         [BackgroundDependencyLoader]

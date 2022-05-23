@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
@@ -14,8 +15,10 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
     {
         private readonly APIUserScoreAggregate score;
 
-        public MatchLeaderboardScore(APIUserScoreAggregate score, int? rank, bool allowHighlight = true)
-            : base(score.CreateScoreInfo(), rank, allowHighlight)
+        public override ScoreInfo TooltipContent => null; // match aggregate scores can't show statistics that the custom tooltip displays.
+
+        public MatchLeaderboardScore(APIUserScoreAggregate score, int? rank, bool isOnlineScope = true)
+            : base(score.CreateScoreInfo(), rank, isOnlineScope)
         {
             this.score = score;
         }
@@ -28,8 +31,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected override IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", model.DisplayAccuracy),
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Sync, "Total Attempts", score.TotalAttempts.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, RankingsStrings.StatAccuracy, model.DisplayAccuracy),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Sync, RankingsStrings.StatPlayCount, score.TotalAttempts.ToString()),
             new LeaderboardScoreStatistic(FontAwesome.Solid.Check, "Completed Beatmaps", score.CompletedBeatmaps.ToString()),
         };
     }

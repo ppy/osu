@@ -33,6 +33,8 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl => "http://localhost";
 
+        public int APIVersion => int.Parse(DateTime.Now.ToString("yyyyMMdd"));
+
         public Exception LastLoginError { get; private set; }
 
         /// <summary>

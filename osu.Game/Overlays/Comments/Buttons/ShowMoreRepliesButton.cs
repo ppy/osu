@@ -9,6 +9,7 @@ using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
@@ -38,7 +39,7 @@ namespace osu.Game.Overlays.Comments.Buttons
             {
                 AlwaysPresent = true,
                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                Text = "show more"
+                Text = CommonStrings.ButtonsShowMore
             }
         };
 
