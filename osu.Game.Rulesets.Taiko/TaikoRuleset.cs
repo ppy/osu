@@ -128,6 +128,9 @@ namespace osu.Game.Rulesets.Taiko
                         new MultiMod(new TaikoModDoubleTime(), new TaikoModNightcore()),
                         new TaikoModHidden(),
                         new TaikoModFlashlight(),
+                        new TaikoModAccuracyChallenge(),
+                        new TaikoModHealthChallenge(),
+                        new TaikoModJudgementChallenge(),
                     };
 
                 case ModType.Conversion:
