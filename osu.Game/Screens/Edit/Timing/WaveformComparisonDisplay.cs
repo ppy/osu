@@ -26,8 +26,6 @@ namespace osu.Game.Screens.Edit.Timing
     {
         private const int total_waveforms = 8;
 
-        private OsuSpriteText beatIndexText = null!;
-
         private readonly BindableNumber<double> beatLength = new BindableDouble();
 
         [Resolved]
@@ -41,9 +39,6 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved]
         private EditorClock editorClock { get; set; } = null!;
-
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private TimingControlPoint timingPoint = TimingControlPoint.DEFAULT;
 
@@ -68,15 +63,9 @@ namespace osu.Game.Screens.Edit.Timing
 
             for (int i = 0; i < total_waveforms; i++)
             {
-                AddInternal(new WaveformGraph
+                AddInternal(new WaveformRow
                 {
                     RelativeSizeAxes = Axes.Both,
-                    BaseColour = colourProvider.Colour0,
-                    LowColour = colourProvider.Colour1,
-                    MidColour = colourProvider.Colour2,
-                    HighColour = colourProvider.Colour4,
-                    Waveform = beatmap.Value.Waveform,
-                    Resolution = 1,
                     RelativePositionAxes = Axes.Both,
                     Height = 1f / total_waveforms,
                     Y = (float)i / total_waveforms,
@@ -90,12 +79,6 @@ namespace osu.Game.Screens.Edit.Timing
                 Colour = Color4.White,
                 RelativeSizeAxes = Axes.Y,
                 Width = 3,
-            });
-
-            AddInternal(beatIndexText = new OsuSpriteText
-            {
-                Anchor = Anchor.CentreLeft,
-                Margin = new MarginPadding(4),
             });
 
             selectedGroup.BindValueChanged(_ => updateTimingGroup(), true);
@@ -166,26 +149,63 @@ namespace osu.Game.Screens.Edit.Timing
             float trackLength = (float)beatmap.Value.Track.Length;
             float scale = trackLength / visible_width;
 
-            beatIndexText.Text = beatIndex.ToString();
-
             // Start displaying from before the current beat
             beatIndex -= total_waveforms / 2;
 
-            foreach (var waveform in InternalChildren.OfType<WaveformGraph>())
+            foreach (var row in InternalChildren.OfType<WaveformRow>())
             {
                 // offset to the required beat index.
                 double time = selectedGroupStartTime + beatIndex * timingPoint.BeatLength;
 
                 float offset = (float)(time - visible_width / 2) / trackLength * scale;
 
-                waveform.Alpha = time < selectedGroupStartTime || time > selectedGroupEndTime ? 0.2f : 1;
-                waveform.X = -offset;
-                waveform.Scale = new Vector2(scale, 1);
-
-                beatIndex++;
+                row.Alpha = time < selectedGroupStartTime || time > selectedGroupEndTime ? 0.2f : 1;
+                row.WaveformOffset = -offset;
+                row.WaveformScale = new Vector2(scale, 1);
+                row.BeatIndex = beatIndex++;
             }
 
             lastDisplayedBeatIndex = beatIndex;
+        }
+
+        internal class WaveformRow : CompositeDrawable
+        {
+            private OsuSpriteText beatIndexText = null!;
+            private WaveformGraph waveformGraph = null!;
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [BackgroundDependencyLoader]
+            private void load(IBindable<WorkingBeatmap> beatmap)
+            {
+                InternalChildren = new Drawable[]
+                {
+                    waveformGraph = new WaveformGraph
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RelativePositionAxes = Axes.Both,
+                        Waveform = beatmap.Value.Waveform,
+                        Resolution = 1,
+
+                        BaseColour = colourProvider.Colour0,
+                        LowColour = colourProvider.Colour1,
+                        MidColour = colourProvider.Colour2,
+                        HighColour = colourProvider.Colour4,
+                    },
+                    beatIndexText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Padding = new MarginPadding(5),
+                        Colour = colourProvider.Content2
+                    }
+                };
+            }
+
+            public int BeatIndex { set => beatIndexText.Text = value.ToString(); }
+            public Vector2 WaveformScale { set => waveformGraph.Scale = value; }
+            public float WaveformOffset { set => waveformGraph.X = value; }
         }
     }
 }
