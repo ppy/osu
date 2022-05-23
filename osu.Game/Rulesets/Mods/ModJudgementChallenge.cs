@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Gavel;
         public override string Description => "Fail the beatmap if your judgements go above specified values.";
 
-        [SettingSource("Maximum non-best judgements", "Maximum number of non-best judgements before fail (disregards judgement type).", 1, SettingControlType = typeof(SettingsNumberBox))]
+        [SettingSource("Maximum non-best judgements", "Maximum number of non-best judgements before fail (disregards judgement type).", 1)]
         public Bindable<int?> MaxNonBest { get; } = new Bindable<int?>
         {
             Default = null,
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mods
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
             hitResultCounts[result.Type] += 1;
-            nonBestCount += JudgementIsFlawed(result) ? 1 : 0;
+            nonBestCount += IsImperfectJudgement(result) ? 1 : 0;
 
             if (!AllowChallengeFailureAtHitObject(result.HitObject))
                 return false;

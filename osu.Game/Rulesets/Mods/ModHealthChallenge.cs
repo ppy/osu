@@ -30,13 +30,13 @@ namespace osu.Game.Rulesets.Mods
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
-            if (JudgementIsFlawed(result))
+            if (IsImperfectJudgement(result))
                 playIsPerfect = false;
             if (!AllowChallengeFailureAtHitObject(result.HitObject))
                 return false;
 
             if (CheckingInterval.Value == ChallengeCheckInterval.Continuously)
-                return healthProcessor.Health.Value < MinimumHealth.Value / 100 && JudgementIsFlawed(result);
+                return healthProcessor.Health.Value < MinimumHealth.Value / 100 && IsImperfectJudgement(result);
 
             return healthProcessor.Health.Value < MinimumHealth.Value && !playIsPerfect;
         }

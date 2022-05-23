@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Scoring;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using System.ComponentModel;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -83,15 +84,20 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <param name="judgement">The judgement to check.</param>
         /// <returns>Whether the judgement is the best it can possibly be.</returns>
-        protected bool JudgementIsFlawed(JudgementResult judgement)
+        protected bool IsImperfectJudgement(JudgementResult judgement)
         {
             return !(judgement.Type == judgement.Judgement.MaxResult || judgement.Type == HitResult.LargeTickHit) && judgement.Type.AffectsCombo();
         }
 
         public enum ChallengeCheckInterval
         {
+            [Description(@"Continously")]
             Continuously,
+
+            [Description(@"At break")]
             AtBreak,
+
+            [Description(@"At end")]
             AtEnd,
         }
     }
