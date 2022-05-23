@@ -47,8 +47,9 @@ namespace osu.Game.Overlays
         private bool isDraggingTopBar;
         private float dragStartChatHeight;
 
+        public const float DEFAULT_HEIGHT = 0.4f;
+
         private const int transition_length = 500;
-        private const float default_chat_height = 0.4f;
         private const float top_bar_height = 40;
         private const float side_bar_width = 190;
         private const float chat_bar_height = 60;
@@ -70,7 +71,7 @@ namespace osu.Game.Overlays
 
         public ChatOverlayV2()
         {
-            Height = default_chat_height;
+            Height = DEFAULT_HEIGHT;
 
             Masking = true;
 
@@ -82,6 +83,7 @@ namespace osu.Game.Overlays
             Margin = new MarginPadding { Bottom = -corner_radius };
             Padding = new MarginPadding { Bottom = corner_radius };
 
+            RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
         }
@@ -294,6 +296,10 @@ namespace osu.Game.Overlays
                     });
                 }
             }
+
+            // Mark channel as read when channel switched
+            if (newChannel.Messages.Any())
+                channelManager.MarkChannelAsRead(newChannel);
         }
 
         protected virtual ChatOverlayDrawableChannel CreateDrawableChannel(Channel newChannel) => new ChatOverlayDrawableChannel(newChannel);
