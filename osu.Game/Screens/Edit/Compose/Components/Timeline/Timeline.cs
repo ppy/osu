@@ -163,10 +163,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
+            WaveformVisible.BindValueChanged(_ => updateWaveformOpacity());
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
 
-            WaveformVisible.ValueChanged += _ => updateWaveformOpacity();
-            TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            TicksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
+
             ControlPointsVisible.BindValueChanged(visible =>
             {
                 if (visible.NewValue)
