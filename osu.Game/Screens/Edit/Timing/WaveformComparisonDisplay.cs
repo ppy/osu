@@ -136,14 +136,21 @@ namespace osu.Game.Screens.Edit.Timing
 
             if (!IsHovered)
             {
-                int beatOffset = (int)Math.Floor((editorClock.CurrentTimeAccurate - selectedGroupStartTime) / timingPoint.BeatLength);
+                int currentBeat = (int)Math.Floor((editorClock.CurrentTimeAccurate - selectedGroupStartTime) / timingPoint.BeatLength);
 
-                showFrom(beatOffset);
+                showFrom(currentBeat);
             }
         }
 
         private void showFrom(int beatIndex)
         {
+            if (lastDisplayedBeatIndex == beatIndex)
+                return;
+
+            // Chosen as a pretty usable number across all BPMs.
+            // Optimally we'd want this to scale with the BPM in question, but performing
+            // scaling of the display is both expensive in resampling, and decreases usability
+            // (as it is harder to track the waveform when making realtime adjustments).
             const float visible_width = 300;
 
             float trackLength = (float)beatmap.Value.Track.Length;
