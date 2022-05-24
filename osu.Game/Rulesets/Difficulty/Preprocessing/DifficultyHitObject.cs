@@ -50,11 +50,10 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// <param name="lastObject">The last <see cref="HitObject"/> which occurs before <paramref name="hitObject"/> in the beatmap.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         /// <param name="objects">The list of <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
-        /// <param name="position">The position of this <see cref="DifficultyHitObject"/> in the <see cref="difficultyHitObjects"/> list.</param>
-        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int position)
+        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects)
         {
             difficultyHitObjects = objects;
-            Position = position;
+            Position = objects.Count;
             BaseObject = hitObject;
             LastObject = lastObject;
             DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;

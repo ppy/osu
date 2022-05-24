@@ -75,10 +75,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int position)
-            : base(hitObject, lastObject, clockRate, objects, position)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects)
+            : base(hitObject, lastObject, clockRate, objects)
         {
-            lastLastObject = position > 1 ? (OsuHitObject)Previous(1).BaseObject : null;
+            lastLastObject = Position > 1 ? (OsuHitObject)Previous(1).BaseObject : null;
             this.lastObject = (OsuHitObject)lastObject;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
