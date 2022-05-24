@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -100,7 +101,7 @@ namespace osu.Game.Screens.Edit.Timing
                         Spacing = new Vector2(5),
                         Children = new Drawable[]
                         {
-                            deleteButton = new OsuButton
+                            deleteButton = new RoundedButton
                             {
                                 Text = "-",
                                 Size = new Vector2(30, 30),
@@ -108,7 +109,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
                             },
-                            new OsuButton
+                            new RoundedButton
                             {
                                 Text = "+ Add at current time",
                                 Action = addNew,
