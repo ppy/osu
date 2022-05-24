@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.Timing
     {
         private LabelledTextBox textBox;
 
-        private TriangleButton button;
+        private OsuButton button;
 
         [Resolved]
         protected Bindable<ControlPointGroup> SelectedGroup { get; private set; }
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             Label = "Time"
                         },
-                        button = new TriangleButton
+                        button = new RoundedButton
                         {
                             Text = "Use current time",
                             RelativeSizeAxes = Axes.X,
