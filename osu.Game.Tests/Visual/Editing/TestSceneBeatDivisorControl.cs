@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Editing
         private BindableBeatDivisor bindableBeatDivisor;
 
         private SliderBar<int> tickSliderBar => beatDivisorControl.ChildrenOfType<SliderBar<int>>().Single();
-        private EquilateralTriangle tickMarkerHead => tickSliderBar.ChildrenOfType<EquilateralTriangle>().Single();
+        private Triangle tickMarkerHead => tickSliderBar.ChildrenOfType<Triangle>().Single();
 
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Green);
