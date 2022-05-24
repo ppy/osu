@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Difficulty.Preprocessing
@@ -61,8 +62,8 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             EndTime = hitObject.GetEndTime() / clockRate;
         }
 
-        public DifficultyHitObject Previous(int backwardsIndex) => difficultyHitObjects[Position - (backwardsIndex + 1)];
+        public DifficultyHitObject Previous(int backwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Position - (backwardsIndex + 1));
 
-        public DifficultyHitObject Next(int forwardsIndex) => difficultyHitObjects[Position + (forwardsIndex + 1)];
+        public DifficultyHitObject Next(int forwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Position - (forwardsIndex + 1));
     }
 }
