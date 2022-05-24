@@ -495,26 +495,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 [Resolved]
                 private OverlayColourProvider colourProvider { get; set; }
 
-                private const float size = 10;
-
                 [BackgroundDependencyLoader]
                 private void load()
                 {
                     Colour = colourProvider.Background3;
-                    Anchor = Anchor.TopLeft;
-                    Origin = Anchor.TopCentre;
+                    Anchor = Anchor.BottomLeft;
+                    Origin = Anchor.BottomCentre;
 
-                    Width = size;
-                    RelativeSizeAxes = Axes.Y;
+                    Size = new Vector2(8, 6.5f);
+
                     RelativePositionAxes = Axes.X;
 
                     InternalChildren = new Drawable[]
                     {
-                        new EquilateralTriangle
+                        new Triangle
                         {
-                            Origin = Anchor.BottomCentre,
-                            Anchor = Anchor.BottomCentre,
-                            Height = size,
+                            RelativeSizeAxes = Axes.Both,
                             EdgeSmoothness = new Vector2(1),
                             Colour = Color4.White,
                         }
