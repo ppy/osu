@@ -50,7 +50,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             CatchHitObject lastObject = null;
 
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
-            int index = 0;
 
             // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
             foreach (var hitObject in beatmap.HitObjects
@@ -63,10 +62,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     continue;
 
                 if (lastObject != null)
-                {
-                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth, objects, index));
-                    index++;
-                }
+                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth, objects));
 
                 lastObject = hitObject;
             }
