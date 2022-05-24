@@ -15,8 +15,7 @@ namespace osu.Game.Screens.Edit
 {
     public abstract class EditorScreenWithTimeline : EditorScreen
     {
-        private const float vertical_margins = 10;
-        private const float horizontal_margins = 20;
+        private const float padding = 10;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
@@ -66,7 +65,7 @@ namespace osu.Game.Screens.Edit
                                     Name = "Timeline content",
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
+                                    Padding = new MarginPadding { Horizontal = padding, Top = padding },
                                     Child = new GridContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
