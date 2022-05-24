@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects)
             : base(hitObject, lastObject, clockRate, objects)
         {
-            lastLastObject = Position > 1 ? (OsuHitObject)Previous(1).BaseObject : null;
+            lastLastObject = (OsuHitObject)Previous(1)?.BaseObject;
             this.lastObject = (OsuHitObject)lastObject;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
