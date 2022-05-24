@@ -64,6 +64,6 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
 
         public DifficultyHitObject Previous(int backwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Position - (backwardsIndex + 1));
 
-        public DifficultyHitObject Next(int forwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Position - (forwardsIndex + 1));
+        public DifficultyHitObject Next(int forwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Position + (forwardsIndex + 1));
     }
 }
