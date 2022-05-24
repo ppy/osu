@@ -777,6 +777,7 @@ namespace osu.Game.Screens.Edit
                 if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
                 {
                     screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
+
                     currentScreen.Show();
                     return;
                 }
