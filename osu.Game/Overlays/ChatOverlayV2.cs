@@ -155,13 +155,15 @@ namespace osu.Game.Overlays
             chatHeight.BindValueChanged(height => { Height = height.NewValue; }, true);
 
             currentChannel.BindTo(channelManager.CurrentChannel);
-            currentChannel.BindValueChanged(currentChannelChanged, true);
-
             joinedChannels.BindTo(channelManager.JoinedChannels);
-            joinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
-
             availableChannels.BindTo(channelManager.AvailableChannels);
-            availableChannels.BindCollectionChanged(availableChannelsChanged, true);
+
+            Schedule(() =>
+            {
+                currentChannel.BindValueChanged(currentChannelChanged, true);
+                joinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
+                availableChannels.BindCollectionChanged(availableChannelsChanged, true);
+            });
 
             channelList.OnRequestSelect += channel => channelManager.CurrentChannel.Value = channel;
             channelList.OnRequestLeave += channel => channelManager.LeaveChannel(channel);
