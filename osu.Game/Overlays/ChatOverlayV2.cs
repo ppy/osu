@@ -397,6 +397,8 @@ namespace osu.Game.Overlays
             int currentIndex = overlayChannels.IndexOf(currentChannel.Value);
 
             currentChannel.Value = overlayChannels[(currentIndex + direction + overlayChannels.Count) % overlayChannels.Count];
+
+            channelList.ScrollChannelIntoView(currentChannel.Value);
         }
 
         private IEnumerable<Channel> filterToChatChannels(IEnumerable channels)
