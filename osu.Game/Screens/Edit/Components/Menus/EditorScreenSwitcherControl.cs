@@ -13,9 +13,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.Menus
 {
-    public class ScreenSelectionTabControl : OsuTabControl<EditorScreenMode>
+    public class EditorScreenSwitcherControl : OsuTabControl<EditorScreenMode>
     {
-        public ScreenSelectionTabControl()
+        public EditorScreenSwitcherControl()
         {
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
