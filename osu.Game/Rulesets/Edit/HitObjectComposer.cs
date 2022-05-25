@@ -114,9 +114,9 @@ namespace osu.Game.Rulesets.Edit
                                               .WithChild(BlueprintContainer = CreateBlueprintContainer())
                     }
                 },
-                new ExpandingToolboxContainer(80, 200)
+                new ExpandingToolboxContainer(90, 200)
                 {
-                    Padding = new MarginPadding { Left = 10 },
+                    Padding = new MarginPadding(10),
                     Children = new Drawable[]
                     {
                         new EditorToolboxGroup("toolbox (1-9)")
