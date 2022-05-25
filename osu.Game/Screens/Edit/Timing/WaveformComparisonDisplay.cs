@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit.Timing
         private double selectedGroupStartTime;
         private double selectedGroupEndTime;
 
-        private readonly BindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
+        private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
         public WaveformComparisonDisplay()
         {
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             selectedGroup.BindValueChanged(_ => updateTimingGroup(), true);
 
-            ((IBindableList<ControlPointGroup>)controlPointGroups).BindTo(editorBeatmap.ControlPointInfo.Groups);
+            controlPointGroups.BindTo(editorBeatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((_, __) => updateTimingGroup());
 
             beatLength.BindValueChanged(_ => showFrom(lastDisplayedBeatIndex), true);
