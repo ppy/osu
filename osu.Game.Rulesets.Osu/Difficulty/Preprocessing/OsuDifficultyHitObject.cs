@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double TravelDistance { get; private set; }
 
         /// <summary>
-        /// The time taken to travel through <see cref="TravelDistance"/>, with a minimum value of 25ms for a non-zero distance.
+        /// The time taken to travel through <see cref="TravelDistance"/>, with a minimum value of 25ms for <see cref="Slider"/> objects.
         /// </summary>
         public double TravelTime { get; private set; }
 
