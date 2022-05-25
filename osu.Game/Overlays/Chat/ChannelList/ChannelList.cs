@@ -57,12 +57,14 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            publicChannelFlow = new ChannelListItemFlow("CHANNELS"),
+                            new ChannelListLabel("CHANNELS"),
+                            publicChannelFlow = new ChannelListItemFlow(),
                             selector = new ChannelListItem(ChannelListingChannel)
                             {
                                 Margin = new MarginPadding { Bottom = 10 },
                             },
-                            privateChannelFlow = new ChannelListItemFlow("DIRECT MESSAGES"),
+                            new ChannelListLabel("DIRECT MESSAGES"),
+                            privateChannelFlow = new ChannelListItemFlow(),
                         },
                     },
                 },
@@ -105,7 +107,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             return channelMap[channel];
         }
 
-        public void ScrollChannelIntoView(Channel channel) => scroll.ScrollIntoView(this.GetItem(channel));
+        public void ScrollChannelIntoView(Channel channel) => scroll.ScrollIntoView(GetItem(channel));
 
         private ChannelListItemFlow getFlowForChannel(Channel channel)
         {
@@ -118,28 +120,29 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     return privateChannelFlow;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    return publicChannelFlow;
             }
         }
 
-        private class ChannelListItemFlow : FillFlowContainer
+        private class ChannelListLabel : OsuSpriteText
         {
-            public IEnumerable<Channel> Channels => Children.Where(c => c is ChannelListItem)
-                                                            .Cast<ChannelListItem>()
-                                                            .Select(c => c.Channel);
+            public ChannelListLabel(string label)
+            {
+                Text = label;
+                Margin = new MarginPadding { Left = 18, Bottom = 5 };
+                Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold);
+            }
+        }
 
-            public ChannelListItemFlow(string label)
+        private class ChannelListItemFlow : FillFlowContainer<ChannelListItem>
+        {
+            public IEnumerable<Channel> Channels => Children.Select(c => c.Channel);
+
+            public ChannelListItemFlow()
             {
                 Direction = FillDirection.Vertical;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-
-                Add(new OsuSpriteText
-                {
-                    Text = label,
-                    Margin = new MarginPadding { Left = 18, Bottom = 5 },
-                    Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
-                });
             }
         }
     }
