@@ -389,7 +389,7 @@ namespace osu.Game.Overlays
 
         private void cycleChannel(int direction)
         {
-            List<Channel> overlayChannels = filterToChatChannels(channelManager.JoinedChannels).ToList();
+            List<Channel> overlayChannels = channelList.Channels.ToList();
 
             if (overlayChannels.Count < 2)
                 return;
@@ -399,6 +399,7 @@ namespace osu.Game.Overlays
             currentChannel.Value = overlayChannels[(currentIndex + direction + overlayChannels.Count) % overlayChannels.Count];
         }
 
-        private IEnumerable<Channel> filterToChatChannels(IEnumerable channels) => channels.Cast<Channel>().Where(c => c.Type != ChannelType.System);
+        private IEnumerable<Channel> filterToChatChannels(IEnumerable channels)
+            => channels.Cast<Channel>().Where(c => c.Type == ChannelType.PM || c.Type == ChannelType.Public);
     }
 }

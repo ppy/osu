@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -21,6 +22,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
     {
         public Action<Channel>? OnRequestSelect;
         public Action<Channel>? OnRequestLeave;
+
+        public IEnumerable<Channel> Channels => publicChannelFlow.Channels.Concat(privateChannelFlow.Channels);
 
         public readonly ChannelListing.ChannelListingChannel ChannelListingChannel = new ChannelListing.ChannelListingChannel();
 
@@ -118,6 +121,10 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private class ChannelListItemFlow : FillFlowContainer
         {
+            public IEnumerable<Channel> Channels => Children.Where(c => c is ChannelListItem)
+                                                            .Cast<ChannelListItem>()
+                                                            .Select(c => c.Channel);
+
             public ChannelListItemFlow(string label)
             {
                 Direction = FillDirection.Vertical;
