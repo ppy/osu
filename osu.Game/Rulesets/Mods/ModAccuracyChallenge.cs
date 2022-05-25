@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Mods
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
+            // accuracy calculation logic taken from `ScoreProcessor`. should be updated here if the formula ever changes.
             if (!result.Type.IsScorable() || result.Type.IsBonus())
                 return false;
 
