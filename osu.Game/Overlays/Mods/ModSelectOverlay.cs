@@ -242,7 +242,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Select all visible mods in all columns.
         /// </summary>
-        protected void SelectAll()
+        public void SelectAll()
         {
             foreach (var column in columnFlow.Columns)
                 column.SelectAll();
