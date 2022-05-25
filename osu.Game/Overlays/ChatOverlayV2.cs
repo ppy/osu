@@ -215,8 +215,12 @@ namespace osu.Game.Overlays
                     channelManager.JoinLastClosedChannel();
                     return true;
 
+                case PlatformAction.DocumentPrevious:
+                    cycleChannel(-1);
+                    return true;
+
                 case PlatformAction.DocumentNext:
-                    cycleChannel();
+                    cycleChannel(1);
                     return true;
 
                 default:
@@ -372,7 +376,6 @@ namespace osu.Game.Overlays
         private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
             => channelListing.UpdateAvailableChannels(channelManager.AvailableChannels);
 
-
         private void handleChatMessage(string message)
         {
             if (string.IsNullOrWhiteSpace(message))
@@ -384,21 +387,16 @@ namespace osu.Game.Overlays
                 channelManager.PostMessage(message);
         }
 
-        private void cycleChannel()
+        private void cycleChannel(int direction)
         {
-            List<Channel> overlayChannels = filterChannels(channelManager.JoinedChannels).ToList();
+            List<Channel> overlayChannels = filterToChatChannels(channelManager.JoinedChannels).ToList();
 
             if (overlayChannels.Count < 2)
                 return;
 
-            int currentIdx = overlayChannels.IndexOf(currentChannel.Value);
-            int nextIdx = currentIdx + 1;
+            int currentIndex = overlayChannels.IndexOf(currentChannel.Value);
 
-            // Cycle the list when reaching the end
-            if (nextIdx > overlayChannels.Count - 1)
-                nextIdx = 0;
-
-            currentChannel.Value = overlayChannels[nextIdx];
+            currentChannel.Value = overlayChannels[(currentIndex + direction + overlayChannels.Count) % overlayChannels.Count];
         }
 
         private IEnumerable<Channel> filterToChatChannels(IEnumerable channels) => channels.Cast<Channel>().Where(c => c.Type != ChannelType.System);
