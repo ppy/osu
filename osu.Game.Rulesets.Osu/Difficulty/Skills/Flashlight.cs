@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
@@ -89,13 +90,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double sliderBonus = 0.0;
 
-            if (osuCurrent.TravelTime != 0)
+            if (osuCurrent.BaseObject is Slider)
             {
+                Debug.Assert(osuCurrent.TravelTime > 0);
+
                 // Reward sliders based on velocity.
-                double normalisedTravelDistance = osuCurrent.TravelDistance / scalingFactor;
-                sliderBonus = Math.Pow(Math.Max(0.0, (normalisedTravelDistance) / osuCurrent.TravelTime - min_velocity), 0.5);
+                sliderBonus = Math.Pow(Math.Max(0.0, osuCurrent.TravelDistance / osuCurrent.TravelTime - min_velocity), 0.5);
+
                 // Longer sliders require more memorisation.
-                sliderBonus *= normalisedTravelDistance;
+                sliderBonus *= osuCurrent.TravelDistance;
             }
 
             result += sliderBonus * slider_multiplier;
