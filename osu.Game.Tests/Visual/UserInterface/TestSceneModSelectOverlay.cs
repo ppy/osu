@@ -435,8 +435,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             createScreen();
             changeRuleset(0);
 
+            AddAssert("deselect all button disabled", () => !this.ChildrenOfType<ShearedButton>().Last().Enabled.Value);
+
             AddStep("select DT + HD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden() });
             AddAssert("DT + HD selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
+            AddAssert("deselect all button enabled", () => this.ChildrenOfType<ShearedButton>().Last().Enabled.Value);
 
             AddStep("click deselect all button", () =>
             {
@@ -444,6 +447,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("all mods deselected", () => !SelectedMods.Value.Any());
+            AddAssert("deselect all button disabled", () => !this.ChildrenOfType<ShearedButton>().Last().Enabled.Value);
         }
 
         [Test]
