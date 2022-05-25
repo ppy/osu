@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Mods
 {
     public abstract class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler
     {
-        protected const int BUTTON_WIDTH = 200;
+        public const int BUTTON_WIDTH = 200;
 
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -76,11 +76,7 @@ namespace osu.Game.Overlays.Mods
                 };
             }
 
-            yield return deselectAllButton = new ShearedButton(BUTTON_WIDTH)
-            {
-                Text = CommonStrings.DeselectAll,
-                Action = DeselectAll
-            };
+            yield return new DeselectAllModsButton(this);
         }
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
@@ -98,7 +94,6 @@ namespace osu.Game.Overlays.Mods
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
         private ShearedToggleButton? customisationButton;
-        private ShearedButton? deselectAllButton;
 
         protected ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
@@ -256,7 +251,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Deselect all visible mods in all columns.
         /// </summary>
-        protected void DeselectAll()
+        public void DeselectAll()
         {
             foreach (var column in columnFlow.Columns)
                 column.DeselectAll();
@@ -514,10 +509,6 @@ namespace osu.Game.Overlays.Mods
                     hideOverlay(true);
                     return true;
                 }
-
-                case GlobalAction.DeselectAllMods:
-                    deselectAllButton?.TriggerClick();
-                    return true;
             }
 
             return base.OnPressed(e);
