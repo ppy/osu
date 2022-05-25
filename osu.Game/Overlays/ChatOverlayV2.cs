@@ -56,6 +56,13 @@ namespace osu.Game.Overlays
         private const float side_bar_width = 190;
         private const float chat_bar_height = 60;
 
+        private readonly ChannelType[] excluded_channel_types = new[]
+        {
+            ChannelType.Multiplayer,
+            ChannelType.Spectator,
+            ChannelType.Temporary,
+        };
+
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
@@ -402,6 +409,6 @@ namespace osu.Game.Overlays
         }
 
         private IEnumerable<Channel> filterToChatChannels(IEnumerable channels)
-            => channels.Cast<Channel>().Where(c => c.Type == ChannelType.PM || c.Type == ChannelType.Public);
+            => channels.Cast<Channel>().Where(c => !excluded_channel_types.Contains(c.Type));
     }
 }
