@@ -12,10 +12,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
     public class OsuDifficultyHitObject : DifficultyHitObject
     {
-        private const int normalised_radius = 50; // Change radius to 50 to make 100 the diameter. Easier for mental maths.
+        /// <summary>
+        /// A distance by which all distances should be scaled in order to assume a uniform circle size.
+        /// </summary>
+        public const int NORMALISED_RADIUS = 50; // Change radius to 50 to make 100 the diameter. Easier for mental maths.
+
         private const int min_delta_time = 25;
-        private const float maximum_slider_radius = normalised_radius * 2.4f;
-        private const float assumed_slider_radius = normalised_radius * 1.8f;
+        private const float maximum_slider_radius = NORMALISED_RADIUS * 2.4f;
+        private const float assumed_slider_radius = NORMALISED_RADIUS * 1.8f;
 
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 
@@ -129,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 return;
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
-            float scalingFactor = normalised_radius / (float)BaseObject.Radius;
+            float scalingFactor = NORMALISED_RADIUS / (float)BaseObject.Radius;
 
             if (BaseObject.Radius < 30)
             {
@@ -203,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             slider.LazyEndPosition = slider.StackedPosition + slider.Path.PositionAt(endTimeMin); // temporary lazy end position until a real result can be derived.
             var currCursorPosition = slider.StackedPosition;
-            double scalingFactor = normalised_radius / slider.Radius; // lazySliderDistance is coded to be sensitive to scaling, this makes the maths easier with the thresholds being used.
+            double scalingFactor = NORMALISED_RADIUS / slider.Radius; // lazySliderDistance is coded to be sensitive to scaling, this makes the maths easier with the thresholds being used.
 
             for (int i = 1; i < slider.NestedHitObjects.Count; i++)
             {
@@ -231,7 +235,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 else if (currMovementObj is SliderRepeat)
                 {
                     // For a slider repeat, assume a tighter movement threshold to better assess repeat sliders.
-                    requiredMovement = normalised_radius;
+                    requiredMovement = NORMALISED_RADIUS;
                 }
 
                 if (currMovementLength > requiredMovement)
