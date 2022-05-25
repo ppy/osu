@@ -29,6 +29,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
+        private OsuScrollContainer scroll = null!;
         private ChannelListItemFlow publicChannelFlow = null!;
         private ChannelListItemFlow privateChannelFlow = null!;
         private ChannelListItem selector = null!;
@@ -43,7 +44,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background6,
                 },
-                new OsuScrollContainer
+                scroll = new OsuScrollContainer
                 {
                     Padding = new MarginPadding { Vertical = 7 },
                     RelativeSizeAxes = Axes.Both,
@@ -103,6 +104,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
             return channelMap[channel];
         }
+
+        public void ScrollChannelIntoView(Channel channel) => scroll.ScrollIntoView(this.GetItem(channel));
 
         private ChannelListItemFlow getFlowForChannel(Channel channel)
         {
