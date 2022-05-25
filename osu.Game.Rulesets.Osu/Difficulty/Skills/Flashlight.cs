@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuCurrent = (OsuDifficultyHitObject)current;
             var osuHitObject = (OsuHitObject)(osuCurrent.BaseObject);
 
-            double scalingFactor = 52.0 / osuHitObject.Radius;
+            double scalingFactor = OsuDifficultyHitObject.NORMALISED_RADIUS / osuHitObject.Radius;
             double smallDistNerf = 1.0;
             double cumulativeStrainTime = 0.0;
 
@@ -70,8 +70,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     if (i == 0)
                         smallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
 
+                    // Invert the scaling factor to determine the true jump distance independent of circle size.
+                    double pixelJumpDistance = osuCurrent.LazyJumpDistance / scalingFactor;
+
                     // We also want to nerf stacks so that only the first object of the stack is accounted for.
-                    double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
+                    double stackNerf = Math.Min(1.0, pixelJumpDistance / 25.0);
 
                     // Bonus based on how visible the object is.
                     double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.OpacityAt(currentHitObject.StartTime, hidden));
@@ -94,11 +97,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 Debug.Assert(osuCurrent.TravelTime > 0);
 
+                // Invert the scaling factor to determine the true travel distance independent of circle size.
+                double pixelTravelDistance = osuCurrent.TravelDistance / scalingFactor;
+
                 // Reward sliders based on velocity.
-                sliderBonus = Math.Pow(Math.Max(0.0, osuCurrent.TravelDistance / osuCurrent.TravelTime - min_velocity), 0.5);
+                sliderBonus = Math.Pow(Math.Max(0.0, pixelTravelDistance / osuCurrent.TravelTime - min_velocity), 0.5);
 
                 // Longer sliders require more memorisation.
-                sliderBonus *= osuCurrent.TravelDistance;
+                sliderBonus *= pixelTravelDistance;
             }
 
             result += sliderBonus * slider_multiplier;
