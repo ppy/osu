@@ -73,12 +73,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createFreeModSelect();
 
+            AddAssert("select all button enabled", () => this.ChildrenOfType<ShearedButton>().ElementAt(1).Enabled.Value);
+
             AddStep("click select all button", () =>
             {
                 InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().ElementAt(1));
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("all mods selected", assertAllAvailableModsSelected);
+            AddAssert("select all button disabled", () => !this.ChildrenOfType<ShearedButton>().ElementAt(1).Enabled.Value);
 
             AddStep("click deselect all button", () =>
             {
@@ -86,6 +89,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("all mods deselected", () => !freeModSelectOverlay.SelectedMods.Value.Any());
+            AddAssert("select all button enabled", () => this.ChildrenOfType<ShearedButton>().ElementAt(1).Enabled.Value);
         }
 
         private void createFreeModSelect()
