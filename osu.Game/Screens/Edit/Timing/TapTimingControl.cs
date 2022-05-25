@@ -24,8 +24,8 @@ namespace osu.Game.Screens.Edit.Timing
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
-            Height = 200;
             RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
 
             CornerRadius = LabelledDrawable<Drawable>.CORNER_RADIUS;
             Masking = true;
@@ -39,20 +39,44 @@ namespace osu.Game.Screens.Edit.Timing
                 },
                 new GridContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     RowDimensions = new[]
                     {
-                        new Dimension(),
+                        new Dimension(GridSizeMode.Absolute, 200),
                         new Dimension(GridSizeMode.Absolute, 60),
                     },
                     Content = new[]
                     {
                         new Drawable[]
                         {
-                            new MetronomeDisplay
+                            new Container
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    new GridContainer
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        ColumnDimensions = new[]
+                                        {
+                                            new Dimension(GridSizeMode.AutoSize),
+                                            new Dimension()
+                                        },
+                                        Content = new[]
+                                        {
+                                            new Drawable[]
+                                            {
+                                                new MetronomeDisplay
+                                                {
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                },
+                                                new WaveformComparisonDisplay(),
+                                            }
+                                        },
+                                    }
+                                }
                             }
                         },
                         new Drawable[]
