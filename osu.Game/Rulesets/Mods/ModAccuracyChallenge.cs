@@ -21,12 +21,13 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Calculator;
         public override ModType Type => ModType.DifficultyIncrease;
         public override double ScoreMultiplier => 1.0;
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModEasyWithExtraLives)).Append(typeof(ModPerfect)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModEasyWithExtraLives), typeof(ModPerfect) }).ToArray();
+        public override bool RequiresConfiguration => false;
 
         [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
         {
-            MinValue = 0,
+            MinValue = 0.01,
             MaxValue = 1,
             Precision = 0.01,
             Default = 0.9,
