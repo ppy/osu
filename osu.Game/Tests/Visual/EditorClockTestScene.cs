@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 
 namespace osu.Game.Tests.Visual
@@ -19,6 +20,10 @@ namespace osu.Game.Tests.Visual
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
+        [Cached(typeof(EditorBeatmap))]
+        [Cached(typeof(IBeatSnapProvider))]
+        private readonly EditorBeatmap editorBeatmap;
+
         protected readonly BindableBeatDivisor BeatDivisor = new BindableBeatDivisor();
         protected new readonly EditorClock Clock;
 
@@ -26,7 +31,9 @@ namespace osu.Game.Tests.Visual
 
         protected EditorClockTestScene()
         {
-            Clock = new EditorClock(new Beatmap(), BeatDivisor) { IsCoupled = false };
+            editorBeatmap = new EditorBeatmap(new Beatmap());
+
+            Clock = new EditorClock(editorBeatmap, BeatDivisor) { IsCoupled = false };
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
