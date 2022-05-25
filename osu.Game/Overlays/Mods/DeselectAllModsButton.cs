@@ -15,11 +15,27 @@ namespace osu.Game.Overlays.Mods
 {
     public class DeselectAllModsButton : ShearedButton, IKeyBindingHandler<GlobalAction>
     {
+        private readonly Bindable<IReadOnlyList<Mod>> selectedMods = new Bindable<IReadOnlyList<Mod>>();
+
         public DeselectAllModsButton(ModSelectOverlay modSelectOverlay)
             : base(ModSelectOverlay.BUTTON_WIDTH)
         {
             Text = CommonStrings.DeselectAll;
             Action = modSelectOverlay.DeselectAll;
+
+            selectedMods.BindTo(modSelectOverlay.SelectedMods);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            selectedMods.BindValueChanged(_ => updateEnabledState(), true);
+        }
+
+        private void updateEnabledState()
+        {
+            Enabled.Value = selectedMods.Value.Any();
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
