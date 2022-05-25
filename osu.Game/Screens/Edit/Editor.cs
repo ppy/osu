@@ -278,7 +278,7 @@ namespace osu.Game.Screens.Edit
                                     }
                                 }
                             },
-                            new ScreenSelectionTabControl
+                            new EditorScreenSwitcherControl
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
