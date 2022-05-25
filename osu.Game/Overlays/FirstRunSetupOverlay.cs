@@ -76,10 +76,10 @@ namespace osu.Game.Overlays
         private void load(OsuColour colours, LegacyImportManager? legacyImportManager)
         {
             steps.Add(typeof(ScreenWelcome));
+            steps.Add(typeof(ScreenUIScale));
             steps.Add(typeof(ScreenBeatmaps));
             if (legacyImportManager?.SupportsImportFromStable == true)
                 steps.Add(typeof(ScreenImportFromStable));
-            steps.Add(typeof(ScreenUIScale));
             steps.Add(typeof(ScreenBehaviour));
 
             Header.Title = FirstRunSetupOverlayStrings.FirstRunSetupTitle;
