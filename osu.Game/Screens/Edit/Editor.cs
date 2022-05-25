@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Edit
         public readonly EditorClipboard Clipboard = new EditorClipboard();
 
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         public Editor(EditorLoader loader = null)
         {
@@ -777,6 +777,7 @@ namespace osu.Game.Screens.Edit
                 if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
                 {
                     screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
+
                     currentScreen.Show();
                     return;
                 }
