@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class TimingScreen : EditorRoundedScreen
+    public class TimingScreen : EditorScreenWithTimeline
     {
         [Cached]
         private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
@@ -26,27 +26,23 @@ namespace osu.Game.Screens.Edit.Timing
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override Drawable CreateMainContent() => new GridContainer
         {
-            Add(new GridContainer
+            RelativeSizeAxes = Axes.Both,
+            ColumnDimensions = new[]
             {
-                RelativeSizeAxes = Axes.Both,
-                ColumnDimensions = new[]
+                new Dimension(),
+                new Dimension(GridSizeMode.Absolute, 350),
+            },
+            Content = new[]
+            {
+                new Drawable[]
                 {
-                    new Dimension(),
-                    new Dimension(GridSizeMode.Absolute, 350),
+                    new ControlPointList(),
+                    new ControlPointSettings(),
                 },
-                Content = new[]
-                {
-                    new Drawable[]
-                    {
-                        new ControlPointList(),
-                        new ControlPointSettings(),
-                    },
-                }
-            });
-        }
+            }
+        };
 
         public class ControlPointList : CompositeDrawable
         {
@@ -77,12 +73,12 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     new Box
                     {
-                        Colour = colours.Background3,
+                        Colour = colours.Background4,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new Box
                     {
-                        Colour = colours.Background2,
+                        Colour = colours.Background3,
                         RelativeSizeAxes = Axes.Y,
                         Width = ControlPointTable.TIMING_COLUMN_WIDTH + margins,
                     },

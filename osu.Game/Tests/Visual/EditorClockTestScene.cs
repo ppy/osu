@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit;
 
 namespace osu.Game.Tests.Visual
@@ -15,6 +16,9 @@ namespace osu.Game.Tests.Visual
     /// </summary>
     public abstract class EditorClockTestScene : OsuManualInputManagerTestScene
     {
+        [Cached]
+        private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         protected readonly BindableBeatDivisor BeatDivisor = new BindableBeatDivisor();
         protected new readonly EditorClock Clock;
 
