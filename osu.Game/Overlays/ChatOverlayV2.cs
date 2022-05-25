@@ -342,7 +342,7 @@ namespace osu.Game.Overlays
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    IEnumerable<Channel> newChannels = filterChannels(args.NewItems);
+                    IEnumerable<Channel> newChannels = filterToChatChannels(args.NewItems);
 
                     foreach (var channel in newChannels)
                         channelList.AddChannel(channel);
@@ -350,7 +350,7 @@ namespace osu.Game.Overlays
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    IEnumerable<Channel> leftChannels = filterChannels(args.OldItems);
+                    IEnumerable<Channel> leftChannels = filterToChatChannels(args.OldItems);
 
                     foreach (var channel in leftChannels)
                     {
@@ -372,8 +372,6 @@ namespace osu.Game.Overlays
         private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
             => channelListing.UpdateAvailableChannels(channelManager.AvailableChannels);
 
-        private IEnumerable<Channel> filterChannels(IEnumerable channels)
-            => channels.Cast<Channel>().Where(c => c.Type == ChannelType.Public || c.Type == ChannelType.PM);
 
         private void handleChatMessage(string message)
         {
@@ -402,5 +400,7 @@ namespace osu.Game.Overlays
 
             currentChannel.Value = overlayChannels[nextIdx];
         }
+
+        private IEnumerable<Channel> filterToChatChannels(IEnumerable channels) => channels.Cast<Channel>().Where(c => c.Type != ChannelType.System);
     }
 }
