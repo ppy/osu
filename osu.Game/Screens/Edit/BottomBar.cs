@@ -50,22 +50,9 @@ namespace osu.Game.Screens.Edit
                         {
                             new Drawable[]
                             {
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Right = 10 },
-                                    Child = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
-                                },
-                                new SummaryTimeline
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Left = 10 },
-                                    Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
-                                },
+                                new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                                new SummaryTimeline { RelativeSizeAxes = Axes.Both },
+                                new PlaybackControl { RelativeSizeAxes = Axes.Both },
                                 TestGameplayButton = new TestGameplayButton
                                 {
                                     RelativeSizeAxes = Axes.Both,
