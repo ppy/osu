@@ -6,18 +6,22 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Components
 {
     public class TimeInfoContainer : BottomBarContainer
     {
-        private readonly OsuSpriteText trackTimer;
+        private OsuSpriteText trackTimer;
 
         [Resolved]
         private EditorClock editorClock { get; set; }
 
-        public TimeInfoContainer()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
+            Background.Colour = colourProvider.Background5;
+
             Children = new Drawable[]
             {
                 trackTimer = new OsuSpriteText
