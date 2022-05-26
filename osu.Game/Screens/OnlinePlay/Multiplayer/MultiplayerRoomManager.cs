@@ -4,7 +4,6 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -53,20 +52,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             Debug.Assert(room.RoomID.Value != null);
 
-            multiplayerClient.JoinRoom(room, password).ContinueWith(t =>
+            multiplayerClient.JoinRoom(room, password).FireAndForget(() =>
             {
-                if (t.IsCompletedSuccessfully)
-                    Schedule(() => onSuccess?.Invoke(room));
-                else if (t.IsFaulted)
-                {
-                    const string message = "Failed to join multiplayer room.";
+                Schedule(() => onSuccess?.Invoke(room));
+            }, exception =>
+            {
+                const string message = "Failed to join multiplayer room.";
 
-                    if (t.Exception != null)
-                        Logger.Error(t.Exception, message);
+                if (exception != null)
+                    Logger.Error(exception, message);
 
-                    PartRoom();
-                    Schedule(() => onError?.Invoke(t.Exception?.AsSingular().Message ?? message));
-                }
+                PartRoom();
+                Schedule(() => onError?.Invoke(exception?.Message ?? message));
             });
         }
     }
