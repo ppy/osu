@@ -20,6 +20,8 @@ namespace osu.Game.Tests.Visual
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         protected readonly BindableBeatDivisor BeatDivisor = new BindableBeatDivisor();
+
+        [Cached]
         protected new readonly EditorClock Clock;
 
         protected virtual bool ScrollUsingMouseWheel => true;
