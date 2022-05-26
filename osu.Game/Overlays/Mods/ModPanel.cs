@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Mods
             Content.Masking = true;
             Content.CornerRadius = CORNER_RADIUS;
             Content.BorderThickness = 2;
-            Content.Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
+            Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
 
             Children = new Drawable[]
             {
