@@ -3,7 +3,6 @@
 
 #nullable enable
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -55,13 +54,6 @@ namespace osu.Game.Overlays
         private const float top_bar_height = 40;
         private const float side_bar_width = 190;
         private const float chat_bar_height = 60;
-
-        private readonly ChannelType[] excludedChannelTypes =
-        {
-            ChannelType.Multiplayer,
-            ChannelType.Spectator,
-            ChannelType.Temporary,
-        };
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -353,7 +345,7 @@ namespace osu.Game.Overlays
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    IEnumerable<Channel> newChannels = filterToChatChannels(args.NewItems);
+                    IEnumerable<Channel> newChannels = args.NewItems.OfType<Channel>().Where(isChatChannel);
 
                     foreach (var channel in newChannels)
                         channelList.AddChannel(channel);
@@ -361,7 +353,7 @@ namespace osu.Game.Overlays
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    IEnumerable<Channel> leftChannels = filterToChatChannels(args.OldItems);
+                    IEnumerable<Channel> leftChannels = args.OldItems.OfType<Channel>().Where(isChatChannel);
 
                     foreach (var channel in leftChannels)
                     {
@@ -408,7 +400,21 @@ namespace osu.Game.Overlays
             channelList.ScrollChannelIntoView(currentChannel.Value);
         }
 
-        private IEnumerable<Channel> filterToChatChannels(IEnumerable channels)
-            => channels.Cast<Channel>().Where(c => !excludedChannelTypes.Contains(c.Type));
+        /// <summary>
+        /// Whether a channel should be displayed in this overlay, based on its type.
+        /// </summary>
+        private static bool isChatChannel(Channel channel)
+        {
+            switch (channel.Type)
+            {
+                case ChannelType.Multiplayer:
+                case ChannelType.Spectator:
+                case ChannelType.Temporary:
+                    return false;
+
+                default:
+                    return true;
+            }
+        }
     }
 }
