@@ -219,9 +219,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double flashlightValue = Math.Pow(rawFlashlight, 2.0) * 25.0;
 
-            if (score.Mods.Any(h => h is OsuModHidden))
-                flashlightValue *= 1.3;
-
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
                 flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));

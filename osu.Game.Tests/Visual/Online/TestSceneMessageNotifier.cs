@@ -200,7 +200,7 @@ namespace osu.Game.Tests.Visual.Online
             [Cached]
             public ChannelManager ChannelManager { get; } = new ChannelManager();
 
-            [Cached]
+            [Cached(typeof(INotificationOverlay))]
             public NotificationOverlay NotificationOverlay { get; } = new NotificationOverlay
             {
                 Anchor = Anchor.TopRight,
@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Visual.Online
             };
 
             [Cached]
-            public ChatOverlay ChatOverlay { get; } = new ChatOverlay();
+            public ChatOverlayV2 ChatOverlay { get; } = new ChatOverlayV2();
 
             private readonly MessageNotifier messageNotifier = new MessageNotifier();
 

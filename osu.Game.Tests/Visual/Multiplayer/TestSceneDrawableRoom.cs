@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -34,9 +35,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestMultipleStatuses()
         {
+            FillFlowContainer rooms = null;
+
             AddStep("create rooms", () =>
             {
-                Child = new FillFlowContainer
+                Child = rooms = new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -124,6 +127,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }
                 };
             });
+
+            AddUntilStep("wait for panel load", () => rooms.Count == 5);
+            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Currently playing", StringComparison.Ordinal)) == 2);
+            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)) == 3);
         }
 
         [Test]

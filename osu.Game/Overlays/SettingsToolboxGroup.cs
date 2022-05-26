@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.EnumExtensions;
@@ -35,13 +34,12 @@ namespace osu.Game.Overlays
         private readonly Cached headerTextVisibilityCache = new Cached();
 
         private readonly FillFlowContainer content;
-        private readonly IconButton button;
 
         public BindableBool Expanded { get; } = new BindableBool(true);
 
-        private Color4 expandedColour;
-
         private readonly OsuSpriteText headerText;
+
+        private readonly Container headerContent;
 
         /// <summary>
         /// Create a new instance.
@@ -71,7 +69,7 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new Container
+                        headerContent = new Container
                         {
                             Name = @"Header",
                             Origin = Anchor.TopCentre,
@@ -88,7 +86,7 @@ namespace osu.Game.Overlays
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Padding = new MarginPadding { Left = 10, Right = 30 },
                                 },
-                                button = new IconButton
+                                new IconButton
                                 {
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.CentreRight,
@@ -117,12 +115,25 @@ namespace osu.Game.Overlays
             };
         }
 
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        protected override void LoadComplete()
         {
-            if (invalidation.HasFlagFast(Invalidation.DrawSize))
-                headerTextVisibilityCache.Invalidate();
+            base.LoadComplete();
 
-            return base.OnInvalidate(invalidation, source);
+            Expanded.BindValueChanged(updateExpandedState, true);
+
+            this.Delay(600).Schedule(updateFadeState);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateFadeState();
+            return false;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateFadeState();
+            base.OnHoverLost(e);
         }
 
         protected override void Update()
@@ -135,72 +146,34 @@ namespace osu.Game.Overlays
                 headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
         }
 
-        [Resolved(canBeNull: true)]
-        private IExpandingContainer expandingContainer { get; set; }
-
-        private bool expandedByContainer;
-
-        protected override void LoadComplete()
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            base.LoadComplete();
+            if (invalidation.HasFlagFast(Invalidation.DrawSize))
+                headerTextVisibilityCache.Invalidate();
 
-            expandingContainer?.Expanded.BindValueChanged(containerExpanded =>
+            return base.OnInvalidate(invalidation, source);
+        }
+
+        private void updateExpandedState(ValueChangedEvent<bool> expanded)
+        {
+            // clearing transforms is necessary to avoid a previous height transform
+            // potentially continuing to get processed while content has changed to autosize.
+            content.ClearTransforms();
+
+            if (expanded.NewValue)
+                content.AutoSizeAxes = Axes.Y;
+            else
             {
-                if (containerExpanded.NewValue && !Expanded.Value)
-                {
-                    Expanded.Value = true;
-                    expandedByContainer = true;
-                }
-                else if (!containerExpanded.NewValue && expandedByContainer)
-                {
-                    Expanded.Value = false;
-                    expandedByContainer = false;
-                }
+                content.AutoSizeAxes = Axes.None;
+                content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+            }
 
-                updateActiveState();
-            }, true);
-
-            Expanded.BindValueChanged(v =>
-            {
-                // clearing transforms can break autosizing, see: https://github.com/ppy/osu-framework/issues/5064
-                if (v.NewValue != v.OldValue)
-                    content.ClearTransforms();
-
-                if (v.NewValue)
-                    content.AutoSizeAxes = Axes.Y;
-                else
-                {
-                    content.AutoSizeAxes = Axes.None;
-                    content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
-                }
-
-                button.FadeColour(Expanded.Value ? expandedColour : Color4.White, 200, Easing.InOutQuint);
-            }, true);
-
-            this.Delay(600).Schedule(updateActiveState);
+            headerContent.FadeColour(expanded.NewValue ? Color4.White : OsuColour.Gray(0.5f), 200, Easing.OutQuint);
         }
 
-        protected override bool OnHover(HoverEvent e)
+        private void updateFadeState()
         {
-            updateActiveState();
-            return false;
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            updateActiveState();
-            base.OnHoverLost(e);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            expandedColour = colours.Yellow;
-        }
-
-        private void updateActiveState()
-        {
-            this.FadeTo(IsHovered || expandingContainer?.Expanded.Value == true ? 1 : inactive_alpha, fade_duration, Easing.OutQuint);
+            this.FadeTo(IsHovered ? 1 : inactive_alpha, fade_duration, Easing.OutQuint);
         }
 
         protected override Container<Drawable> Content => content;

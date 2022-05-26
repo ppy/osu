@@ -10,12 +10,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class TimingScreen : EditorRoundedScreen
+    public class TimingScreen : EditorScreenWithTimeline
     {
         [Cached]
         private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
@@ -25,27 +26,23 @@ namespace osu.Game.Screens.Edit.Timing
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override Drawable CreateMainContent() => new GridContainer
         {
-            Add(new GridContainer
+            RelativeSizeAxes = Axes.Both,
+            ColumnDimensions = new[]
             {
-                RelativeSizeAxes = Axes.Both,
-                ColumnDimensions = new[]
+                new Dimension(),
+                new Dimension(GridSizeMode.Absolute, 350),
+            },
+            Content = new[]
+            {
+                new Drawable[]
                 {
-                    new Dimension(),
-                    new Dimension(GridSizeMode.Absolute, 350),
+                    new ControlPointList(),
+                    new ControlPointSettings(),
                 },
-                Content = new[]
-                {
-                    new Drawable[]
-                    {
-                        new ControlPointList(),
-                        new ControlPointSettings(),
-                    },
-                }
-            });
-        }
+            }
+        };
 
         public class ControlPointList : CompositeDrawable
         {
@@ -76,12 +73,12 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     new Box
                     {
-                        Colour = colours.Background3,
+                        Colour = colours.Background4,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new Box
                     {
-                        Colour = colours.Background2,
+                        Colour = colours.Background3,
                         RelativeSizeAxes = Axes.Y,
                         Width = ControlPointTable.TIMING_COLUMN_WIDTH + margins,
                     },
@@ -100,7 +97,7 @@ namespace osu.Game.Screens.Edit.Timing
                         Spacing = new Vector2(5),
                         Children = new Drawable[]
                         {
-                            deleteButton = new OsuButton
+                            deleteButton = new RoundedButton
                             {
                                 Text = "-",
                                 Size = new Vector2(30, 30),
@@ -108,7 +105,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
                             },
-                            new OsuButton
+                            new RoundedButton
                             {
                                 Text = "+ Add at current time",
                                 Action = addNew,

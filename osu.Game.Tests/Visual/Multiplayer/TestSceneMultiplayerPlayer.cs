@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen() && player.IsLoaded);
-            AddStep("start gameplay", () => ((IMultiplayerClient)MultiplayerClient).MatchStarted());
+            AddStep("start gameplay", () => ((IMultiplayerClient)MultiplayerClient).GameplayStarted());
         }
 
         [Test]

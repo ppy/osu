@@ -24,7 +24,7 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Visual.UserInterface;
+using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         new Drawable[]
                         {
-                            recordingManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                            recordingManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                             {
                                 Recorder = recorder = new TestReplayRecorder(new Score
                                 {
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         },
                         new Drawable[]
                         {
-                            playbackManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                            playbackManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                             {
                                 ReplayInputHandler = new TestFramedReplayInputHandler(replay)
                                 {

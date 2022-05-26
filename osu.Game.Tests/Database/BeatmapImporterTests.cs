@@ -137,6 +137,37 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestAddFileToAsyncImportedBeatmap()
+        {
+            RunTestWithRealm((realm, storage) =>
+            {
+                BeatmapSetInfo? detachedSet = null;
+
+                using (var importer = new BeatmapModelManager(realm, storage))
+                using (new RealmRulesetStore(realm, storage))
+                {
+                    Task.Run(async () =>
+                    {
+                        Live<BeatmapSetInfo>? beatmapSet;
+
+                        using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
+                            // ReSharper disable once AccessToDisposedClosure
+                            beatmapSet = await importer.Import(reader);
+
+                        Assert.NotNull(beatmapSet);
+                        Debug.Assert(beatmapSet != null);
+
+                        // Intentionally detach on async thread as to not trigger a refresh on the main thread.
+                        beatmapSet.PerformRead(s => detachedSet = s.Detach());
+                    }).WaitSafely();
+
+                    Debug.Assert(detachedSet != null);
+                    importer.AddFile(detachedSet, new MemoryStream(), "test");
+                }
+            });
+        }
+
+        [Test]
         public void TestImportBeatmapThenCleanup()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
@@ -476,7 +507,7 @@ namespace osu.Game.Tests.Database
                 using (var stream = storage.GetStream(firstFile.File.GetStoragePath()))
                     originalLength = stream.Length;
 
-                using (var stream = storage.GetStream(firstFile.File.GetStoragePath(), FileAccess.Write, FileMode.Create))
+                using (var stream = storage.CreateFileSafely(firstFile.File.GetStoragePath()))
                     stream.WriteByte(0);
 
                 var importedSecondTime = await LoadOszIntoStore(importer, realm.Realm);

@@ -88,17 +88,17 @@ namespace osu.Game.Overlays.Dialog
                         if (actionInvoked) return;
 
                         actionInvoked = true;
-                        action?.Invoke();
 
+                        // Hide the dialog before running the action.
+                        // This is important as the code which is performed may check for a dialog being present (ie. `OsuGame.PerformFromScreen`)
+                        // and we don't want it to see the already dismissed dialog.
                         Hide();
+
+                        action?.Invoke();
                     };
                 }
             }
         }
-
-        // We always want dialogs to show their appear animation, so we request they start hidden.
-        // Normally this would not be required, but is here due to the manual Show() call that occurs before LoadComplete().
-        protected override bool StartHidden => true;
 
         protected PopupDialog()
         {
@@ -212,7 +212,7 @@ namespace osu.Game.Overlays.Dialog
             };
 
             // It's important we start in a visible state so our state fires on hide, even before load.
-            // This is used by the DialogOverlay to know when the dialog was dismissed.
+            // This is used by the dialog overlay to know when the dialog was dismissed.
             Show();
         }
 
@@ -268,7 +268,7 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopOut()
         {
-            if (!actionInvoked && content.IsPresent)
+            if (!actionInvoked)
                 // In the case a user did not choose an action before a hide was triggered, press the last button.
                 // This is presumed to always be a sane default "cancel" action.
                 buttonsContainer.Last().TriggerClick();

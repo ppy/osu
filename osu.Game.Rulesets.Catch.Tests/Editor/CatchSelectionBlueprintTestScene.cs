@@ -29,13 +29,14 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
         protected CatchSelectionBlueprintTestScene()
         {
-            EditorBeatmap = new EditorBeatmap(new CatchBeatmap
+            var catchBeatmap = new CatchBeatmap
             {
                 BeatmapInfo =
                 {
                     Ruleset = new CatchRuleset().RulesetInfo,
                 }
-            }) { Difficulty = { CircleSize = 0 } };
+            };
+            EditorBeatmap = new EditorBeatmap(catchBeatmap) { Difficulty = { CircleSize = 0 } };
             EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint
             {
                 BeatLength = 100

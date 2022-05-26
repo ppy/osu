@@ -42,6 +42,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"nsfw")]
         public bool HasExplicitContent { get; set; }
 
+        [JsonProperty(@"spotlight")]
+        public bool FeaturedInSpotlight { get; set; }
+
         [JsonProperty(@"video")]
         public bool HasVideo { get; set; }
 

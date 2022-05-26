@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -69,7 +70,7 @@ namespace osu.Game.Tests.Editing
         [TestCase(2)]
         public void TestSliderMultiplier(float multiplier)
         {
-            AddStep($"set multiplier = {multiplier}", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = multiplier);
+            AddStep($"set slider multiplier = {multiplier}", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = multiplier);
 
             assertSnapDistance(100 * multiplier);
         }
@@ -212,14 +213,16 @@ namespace osu.Game.Tests.Editing
             => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceToDuration(new HitObject(), distance) == expectedDuration);
 
         private void assertSnappedDuration(float distance, double expectedDuration)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.GetSnappedDurationFromDistance(new HitObject(), distance) == expectedDuration);
+            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.FindSnappedDuration(new HitObject(), distance) == expectedDuration);
 
         private void assertSnappedDistance(float distance, float expectedDistance)
-            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.GetSnappedDistanceFromDistance(new HitObject(), distance) == expectedDistance);
+            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.FindSnappedDistance(new HitObject(), distance) == expectedDistance);
 
         private class TestHitObjectComposer : OsuHitObjectComposer
         {
             public new EditorBeatmap EditorBeatmap => base.EditorBeatmap;
+
+            public new Bindable<double> DistanceSpacingMultiplier => base.DistanceSpacingMultiplier;
 
             public TestHitObjectComposer()
                 : base(new OsuRuleset())

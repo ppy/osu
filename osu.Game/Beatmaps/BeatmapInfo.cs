@@ -1,20 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Scoring;
 using Realms;
-
-#nullable enable
 
 namespace osu.Game.Beatmaps
 {
@@ -109,7 +111,17 @@ namespace osu.Game.Beatmaps
 
         public bool SamplesMatchPlaybackRate { get; set; } = true;
 
-        public double DistanceSpacing { get; set; }
+        /// <summary>
+        /// The ratio of distance travelled per time unit.
+        /// Generally used to decouple the spacing between hit objects from the enforced "velocity" of the beatmap (see <see cref="DifficultyControlPoint.SliderVelocity"/>).
+        /// </summary>
+        /// <remarks>
+        /// The most common method of understanding is that at a default value of 1.0, the time-to-distance ratio will match the slider velocity of the beatmap
+        /// at the current point in time. Increasing this value will make hit objects more spaced apart when compared to the cursor movement required to track a slider.
+        ///
+        /// This is only a hint property, used by the editor in <see cref="IDistanceSnapProvider"/> implementations. It does not directly affect the beatmap or gameplay.
+        /// </remarks>
+        public double DistanceSpacing { get; set; } = 1.0;
 
         public int BeatDivisor { get; set; }
 

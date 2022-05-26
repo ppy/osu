@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.AccountCreation
 
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
             if (string.IsNullOrEmpty(api?.ProvidedUsername) || game?.UseDevelopmentServer == true)
             {
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.AccountCreation
                 return;
             }
 
-            base.OnEntering(last);
+            base.OnEntering(e);
         }
 
         [BackgroundDependencyLoader(true)]

@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -44,8 +45,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         internal class Background : CompositeDrawable
         {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            [BackgroundDependencyLoader(true)]
+            private void load(OverlayColourProvider overlayColourProvider, OsuColour colours)
             {
                 RelativeSizeAxes = Axes.Both;
 
@@ -54,7 +55,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 InternalChild = new Box
                 {
-                    Colour = colours.GreySeaFoamDarker,
+                    Colour = overlayColourProvider?.Background5 ?? colours.GreySeaFoamDarker,
                     RelativeSizeAxes = Axes.Both,
                 };
             }

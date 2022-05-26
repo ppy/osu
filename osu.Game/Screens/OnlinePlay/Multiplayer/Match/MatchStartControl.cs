@@ -114,18 +114,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             bool isReady() => Client.LocalUser?.State == MultiplayerUserState.Ready || Client.LocalUser?.State == MultiplayerUserState.Spectating;
 
-            void toggleReady() => Client.ToggleReady().ContinueWith(_ => endOperation());
+            void toggleReady() => Client.ToggleReady().FireAndForget(
+                onSuccess: endOperation,
+                onError: _ => endOperation());
 
-            void startMatch() => Client.StartMatch().ContinueWith(t =>
+            void startMatch() => Client.StartMatch().FireAndForget(onSuccess: () =>
             {
-                // accessing Exception here silences any potential errors from the antecedent task
-                if (t.Exception != null)
-                {
-                    // gameplay was not started due to an exception; unblock button.
-                    endOperation();
-                }
-
                 // gameplay is starting, the button will be unblocked on load requested.
+            }, onError: _ =>
+            {
+                // gameplay was not started due to an exception; unblock button.
+                endOperation();
             });
         }
 

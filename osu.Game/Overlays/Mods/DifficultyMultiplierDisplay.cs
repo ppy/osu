@@ -15,11 +15,14 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
     public class DifficultyMultiplierDisplay : CompositeDrawable, IHasCurrentValue<double>
     {
+        public const float HEIGHT = 42;
+
         public Bindable<double> Current
         {
             get => current.Current;
@@ -42,22 +45,21 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        private const float height = 42;
         private const float multiplier_value_area_width = 56;
         private const float transition_duration = 200;
 
         public DifficultyMultiplierDisplay()
         {
-            Height = height;
+            Height = HEIGHT;
             AutoSizeAxes = Axes.X;
 
-            InternalChild = new Container
+            InternalChild = new InputBlockingContainer
             {
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
                 Masking = true,
                 CornerRadius = ModPanel.CORNER_RADIUS,
-                Shear = new Vector2(ModPanel.SHEAR_X, 0),
+                Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0),
                 Children = new Drawable[]
                 {
                     underlayBackground = new Box
@@ -97,8 +99,8 @@ namespace osu.Game.Overlays.Mods
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Margin = new MarginPadding { Horizontal = 18 },
-                                            Shear = new Vector2(-ModPanel.SHEAR_X, 0),
-                                            Text = "Difficulty Multiplier",
+                                            Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                            Text = DifficultyMultiplierDisplayStrings.DifficultyMultiplier,
                                             Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
                                         }
                                     }
@@ -108,7 +110,7 @@ namespace osu.Game.Overlays.Mods
                                     AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Shear = new Vector2(-ModPanel.SHEAR_X, 0),
+                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(2, 0),
                                     Children = new Drawable[]
@@ -145,8 +147,9 @@ namespace osu.Game.Overlays.Mods
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             current.BindValueChanged(_ => updateState(), true);
-            FinishTransforms(true);
+
             // required to prevent the counter initially rolling up from 0 to 1
             // due to `Current.Value` having a nonstandard default value of 1.
             multiplierCounter.SetCountWithoutRolling(Current.Value);

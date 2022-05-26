@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Select
             HeaderText = "Confirm deletion of local score";
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                new PopupDialogDangerousButton
                 {
                     Text = "Yes. Please.",
                     Action = () => scoreManager?.Delete(score)

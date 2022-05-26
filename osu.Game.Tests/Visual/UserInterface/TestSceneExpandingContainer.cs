@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private TestExpandingContainer container;
         private SettingsToolboxGroup toolboxGroup;
 
-        private ExpandableSlider<float, SizeSlider> slider1;
+        private ExpandableSlider<float, SizeSlider<float>> slider1;
         private ExpandableSlider<double> slider2;
 
         [SetUp]
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Width = 1,
                     Children = new Drawable[]
                     {
-                        slider1 = new ExpandableSlider<float, SizeSlider>
+                        slider1 = new ExpandableSlider<float, SizeSlider<float>>
                         {
                             Current = new BindableFloat
                             {
@@ -99,15 +99,15 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         /// <summary>
-        /// Tests expanding a container will expand underlying groups if contracted.
+        /// Tests expanding a container will not expand underlying groups if they were manually contracted by the user.
         /// </summary>
         [Test]
-        public void TestExpandingContainerExpandsContractedGroup()
+        public void TestExpandingContainerDoesNotExpandContractedGroup()
         {
             AddStep("contract group", () => toolboxGroup.Expanded.Value = false);
 
             AddStep("expand container", () => container.Expanded.Value = true);
-            AddAssert("group expanded", () => toolboxGroup.Expanded.Value);
+            AddAssert("group not expanded", () => !toolboxGroup.Expanded.Value);
             AddAssert("controls expanded", () => slider1.Expanded.Value && slider2.Expanded.Value);
 
             AddStep("contract container", () => container.Expanded.Value = false);

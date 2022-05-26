@@ -14,6 +14,7 @@ using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Chat.Listing;
 using osu.Game.Overlays.Chat.Tabs;
 
 namespace osu.Game.Online.Chat
@@ -133,7 +134,9 @@ namespace osu.Game.Online.Chat
 
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
         {
-            if (!(e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+            bool isSelectorChannel = e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel || e.NewValue is ChannelListing.ChannelListingChannel;
+
+            if (!isSelectorChannel)
                 JoinChannel(e.NewValue);
         }
 

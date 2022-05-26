@@ -4,8 +4,6 @@
 using System;
 using System.IO;
 using System.Runtime.Versioning;
-using System.Threading;
-using System.Threading.Tasks;
 using osu.Desktop.LegacyIpc;
 using osu.Framework;
 using osu.Framework.Development;
@@ -63,8 +61,6 @@ namespace osu.Desktop
 
             using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = true }))
             {
-                host.ExceptionThrown += handleException;
-
                 if (!host.IsPrimaryInstance)
                 {
                     if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
@@ -123,26 +119,13 @@ namespace osu.Desktop
                 tools.RemoveUninstallerRegistryEntry();
             }, onEveryRun: (version, tools, firstRun) =>
             {
-                tools.SetProcessAppUserModelId();
+                // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
+                // causes the right-click context menu to function incorrectly.
+                //
+                // This may turn out to be non-required after an alternative solution is implemented.
+                // see https://github.com/clowd/Clowd.Squirrel/issues/24
+                // tools.SetProcessAppUserModelId();
             });
-        }
-
-        private static int allowableExceptions = DebugUtils.IsDebugBuild ? 0 : 1;
-
-        /// <summary>
-        /// Allow a maximum of one unhandled exception, per second of execution.
-        /// </summary>
-        /// <param name="arg"></param>
-        private static bool handleException(Exception arg)
-        {
-            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
-
-            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
-
-            // restore the stock of allowable exceptions after a short delay.
-            Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
-
-            return continueExecution;
         }
     }
 }

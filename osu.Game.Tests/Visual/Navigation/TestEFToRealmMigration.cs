@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
@@ -25,7 +24,7 @@ namespace osu.Game.Tests.Visual.Navigation
             if (isDisposing)
                 return;
 
-            using (var outStream = LocalStorage.GetStream(DatabaseContextFactory.DATABASE_NAME, FileAccess.Write, FileMode.Create))
+            using (var outStream = LocalStorage.CreateFileSafely(DatabaseContextFactory.DATABASE_NAME))
             using (var stream = TestResources.OpenResource(DatabaseContextFactory.DATABASE_NAME))
                 stream.CopyTo(outStream);
         }

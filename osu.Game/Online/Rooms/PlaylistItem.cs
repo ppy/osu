@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
 {
@@ -84,6 +85,19 @@ namespace osu.Game.Online.Rooms
             Beatmap = beatmap;
         }
 
+        public PlaylistItem(MultiplayerPlaylistItem item)
+            : this(new APIBeatmap { OnlineID = item.BeatmapID })
+        {
+            ID = item.ID;
+            OwnerID = item.OwnerID;
+            RulesetID = item.RulesetID;
+            Expired = item.Expired;
+            PlaylistOrder = item.PlaylistOrder;
+            PlayedAt = item.PlayedAt;
+            RequiredMods = item.RequiredMods.ToArray();
+            AllowedMods = item.AllowedMods.ToArray();
+        }
+
         public void MarkInvalid() => valid.Value = false;
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods
@@ -101,13 +115,13 @@ namespace osu.Game.Online.Rooms
 
         #endregion
 
-        public PlaylistItem With(IBeatmapInfo beatmap) => new PlaylistItem(beatmap)
+        public PlaylistItem With(Optional<IBeatmapInfo> beatmap = default, Optional<ushort?> playlistOrder = default) => new PlaylistItem(beatmap.GetOr(Beatmap))
         {
             ID = ID,
             OwnerID = OwnerID,
             RulesetID = RulesetID,
             Expired = Expired,
-            PlaylistOrder = PlaylistOrder,
+            PlaylistOrder = playlistOrder.GetOr(PlaylistOrder),
             PlayedAt = PlayedAt,
             AllowedMods = AllowedMods,
             RequiredMods = RequiredMods,
@@ -119,6 +133,7 @@ namespace osu.Game.Online.Rooms
                && Beatmap.OnlineID == other.Beatmap.OnlineID
                && RulesetID == other.RulesetID
                && Expired == other.Expired
+               && PlaylistOrder == other.PlaylistOrder
                && AllowedMods.SequenceEqual(other.AllowedMods)
                && RequiredMods.SequenceEqual(other.RequiredMods);
     }

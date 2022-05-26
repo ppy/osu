@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateTooltipText()
         {
-            TooltipText = cumulativeRotation.Value?.ToLocalisableString("0.0°") ?? default(LocalisableString);
+            TooltipText = cumulativeRotation.Value?.ToLocalisableString("0.0°") ?? default;
         }
     }
 }
