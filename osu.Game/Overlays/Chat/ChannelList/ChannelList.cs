@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -22,10 +23,13 @@ namespace osu.Game.Overlays.Chat.ChannelList
         public Action<Channel>? OnRequestSelect;
         public Action<Channel>? OnRequestLeave;
 
+        public IEnumerable<Channel> Channels => publicChannelFlow.Channels.Concat(privateChannelFlow.Channels);
+
         public readonly ChannelListing.ChannelListingChannel ChannelListingChannel = new ChannelListing.ChannelListingChannel();
 
         private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
+        private OsuScrollContainer scroll = null!;
         private ChannelListItemFlow publicChannelFlow = null!;
         private ChannelListItemFlow privateChannelFlow = null!;
         private ChannelListItem selector = null!;
@@ -40,7 +44,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background6,
                 },
-                new OsuScrollContainer
+                scroll = new OsuScrollContainer
                 {
                     Padding = new MarginPadding { Vertical = 7 },
                     RelativeSizeAxes = Axes.Both,
@@ -53,12 +57,14 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            publicChannelFlow = new ChannelListItemFlow("CHANNELS"),
+                            new ChannelListLabel("CHANNELS"),
+                            publicChannelFlow = new ChannelListItemFlow(),
                             selector = new ChannelListItem(ChannelListingChannel)
                             {
                                 Margin = new MarginPadding { Bottom = 10 },
                             },
-                            privateChannelFlow = new ChannelListItemFlow("DIRECT MESSAGES"),
+                            new ChannelListLabel("DIRECT MESSAGES"),
+                            privateChannelFlow = new ChannelListItemFlow(),
                         },
                     },
                 },
@@ -101,6 +107,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
             return channelMap[channel];
         }
 
+        public void ScrollChannelIntoView(Channel channel) => scroll.ScrollIntoView(GetItem(channel));
+
         private ChannelListItemFlow getFlowForChannel(Channel channel)
         {
             switch (channel.Type)
@@ -112,24 +120,29 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     return privateChannelFlow;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    return publicChannelFlow;
             }
         }
 
-        private class ChannelListItemFlow : FillFlowContainer
+        private class ChannelListLabel : OsuSpriteText
         {
-            public ChannelListItemFlow(string label)
+            public ChannelListLabel(string label)
+            {
+                Text = label;
+                Margin = new MarginPadding { Left = 18, Bottom = 5 };
+                Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold);
+            }
+        }
+
+        private class ChannelListItemFlow : FillFlowContainer<ChannelListItem>
+        {
+            public IEnumerable<Channel> Channels => Children.Select(c => c.Channel);
+
+            public ChannelListItemFlow()
             {
                 Direction = FillDirection.Vertical;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-
-                Add(new OsuSpriteText
-                {
-                    Text = label,
-                    Margin = new MarginPadding { Left = 18, Bottom = 5 },
-                    Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
-                });
             }
         }
     }
