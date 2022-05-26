@@ -11,6 +11,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -33,6 +34,7 @@ namespace osu.Game.Screens.Edit.Timing
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(20),
                     Children = new Drawable[]
                     {
                         textBox = new LabelledTextBox

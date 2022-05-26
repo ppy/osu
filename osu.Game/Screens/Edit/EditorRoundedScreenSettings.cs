@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.Edit
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.Edit
             {
                 new Box
                 {
-                    Colour = colours.Background4,
+                    Colour = colours.Background6,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new OsuScrollContainer
@@ -33,6 +34,8 @@ namespace osu.Game.Screens.Edit
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding(10),
+                        Spacing = new Vector2(10),
                         Children = CreateSections()
                     },
                 }
