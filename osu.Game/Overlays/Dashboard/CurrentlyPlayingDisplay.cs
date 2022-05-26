@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -11,6 +12,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
@@ -24,9 +27,16 @@ namespace osu.Game.Overlays.Dashboard
 {
     internal class CurrentlyPlayingDisplay : CompositeDrawable
     {
+        private const float search_bar_height = 40;
+        private const float search_bar_width = 250;
+
         private readonly IBindableList<int> playingUsers = new BindableList<int>();
 
         private FillFlowContainer<PlayingUserPanel> userFlow;
+
+        private List<int> currentUsers = new List<int>();
+        private FocusedTextBox searchBar;
+        private Container<FocusedTextBox> searchBarContainer;
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
@@ -37,13 +47,46 @@ namespace osu.Game.Overlays.Dashboard
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = userFlow = new FillFlowContainer<PlayingUserPanel>
+            searchBarContainer = new Container<FocusedTextBox>
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Padding = new MarginPadding(10),
+                Child = searchBar = new FocusedTextBox
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Height = search_bar_height,
+                    Width = search_bar_width,
+
+                    Colour = OsuColour.Gray(0.8f),
+
+                    PlaceholderText = "Search for User...",
+                    HoldFocus = true,
+                    ReleaseFocusOnCommit = true,
+                },
+            };
+
+            userFlow = new FillFlowContainer<PlayingUserPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Padding = new MarginPadding(10),
+                Padding = new MarginPadding {
+                    Top = 10 + 10 + search_bar_height,
+                    Bottom = 10,
+                    Right = 10,
+                    Left = 10,
+                },
                 Spacing = new Vector2(10),
             };
+
+            InternalChildren = new Drawable[]
+            {
+                searchBarContainer,
+                userFlow,
+            };
+
+            searchBar.Current.ValueChanged += onSearchBarValueChanged;
         }
 
         [Resolved]
@@ -57,6 +100,57 @@ namespace osu.Game.Overlays.Dashboard
             playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
         }
 
+        private void addCard(int userId)
+        {
+            if (currentUsers.Contains(userId))
+                return;
+
+            users.GetUserAsync(userId).ContinueWith(task =>
+            {
+                var user = task.GetResultSafely();
+
+                if (user == null)
+                    return;
+
+                if (!user.Username.ToLower().Contains(searchBar.Text.ToLower()))
+                    return;
+
+                Schedule(() =>
+                {
+                    // user may no longer be playing.
+                    if (!playingUsers.Contains(user.Id))
+                        return;
+
+                    currentUsers.Add(user.Id);
+
+                    userFlow.Add(createUserPanel(user));
+                });
+            });
+        }
+
+        private void removeCard(PlayingUserPanel card)
+        {
+            if (card == null)
+                return;
+
+            currentUsers.Remove(card.User.Id);
+            card.Expire();
+        }
+
+        private void onSearchBarValueChanged(ValueChangedEvent<string> change)
+        {
+            foreach (PlayingUserPanel card in userFlow)
+            {
+                if (!card.User.Username.ToLower().Contains(change.NewValue.ToLower()))
+                    removeCard(card);
+            }
+
+            foreach (int userId in playingUsers)
+            {
+                addCard(userId);
+            }
+        }
+
         private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
             switch (e.Action)
@@ -65,24 +159,7 @@ namespace osu.Game.Overlays.Dashboard
                     Debug.Assert(e.NewItems != null);
 
                     foreach (int userId in e.NewItems)
-                    {
-                        users.GetUserAsync(userId).ContinueWith(task =>
-                        {
-                            var user = task.GetResultSafely();
-
-                            if (user == null)
-                                return;
-
-                            Schedule(() =>
-                            {
-                                // user may no longer be playing.
-                                if (!playingUsers.Contains(user.Id))
-                                    return;
-
-                                userFlow.Add(createUserPanel(user));
-                            });
-                        });
-                    }
+                        addCard(userId);
 
                     break;
 
@@ -90,7 +167,7 @@ namespace osu.Game.Overlays.Dashboard
                     Debug.Assert(e.OldItems != null);
 
                     foreach (int userId in e.OldItems)
-                        userFlow.FirstOrDefault(card => card.User.Id == userId)?.Expire();
+                        removeCard(userFlow.FirstOrDefault(card => card.User.Id == userId));
                     break;
             }
         });
