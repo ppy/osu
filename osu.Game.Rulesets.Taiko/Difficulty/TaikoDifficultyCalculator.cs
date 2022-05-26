@@ -52,10 +52,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 taikoDifficultyHitObjects.Add(
                     new TaikoDifficultyHitObject(
-                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, i
+                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], taikoDifficultyHitObjects.DefaultIfEmpty(null).LastOrDefault(), clockRate, i
                     )
                 );
             }
+
+            // Find repetition interval for the final TaikoDifficultyHitObjectColour
+            // TODO: Might be a good idea to refactor this
+            taikoDifficultyHitObjects.Last().Colour.FindRepetitionInterval();
+
+            taikoDifficultyHitObjects.ForEach((item) =>
+            {
+                Console.WriteLine($"{item.StartTime}, {item.Colour.GetHashCode()}, {item.Colour.Delta}, {item.Colour.DeltaRunLength}, {item.Colour.RepetitionInterval}");
+            });
 
             return taikoDifficultyHitObjects;
         }
