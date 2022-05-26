@@ -109,9 +109,6 @@ namespace osu.Game.Overlays.Dashboard
                 if (user == null)
                     return;
 
-                if (!user.Username.ToLower().Contains(searchBar.Text.ToLower()))
-                    return;
-
                 Schedule(() =>
                 {
                     // user may no longer be playing.
