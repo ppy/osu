@@ -64,20 +64,28 @@ namespace osu.Game.Online
             this.preferMessagePack = preferMessagePack;
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(state =>
-            {
-                switch (state.NewValue)
-                {
-                    case APIState.Failing:
-                    case APIState.Offline:
-                        Task.Run(() => disconnect(true));
-                        break;
+            apiState.BindValueChanged(state => connectIfPossible(), true);
+        }
 
-                    case APIState.Online:
-                        Task.Run(connect);
-                        break;
-                }
-            }, true);
+        public void Reconnect()
+        {
+            Logger.Log($"{clientName} reconnecting...", LoggingTarget.Network);
+            Task.Run(connectIfPossible);
+        }
+
+        private void connectIfPossible()
+        {
+            switch (apiState.Value)
+            {
+                case APIState.Failing:
+                case APIState.Offline:
+                    Task.Run(() => disconnect(true));
+                    break;
+
+                case APIState.Online:
+                    Task.Run(connect);
+                    break;
+            }
         }
 
         private async Task connect()
