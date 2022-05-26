@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Screens.Edit;
@@ -45,6 +46,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                     {
                         (typeof(EditorBeatmap), editorBeatmap),
                         (typeof(IBeatSnapProvider), editorBeatmap),
+                        (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Green)),
                     },
                     Child = new ComposeScreen { State = { Value = Visibility.Visible } },
                 };
