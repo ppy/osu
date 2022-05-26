@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -32,9 +33,8 @@ namespace osu.Game.Overlays.Dashboard
 
         private readonly IBindableList<int> playingUsers = new BindableList<int>();
 
-        private FillFlowContainer<PlayingUserPanel> userFlow;
+        private SearchContainer<PlayingUserPanel> userFlow;
 
-        private List<int> currentUsers = new List<int>();
         private FocusedTextBox searchBar;
         private Container<FocusedTextBox> searchBarContainer;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Dashboard
                 },
             };
 
-            userFlow = new FillFlowContainer<PlayingUserPanel>
+            userFlow = new SearchContainer<PlayingUserPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -102,9 +102,6 @@ namespace osu.Game.Overlays.Dashboard
 
         private void addCard(int userId)
         {
-            if (currentUsers.Contains(userId))
-                return;
-
             users.GetUserAsync(userId).ContinueWith(task =>
             {
                 var user = task.GetResultSafely();
@@ -121,35 +118,12 @@ namespace osu.Game.Overlays.Dashboard
                     if (!playingUsers.Contains(user.Id))
                         return;
 
-                    currentUsers.Add(user.Id);
-
                     userFlow.Add(createUserPanel(user));
                 });
             });
         }
 
-        private void removeCard(PlayingUserPanel card)
-        {
-            if (card == null)
-                return;
-
-            currentUsers.Remove(card.User.Id);
-            card.Expire();
-        }
-
-        private void onSearchBarValueChanged(ValueChangedEvent<string> change)
-        {
-            foreach (PlayingUserPanel card in userFlow)
-            {
-                if (!card.User.Username.ToLower().Contains(change.NewValue.ToLower()))
-                    removeCard(card);
-            }
-
-            foreach (int userId in playingUsers)
-            {
-                addCard(userId);
-            }
-        }
+        private void onSearchBarValueChanged(ValueChangedEvent<string> change) => userFlow.SearchTerm = searchBar.Text;
 
         private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
@@ -167,7 +141,7 @@ namespace osu.Game.Overlays.Dashboard
                     Debug.Assert(e.OldItems != null);
 
                     foreach (int userId in e.OldItems)
-                        removeCard(userFlow.FirstOrDefault(card => card.User.Id == userId));
+                        userFlow.FirstOrDefault(card => card.User.Id == userId)?.Expire();
                     break;
             }
         });
@@ -179,16 +153,35 @@ namespace osu.Game.Overlays.Dashboard
                 panel.Origin = Anchor.TopCentre;
             });
 
-        private class PlayingUserPanel : CompositeDrawable
+        private class PlayingUserPanel : CompositeDrawable, IFilterable
         {
             public readonly APIUser User;
+            public IEnumerable<LocalisableString> FilterTerms => filterTerm;
 
             [Resolved(canBeNull: true)]
             private IPerformFromScreenRunner performer { get; set; }
+            private IEnumerable<LocalisableString> filterTerm;
+
+            public bool MatchingFilter
+            {
+                set
+                {
+                    if (value)
+                        Show();
+                    else
+                        Hide();
+                }
+            }
+
+            public bool FilteringActive
+            {
+                set { }
+            }
 
             public PlayingUserPanel(APIUser user)
             {
                 User = user;
+                filterTerm = new LocalisableString[] { User.Username };
 
                 AutoSizeAxes = Axes.Both;
             }
