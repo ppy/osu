@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Framework.Platform.Windows;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -34,9 +35,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private Bindable<Size> sizeFullscreen;
 
         private readonly BindableList<Size> resolutions = new BindableList<Size>(new[] { new Size(9999, 9999) });
+        private readonly IBindable<FullscreenCapability> fullscreenCapability = new Bindable<FullscreenCapability>(FullscreenCapability.Capable);
 
         [Resolved]
         private OsuGameBase game { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         private SettingsDropdown<Size> resolutionDropdown;
         private SettingsDropdown<Display> displayDropdown;
@@ -64,6 +69,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 currentDisplay.BindTo(host.Window.CurrentDisplayBindable);
                 windowModes.BindTo(host.Window.SupportedWindowModes);
             }
+
+            if (host.Window is WindowsWindow windowsWindow)
+                fullscreenCapability.BindTo(windowsWindow.FullscreenCapability);
 
             Children = new Drawable[]
             {
@@ -139,6 +147,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     }
                 },
             };
+
+            fullscreenCapability.BindValueChanged(_ => Schedule(updateScreenModeWarning), true);
         }
 
         protected override void LoadComplete()
@@ -150,8 +160,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             windowModeDropdown.Current.BindValueChanged(mode =>
             {
                 updateDisplayModeDropdowns();
-
-                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? GraphicsSettingsStrings.NotFullscreenNote : default;
+                updateScreenModeWarning();
             }, true);
 
             windowModes.BindCollectionChanged((sender, args) =>
@@ -210,6 +219,31 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                 scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
                 scalingSettings.ForEach(s => s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything);
+            }
+        }
+
+        private void updateScreenModeWarning()
+        {
+            if (windowModeDropdown.Current.Value != WindowMode.Fullscreen)
+            {
+                windowModeDropdown.WarningText = GraphicsSettingsStrings.NotFullscreenNote;
+                return;
+            }
+
+            switch (fullscreenCapability.Value)
+            {
+                case FullscreenCapability.Unknown:
+                    if (host.Window is WindowsWindow)
+                        windowModeDropdown.WarningText = "Checking for exclusive fullscreen...";
+                    break;
+
+                case FullscreenCapability.Capable:
+                    windowModeDropdown.WarningText = default;
+                    break;
+
+                case FullscreenCapability.Incapable:
+                    windowModeDropdown.WarningText = "Unable to enter exclusive fullscreen. You'll still experience some input latency.";
+                    break;
             }
         }
 
