@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
 
             for (int i = 1; i < sortedObjects.Length; i++)
-                objects.Add(new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects));
+                objects.Add(new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects, objects.Count));
 
             return objects;
         }
