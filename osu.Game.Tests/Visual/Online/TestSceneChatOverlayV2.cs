@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -63,7 +64,7 @@ namespace osu.Game.Tests.Visual.Online
                 Children = new Drawable[]
                 {
                     channelManager,
-                    chatOverlay = new TestChatOverlayV2 { RelativeSizeAxes = Axes.Both },
+                    chatOverlay = new TestChatOverlayV2(),
                 },
             };
         });
@@ -417,6 +418,67 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
         }
 
+        [Test]
+        public void TestKeyboardCloseAndRestoreChannel()
+        {
+            AddStep("Show overlay with channel 1", () =>
+            {
+                channelManager.JoinChannel(testChannel1);
+                chatOverlay.Show();
+            });
+            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+
+            AddStep("Press document close keys", () => InputManager.Keys(PlatformAction.DocumentClose));
+            AddAssert("Listing is visible", () => listingIsVisible);
+
+            AddStep("Press tab restore keys", () => InputManager.Keys(PlatformAction.TabRestore));
+            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+        }
+
+        [Test]
+        public void TestKeyboardNewChannel()
+        {
+            AddStep("Show overlay with channel 1", () =>
+            {
+                channelManager.JoinChannel(testChannel1);
+                chatOverlay.Show();
+            });
+            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+
+            AddStep("Press tab new keys", () => InputManager.Keys(PlatformAction.TabNew));
+            AddAssert("Listing is visible", () => listingIsVisible);
+        }
+
+        [Test]
+        public void TestKeyboardNextChannel()
+        {
+            Channel pmChannel1 = createPrivateChannel();
+            Channel pmChannel2 = createPrivateChannel();
+
+            AddStep("Show overlay with channels", () =>
+            {
+                channelManager.JoinChannel(testChannel1);
+                channelManager.JoinChannel(testChannel2);
+                channelManager.JoinChannel(pmChannel1);
+                channelManager.JoinChannel(pmChannel2);
+                chatOverlay.Show();
+            });
+
+            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            AddAssert("Channel 2 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel2);
+
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            AddAssert("PM Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == pmChannel1);
+
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            AddAssert("PM Channel 2 displayed", () => channelIsVisible && currentDrawableChannel.Channel == pmChannel2);
+
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+        }
+
         private bool listingIsVisible =>
             chatOverlay.ChildrenOfType<ChannelListing>().Single().State.Value == Visibility.Visible;
 
@@ -466,6 +528,16 @@ namespace osu.Game.Tests.Visual.Online
             Topic = $"We talk about the number {id} here",
             Type = ChannelType.Public,
         };
+
+        private Channel createPrivateChannel()
+        {
+            int id = RNG.Next(0, 10000);
+            return new Channel(new APIUser
+            {
+                Id = id,
+                Username = $"test user {id}",
+            });
+        }
 
         private class TestChatOverlayV2 : ChatOverlayV2
         {
