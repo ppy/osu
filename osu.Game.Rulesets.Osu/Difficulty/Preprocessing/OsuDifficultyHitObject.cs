@@ -75,8 +75,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects)
-            : base(hitObject, lastObject, clockRate, objects)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int position)
+            : base(hitObject, lastObject, clockRate, objects, position)
         {
             lastLastObject = (OsuHitObject)Previous(1)?.BaseObject;
             this.lastObject = (OsuHitObject)lastObject;
