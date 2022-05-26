@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Description => "It never gets boring!";
 
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTarget)).ToArray();
+
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
         private Random? rng;

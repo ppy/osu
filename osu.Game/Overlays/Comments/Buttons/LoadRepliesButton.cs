@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         {
             public ButtonContent()
             {
-                Text = "load replies";
+                Text = CommentsStrings.LoadReplies;
             }
         }
     }

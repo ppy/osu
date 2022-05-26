@@ -3,11 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 namespace osu.Game.IO.Legacy
@@ -25,15 +21,6 @@ namespace osu.Game.IO.Legacy
         }
 
         public int RemainingBytes => (int)(stream.Length - stream.Position);
-
-        /// <summary> Static method to take a SerializationInfo object (an input to an ISerializable constructor)
-        /// and produce a SerializationReader from which serialized objects can be read </summary>.
-        public static SerializationReader GetReader(SerializationInfo info)
-        {
-            byte[] byteArray = (byte[])info.GetValue("X", typeof(byte[]));
-            MemoryStream ms = new MemoryStream(byteArray);
-            return new SerializationReader(ms);
-        }
 
         /// <summary> Reads a string from the buffer.  Overrides the base implementation so it can cope with nulls. </summary>
         public override string ReadString()
@@ -186,97 +173,11 @@ namespace osu.Game.IO.Legacy
                     return ReadCharArray();
 
                 case ObjType.otherType:
-                    return DynamicDeserializer.Deserialize(BaseStream);
+                    throw new IOException("Deserialization of arbitrary type is not supported.");
 
                 default:
                     return null;
             }
-        }
-
-        public static class DynamicDeserializer
-        {
-            private static VersionConfigToNamespaceAssemblyObjectBinder versionBinder;
-            private static BinaryFormatter formatter;
-
-            private static void initialize()
-            {
-                versionBinder = new VersionConfigToNamespaceAssemblyObjectBinder();
-                formatter = new BinaryFormatter
-                {
-                    // AssemblyFormat = FormatterAssemblyStyle.Simple,
-                    Binder = versionBinder
-                };
-            }
-
-            public static object Deserialize(Stream stream)
-            {
-                if (formatter == null)
-                    initialize();
-
-                Debug.Assert(formatter != null, "formatter != null");
-
-                // ReSharper disable once PossibleNullReferenceException
-                return formatter.Deserialize(stream);
-            }
-
-            #region Nested type: VersionConfigToNamespaceAssemblyObjectBinder
-
-            public sealed class VersionConfigToNamespaceAssemblyObjectBinder : SerializationBinder
-            {
-                private readonly Dictionary<string, Type> cache = new Dictionary<string, Type>();
-
-                public override Type BindToType(string assemblyName, string typeName)
-                {
-                    if (cache.TryGetValue(assemblyName + typeName, out var typeToDeserialize))
-                        return typeToDeserialize;
-
-                    List<Type> tmpTypes = new List<Type>();
-                    Type genType = null;
-
-                    if (typeName.Contains("System.Collections.Generic") && typeName.Contains("[["))
-                    {
-                        string[] splitTypes = typeName.Split('[');
-
-                        foreach (string typ in splitTypes)
-                        {
-                            if (typ.Contains("Version"))
-                            {
-                                string asmTmp = typ.Substring(typ.IndexOf(',') + 1);
-                                string asmName = asmTmp.Remove(asmTmp.IndexOf(']')).Trim();
-                                string typName = typ.Remove(typ.IndexOf(','));
-                                tmpTypes.Add(BindToType(asmName, typName));
-                            }
-                            else if (typ.Contains("Generic"))
-                            {
-                                genType = BindToType(assemblyName, typ);
-                            }
-                        }
-
-                        if (genType != null && tmpTypes.Count > 0)
-                        {
-                            return genType.MakeGenericType(tmpTypes.ToArray());
-                        }
-                    }
-
-                    string toAssemblyName = assemblyName.Split(',')[0];
-                    Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-                    foreach (Assembly a in assemblies)
-                    {
-                        if (a.FullName.Split(',')[0] == toAssemblyName)
-                        {
-                            typeToDeserialize = a.GetType(typeName);
-                            break;
-                        }
-                    }
-
-                    cache.Add(assemblyName + typeName, typeToDeserialize);
-
-                    return typeToDeserialize;
-                }
-            }
-
-            #endregion
         }
     }
 

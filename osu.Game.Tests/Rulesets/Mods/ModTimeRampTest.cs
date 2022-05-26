@@ -3,9 +3,11 @@
 
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Tests.Rulesets.Mods
 {
@@ -16,11 +18,14 @@ namespace osu.Game.Tests.Rulesets.Mods
         private const double duration = 9000;
 
         private TrackVirtual track;
+        private OsuPlayfield playfield;
 
         [SetUp]
         public void SetUp()
         {
             track = new TrackVirtual(20_000);
+            // define a fake playfield to re-calculate the current rate by ModTimeRamp.Update(Playfield).
+            playfield = new OsuPlayfield { Clock = new FramedClock(track) };
         }
 
         [TestCase(0, 1)]
@@ -80,8 +85,8 @@ namespace osu.Game.Tests.Rulesets.Mods
         private void seekTrackAndUpdateMod(ModTimeRamp mod, double time)
         {
             track.Seek(time);
-            // update the mod via a fake playfield to re-calculate the current rate.
-            mod.Update(null);
+            playfield.Clock.ProcessFrame();
+            mod.Update(playfield);
         }
 
         private static Beatmap createSingleSpinnerBeatmap()

@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual
         {
             [Resolved(canBeNull: true)]
             [CanBeNull]
-            private DialogOverlay dialogOverlay { get; set; }
+            private IDialogOverlay dialogOverlay { get; set; }
 
             public new void Undo() => base.Undo();
 
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Visual
 
             public new bool HasUnsavedChanges => base.HasUnsavedChanges;
 
-            public override bool OnExiting(IScreen next)
+            public override bool OnExiting(ScreenExitEvent e)
             {
                 // For testing purposes allow the screen to exit without saving on second attempt.
                 if (!ExitConfirmed && dialogOverlay?.CurrentDialog is PromptForSaveDialog saveDialog)
@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual
                     return true;
                 }
 
-                return base.OnExiting(next);
+                return base.OnExiting(e);
             }
 
             public TestEditor(EditorLoader loader = null)

@@ -166,11 +166,35 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestSpotlightBeatmap()
+        {
+            AddStep("show spotlight map", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.FeaturedInSpotlight = true;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+        }
+
+        [Test]
         public void TestFeaturedBeatmap()
         {
             AddStep("show featured map", () =>
             {
                 var beatmapSet = getBeatmapSet();
+                beatmapSet.TrackId = 1;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+        }
+
+        [Test]
+        public void TestAllBadgesBeatmap()
+        {
+            AddStep("show map with all badges", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.HasExplicitContent = true;
+                beatmapSet.FeaturedInSpotlight = true;
                 beatmapSet.TrackId = 1;
                 overlay.ShowBeatmapSet(beatmapSet);
             });

@@ -37,7 +37,7 @@ namespace osu.Game.Database
         {
             string filename = $"{item.GetDisplayString().GetValidArchiveContentFilename()}{FileExtension}";
 
-            using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
+            using (var stream = exportStorage.CreateFileSafely(filename))
                 ExportModelTo(item, stream);
 
             exportStorage.PresentFileExternally(filename);

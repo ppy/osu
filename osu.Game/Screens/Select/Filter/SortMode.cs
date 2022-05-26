@@ -2,36 +2,39 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Select.Filter
 {
     public enum SortMode
     {
-        [Description("Artist")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingArtist))]
         Artist,
 
         [Description("Author")]
         Author,
 
-        [Description("BPM")]
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowStatsBpm))]
         BPM,
 
         [Description("Date Added")]
         DateAdded,
 
-        [Description("Difficulty")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingDifficulty))]
         Difficulty,
 
-        [Description("Length")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.ArtistTracksLength))]
         Length,
 
-        [Description("Rank Achieved")]
-        RankAchieved,
+        // todo: pending support (https://github.com/ppy/osu/issues/4917)
+        // [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchFiltersRank))]
+        // RankAchieved,
 
-        [Description("Source")]
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoSource))]
         Source,
 
-        [Description("Title")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingTitle))]
         Title,
     }
 }

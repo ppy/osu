@@ -59,8 +59,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for player", () =>
             {
-                // dismiss any notifications that may appear (ie. muted notification).
-                clickMouseInCentre();
+                DismissAnyNotifications();
                 return player != null;
             });
 
@@ -71,12 +70,6 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("press 's'", () => InputManager.Key(Key.S));
             AddAssert("key counter did increase", () => keyCounter.CountPresses == 1);
-        }
-
-        private void clickMouseInCentre()
-        {
-            InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre);
-            InputManager.Click(MouseButton.Left);
         }
 
         private KeyBindingsSubsection osuBindingSubsection => keyBindingPanel

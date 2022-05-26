@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Menus
 
         private IntroScreen intro;
 
-        [Cached]
+        [Cached(typeof(INotificationOverlay))]
         private NotificationOverlay notifications;
 
         private ScheduledDelegate trackResetDelegate;

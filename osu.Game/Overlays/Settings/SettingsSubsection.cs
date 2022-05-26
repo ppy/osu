@@ -25,11 +25,7 @@ namespace osu.Game.Overlays.Settings
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
 
-        // FilterTerms should contains both original string and localised string for user to search.
-        // Since LocalisableString is unable to get original string at this time (2021-08-14),
-        // only call .ToString() to use localised one.
-        // TODO: Update here when FilterTerms accept LocalisableString.
-        public virtual IEnumerable<string> FilterTerms => new[] { Header.ToString() };
+        public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Header };
 
         public bool MatchingFilter
         {

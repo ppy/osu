@@ -19,9 +19,9 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             MetadataInfo.FinishTransforms(true);
         }

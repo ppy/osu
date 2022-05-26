@@ -13,6 +13,7 @@ using osuTK.Input;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Events;
 using System.Linq;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Select.Options
 {
@@ -63,7 +64,7 @@ namespace osu.Game.Screens.Select.Options
         /// <param name="colour">Colour of the button.</param>
         /// <param name="icon">Icon of the button.</param>
         /// <param name="action">Binding the button does.</param>
-        public void AddButton(string firstLine, string secondLine, IconUsage icon, Color4 colour, Action action)
+        public void AddButton(LocalisableString firstLine, string secondLine, IconUsage icon, Color4 colour, Action action)
         {
             var button = new BeatmapOptionsButton
             {
