@@ -20,6 +20,8 @@ namespace osu.Game.Online
 {
     public class HubClientConnector : IHubClientConnector
     {
+        public const string SERVER_SHUTDOWN_MESSAGE = "Server is shutting down.";
+
         /// <summary>
         /// Invoked whenever a new hub connection is built, to configure it before it's started.
         /// </summary>
