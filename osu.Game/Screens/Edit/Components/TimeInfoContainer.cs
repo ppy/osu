@@ -31,8 +31,8 @@ namespace osu.Game.Screens.Edit.Components
             {
                 trackTimer = new OsuSpriteText
                 {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                     Spacing = new Vector2(-2, 0),
                     Font = OsuFont.Torus.With(size: 36, fixedWidth: true, weight: FontWeight.Light),
                     Y = -10,
@@ -40,9 +40,9 @@ namespace osu.Game.Screens.Edit.Components
                 bpm = new OsuSpriteText
                 {
                     Colour = colours.Orange1,
-                    Anchor = Anchor.CentreRight,
+                    Anchor = Anchor.CentreLeft,
                     Font = OsuFont.Torus.With(size: 18, weight: FontWeight.SemiBold),
-                    Y = 5,
+                    Position = new Vector2(2, 5),
                 }
             };
         }
@@ -52,7 +52,6 @@ namespace osu.Game.Screens.Edit.Components
             base.Update();
             trackTimer.Text = editorClock.CurrentTime.ToEditorFormattedString();
             bpm.Text = @$"{editorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime).BPM:0} BPM";
-            bpm.X = 5 - trackTimer.DrawWidth;
         }
     }
 }
