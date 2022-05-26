@@ -31,10 +31,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// TODO: findRepetitionInterval needs to be called a final time after all hitObjects have been processed.
         /// </summary>
         public static TaikoDifficultyHitObjectColour GetInstanceFor(
-            TaikoDifficultyHitObject hitObject, TaikoDifficultyHitObject lastObject, TaikoDifficultyHitObjectColour previous)
+            TaikoDifficultyHitObject hitObject, TaikoDifficultyHitObject lastObject)
         {
+            TaikoDifficultyHitObjectColour previous = lastObject?.Colour;
             bool delta = lastObject == null || hitObject.HitType != lastObject.HitType;
-            if (delta == previous.Delta)
+            if (previous != null && delta == previous.Delta)
             {
                 previous.DeltaRunLength += 1;
                 return previous;
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             else
             {
                 // Calculate RepetitionInterval for previous
-                previous.RepetitionInterval = findRepetitionInterval(previous);
+                previous?.FindRepetitionInterval();
 
                 return new TaikoDifficultyHitObjectColour()
                 {
@@ -56,23 +57,35 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
         /// <summary>
         /// Finds the closest previous <see cref="TaikoDifficultyHitObjectColour"/> that has the identical delta value 
-        /// and run length to target, and returns the amount of notes between them.
+        /// and run length with the current instance, and returns the amount of notes between them.
         /// </summary>
-        private static int findRepetitionInterval(TaikoDifficultyHitObjectColour target) {
-            if (target.previous == null || target.previous.previous == null)
-                return -1;
+        public void FindRepetitionInterval()
+        {
+            if (this.previous == null || this.previous.previous == null)
+            {
+                this.RepetitionInterval = -1;
+                return;
+            }
 
-            int interval = target.previous.DeltaRunLength;
-            TaikoDifficultyHitObjectColour other = target.previous.previous;
-            while(other != null && interval < max_repetition_interval) {
-                if (other.Delta == target.Delta && other.DeltaRunLength == target.DeltaRunLength)
-                    return interval;
+
+            int interval = this.previous.DeltaRunLength;
+            TaikoDifficultyHitObjectColour other = this.previous.previous;
+            while (other != null && interval < max_repetition_interval)
+            {
+                if (other.Delta == this.Delta && other.DeltaRunLength == this.DeltaRunLength)
+                {
+                    this.RepetitionInterval = interval;
+                    return;
+                }
                 else
+                {
                     interval += other.DeltaRunLength;
+                }
+
                 other = other.previous;
             }
 
-            return -1;
+            this.RepetitionInterval = -1;
         }
     }
 }

@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// </summary>
         public readonly TaikoDifficultyHitObjectRhythm Rhythm;
 
+        public readonly TaikoDifficultyHitObjectColour Colour;
+
         /// <summary>
         /// The hit type of this hit object.
         /// </summary>
@@ -30,28 +32,25 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public readonly int ObjectIndex;
 
         /// <summary>
-        /// Whether the object should carry a penalty due to being hittable using special techniques
-        /// making it easier to do so.
-        /// </summary>
-        public bool StaminaCheese;
-
-        /// <summary>
         /// Creates a new difficulty hit object.
         /// </summary>
         /// <param name="hitObject">The gameplay <see cref="HitObject"/> associated with this difficulty object.</param>
         /// <param name="lastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="hitObject"/>.</param>
         /// <param name="lastLastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="lastObject"/>.</param>
+        /// <param name="lastDifficulty">The <see cref="TaikoDifficultyHitObject"/> for <paramref name="lastObject"/>.</param>
         /// <param name="clockRate">The rate of the gameplay clock. Modified by speed-changing mods.</param>
         /// <param name="objectIndex">The index of the object in the beatmap.</param>
-        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, int objectIndex)
+        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, TaikoDifficultyHitObject lastDifficulty, double clockRate, int objectIndex)
             : base(hitObject, lastObject, clockRate)
         {
             var currentHit = hitObject as Hit;
 
             Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRate);
             HitType = currentHit?.Type;
-
             ObjectIndex = objectIndex;
+
+            // Need to be done after HitType is set.
+            Colour = TaikoDifficultyHitObjectColour.GetInstanceFor(this, lastDifficulty);
         }
 
         /// <summary>
