@@ -27,9 +27,9 @@ namespace osu.Game.Overlays.Chat.ChannelList
         public Action<Channel>? OnRequestLeave;
 
         public IEnumerable<Channel> Channels => groupFlow.Children.Where(child => child is ChannelGroup)
-                                                                  .Cast<ChannelGroup>()
-                                                                  .SelectMany(channelGroup => channelGroup.ItemFlow)
-                                                                  .Select(item => item.Channel);
+                                                .Cast<ChannelGroup>()
+                                                .SelectMany(channelGroup => channelGroup.ItemFlow)
+                                                .Select(item => item.Channel);
 
         public readonly ChannelListing.ChannelListingChannel ChannelListingChannel = new ChannelListing.ChannelListingChannel();
 
@@ -144,9 +144,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private class ChannelGroup : FillFlowContainer
         {
-            public FillFlowContainer<ChannelListItem> ItemFlow => flow;
-
-            private readonly FillFlowContainer<ChannelListItem> flow;
+            public readonly FillFlowContainer<ChannelListItem> ItemFlow;
 
             public ChannelGroup(LocalisableString label)
             {
@@ -163,7 +161,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         Margin = new MarginPadding { Left = 18, Bottom = 5 },
                         Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
                     },
-                    flow = new FillFlowContainer<ChannelListItem>
+                    ItemFlow = new FillFlowContainer<ChannelListItem>
                     {
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
