@@ -110,8 +110,28 @@ namespace osu.Game.Screens.Edit.Components.Menus
                     case EditorMenuItemSpacer spacer:
                         return new DrawableSpacer(spacer);
 
+                    case StatefulMenuItem stateful:
+                        return new EditorStatefulMenuItem(stateful);
+
                     default:
                         return new EditorMenuItem(item);
+                }
+            }
+
+            private class EditorStatefulMenuItem : DrawableStatefulMenuItem
+            {
+                public EditorStatefulMenuItem(StatefulMenuItem item)
+                    : base(item)
+                {
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    BackgroundColour = colourProvider.Background2;
+                    BackgroundColourHover = colourProvider.Background1;
+
+                    Foreground.Padding = new MarginPadding { Vertical = 2 };
                 }
             }
 
