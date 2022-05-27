@@ -13,6 +13,7 @@ using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.BeatmapSet.Scores;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
@@ -105,10 +106,12 @@ namespace osu.Game.Tests.Visual.Online
             downloadAssert(true);
 
             AddAssert("status is loved", () => overlay.ChildrenOfType<BeatmapSetOnlineStatusPill>().Single().Status == BeatmapOnlineStatus.Loved);
+            AddAssert("scores container is visible", () => overlay.ChildrenOfType<ScoresContainer>().Single().Alpha == 1);
 
             AddStep("go to second beatmap", () => overlay.ChildrenOfType<BeatmapPicker.DifficultySelectorButton>().ElementAt(1).TriggerClick());
 
             AddAssert("status is graveyard", () => overlay.ChildrenOfType<BeatmapSetOnlineStatusPill>().Single().Status == BeatmapOnlineStatus.Graveyard);
+            AddAssert("scores container is hidden", () => overlay.ChildrenOfType<ScoresContainer>().Single().Alpha == 0);
         }
 
         [Test]
