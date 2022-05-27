@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Rooms;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
@@ -53,16 +52,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 text.Text = c.NewValue.GetLocalisableDescription();
 
-                switch (c.NewValue)
-                {
-                    case RoomCategory.Spotlight:
-                        pill.Background.Colour = colours.Green2;
-                        break;
-
-                    case RoomCategory.FeaturedArtist:
-                        pill.Background.Colour = colours.Blue2;
-                        break;
-                }
+                var backgroundColour = colours.ForRoomCategory(Category.Value);
+                if (backgroundColour != null)
+                    pill.Background.Colour = backgroundColour.Value;
             }, true);
         }
     }
