@@ -493,7 +493,7 @@ namespace osu.Game.Screens.Edit
             if (scrollAccumulation != 0 && Math.Sign(scrollAccumulation) != scrollDirection)
                 scrollAccumulation = scrollDirection * (precision - Math.Abs(scrollAccumulation));
 
-            scrollAccumulation += scrollComponent * (e.IsPrecise ? 0.1 : 1);
+            scrollAccumulation += scrollComponent;
 
             // because we are doing snapped seeking, we need to add up precise scrolls until they accumulate to an arbitrary cut-off.
             while (Math.Abs(scrollAccumulation) >= precision)
