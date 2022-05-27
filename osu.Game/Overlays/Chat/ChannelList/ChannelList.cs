@@ -7,14 +7,17 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat.Listing;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
@@ -57,13 +60,13 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            new ChannelListLabel("CHANNELS"),
+                            new ChannelListLabel(ChatStrings.ChannelsListTitlePUBLIC.ToUpper()),
                             publicChannelFlow = new ChannelListItemFlow(),
                             selector = new ChannelListItem(ChannelListingChannel)
                             {
                                 Margin = new MarginPadding { Bottom = 10 },
                             },
-                            new ChannelListLabel("DIRECT MESSAGES"),
+                            new ChannelListLabel(ChatStrings.ChannelsListTitlePM.ToUpper()),
                             privateChannelFlow = new ChannelListItemFlow(),
                         },
                     },
@@ -126,7 +129,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private class ChannelListLabel : OsuSpriteText
         {
-            public ChannelListLabel(string label)
+            public ChannelListLabel(LocalisableString label)
             {
                 Text = label;
                 Margin = new MarginPadding { Left = 18, Bottom = 5 };
