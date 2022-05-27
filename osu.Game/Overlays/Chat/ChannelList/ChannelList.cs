@@ -26,18 +26,20 @@ namespace osu.Game.Overlays.Chat.ChannelList
         public Action<Channel>? OnRequestSelect;
         public Action<Channel>? OnRequestLeave;
 
-        public IEnumerable<Channel> Channels =>
-            announceChannelFlow.Channels.Concat(publicChannelFlow.Channels).Concat(privateChannelFlow.Channels);
+        public IEnumerable<Channel> Channels => groupFlow.Children.Where(child => child is ChannelGroup)
+                                                                  .Cast<ChannelGroup>()
+                                                                  .SelectMany(channelGroup => channelGroup.ItemFlow)
+                                                                  .Select(item => item.Channel);
 
         public readonly ChannelListing.ChannelListingChannel ChannelListingChannel = new ChannelListing.ChannelListingChannel();
 
         private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
         private OsuScrollContainer scroll = null!;
-        private ChannelListLabel announceChannelLabel = null!;
-        private ChannelListItemFlow announceChannelFlow = null!;
-        private ChannelListItemFlow publicChannelFlow = null!;
-        private ChannelListItemFlow privateChannelFlow = null!;
+        private FillFlowContainer groupFlow = null!;
+        private ChannelGroup announceChannelGroup = null!;
+        private ChannelGroup publicChannelGroup = null!;
+        private ChannelGroup privateChannelGroup = null!;
         private ChannelListItem selector = null!;
 
         [BackgroundDependencyLoader]
@@ -55,20 +57,17 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarAnchor = Anchor.TopRight,
                     ScrollDistance = 35f,
-                    Child = new FillFlowContainer
+                    Child = groupFlow = new FillFlowContainer
                     {
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            announceChannelLabel = new ChannelListLabel(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper()),
-                            announceChannelFlow = new ChannelListItemFlow(),
-                            new ChannelListLabel(ChatStrings.ChannelsListTitlePUBLIC.ToUpper()),
-                            publicChannelFlow = new ChannelListItemFlow(),
+                            announceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper()),
+                            publicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper()),
                             selector = new ChannelListItem(ChannelListingChannel),
-                            new ChannelListLabel(ChatStrings.ChannelsListTitlePM.ToUpper()),
-                            privateChannelFlow = new ChannelListItemFlow(),
+                            privateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper()),
                         },
                     },
                 },
@@ -86,7 +85,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             item.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
             item.OnRequestLeave += chan => OnRequestLeave?.Invoke(chan);
 
-            ChannelListItemFlow flow = getFlowForChannel(channel);
+            FillFlowContainer<ChannelListItem> flow = getFlowForChannel(channel);
             channelMap.Add(channel, item);
             flow.Add(item);
 
@@ -99,7 +98,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 return;
 
             ChannelListItem item = channelMap[channel];
-            ChannelListItemFlow flow = getFlowForChannel(channel);
+            FillFlowContainer<ChannelListItem> flow = getFlowForChannel(channel);
 
             channelMap.Remove(channel);
             flow.Remove(item);
@@ -117,57 +116,60 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         public void ScrollChannelIntoView(Channel channel) => scroll.ScrollIntoView(GetItem(channel));
 
-        private ChannelListItemFlow getFlowForChannel(Channel channel)
+        private FillFlowContainer<ChannelListItem> getFlowForChannel(Channel channel)
         {
             switch (channel.Type)
             {
                 case ChannelType.Public:
-                    return publicChannelFlow;
+                    return publicChannelGroup.ItemFlow;
 
                 case ChannelType.PM:
-                    return privateChannelFlow;
+                    return privateChannelGroup.ItemFlow;
 
                 case ChannelType.Announce:
-                    return announceChannelFlow;
+                    return announceChannelGroup.ItemFlow;
 
                 default:
-                    return publicChannelFlow;
+                    return publicChannelGroup.ItemFlow;
             }
         }
 
         private void updateVisibility()
         {
-            if (announceChannelFlow.Channels.Count() == 0)
-            {
-                announceChannelLabel.Hide();
-                announceChannelFlow.Hide();
-            }
+            if (announceChannelGroup.ItemFlow.Children.Count == 0)
+                announceChannelGroup.Hide();
             else
-            {
-                announceChannelLabel.Show();
-                announceChannelFlow.Show();
-            }
+                announceChannelGroup.Show();
         }
 
-        private class ChannelListLabel : OsuSpriteText
+        private class ChannelGroup : FillFlowContainer
         {
-            public ChannelListLabel(LocalisableString label)
-            {
-                Text = label;
-                Margin = new MarginPadding { Left = 18, Bottom = 5, Top = 8 };
-                Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold);
-            }
-        }
+            public FillFlowContainer<ChannelListItem> ItemFlow => flow;
 
-        private class ChannelListItemFlow : FillFlowContainer<ChannelListItem>
-        {
-            public IEnumerable<Channel> Channels => Children.Select(c => c.Channel);
+            private readonly FillFlowContainer<ChannelListItem> flow;
 
-            public ChannelListItemFlow()
+            public ChannelGroup(LocalisableString label)
             {
                 Direction = FillDirection.Vertical;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
+                Padding = new MarginPadding { Top = 8 };
+
+                Children = new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Text = label,
+                        Margin = new MarginPadding { Left = 18, Bottom = 5 },
+                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
+                    },
+                    flow = new FillFlowContainer<ChannelListItem>
+                    {
+                        Direction = FillDirection.Vertical,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    },
+                };
             }
         }
     }
