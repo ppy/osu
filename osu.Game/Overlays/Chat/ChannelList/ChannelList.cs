@@ -26,13 +26,16 @@ namespace osu.Game.Overlays.Chat.ChannelList
         public Action<Channel>? OnRequestSelect;
         public Action<Channel>? OnRequestLeave;
 
-        public IEnumerable<Channel> Channels => publicChannelFlow.Channels.Concat(privateChannelFlow.Channels);
+        public IEnumerable<Channel> Channels =>
+            announceChannelFlow.Channels.Concat(publicChannelFlow.Channels).Concat(privateChannelFlow.Channels);
 
         public readonly ChannelListing.ChannelListingChannel ChannelListingChannel = new ChannelListing.ChannelListingChannel();
 
         private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
         private OsuScrollContainer scroll = null!;
+        private ChannelListLabel announceChannelLabel = null!;
+        private ChannelListItemFlow announceChannelFlow = null!;
         private ChannelListItemFlow publicChannelFlow = null!;
         private ChannelListItemFlow privateChannelFlow = null!;
         private ChannelListItem selector = null!;
@@ -49,7 +52,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 },
                 scroll = new OsuScrollContainer
                 {
-                    Padding = new MarginPadding { Vertical = 7 },
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarAnchor = Anchor.TopRight,
                     ScrollDistance = 35f,
@@ -60,12 +62,11 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
+                            announceChannelLabel = new ChannelListLabel(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper()),
+                            announceChannelFlow = new ChannelListItemFlow(),
                             new ChannelListLabel(ChatStrings.ChannelsListTitlePUBLIC.ToUpper()),
                             publicChannelFlow = new ChannelListItemFlow(),
-                            selector = new ChannelListItem(ChannelListingChannel)
-                            {
-                                Margin = new MarginPadding { Bottom = 10 },
-                            },
+                            selector = new ChannelListItem(ChannelListingChannel),
                             new ChannelListLabel(ChatStrings.ChannelsListTitlePM.ToUpper()),
                             privateChannelFlow = new ChannelListItemFlow(),
                         },
@@ -88,6 +89,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
             ChannelListItemFlow flow = getFlowForChannel(channel);
             channelMap.Add(channel, item);
             flow.Add(item);
+
+            updateVisibility();
         }
 
         public void RemoveChannel(Channel channel)
@@ -100,6 +103,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
             channelMap.Remove(channel);
             flow.Remove(item);
+
+            updateVisibility();
         }
 
         public ChannelListItem GetItem(Channel channel)
@@ -122,8 +127,25 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 case ChannelType.PM:
                     return privateChannelFlow;
 
+                case ChannelType.Announce:
+                    return announceChannelFlow;
+
                 default:
                     return publicChannelFlow;
+            }
+        }
+
+        private void updateVisibility()
+        {
+            if (announceChannelFlow.Channels.Count() == 0)
+            {
+                announceChannelLabel.Hide();
+                announceChannelFlow.Hide();
+            }
+            else
+            {
+                announceChannelLabel.Show();
+                announceChannelFlow.Show();
             }
         }
 
@@ -132,7 +154,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             public ChannelListLabel(LocalisableString label)
             {
                 Text = label;
-                Margin = new MarginPadding { Left = 18, Bottom = 5 };
+                Margin = new MarginPadding { Left = 18, Bottom = 5, Top = 8 };
                 Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold);
             }
         }
