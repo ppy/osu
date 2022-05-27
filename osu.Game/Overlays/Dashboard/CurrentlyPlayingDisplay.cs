@@ -10,6 +10,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Database;
@@ -35,35 +37,42 @@ namespace osu.Game.Overlays.Dashboard
 
         private SearchContainer<PlayingUserPanel> userFlow;
 
-        private FocusedTextBox searchBar;
-        private Container<FocusedTextBox> searchBarContainer;
+        private Box searchBarBackground;
+        private BasicSearchTextBox searchBar;
+        private Container<BasicSearchTextBox> searchBarContainer;
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            searchBarContainer = new Container<FocusedTextBox>
+            searchBarBackground = new Box
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 10*2 + search_bar_height,
+                Colour = colourProvider.Background4,
+            };
+
+            searchBarContainer = new Container<BasicSearchTextBox>
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
+                RelativeSizeAxes = Axes.X,
                 Padding = new MarginPadding(10),
-                Child = searchBar = new FocusedTextBox
+
+                Child = searchBar = new BasicSearchTextBox
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Height = search_bar_height,
-                    Width = search_bar_width,
 
-                    Colour = OsuColour.Gray(0.8f),
+                    RelativeSizeAxes = Axes.X,
 
-                    PlaceholderText = "Search for User...",
-                    HoldFocus = true,
-                    ReleaseFocusOnCommit = true,
+                    PlaceholderText = "type to search",
                 },
             };
 
@@ -72,7 +81,7 @@ namespace osu.Game.Overlays.Dashboard
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Padding = new MarginPadding {
-                    Top = 10 + 10 + search_bar_height,
+                    Top = 10*3 + search_bar_height,
                     Bottom = 10,
                     Right = 10,
                     Left = 10,
@@ -82,6 +91,7 @@ namespace osu.Game.Overlays.Dashboard
 
             InternalChildren = new Drawable[]
             {
+                searchBarBackground,
                 searchBarContainer,
                 userFlow,
             };
@@ -170,10 +180,7 @@ namespace osu.Game.Overlays.Dashboard
                 }
             }
 
-            public bool FilteringActive
-            {
-                set { }
-            }
+            public bool FilteringActive { set; get; }
 
             public PlayingUserPanel(APIUser user)
             {
