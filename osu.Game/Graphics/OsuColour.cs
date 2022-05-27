@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -185,6 +186,24 @@ namespace osu.Game.Graphics
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(modType), modType, "Unknown mod type");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the main accent colour for a <see cref="RoomCategory"/>.
+        /// </summary>
+        public Color4? ForRoomCategory(RoomCategory roomCategory)
+        {
+            switch (roomCategory)
+            {
+                case RoomCategory.Spotlight:
+                    return Green2;
+
+                case RoomCategory.FeaturedArtist:
+                    return Blue2;
+
+                default:
+                    return null;
             }
         }
 
