@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Dashboard
     internal class CurrentlyPlayingDisplay : CompositeDrawable
     {
         private const float SEARCHBAR_HEIGHT = 40;
+        private const float CONTAINER_PADDING = 10;
 
         private readonly IBindableList<int> playingUsers = new BindableList<int>();
 
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Dashboard
             searchBarBackground = new Box
             {
                 RelativeSizeAxes = Axes.X,
-                Height = 10*2 + SEARCHBAR_HEIGHT,
+                Height = CONTAINER_PADDING * 2 + SEARCHBAR_HEIGHT,
                 Colour = colourProvider.Background4,
             };
 
@@ -70,7 +71,7 @@ namespace osu.Game.Overlays.Dashboard
 
                     RelativeSizeAxes = Axes.X,
 
-                    PlaceholderText = "type to search",
+                    PlaceholderText = Resources.Localisation.Web.HomeStrings.SearchPlaceholder,
                 },
             };
 
@@ -79,7 +80,7 @@ namespace osu.Game.Overlays.Dashboard
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Padding = new MarginPadding {
-                    Top = 10*3 + SEARCHBAR_HEIGHT,
+                    Top = CONTAINER_PADDING * 3 + SEARCHBAR_HEIGHT,
                     Bottom = 10,
                     Right = 10,
                     Left = 10,
