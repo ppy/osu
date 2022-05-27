@@ -64,6 +64,8 @@ namespace osu.Game.Overlays.Dashboard
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Height = search_textbox_height,
+                        ReleaseFocusOnCommit = false,
+                        HoldFocus = true,
                         PlaceholderText = HomeStrings.SearchPlaceholder,
                     },
                 },
