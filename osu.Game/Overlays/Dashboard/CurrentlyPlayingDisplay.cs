@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -29,16 +28,13 @@ namespace osu.Game.Overlays.Dashboard
 {
     internal class CurrentlyPlayingDisplay : CompositeDrawable
     {
-        private const float SEARCHBAR_HEIGHT = 40;
-        private const float CONTAINER_PADDING = 10;
+        private const float searchbox_height = 40f;
+        private const float container_padding = 10f;
 
         private readonly IBindableList<int> playingUsers = new BindableList<int>();
 
         private SearchContainer<PlayingUserPanel> userFlow;
-
-        private Box searchBarBackground;
-        private BasicSearchTextBox searchBar;
-        private Container<BasicSearchTextBox> searchBarContainer;
+        private BasicSearchTextBox userFlowSearchTextBox;
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
@@ -49,53 +45,48 @@ namespace osu.Game.Overlays.Dashboard
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            searchBarBackground = new Box
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = CONTAINER_PADDING * 2 + SEARCHBAR_HEIGHT,
-                Colour = colourProvider.Background4,
-            };
-
-            searchBarContainer = new Container<BasicSearchTextBox>
-            {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                RelativeSizeAxes = Axes.X,
-                Padding = new MarginPadding(CONTAINER_PADDING),
-
-                Child = searchBar = new BasicSearchTextBox
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Height = SEARCHBAR_HEIGHT,
-
-                    RelativeSizeAxes = Axes.X,
-
-                    PlaceholderText = Resources.Localisation.Web.HomeStrings.SearchPlaceholder,
-                },
-            };
-
-            userFlow = new SearchContainer<PlayingUserPanel>
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Padding = new MarginPadding {
-                    Top = CONTAINER_PADDING * 3 + SEARCHBAR_HEIGHT,
-                    Bottom = CONTAINER_PADDING,
-                    Right = CONTAINER_PADDING,
-                    Left = CONTAINER_PADDING,
-                },
-                Spacing = new Vector2(10),
-            };
-
             InternalChildren = new Drawable[]
             {
-                searchBarBackground,
-                searchBarContainer,
-                userFlow,
+                new Box
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = container_padding * 2 + searchbox_height,
+                    Colour = colourProvider.Background4,
+                },
+
+                new Container<BasicSearchTextBox>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Padding = new MarginPadding(container_padding),
+
+                    Child = userFlowSearchTextBox = new BasicSearchTextBox
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Height = searchbox_height,
+                        PlaceholderText = Resources.Localisation.Web.HomeStrings.SearchPlaceholder,
+                    },
+                },
+
+                userFlow = new SearchContainer<PlayingUserPanel>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding
+                    {
+                        Top = container_padding * 3 + searchbox_height,
+                        Bottom = container_padding,
+                        Right = container_padding,
+                        Left = container_padding,
+                    },
+                    Spacing = new Vector2(10),
+                },
             };
 
-            searchBar.Current.ValueChanged += onSearchBarValueChanged;
+            userFlowSearchTextBox.Current.ValueChanged += onSearchBarValueChanged;
         }
 
         [Resolved]
@@ -109,27 +100,7 @@ namespace osu.Game.Overlays.Dashboard
             playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
         }
 
-        private void addCard(int userId)
-        {
-            users.GetUserAsync(userId).ContinueWith(task =>
-            {
-                var user = task.GetResultSafely();
-
-                if (user == null)
-                    return;
-
-                Schedule(() =>
-                {
-                    // user may no longer be playing.
-                    if (!playingUsers.Contains(user.Id))
-                        return;
-
-                    userFlow.Add(createUserPanel(user));
-                });
-            });
-        }
-
-        private void onSearchBarValueChanged(ValueChangedEvent<string> change) => userFlow.SearchTerm = searchBar.Text;
+        private void onSearchBarValueChanged(ValueChangedEvent<string> change) => userFlow.SearchTerm = userFlowSearchTextBox.Text;
 
         private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
@@ -139,7 +110,24 @@ namespace osu.Game.Overlays.Dashboard
                     Debug.Assert(e.NewItems != null);
 
                     foreach (int userId in e.NewItems)
-                        addCard(userId);
+                    {
+                        users.GetUserAsync(userId).ContinueWith(task =>
+                        {
+                            var user = task.GetResultSafely();
+
+                            if (user == null)
+                                return;
+
+                            Schedule(() =>
+                            {
+                                // user may no longer be playing.
+                                if (!playingUsers.Contains(user.Id))
+                                    return;
+
+                                userFlow.Add(createUserPanel(user));
+                            });
+                        });
+                    }
 
                     break;
 
@@ -159,14 +147,15 @@ namespace osu.Game.Overlays.Dashboard
                 panel.Origin = Anchor.TopCentre;
             });
 
-        private class PlayingUserPanel : CompositeDrawable, IFilterable
+        public class PlayingUserPanel : CompositeDrawable, IFilterable
         {
             public readonly APIUser User;
-            public IEnumerable<LocalisableString> FilterTerms => filterTerm;
+            public IEnumerable<LocalisableString> FilterTerms { get; set; }
 
             [Resolved(canBeNull: true)]
             private IPerformFromScreenRunner performer { get; set; }
-            private IEnumerable<LocalisableString> filterTerm;
+
+            public bool FilteringActive { set; get; }
 
             public bool MatchingFilter
             {
@@ -179,12 +168,10 @@ namespace osu.Game.Overlays.Dashboard
                 }
             }
 
-            public bool FilteringActive { set; get; }
-
             public PlayingUserPanel(APIUser user)
             {
                 User = user;
-                filterTerm = new LocalisableString[] { User.Username };
+                FilterTerms = new LocalisableString[] { User.Username };
 
                 AutoSizeAxes = Axes.Both;
             }
