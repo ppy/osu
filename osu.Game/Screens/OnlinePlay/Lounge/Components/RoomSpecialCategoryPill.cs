@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Rooms;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
@@ -13,6 +15,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     public class RoomSpecialCategoryPill : OnlinePlayComposite
     {
         private SpriteText text;
+        private PillContainer pill;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public RoomSpecialCategoryPill()
         {
@@ -20,9 +26,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            InternalChild = new PillContainer
+            InternalChild = pill = new PillContainer
             {
                 Background =
                 {
@@ -43,7 +49,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            Category.BindValueChanged(c => text.Text = c.NewValue.ToString(), true);
+            Category.BindValueChanged(c =>
+            {
+                text.Text = c.NewValue.GetLocalisableDescription();
+
+                switch (c.NewValue)
+                {
+                    case RoomCategory.Spotlight:
+                        pill.Background.Colour = colours.Green2;
+                        break;
+
+                    case RoomCategory.FeaturedArtist:
+                        pill.Background.Colour = colours.Blue2;
+                        break;
+                }
+            }, true);
         }
     }
 }
