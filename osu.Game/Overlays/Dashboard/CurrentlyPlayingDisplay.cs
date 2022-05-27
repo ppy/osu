@@ -18,6 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
@@ -28,13 +29,13 @@ namespace osu.Game.Overlays.Dashboard
 {
     internal class CurrentlyPlayingDisplay : CompositeDrawable
     {
-        private const float searchbox_height = 40f;
-        private const float container_padding = 10f;
+        private const float search_textbox_height = 40;
+        private const float padding = 10;
 
         private readonly IBindableList<int> playingUsers = new BindableList<int>();
 
         private SearchContainer<PlayingUserPanel> userFlow;
-        private BasicSearchTextBox userFlowSearchTextBox;
+        private BasicSearchTextBox searchTextBox;
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
@@ -50,43 +51,38 @@ namespace osu.Game.Overlays.Dashboard
                 new Box
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = container_padding * 2 + searchbox_height,
+                    Height = padding * 2 + search_textbox_height,
                     Colour = colourProvider.Background4,
                 },
-
                 new Container<BasicSearchTextBox>
                 {
                     RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding(container_padding),
-
-                    Child = userFlowSearchTextBox = new BasicSearchTextBox
+                    Padding = new MarginPadding(padding),
+                    Child = searchTextBox = new BasicSearchTextBox
                     {
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Height = searchbox_height,
-                        PlaceholderText = Resources.Localisation.Web.HomeStrings.SearchPlaceholder,
+                        Height = search_textbox_height,
+                        PlaceholderText = HomeStrings.SearchPlaceholder,
                     },
                 },
-
                 userFlow = new SearchContainer<PlayingUserPanel>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(10),
                     Padding = new MarginPadding
                     {
-                        Top = container_padding * 3 + searchbox_height,
-                        Bottom = container_padding,
-                        Right = container_padding,
-                        Left = container_padding,
+                        Top = padding * 3 + search_textbox_height,
+                        Bottom = padding,
+                        Right = padding,
+                        Left = padding,
                     },
-                    Spacing = new Vector2(10),
                 },
             };
 
-            userFlowSearchTextBox.Current.ValueChanged += onSearchBarValueChanged;
+            searchTextBox.Current.ValueChanged += text => userFlow.SearchTerm = text.NewValue;
         }
 
         [Resolved]
@@ -99,8 +95,6 @@ namespace osu.Game.Overlays.Dashboard
             playingUsers.BindTo(spectatorClient.PlayingUsers);
             playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
         }
-
-        private void onSearchBarValueChanged(ValueChangedEvent<string> change) => userFlow.SearchTerm = userFlowSearchTextBox.Text;
 
         private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
@@ -150,7 +144,8 @@ namespace osu.Game.Overlays.Dashboard
         public class PlayingUserPanel : CompositeDrawable, IFilterable
         {
             public readonly APIUser User;
-            public IEnumerable<LocalisableString> FilterTerms { get; set; }
+
+            public IEnumerable<LocalisableString> FilterTerms { get; }
 
             [Resolved(canBeNull: true)]
             private IPerformFromScreenRunner performer { get; set; }
@@ -171,6 +166,7 @@ namespace osu.Game.Overlays.Dashboard
             public PlayingUserPanel(APIUser user)
             {
                 User = user;
+
                 FilterTerms = new LocalisableString[] { User.Username };
 
                 AutoSizeAxes = Axes.Both;
