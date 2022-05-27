@@ -237,7 +237,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomCategory.BindTo(Room.Category);
                 roomCategory.BindValueChanged(c =>
                 {
-                    if (c.NewValue == RoomCategory.Spotlight)
+                    if (c.NewValue > RoomCategory.Normal)
                         specialCategoryPill.Show();
                     else
                         specialCategoryPill.Hide();

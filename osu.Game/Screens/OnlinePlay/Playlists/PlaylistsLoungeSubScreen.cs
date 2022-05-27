@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -49,6 +50,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 case PlaylistsCategory.Spotlight:
                     criteria.Category = @"spotlight";
                     break;
+
+                case PlaylistsCategory.FeaturedArtist:
+                    criteria.Category = @"featured_artist";
+                    break;
             }
 
             return criteria;
@@ -73,7 +78,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             Any,
             Normal,
-            Spotlight
+            Spotlight,
+
+            [Description("Featured Artist")]
+            FeaturedArtist,
         }
     }
 }
