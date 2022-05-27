@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 using osuTK.Graphics;
 
@@ -22,12 +21,10 @@ namespace osu.Game.Tests.Visual.Online
     public class TestSceneChatLink : OsuTestScene
     {
         private readonly TestChatLineContainer textContainer;
-        private readonly DialogOverlay dialogOverlay;
         private Color4 linkColour;
 
         public TestSceneChatLink()
         {
-            Add(dialogOverlay = new DialogOverlay { Depth = float.MinValue });
             Add(textContainer = new TestChatLineContainer
             {
                 Padding = new MarginPadding { Left = 20, Right = 20 },
@@ -47,9 +44,6 @@ namespace osu.Game.Tests.Visual.Online
             availableChannels.Add(new Channel { Name = "#english" });
             availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);
-
-            Dependencies.Cache(new ChatOverlay());
-            Dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
         }
 
         [SetUp]

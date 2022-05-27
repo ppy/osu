@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Edit
         {
             AddInternal(RightSideToolboxContainer = new ExpandingToolboxContainer(130, 250)
             {
-                Padding = new MarginPadding { Right = 10 },
+                Padding = new MarginPadding(10),
                 Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
