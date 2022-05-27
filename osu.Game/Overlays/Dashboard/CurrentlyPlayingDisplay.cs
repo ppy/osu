@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Dashboard
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
                 RelativeSizeAxes = Axes.X,
-                Padding = new MarginPadding(10),
+                Padding = new MarginPadding(CONTAINER_PADDING),
 
                 Child = searchBar = new BasicSearchTextBox
                 {
@@ -81,9 +81,9 @@ namespace osu.Game.Overlays.Dashboard
                 AutoSizeAxes = Axes.Y,
                 Padding = new MarginPadding {
                     Top = CONTAINER_PADDING * 3 + SEARCHBAR_HEIGHT,
-                    Bottom = 10,
-                    Right = 10,
-                    Left = 10,
+                    Bottom = CONTAINER_PADDING,
+                    Right = CONTAINER_PADDING,
+                    Left = CONTAINER_PADDING,
                 },
                 Spacing = new Vector2(10),
             };
