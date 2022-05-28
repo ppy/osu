@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         protected BindableFloat EasementStrength = new BindableFloat(0.5f);
         protected Vector2 CursorPosition;
         protected DrawableHitObject WorkingHitObject;
-        protected abstract Vector2 DestinationVector { get; }
-        
+        protected virtual Vector2 DestinationVector => WorkingHitObject.Position;
+
         private IFrameStableClock gameplayClock;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
@@ -47,22 +47,22 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:
-                        easeHitObjectPositionToVector(circle, DestinationVector);
+                        EaseHitObjectPositionToVector(circle, DestinationVector);
                         break;
 
                     case DrawableSlider slider:
 
                         if (!slider.HeadCircle.Result.HasResult)
-                            easeHitObjectPositionToVector(slider, DestinationVector);
+                            EaseHitObjectPositionToVector(slider, DestinationVector);
                         else
-                            easeHitObjectPositionToVector(slider, DestinationVector - slider.Ball.DrawPosition);
+                            EaseHitObjectPositionToVector(slider, DestinationVector - slider.Ball.DrawPosition);
 
                         break;
                 }
             }
         }
 
-        private void easeHitObjectPositionToVector(DrawableHitObject hitObject, Vector2 destination)
+        protected void EaseHitObjectPositionToVector(DrawableHitObject hitObject, Vector2 destination)
         {
             double dampLength = Interpolation.Lerp(3000, 40, EasementStrength.Value);
 
