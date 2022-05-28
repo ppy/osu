@@ -12,6 +12,7 @@ namespace osu.Game.Online.Chat
         Temporary,
         PM,
         Group,
-        System
+        System,
+        Announce,
     }
 }

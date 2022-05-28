@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Components
@@ -155,10 +156,10 @@ namespace osu.Game.Screens.Edit.Components
                 private Color4 normalColour;
 
                 [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
+                private void load(OverlayColourProvider colourProvider)
                 {
-                    text.Colour = normalColour = colours.YellowDarker;
-                    textBold.Colour = hoveredColour = colours.Yellow;
+                    text.Colour = normalColour = colourProvider.Light3;
+                    textBold.Colour = hoveredColour = colourProvider.Content1;
                 }
 
                 protected override bool OnHover(HoverEvent e)

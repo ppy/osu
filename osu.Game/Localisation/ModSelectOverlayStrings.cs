@@ -5,9 +5,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
 {
-    public static class ModSelectScreenStrings
+    public static class ModSelectOverlayStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.ModSelectScreen";
+        private const string prefix = @"osu.Game.Resources.Localisation.ModSelectOverlay";
 
         /// <summary>
         /// "Mod Select"

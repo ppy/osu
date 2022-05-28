@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -83,6 +84,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             StrainTime = Math.Max(DeltaTime, min_delta_time);
 
             setDistances(clockRate);
+        }
+
+        public double OpacityAt(double time, bool hidden)
+        {
+            if (time > BaseObject.StartTime)
+            {
+                // Consider a hitobject as being invisible when its start time is passed.
+                // In reality the hitobject will be visible beyond its start time up until its hittable window has passed,
+                // but this is an approximation and such a case is unlikely to be hit where this function is used.
+                return 0.0;
+            }
+
+            double fadeInStartTime = BaseObject.StartTime - BaseObject.TimePreempt;
+            double fadeInDuration = BaseObject.TimeFadeIn;
+
+            if (hidden)
+            {
+                // Taken from OsuModHidden.
+                double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeIn;
+                double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
+
+                return Math.Min
+                (
+                    Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0),
+                    1.0 - Math.Clamp((time - fadeOutStartTime) / fadeOutDuration, 0.0, 1.0)
+                );
+            }
+
+            return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
         }
 
         private void setDistances(double clockRate)

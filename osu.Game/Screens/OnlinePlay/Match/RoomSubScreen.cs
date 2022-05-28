@@ -15,9 +15,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -81,7 +84,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public readonly Room Room;
         private readonly bool allowEdit;
 
-        private ModSelectScreen userModsSelectOverlay;
+        private ModSelectOverlay userModsSelectOverlay;
 
         [CanBeNull]
         private IDisposable userModsSelectOverlayRegistration;
@@ -231,7 +234,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 }
             };
 
-            LoadComponent(userModsSelectOverlay = new UserModSelectScreen(OverlayColourScheme.Plum)
+            LoadComponent(userModsSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Plum)
             {
                 SelectedMods = { BindTarget = UserMods },
                 IsValidMod = _ => false
@@ -473,8 +476,20 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// <param name="room">The room to change the settings of.</param>
         protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay(Room room);
 
-        public class UserModSelectButton : PurpleTriangleButton
+        public class UserModSelectButton : PurpleTriangleButton, IKeyBindingHandler<GlobalAction>
         {
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                if (e.Action == GlobalAction.ToggleModSelection && !e.Repeat)
+                {
+                    TriggerClick();
+                    return true;
+                }
+
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
         }
 
         protected override void Dispose(bool isDisposing)

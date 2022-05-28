@@ -126,11 +126,19 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Transfer a valid audio track into this working beatmap. Used as an optimisation to avoid reload / track swap
-        /// across difficulties in the same beatmap set.
+        /// Attempts to transfer the audio track to a target working beatmap, if valid for transferring.
+        /// Used as an optimisation to avoid reload / track swap across difficulties in the same beatmap set.
         /// </summary>
-        /// <param name="track">The track to transfer.</param>
-        public void TransferTrack([NotNull] Track track) => this.track = track ?? throw new ArgumentNullException(nameof(track));
+        /// <param name="target">The target working beatmap to transfer this track to.</param>
+        /// <returns>Whether the track has been transferred to the <paramref name="target"/>.</returns>
+        public virtual bool TryTransferTrack([NotNull] WorkingBeatmap target)
+        {
+            if (BeatmapInfo?.AudioEquals(target.BeatmapInfo) != true || Track.IsDummyDevice)
+                return false;
+
+            target.track = Track;
+            return true;
+        }
 
         /// <summary>
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.

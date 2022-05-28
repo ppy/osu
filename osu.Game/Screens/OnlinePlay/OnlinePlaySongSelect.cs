@@ -52,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay
         private IReadOnlyList<Mod> initialMods;
         private bool itemSelected;
 
-        private readonly FreeModSelectScreen freeModSelectOverlay;
+        private readonly FreeModSelectOverlay freeModSelectOverlay;
         private IDisposable freeModSelectOverlayRegistration;
 
         protected OnlinePlaySongSelect(Room room)
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
 
-            freeModSelectOverlay = new FreeModSelectScreen
+            freeModSelectOverlay = new FreeModSelectOverlay
             {
                 SelectedMods = { BindTarget = FreeMods },
                 IsValidMod = IsValidFreeMod,
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.OnlinePlay
             return base.OnExiting(e);
         }
 
-        protected override ModSelectScreen CreateModSelectOverlay() => new UserModSelectScreen(OverlayColourScheme.Plum)
+        protected override ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay(OverlayColourScheme.Plum)
         {
             IsValidMod = IsValidMod
         };

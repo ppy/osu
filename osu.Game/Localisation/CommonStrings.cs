@@ -69,6 +69,26 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString SelectAll => new TranslatableString(getKey(@"llin_select_all"), @"全选");
 
+        /// <summary>
+        /// "Beatmaps"
+        /// </summary>
+        public static LocalisableString Beatmaps => new TranslatableString(getKey(@"beatmaps"), @"Beatmaps");
+
+        /// <summary>
+        /// "Scores"
+        /// </summary>
+        public static LocalisableString Scores => new TranslatableString(getKey(@"scores"), @"Scores");
+
+        /// <summary>
+        /// "Skins"
+        /// </summary>
+        public static LocalisableString Skins => new TranslatableString(getKey(@"skins"), @"Skins");
+
+        /// <summary>
+        /// "Collections"
+        /// </summary>
+        public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Collections");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

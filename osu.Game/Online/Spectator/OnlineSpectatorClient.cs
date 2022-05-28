@@ -5,10 +5,12 @@
 
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Online.Spectator
 {
@@ -47,14 +49,23 @@ namespace osu.Game.Online.Spectator
             }
         }
 
-        protected override Task BeginPlayingInternal(SpectatorState state)
+        protected override async Task BeginPlayingInternal(SpectatorState state)
         {
             if (!IsConnected.Value)
-                return Task.CompletedTask;
+                return;
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), state);
+            try
+            {
+                await connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), state);
+            }
+            catch (HubException exception)
+            {
+                if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
+                    connector?.Reconnect();
+                throw;
+            }
         }
 
         protected override Task SendFramesInternal(FrameDataBundle bundle)

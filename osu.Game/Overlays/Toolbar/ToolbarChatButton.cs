@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(ChatOverlay chat)
+        private void load(ChatOverlayV2 chat)
         {
             StateContainer = chat;
         }

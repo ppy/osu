@@ -30,5 +30,10 @@ namespace osu.Game.Online
         /// Invoked whenever a new hub connection is built, to configure it before it's started.
         /// </summary>
         public Action<HubConnection>? ConfigureConnection { get; set; }
+
+        /// <summary>
+        /// Reconnect if already connected.
+        /// </summary>
+        void Reconnect();
     }
 }

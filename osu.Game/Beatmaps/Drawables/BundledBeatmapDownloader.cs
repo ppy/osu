@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Online;
@@ -89,6 +91,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         private void queueDownloads(string[] sourceFilenames, int? limit = null)
         {
+            Debug.Assert(LoadState == LoadState.NotLoaded);
+
             try
             {
                 // Matches osu-stable, in order to provide new users with roughly the same randomised selection of bundled beatmaps.

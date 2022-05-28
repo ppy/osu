@@ -84,20 +84,26 @@ namespace osu.Game.Tests.Visual.Beatmaps
             explicitMap.Title = someDifficulties.TitleUnicode = "explicit beatmap";
             explicitMap.HasExplicitContent = true;
 
+            var spotlightMap = CreateAPIBeatmapSet(Ruleset.Value);
+            spotlightMap.Title = someDifficulties.TitleUnicode = "spotlight beatmap";
+            spotlightMap.FeaturedInSpotlight = true;
+
             var featuredMap = CreateAPIBeatmapSet(Ruleset.Value);
             featuredMap.Title = someDifficulties.TitleUnicode = "featured artist beatmap";
             featuredMap.TrackId = 1;
 
-            var explicitFeaturedMap = CreateAPIBeatmapSet(Ruleset.Value);
-            explicitFeaturedMap.Title = someDifficulties.TitleUnicode = "explicit featured artist";
-            explicitFeaturedMap.HasExplicitContent = true;
-            explicitFeaturedMap.TrackId = 2;
+            var allBadgesMap = CreateAPIBeatmapSet(Ruleset.Value);
+            allBadgesMap.Title = someDifficulties.TitleUnicode = "all-badges beatmap";
+            allBadgesMap.HasExplicitContent = true;
+            allBadgesMap.FeaturedInSpotlight = true;
+            allBadgesMap.TrackId = 2;
 
             var longName = CreateAPIBeatmapSet(Ruleset.Value);
             longName.Title = longName.TitleUnicode = "this track has an incredibly and implausibly long title";
             longName.Artist = longName.ArtistUnicode = "and this artist! who would have thunk it. it's really such a long name.";
             longName.Source = "wow. even the source field has an impossibly long string in it. this really takes the cake, doesn't it?";
             longName.HasExplicitContent = true;
+            longName.FeaturedInSpotlight = true;
             longName.TrackId = 444;
 
             testCases = new[]
@@ -108,8 +114,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 someDifficulties,
                 manyDifficulties,
                 explicitMap,
+                spotlightMap,
                 featuredMap,
-                explicitFeaturedMap,
+                allBadgesMap,
                 longName
             };
 
