@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Verify
             {
                 new Box
                 {
-                    Colour = colours.Background2,
+                    Colour = colours.Background3,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new OsuScrollContainer
