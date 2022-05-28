@@ -25,6 +25,7 @@ using osu.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -62,6 +63,8 @@ using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 using osu.Game.Users;
 using osuTK.Graphics;
+using Sentry;
+using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Game
 {
@@ -78,7 +81,7 @@ namespace osu.Game
 
         public Toolbar Toolbar;
 
-        private ChatOverlay chatOverlay;
+        private ChatOverlayV2 chatOverlay;
 
         private ChannelManager channelManager;
 
@@ -314,7 +317,7 @@ namespace osu.Game
         {
             dependencies.CacheAs(this);
 
-            dependencies.Cache(SentryLogger);
+            //SentryLogger.AttachUser(API.LocalUser);
 
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
@@ -915,7 +918,7 @@ namespace osu.Game
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
-            loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(chatOverlay = new ChatOverlayV2(), overlayContent.Add, true);
             loadComponentSingleFile(Picture = new OnlinePictureOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
@@ -1272,6 +1275,17 @@ namespace osu.Game
 
         private void screenChanged(IScreen current, IScreen newScreen)
         {
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.Contexts[@"screen stack"] = new
+                {
+                    Current = newScreen?.GetType().ReadableName(),
+                    Previous = current?.GetType().ReadableName(),
+                };
+
+                scope.SetTag(@"screen", newScreen?.GetType().ReadableName() ?? @"none");
+            });
+
             switch (newScreen)
             {
                 case IntroScreen intro:

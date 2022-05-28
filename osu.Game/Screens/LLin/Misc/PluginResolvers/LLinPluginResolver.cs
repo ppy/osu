@@ -20,6 +20,15 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
             return target.GetType().Name + "@" + target.GetType().Namespace;
         }
 
+        internal bool RemoveFunctionBarProvider(IFunctionBarProvider functionBarProvider)
+            => functionBarDictionary.Remove(ToPath(functionBarProvider), out functionBarProvider);
+
+        internal bool RemoveAudioControlProvider(IProvideAudioControlPlugin provideAudioControlPlugin)
+            => audioPluginDictionary.Remove(ToPath(provideAudioControlPlugin), out provideAudioControlPlugin);
+
+        private readonly ConcurrentDictionary<string, IProvideAudioControlPlugin> audioPluginDictionary = new ConcurrentDictionary<string, IProvideAudioControlPlugin>();
+        private readonly ConcurrentDictionary<string, IFunctionBarProvider> functionBarDictionary = new ConcurrentDictionary<string, IFunctionBarProvider>();
+
         internal void UpdatePluginDictionary(List<LLinPlugin> newPluginList)
         {
             functionBarDictionary.Clear();
@@ -45,15 +54,6 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
 
             audioPluginDictionary[defaultAudioControlPath] = pluginManager.DefaultAudioController;
         }
-
-        internal bool RemoveFunctionBarProvider(IFunctionBarProvider functionBarProvider)
-            => functionBarDictionary.Remove(ToPath(functionBarProvider), out functionBarProvider);
-
-        internal bool RemoveAudioControlProvider(IProvideAudioControlPlugin provideAudioControlPlugin)
-            => audioPluginDictionary.Remove(ToPath(provideAudioControlPlugin), out provideAudioControlPlugin);
-
-        private readonly ConcurrentDictionary<string, IProvideAudioControlPlugin> audioPluginDictionary = new ConcurrentDictionary<string, IProvideAudioControlPlugin>();
-        private readonly ConcurrentDictionary<string, IFunctionBarProvider> functionBarDictionary = new ConcurrentDictionary<string, IFunctionBarProvider>();
 
         [CanBeNull]
         internal IProvideAudioControlPlugin GetAudioControlPluginByPath(string path)

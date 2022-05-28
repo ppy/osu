@@ -15,9 +15,12 @@ using osu.Framework.Development;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Screens.LLin.Misc.PluginResolvers;
 using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Internal;
+using osu.Game.Screens.LLin.Plugins.Internal.DummyAudio;
+using osu.Game.Screens.LLin.Plugins.Internal.DummyBase;
 using osu.Game.Screens.LLin.Plugins.Types;
 
 namespace osu.Game.Screens.LLin.Plugins
@@ -41,8 +44,10 @@ namespace osu.Game.Screens.LLin.Plugins
         internal Action<LLinPlugin> OnPluginAdd;
         internal Action<LLinPlugin> OnPluginUnLoad;
 
-        public int PluginVersion => 9;
-        public int MinimumPluginVersion => 8;
+        internal static int LatestPluginVersion => 10;
+        public int PluginVersion => LatestPluginVersion;
+        public int MinimumPluginVersion => 9;
+
         private const bool experimental = false;
 
         public readonly IProvideAudioControlPlugin DefaultAudioController = new OsuMusicControllerWrapper();
@@ -63,7 +68,7 @@ namespace osu.Game.Screens.LLin.Plugins
         internal PluginStore PluginStore;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase gameBase, Storage storage)
+        private void load(OsuGameBase gameBase, Storage storage, MConfigManager config)
         {
             try
             {
@@ -90,6 +95,17 @@ namespace osu.Game.Screens.LLin.Plugins
                 Logger.Error(e, $"未能初始化插件存储, 本次启动将不会加载任何插件！({e.Message})");
                 PluginStore = null;
             }
+
+            DummyBasePluginProvider dbpp;
+            DummyAudioPluginProvider dapp;
+            providers.AddRange(new LLinPluginProvider[]
+            {
+                dbpp = new DummyBasePluginProvider(config, this),
+                dapp = new DummyAudioPluginProvider(config, this)
+            });
+
+            AddPlugin(dbpp.CreatePlugin);
+            AddPlugin(dapp.CreatePlugin);
 
             if (PluginStore != null)
             {
@@ -163,6 +179,8 @@ namespace osu.Game.Screens.LLin.Plugins
 
             avaliablePlugins.Add(pl);
             OnPluginAdd?.Invoke(pl);
+
+            pl.PluginManager = this;
             return true;
         }
 

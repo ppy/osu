@@ -21,6 +21,9 @@ namespace osu.Game.Overlays.BeatmapListing
         [Description("已关注的谱师")]
         Follows,
 
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GeneralSpotlights))]
+        Spotlights,
+
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GeneralFeaturedArtists))]
         [Description("精选艺术家")]
         FeaturedArtists

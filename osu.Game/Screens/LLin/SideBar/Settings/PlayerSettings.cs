@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.SideBar.Settings.Sections;
 using osu.Game.Screens.LLin.SideBar.Tabs;
 using osuTK;
@@ -35,15 +36,16 @@ namespace osu.Game.Screens.LLin.SideBar.Settings
             RelativeSizeAxes = Axes.Both;
             Add(fillFlow);
 
-            AddSection(new BaseSettings());
-            AddSection(new AudioSettings());
-
             foreach (var pl in pluginManager.GetAllPlugins(false))
             {
+#pragma warning disable CS0618
                 var pluginSidebarSection = pl.CreateSidebarSettingsSection();
+#pragma warning restore CS0618
 
                 if (pluginSidebarSection != null)
                     AddSection(pluginSidebarSection);
+                else if (pl.GetSettingEntries()?.Length > 0)
+                    AddSection(new NewPluginSettingsSection(pl));
             }
 
             currentTabPosition = config.GetBindable<TabControlPosition>(MSetting.MvisTabControlPosition);

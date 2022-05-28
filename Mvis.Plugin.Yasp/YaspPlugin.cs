@@ -1,5 +1,6 @@
+using M.Resources.Localisation.LLin;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.Yasp.Config;
-using Mvis.Plugin.Yasp.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -7,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -16,6 +18,7 @@ using osu.Game.Screens.LLin.Misc;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 using osuTK;
 using osuTK.Graphics;
 
@@ -33,11 +36,30 @@ namespace Mvis.Plugin.Yasp
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new YaspConfigManager(storage);
 
-        public override PluginSettingsSubSection CreateSettingsSubSection()
-            => new YaspSettingsSubSection(this);
+        private SettingsEntry[] entries;
 
-        public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
-            => new YaspSidebarSection(this);
+        public override SettingsEntry[] GetSettingEntries()
+        {
+            var config = (YaspConfigManager)PluginManager.GetConfigManager(this);
+
+            entries ??= new SettingsEntry[]
+            {
+                new NumberSettingsEntry<float>
+                {
+                    Icon = FontAwesome.Solid.ExpandArrowsAlt,
+                    Name = YaspStrings.Scale,
+                    Bindable = config.GetBindable<float>(YaspSettings.Scale),
+                    DisplayAsPercentage = true,
+                },
+                new BooleanSettingsEntry
+                {
+                    Name = LLinGenericStrings.EnablePlugin,
+                    Bindable = config.GetBindable<bool>(YaspSettings.EnablePlugin)
+                }
+            };
+
+            return entries;
+        }
 
         public override int Version => 9;
 

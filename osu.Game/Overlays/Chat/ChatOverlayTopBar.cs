@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -58,8 +59,8 @@ namespace osu.Game.Overlays.Chat
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = "osu!chat",
-                                Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
+                                Text = ChatStrings.TitleCompact,
+                                Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                                 Margin = new MarginPadding { Bottom = 2f },
                             },
                         },

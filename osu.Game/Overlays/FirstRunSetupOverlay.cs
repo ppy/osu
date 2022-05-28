@@ -4,18 +4,22 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -54,68 +58,82 @@ namespace osu.Game.Overlays
         /// </summary>
         public FirstRunSetupScreen? CurrentScreen => (FirstRunSetupScreen?)stack?.CurrentScreen;
 
-        private readonly Type[] steps =
-        {
-            typeof(ScreenWelcome),
-            typeof(ScreenBeatmaps),
-            typeof(ScreenUIScale),
-            typeof(ScreenBehaviour),
-        };
+        private readonly List<Type> steps = new List<Type>();
 
-        private Container stackContainer = null!;
-
-        private Bindable<OverlayActivation>? overlayActivationMode;
+        private Container screenContent = null!;
 
         private Container content = null!;
+
+        private LoadingSpinner loading = null!;
+        private ScheduledDelegate? loadingShowDelegate;
 
         public FirstRunSetupOverlay()
             : base(OverlayColourScheme.Purple)
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuColour colours, LegacyImportManager? legacyImportManager)
         {
+            steps.Add(typeof(ScreenWelcome));
+            steps.Add(typeof(ScreenUIScale));
+            steps.Add(typeof(ScreenBeatmaps));
+            if (legacyImportManager?.SupportsImportFromStable == true)
+                steps.Add(typeof(ScreenImportFromStable));
+            steps.Add(typeof(ScreenBehaviour));
+
             Header.Title = FirstRunSetupOverlayStrings.FirstRunSetupTitle;
             Header.Description = FirstRunSetupOverlayStrings.FirstRunSetupDescription;
 
             MainAreaContent.AddRange(new Drawable[]
             {
-                content = new Container
+                content = new PopoverContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding
+                    Padding = new MarginPadding { Bottom = 20, },
+                    Child = new GridContainer
                     {
-                        Horizontal = 70 * 1.2f,
-                        Bottom = 20,
-                    },
-                    Child = new InputBlockingContainer
-                    {
-                        Masking = true,
-                        CornerRadius = 14,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        ColumnDimensions = new[]
                         {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = ColourProvider.Background6,
-                            },
-                            stackContainer = new Container
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding
-                                {
-                                    Vertical = 20,
-                                    Horizontal = 70,
-                                },
-                            }
+                            new Dimension(),
+                            new Dimension(minSize: 640, maxSize: 800),
+                            new Dimension(),
                         },
-                    },
+                        Content = new[]
+                        {
+                            new[]
+                            {
+                                Empty(),
+                                new InputBlockingContainer
+                                {
+                                    Masking = true,
+                                    CornerRadius = 14,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = ColourProvider.Background6,
+                                        },
+                                        loading = new LoadingSpinner(),
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Vertical = 20 },
+                                            Child = screenContent = new Container { RelativeSizeAxes = Axes.Both, },
+                                        },
+                                    },
+                                },
+                                Empty(),
+                            },
+                        }
+                    }
                 },
             });
 
@@ -171,8 +189,7 @@ namespace osu.Game.Overlays
 
             config.BindWith(OsuSetting.ShowFirstRunSetup, showFirstRunSetup);
 
-            // TODO: uncomment when happy with the whole flow.
-            // if (showFirstRunSetup.Value) Show();
+            if (showFirstRunSetup.Value) Show();
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -206,16 +223,9 @@ namespace osu.Game.Overlays
             // if we are valid for display, only do so after reaching the main menu.
             performer.PerformFromScreen(screen =>
             {
-                MainMenu menu = (MainMenu)screen;
-
-                // Eventually I'd like to replace this with a better method that doesn't access the screen.
-                // Either this dialog would be converted to its own screen, or at very least be "hosted" by a screen pushed to the main menu.
-                // Alternatively, another method of disabling notifications could be added to `INotificationOverlay`.
-                if (menu != null)
-                {
-                    overlayActivationMode = menu.OverlayActivationMode.GetBoundCopy();
-                    overlayActivationMode.Value = OverlayActivation.UserTriggered;
-                }
+                // Hides the toolbar for us.
+                if (screen is MainMenu menu)
+                    menu.ReturnToOsuLogo();
 
                 base.Show();
             }, new[] { typeof(MainMenu) });
@@ -237,13 +247,6 @@ namespace osu.Game.Overlays
             base.PopOut();
 
             content.ScaleTo(0.99f, 400, Easing.OutQuint);
-
-            if (overlayActivationMode != null)
-            {
-                // If this is non-null we are guaranteed to have come from the main menu.
-                overlayActivationMode.Value = OverlayActivation.All;
-                overlayActivationMode = null;
-            }
 
             if (currentStepIndex != null)
             {
@@ -269,7 +272,7 @@ namespace osu.Game.Overlays
         {
             Debug.Assert(currentStepIndex == null);
 
-            stackContainer.Child = stack = new ScreenStack
+            screenContent.Child = stack = new ScreenStack
             {
                 RelativeSizeAxes = Axes.Both,
             };
@@ -298,14 +301,22 @@ namespace osu.Game.Overlays
 
             currentStepIndex++;
 
-            if (currentStepIndex < steps.Length)
+            if (currentStepIndex < steps.Count)
             {
-                stack.Push((Screen)Activator.CreateInstance(steps[currentStepIndex.Value]));
+                var nextScreen = (Screen)Activator.CreateInstance(steps[currentStepIndex.Value]);
+
+                loadingShowDelegate = Scheduler.AddDelayed(() => loading.Show(), 200);
+                nextScreen.OnLoadComplete += _ =>
+                {
+                    loadingShowDelegate?.Cancel();
+                    loading.Hide();
+                };
+
+                stack.Push(nextScreen);
             }
             else
             {
-                // TODO: uncomment when happy with the whole flow.
-                // showFirstRunSetup.Value = false;
+                showFirstRunSetup.Value = false;
                 currentStepIndex = null;
                 Hide();
             }
@@ -322,7 +333,7 @@ namespace osu.Game.Overlays
                 return;
 
             bool isFirstStep = currentStepIndex == 0;
-            bool isLastStep = currentStepIndex == steps.Length - 1;
+            bool isLastStep = currentStepIndex == steps.Count - 1;
 
             if (isFirstStep)
             {

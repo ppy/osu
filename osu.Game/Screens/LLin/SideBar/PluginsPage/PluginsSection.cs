@@ -69,7 +69,8 @@ namespace osu.Game.Screens.LLin.SideBar.PluginsPage
         {
             foreach (var pl in manager.GetAllPlugins(false))
             {
-                addPiece(pl);
+                if (!pl.HideFromPluginManagement)
+                    addPiece(pl);
             }
 
             FillFlow.LayoutEasing = Easing.OutQuint;

@@ -19,13 +19,18 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         protected FillFlowContainer Content { get; private set; }
 
+        protected const float CONTENT_FONT_SIZE = 18;
+
+        protected const float CONTENT_PADDING = 30;
+
+        protected const float HEADER_FONT_SIZE = 24;
+
         [Resolved]
         protected OverlayColourProvider OverlayColourProvider { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float header_size = 40;
             const float spacing = 20;
 
             InternalChildren = new Drawable[]
@@ -33,23 +38,29 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new OsuScrollContainer(Direction.Vertical)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollbarOverlapsContent = false,
-                    Children = new Drawable[]
+                    Masking = false,
+                    Child = new Container
                     {
-                        new OsuSpriteText
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = CONTENT_PADDING },
+                        Children = new Drawable[]
                         {
-                            Text = this.GetLocalisableDescription(),
-                            Font = OsuFont.Default.With(size: header_size),
-                            Colour = OverlayColourProvider.Light1,
+                            new OsuSpriteText
+                            {
+                                Text = this.GetLocalisableDescription(),
+                                Font = OsuFont.TorusAlternate.With(size: HEADER_FONT_SIZE),
+                                Colour = OverlayColourProvider.Light1,
+                            },
+                            Content = new FillFlowContainer
+                            {
+                                Y = HEADER_FONT_SIZE + spacing,
+                                Spacing = new Vector2(spacing),
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                            }
                         },
-                        Content = new FillFlowContainer
-                        {
-                            Y = header_size + spacing,
-                            Spacing = new Vector2(spacing),
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                        }
                     },
                 }
             };
@@ -59,7 +70,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             base.OnEntering(e);
             this
-                .FadeInFromZero(500)
+                .FadeInFromZero(100)
                 .MoveToX(offset)
                 .MoveToX(0, 500, Easing.OutQuint);
         }
@@ -68,7 +79,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             base.OnResuming(e);
             this
-                .FadeInFromZero(500)
+                .FadeInFromZero(100)
                 .MoveToX(0, 500, Easing.OutQuint);
         }
 

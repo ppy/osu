@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
 namespace osu.Game.Screens.LLin.Plugins
 {
@@ -24,15 +25,20 @@ namespace osu.Game.Screens.LLin.Plugins
         /// 为游戏设置创建设置页面
         /// </summary>
         /// <returns>创建的设置页面</returns>
+        [Obsolete("请使用GetSettingEntries")]
         public virtual PluginSettingsSubSection CreateSettingsSubSection() => null;
 
         /// <summary>
         /// 为Mvis侧边栏创建设置页面
         /// </summary>
         /// <returns>创建的设置页面</returns>
+        [Obsolete("请使用GetSettingEntries")]
         public virtual PluginSidebarSettingsSection CreateSidebarSettingsSection() => null;
 
         public virtual IPluginConfigManager CreateConfigManager(Storage storage) => null;
+
+        [CanBeNull]
+        public virtual SettingsEntry[] GetSettingEntries() => Array.Empty<SettingsEntry>();
 
         /// <summary>
         /// 内容加载完毕后要执行的步骤
@@ -76,6 +82,8 @@ namespace osu.Game.Screens.LLin.Plugins
         public string Author = "插件作者";
         public string Website = "???";
 
+        public bool HideFromPluginManagement { get; internal set; } = false;
+
         public abstract int Version { get; }
 
         [Resolved(CanBeNull = true)]
@@ -106,7 +114,7 @@ namespace osu.Game.Screens.LLin.Plugins
 
         protected DependencyContainer DependenciesContainer;
 
-        protected LLinPluginManager PluginManager;
+        public LLinPluginManager PluginManager { get; internal set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             DependenciesContainer = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -114,10 +122,9 @@ namespace osu.Game.Screens.LLin.Plugins
         [BackgroundDependencyLoader]
         private void load()
         {
-            var pluginManager = DependenciesContainer.Get<LLinPluginManager>();
-            PluginManager = pluginManager;
+            PluginManager ??= DependenciesContainer.Get<LLinPluginManager>();
 
-            var config = pluginManager.GetConfigManager(this);
+            var config = PluginManager.GetConfigManager(this);
 
             if (config != null)
                 DependenciesContainer.Cache(config);

@@ -210,6 +210,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"切换Mod选择");
 
         /// <summary>
+        /// "Deselect all mods"
+        /// </summary>
+        public static LocalisableString DeselectAllMods => new TranslatableString(getKey(@"deselect_all_mods"), @"反选所有Mod");
+
+        /// <summary>
         /// "Random"
         /// </summary>
         public static LocalisableString SelectNextRandom => new TranslatableString(getKey(@"select_next_random"), @"随机选择");

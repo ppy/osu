@@ -8,9 +8,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
@@ -52,6 +54,39 @@ namespace osu.Game.Tests.Visual.Navigation
             pushEscape();
             AddAssert("Overlay was hidden", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
             exitViaEscapeAndConfirm();
+        }
+
+        [Test]
+        public void TestSongSelectBackActionHandling()
+        {
+            TestPlaySongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+
+            AddStep("set filter", () => songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value = "test");
+            AddStep("press back", () => InputManager.Click(MouseButton.Button1));
+
+            AddAssert("still at song select", () => Game.ScreenStack.CurrentScreen == songSelect);
+            AddAssert("filter cleared", () => string.IsNullOrEmpty(songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value));
+
+            AddStep("set filter again", () => songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value = "test");
+            AddStep("open collections dropdown", () =>
+            {
+                InputManager.MoveMouseTo(songSelect.ChildrenOfType<CollectionFilterDropdown>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("press back once", () => InputManager.Click(MouseButton.Button1));
+            AddAssert("still at song select", () => Game.ScreenStack.CurrentScreen == songSelect);
+            AddAssert("collections dropdown closed", () => songSelect
+                                                           .ChildrenOfType<CollectionFilterDropdown>().Single()
+                                                           .ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownMenu>().Single().State == MenuState.Closed);
+
+            AddStep("press back a second time", () => InputManager.Click(MouseButton.Button1));
+            AddAssert("filter cleared", () => string.IsNullOrEmpty(songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value));
+
+            AddStep("press back a third time", () => InputManager.Click(MouseButton.Button1));
+            ConfirmAtMainMenu();
         }
 
         /// <summary>
@@ -487,6 +522,9 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
             AddStep("click left mouse button", () => InputManager.Click(MouseButton.Left));
             AddAssert("now playing is hidden", () => nowPlayingOverlay.State.Value == Visibility.Hidden);
+
+            // move the mouse firmly inside game bounds to avoid interfering with other tests.
+            AddStep("center cursor", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
         }
 
         [Test]
@@ -568,7 +606,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
         public class TestPlaySongSelect : PlaySongSelect
         {
-            public ModSelectScreen ModSelectOverlay => ModSelect;
+            public ModSelectOverlay ModSelectOverlay => ModSelect;
 
             public BeatmapOptionsOverlay BeatmapOptionsOverlay => BeatmapOptions;
 

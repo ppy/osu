@@ -59,6 +59,13 @@ namespace osu.Game.Tests
 
         protected override Track GetBeatmapTrack() => trackStore.Get(firstAudioFile);
 
+        public override bool TryTransferTrack(WorkingBeatmap target)
+        {
+            // Our track comes from a local track store that's disposed on finalizer,
+            // therefore it's unsafe to transfer it to another working beatmap.
+            return false;
+        }
+
         private string firstAudioFile
         {
             get

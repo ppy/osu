@@ -14,8 +14,6 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osuTK;
@@ -27,7 +25,6 @@ namespace osu.Game.Overlays.FirstRunSetup
     public class ScreenBeatmaps : FirstRunSetupScreen
     {
         private ProgressRoundedButton downloadBundledButton = null!;
-        private ProgressRoundedButton importBeatmapsButton = null!;
         private ProgressRoundedButton downloadTutorialButton = null!;
 
         private OsuTextFlowContainer currentlyLoadedBeatmaps = null!;
@@ -43,14 +40,14 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private IDisposable? beatmapSubscription;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(LegacyImportManager? legacyImportManager)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            Vector2 buttonSize = new Vector2(500, 60);
+            Vector2 buttonSize = new Vector2(400, 50);
 
             Content.Children = new Drawable[]
             {
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.Description,
@@ -63,7 +60,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Height = 30,
                     Children = new Drawable[]
                     {
-                        currentlyLoadedBeatmaps = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold))
+                        currentlyLoadedBeatmaps = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: HEADER_FONT_SIZE, weight: FontWeight.SemiBold))
                         {
                             Colour = OverlayColourProvider.Content2,
                             TextAnchor = Anchor.Centre,
@@ -73,7 +70,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                         },
                     }
                 },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.TutorialDescription,
@@ -89,7 +86,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Text = FirstRunSetupBeatmapScreenStrings.TutorialButton,
                     Action = downloadTutorial
                 },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
                     Text = FirstRunSetupBeatmapScreenStrings.BundledDescription,
@@ -105,36 +102,10 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Text = FirstRunSetupBeatmapScreenStrings.BundledButton,
                     Action = downloadBundled
                 },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
-                    Text = "如果您的设备上装有稳定版，您也可以选择导入这些谱面。",
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y
-                },
-                importBeatmapsButton = new ProgressRoundedButton
-                {
-                    Size = buttonSize,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    BackgroundColour = colours.Blue3,
-                    Text = MaintenanceSettingsStrings.ImportBeatmapsFromStable,
-                    Action = () =>
-                    {
-                        importBeatmapsButton.Enabled.Value = false;
-                        legacyImportManager?.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() =>
-                        {
-                            if (t.IsCompletedSuccessfully)
-                                importBeatmapsButton.Complete();
-                            else
-                                importBeatmapsButton.Enabled.Value = true;
-                        }));
-                    }
-                },
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
-                {
-                    Colour = OverlayColourProvider.Content1,
-                    Text = FirstRunSetupBeatmapScreenStrings.ObtainMoreBeatmaps,
+                    Text = FirstRunSetupBeatmapScreenStrings.ObtainMoreBeatmaps, //如果您的设备上装有稳定版，您也可以选择导入这些谱面。
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
@@ -212,46 +183,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                     downloadBundledButton.Complete();
                 else
                     downloadBundledButton.SetProgress(progress, true);
-            }
-        }
-
-        private class ProgressRoundedButton : RoundedButton
-        {
-            [Resolved]
-            private OsuColour colours { get; set; } = null!;
-
-            private ProgressBar progressBar = null!;
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                Add(progressBar = new ProgressBar(false)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingParameters.Additive,
-                    FillColour = BackgroundColour,
-                    Alpha = 0.5f,
-                    Depth = float.MinValue
-                });
-            }
-
-            public void Complete()
-            {
-                Enabled.Value = false;
-
-                Background.FadeColour(colours.Green, 500, Easing.OutQuint);
-                progressBar.FillColour = colours.Green;
-
-                this.TransformBindableTo(progressBar.Current, 1, 500, Easing.OutQuint);
-            }
-
-            public void SetProgress(double progress, bool animated)
-            {
-                if (!Enabled.Value)
-                    return;
-
-                this.TransformBindableTo(progressBar.Current, progress, animated ? 500 : 0, Easing.OutQuint);
             }
         }
     }

@@ -43,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private readonly MultiplayerRoomUser[] users;
 
+        private readonly Bindable<bool> leaderboardExpanded = new BindableBool();
+
         private LoadingLayer loadingDisplay;
         private FillFlowContainer leaderboardFlow;
 
@@ -76,13 +78,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Spacing = new Vector2(5)
             });
 
+            HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());
+            LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
+
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
             LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(GameplayState.Ruleset.RulesetInfo, ScoreProcessor, users), l =>
             {
                 if (!LoadedBeatmapSuccessfully)
                     return;
 
-                ((IBindable<bool>)leaderboard.Expanded).BindTo(HUDOverlay.ShowHud);
+                leaderboard.Expanded.BindTo(leaderboardExpanded);
 
                 leaderboardFlow.Insert(0, l);
 
@@ -99,7 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             LoadComponentAsync(new GameplayChatDisplay(Room)
             {
-                Expanded = { BindTarget = HUDOverlay.ShowHud },
+                Expanded = { BindTarget = leaderboardExpanded },
             }, chat => leaderboardFlow.Insert(2, chat));
 
             HUDOverlay.Add(loadingDisplay = new LoadingLayer(true) { Depth = float.MaxValue });
@@ -144,13 +149,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void StartGameplay()
         {
+            // We can enter this screen one of two ways:
+            // 1. Via the automatic natural progression of PlayerLoader into Player.
+            //    We'll arrive here in a Loaded state, and we need to let the server know that we're ready to start.
+            // 2. Via the server forcefully starting gameplay because players have been hanging out in PlayerLoader for too long.
+            //    We'll arrive here in a Playing state, and we should neither show the loading spinner nor tell the server that we're ready to start (gameplay has already started).
+            //
+            // The base call is blocked here because in both cases gameplay is started only when the server says so via onGameplayStarted().
+
             if (client.LocalUser?.State == MultiplayerUserState.Loaded)
             {
-                // block base call, but let the server know we are ready to start.
                 loadingDisplay.Show();
                 client.ChangeState(MultiplayerUserState.ReadyForGameplay);
             }
         }
+
+        private void updateLeaderboardExpandedState() =>
+            leaderboardExpanded.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
 
         private void failAndBail(string message = null)
         {

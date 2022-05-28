@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -101,7 +102,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public bool FilteringActive { get; set; }
 
-        public IEnumerable<string> FilterTerms => new[] { Room.Name.Value };
+        public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Room.Name.Value };
 
         private bool matchingFilter = true;
 

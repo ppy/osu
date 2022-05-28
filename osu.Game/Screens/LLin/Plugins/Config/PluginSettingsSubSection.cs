@@ -1,9 +1,12 @@
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.LLin.Plugins.Config
 {
+    [Obsolete("请使用GetSettingEntries")]
     public abstract class PluginSettingsSubSection : SettingsSubsection
     {
         private readonly LLinPlugin plugin;
@@ -21,6 +24,31 @@ namespace osu.Game.Screens.LLin.Plugins.Config
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
             ConfigManager = dependencies.Get<LLinPluginManager>().GetConfigManager(plugin);
             return dependencies;
+        }
+    }
+
+    public class PluginSettingsSubsection : SettingsSubsection
+    {
+        private readonly LLinPlugin plugin;
+
+        public PluginSettingsSubsection(LLinPlugin plugin)
+        {
+            this.plugin = plugin;
+            Name = $"{plugin}的subsection";
+
+            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
+        }
+
+        protected override LocalisableString Header => plugin.Name;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            foreach (var se in plugin.GetSettingEntries())
+            {
+                Add(se.ToSettingsItem());
+            }
         }
     }
 }

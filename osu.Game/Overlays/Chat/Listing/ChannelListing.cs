@@ -75,5 +75,14 @@ namespace osu.Game.Overlays.Chat.Listing
         protected override void PopIn() => this.FadeIn();
 
         protected override void PopOut() => this.FadeOut();
+
+        public class ChannelListingChannel : Channel
+        {
+            public ChannelListingChannel()
+            {
+                Name = "添加更多频道";
+                Type = ChannelType.System;
+            }
+        }
     }
 }

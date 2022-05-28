@@ -1,15 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Mania.Objects;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input;
-using osu.Game.Rulesets.Mania.Skinning.Default;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -55,28 +54,6 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) =>
             Playfield.GetColumnByPosition(screenSpacePosition);
-
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
-        {
-            var result = base.FindSnappedPositionAndTime(screenSpacePosition);
-
-            switch (ScrollingInfo.Direction.Value)
-            {
-                case ScrollingDirection.Down:
-                    result.ScreenSpacePosition -= new Vector2(0, getNoteHeight() / 2);
-                    break;
-
-                case ScrollingDirection.Up:
-                    result.ScreenSpacePosition += new Vector2(0, getNoteHeight() / 2);
-                    break;
-            }
-
-            return result;
-        }
-
-        private float getNoteHeight() =>
-            Playfield.GetColumn(0).ToScreenSpace(new Vector2(DefaultNotePiece.NOTE_HEIGHT)).Y -
-            Playfield.GetColumn(0).ToScreenSpace(Vector2.Zero).Y;
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
         {
