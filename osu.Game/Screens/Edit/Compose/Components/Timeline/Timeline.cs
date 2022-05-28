@@ -302,7 +302,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// <summary>
         /// The total amount of time visible on the timeline.
         /// </summary>
-        public double VisibleRange => track.Length / Zoom;
+        public double VisibleRange => (DisplayableContent / Content.DrawWidth) * track.Length;
 
         public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All) =>
             new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(screenSpacePosition))));
