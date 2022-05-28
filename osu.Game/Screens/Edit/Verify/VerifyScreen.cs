@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Verify
                     ColumnDimensions = new[]
                     {
                         new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 225),
+                        new Dimension(GridSizeMode.Absolute, 250),
                     },
                     Content = new[]
                     {
