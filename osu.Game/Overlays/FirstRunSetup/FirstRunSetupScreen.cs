@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         protected FillFlowContainer Content { get; private set; }
 
-        protected const float CONTENT_FONT_SIZE = 16;
+        protected const float CONTENT_FONT_SIZE = 18;
 
         protected const float CONTENT_PADDING = 30;
 

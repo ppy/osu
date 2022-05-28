@@ -10,6 +10,7 @@ namespace osu.Game.Utils
     /// <summary>
     /// Report errors to sentry.
     /// </summary>
+    //不要给上游发日志
     public class SentryLogger : IDisposable
     {
         //private Scope sentryScope;

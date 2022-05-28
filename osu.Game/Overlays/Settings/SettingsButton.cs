@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.Settings
