@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             {
                 Text = label;
                 Margin = new MarginPadding { Left = 18, Bottom = 5 };
-                Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold);
+                Font = OsuFont.Torus.With(weight: FontWeight.SemiBold);
             }
         }
 

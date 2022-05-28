@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Chat.Listing
         {
             public ChannelListingChannel()
             {
-                Name = "Add more channels";
+                Name = "添加更多频道";
                 Type = ChannelType.System;
             }
         }

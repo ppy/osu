@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Chat
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Text = ChatStrings.TitleCompact,
-                                Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
+                                Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                                 Margin = new MarginPadding { Bottom = 2f },
                             },
                         },

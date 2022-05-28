@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 {
                                     new RoundedButton
                                     {
-                                        Text = "Reset",
+                                        Text = "重置",
                                         BackgroundColour = colours.Pink,
                                         RelativeSizeAxes = Axes.X,
                                         Width = 0.3f,
@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Edit.Timing
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
-                                        Text = "Play from start",
+                                        Text = "从头开始播放",
                                         RelativeSizeAxes = Axes.X,
                                         BackgroundColour = colourProvider.Background1,
                                         Width = 0.68f,

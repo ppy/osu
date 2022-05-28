@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = "启用倒计时",
                     Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None },
-                    Description = "If enabled, an \"Are you ready? 3, 2, 1, GO!\" countdown will be inserted at the beginning of the beatmap, assuming there is enough time to do so."
+                    Description = "启用后，将会在谱面开头插入\"Are you ready? 3, 2, 1, GO!\" 的倒计时, 让玩家可以有时间准备"
                 },
                 CountdownSettings = new FillFlowContainer
                 {
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Edit.Setup
                         {
                             Label = "倒计时偏移",
                             Current = { Value = Beatmap.BeatmapInfo.CountdownOffset.ToString() },
-                            Description = "If the countdown sounds off-time, use this to make it appear one or more beats early.",
+                            Description = "如果倒计时出现的时间听上去不对，可以在这里设置让他早几拍",
                         }
                     }
                 },
@@ -66,25 +66,25 @@ namespace osu.Game.Screens.Edit.Setup
                 widescreenSupport = new LabelledSwitchButton
                 {
                     Label = "宽屏支持",
-                    Description = "Allows storyboards to use the full screen space, rather than be confined to a 4:3 area.",
+                    Description = "允许故事版全屏显示，而不是标准的4:3",
                     Current = { Value = Beatmap.BeatmapInfo.WidescreenStoryboard }
                 },
                 epilepsyWarning = new LabelledSwitchButton
                 {
                     Label = "光敏性癫痫警告",
-                    Description = "Recommended if the storyboard or video contain scenes with rapidly flashing colours.",
+                    Description = "如果故事版或视频有快速的闪光，建议开启",
                     Current = { Value = Beatmap.BeatmapInfo.EpilepsyWarning }
                 },
                 letterboxDuringBreaks = new LabelledSwitchButton
                 {
-                    Label = "Letterbox during breaks",
-                    Description = "Adds horizontal letterboxing to give a cinematic look during breaks.",
+                    Label = "遮罩",
+                    Description = "在休息时段添加上下两条黑色遮罩以提供电影效果",
                     Current = { Value = Beatmap.BeatmapInfo.LetterboxInBreaks }
                 },
                 samplesMatchPlaybackRate = new LabelledSwitchButton
                 {
-                    Label = "Samples match playback rate",
-                    Description = "When enabled, all samples will speed up or slow down when rate-changing mods are enabled.",
+                    Label = "采样跟随播放速度",
+                    Description = "启用后，所有音频采样将根据当前调速Mod加或减速播放",
                     Current = { Value = Beatmap.BeatmapInfo.SamplesMatchPlaybackRate }
                 }
             };
