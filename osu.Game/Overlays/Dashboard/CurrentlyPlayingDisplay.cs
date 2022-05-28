@@ -11,6 +11,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Database;
@@ -96,6 +97,13 @@ namespace osu.Game.Overlays.Dashboard
 
             playingUsers.BindTo(spectatorClient.PlayingUsers);
             playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
+        }
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+
+            searchTextBox.TakeFocus();
         }
 
         private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
