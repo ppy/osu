@@ -197,10 +197,10 @@ namespace osu.Game.Graphics
             switch (roomCategory)
             {
                 case RoomCategory.Spotlight:
-                    return Green2;
+                    return SpotlightColour;
 
                 case RoomCategory.FeaturedArtist:
-                    return Blue2;
+                    return FeaturedArtistColour;
 
                 default:
                     return null;
@@ -379,5 +379,8 @@ namespace osu.Game.Graphics
         public readonly Color4 ChatBlue = Color4Extensions.FromHex(@"17292e");
 
         public readonly Color4 ContextMenuGray = Color4Extensions.FromHex(@"223034");
+
+        public Color4 SpotlightColour => Green2;
+        public Color4 FeaturedArtistColour => Blue2;
     }
 }
