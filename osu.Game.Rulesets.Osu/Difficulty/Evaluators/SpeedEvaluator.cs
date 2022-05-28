@@ -15,6 +15,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
 
+        /// <summary>
+        /// Evaluates the difficulty of tapping the current object, based on:
+        /// <list type="bullet">
+        /// <item><description>time between pressing the previous and current object,</description></item>
+        /// <item><description>distance between those objects,</description></item>
+        /// <item><description>and how easily they can be cheesed.</description></item>
+        /// </list>
+        /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, double greatWindow)
         {
             if (current.BaseObject is Spinner)

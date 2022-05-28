@@ -16,7 +16,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double velocity_change_multiplier = 0.75;
 
         /// <summary>
-        /// Evaluates the difficulty of aiming the current object.
+        /// Evaluates the difficulty of aiming the current object, based on:
+        /// <list type="bullet">
+        /// <item><description>cursor velocity to the current object,</description></item>
+        /// <item><description>angle difficulty,</description></item>
+        /// <item><description>sharp velocity increases,</description></item>
+        /// <item><description>and slider difficulty.</description></item>
+        /// </list>
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliders)
         {

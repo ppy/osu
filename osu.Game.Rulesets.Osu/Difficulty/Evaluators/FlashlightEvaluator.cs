@@ -13,6 +13,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double max_opacity_bonus = 0.4;
         private const double hidden_bonus = 0.2;
 
+        /// <summary>
+        /// Evaluates the difficulty of memorising and hitting an object, based on:
+        /// <list type="bullet">
+        /// <item><description>distance between the previous and current object,</description></item>
+        /// <item><description>the visual opacity of the current object,</description></item>
+        /// <item><description>and whether the hidden mod is enabled.</description></item>
+        /// </list>
+        /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
         {
             if (current.BaseObject is Spinner)
