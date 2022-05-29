@@ -26,8 +26,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
         public Action<Channel>? OnRequestSelect;
         public Action<Channel>? OnRequestLeave;
 
-        public IEnumerable<Channel> Channels => groupFlow.Children.Where(child => child is ChannelGroup)
-                                                         .Cast<ChannelGroup>()
+        public IEnumerable<Channel> Channels => groupFlow.Children
+                                                         .OfType<ChannelGroup>()
                                                          .SelectMany(channelGroup => channelGroup.ItemFlow)
                                                          .Select(item => item.Channel);
 
