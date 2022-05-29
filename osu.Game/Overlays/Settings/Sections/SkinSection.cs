@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Settings.Sections
             configBindable.Value = skin.NewValue.ID.ToString();
         }
 
-        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes, Exception error) => Schedule(() =>
+        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes, Exception error)
         {
             // This can only mean that realm is recycling, else we would see the protected skins.
             // Because we are using `Live<>` in this class, we don't need to worry about this scenario too much.
@@ -127,10 +127,13 @@ namespace osu.Game.Overlays.Settings.Sections
                 dropdownItems.Add(skin.ToLive(realm));
             dropdownItems.Insert(protectedCount, random_skin_info);
 
-            skinDropdown.Items = dropdownItems;
+            Schedule(() =>
+            {
+                skinDropdown.Items = dropdownItems;
 
-            updateSelectedSkinFromConfig();
-        });
+                updateSelectedSkinFromConfig();
+            });
+        }
 
         private void updateSelectedSkinFromConfig()
         {
