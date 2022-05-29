@@ -150,10 +150,14 @@ namespace osu.Game.Tests.Visual.Online
         public void TestChatHeight()
         {
             BindableFloat configChatHeight = new BindableFloat();
-            config.BindWith(OsuSetting.ChatDisplayHeight, configChatHeight);
+
             float newHeight = 0;
 
-            AddStep("Reset config chat height", () => configChatHeight.SetDefault());
+            AddStep("Reset config chat height", () =>
+            {
+                config.BindWith(OsuSetting.ChatDisplayHeight, configChatHeight);
+                configChatHeight.SetDefault();
+            });
             AddStep("Show overlay", () => chatOverlay.Show());
             AddAssert("Overlay uses config height", () => chatOverlay.Height == configChatHeight.Default);
             AddStep("Click top bar", () =>
