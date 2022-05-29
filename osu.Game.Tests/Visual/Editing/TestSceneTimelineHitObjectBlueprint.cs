@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestContextMenu()
         {
-            TimelineHitObjectBlueprint blueprint = null;
+            TimelineHitObjectBlueprint blueprint;
 
             AddStep("add object", () =>
             {
