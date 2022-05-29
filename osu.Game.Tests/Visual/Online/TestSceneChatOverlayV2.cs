@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.Online
                 channelManager.CurrentChannel.Value = joinedChannel;
             });
             AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
-            AddUntilStep("Channel is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            waitForChannel1Visible();
         }
 
         [Test]
@@ -181,7 +181,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Listing is visible", () => listingIsVisible);
             AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
-            AddUntilStep("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            waitForChannel1Visible();
         }
 
         [Test]
@@ -190,7 +190,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Show overlay", () => chatOverlay.Show());
             AddAssert("Listing is visible", () => listingIsVisible);
             AddStep("Search for 'number 2'", () => chatOverlayTextBox.Text = "number 2");
-            AddUntilStep("Only channel 2 visibile", () =>
+            AddUntilStep("Only channel 2 visible", () =>
             {
                 IEnumerable<ChannelListingItem> listingItems = chatOverlay.ChildrenOfType<ChannelListingItem>()
                                                                           .Where(item => item.IsPresent);
@@ -280,7 +280,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel1));
-            AddUntilStep("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            waitForChannel1Visible();
         }
 
         [Test]
@@ -303,7 +303,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel2));
-            AddUntilStep("Channel 2 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel2);
+            waitForChannel2Visible();
         }
 
         [Test]
@@ -327,7 +327,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Leave channel 2", () => channelManager.LeaveChannel(testChannel2));
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel2));
-            AddUntilStep("Channel 2 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel2);
+            waitForChannel2Visible();
         }
 
         [Test]
@@ -347,7 +347,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel1));
-            AddUntilStep("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            waitForChannel1Visible();
         }
 
         [Test]
@@ -368,7 +368,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Set null channel", () => channelManager.CurrentChannel.Value = null);
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel1));
-            AddUntilStep("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            waitForChannel1Visible();
         }
 
         [Test]
@@ -378,6 +378,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
             AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
+            waitForChannel1Visible();
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
             AddStep("Click drawable channel", () => clickDrawable(currentDrawableChannel));
             AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
@@ -415,11 +416,11 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Finish channel 2 load", () => chatOverlay.GetSlowLoadingChannel(testChannel2).LoadEvent.Set());
             AddAssert("Channel 2 loaded", () => chatOverlay.GetSlowLoadingChannel(testChannel2).IsLoaded);
-            AddAssert("Channel 2 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel2);
+            waitForChannel2Visible();
 
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddAssert("Channel 1 loaded", () => chatOverlay.GetSlowLoadingChannel(testChannel1).IsLoaded);
-            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            waitForChannel1Visible();
         }
 
         [Test]
@@ -430,13 +431,12 @@ namespace osu.Game.Tests.Visual.Online
                 channelManager.JoinChannel(testChannel1);
                 chatOverlay.Show();
             });
-            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
-
+            waitForChannel1Visible();
             AddStep("Press document close keys", () => InputManager.Keys(PlatformAction.DocumentClose));
             AddAssert("Listing is visible", () => listingIsVisible);
 
             AddStep("Press tab restore keys", () => InputManager.Keys(PlatformAction.TabRestore));
-            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            waitForChannel1Visible();
         }
 
         [Test]
@@ -447,8 +447,7 @@ namespace osu.Game.Tests.Visual.Online
                 channelManager.JoinChannel(testChannel1);
                 chatOverlay.Show();
             });
-            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
-
+            waitForChannel1Visible();
             AddStep("Press tab new keys", () => InputManager.Keys(PlatformAction.TabNew));
             AddAssert("Listing is visible", () => listingIsVisible);
         }
@@ -468,20 +467,25 @@ namespace osu.Game.Tests.Visual.Online
                 chatOverlay.Show();
             });
 
-            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            waitForChannel1Visible();
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            waitForChannel2Visible();
 
             AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
-            AddAssert("Channel 2 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel2);
+            AddUntilStep("PM Channel 1 displayed", () => channelIsVisible && currentDrawableChannel?.Channel == pmChannel1);
 
             AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
-            AddAssert("PM Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == pmChannel1);
+            AddUntilStep("PM Channel 2 displayed", () => channelIsVisible && currentDrawableChannel?.Channel == pmChannel2);
 
             AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
-            AddAssert("PM Channel 2 displayed", () => channelIsVisible && currentDrawableChannel.Channel == pmChannel2);
-
-            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
-            AddAssert("Channel 1 displayed", () => channelIsVisible && currentDrawableChannel.Channel == testChannel1);
+            waitForChannel1Visible();
         }
+
+        private void waitForChannel1Visible() =>
+            AddUntilStep("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel?.Channel == testChannel1);
+
+        private void waitForChannel2Visible() =>
+            AddUntilStep("Channel 2 is visible", () => channelIsVisible && currentDrawableChannel?.Channel == testChannel2);
 
         private bool listingIsVisible =>
             chatOverlay.ChildrenOfType<ChannelListing>().Single().State.Value == Visibility.Visible;
@@ -492,8 +496,9 @@ namespace osu.Game.Tests.Visual.Online
         private bool channelIsVisible =>
             !listingIsVisible && !loadingIsVisible;
 
+        [CanBeNull]
         private DrawableChannel currentDrawableChannel =>
-            chatOverlay.ChildrenOfType<DrawableChannel>().Single();
+            chatOverlay.ChildrenOfType<DrawableChannel>().SingleOrDefault();
 
         private ChannelListItem getChannelListItem(Channel channel) =>
             chatOverlay.ChildrenOfType<ChannelListItem>().Single(item => item.Channel == channel);
