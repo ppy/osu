@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                         Vector2 size = Vector2.One;
 
-                        if (indexInBar != 1)
+                        if (indexInBar != 0)
                             size = BindableBeatDivisor.GetSize(divisor);
 
                         var line = getNextUsableLine();
