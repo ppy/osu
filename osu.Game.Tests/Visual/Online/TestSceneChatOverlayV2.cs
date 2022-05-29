@@ -404,22 +404,22 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
-            AddAssert("Channel 1 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel1).LoadState == LoadState.Loading);
+            AddUntilStep("Channel 1 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel1).LoadState == LoadState.Loading);
 
             AddStep("Join channel 2", () => channelManager.JoinChannel(testChannel2));
             AddStep("Select channel 2", () => clickDrawable(getChannelListItem(testChannel2)));
-            AddAssert("Channel 2 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel2).LoadState == LoadState.Loading);
+            AddUntilStep("Channel 2 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel2).LoadState == LoadState.Loading);
 
             AddStep("Finish channel 1 load", () => chatOverlay.GetSlowLoadingChannel(testChannel1).LoadEvent.Set());
-            AddAssert("Channel 1 ready", () => chatOverlay.GetSlowLoadingChannel(testChannel1).LoadState == LoadState.Ready);
+            AddUntilStep("Channel 1 ready", () => chatOverlay.GetSlowLoadingChannel(testChannel1).LoadState == LoadState.Ready);
             AddAssert("Channel 1 not displayed", () => !channelIsVisible);
 
             AddStep("Finish channel 2 load", () => chatOverlay.GetSlowLoadingChannel(testChannel2).LoadEvent.Set());
-            AddAssert("Channel 2 loaded", () => chatOverlay.GetSlowLoadingChannel(testChannel2).IsLoaded);
+            AddUntilStep("Channel 2 loaded", () => chatOverlay.GetSlowLoadingChannel(testChannel2).IsLoaded);
             waitForChannel2Visible();
 
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
-            AddAssert("Channel 1 loaded", () => chatOverlay.GetSlowLoadingChannel(testChannel1).IsLoaded);
+            AddUntilStep("Channel 1 loaded", () => chatOverlay.GetSlowLoadingChannel(testChannel1).IsLoaded);
             waitForChannel1Visible();
         }
 
