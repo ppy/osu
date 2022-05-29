@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
@@ -27,6 +28,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         private Drawable weight;
         private Drawable stick;
+
+        private IAdjustableClock metronomeClock;
 
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; }
@@ -192,6 +195,8 @@ namespace osu.Game.Screens.Edit.Timing
                     Y = -3,
                 },
             };
+
+            Clock = new FramedClock(metronomeClock = new StopwatchClock(true));
         }
 
         private double beatLength;
@@ -215,6 +220,8 @@ namespace osu.Game.Screens.Edit.Timing
 
             if (BeatSyncSource.ControlPoints == null || BeatSyncSource.Clock == null)
                 return;
+
+            metronomeClock.Rate = IsBeatSyncedWithTrack ? BeatSyncSource.Clock.Rate : 1;
 
             timingPoint = BeatSyncSource.ControlPoints.TimingPointAt(BeatSyncSource.Clock.CurrentTime);
 
