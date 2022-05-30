@@ -65,9 +65,7 @@ namespace osu.Game.Online.API
         {
             if (HandleRequest?.Invoke(request) != true)
             {
-                // this will fail due to not receiving an APIAccess, and trigger a failure on the request.
-                // this is intended - any request in testing that needs non-failures should use HandleRequest.
-                request.Perform(this);
+                request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} cannot process this request."));
             }
         }
 
