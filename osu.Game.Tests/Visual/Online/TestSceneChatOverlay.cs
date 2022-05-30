@@ -32,9 +32,9 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChatOverlayV2 : OsuManualInputManagerTestScene
+    public class TestSceneChatOverlay : OsuManualInputManagerTestScene
     {
-        private TestChatOverlayV2 chatOverlay;
+        private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
 
         private APIUser testUser;
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Online
                 Children = new Drawable[]
                 {
                     channelManager,
-                    chatOverlay = new TestChatOverlayV2(),
+                    chatOverlay = new TestChatOverlay(),
                 },
             };
         });
@@ -455,6 +455,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestKeyboardNextChannel()
         {
+            Channel announceChannel = createAnnounceChannel();
             Channel pmChannel1 = createPrivateChannel();
             Channel pmChannel2 = createPrivateChannel();
 
@@ -464,6 +465,7 @@ namespace osu.Game.Tests.Visual.Online
                 channelManager.JoinChannel(testChannel2);
                 channelManager.JoinChannel(pmChannel1);
                 channelManager.JoinChannel(pmChannel2);
+                channelManager.JoinChannel(announceChannel);
                 chatOverlay.Show();
             });
 
@@ -476,6 +478,9 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
             AddUntilStep("PM Channel 2 displayed", () => channelIsVisible && currentDrawableChannel?.Channel == pmChannel2);
+
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            AddUntilStep("Announce channel displayed", () => channelIsVisible && currentDrawableChannel?.Channel == announceChannel);
 
             AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
             waitForChannel1Visible();
@@ -548,7 +553,18 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private class TestChatOverlayV2 : ChatOverlayV2
+        private Channel createAnnounceChannel()
+        {
+            int id = RNG.Next(0, 10000);
+            return new Channel
+            {
+                Name = $"Announce {id}",
+                Type = ChannelType.Announce,
+                Id = id,
+            };
+        }
+
+        private class TestChatOverlay : ChatOverlay
         {
             public bool SlowLoading { get; set; }
 

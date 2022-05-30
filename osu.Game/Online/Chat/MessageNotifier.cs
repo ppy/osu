@@ -27,7 +27,7 @@ namespace osu.Game.Online.Chat
         private INotificationOverlay notifications { get; set; }
 
         [Resolved]
-        private ChatOverlayV2 chatOverlay { get; set; }
+        private ChatOverlay chatOverlay { get; set; }
 
         [Resolved]
         private ChannelManager channelManager { get; set; }
@@ -170,7 +170,7 @@ namespace osu.Game.Online.Chat
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChatOverlayV2 chatOverlay, INotificationOverlay notificationOverlay)
+            private void load(OsuColour colours, ChatOverlay chatOverlay, INotificationOverlay notificationOverlay)
             {
                 IconBackground.Colour = colours.PurpleDark;
 
