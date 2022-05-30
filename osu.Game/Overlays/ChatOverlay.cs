@@ -27,7 +27,7 @@ using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlayV2 : OsuFocusedOverlayContainer, INamedOverlayComponent, IKeyBindingHandler<PlatformAction>
+    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, IKeyBindingHandler<PlatformAction>
     {
         public string IconTexture => "Icons/Hexacons/messaging";
         public LocalisableString Title => ChatStrings.HeaderTitle;
@@ -70,7 +70,7 @@ namespace osu.Game.Overlays
         private readonly IBindableList<Channel> availableChannels = new BindableList<Channel>();
         private readonly IBindableList<Channel> joinedChannels = new BindableList<Channel>();
 
-        public ChatOverlayV2()
+        public ChatOverlay()
         {
             Height = DEFAULT_HEIGHT;
 
