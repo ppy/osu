@@ -39,7 +39,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// The states of all users currently being watched.
         /// </summary>
-        public IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
+        public virtual IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
 
         /// <summary>
         /// A global list of all players currently playing.
