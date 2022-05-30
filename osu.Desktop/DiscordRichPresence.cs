@@ -192,7 +192,7 @@ namespace osu.Desktop
             switch (activity)
             {
                 case UserActivity.InGame game:
-                    return $"[{Math.Round(game.BeatmapInfo.StarRating, 2)}*] {game.BeatmapInfo}";
+                    return game.BeatmapInfo.ToString();
 
                 case UserActivity.Editing edit:
                     return edit.BeatmapInfo.ToString();
