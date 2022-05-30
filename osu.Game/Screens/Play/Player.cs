@@ -213,8 +213,8 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(DrawableRuleset);
 
             ScoreProcessor = ruleset.CreateScoreProcessor();
-            ScoreProcessor.ApplyBeatmap(playableBeatmap);
             ScoreProcessor.Mods.Value = gameplayMods;
+            ScoreProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(ScoreProcessor);
 
