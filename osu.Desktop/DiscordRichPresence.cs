@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
@@ -12,6 +13,7 @@ using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -29,6 +31,9 @@ namespace osu.Desktop
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         private IBindable<APIUser> user;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
@@ -66,7 +71,7 @@ namespace osu.Desktop
                 activity.BindTo(u.NewValue.Activity);
             }, true);
 
-            ruleset.BindValueChanged(_ => updateStatus());
+            ruleset.BindValueChanged(_ => requestUserRulesetsRankings());
             status.BindValueChanged(_ => updateStatus());
             activity.BindValueChanged(_ => updateStatus());
             privacyMode.BindValueChanged(_ => updateStatus());
@@ -77,7 +82,7 @@ namespace osu.Desktop
         private void onReady(object _, ReadyMessage __)
         {
             Logger.Log("Discord RPC Client ready.", LoggingTarget.Network, LogLevel.Debug);
-            updateStatus();
+            requestUserRulesetsRankings();
         }
 
         private void updateStatus()
@@ -106,13 +111,59 @@ namespace osu.Desktop
             if (privacyMode.Value == DiscordRichPresenceMode.Limited)
                 presence.Assets.LargeImageText = string.Empty;
             else
-                presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
+            {
+                if (user.Value.RulesetsStatistics != null && user.Value.RulesetsStatistics.TryGetValue(ruleset.Value.ShortName, out UserStatistics statistics))
+                    presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics.GlobalRank > 0 ? $" (rank #{statistics.GlobalRank:N0})" : string.Empty);
+                else
+                    presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
+            }
 
             // update ruleset
             presence.Assets.SmallImageKey = ruleset.Value.IsLegacyRuleset() ? $"mode_{ruleset.Value.OnlineID}" : "mode_custom";
             presence.Assets.SmallImageText = ruleset.Value.Name;
 
             client.SetPresence(presence);
+        }
+
+        private void requestUserRulesetsRankings()
+        {
+            RulesetInfo cachedRuleset = ruleset.Value;
+
+            // When first logging in, we can't send a request with an empty id
+            if (api.LocalUser.Value.Id > 1)
+            {
+                var req = new GetUsersRequest(new int[] { api.LocalUser.Value.Id });
+                req.Success += result =>
+                {
+                    if (result.Users.Count == 1)
+                    {
+                        APIUser apiUser = result.Users[0];
+                        user.Value.RulesetsStatistics = apiUser.RulesetsStatistics;
+                    }
+
+                    updateStatus();
+                };
+                req.Failure += _ => updateStatus();
+
+                api.Queue(req);
+            }
+            else
+            {
+                var req = new GetUserRequest(api.LocalUser.Value.Username, ruleset.Value);
+
+                req.Success += result =>
+                {
+                    user.Value.RulesetsStatistics ??= new Dictionary<string, UserStatistics>();
+                    user.Value.RulesetsStatistics[ruleset.Value.ShortName] = result.Statistics;
+                    updateStatus();
+                };
+                req.Failure += error =>
+                {
+                    updateStatus();
+                };
+
+                api.Queue(req);
+            }
         }
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
