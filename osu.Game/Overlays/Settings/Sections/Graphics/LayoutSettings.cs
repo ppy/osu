@@ -234,15 +234,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 case FullscreenCapability.Unknown:
                     if (host.Window is WindowsWindow)
-                        windowModeDropdown.WarningText = "Checking for exclusive fullscreen...";
+                        windowModeDropdown.WarningText = "Checking for fullscreen capabilities...";
                     break;
 
                 case FullscreenCapability.Capable:
-                    windowModeDropdown.WarningText = default;
+                    windowModeDropdown.WarningText = "osu! is running exclusive fullscreen, guaranteeing low latency!";
                     break;
 
                 case FullscreenCapability.Incapable:
-                    windowModeDropdown.WarningText = "Unable to enter exclusive fullscreen. You'll still experience some input latency.";
+                    windowModeDropdown.WarningText = "Unable to run exclusive fullscreen. You'll still experience some input latency.";
                     break;
             }
         }
