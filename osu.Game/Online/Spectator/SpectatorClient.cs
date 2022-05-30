@@ -172,6 +172,9 @@ namespace osu.Game.Online.Spectator
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
                 currentState.State = SpectatedUserState.Playing;
+                currentState.MaxAchievableCombo = state.ScoreProcessor.MaxAchievableCombo;
+                currentState.MaxAchievableBaseScore = state.ScoreProcessor.MaxAchievableBaseScore;
+                currentState.TotalBasicHitObjects = state.ScoreProcessor.TotalBasicHitObjects;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
