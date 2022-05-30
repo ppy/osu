@@ -63,10 +63,13 @@ namespace osu.Game.Online.API
 
         public virtual void Queue(APIRequest request)
         {
-            if (HandleRequest?.Invoke(request) != true)
+            Schedule(() =>
             {
-                request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} cannot process this request."));
-            }
+                if (HandleRequest?.Invoke(request) != true)
+                {
+                    request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} cannot process this request."));
+                }
+            });
         }
 
         public void Perform(APIRequest request) => HandleRequest?.Invoke(request);
