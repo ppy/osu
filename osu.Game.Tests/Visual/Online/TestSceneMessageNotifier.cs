@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Visual.Online
             };
 
             [Cached]
-            public ChatOverlayV2 ChatOverlay { get; } = new ChatOverlayV2();
+            public ChatOverlay ChatOverlay { get; } = new ChatOverlay();
 
             private readonly MessageNotifier messageNotifier = new MessageNotifier();
 
