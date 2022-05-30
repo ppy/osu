@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
@@ -33,7 +32,7 @@ namespace osu.Desktop
         private IBindable<APIUser> user;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider provider { get; set; }
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
@@ -46,7 +45,7 @@ namespace osu.Desktop
         };
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider provider, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
             client = new DiscordRpcClient(client_id)
             {
@@ -129,7 +128,7 @@ namespace osu.Desktop
         {
             RulesetInfo cachedRuleset = ruleset.Value;
 
-            var req = new GetUsersRequest(new int[] { api.LocalUser.Value.Id });
+            var req = new GetUsersRequest(new int[] { provider.LocalUser.Value.Id });
             req.Success += result =>
             {
                 if (result.Users.Count == 1)
@@ -142,7 +141,7 @@ namespace osu.Desktop
             };
             req.Failure += _ => updateStatus();
 
-            api.Queue(req);
+            provider.Queue(req);
         }
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
