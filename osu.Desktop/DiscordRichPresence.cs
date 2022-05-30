@@ -71,7 +71,7 @@ namespace osu.Desktop
                 activity.BindTo(u.NewValue.Activity);
             }, true);
 
-            ruleset.BindValueChanged(_ => requestUserRulesetsRankings());
+            ruleset.BindValueChanged(_ => updateStatus());
             status.BindValueChanged(_ => updateStatus());
             activity.BindValueChanged(_ => updateStatus());
             privacyMode.BindValueChanged(_ => updateStatus());
@@ -129,41 +129,20 @@ namespace osu.Desktop
         {
             RulesetInfo cachedRuleset = ruleset.Value;
 
-            // When first logging in, we can't send a request with an empty id
-            if (api.LocalUser.Value.Id > 1)
+            var req = new GetUsersRequest(new int[] { api.LocalUser.Value.Id });
+            req.Success += result =>
             {
-                var req = new GetUsersRequest(new int[] { api.LocalUser.Value.Id });
-                req.Success += result =>
+                if (result.Users.Count == 1)
                 {
-                    if (result.Users.Count == 1)
-                    {
-                        APIUser apiUser = result.Users[0];
-                        user.Value.RulesetsStatistics = apiUser.RulesetsStatistics;
-                    }
+                    APIUser apiUser = result.Users[0];
+                    user.Value.RulesetsStatistics = apiUser.RulesetsStatistics;
+                }
 
-                    updateStatus();
-                };
-                req.Failure += _ => updateStatus();
+                updateStatus();
+            };
+            req.Failure += _ => updateStatus();
 
-                api.Queue(req);
-            }
-            else
-            {
-                var req = new GetUserRequest(api.LocalUser.Value.Username, ruleset.Value);
-
-                req.Success += result =>
-                {
-                    user.Value.RulesetsStatistics ??= new Dictionary<string, UserStatistics>();
-                    user.Value.RulesetsStatistics[ruleset.Value.ShortName] = result.Statistics;
-                    updateStatus();
-                };
-                req.Failure += error =>
-                {
-                    updateStatus();
-                };
-
-                api.Queue(req);
-            }
+            api.Queue(req);
         }
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
