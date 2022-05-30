@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private UserProfileOverlay userOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private ChatOverlayV2 chatOverlay { get; set; }
+        private ChatOverlay chatOverlay { get; set; }
 
         [Resolved]
         private IAPIProvider apiProvider { get; set; }
