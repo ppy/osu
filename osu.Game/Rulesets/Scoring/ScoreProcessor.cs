@@ -88,17 +88,20 @@ namespace osu.Game.Rulesets.Scoring
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
-        private int maxAchievableCombo;
+        /// <summary>
+        /// The maximum achievable combo, if everything is hit perfectly.
+        /// </summary>
+        internal int MaxAchievableCombo;
 
         /// <summary>
-        /// The maximum achievable base score.
+        /// The maximum achievable base score, if everything is hit perfectly.
         /// </summary>
-        private double maxBaseScore;
+        internal double MaxAchievableBaseScore;
 
         /// <summary>
-        /// The maximum number of basic (non-tick and non-bonus) hitobjects.
+        /// The total number of basic (non-tick and non-bonus) hitobjects that can be hit.
         /// </summary>
-        private int maxBasicHitObjects;
+        internal int TotalBasicHitObjects;
 
         /// <summary>
         /// The maximum <see cref="HitResult"/> of a basic (non-tick and non-bonus) hitobject.
@@ -106,9 +109,9 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         private HitResult? maxBasicResult;
 
-        private double rollingMaxBaseScore;
-        private double baseScore;
-        private int basicHitObjects;
+        private double rollingMaxAchievableBaseScore;
+        private double rollingBaseScore;
+        private int rollingBasicHitObjects;
         private bool beatmapApplied;
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
@@ -175,12 +178,12 @@ namespace osu.Game.Rulesets.Scoring
 
             if (!result.Type.IsBonus())
             {
-                baseScore += scoreIncrease;
-                rollingMaxBaseScore += result.Judgement.MaxNumericResult;
+                rollingBaseScore += scoreIncrease;
+                rollingMaxAchievableBaseScore += result.Judgement.MaxNumericResult;
             }
 
             if (result.Type.IsBasic())
-                basicHitObjects++;
+                rollingBasicHitObjects++;
 
             hitEvents.Add(CreateHitEvent(result));
             lastHitObject = result.HitObject;
@@ -213,12 +216,12 @@ namespace osu.Game.Rulesets.Scoring
 
             if (!result.Type.IsBonus())
             {
-                baseScore -= scoreIncrease;
-                rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
+                rollingBaseScore -= scoreIncrease;
+                rollingMaxAchievableBaseScore -= result.Judgement.MaxNumericResult;
             }
 
             if (result.Type.IsBasic())
-                basicHitObjects--;
+                rollingBasicHitObjects--;
 
             Debug.Assert(hitEvents.Count > 0);
             lastHitObject = hitEvents[^1].LastHitObject;
@@ -229,12 +232,12 @@ namespace osu.Game.Rulesets.Scoring
 
         private void updateScore()
         {
-            double rollingAccuracyRatio = rollingMaxBaseScore > 0 ? baseScore / rollingMaxBaseScore : 1;
-            double accuracyRatio = maxBaseScore > 0 ? baseScore / maxBaseScore : 1;
-            double comboRatio = maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1;
+            double rollingAccuracyRatio = rollingMaxAchievableBaseScore > 0 ? rollingBaseScore / rollingMaxAchievableBaseScore : 1;
+            double accuracyRatio = MaxAchievableBaseScore > 0 ? rollingBaseScore / MaxAchievableBaseScore : 1;
+            double comboRatio = MaxAchievableCombo > 0 ? (double)HighestCombo.Value / MaxAchievableCombo : 1;
 
             Accuracy.Value = rollingAccuracyRatio;
-            TotalScore.Value = ComputeScore(Mode.Value, accuracyRatio, comboRatio, getBonusScore(scoreResultCounts), maxBasicHitObjects);
+            TotalScore.Value = ComputeScore(Mode.Value, accuracyRatio, comboRatio, getBonusScore(scoreResultCounts), TotalBasicHitObjects);
         }
 
         /// <summary>
@@ -288,10 +291,10 @@ namespace osu.Game.Rulesets.Scoring
                 out _,
                 out _);
 
-            double accuracyRatio = maxBaseScore > 0 ? extractedBaseScore / maxBaseScore : 1;
-            double comboRatio = maxAchievableCombo > 0 ? (double)scoreInfo.MaxCombo / maxAchievableCombo : 1;
+            double accuracyRatio = MaxAchievableBaseScore > 0 ? extractedBaseScore / MaxAchievableBaseScore : 1;
+            double comboRatio = MaxAchievableCombo > 0 ? (double)scoreInfo.MaxCombo / MaxAchievableCombo : 1;
 
-            return ComputeScore(mode, accuracyRatio, comboRatio, getBonusScore(scoreInfo.Statistics), maxBasicHitObjects);
+            return ComputeScore(mode, accuracyRatio, comboRatio, getBonusScore(scoreInfo.Statistics), TotalBasicHitObjects);
         }
 
         /// <summary>
@@ -403,14 +406,14 @@ namespace osu.Game.Rulesets.Scoring
 
             if (storeResults)
             {
-                maxAchievableCombo = HighestCombo.Value;
-                maxBaseScore = baseScore;
-                maxBasicHitObjects = basicHitObjects;
+                MaxAchievableCombo = HighestCombo.Value;
+                MaxAchievableBaseScore = rollingBaseScore;
+                TotalBasicHitObjects = rollingBasicHitObjects;
             }
 
-            baseScore = 0;
-            rollingMaxBaseScore = 0;
-            basicHitObjects = 0;
+            rollingBaseScore = 0;
+            rollingMaxAchievableBaseScore = 0;
+            rollingBasicHitObjects = 0;
 
             TotalScore.Value = 0;
             Accuracy.Value = 1;
@@ -444,7 +447,7 @@ namespace osu.Game.Rulesets.Scoring
             if (frame.Header == null)
                 return;
 
-            extractFromStatistics(ruleset, frame.Header.Statistics, out baseScore, out rollingMaxBaseScore, out _, out _);
+            extractFromStatistics(ruleset, frame.Header.Statistics, out rollingBaseScore, out rollingMaxAchievableBaseScore, out _, out _);
             HighestCombo.Value = frame.Header.MaxCombo;
 
             scoreResultCounts.Clear();
