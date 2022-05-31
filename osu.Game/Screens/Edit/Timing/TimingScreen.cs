@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -150,6 +151,23 @@ namespace osu.Game.Screens.Edit.Timing
 
                 if (isFirstControlPoint)
                     group.Add(new TimingControlPoint());
+                else
+                {
+                    // Try and create matching types from the currently selected control point.
+                    var selected = selectedGroup.Value;
+
+                    if (selected != null)
+                    {
+                        foreach (var controlPoint in selected.ControlPoints)
+                        {
+                            if (Activator.CreateInstance(controlPoint.GetType()) is ControlPoint copy)
+                            {
+                                copy.CopyFrom(controlPoint);
+                                group.Add(copy);
+                            }
+                        }
+                    }
+                }
 
                 selectedGroup.Value = group;
             }
