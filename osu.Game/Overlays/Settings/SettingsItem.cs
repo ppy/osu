@@ -70,27 +70,32 @@ namespace osu.Game.Overlays.Settings
         }
 
         /// <summary>
-        /// Text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
+        /// Clear any warning text.
+        /// </summary>
+        public void ClearWarningText()
+        {
+            warningText?.Expire();
+            warningText = null;
+        }
+
+        /// <summary>
+        /// Set the text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
         /// Generally used to recommend the user change their setting as the current one is considered sub-optimal.
         /// </summary>
-        public LocalisableString? WarningText
+        /// <param name="text">The text to display.</param>
+        /// <param name="isWarning">Whether the text is in a warning state. Will decide how this is visually represented.</param>
+        public void SetWarningText(LocalisableString text, bool isWarning = true)
         {
-            set
+            ClearWarningText();
+
+            // construct lazily for cases where the label is not needed (may be provided by the Control).
+            FlowContent.Add(warningText = new LinkFlowContainer(cp => cp.Colour = isWarning ? colours.Yellow : colours.Green)
             {
-                bool hasValue = value != default;
-
-                if (warningText == null)
-                {
-                    if (!hasValue)
-                        return;
-
-                    // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    FlowContent.Add(warningText = new SettingsNoticeText(colours) { Margin = new MarginPadding { Bottom = 5 } });
-                }
-
-                warningText.Alpha = hasValue ? 1 : 0;
-                warningText.Text = value ?? default;
-            }
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Margin = new MarginPadding { Bottom = 5 },
+                Text = text,
+            });
         }
 
         public virtual Bindable<T> Current
