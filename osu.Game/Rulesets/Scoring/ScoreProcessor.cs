@@ -338,7 +338,7 @@ namespace osu.Game.Rulesets.Scoring
             // To get around this, the accuracy ratio is always recalculated based on the hit statistics rather than trusting the score.
             // Note: This cannot be applied universally to all legacy scores, as some rulesets (e.g. catch) group multiple judgements together.
             if (scoreInfo.IsLegacyScore && scoreInfo.Ruleset.OnlineID == 3 && maximum.BaseScore > 0)
-                accuracyRatio = current.BaseScore / current.MaxCombo;
+                accuracyRatio = current.BaseScore / maximum.BaseScore;
 
             return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.HitObjects);
         }
