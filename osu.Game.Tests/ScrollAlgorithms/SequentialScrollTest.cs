@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using FluentAssertions;
 using NUnit.Framework;
 using osu.Framework.Lists;
 using osu.Game.Rulesets.Timing;
@@ -30,9 +31,9 @@ namespace osu.Game.Tests.ScrollAlgorithms
         public void TestDisplayStartTime()
         {
             // easy cases - time range adjusted for velocity fits within control point duration
-            Assert.AreEqual(2500, algorithm.GetDisplayStartTime(5000, 0, 2500, 1)); // 5000 - (2500 / 1)
-            Assert.AreEqual(13750, algorithm.GetDisplayStartTime(15000, 0, 2500, 1)); // 15000 - (2500 / 2)
-            Assert.AreEqual(20000, algorithm.GetDisplayStartTime(25000, 0, 2500, 1)); // 25000 - (2500 / 0.5)
+            algorithm.GetDisplayStartTime(5000, 0, 2500, 1).Should().Be(2500); // 5000 - (2500 / 1)
+            algorithm.GetDisplayStartTime(15000, 0, 2500, 1).Should().Be(13750); // 15000 - (2500 / 2)
+            algorithm.GetDisplayStartTime(25000, 0, 2500, 1).Should().Be(20000); // 25000 - (2500 / 0.5)
 
             // hard case - time range adjusted for velocity exceeds control point duration
 
@@ -44,24 +45,24 @@ namespace osu.Game.Tests.ScrollAlgorithms
             // minus one scroll length allowance = 12500 - 1000 = 11500 = 11.5 [scroll lengths]
             // therefore the start time lies within the second multiplier point (because 11.5 < 4 + 8)
             // its exact time position is = 10000 + 7.5 * (2500 / 2) = 19375
-            Assert.AreEqual(19375, algorithm.GetDisplayStartTime(22500, 0, 2500, 1000));
+            algorithm.GetDisplayStartTime(22500, 0, 2500, 1000).Should().Be(19375);
         }
 
         [Test]
         public void TestLength()
         {
-            Assert.AreEqual(1f / 5, algorithm.GetLength(0, 1000, 5000, 1)); // Like constant
-            Assert.AreEqual(1f / 5, algorithm.GetLength(10000, 10500, 5000, 1)); // (10500 - 10000) / 0.5 / 5000
-            Assert.AreEqual(1f / 5, algorithm.GetLength(20000, 22000, 5000, 1)); // (22000 - 20000) * 0.5 / 5000
+            algorithm.GetLength(0, 1000, 5000, 1).Should().Be(1f / 5); // Like constant
+            algorithm.GetLength(10000, 10500, 5000, 1).Should().Be(1f / 5); // (10500 - 10000) / 0.5 / 5000
+            algorithm.GetLength(20000, 22000, 5000, 1).Should().Be(1f / 5); // (22000 - 20000) * 0.5 / 5000
         }
 
         [Test]
         public void TestPosition()
         {
             // Basically same calculations as TestLength()
-            Assert.AreEqual(1f / 5, algorithm.PositionAt(1000, 0, 5000, 1));
-            Assert.AreEqual(1f / 5, algorithm.PositionAt(10500, 10000, 5000, 1));
-            Assert.AreEqual(1f / 5, algorithm.PositionAt(22000, 20000, 5000, 1));
+            algorithm.PositionAt(1000, 0, 5000, 1).Should().Be(1f / 5);
+            algorithm.PositionAt(10500, 10000, 5000, 1).Should().Be(1f / 5);
+            algorithm.PositionAt(22000, 20000, 5000, 1).Should().Be(1f / 5);
         }
 
         [TestCase(1000)]
@@ -71,8 +72,8 @@ namespace osu.Game.Tests.ScrollAlgorithms
         [TestCase(25000)]
         public void TestTime(double time)
         {
-            Assert.AreEqual(time, algorithm.TimeAt(algorithm.PositionAt(time, 0, 5000, 1), 0, 5000, 1), 0.001);
-            Assert.AreEqual(time, algorithm.TimeAt(algorithm.PositionAt(time, 5000, 5000, 1), 5000, 5000, 1), 0.001);
+            algorithm.TimeAt(algorithm.PositionAt(time, 0, 5000, 1), 0, 5000, 1).Should().BeApproximately(time, 0.001);
+            algorithm.TimeAt(algorithm.PositionAt(time, 5000, 5000, 1), 5000, 5000, 1).Should().BeApproximately(time, 0.001);
         }
     }
 }
