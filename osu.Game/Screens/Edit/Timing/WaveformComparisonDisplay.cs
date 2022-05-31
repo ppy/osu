@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private TimingControlPoint timingPoint = TimingControlPoint.DEFAULT;
 
-        private int lastDisplayedBeatIndex;
+        private double displayedTime;
 
         private double selectedGroupStartTime;
         private double selectedGroupEndTime;
@@ -55,9 +55,6 @@ namespace osu.Game.Screens.Edit.Timing
         private readonly BindableBool displayLocked = new BindableBool();
 
         private LockedOverlay lockedOverlay = null!;
-
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
 
         public WaveformComparisonDisplay()
         {
@@ -98,7 +95,7 @@ namespace osu.Game.Screens.Edit.Timing
             controlPointGroups.BindTo(editorBeatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((_, __) => updateTimingGroup());
 
-            beatLength.BindValueChanged(_ => showFrom(lastDisplayedBeatIndex), true);
+            beatLength.BindValueChanged(_ => regenerateDisplay(), true);
 
             displayLocked.BindValueChanged(locked =>
             {
@@ -139,10 +136,13 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            float trackLength = (float)beatmap.Value.Track.Length;
-            int totalBeatsAvailable = (int)(trackLength / timingPoint.BeatLength);
+            if (!displayLocked.Value)
+            {
+                float trackLength = (float)beatmap.Value.Track.Length;
+                int totalBeatsAvailable = (int)(trackLength / timingPoint.BeatLength);
 
-            Scheduler.AddOnce(showFrom, (int)(e.MousePosition.X / DrawWidth * totalBeatsAvailable));
+                Scheduler.AddOnce(showFromBeat, (int)(e.MousePosition.X / DrawWidth * totalBeatsAvailable));
+            }
 
             return base.OnMouseMove(e);
         }
@@ -157,21 +157,29 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.Update();
 
-            if (!IsHovered)
+            if (!IsHovered && !displayLocked.Value)
             {
                 int currentBeat = (int)Math.Floor((editorClock.CurrentTimeAccurate - selectedGroupStartTime) / timingPoint.BeatLength);
 
-                showFrom(currentBeat);
+                showFromBeat(currentBeat);
             }
         }
 
-        private void showFrom(int beatIndex)
+        private void showFromBeat(int beatIndex) =>
+            showFromTime(selectedGroupStartTime + beatIndex * timingPoint.BeatLength);
+
+        private void showFromTime(double time)
         {
-            if (lastDisplayedBeatIndex == beatIndex)
+            if (displayedTime == time)
                 return;
 
-            if (displayLocked.Value)
-                return;
+            displayedTime = time;
+            regenerateDisplay();
+        }
+
+        private void regenerateDisplay()
+        {
+            double index = (displayedTime - selectedGroupStartTime) / timingPoint.BeatLength;
 
             // Chosen as a pretty usable number across all BPMs.
             // Optimally we'd want this to scale with the BPM in question, but performing
@@ -182,23 +190,25 @@ namespace osu.Game.Screens.Edit.Timing
             float trackLength = (float)beatmap.Value.Track.Length;
             float scale = trackLength / visible_width;
 
+            const int start_offset = total_waveforms / 2;
+
             // Start displaying from before the current beat
-            beatIndex -= total_waveforms / 2;
+            index -= start_offset;
 
             foreach (var row in InternalChildren.OfType<WaveformRow>())
             {
                 // offset to the required beat index.
-                double time = selectedGroupStartTime + beatIndex * timingPoint.BeatLength;
+                double time = selectedGroupStartTime + index * timingPoint.BeatLength;
 
                 float offset = (float)(time - visible_width / 2) / trackLength * scale;
 
                 row.Alpha = time < selectedGroupStartTime || time > selectedGroupEndTime ? 0.2f : 1;
                 row.WaveformOffset = -offset;
                 row.WaveformScale = new Vector2(scale, 1);
-                row.BeatIndex = beatIndex++;
-            }
+                row.BeatIndex = (int)Math.Floor(index);
 
-            lastDisplayedBeatIndex = beatIndex;
+                index++;
+            }
         }
 
         internal class LockedOverlay : CompositeDrawable
