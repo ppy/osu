@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Scoring values for a perfect play.
         /// </summary>
-        private ScoringValues maximumScoringValues;
+        public ScoringValues MaximumScoringValues { get; private set; }
 
         /// <summary>
         /// Scoring values for the current play assuming all perfect hits.
@@ -271,7 +271,7 @@ namespace osu.Game.Rulesets.Scoring
         private void updateScore()
         {
             Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
-            TotalScore.Value = ComputeScore(Mode.Value, currentScoringValues, maximumScoringValues);
+            TotalScore.Value = ComputeScore(Mode.Value, currentScoringValues, MaximumScoringValues);
         }
 
         /// <summary>
@@ -314,7 +314,7 @@ namespace osu.Game.Rulesets.Scoring
             extractScoringValues(scoreInfo.Statistics, out var current, out _);
             current.MaxCombo = scoreInfo.MaxCombo;
 
-            return ComputeScore(mode, current, maximumScoringValues);
+            return ComputeScore(mode, current, MaximumScoringValues);
         }
 
         /// <summary>
@@ -419,7 +419,7 @@ namespace osu.Game.Rulesets.Scoring
             lastHitObject = null;
 
             if (storeResults)
-                maximumScoringValues = currentScoringValues;
+                MaximumScoringValues = currentScoringValues;
 
             currentScoringValues = default;
             currentMaximumScoringValues = default;
