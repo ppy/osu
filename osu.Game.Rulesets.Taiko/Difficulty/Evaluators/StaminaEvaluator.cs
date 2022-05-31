@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Difficulty.Skills;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -42,19 +40,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             do
             {
                 previous = (TaikoDifficultyHitObject)previous.Previous(1);
+                if (previous == null) return 0; // No previous (The note is the first press of the current key)
                 if (previous.BaseObject is Hit && previous.HitType == taikoCurrent.HitType)
                 {
                     --monoNoteInterval;
                 }
                 currentKeyInterval += previous.DeltaTime;
 
-            } while (previous != null && monoNoteInterval > 0);
-
-            // This note is the first press of the current key
-            if (monoNoteInterval > 0)
-            {
-                return 0;
-            }
+            } while (monoNoteInterval > 0);
 
             double objectStrain = 0.5;
             objectStrain += speedBonus(currentKeyInterval);
