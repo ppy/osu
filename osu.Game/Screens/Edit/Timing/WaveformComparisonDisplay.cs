@@ -107,29 +107,37 @@ namespace osu.Game.Screens.Edit.Timing
         {
             beatLength.UnbindBindings();
 
-            selectedGroupStartTime = 0;
-            selectedGroupEndTime = beatmap.Value.Track.Length;
-
             var tcp = selectedGroup.Value?.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
             if (tcp == null)
             {
                 timingPoint = new TimingControlPoint();
+                // During movement of a control point's offset, this clause can be hit momentarily.
+                // We don't want to reset the `selectedGroupStartTime` here as we rely on having the
+                // last value to perform an offset traversal below.
+                selectedGroupEndTime = beatmap.Value.Track.Length;
                 return;
             }
 
             timingPoint = tcp;
             beatLength.BindTo(timingPoint.BeatLengthBindable);
 
-            selectedGroupStartTime = selectedGroup.Value?.Time ?? 0;
+            double? newStartTime = selectedGroup.Value?.Time;
+
+            if (newStartTime.HasValue && selectedGroupStartTime != newStartTime)
+            {
+                // The offset of the selected point may have changed.
+                // This handles the case the user has locked the view and expects the display to update with this change.
+                showFromTime(displayedTime + (newStartTime.Value - selectedGroupStartTime));
+            }
 
             var nextGroup = editorBeatmap.ControlPointInfo.TimingPoints
                                          .SkipWhile(g => g != tcp)
                                          .Skip(1)
                                          .FirstOrDefault();
 
-            if (nextGroup != null)
-                selectedGroupEndTime = nextGroup.Time;
+            selectedGroupStartTime = newStartTime ?? 0;
+            selectedGroupEndTime = nextGroup?.Time ?? beatmap.Value.Track.Length;
         }
 
         protected override bool OnHover(HoverEvent e) => true;
