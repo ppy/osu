@@ -14,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Overlays.Chat
@@ -140,16 +141,16 @@ namespace osu.Game.Overlays.Chat
 
                 switch (newChannel?.Type)
                 {
-                    case ChannelType.Public:
-                        chattingText.Text = $"chatting in {newChannel.Name}";
+                    case null:
+                        chattingText.Text = string.Empty;
                         break;
 
                     case ChannelType.PM:
-                        chattingText.Text = $"chatting with {newChannel.Name}";
+                        chattingText.Text = ChatStrings.TalkingWith(newChannel.Name);
                         break;
 
                     default:
-                        chattingText.Text = string.Empty;
+                        chattingText.Text = ChatStrings.TalkingIn(newChannel.Name);
                         break;
                 }
             }, true);

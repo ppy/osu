@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         [Cached]
-        private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
+        private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
         [Cached]
         private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
