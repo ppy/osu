@@ -353,7 +353,7 @@ namespace osu.Game.Rulesets.Scoring
         public double ComputeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum)
         {
             double accuracyRatio = maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
-            double comboRatio = maximum.MaxCombo > 0 ? current.MaxCombo / maximum.MaxCombo : 1;
+            double comboRatio = maximum.MaxCombo > 0 ? (double)current.MaxCombo / maximum.MaxCombo : 1;
             return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.HitObjects);
         }
 
