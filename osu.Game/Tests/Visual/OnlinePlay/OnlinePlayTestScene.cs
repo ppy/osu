@@ -83,6 +83,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 #pragma warning disable RS0030
                 // We can't GetResultSafely() here (will fail with "Can't use GetResultSafely from inside an async operation."), but Wait is safe enough due to
                 // the task being a TaskCompletionSource.
+                // Importantly, this doesn't deadlock because of the scheduler call above running inline where feasible (see the `false` argument).
                 return tcs.Task.Result;
 #pragma warning restore RS0030
             };
