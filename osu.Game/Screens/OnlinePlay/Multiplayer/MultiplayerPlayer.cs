@@ -149,9 +149,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void StartGameplay()
         {
+            // We can enter this screen one of two ways:
+            // 1. Via the automatic natural progression of PlayerLoader into Player.
+            //    We'll arrive here in a Loaded state, and we need to let the server know that we're ready to start.
+            // 2. Via the server forcefully starting gameplay because players have been hanging out in PlayerLoader for too long.
+            //    We'll arrive here in a Playing state, and we should neither show the loading spinner nor tell the server that we're ready to start (gameplay has already started).
+            //
+            // The base call is blocked here because in both cases gameplay is started only when the server says so via onGameplayStarted().
+
             if (client.LocalUser?.State == MultiplayerUserState.Loaded)
             {
-                // block base call, but let the server know we are ready to start.
                 loadingDisplay.Show();
                 client.ChangeState(MultiplayerUserState.ReadyForGameplay);
             }

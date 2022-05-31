@@ -12,7 +12,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -26,7 +25,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -37,9 +35,7 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
-using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
 using osu.Game.Screens.Edit.GameplayTest;
@@ -48,7 +44,6 @@ using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
-using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -119,12 +114,12 @@ namespace osu.Game.Screens.Edit
         private IBeatmap playableBeatmap;
         private EditorBeatmap editorBeatmap;
 
+        private BottomBar bottomBar;
+
         [CanBeNull] // Should be non-null once it can support custom rulesets.
         private EditorChangeHandler changeHandler;
 
         private DependencyContainer dependencies;
-
-        private TestGameplayButton testGameplayButton;
 
         private bool isNewBeatmap;
 
@@ -148,7 +143,7 @@ namespace osu.Game.Screens.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
             var loadableBeatmap = Beatmap.Value;
 
@@ -226,7 +221,7 @@ namespace osu.Game.Screens.Edit
             AddInternal(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new[]
+                Children = new Drawable[]
                 {
                     new Container
                     {
@@ -287,67 +282,7 @@ namespace osu.Game.Screens.Edit
                             },
                         },
                     },
-                    new Container
-                    {
-                        Name = "Bottom bar",
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        RelativeSizeAxes = Axes.X,
-                        Height = 60,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colours.Gray2
-                            },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
-                                Child = new GridContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColumnDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.Absolute, 220),
-                                        new Dimension(),
-                                        new Dimension(GridSizeMode.Absolute, 220),
-                                        new Dimension(GridSizeMode.Absolute, 120),
-                                    },
-                                    Content = new[]
-                                    {
-                                        new Drawable[]
-                                        {
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Right = 10 },
-                                                Child = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
-                                            },
-                                            new SummaryTimeline
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                            },
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Left = 10 },
-                                                Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
-                                            },
-                                            testGameplayButton = new TestGameplayButton
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Left = 10 },
-                                                Size = new Vector2(1),
-                                                Action = testGameplay
-                                            }
-                                        },
-                                    }
-                                },
-                            }
-                        }
-                    },
+                    bottomBar = new BottomBar(),
                 }
             });
 
@@ -391,6 +326,24 @@ namespace osu.Game.Screens.Edit
             clock.Seek(state.Time);
             Clipboard.Content.Value = state.ClipboardContent;
         });
+
+        public void TestGameplay()
+        {
+            if (HasUnsavedChanges)
+            {
+                dialogOverlay.Push(new SaveBeforeGameplayTestDialog(() =>
+                {
+                    Save();
+                    pushEditorPlayer();
+                }));
+            }
+            else
+            {
+                pushEditorPlayer();
+            }
+
+            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(this));
+        }
 
         /// <summary>
         /// Saves the currently edited beatmap.
@@ -540,7 +493,7 @@ namespace osu.Game.Screens.Edit
             if (scrollAccumulation != 0 && Math.Sign(scrollAccumulation) != scrollDirection)
                 scrollAccumulation = scrollDirection * (precision - Math.Abs(scrollAccumulation));
 
-            scrollAccumulation += scrollComponent * (e.IsPrecise ? 0.1 : 1);
+            scrollAccumulation += scrollComponent;
 
             // because we are doing snapped seeking, we need to add up precise scrolls until they accumulate to an arbitrary cut-off.
             while (Math.Abs(scrollAccumulation) >= precision)
@@ -589,7 +542,7 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case GlobalAction.EditorTestGameplay:
-                    testGameplayButton.TriggerClick();
+                    bottomBar.TestGameplayButton.TriggerClick();
                     return true;
 
                 default:
@@ -933,24 +886,6 @@ namespace osu.Game.Screens.Edit
         {
             samplePlaybackDisabled.Value = false;
             loader?.CancelPendingDifficultySwitch();
-        }
-
-        private void testGameplay()
-        {
-            if (HasUnsavedChanges)
-            {
-                dialogOverlay.Push(new SaveBeforeGameplayTestDialog(() =>
-                {
-                    Save();
-                    pushEditorPlayer();
-                }));
-            }
-            else
-            {
-                pushEditorPlayer();
-            }
-
-            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(this));
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

@@ -26,8 +26,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         protected override bool ReadyForGameplay =>
-            base.ReadyForGameplay
-            // The server is forcefully starting gameplay.
+            (
+                // The user is ready to enter gameplay.
+                base.ReadyForGameplay
+                // And the server has received the message that we're loaded.
+                && multiplayerClient.LocalUser?.State == MultiplayerUserState.Loaded
+            )
+            // Or the server is forcefully starting gameplay.
             || multiplayerClient.LocalUser?.State == MultiplayerUserState.Playing;
 
         protected override void OnPlayerLoaded()
