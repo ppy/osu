@@ -123,13 +123,7 @@ namespace osu.Game.Screens.Edit.Timing
             beatLength.BindTo(timingPoint.BeatLengthBindable);
 
             double? newStartTime = selectedGroup.Value?.Time;
-
-            if (newStartTime.HasValue && selectedGroupStartTime != newStartTime)
-            {
-                // The offset of the selected point may have changed.
-                // This handles the case the user has locked the view and expects the display to update with this change.
-                showFromTime(displayedTime + (newStartTime.Value - selectedGroupStartTime), true);
-            }
+            double? offsetChange = newStartTime - selectedGroupStartTime;
 
             var nextGroup = editorBeatmap.ControlPointInfo.TimingPoints
                                          .SkipWhile(g => g != tcp)
@@ -138,6 +132,13 @@ namespace osu.Game.Screens.Edit.Timing
 
             selectedGroupStartTime = newStartTime ?? 0;
             selectedGroupEndTime = nextGroup?.Time ?? beatmap.Value.Track.Length;
+
+            if (newStartTime.HasValue && offsetChange.HasValue)
+            {
+                // The offset of the selected point may have changed.
+                // This handles the case the user has locked the view and expects the display to update with this change.
+                showFromTime(displayedTime + offsetChange.Value, true);
+            }
         }
 
         protected override bool OnHover(HoverEvent e) => true;
