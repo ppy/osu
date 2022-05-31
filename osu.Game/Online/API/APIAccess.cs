@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -47,12 +48,15 @@ namespace osu.Game.Online.API
         public IBindable<APIUser> LocalUser => localUser;
         public IBindableList<APIUser> Friends => friends;
         public IBindable<UserActivity> Activity => activity;
+        public IBindable<Dictionary<string, UserStatistics>> RulesetsStatistics => statistics;
 
         private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
 
         private BindableList<APIUser> friends { get; } = new BindableList<APIUser>();
 
         private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
+
+        private Bindable<Dictionary<string, UserStatistics>> statistics { get; } = new Bindable<Dictionary<string, UserStatistics>>();
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
@@ -202,6 +206,13 @@ namespace osu.Game.Online.API
                             failConnectionProcess();
                             continue;
                         }
+
+                        // populating ruleset statistics
+                        var usersRequest = new GetUsersRequest(new[] { localUser.Value.Id });
+
+                        usersRequest.Success += res => statistics.Value = res.Users.First().RulesetsStatistics;
+
+                        handleRequest(usersRequest);
 
                         // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
                         // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests

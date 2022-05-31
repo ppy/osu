@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
@@ -22,6 +23,8 @@ namespace osu.Game.Online.API
         public BindableList<APIUser> Friends { get; } = new BindableList<APIUser>();
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
+
+        public Bindable<Dictionary<string, UserStatistics>> RulesetsStatistics { get; } = new Bindable<Dictionary<string, UserStatistics>>();
 
         public string AccessToken => "token";
 
@@ -121,6 +124,7 @@ namespace osu.Game.Online.API
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
         IBindableList<APIUser> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
+        IBindable<Dictionary<string, UserStatistics>> IAPIProvider.RulesetsStatistics => RulesetsStatistics;
 
         public void FailNextLogin() => shouldFailNextLogin = true;
     }

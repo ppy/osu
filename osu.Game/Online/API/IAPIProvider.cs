@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
@@ -30,6 +31,11 @@ namespace osu.Game.Online.API
         /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         IBindable<UserActivity> Activity { get; }
+
+        /// <summary>
+        /// Local user's statistics per ruleset's short name
+        /// </summary>
+        IBindable<Dictionary<string, UserStatistics>> RulesetsStatistics { get; }
 
         /// <summary>
         /// Retrieve the OAuth access token.
