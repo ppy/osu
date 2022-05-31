@@ -15,6 +15,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     /// </summary>
     public class TaikoDifficultyHitObject : DifficultyHitObject
     {
+        // TODO: Review this - these was originally handled in TaikodifficultyCalculator.CreateDifficultyHitObjects, but
+        //       it might be a good idea to encapsulate as much detail within the class as possible.
+        private static List<TaikoDifficultyHitObject> centreHitObjects = new List<TaikoDifficultyHitObject>();
+        private static List<TaikoDifficultyHitObject> rimHitObjects = new List<TaikoDifficultyHitObject>();
+
+        private readonly IReadOnlyList<TaikoDifficultyHitObject> monoDifficultyHitObjects;
+        public readonly int MonoPosition;
+
         /// <summary>
         /// The rhythm required to hit this hit object.
         /// </summary>
@@ -47,6 +55,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRate);
             HitType = currentHit?.Type;
+
+            if (HitType == Objects.HitType.Centre)
+            {
+                MonoPosition = centreHitObjects.Count();
+                centreHitObjects.Add(this);
+                monoDifficultyHitObjects = centreHitObjects;
+            }
+            else if (HitType == Objects.HitType.Rim)
+            {
+                MonoPosition = rimHitObjects.Count();
+                rimHitObjects.Add(this);
+                monoDifficultyHitObjects = rimHitObjects;
+            }
         }
 
         /// <summary>
@@ -85,5 +106,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             return common_rhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();
         }
+
+        public TaikoDifficultyHitObject PreviousMono(int backwardsIndex) => monoDifficultyHitObjects.ElementAtOrDefault(MonoPosition - (backwardsIndex + 1));
+
+        public TaikoDifficultyHitObject NextMono(int forwardsIndex) => monoDifficultyHitObjects.ElementAtOrDefault(MonoPosition + (forwardsIndex + 1));
     }
 }
