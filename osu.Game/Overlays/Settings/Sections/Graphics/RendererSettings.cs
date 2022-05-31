@@ -48,7 +48,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             frameLimiterDropdown.Current.BindValueChanged(limit =>
             {
-                frameLimiterDropdown.WarningText = limit.NewValue == FrameSync.Unlimited ? GraphicsSettingsStrings.UnlimitedFramesNote : default;
+                switch (limit.NewValue)
+                {
+                    case FrameSync.Unlimited:
+                        frameLimiterDropdown.SetWarningText(GraphicsSettingsStrings.UnlimitedFramesNote);
+                        break;
+
+                    default:
+                        frameLimiterDropdown.ClearWarningText();
+                        break;
+                }
             }, true);
         }
     }
