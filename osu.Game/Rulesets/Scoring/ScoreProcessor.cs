@@ -251,8 +251,7 @@ namespace osu.Game.Rulesets.Scoring
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
-            extractFromStatistics(ruleset,
-                scoreInfo.Statistics,
+            extractFromStatistics(scoreInfo.Statistics,
                 out double extractedBaseScore,
                 out double extractedMaxBaseScore,
                 out int extractedMaxCombo,
@@ -281,8 +280,7 @@ namespace osu.Game.Rulesets.Scoring
             if (!beatmapApplied)
                 throw new InvalidOperationException($"Cannot compute partial score without calling {nameof(ApplyBeatmap)}.");
 
-            extractFromStatistics(ruleset,
-                scoreInfo.Statistics,
+            extractFromStatistics(scoreInfo.Statistics,
                 out double extractedBaseScore,
                 out _,
                 out _,
@@ -318,9 +316,7 @@ namespace osu.Game.Rulesets.Scoring
             // Note: This cannot be applied universally to all legacy scores, as some rulesets (e.g. catch) group multiple judgements together.
             if (scoreInfo.IsLegacyScore && scoreInfo.Ruleset.OnlineID == 3)
             {
-                extractFromStatistics(
-                    ruleset,
-                    scoreInfo.Statistics,
+                extractFromStatistics(scoreInfo.Statistics,
                     out double computedBaseScore,
                     out double computedMaxBaseScore,
                     out _,
@@ -437,14 +433,14 @@ namespace osu.Game.Rulesets.Scoring
             score.TotalScore = (long)Math.Round(ComputeFinalScore(ScoringMode.Standardised, score));
         }
 
-        public override void ResetFromReplayFrame(Ruleset ruleset, ReplayFrame frame)
+        public override void ResetFromReplayFrame(ReplayFrame frame)
         {
-            base.ResetFromReplayFrame(ruleset, frame);
+            base.ResetFromReplayFrame(frame);
 
             if (frame.Header == null)
                 return;
 
-            extractFromStatistics(ruleset, frame.Header.Statistics, out baseScore, out rollingMaxBaseScore, out _, out _);
+            extractFromStatistics(frame.Header.Statistics, out baseScore, out rollingMaxBaseScore, out _, out _);
             HighestCombo.Value = frame.Header.MaxCombo;
 
             scoreResultCounts.Clear();
@@ -455,7 +451,7 @@ namespace osu.Game.Rulesets.Scoring
             OnResetFromReplayFrame?.Invoke();
         }
 
-        private void extractFromStatistics(Ruleset ruleset, IReadOnlyDictionary<HitResult, int> statistics, out double baseScore, out double maxBaseScore, out int maxCombo,
+        private void extractFromStatistics(IReadOnlyDictionary<HitResult, int> statistics, out double baseScore, out double maxBaseScore, out int maxCombo,
                                            out int basicHitObjects)
         {
             baseScore = 0;
