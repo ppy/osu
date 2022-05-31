@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
@@ -25,6 +26,8 @@ namespace osu.Game.Screens.Edit.Timing
     internal class WaveformComparisonDisplay : CompositeDrawable
     {
         private const int total_waveforms = 8;
+
+        private const float corner_radius = LabelledDrawable<Drawable>.CORNER_RADIUS;
 
         private readonly BindableNumber<double> beatLength = new BindableDouble();
 
@@ -49,11 +52,18 @@ namespace osu.Game.Screens.Edit.Timing
 
         private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
+        private readonly BindableBool displayLocked = new BindableBool();
+
+        private LockedOverlay lockedOverlay = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         public WaveformComparisonDisplay()
         {
             RelativeSizeAxes = Axes.Both;
 
-            CornerRadius = LabelledDrawable<Drawable>.CORNER_RADIUS;
+            CornerRadius = corner_radius;
             Masking = true;
         }
 
@@ -81,12 +91,19 @@ namespace osu.Game.Screens.Edit.Timing
                 Width = 3,
             });
 
+            AddInternal(lockedOverlay = new LockedOverlay());
+
             selectedGroup.BindValueChanged(_ => updateTimingGroup(), true);
 
             controlPointGroups.BindTo(editorBeatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((_, __) => updateTimingGroup());
 
             beatLength.BindValueChanged(_ => showFrom(lastDisplayedBeatIndex), true);
+
+            displayLocked.BindValueChanged(locked =>
+            {
+                lockedOverlay.FadeTo(locked.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            }, true);
         }
 
         private void updateTimingGroup()
@@ -130,6 +147,12 @@ namespace osu.Game.Screens.Edit.Timing
             return base.OnMouseMove(e);
         }
 
+        protected override bool OnClick(ClickEvent e)
+        {
+            displayLocked.Toggle();
+            return true;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -145,6 +168,9 @@ namespace osu.Game.Screens.Edit.Timing
         private void showFrom(int beatIndex)
         {
             if (lastDisplayedBeatIndex == beatIndex)
+                return;
+
+            if (displayLocked.Value)
                 return;
 
             // Chosen as a pretty usable number across all BPMs.
@@ -173,6 +199,64 @@ namespace osu.Game.Screens.Edit.Timing
             }
 
             lastDisplayedBeatIndex = beatIndex;
+        }
+
+        internal class LockedOverlay : CompositeDrawable
+        {
+            private OsuSpriteText text = null!;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                RelativeSizeAxes = Axes.Both;
+                Masking = true;
+                CornerRadius = corner_radius;
+                BorderColour = colours.Red;
+                BorderThickness = 3;
+                Alpha = 0;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        AlwaysPresent = true,
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                    },
+                    new Container
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                Colour = colours.Red,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            text = new OsuSpriteText
+                            {
+                                Colour = colours.GrayF,
+                                Text = "Locked",
+                                Margin = new MarginPadding(5),
+                                Shadow = false,
+                                Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
+                            }
+                        }
+                    },
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                text
+                    .FadeIn().Then().Delay(500)
+                    .FadeOut().Then().Delay(500)
+                    .Loop();
+            }
         }
 
         internal class WaveformRow : CompositeDrawable
