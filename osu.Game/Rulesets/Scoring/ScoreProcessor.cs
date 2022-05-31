@@ -271,7 +271,7 @@ namespace osu.Game.Rulesets.Scoring
             double comboRatio = maximumScoringValues.MaxCombo > 0 ? currentScoringValues.MaxCombo / maximumScoringValues.MaxCombo : 1;
 
             Accuracy.Value = rollingAccuracyRatio;
-            TotalScore.Value = ComputeScore(Mode.Value, accuracyRatio, comboRatio, getBonusScore(scoreResultCounts), maximumScoringValues.HitObjects);
+            TotalScore.Value = ComputeScore(Mode.Value, accuracyRatio, comboRatio, currentScoringValues.BonusScore, maximumScoringValues.HitObjects);
         }
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace osu.Game.Rulesets.Scoring
             double accuracyRatio = max.BaseScore > 0 ? current.BaseScore / max.BaseScore : 1;
             double comboRatio = max.MaxCombo > 0 ? (double)scoreInfo.MaxCombo / max.MaxCombo : 1;
 
-            return ComputeScore(mode, accuracyRatio, comboRatio, getBonusScore(scoreInfo.Statistics), max.HitObjects);
+            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, max.HitObjects);
         }
 
         /// <summary>
@@ -318,7 +318,7 @@ namespace osu.Game.Rulesets.Scoring
             double accuracyRatio = maximumScoringValues.BaseScore > 0 ? current.BaseScore / maximumScoringValues.BaseScore : 1;
             double comboRatio = maximumScoringValues.MaxCombo > 0 ? (double)scoreInfo.MaxCombo / maximumScoringValues.MaxCombo : 1;
 
-            return ComputeScore(mode, accuracyRatio, comboRatio, getBonusScore(scoreInfo.Statistics), maximumScoringValues.HitObjects);
+            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximumScoringValues.HitObjects);
         }
 
         /// <summary>
@@ -340,19 +340,15 @@ namespace osu.Game.Rulesets.Scoring
             double accuracyRatio = scoreInfo.Accuracy;
             double comboRatio = maxAchievableCombo > 0 ? (double)scoreInfo.MaxCombo / maxAchievableCombo : 1;
 
+            extractFromStatistics(scoreInfo.Statistics, out var current, out var maximum);
+
             // For legacy osu!mania scores, a full-GREAT score has 100% accuracy. If combined with a full-combo, the score becomes indistinguishable from a full-PERFECT score.
             // To get around this, the accuracy ratio is always recalculated based on the hit statistics rather than trusting the score.
             // Note: This cannot be applied universally to all legacy scores, as some rulesets (e.g. catch) group multiple judgements together.
-            if (scoreInfo.IsLegacyScore && scoreInfo.Ruleset.OnlineID == 3)
-            {
-                extractFromStatistics(scoreInfo.Statistics, out var current, out var maximum);
-                if (maximum.BaseScore > 0)
-                    accuracyRatio = current.BaseScore / current.MaxCombo;
-            }
+            if (scoreInfo.IsLegacyScore && scoreInfo.Ruleset.OnlineID == 3 && maximum.BaseScore > 0)
+                accuracyRatio = current.BaseScore / current.MaxCombo;
 
-            int computedBasicHitObjects = scoreInfo.Statistics.Where(kvp => kvp.Key.IsBasic()).Select(kvp => kvp.Value).Sum();
-
-            return ComputeScore(mode, accuracyRatio, comboRatio, getBonusScore(scoreInfo.Statistics), computedBasicHitObjects);
+            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.HitObjects);
         }
 
         /// <summary>
@@ -381,15 +377,6 @@ namespace osu.Game.Rulesets.Scoring
                     return Math.Pow(scaledStandardised * Math.Max(1, totalBasicHitObjects), 2) * ClassicScoreMultiplier;
             }
         }
-
-        /// <summary>
-        /// Calculates the total bonus score from score statistics.
-        /// </summary>
-        /// <param name="statistics">The score statistics.</param>
-        /// <returns>The total bonus score.</returns>
-        private double getBonusScore(IReadOnlyDictionary<HitResult, int> statistics)
-            => statistics.GetValueOrDefault(HitResult.SmallBonus) * Judgement.SMALL_BONUS_SCORE
-               + statistics.GetValueOrDefault(HitResult.LargeBonus) * Judgement.LARGE_BONUS_SCORE;
 
         private ScoreRank rankFrom(double acc)
         {
