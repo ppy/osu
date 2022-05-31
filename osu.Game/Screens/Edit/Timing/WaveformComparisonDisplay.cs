@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Edit.Timing
             controlPointGroups.BindTo(editorBeatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((_, __) => updateTimingGroup());
 
-            beatLength.BindValueChanged(_ => regenerateDisplay(), true);
+            beatLength.BindValueChanged(_ => regenerateDisplay(true), true);
 
             displayLocked.BindValueChanged(locked =>
             {
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 // The offset of the selected point may have changed.
                 // This handles the case the user has locked the view and expects the display to update with this change.
-                showFromTime(displayedTime + (newStartTime.Value - selectedGroupStartTime));
+                showFromTime(displayedTime + (newStartTime.Value - selectedGroupStartTime), true);
             }
 
             var nextGroup = editorBeatmap.ControlPointInfo.TimingPoints
@@ -174,18 +174,18 @@ namespace osu.Game.Screens.Edit.Timing
         }
 
         private void showFromBeat(int beatIndex) =>
-            showFromTime(selectedGroupStartTime + beatIndex * timingPoint.BeatLength);
+            showFromTime(selectedGroupStartTime + beatIndex * timingPoint.BeatLength, false);
 
-        private void showFromTime(double time)
+        private void showFromTime(double time, bool animated)
         {
             if (displayedTime == time)
                 return;
 
             displayedTime = time;
-            regenerateDisplay();
+            regenerateDisplay(animated);
         }
 
-        private void regenerateDisplay()
+        private void regenerateDisplay(bool animated)
         {
             double index = (displayedTime - selectedGroupStartTime) / timingPoint.BeatLength;
 
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Edit.Timing
                 float offset = (float)(time - visible_width / 2) / trackLength * scale;
 
                 row.Alpha = time < selectedGroupStartTime || time > selectedGroupEndTime ? 0.2f : 1;
-                row.WaveformOffset = -offset;
+                row.WaveformOffsetTo(-offset, animated);
                 row.WaveformScale = new Vector2(scale, 1);
                 row.BeatIndex = (int)Math.Floor(index);
 
@@ -314,7 +314,15 @@ namespace osu.Game.Screens.Edit.Timing
 
             public int BeatIndex { set => beatIndexText.Text = value.ToString(); }
             public Vector2 WaveformScale { set => waveformGraph.Scale = value; }
-            public float WaveformOffset { set => waveformGraph.X = value; }
+
+            public void WaveformOffsetTo(float value, bool animated) =>
+                this.TransformTo(nameof(waveformOffset), value, animated ? 300 : 0, Easing.OutQuint);
+
+            private float waveformOffset
+            {
+                get => waveformGraph.X;
+                set => waveformGraph.X = value;
+            }
         }
     }
 }
