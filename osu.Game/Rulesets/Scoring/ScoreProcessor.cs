@@ -266,12 +266,8 @@ namespace osu.Game.Rulesets.Scoring
 
         private void updateScore()
         {
-            double rollingAccuracyRatio = rollingMaximumScoringValues.BaseScore > 0 ? currentScoringValues.BaseScore / rollingMaximumScoringValues.BaseScore : 1;
-            double accuracyRatio = maximumScoringValues.BaseScore > 0 ? currentScoringValues.BaseScore / maximumScoringValues.BaseScore : 1;
-            double comboRatio = maximumScoringValues.MaxCombo > 0 ? currentScoringValues.MaxCombo / maximumScoringValues.MaxCombo : 1;
-
-            Accuracy.Value = rollingAccuracyRatio;
-            TotalScore.Value = ComputeScore(Mode.Value, accuracyRatio, comboRatio, currentScoringValues.BonusScore, maximumScoringValues.HitObjects);
+            Accuracy.Value = rollingMaximumScoringValues.BaseScore > 0 ? currentScoringValues.BaseScore / rollingMaximumScoringValues.BaseScore : 1;
+            TotalScore.Value = ComputeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
 
         /// <summary>
@@ -288,12 +284,10 @@ namespace osu.Game.Rulesets.Scoring
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
-            extractFromStatistics(scoreInfo.Statistics, out var current, out var max);
+            extractFromStatistics(scoreInfo.Statistics, out var current, out var maximum);
+            current.MaxCombo = scoreInfo.MaxCombo;
 
-            double accuracyRatio = max.BaseScore > 0 ? current.BaseScore / max.BaseScore : 1;
-            double comboRatio = max.MaxCombo > 0 ? (double)scoreInfo.MaxCombo / max.MaxCombo : 1;
-
-            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, max.HitObjects);
+            return ComputeScore(mode, current, maximum);
         }
 
         /// <summary>
@@ -314,11 +308,9 @@ namespace osu.Game.Rulesets.Scoring
                 throw new InvalidOperationException($"Cannot compute partial score without calling {nameof(ApplyBeatmap)}.");
 
             extractFromStatistics(scoreInfo.Statistics, out var current, out _);
+            current.MaxCombo = scoreInfo.MaxCombo;
 
-            double accuracyRatio = maximumScoringValues.BaseScore > 0 ? current.BaseScore / maximumScoringValues.BaseScore : 1;
-            double comboRatio = maximumScoringValues.MaxCombo > 0 ? (double)scoreInfo.MaxCombo / maximumScoringValues.MaxCombo : 1;
-
-            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximumScoringValues.HitObjects);
+            return ComputeScore(mode, current, maximumScoringValues);
         }
 
         /// <summary>
