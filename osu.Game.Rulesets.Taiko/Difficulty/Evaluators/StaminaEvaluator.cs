@@ -30,27 +30,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             }
 
             // Find the previous hit object hit by the current key, which is two notes of the same colour prior.
-            // TODO: This could result in potential performance issue where it has to check the colour of a large amount
-            //       of objects due to previous objects being mono of the other colour. A potential fix for this would be
-            //       to store two separate lists of previous objects, one for each colour.
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
-            TaikoDifficultyHitObject previous = taikoCurrent;
-            int monoNoteInterval = 2; // The amount of same-colour notes to go back
-            double currentKeyInterval = 0; // Interval of the current key being pressed
-            do
+            TaikoDifficultyHitObject keyPrevious = taikoCurrent.PreviousMono(1);
+            if (keyPrevious == null)
             {
-                previous = (TaikoDifficultyHitObject)previous.Previous(1);
-                if (previous == null) return 0; // No previous (The note is the first press of the current key)
-                if (previous.BaseObject is Hit && previous.HitType == taikoCurrent.HitType)
-                {
-                    --monoNoteInterval;
-                }
-                currentKeyInterval += previous.DeltaTime;
-
-            } while (monoNoteInterval > 0);
+                // There is no previous hit object hit by the current key
+                return 0.0;
+            }
 
             double objectStrain = 0.5;
-            objectStrain += speedBonus(currentKeyInterval);
+            objectStrain += speedBonus(taikoCurrent.StartTime - keyPrevious.StartTime);
             return objectStrain;
         }
     }
