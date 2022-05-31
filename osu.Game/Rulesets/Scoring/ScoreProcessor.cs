@@ -452,7 +452,12 @@ namespace osu.Game.Rulesets.Scoring
             if (frame.Header == null)
                 return;
 
-            extractFromStatistics(frame.Header.Statistics, out currentScoringValues, out rollingMaximumScoringValues);
+            extractFromStatistics(frame.Header.Statistics, out var current, out var maximum);
+            currentScoringValues.BaseScore = current.BaseScore;
+            currentScoringValues.MaxCombo = frame.Header.MaxCombo;
+            rollingMaximumScoringValues.BaseScore = maximum.BaseScore;
+            rollingMaximumScoringValues.MaxCombo = maximum.MaxCombo;
+
             HighestCombo.Value = frame.Header.MaxCombo;
 
             scoreResultCounts.Clear();
