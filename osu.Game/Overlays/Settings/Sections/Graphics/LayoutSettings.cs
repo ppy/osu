@@ -230,20 +230,27 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 return;
             }
 
-            switch (fullscreenCapability.Value)
+            if (host.Window is WindowsWindow)
             {
-                case FullscreenCapability.Unknown:
-                    if (host.Window is WindowsWindow)
+                switch (fullscreenCapability.Value)
+                {
+                    case FullscreenCapability.Unknown:
                         windowModeDropdown.SetWarningText(LayoutSettingsStrings.CheckingForFullscreenCapabilities);
-                    break;
+                        break;
 
-                case FullscreenCapability.Capable:
-                    windowModeDropdown.SetWarningText(LayoutSettingsStrings.OsuIsRunningExclusiveFullscreen, false);
-                    break;
+                    case FullscreenCapability.Capable:
+                        windowModeDropdown.SetWarningText(LayoutSettingsStrings.OsuIsRunningExclusiveFullscreen, false);
+                        break;
 
-                case FullscreenCapability.Incapable:
-                    windowModeDropdown.SetWarningText(LayoutSettingsStrings.UnableToRunExclusiveFullscreen);
-                    break;
+                    case FullscreenCapability.Incapable:
+                        windowModeDropdown.SetWarningText(LayoutSettingsStrings.UnableToRunExclusiveFullscreen);
+                        break;
+                }
+            }
+            else
+            {
+                // We can only detect exclusive fullscreen status on windows currently.
+                windowModeDropdown.ClearWarningText();
             }
         }
 
