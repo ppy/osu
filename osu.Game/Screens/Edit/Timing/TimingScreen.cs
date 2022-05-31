@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,7 +20,7 @@ namespace osu.Game.Screens.Edit.Timing
     public class TimingScreen : EditorScreenWithTimeline
     {
         [Cached]
-        private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
+        public readonly Bindable<ControlPointGroup> SelectedGroup = new Bindable<ControlPointGroup>();
 
         public TimingScreen()
             : base(EditorScreenMode.Timing)
@@ -130,6 +131,61 @@ namespace osu.Game.Screens.Edit.Timing
                     table.ControlGroups = controlPointGroups;
                     changeHandler?.SaveState();
                 }, true);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                trackActivePoint();
+            }
+
+            /// <summary>
+            /// Given the user has selected a control point group, we want to track any group which is
+            /// active at the current point in time which matches the type the user has selected.
+            ///
+            /// So if the user is currently looking at a timing point and seeks into the future, a
+            /// future timing point would be automatically selected if it is now the new "current" point.
+            /// </summary>
+            private void trackActivePoint()
+            {
+                // For simplicity only match on the first type of the active control point.
+                var selectedPointType = selectedGroup.Value?.ControlPoints.FirstOrDefault()?.GetType();
+
+                if (selectedPointType != null)
+                {
+                    // We don't have an efficient way of looking up groups currently, only individual point types.
+                    // To improve the efficiency of this in the future, we should reconsider the overall structure of ControlPointInfo.
+                    IEnumerable<ControlPointGroup> groups = Beatmap.ControlPointInfo.Groups;
+
+                    bool currentTimeBeforeSelectedGroup = clock.CurrentTimeAccurate < selectedGroup.Value.Time;
+
+                    // Decide whether we are searching backwards or forwards.
+                    if (currentTimeBeforeSelectedGroup)
+                        groups = groups.Reverse();
+
+                    // Find the next group which has the same type as the selected one.
+                    groups = groups.SkipWhile(g => g != selectedGroup.Value)
+                                   .Skip(1)
+                                   .Where(g => g.ControlPoints.Any(cp => cp.GetType() == selectedPointType));
+
+                    ControlPointGroup newGroup = groups.FirstOrDefault();
+
+                    if (newGroup != null)
+                    {
+                        if (currentTimeBeforeSelectedGroup)
+                        {
+                            // When seeking backwards, the first match from the LINQ query is always what we want.
+                            selectedGroup.Value = newGroup;
+                        }
+                        else
+                        {
+                            // When seeking forwards, we also need to check that the next match is before the current time.
+                            if (newGroup.Time <= clock.CurrentTimeAccurate)
+                                selectedGroup.Value = newGroup;
+                        }
+                    }
+                }
             }
 
             private void delete()
