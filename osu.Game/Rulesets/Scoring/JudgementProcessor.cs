@@ -117,9 +117,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <remarks>
         /// If the provided replay frame does not have any header information, this will be a noop.
         /// </remarks>
-        /// <param name="ruleset">The ruleset to be used for retrieving statistics.</param>
         /// <param name="frame">The replay frame to read header statistics from.</param>
-        public virtual void ResetFromReplayFrame(Ruleset ruleset, ReplayFrame frame)
+        public virtual void ResetFromReplayFrame(ReplayFrame frame)
         {
             if (frame.Header == null)
                 return;

@@ -115,9 +115,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         BeatmapID = 0,
                         RulesetID = 0,
                         Mods = user.Mods,
-                        MaxAchievableCombo = 1000,
-                        MaxAchievableBaseScore = 10000,
-                        TotalBasicHitObjects = 1000
+                        MaximumScoringValues = new ScoringValues
+                        {
+                            BaseScore = 10000,
+                            MaxCombo = 1000,
+                            HitObjects = 1000
+                        }
                     };
                 }
             });
