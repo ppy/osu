@@ -32,9 +32,11 @@ namespace osu.Game.Screens.Edit.Timing
         {
             if (point.NewValue != null)
             {
+                bpmTextEntry.Current.UnbindEvents();
                 bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
                 bpmTextEntry.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
 
+                timeSignature.Current.UnbindEvents();
                 timeSignature.Current = point.NewValue.TimeSignatureBindable;
                 timeSignature.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
