@@ -62,6 +62,7 @@ namespace osu.Game.Online.Spectator
         private readonly List<TimedFrame> replayFrames = new List<TimedFrame>();
         private readonly int userId;
 
+        private SpectatorState? spectatorState;
         private ScoreProcessor? scoreProcessor;
         private ScoreInfo? scoreInfo;
 
@@ -89,6 +90,7 @@ namespace osu.Game.Online.Spectator
                 scoreProcessor?.RemoveAndDisposeImmediately();
                 scoreProcessor = null;
                 scoreInfo = null;
+                spectatorState = null;
                 replayFrames.Clear();
                 return;
             }
@@ -104,18 +106,13 @@ namespace osu.Game.Online.Spectator
 
             Ruleset ruleset = rulesetInfo.CreateInstance();
 
+            spectatorState = userState;
             scoreInfo = new ScoreInfo { Ruleset = rulesetInfo };
             scoreProcessor = ruleset.CreateScoreProcessor();
 
             // Mods are required for score multiplier.
             scoreProcessor.Mods.Value = userState.Mods.Select(m => m.ToMod(ruleset)).ToArray();
-
-            // Applying beatmap required to call ComputePartialScore().
             scoreProcessor.ApplyBeatmap(new DummyBeatmap());
-
-            scoreProcessor.MaxAchievableCombo = userState.MaxAchievableCombo;
-            scoreProcessor.MaxAchievableBaseScore = userState.MaxAchievableBaseScore;
-            scoreProcessor.TotalBasicHitObjects = userState.TotalBasicHitObjects;
         }
 
         private void onNewFrames(int incomingUserId, FrameDataBundle bundle)
@@ -138,6 +135,7 @@ namespace osu.Game.Online.Spectator
             if (scoreInfo == null || replayFrames.Count == 0)
                 return;
 
+            Debug.Assert(spectatorState != null);
             Debug.Assert(scoreProcessor != null);
 
             int frameIndex = replayFrames.BinarySearch(new TimedFrame(Time.Current));
@@ -153,7 +151,9 @@ namespace osu.Game.Online.Spectator
 
             Accuracy.Value = frame.Header.Accuracy;
             Combo.Value = frame.Header.Combo;
-            TotalScore.Value = scoreProcessor.ComputePartialScore(Mode.Value, scoreInfo);
+
+            scoreProcessor.ExtractScoringValues(frame.Header, out var currentScoringValues, out _);
+            TotalScore.Value = scoreProcessor.ComputeScore(Mode.Value, currentScoringValues, spectatorState.MaximumScoringValues);
         }
 
         protected override void Dispose(bool isDisposing)

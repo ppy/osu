@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using MessagePack;
 using osu.Game.Online.API;
+using osu.Game.Scoring;
 
 namespace osu.Game.Online.Spectator
 {
@@ -27,23 +28,8 @@ namespace osu.Game.Online.Spectator
         [Key(3)]
         public SpectatedUserState State { get; set; }
 
-        /// <summary>
-        /// The maximum achievable combo, if everything is hit perfectly.
-        /// </summary>
         [Key(4)]
-        public int MaxAchievableCombo { get; set; }
-
-        /// <summary>
-        /// The maximum achievable base score, if everything is hit perfectly.
-        /// </summary>
-        [Key(5)]
-        public double MaxAchievableBaseScore { get; set; }
-
-        /// <summary>
-        /// The total number of basic (non-tick and non-bonus) hitobjects that can be hit.
-        /// </summary>
-        [Key(6)]
-        public int TotalBasicHitObjects { get; set; }
+        public ScoringValues MaximumScoringValues { get; set; }
 
         public bool Equals(SpectatorState other)
         {
