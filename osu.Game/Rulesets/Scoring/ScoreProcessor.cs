@@ -352,6 +352,20 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
+        /// Computes the total score from scoring values.
+        /// </summary>
+        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
+        /// <param name="current">The current scoring values.</param>
+        /// <param name="maximum">The maximum scoring values.</param>
+        /// <returns>The total score computed from the given scoring values.</returns>
+        public double ComputeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum)
+        {
+            double accuracyRatio = maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
+            double comboRatio = maximum.MaxCombo > 0 ? current.MaxCombo / maximum.MaxCombo : 1;
+            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.HitObjects);
+        }
+
+        /// <summary>
         /// Computes the total score from individual scoring components.
         /// </summary>
         /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
