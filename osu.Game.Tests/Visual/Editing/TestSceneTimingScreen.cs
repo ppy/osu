@@ -52,6 +52,8 @@ namespace osu.Game.Tests.Visual.Editing
         public void SetUpSteps()
         {
             AddStep("Stop clock", () => Clock.Stop());
+
+            AddUntilStep("wait for rows to load", () => Child.ChildrenOfType<EffectRowAttribute>().Any());
         }
 
         [Test]
