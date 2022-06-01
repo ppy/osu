@@ -144,7 +144,27 @@ namespace osu.Game.Screens.Edit.Timing
 
             private void addNew()
             {
-                selectedGroup.Value = Beatmap.ControlPointInfo.GroupAt(clock.CurrentTime, true);
+                bool isFirstControlPoint = !Beatmap.ControlPointInfo.TimingPoints.Any();
+
+                var group = Beatmap.ControlPointInfo.GroupAt(clock.CurrentTime, true);
+
+                if (isFirstControlPoint)
+                    group.Add(new TimingControlPoint());
+                else
+                {
+                    // Try and create matching types from the currently selected control point.
+                    var selected = selectedGroup.Value;
+
+                    if (selected != null)
+                    {
+                        foreach (var controlPoint in selected.ControlPoints)
+                        {
+                            group.Add(controlPoint.DeepClone());
+                        }
+                    }
+                }
+
+                selectedGroup.Value = group;
             }
         }
     }
