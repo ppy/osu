@@ -50,6 +50,7 @@ namespace osu.Game.Screens.Edit.Timing
                         new Dimension(GridSizeMode.Absolute, 200),
                         new Dimension(GridSizeMode.Absolute, 60),
                         new Dimension(GridSizeMode.Absolute, 60),
+                        new Dimension(GridSizeMode.Absolute, 120),
                     },
                     Content = new[]
                     {
@@ -141,6 +142,14 @@ namespace osu.Game.Screens.Edit.Timing
                                     }
                                 }
                             },
+                        },
+                        new Drawable[]
+                        {
+                            new TapButton
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }
                         }
                     }
                 },
