@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal class TapButton : CircularContainer
     {
-        public const float SIZE = 100;
+        public const float SIZE = 140;
 
         public readonly BindableBool IsHandlingTapping = new BindableBool();
 
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             Size = new Vector2(SIZE);
 
-            const float ring_width = 18;
+            const float ring_width = 22;
             const float light_padding = 3;
 
             InternalChild = scaleContainer = new Container
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Timing
                     new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background3
+                        Colour = colourProvider.Background4
                     },
                     lights = new Container
                     {
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Edit.Timing
                         Name = @"outer masking",
                         Masking = true,
                         BorderThickness = light_padding,
-                        BorderColour = colourProvider.Background3,
+                        BorderColour = colourProvider.Background4,
                         Children = new Drawable[]
                         {
                             new Box
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit.Timing
                         Size = new Vector2(SIZE - ring_width * 2 + light_padding * 2),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Colour = colourProvider.Background3,
+                        Colour = colourProvider.Background4,
                     },
                     lightsGlow = new Container
                     {
@@ -139,17 +139,18 @@ namespace osu.Game.Screens.Edit.Timing
                                 {
                                     new OsuSpriteText
                                     {
-                                        Font = OsuFont.Torus.With(size: 20),
+                                        Font = OsuFont.Torus.With(size: 34, weight: FontWeight.SemiBold),
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.BottomCentre,
-                                        Y = 3,
-                                        Text = "Tap"
+                                        Y = 5,
+                                        Text = "Tap",
                                     },
                                     bpmText = new OsuSpriteText
                                     {
-                                        Font = OsuFont.Torus.With(size: 14),
+                                        Font = OsuFont.Torus.With(size: 23, weight: FontWeight.Regular),
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.TopCentre,
+                                        Y = -1,
                                     },
                                 }
                             },
@@ -200,7 +201,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             hoverLayer.FadeIn(500, Easing.OutQuint);
             textContainer.FadeColour(textColour, 500, Easing.OutQuint);
-            return base.OnHover(e);
+            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
@@ -322,12 +323,14 @@ namespace osu.Game.Screens.Edit.Timing
 
                 Size = new Vector2(0.98f); // Avoid bleed into masking edge.
 
+                const float angular_gap = 0.007f;
+
                 InternalChildren = new Drawable[]
                 {
                     new CircularProgress
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Current = { Value = 1f / light_count - 0.01f },
+                        Current = { Value = 1f / light_count - angular_gap },
                         Colour = colourProvider.Background2,
                     },
                     fillContent = new Container
@@ -340,7 +343,7 @@ namespace osu.Game.Screens.Edit.Timing
                             new CircularProgress
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Current = { Value = 1f / light_count - 0.01f },
+                                Current = { Value = 1f / light_count - angular_gap },
                                 Blending = BlendingParameters.Additive
                             },
                             Glow = new CircularProgress
