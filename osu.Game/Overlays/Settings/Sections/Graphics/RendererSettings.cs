@@ -51,11 +51,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 switch (limit.NewValue)
                 {
                     case FrameSync.Unlimited:
-                        frameLimiterDropdown.SetWarningText(GraphicsSettingsStrings.UnlimitedFramesNote);
+                        frameLimiterDropdown.SetNoticeText(GraphicsSettingsStrings.UnlimitedFramesNote, true);
                         break;
 
                     default:
-                        frameLimiterDropdown.ClearWarningText();
+                        frameLimiterDropdown.ClearNoticeText();
                         break;
                 }
             }, true);
