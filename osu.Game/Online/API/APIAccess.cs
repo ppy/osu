@@ -171,12 +171,32 @@ namespace osu.Game.Online.API
                         };
                         userReq.Success += u =>
                         {
-                            localUser.Value = u;
-
                             // todo: save/pull from settings
-                            localUser.Value.Status.Value = new UserStatusOnline();
+                            u.Status.Value = new UserStatusOnline();
 
                             failureCount = 0;
+
+                            // getting user's full statistics (concerning every ruleset)
+                            // we delay the localUser.Value setting because BindValueChanged won't record two value changes in a row
+                            var statsRequest = new GetUsersRequest(new int[] { u.Id });
+                            statsRequest.Failure += _ =>
+                            {
+                                localUser.Value = u;
+                                failConnectionProcess();
+                            };
+                            statsRequest.Success += result =>
+                            {
+                                if (result.Users.Count == 1)
+                                {
+                                    u.RulesetsStatistics = result.Users[0].RulesetsStatistics;
+                                    localUser.Value = u;
+                                    return;
+                                }
+                                // Should never... happen ?
+                                statsRequest.Fail(new Exception("Empty response for GetUsersRequest"));
+                            };
+
+                            handleRequest(statsRequest);
                         };
 
                         if (!handleRequest(userReq))
