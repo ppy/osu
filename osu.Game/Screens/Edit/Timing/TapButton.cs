@@ -1,14 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -34,7 +39,12 @@ namespace osu.Game.Screens.Edit.Timing
         private Container scaleContainer;
         private Container lights;
         private Container lightsGlow;
-        private OsuSpriteText text;
+        private OsuSpriteText bpmText;
+        private Container textContainer;
+
+        private bool grabbedMouseDown;
+
+        private ScheduledDelegate resetDelegate;
 
         private const int light_count = 6;
 
@@ -65,7 +75,7 @@ namespace osu.Game.Screens.Edit.Timing
                     new CircularContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Name = "outer masking",
+                        Name = @"outer masking",
                         Masking = true,
                         BorderThickness = light_padding,
                         BorderColour = colourProvider.Background3,
@@ -82,7 +92,7 @@ namespace osu.Game.Screens.Edit.Timing
                     },
                     new Circle
                     {
-                        Name = "inner masking",
+                        Name = @"inner masking",
                         Size = new Vector2(SIZE - ring_width * 2 + light_padding * 2),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -112,13 +122,27 @@ namespace osu.Game.Screens.Edit.Timing
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0,
                             },
-                            text = new OsuSpriteText
+                            textContainer = new Container
                             {
-                                Font = OsuFont.Torus.With(size: 20),
+                                RelativeSizeAxes = Axes.Both,
                                 Colour = colourProvider.Background1,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Text = "Tap!"
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Font = OsuFont.Torus.With(size: 20),
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.BottomCentre,
+                                        Y = 3,
+                                        Text = "Tap"
+                                    },
+                                    bpmText = new OsuSpriteText
+                                    {
+                                        Font = OsuFont.Torus.With(size: 14),
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.TopCentre,
+                                    },
+                                }
                             },
                             hoverLayer = new Circle
                             {
@@ -142,20 +166,38 @@ namespace osu.Game.Screens.Edit.Timing
                 lights.Add(light);
                 lightsGlow.Add(light.Glow.CreateProxy());
             }
+
+            reset();
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             hoverLayer.ReceivePositionalInputAt(screenSpacePos);
 
+        private ColourInfo textColour
+        {
+            get
+            {
+                if (grabbedMouseDown)
+                    return colourProvider.Background4;
+
+                if (IsHovered)
+                    return colourProvider.Content2;
+
+                return colourProvider.Background1;
+            }
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             hoverLayer.FadeIn(500, Easing.OutQuint);
+            textContainer.FadeColour(textColour, 500, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             hoverLayer.FadeOut(500, Easing.OutQuint);
+            textContainer.FadeColour(textColour, 500, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -163,7 +205,14 @@ namespace osu.Game.Screens.Edit.Timing
         {
             const double in_duration = 100;
 
-            text.FadeColour(colourProvider.Background4, in_duration, Easing.OutQuint);
+            grabbedMouseDown = true;
+
+            handleTap();
+
+            resetDelegate?.Cancel();
+            resetDelegate = Scheduler.AddDelayed(reset, 1000);
+
+            textContainer.FadeColour(textColour, in_duration, Easing.OutQuint);
 
             scaleContainer.ScaleTo(0.99f, in_duration, Easing.OutQuint);
             innerCircle.ScaleTo(0.96f, in_duration, Easing.OutQuint);
@@ -180,19 +229,57 @@ namespace osu.Game.Screens.Edit.Timing
             lights[currentLight % light_count].Show();
             lights[(currentLight + light_count / 2) % light_count].Show();
 
-            return base.OnMouseDown(e);
+            return true;
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
             const double out_duration = 800;
 
-            text.FadeColour(colourProvider.Background1, out_duration, Easing.OutQuint);
+            grabbedMouseDown = false;
+
+            textContainer.FadeColour(textColour, out_duration, Easing.OutQuint);
 
             scaleContainer.ScaleTo(1, out_duration, Easing.OutQuint);
             innerCircle.ScaleTo(1, out_duration, Easing.OutQuint);
             innerCircleHighlight.FadeOut(out_duration, Easing.OutQuint);
             base.OnMouseUp(e);
+        }
+
+        private readonly List<double> tapTimings = new List<double>();
+
+        private void reset()
+        {
+            bpmText.FadeOut(500, Easing.OutQuint);
+
+            using (BeginDelayedSequence(tapTimings.Count > 0 ? 500 : 0))
+            {
+                Schedule(() => bpmText.Text = "the beat!");
+                bpmText.FadeIn(800, Easing.OutQuint);
+            }
+
+            foreach (var light in lights)
+                light.Hide();
+
+            tapTimings.Clear();
+        }
+
+        private void handleTap()
+        {
+            tapTimings.Add(Clock.CurrentTime);
+
+            if (tapTimings.Count > 8)
+                tapTimings.RemoveAt(0);
+
+            if (tapTimings.Count < 5)
+            {
+                bpmText.Text = new string('.', tapTimings.Count);
+                return;
+            }
+
+            double bpm = Math.Round(60000 / ((tapTimings.Last() - tapTimings.First()) / (tapTimings.Count - 1)));
+
+            bpmText.Text = $"{bpm} BPM";
         }
 
         private class Light : CompositeDrawable
