@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
@@ -283,6 +284,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
         /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
+        [Pure]
         public double ComputeFinalScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
@@ -303,6 +305,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
         /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
+        [Pure]
         public double ComputePartialScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
@@ -328,6 +331,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
         /// <param name="maxAchievableCombo">The maximum achievable combo for the provided beatmap.</param>
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
+        [Pure]
         public double ComputeFinalLegacyScore(ScoringMode mode, ScoreInfo scoreInfo, int maxAchievableCombo)
         {
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
@@ -354,6 +358,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="current">The current scoring values.</param>
         /// <param name="maximum">The maximum scoring values.</param>
         /// <returns>The total score computed from the given scoring values.</returns>
+        [Pure]
         public double ComputeScore(ScoringMode mode, ScoringValues current, ScoringValues maximum)
         {
             double accuracyRatio = maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
@@ -370,6 +375,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="bonusScore">The total bonus score.</param>
         /// <param name="totalBasicHitObjects">The total number of basic (non-tick and non-bonus) hitobjects in the beatmap.</param>
         /// <returns>The total score computed from the given scoring component ratios.</returns>
+        [Pure]
         public double ComputeScore(ScoringMode mode, double accuracyRatio, double comboRatio, double bonusScore, int totalBasicHitObjects)
         {
             switch (mode)
@@ -492,7 +498,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="scoreInfo">The score to extract scoring values from.</param>
         /// <param name="current">The "current" scoring values, representing the hit statistics as they appear.</param>
         /// <param name="maximum">The "maximum" scoring values, representing the hit statistics as if the maximum hit result was attained each time.</param>
-        public void ExtractScoringValues(ScoreInfo scoreInfo, out ScoringValues current, out ScoringValues maximum)
+        [Pure]
+        internal void ExtractScoringValues(ScoreInfo scoreInfo, out ScoringValues current, out ScoringValues maximum)
         {
             extractScoringValues(scoreInfo.Statistics, out current, out maximum);
             current.MaxCombo = scoreInfo.MaxCombo;
@@ -516,7 +523,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="header">The replay frame header to extract scoring values from.</param>
         /// <param name="current">The "current" scoring values, representing the hit statistics as they appear.</param>
         /// <param name="maximum">The "maximum" scoring values, representing the hit statistics as if the maximum hit result was attained each time.</param>
-        public void ExtractScoringValues(FrameHeader header, out ScoringValues current, out ScoringValues maximum)
+        [Pure]
+        internal void ExtractScoringValues(FrameHeader header, out ScoringValues current, out ScoringValues maximum)
         {
             extractScoringValues(header.Statistics, out current, out maximum);
             current.MaxCombo = header.MaxCombo;
@@ -537,6 +545,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="statistics">The hit statistics to extract scoring values from.</param>
         /// <param name="current">The "current" scoring values, representing the hit statistics as they appear.</param>
         /// <param name="maximum">The "maximum" scoring values, representing the hit statistics as if the maximum hit result was attained each time.</param>
+        [Pure]
         private void extractScoringValues(IReadOnlyDictionary<HitResult, int> statistics, out ScoringValues current, out ScoringValues maximum)
         {
             current = default;
