@@ -275,20 +275,23 @@ namespace osu.Game.Screens.Edit.Timing
             IsHandlingTapping.Value = false;
         }
 
+        private const int initial_taps_to_ignore = 4;
+        private const int max_taps_to_consider = 8;
+
         private void handleTap()
         {
             tapTimings.Add(Clock.CurrentTime);
 
-            if (tapTimings.Count > 8)
+            if (tapTimings.Count > initial_taps_to_ignore + max_taps_to_consider)
                 tapTimings.RemoveAt(0);
 
-            if (tapTimings.Count < 5)
+            if (tapTimings.Count < initial_taps_to_ignore * 2)
             {
                 bpmText.Text = new string('.', tapTimings.Count);
                 return;
             }
 
-            double bpm = Math.Round(60000 / ((tapTimings.Last() - tapTimings.First()) / (tapTimings.Count - 1)));
+            double bpm = Math.Round(60000 / ((tapTimings.Last() - tapTimings.Skip(initial_taps_to_ignore).First()) / (tapTimings.Count - initial_taps_to_ignore - 1)));
 
             bpmText.Text = $"{bpm} BPM";
 
