@@ -158,9 +158,12 @@ namespace osu.Game.Screens.Edit.Timing
                     // To improve the efficiency of this in the future, we should reconsider the overall structure of ControlPointInfo.
 
                     // Find the next group which has the same type as the selected one.
-                    selectedGroup.Value = Beatmap.ControlPointInfo.Groups
-                                                 .Where(g => g.ControlPoints.Any(cp => cp.GetType() == selectedPointType))
-                                                 .LastOrDefault(g => g.Time <= clock.CurrentTimeAccurate);
+                    var found = Beatmap.ControlPointInfo.Groups
+                                       .Where(g => g.ControlPoints.Any(cp => cp.GetType() == selectedPointType))
+                                       .LastOrDefault(g => g.Time <= clock.CurrentTimeAccurate);
+
+                    if (found != null)
+                        selectedGroup.Value = found;
                 }
             }
 
