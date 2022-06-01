@@ -112,9 +112,10 @@ namespace osu.Game.Screens.Edit.Timing
             if (tcp == null)
             {
                 timingPoint = new TimingControlPoint();
-                // During movement of a control point's offset, this clause can be hit momentarily.
+                // During movement of a control point's offset, this clause can be hit momentarily,
+                // as moving a control point is implemented by removing it and inserting it at the new time.
                 // We don't want to reset the `selectedGroupStartTime` here as we rely on having the
-                // last value to perform an offset traversal below.
+                // last value to update the waveform display below.
                 selectedGroupEndTime = beatmap.Value.Track.Length;
                 return;
             }
