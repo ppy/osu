@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Edit.Timing
     {
         public const float SIZE = 100;
 
+        public readonly BindableBool IsHandlingTapping = new BindableBool();
+
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
@@ -213,6 +215,7 @@ namespace osu.Game.Screens.Edit.Timing
             const double in_duration = 100;
 
             grabbedMouseDown = true;
+            IsHandlingTapping.Value = true;
 
             handleTap();
 
@@ -269,6 +272,7 @@ namespace osu.Game.Screens.Edit.Timing
                 light.Hide();
 
             tapTimings.Clear();
+            IsHandlingTapping.Value = false;
         }
 
         private void handleTap()

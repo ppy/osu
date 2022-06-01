@@ -25,6 +25,10 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private Bindable<ControlPointGroup> selectedGroup { get; set; }
 
+        private readonly BindableBool isHandlingTapping = new BindableBool();
+
+        private MetronomeDisplay metronome;
+
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
@@ -73,7 +77,7 @@ namespace osu.Game.Screens.Edit.Timing
                                         {
                                             new Drawable[]
                                             {
-                                                new MetronomeDisplay
+                                                metronome = new MetronomeDisplay
                                                 {
                                                     Anchor = Anchor.CentreLeft,
                                                     Origin = Anchor.CentreLeft,
@@ -149,11 +153,17 @@ namespace osu.Game.Screens.Edit.Timing
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
+                                IsHandlingTapping = { BindTarget = isHandlingTapping }
                             }
                         }
                     }
                 },
             };
+
+            isHandlingTapping.BindValueChanged(handling =>
+            {
+                metronome.EnableClicking = !handling.NewValue;
+            }, true);
         }
 
         private void adjustOffset(double adjust)
