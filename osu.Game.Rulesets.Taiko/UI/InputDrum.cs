@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     internal class InputDrum : Container
     {
-        public float centre_size = 0.7f;
+        public float CentreSize = 0.7f;
         private const float middle_split = 0.025f;
 
         public InputDrum()
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Scale = new Vector2(0.9f),
                     Children = new Drawable[]
                     {
-                        new TaikoHalfDrum(false, centre_size)
+                        new TaikoHalfDrum(false, CentreSize)
                         {
                             Name = "Left Half",
                             Anchor = Anchor.Centre,
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RimAction = TaikoAction.LeftRim,
                             CentreAction = TaikoAction.LeftCentre
                         },
-                        new TaikoHalfDrum(true, centre_size)
+                        new TaikoHalfDrum(true, CentreSize)
                         {
                             Name = "Right Half",
                             Anchor = Anchor.Centre,

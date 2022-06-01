@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     public class DrumTouchInputArea : Container
     {
         // The percent of the drum that extends past the bottom of the screen (set to 0.0f to show the full drum)
-        private const float offscreenPercent = 0.35f;
+        private const float offscreen_percent = 0.35f;
         private InputDrum touchInputDrum;
         private Circle drumBackground;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             Padding = new MarginPadding
             {
                 Top = TaikoPlayfield.DEFAULT_HEIGHT * 2f, // Visual elements should start right below the playfield
-                Bottom = -touchInputDrum.DrawHeight * offscreenPercent, // The drum should go past the bottom of the screen so that it can be wider
+                Bottom = -touchInputDrum.DrawHeight * offscreen_percent, // The drum should go past the bottom of the screen so that it can be wider
             };
         }
 
@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             Vector2 inputPositionToDrumCentreDelta = touchInputDrum.ToLocalSpace(inputPosition) - touchInputDrum.OriginPosition;
 
             float inputDrumRadius = Math.Max(touchInputDrum.Width, touchInputDrum.DrawHeight) / 2f;
-            float centreRadius = (inputDrumRadius * touchInputDrum.centre_size);
+            float centreRadius = (inputDrumRadius * touchInputDrum.CentreSize);
             return inputPositionToDrumCentreDelta.Length <= centreRadius;
         }
     }
