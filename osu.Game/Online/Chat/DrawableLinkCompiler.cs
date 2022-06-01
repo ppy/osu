@@ -38,7 +38,6 @@ namespace osu.Game.Online.Chat
         }
 
         public DrawableLinkCompiler(IEnumerable<Drawable> parts)
-            : base(HoverSampleSet.Submit)
         {
             Parts = parts.ToList();
         }
