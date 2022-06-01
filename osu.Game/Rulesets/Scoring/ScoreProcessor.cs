@@ -168,48 +168,39 @@ namespace osu.Game.Rulesets.Scoring
 
             scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) + 1;
 
+            // Always update the maximum scoring values.
+            applyResult(result.Judgement.MaxResult, ref currentMaximumScoringValues);
+            currentMaximumScoringValues.MaxCombo += result.Judgement.MaxResult.IncreasesCombo() ? 1 : 0;
+
             if (!result.Type.IsScorable())
-            {
-                // The inverse of non-scorable (ignore) judgements may be bonus judgements.
-                if (result.Judgement.MaxResult.IsBonus())
-                    currentMaximumScoringValues.BonusScore += result.Judgement.MaxNumericResult;
-
                 return;
-            }
 
-            // Update rolling combo.
             if (result.Type.IncreasesCombo())
                 Combo.Value++;
             else if (result.Type.BreaksCombo())
                 Combo.Value = 0;
 
-            // Update maximum combo.
+            applyResult(result.Type, ref currentScoringValues);
             currentScoringValues.MaxCombo = HighestCombo.Value;
-            currentMaximumScoringValues.MaxCombo += result.Judgement.MaxResult.AffectsCombo() ? 1 : 0;
-
-            // Update base/bonus score.
-            if (result.Type.IsBonus())
-            {
-                currentScoringValues.BonusScore += result.Type.IsHit() ? result.Judgement.NumericResultFor(result) : 0;
-                currentMaximumScoringValues.BonusScore += result.Judgement.MaxNumericResult;
-            }
-            else
-            {
-                currentScoringValues.BaseScore += result.Type.IsHit() ? result.Judgement.NumericResultFor(result) : 0;
-                currentMaximumScoringValues.BaseScore += result.Judgement.MaxNumericResult;
-            }
-
-            // Update hitobject count.
-            if (result.Type.IsBasic())
-            {
-                currentScoringValues.HitObjects++;
-                currentMaximumScoringValues.HitObjects++;
-            }
 
             hitEvents.Add(CreateHitEvent(result));
             lastHitObject = result.HitObject;
 
             updateScore();
+        }
+
+        private static void applyResult(HitResult result, ref ScoringValues scoringValues)
+        {
+            if (!result.IsScorable())
+                return;
+
+            if (result.IsBonus())
+                scoringValues.BonusScore += result.IsHit() ? Judgement.ToNumericResult(result) : 0;
+            else
+                scoringValues.BaseScore += result.IsHit() ? Judgement.ToNumericResult(result) : 0;
+
+            if (result.IsBasic())
+                scoringValues.HitObjects++;
         }
 
         /// <summary>
@@ -230,43 +221,35 @@ namespace osu.Game.Rulesets.Scoring
 
             scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) - 1;
 
+            // Always update the maximum scoring values.
+            revertResult(result.Judgement.MaxResult, ref currentMaximumScoringValues);
+            currentMaximumScoringValues.MaxCombo -= result.Judgement.MaxResult.IncreasesCombo() ? 1 : 0;
+
             if (!result.Type.IsScorable())
-            {
-                // The inverse of non-scorable (ignore) judgements may be bonus judgements.
-                if (result.Judgement.MaxResult.IsBonus())
-                    currentMaximumScoringValues.BonusScore -= result.Judgement.MaxNumericResult;
-
                 return;
-            }
 
-            // Update maximum combo.
+            revertResult(result.Type, ref currentScoringValues);
             currentScoringValues.MaxCombo = HighestCombo.Value;
-            currentMaximumScoringValues.MaxCombo -= result.Judgement.MaxResult.AffectsCombo() ? 1 : 0;
-
-            // Update base/bonus score.
-            if (result.Type.IsBonus())
-            {
-                currentScoringValues.BonusScore -= result.Type.IsHit() ? result.Judgement.NumericResultFor(result) : 0;
-                currentMaximumScoringValues.BonusScore -= result.Judgement.MaxNumericResult;
-            }
-            else
-            {
-                currentScoringValues.BaseScore -= result.Type.IsHit() ? result.Judgement.NumericResultFor(result) : 0;
-                currentMaximumScoringValues.BaseScore -= result.Judgement.MaxNumericResult;
-            }
-
-            // Update hitobject count.
-            if (result.Type.IsBasic())
-            {
-                currentScoringValues.HitObjects--;
-                currentMaximumScoringValues.HitObjects--;
-            }
 
             Debug.Assert(hitEvents.Count > 0);
             lastHitObject = hitEvents[^1].LastHitObject;
             hitEvents.RemoveAt(hitEvents.Count - 1);
 
             updateScore();
+        }
+
+        private static void revertResult(HitResult result, ref ScoringValues scoringValues)
+        {
+            if (!result.IsScorable())
+                return;
+
+            if (result.IsBonus())
+                scoringValues.BonusScore -= result.IsHit() ? Judgement.ToNumericResult(result) : 0;
+            else
+                scoringValues.BaseScore -= result.IsHit() ? Judgement.ToNumericResult(result) : 0;
+
+            if (result.IsBasic())
+                scoringValues.HitObjects--;
         }
 
         private void updateScore()
