@@ -62,9 +62,9 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             user.BindValueChanged(u =>
             {
                 if (u.NewValue?.IsSupporter != true)
-                    backgroundSourceDropdown.SetWarningText(UserInterfaceStrings.NotSupporterNote);
+                    backgroundSourceDropdown.SetNoticeText(UserInterfaceStrings.NotSupporterNote, true);
                 else
-                    backgroundSourceDropdown.ClearWarningText();
+                    backgroundSourceDropdown.ClearNoticeText();
             }, true);
         }
     }

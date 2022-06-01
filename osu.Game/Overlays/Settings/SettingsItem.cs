@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText labelText;
 
-        private OsuTextFlowContainer warningText;
+        private OsuTextFlowContainer noticeText;
 
         public bool ShowsDefaultIndicator = true;
         private readonly Container defaultValueIndicatorContainer;
@@ -72,24 +72,24 @@ namespace osu.Game.Overlays.Settings
         /// <summary>
         /// Clear any warning text.
         /// </summary>
-        public void ClearWarningText()
+        public void ClearNoticeText()
         {
-            warningText?.Expire();
-            warningText = null;
+            noticeText?.Expire();
+            noticeText = null;
         }
 
         /// <summary>
         /// Set the text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
-        /// Generally used to recommend the user change their setting as the current one is considered sub-optimal.
+        /// Generally used to provide feedback to a user about a sub-optimal setting.
         /// </summary>
         /// <param name="text">The text to display.</param>
         /// <param name="isWarning">Whether the text is in a warning state. Will decide how this is visually represented.</param>
-        public void SetWarningText(LocalisableString text, bool isWarning = true)
+        public void SetNoticeText(LocalisableString text, bool isWarning = false)
         {
-            ClearWarningText();
+            ClearNoticeText();
 
             // construct lazily for cases where the label is not needed (may be provided by the Control).
-            FlowContent.Add(warningText = new LinkFlowContainer(cp => cp.Colour = isWarning ? colours.Yellow : colours.Green)
+            FlowContent.Add(noticeText = new LinkFlowContainer(cp => cp.Colour = isWarning ? colours.Yellow : colours.Green)
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
