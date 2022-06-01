@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new SettingsButton
                 {
                     Text = SkinSettingsStrings.SkinLayoutEditor,
-                    Action = () => skinEditor?.Toggle(),
+                    Action = () => skinEditor?.ToggleVisibility(),
                 },
                 new ExportSkinButton(),
             };
@@ -127,9 +127,12 @@ namespace osu.Game.Overlays.Settings.Sections
                 dropdownItems.Add(skin.ToLive(realm));
             dropdownItems.Insert(protectedCount, random_skin_info);
 
-            skinDropdown.Items = dropdownItems;
+            Schedule(() =>
+            {
+                skinDropdown.Items = dropdownItems;
 
-            updateSelectedSkinFromConfig();
+                updateSelectedSkinFromConfig();
+            });
         }
 
         private void updateSelectedSkinFromConfig()

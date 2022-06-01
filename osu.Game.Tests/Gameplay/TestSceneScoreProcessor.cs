@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Gameplay
         {
             var beatmap = new Beatmap<HitObject> { HitObjects = { new HitObject() } };
 
-            var scoreProcessor = new ScoreProcessor();
+            var scoreProcessor = new ScoreProcessor(new OsuRuleset());
             scoreProcessor.ApplyBeatmap(beatmap);
 
             // Apply a miss judgement
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Gameplay
         {
             var beatmap = new Beatmap<HitObject> { HitObjects = { new HitObject() } };
 
-            var scoreProcessor = new ScoreProcessor();
+            var scoreProcessor = new ScoreProcessor(new OsuRuleset());
             scoreProcessor.ApplyBeatmap(beatmap);
 
             // Apply a judgement
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Gameplay
         {
             var beatmap = new Beatmap<HitObject> { HitObjects = { new HitCircle() } };
 
-            var scoreProcessor = new ScoreProcessor();
+            var scoreProcessor = new ScoreProcessor(new OsuRuleset());
             scoreProcessor.ApplyBeatmap(beatmap);
 
             scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new TestJudgement(HitResult.Great)) { Type = HitResult.Great });

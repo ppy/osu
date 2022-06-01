@@ -12,22 +12,22 @@ namespace osu.Game.Rulesets.Catch.Objects
     /// </summary>
     public readonly struct JuiceStreamPathVertex : IComparable<JuiceStreamPathVertex>
     {
-        public readonly double Distance;
+        public readonly double Time;
 
         public readonly float X;
 
-        public JuiceStreamPathVertex(double distance, float x)
+        public JuiceStreamPathVertex(double time, float x)
         {
-            Distance = distance;
+            Time = time;
             X = x;
         }
 
         public int CompareTo(JuiceStreamPathVertex other)
         {
-            int c = Distance.CompareTo(other.Distance);
+            int c = Time.CompareTo(other.Time);
             return c != 0 ? c : X.CompareTo(other.X);
         }
 
-        public override string ToString() => $"({Distance}, {X})";
+        public override string ToString() => $"({Time}, {X})";
     }
 }

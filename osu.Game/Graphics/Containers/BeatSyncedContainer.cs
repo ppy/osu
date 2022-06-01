@@ -5,9 +5,7 @@ using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Play;
@@ -74,65 +72,38 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected bool IsBeatSyncedWithTrack { get; private set; }
 
+        [Resolved]
+        protected IBeatSyncProvider BeatSyncSource { get; private set; }
+
         protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
         }
 
-        [Resolved]
-        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
-
-        [Resolved(canBeNull: true)]
-        protected GameplayClock GameplayClock { get; private set; }
-
-        protected IClock BeatSyncClock
-        {
-            get
-            {
-                if (GameplayClock != null)
-                    return GameplayClock;
-
-                if (Beatmap.Value.TrackLoaded)
-                    return Beatmap.Value.Track;
-
-                return null;
-            }
-        }
-
         protected override void Update()
         {
-            ITrack track = null;
-            IBeatmap beatmap = null;
-
             TimingControlPoint timingPoint;
             EffectControlPoint effectPoint;
 
-            IClock clock = BeatSyncClock;
+            IsBeatSyncedWithTrack = BeatSyncSource.Clock?.IsRunning == true;
 
-            if (clock == null)
-                return;
-
-            double currentTrackTime = clock.CurrentTime + EarlyActivationMilliseconds;
-
-            if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
-            {
-                track = Beatmap.Value.Track;
-                beatmap = Beatmap.Value.Beatmap;
-            }
-
-            IsBeatSyncedWithTrack = beatmap != null && clock.IsRunning && track?.Length > 0;
+            double currentTrackTime;
 
             if (IsBeatSyncedWithTrack)
             {
-                Debug.Assert(beatmap != null);
+                Debug.Assert(BeatSyncSource.ControlPoints != null);
+                Debug.Assert(BeatSyncSource.Clock != null);
 
-                timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
-                effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
+                currentTrackTime = BeatSyncSource.Clock.CurrentTime + EarlyActivationMilliseconds;
+
+                timingPoint = BeatSyncSource.ControlPoints.TimingPointAt(currentTrackTime);
+                effectPoint = BeatSyncSource.ControlPoints.EffectPointAt(currentTrackTime);
             }
             else
             {
                 // this may be the case where the beat syncing clock has been paused.
                 // we still want to show an idle animation, so use this container's time instead.
                 currentTrackTime = Clock.CurrentTime + EarlyActivationMilliseconds;
+
                 timingPoint = TimingControlPoint.DEFAULT;
                 effectPoint = EffectControlPoint.DEFAULT;
             }
@@ -162,7 +133,7 @@ namespace osu.Game.Graphics.Containers
             if (AllowMistimedEventFiring || Math.Abs(TimeSinceLastBeat) < MISTIMED_ALLOWANCE)
             {
                 using (BeginDelayedSequence(-TimeSinceLastBeat))
-                    OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? ChannelAmplitudes.Empty);
+                    OnNewBeat(beatIndex, timingPoint, effectPoint, BeatSyncSource.Amplitudes ?? ChannelAmplitudes.Empty);
             }
 
             lastBeat = beatIndex;

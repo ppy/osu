@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Backgrounds
             };
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
             Show();
         }

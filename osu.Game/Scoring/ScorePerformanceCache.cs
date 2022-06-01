@@ -43,9 +43,7 @@ namespace osu.Game.Scoring
 
             token.ThrowIfCancellationRequested();
 
-            var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(attributes.Value.Attributes, score);
-
-            return calculator?.Calculate();
+            return score.Ruleset.CreateInstance().CreatePerformanceCalculator()?.Calculate(score, attributes.Value.Attributes);
         }
 
         public readonly struct PerformanceCacheLookup

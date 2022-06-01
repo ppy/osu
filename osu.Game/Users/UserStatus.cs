@@ -1,20 +1,22 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Localisation;
 using osuTK.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Users
 {
     public abstract class UserStatus
     {
-        public abstract string Message { get; }
+        public abstract LocalisableString Message { get; }
         public abstract Color4 GetAppropriateColour(OsuColour colours);
     }
 
     public class UserStatusOnline : UserStatus
     {
-        public override string Message => @"Online";
+        public override LocalisableString Message => UsersStrings.StatusOnline;
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.GreenLight;
     }
 
@@ -25,13 +27,13 @@ namespace osu.Game.Users
 
     public class UserStatusOffline : UserStatus
     {
-        public override string Message => @"Offline";
+        public override LocalisableString Message => UsersStrings.StatusOffline;
         public override Color4 GetAppropriateColour(OsuColour colours) => Color4.Black;
     }
 
     public class UserStatusDoNotDisturb : UserStatus
     {
-        public override string Message => @"Do not disturb";
+        public override LocalisableString Message => "Do not disturb";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.RedDark;
     }
 }

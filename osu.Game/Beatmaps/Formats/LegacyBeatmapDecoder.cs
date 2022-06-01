@@ -19,6 +19,11 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyBeatmapDecoder : LegacyDecoder<Beatmap>
     {
+        /// <summary>
+        /// An offset which needs to be applied to old beatmaps (v4 and lower) to correct timing changes that were applied at a game client level.
+        /// </summary>
+        public const int EARLY_VERSION_TIMING_OFFSET = 24;
+
         internal static RulesetStore RulesetStore;
 
         private Beatmap beatmap;
@@ -50,8 +55,7 @@ namespace osu.Game.Beatmaps.Formats
                 RulesetStore = new AssemblyRulesetStore();
             }
 
-            // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
-            offset = FormatVersion < 5 ? 24 : 0;
+            offset = FormatVersion < 5 ? EARLY_VERSION_TIMING_OFFSET : 0;
         }
 
         protected override Beatmap CreateTemplateObject()
@@ -427,9 +431,10 @@ namespace osu.Game.Beatmaps.Formats
                 OmitFirstBarLine = omitFirstBarSignature,
             };
 
-            bool isOsuRuleset = beatmap.BeatmapInfo.Ruleset.OnlineID == 0;
-            // scrolling rulesets use effect points rather than difficulty points for scroll speed adjustments.
-            if (!isOsuRuleset)
+            int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
+
+            // osu!taiko and osu!mania use effect points rather than difficulty points for scroll speed adjustments.
+            if (onlineRulesetID == 1 || onlineRulesetID == 3)
                 effectPoint.ScrollSpeed = speedMultiplier;
 
             addControlPoint(time, effectPoint, timingChange);

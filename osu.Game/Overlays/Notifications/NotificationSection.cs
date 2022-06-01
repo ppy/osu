@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -34,9 +35,9 @@ namespace osu.Game.Overlays.Notifications
 
         private readonly string clearButtonText;
 
-        private readonly string titleText;
+        private readonly LocalisableString titleText;
 
-        public NotificationSection(string title, string clearButtonText)
+        public NotificationSection(LocalisableString title, string clearButtonText)
         {
             this.clearButtonText = clearButtonText.ToUpperInvariant();
             titleText = title;
@@ -84,7 +85,7 @@ namespace osu.Game.Overlays.Notifications
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = titleText.ToUpperInvariant(),
+                                    Text = titleText.ToUpper(),
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold)
                                 },
                                 countDrawable = new OsuSpriteText

@@ -45,9 +45,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             Exited?.Invoke();

@@ -15,8 +15,14 @@ namespace osu.Game.Database
         protected override string ImportFromStablePath => Path.Combine("Data", "r");
 
         protected override IEnumerable<string> GetStableImportPaths(Storage storage)
-            => storage.GetFiles(ImportFromStablePath).Where(p => Importer.HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false))
-                      .Select(path => storage.GetFullPath(path));
+        {
+            if (!storage.ExistsDirectory(ImportFromStablePath))
+                return Enumerable.Empty<string>();
+
+            return storage.GetFiles(ImportFromStablePath)
+                          .Where(p => Importer.HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false))
+                          .Select(path => storage.GetFullPath(path));
+        }
 
         public LegacyScoreImporter(IModelImporter<ScoreInfo> importer)
             : base(importer)

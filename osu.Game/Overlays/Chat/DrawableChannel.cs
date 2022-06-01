@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -48,6 +49,8 @@ namespace osu.Game.Overlays.Chat
             RelativeSizeAxes = Axes.Both;
         }
 
+        private Bindable<Message> highlightedMessage;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -79,6 +82,34 @@ namespace osu.Game.Overlays.Chat
             Channel.PendingMessageResolved += pendingMessageResolved;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            highlightedMessage = Channel.HighlightedMessage.GetBoundCopy();
+            highlightedMessage.BindValueChanged(_ => processMessageHighlighting(), true);
+        }
+
+        /// <summary>
+        /// Processes any pending message in <see cref="highlightedMessage"/>.
+        /// </summary>
+        // ScheduleAfterChildren is for ensuring the scroll flow has updated with any new chat lines.
+        private void processMessageHighlighting() => SchedulerAfterChildren.AddOnce(() =>
+        {
+            if (highlightedMessage.Value == null)
+                return;
+
+            var chatLine = chatLines.FirstOrDefault(c => c.Message.Equals(highlightedMessage.Value));
+            if (chatLine == null)
+                return;
+
+            float center = scroll.GetChildPosInContent(chatLine, chatLine.DrawSize / 2) - scroll.DisplayableContent / 2;
+            scroll.ScrollTo(Math.Clamp(center, 0, scroll.ScrollableExtent));
+            chatLine.Highlight();
+
+            highlightedMessage.Value = null;
+        });
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -90,10 +121,10 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual ChatLine CreateChatLine(Message m) => new ChatLine(m);
 
-        protected virtual DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
+        protected virtual Drawable CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
         {
-            Margin = new MarginPadding { Vertical = 10 },
             Colour = colours.ChatBlue.Lighten(0.7f),
+            Margin = new MarginPadding { Vertical = 10 },
         };
 
         private void newMessagesArrived(IEnumerable<Message> newMessages) => Schedule(() =>
@@ -148,6 +179,8 @@ namespace osu.Game.Overlays.Chat
             // to avoid making the container think the user has scrolled back up and unwantedly disable auto-scrolling.
             if (newMessages.Any(m => m is LocalMessage))
                 scroll.ScrollToEnd();
+
+            processMessageHighlighting();
         });
 
         private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>

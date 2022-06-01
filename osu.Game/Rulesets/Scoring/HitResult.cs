@@ -122,7 +122,19 @@ namespace osu.Game.Rulesets.Scoring
     public static class HitResultExtensions
     {
         /// <summary>
-        /// Whether a <see cref="HitResult"/> increases/decreases the combo, and affects the combo portion of the score.
+        /// Whether a <see cref="HitResult"/> increases the combo.
+        /// </summary>
+        public static bool IncreasesCombo(this HitResult result)
+            => AffectsCombo(result) && IsHit(result);
+
+        /// <summary>
+        /// Whether a <see cref="HitResult"/> breaks the combo and resets it back to zero.
+        /// </summary>
+        public static bool BreaksCombo(this HitResult result)
+            => AffectsCombo(result) && !IsHit(result);
+
+        /// <summary>
+        /// Whether a <see cref="HitResult"/> increases/breaks the combo, and affects the combo portion of the score.
         /// </summary>
         public static bool AffectsCombo(this HitResult result)
         {

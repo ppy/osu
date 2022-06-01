@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -93,7 +94,12 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         {
         }
 
-        protected class SectionContainer : FillFlowContainer<Section>
+        /// <remarks>
+        /// <see cref="ReverseChildIDFillFlowContainer{T}"/> is used to ensure that if the nested <see cref="Section"/>s
+        /// use expanded overhanging content (like an <see cref="OsuDropdown{T}"/>'s dropdown),
+        /// then the overhanging content will be correctly Z-ordered.
+        /// </remarks>
+        protected class SectionContainer : ReverseChildIDFillFlowContainer<Section>
         {
             public SectionContainer()
             {

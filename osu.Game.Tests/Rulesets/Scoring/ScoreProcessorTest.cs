@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [SetUp]
         public void SetUp()
         {
-            scoreProcessor = new ScoreProcessor();
+            scoreProcessor = new ScoreProcessor(new TestRuleset());
             beatmap = new TestBeatmap(new RulesetInfo())
             {
                 HitObjects = new List<HitObject>

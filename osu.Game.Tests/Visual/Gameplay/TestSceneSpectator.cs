@@ -18,8 +18,8 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Tests.Visual.Spectator;
 using osuTK;
@@ -68,6 +68,56 @@ namespace osu.Game.Tests.Visual.Gameplay
                 importedBeatmap = BeatmapImportHelper.LoadOszIntoOsu(game, virtualTrack: true).GetResultSafely();
                 importedBeatmapId = importedBeatmap.Beatmaps.First(b => b.Ruleset.OnlineID == 0).OnlineID;
             });
+        }
+
+        [Test]
+        public void TestSeekToGameplayStartFramesArriveAfterPlayerLoad()
+        {
+            const double gameplay_start = 10000;
+
+            loadSpectatingScreen();
+
+            start();
+
+            waitForPlayer();
+
+            sendFrames(startTime: gameplay_start);
+
+            AddAssert("time is greater than seek target", () => currentFrameStableTime > gameplay_start);
+        }
+
+        /// <summary>
+        /// Tests the same as <see cref="TestSeekToGameplayStartFramesArriveAfterPlayerLoad"/> but with the frames arriving just as <see cref="Player"/> is transitioning into existence.
+        /// </summary>
+        [Test]
+        public void TestSeekToGameplayStartFramesArriveAsPlayerLoaded()
+        {
+            const double gameplay_start = 10000;
+
+            loadSpectatingScreen();
+
+            start();
+
+            AddUntilStep("wait for player loader", () => (Stack.CurrentScreen as PlayerLoader)?.IsLoaded == true);
+
+            AddUntilStep("queue send frames on player load", () =>
+            {
+                var loadingPlayer = (Stack.CurrentScreen as PlayerLoader)?.CurrentPlayer;
+
+                if (loadingPlayer == null)
+                    return false;
+
+                loadingPlayer.OnLoadComplete += _ =>
+                {
+                    spectatorClient.SendFramesFromUser(streamingUser.Id, 10, gameplay_start);
+                };
+                return true;
+            });
+
+            waitForPlayer();
+
+            AddUntilStep("state is playing", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Playing);
+            AddAssert("time is greater than seek target", () => currentFrameStableTime > gameplay_start);
         }
 
         [Test]
@@ -209,12 +259,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestFinalFramesPurgedBeforeEndingPlay()
         {
-            AddStep("begin playing", () => spectatorClient.BeginPlaying(new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset()), new Score()));
+            AddStep("begin playing", () => spectatorClient.BeginPlaying(TestGameplayState.Create(new OsuRuleset()), new Score()));
 
             AddStep("send frames and finish play", () =>
             {
                 spectatorClient.HandleFrame(new OsuReplayFrame(1000, Vector2.Zero));
-                spectatorClient.EndPlaying(new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset()) { HasPassed = true });
+
+                var completedGameplayState = TestGameplayState.Create(new OsuRuleset());
+                completedGameplayState.HasPassed = true;
+                spectatorClient.EndPlaying(completedGameplayState);
             });
 
             // We can't access API because we're an "online" test.
@@ -319,9 +372,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void checkPaused(bool state) =>
             AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
 
-        private void sendFrames(int count = 10)
+        private void sendFrames(int count = 10, double startTime = 0)
         {
-            AddStep("send frames", () => spectatorClient.SendFramesFromUser(streamingUser.Id, count));
+            AddStep("send frames", () => spectatorClient.SendFramesFromUser(streamingUser.Id, count, startTime));
         }
 
         private void loadSpectatingScreen()

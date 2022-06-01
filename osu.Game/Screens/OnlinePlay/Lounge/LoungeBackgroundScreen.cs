@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 playlist.Clear();
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             // This screen never exits.
             return true;

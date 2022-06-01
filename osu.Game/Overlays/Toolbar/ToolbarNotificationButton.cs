@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         protected override Anchor TooltipAnchor => Anchor.TopRight;
 
-        public BindableInt NotificationCount = new BindableInt();
+        public IBindable<int> NotificationCount = new BindableInt();
 
         private readonly CountCircle countDisplay;
 
@@ -36,10 +36,10 @@ namespace osu.Game.Overlays.Toolbar
             });
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(NotificationOverlay notificationOverlay)
+        [BackgroundDependencyLoader]
+        private void load(INotificationOverlay notificationOverlay)
         {
-            StateContainer = notificationOverlay;
+            StateContainer = notificationOverlay as NotificationOverlay;
 
             if (notificationOverlay != null)
                 NotificationCount.BindTo(notificationOverlay.UnreadCount);

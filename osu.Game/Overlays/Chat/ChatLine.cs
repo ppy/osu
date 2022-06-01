@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float TextSize => 20;
 
-        private Color4 customUsernameColour;
+        private Color4 usernameColour;
 
         private OsuSpriteText timestamp;
 
@@ -78,19 +78,22 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        private bool senderHasBackground => !string.IsNullOrEmpty(message.Sender.Colour);
+        private bool senderHasColour => !string.IsNullOrEmpty(message.Sender.Colour);
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            customUsernameColour = colours.ChatBlue;
-
-            bool hasBackground = senderHasBackground;
+            usernameColour = senderHasColour
+                ? Color4Extensions.FromHex(message.Sender.Colour)
+                : username_colours[message.Sender.Id % username_colours.Length];
 
             Drawable effectedUsername = username = new OsuSpriteText
             {
                 Shadow = false,
-                Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
+                Colour = senderHasColour ? colours.ChatBlue : usernameColour,
                 Truncate = true,
                 EllipsisString = "… :",
                 Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
@@ -99,7 +102,7 @@ namespace osu.Game.Overlays.Chat
                 MaxWidth = MessagePadding - TimestampPadding
             };
 
-            if (hasBackground)
+            if (senderHasColour)
             {
                 // Background effect
                 effectedUsername = new Container
@@ -126,7 +129,7 @@ namespace osu.Game.Overlays.Chat
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex(message.Sender.Colour),
+                                Colour = usernameColour,
                             },
                             new Container
                             {
@@ -177,7 +180,7 @@ namespace osu.Game.Overlays.Chat
                             {
                                 t.Font = OsuFont.GetFont(italics: true);
 
-                                if (senderHasBackground)
+                                if (senderHasColour)
                                     t.Colour = Color4Extensions.FromHex(message.Sender.Colour);
                             }
 
@@ -200,13 +203,37 @@ namespace osu.Game.Overlays.Chat
             FinishTransforms(true);
         }
 
+        private Container highlight;
+
+        /// <summary>
+        /// Performs a highlight animation on this <see cref="ChatLine"/>.
+        /// </summary>
+        public void Highlight()
+        {
+            if (highlight?.IsAlive != true)
+            {
+                AddInternal(highlight = new Container
+                {
+                    CornerRadius = 2f,
+                    Masking = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = usernameColour.Darken(1f),
+                    Depth = float.MaxValue,
+                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                });
+            }
+
+            highlight.FadeTo(0.5f).FadeOut(1500, Easing.InQuint);
+            highlight.Expire();
+        }
+
         private void updateMessageContent()
         {
             this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
             timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
 
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
-            username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
+            username.Text = $@"{message.Sender.Username}" + (senderHasColour || message.IsAction ? "" : ":");
 
             // remove non-existent channels from the link list
             message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument.ToString()) != true);

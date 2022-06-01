@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            scoreProcessor = new ScoreProcessor();
+            scoreProcessor = new ScoreProcessor(new CatchRuleset());
 
             SetContents(_ => new CatchComboDisplay
             {

@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select
             HeaderText = @"Confirm deletion of";
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                new PopupDialogDangerousButton
                 {
                     Text = @"Yes. Totally. Delete it.",
                     Action = () => manager?.Delete(beatmap),

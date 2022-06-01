@@ -6,6 +6,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Layout;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Screens;
@@ -19,6 +21,8 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class ScalingContainer : Container
     {
+        private const float duration = 500;
+
         private Bindable<float> sizeX;
         private Bindable<float> sizeY;
         private Bindable<float> posX;
@@ -66,7 +70,7 @@ namespace osu.Game.Graphics.Containers
             this.targetMode = targetMode;
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = sizableContainer = new AlwaysInputContainer
+            InternalChild = sizableContainer = new SizeableAlwaysInputContainer(targetMode == ScalingMode.Everything)
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Both,
@@ -75,10 +79,12 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        private class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
+        public class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
         {
             private readonly bool applyUIScale;
             private Bindable<float> uiScale;
+
+            protected float CurrentScale { get; private set; } = 1;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -93,14 +99,16 @@ namespace osu.Game.Graphics.Containers
                 if (applyUIScale)
                 {
                     uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
-                    uiScale.BindValueChanged(scaleChanged, true);
+                    uiScale.BindValueChanged(args => this.TransformTo(nameof(CurrentScale), args.NewValue, duration, Easing.OutQuart), true);
                 }
             }
 
-            private void scaleChanged(ValueChangedEvent<float> args)
+            protected override void Update()
             {
-                this.ScaleTo(new Vector2(args.NewValue), 500, Easing.Out);
-                this.ResizeTo(new Vector2(1 / args.NewValue), 500, Easing.Out);
+                Scale = new Vector2(CurrentScale);
+                Size = new Vector2(1 / CurrentScale);
+
+                base.Update();
             }
         }
 
@@ -138,8 +146,6 @@ namespace osu.Game.Graphics.Containers
 
         private void updateSize()
         {
-            const float duration = 500;
-
             if (targetMode == ScalingMode.Everything)
             {
                 // the top level scaling container manages the background to be displayed while scaling.
@@ -203,19 +209,56 @@ namespace osu.Game.Graphics.Containers
         {
             protected override bool AllowStoryboardBackground => false;
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
                 this.FadeInFromZero(4000, Easing.OutQuint);
             }
         }
 
-        private class AlwaysInputContainer : Container
+        private class SizeableAlwaysInputContainer : Container
         {
+            [Resolved]
+            private GameHost host { get; set; }
+
+            [Resolved]
+            private ISafeArea safeArea { get; set; }
+
+            private readonly bool confineHostCursor;
+            private readonly LayoutValue cursorRectCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
+
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-            public AlwaysInputContainer()
+            /// <summary>
+            /// Container used for sizing/positioning purposes in <see cref="ScalingContainer"/>. Always receives mouse input.
+            /// </summary>
+            /// <param name="confineHostCursor">Whether to confine the host cursor to the draw area of this container.</param>
+            /// <remarks>Cursor confinement will abide by the <see cref="OsuSetting.ConfineMouseMode"/> setting.</remarks>
+            public SizeableAlwaysInputContainer(bool confineHostCursor)
             {
                 RelativeSizeAxes = Axes.Both;
+                this.confineHostCursor = confineHostCursor;
+
+                if (confineHostCursor)
+                    AddLayout(cursorRectCache);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (confineHostCursor && !cursorRectCache.IsValid)
+                {
+                    updateHostCursorConfineRect();
+                    cursorRectCache.Validate();
+                }
+            }
+
+            private void updateHostCursorConfineRect()
+            {
+                if (host.Window == null) return;
+
+                bool coversWholeScreen = Size == Vector2.One && safeArea.SafeAreaPadding.Value.Total == Vector2.Zero;
+                host.Window.CursorConfineRect = coversWholeScreen ? (RectangleF?)null : ToScreenSpace(DrawRectangle).AABBFloat;
             }
         }
     }

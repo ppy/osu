@@ -5,6 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -19,7 +21,7 @@ namespace osu.Game.Overlays.BeatmapSet
         protected readonly FailRetryGraph Graph;
 
         private readonly FillFlowContainer header;
-        private readonly OsuSpriteText successPercent;
+        private readonly SuccessRatePercentage successPercent;
         private readonly Bar successRate;
         private readonly Container percentContainer;
 
@@ -45,6 +47,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             float rate = playCount != 0 ? (float)passCount / playCount : 0;
             successPercent.Text = rate.ToLocalisableString(@"0.#%");
+            successPercent.TooltipText = $"{passCount} / {playCount}";
             successRate.Length = rate;
             percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
@@ -80,7 +83,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Width = 0f,
-                            Child = successPercent = new OsuSpriteText
+                            Child = successPercent = new SuccessRatePercentage
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopCentre,
@@ -120,6 +123,11 @@ namespace osu.Game.Overlays.BeatmapSet
             base.UpdateAfterChildren();
 
             Graph.Padding = new MarginPadding { Top = header.DrawHeight };
+        }
+
+        private class SuccessRatePercentage : OsuSpriteText, IHasTooltip
+        {
+            public LocalisableString TooltipText { get; set; }
         }
     }
 }

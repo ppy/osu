@@ -157,13 +157,13 @@ namespace osu.Game.Skinning.Editor
 
                 if (item.UsesFixedAnchor) continue;
 
-                applyClosestAnchor(drawable);
+                ApplyClosestAnchor(drawable);
             }
 
             return true;
         }
 
-        private static void applyClosestAnchor(Drawable drawable) => applyAnchor(drawable, getClosestAnchor(drawable));
+        public static void ApplyClosestAnchor(Drawable drawable) => applyAnchor(drawable, getClosestAnchor(drawable));
 
         protected override void OnSelectionChanged()
         {
@@ -198,6 +198,12 @@ namespace osu.Game.Skinning.Editor
             {
                 Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
             };
+
+            yield return new OsuMenuItem("Reset position", MenuItemType.Standard, () =>
+            {
+                foreach (var blueprint in SelectedBlueprints)
+                    ((Drawable)blueprint.Item).Position = Vector2.Zero;
+            });
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
@@ -246,7 +252,7 @@ namespace osu.Game.Skinning.Editor
 
                 if (item.UsesFixedAnchor) continue;
 
-                applyClosestAnchor(drawable);
+                ApplyClosestAnchor(drawable);
             }
         }
 
@@ -273,7 +279,7 @@ namespace osu.Game.Skinning.Editor
             foreach (var item in SelectedItems)
             {
                 item.UsesFixedAnchor = false;
-                applyClosestAnchor((Drawable)item);
+                ApplyClosestAnchor((Drawable)item);
             }
         }
 
