@@ -19,6 +19,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         private readonly string label;
 
+        protected Drawable Background { get; private set; }
+
         protected FillFlowContainer Content { get; private set; }
 
         public RowAttribute(ControlPoint point, string label)
@@ -41,11 +43,11 @@ namespace osu.Game.Screens.Edit.Timing
             Masking = true;
             CornerRadius = 3;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                new Box
+                Background = new Box
                 {
-                    Colour = overlayColours.Background4,
+                    Colour = overlayColours.Background5,
                     RelativeSizeAxes = Axes.Both,
                 },
                 Content = new FillFlowContainer

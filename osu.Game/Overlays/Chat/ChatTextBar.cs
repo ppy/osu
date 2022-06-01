@@ -141,8 +141,8 @@ namespace osu.Game.Overlays.Chat
 
                 switch (newChannel?.Type)
                 {
-                    case ChannelType.Public:
-                        chattingText.Text = ChatStrings.TalkingIn(newChannel.Name);
+                    case null:
+                        chattingText.Text = string.Empty;
                         break;
 
                     case ChannelType.PM:
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.Chat
                         break;
 
                     default:
-                        chattingText.Text = string.Empty;
+                        chattingText.Text = ChatStrings.TalkingIn(newChannel.Name);
                         break;
                 }
             }, true);
