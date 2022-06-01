@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             for (int i = 0; i < total_waveforms; i++)
             {
-                AddInternal(new WaveformRow
+                AddInternal(new WaveformRow(i == total_waveforms / 2)
                 {
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
@@ -289,17 +289,29 @@ namespace osu.Game.Screens.Edit.Timing
 
         internal class WaveformRow : CompositeDrawable
         {
+            private readonly bool isMainRow;
             private OsuSpriteText beatIndexText = null!;
             private WaveformGraph waveformGraph = null!;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
+            public WaveformRow(bool isMainRow)
+            {
+                this.isMainRow = isMainRow;
+            }
+
             [BackgroundDependencyLoader]
             private void load(IBindable<WorkingBeatmap> beatmap)
             {
                 InternalChildren = new Drawable[]
                 {
+                    new Box
+                    {
+                        Colour = colourProvider.Background3,
+                        Alpha = isMainRow ? 1 : 0,
+                        RelativeSizeAxes = Axes.Both,
+                    },
                     waveformGraph = new WaveformGraph
                     {
                         RelativeSizeAxes = Axes.Both,

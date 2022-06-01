@@ -78,6 +78,12 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestNoop()
+        {
+            AddStep("do nothing", () => { });
+        }
+
+        [Test]
         public void TestTapThenReset()
         {
             AddStep("click tap button", () =>
