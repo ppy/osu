@@ -75,7 +75,7 @@ namespace osu.Game
 
         public Toolbar Toolbar;
 
-        private ChatOverlayV2 chatOverlay;
+        private ChatOverlay chatOverlay;
 
         private ChannelManager channelManager;
 
@@ -848,7 +848,7 @@ namespace osu.Game
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
-            loadComponentSingleFile(chatOverlay = new ChatOverlayV2(), overlayContent.Add, true);
+            loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
             loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add, true);
