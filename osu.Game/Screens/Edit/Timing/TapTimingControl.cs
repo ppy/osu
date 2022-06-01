@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 Padding = new MarginPadding(10),
                                 Children = new Drawable[]
                                 {
-                                    new AdjustButton(1)
+                                    new TimingAdjustButton(1)
                                     {
                                         Text = "Offset",
                                         RelativeSizeAxes = Axes.X,
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Edit.Timing
                                         Height = 50,
                                         Action = adjustOffset,
                                     },
-                                    new AdjustButton(0.1)
+                                    new TimingAdjustButton(0.1)
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
