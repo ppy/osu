@@ -156,35 +156,11 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     // We don't have an efficient way of looking up groups currently, only individual point types.
                     // To improve the efficiency of this in the future, we should reconsider the overall structure of ControlPointInfo.
-                    IEnumerable<ControlPointGroup> groups = Beatmap.ControlPointInfo.Groups;
-
-                    bool currentTimeBeforeSelectedGroup = clock.CurrentTimeAccurate < selectedGroup.Value.Time;
-
-                    // Decide whether we are searching backwards or forwards.
-                    if (currentTimeBeforeSelectedGroup)
-                        groups = groups.Reverse();
 
                     // Find the next group which has the same type as the selected one.
-                    groups = groups.SkipWhile(g => g != selectedGroup.Value)
-                                   .Skip(1)
-                                   .Where(g => g.ControlPoints.Any(cp => cp.GetType() == selectedPointType));
-
-                    ControlPointGroup newGroup = groups.FirstOrDefault();
-
-                    if (newGroup != null)
-                    {
-                        if (currentTimeBeforeSelectedGroup)
-                        {
-                            // When seeking backwards, the first match from the LINQ query is always what we want.
-                            selectedGroup.Value = newGroup;
-                        }
-                        else
-                        {
-                            // When seeking forwards, we also need to check that the next match is before the current time.
-                            if (newGroup.Time <= clock.CurrentTimeAccurate)
-                                selectedGroup.Value = newGroup;
-                        }
-                    }
+                    selectedGroup.Value = Beatmap.ControlPointInfo.Groups
+                                                 .Where(g => g.ControlPoints.Any(cp => cp.GetType() == selectedPointType))
+                                                 .LastOrDefault(g => g.Time <= clock.CurrentTimeAccurate);
                 }
             }
 
