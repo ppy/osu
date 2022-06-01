@@ -12,7 +12,6 @@ using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -81,7 +80,7 @@ namespace osu.Desktop
         private void onReady(object _, ReadyMessage __)
         {
             Logger.Log("Discord RPC Client ready.", LoggingTarget.Network, LogLevel.Debug);
-            requestUserRulesetsRankings();
+            updateStatus();
         }
 
         private void updateStatus()
@@ -122,26 +121,6 @@ namespace osu.Desktop
             presence.Assets.SmallImageText = ruleset.Value.Name;
 
             client.SetPresence(presence);
-        }
-
-        private void requestUserRulesetsRankings()
-        {
-            RulesetInfo cachedRuleset = ruleset.Value;
-
-            var req = new GetUsersRequest(new int[] { provider.LocalUser.Value.Id });
-            req.Success += result =>
-            {
-                if (result.Users.Count == 1)
-                {
-                    APIUser apiUser = result.Users[0];
-                    user.Value.RulesetsStatistics = apiUser.RulesetsStatistics;
-                }
-
-                updateStatus();
-            };
-            req.Failure += _ => updateStatus();
-
-            provider.Queue(req);
         }
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
