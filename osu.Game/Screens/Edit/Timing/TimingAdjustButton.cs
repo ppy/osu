@@ -16,7 +16,10 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class AdjustButton : CompositeDrawable
+    /// <summary>
+    /// A button with variable constant output based on hold position and length.
+    /// </summary>
+    public class TimingAdjustButton : CompositeDrawable
     {
         public Action<double> Action;
 
@@ -50,7 +53,7 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        public AdjustButton(double adjustAmount)
+        public TimingAdjustButton(double adjustAmount)
         {
             this.adjustAmount = adjustAmount;
 
