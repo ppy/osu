@@ -42,12 +42,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         public LocalisableString Text
         {
-            get => text?.Text ?? default;
-            set
-            {
-                if (text != null)
-                    text.Text = value;
-            }
+            get => text.Text;
+            set => text.Text = value;
         }
 
         [Resolved]
