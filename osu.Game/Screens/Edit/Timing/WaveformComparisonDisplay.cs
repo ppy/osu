@@ -99,7 +99,10 @@ namespace osu.Game.Screens.Edit.Timing
 
             displayLocked.BindValueChanged(locked =>
             {
-                lockedOverlay.FadeTo(locked.NewValue ? 1 : 0, 200, Easing.OutQuint);
+                if (locked.NewValue)
+                    lockedOverlay.Show();
+                else
+                    lockedOverlay.Hide();
             }, true);
         }
 
@@ -268,14 +271,19 @@ namespace osu.Game.Screens.Edit.Timing
                 };
             }
 
-            protected override void LoadComplete()
+            public override void Show()
             {
-                base.LoadComplete();
+                this.FadeIn(100, Easing.OutQuint);
 
                 text
-                    .FadeIn().Then().Delay(500)
-                    .FadeOut().Then().Delay(500)
+                    .FadeIn().Then().Delay(600)
+                    .FadeOut().Then().Delay(600)
                     .Loop();
+            }
+
+            public override void Hide()
+            {
+                this.FadeOut(100, Easing.OutQuint);
             }
         }
 
