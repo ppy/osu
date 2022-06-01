@@ -160,11 +160,7 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         foreach (var controlPoint in selected.ControlPoints)
                         {
-                            if (Activator.CreateInstance(controlPoint.GetType()) is ControlPoint copy)
-                            {
-                                copy.CopyFrom(controlPoint);
-                                group.Add(copy);
-                            }
+                            group.Add(controlPoint.DeepClone());
                         }
                     }
                 }
