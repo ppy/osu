@@ -7,10 +7,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -32,6 +36,8 @@ namespace osu.Game.Screens.Edit.Timing
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
+            const float padding = 10;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -52,9 +58,8 @@ namespace osu.Game.Screens.Edit.Timing
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 200),
-                        new Dimension(GridSizeMode.Absolute, 60),
-                        new Dimension(GridSizeMode.Absolute, 60),
-                        new Dimension(GridSizeMode.Absolute, 120),
+                        new Dimension(GridSizeMode.Absolute, 50),
+                        new Dimension(GridSizeMode.Absolute, TapButton.SIZE + padding),
                     },
                     Content = new[]
                     {
@@ -63,6 +68,7 @@ namespace osu.Game.Screens.Edit.Timing
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(padding),
                                 Children = new Drawable[]
                                 {
                                     new GridContainer
@@ -94,15 +100,14 @@ namespace osu.Game.Screens.Edit.Timing
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding(10),
+                                Padding = new MarginPadding { Bottom = padding, Horizontal = padding },
                                 Children = new Drawable[]
                                 {
                                     new TimingAdjustButton(1)
                                     {
                                         Text = "Offset",
-                                        RelativeSizeAxes = Axes.X,
-                                        Width = 0.48f,
-                                        Height = 50,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Size = new Vector2(0.48f, 1),
                                         Action = adjustOffset,
                                     },
                                     new TimingAdjustButton(0.1)
@@ -110,9 +115,8 @@ namespace osu.Game.Screens.Edit.Timing
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                         Text = "BPM",
-                                        RelativeSizeAxes = Axes.X,
-                                        Width = 0.48f,
-                                        Height = 50,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Size = new Vector2(0.48f, 1),
                                         Action = adjustBpm,
                                     }
                                 }
@@ -123,39 +127,47 @@ namespace osu.Game.Screens.Edit.Timing
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding(10),
+                                Padding = new MarginPadding { Bottom = padding, Horizontal = padding },
                                 Children = new Drawable[]
                                 {
-                                    new RoundedButton
+                                    new Container
                                     {
-                                        Text = "Reset",
-                                        BackgroundColour = colours.Pink,
-                                        RelativeSizeAxes = Axes.X,
-                                        Width = 0.3f,
-                                        Action = reset,
+                                        RelativeSizeAxes = Axes.Y,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.CentreRight,
+                                        Height = 0.98f,
+                                        Width = TapButton.SIZE / 1.3f,
+                                        Masking = true,
+                                        CornerRadius = 15,
+                                        Children = new Drawable[]
+                                        {
+                                            new LessRoundedButton(FontAwesome.Solid.Stop, Anchor.TopLeft)
+                                            {
+                                                BackgroundColour = colourProvider.Background1,
+                                                RelativeSizeAxes = Axes.Both,
+                                                Height = 0.49f,
+                                                Action = reset,
+                                            },
+                                            new LessRoundedButton(FontAwesome.Solid.Play, Anchor.BottomLeft)
+                                            {
+                                                BackgroundColour = colourProvider.Background1,
+                                                RelativeSizeAxes = Axes.Both,
+                                                Height = 0.49f,
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Action = start,
+                                            },
+                                        },
                                     },
-                                    new RoundedButton
+                                    new TapButton
                                     {
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        Text = "Play from start",
-                                        RelativeSizeAxes = Axes.X,
-                                        BackgroundColour = colourProvider.Background1,
-                                        Width = 0.68f,
-                                        Action = tap,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        IsHandlingTapping = { BindTarget = isHandlingTapping }
                                     }
                                 }
                             },
                         },
-                        new Drawable[]
-                        {
-                            new TapButton
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                IsHandlingTapping = { BindTarget = isHandlingTapping }
-                            }
-                        }
                     }
                 },
             };
@@ -165,11 +177,76 @@ namespace osu.Game.Screens.Edit.Timing
                 metronome.EnableClicking = !handling.NewValue;
 
                 if (handling.NewValue)
-                {
-                    editorClock.Seek(selectedGroup.Value.Time);
-                    editorClock.Start();
-                }
+                    start();
             }, true);
+        }
+
+        private class LessRoundedButton : OsuButton
+        {
+            private readonly IconUsage icon;
+            private readonly Anchor anchor;
+
+            private SpriteIcon spriteIcon;
+
+            public LessRoundedButton(IconUsage icon, Anchor anchor)
+            {
+                this.icon = icon;
+                this.anchor = anchor;
+            }
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Content.CornerRadius = 0;
+                Content.Masking = false;
+
+                BackgroundColour = colourProvider.Background2;
+
+                Content.Add(new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(15),
+                    Children = new Drawable[]
+                    {
+                        spriteIcon = new SpriteIcon
+                        {
+                            Icon = icon,
+                            Size = new Vector2(22),
+                            Anchor = anchor,
+                            Origin = anchor,
+                            Colour = colourProvider.Background1,
+                        },
+                    }
+                });
+            }
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                // scale looks bad so don't call base.
+                return false;
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                spriteIcon.FadeColour(colourProvider.Content2, 200, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                spriteIcon.FadeColour(colourProvider.Background1, 200, Easing.OutQuint);
+                base.OnHoverLost(e);
+            }
+        }
+
+        private void start()
+        {
+            editorClock.Seek(selectedGroup.Value.Time);
+            editorClock.Start();
         }
 
         private void adjustOffset(double adjust)
@@ -199,12 +276,6 @@ namespace osu.Game.Screens.Edit.Timing
                 return;
 
             timing.BeatLength = 60000 / (timing.BPM + adjust);
-        }
-
-        private void tap()
-        {
-            editorClock.Seek(selectedGroup.Value.Time);
-            editorClock.Start();
         }
 
         private void reset()
