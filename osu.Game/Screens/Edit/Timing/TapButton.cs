@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -14,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -27,24 +31,27 @@ namespace osu.Game.Screens.Edit.Timing
         public const float SIZE = 100;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        private Circle hoverLayer;
+        [Resolved(canBeNull: true)]
+        private Bindable<ControlPointGroup>? selectedGroup { get; set; }
 
-        private CircularContainer innerCircle;
-        private Box innerCircleHighlight;
+        private Circle hoverLayer = null!;
+
+        private CircularContainer innerCircle = null!;
+        private Box innerCircleHighlight = null!;
 
         private int currentLight;
 
-        private Container scaleContainer;
-        private Container lights;
-        private Container lightsGlow;
-        private OsuSpriteText bpmText;
-        private Container textContainer;
+        private Container scaleContainer = null!;
+        private Container lights = null!;
+        private Container lightsGlow = null!;
+        private OsuSpriteText bpmText = null!;
+        private Container textContainer = null!;
 
         private bool grabbedMouseDown;
 
-        private ScheduledDelegate resetDelegate;
+        private ScheduledDelegate? resetDelegate;
 
         private const int light_count = 6;
 
@@ -280,16 +287,24 @@ namespace osu.Game.Screens.Edit.Timing
             double bpm = Math.Round(60000 / ((tapTimings.Last() - tapTimings.First()) / (tapTimings.Count - 1)));
 
             bpmText.Text = $"{bpm} BPM";
+
+            var timingPoint = selectedGroup?.Value.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
+
+            if (timingPoint != null)
+            {
+                // Intentionally use the rounded BPM here.
+                timingPoint.BeatLength = 60000 / bpm;
+            }
         }
 
         private class Light : CompositeDrawable
         {
-            public Drawable Glow { get; private set; }
+            public Drawable Glow { get; private set; } = null!;
 
-            private Container fillContent;
+            private Container fillContent = null!;
 
             [Resolved]
-            private OverlayColourProvider colourProvider { get; set; }
+            private OverlayColourProvider colourProvider { get; set; } = null!;
 
             [BackgroundDependencyLoader]
             private void load()
