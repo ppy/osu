@@ -163,6 +163,12 @@ namespace osu.Game.Screens.Edit.Timing
             isHandlingTapping.BindValueChanged(handling =>
             {
                 metronome.EnableClicking = !handling.NewValue;
+
+                if (handling.NewValue)
+                {
+                    editorClock.Seek(selectedGroup.Value.Time);
+                    editorClock.Start();
+                }
             }, true);
         }
 
