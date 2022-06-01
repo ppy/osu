@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Edit.Timing
                         Origin = direction,
                         Font = OsuFont.Default.With(size: 10, weight: FontWeight.Bold),
                         Text = $"{(index > 0 ? "+" : "-")}{Math.Abs(Multiplier * amount)}",
-                        Padding = new MarginPadding(5),
+                        Padding = new MarginPadding(2),
                         Alpha = 0,
                     }
                 };
