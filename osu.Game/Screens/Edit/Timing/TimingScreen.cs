@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Timing
     public class TimingScreen : EditorScreenWithTimeline
     {
         [Cached]
-        private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
+        public readonly Bindable<ControlPointGroup> SelectedGroup = new Bindable<ControlPointGroup>();
 
         public TimingScreen()
             : base(EditorScreenMode.Timing)
@@ -130,6 +130,40 @@ namespace osu.Game.Screens.Edit.Timing
                     table.ControlGroups = controlPointGroups;
                     changeHandler?.SaveState();
                 }, true);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                trackActivePoint();
+            }
+
+            /// <summary>
+            /// Given the user has selected a control point group, we want to track any group which is
+            /// active at the current point in time which matches the type the user has selected.
+            ///
+            /// So if the user is currently looking at a timing point and seeks into the future, a
+            /// future timing point would be automatically selected if it is now the new "current" point.
+            /// </summary>
+            private void trackActivePoint()
+            {
+                // For simplicity only match on the first type of the active control point.
+                var selectedPointType = selectedGroup.Value?.ControlPoints.FirstOrDefault()?.GetType();
+
+                if (selectedPointType != null)
+                {
+                    // We don't have an efficient way of looking up groups currently, only individual point types.
+                    // To improve the efficiency of this in the future, we should reconsider the overall structure of ControlPointInfo.
+
+                    // Find the next group which has the same type as the selected one.
+                    var found = Beatmap.ControlPointInfo.Groups
+                                       .Where(g => g.ControlPoints.Any(cp => cp.GetType() == selectedPointType))
+                                       .LastOrDefault(g => g.Time <= clock.CurrentTimeAccurate);
+
+                    if (found != null)
+                        selectedGroup.Value = found;
+                }
             }
 
             private void delete()
