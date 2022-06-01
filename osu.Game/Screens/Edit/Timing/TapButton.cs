@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         private Container scaleContainer;
         private Container lights;
+        private Container lightsGlow;
+        private OsuSpriteText text;
 
         private const int light_count = 6;
 
@@ -79,10 +82,15 @@ namespace osu.Game.Screens.Edit.Timing
                     },
                     new Circle
                     {
+                        Name = "inner masking",
                         Size = new Vector2(SIZE - ring_width * 2 + light_padding * 2),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Colour = colourProvider.Background3,
+                    },
+                    lightsGlow = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
                     },
                     innerCircle = new CircularContainer
                     {
@@ -104,7 +112,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0,
                             },
-                            new OsuSpriteText
+                            text = new OsuSpriteText
                             {
                                 Font = OsuFont.Torus.With(size: 20),
                                 Colour = colourProvider.Background1,
@@ -126,10 +134,13 @@ namespace osu.Game.Screens.Edit.Timing
 
             for (int i = 0; i < light_count; i++)
             {
-                lights.Add(new Light
+                var light = new Light
                 {
                     Rotation = i * (360f / light_count)
-                });
+                };
+
+                lights.Add(light);
+                lightsGlow.Add(light.Glow.CreateProxy());
             }
         }
 
@@ -151,6 +162,8 @@ namespace osu.Game.Screens.Edit.Timing
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             const double in_duration = 100;
+
+            text.FadeColour(colourProvider.Background4, in_duration, Easing.OutQuint);
 
             scaleContainer.ScaleTo(0.99f, in_duration, Easing.OutQuint);
             innerCircle.ScaleTo(0.96f, in_duration, Easing.OutQuint);
@@ -174,6 +187,8 @@ namespace osu.Game.Screens.Edit.Timing
         {
             const double out_duration = 800;
 
+            text.FadeColour(colourProvider.Background1, out_duration, Easing.OutQuint);
+
             scaleContainer.ScaleTo(1, out_duration, Easing.OutQuint);
             innerCircle.ScaleTo(1, out_duration, Easing.OutQuint);
             innerCircleHighlight.FadeOut(out_duration, Easing.OutQuint);
@@ -182,7 +197,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         private class Light : CompositeDrawable
         {
-            private CircularProgress fill;
+            public Drawable Glow { get; private set; }
+
+            private Container fillContent;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
@@ -194,41 +211,56 @@ namespace osu.Game.Screens.Edit.Timing
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
+                Size = new Vector2(0.98f); // Avoid bleed into masking edge.
+
                 InternalChildren = new Drawable[]
                 {
                     new CircularProgress
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(0.99f),
                         Current = { Value = 1f / light_count - 0.01f },
                         Colour = colourProvider.Background2,
                     },
-                    fill = new CircularProgress
+                    fillContent = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
                         Alpha = 0,
-                        Size = new Vector2(0.99f),
-                        Current = { Value = 1f / light_count - 0.01f },
                         Colour = colourProvider.Colour1,
-                        Blending = BlendingParameters.Additive
+                        Children = new[]
+                        {
+                            new CircularProgress
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Current = { Value = 1f / light_count - 0.01f },
+                                Blending = BlendingParameters.Additive
+                            },
+                            Glow = new CircularProgress
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Current = { Value = 1f / light_count - 0.01f },
+                                Blending = BlendingParameters.Additive
+                            }.WithEffect(new GlowEffect
+                            {
+                                Colour = colourProvider.Colour1.Opacity(0.4f),
+                                BlurSigma = new Vector2(9f),
+                                Strength = 10,
+                                PadExtent = true
+                            }),
+                        }
                     },
                 };
             }
 
             public override void Show()
             {
-                fill
+                fillContent
                     .FadeIn(50, Easing.OutQuint)
                     .FlashColour(Color4.White, 1000, Easing.OutQuint);
             }
 
             public override void Hide()
             {
-                fill
+                fillContent
                     .FadeOut(300, Easing.OutQuint);
             }
         }
