@@ -93,14 +93,20 @@ namespace osu.Game.Online.Multiplayer
         Task UserModsChanged(int userId, IEnumerable<APIMod> mods);
 
         /// <summary>
-        /// Signals that a match is to be started. This will *only* be sent to clients which are to begin loading at this point.
+        /// Signals that the match is starting and the loading of gameplay should be started. This will *only* be sent to clients which are to begin loading at this point.
         /// </summary>
         Task LoadRequested();
 
         /// <summary>
-        /// Signals that a match has started. All users in the <see cref="MultiplayerUserState.Loaded"/> state should begin gameplay as soon as possible.
+        /// Signals that loading of gameplay is to be aborted.
         /// </summary>
-        Task MatchStarted();
+        Task LoadAborted();
+
+        /// <summary>
+        /// Signals that gameplay has started.
+        /// All users in the <see cref="MultiplayerUserState.Loaded"/> or <see cref="MultiplayerUserState.ReadyForGameplay"/> states should begin gameplay as soon as possible.
+        /// </summary>
+        Task GameplayStarted();
 
         /// <summary>
         /// Signals that the match has ended, all players have finished and results are ready to be displayed.

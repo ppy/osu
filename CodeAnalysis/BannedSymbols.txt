@@ -11,6 +11,7 @@ T:Microsoft.EntityFrameworkCore.Internal.TypeExtensions;Don't use internal exten
 T:NuGet.Packaging.CollectionExtensions;Don't use internal extension methods.
 M:System.Enum.HasFlag(System.Enum);Use osu.Framework.Extensions.EnumExtensions.HasFlagFast<T>() instead.
 M:Realms.IRealmCollection`1.SubscribeForNotifications`1(Realms.NotificationCallbackDelegate{``0});Use osu.Game.Database.RealmObjectExtensions.QueryAsyncWithNotifications(IRealmCollection<T>,NotificationCallbackDelegate<T>) instead.
+M:System.Guid.#ctor;Probably meaning to use Guid.NewGuid() instead. If actually wanting empty, use Guid.Empty.
 M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Linq.IQueryable{``0},Realms.NotificationCallbackDelegate{``0});Use osu.Game.Database.RealmObjectExtensions.QueryAsyncWithNotifications(IQueryable<T>,NotificationCallbackDelegate<T>) instead.
 M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Collections.Generic.IList{``0},Realms.NotificationCallbackDelegate{``0});Use osu.Game.Database.RealmObjectExtensions.QueryAsyncWithNotifications(IList<T>,NotificationCallbackDelegate<T>) instead.
 M:System.Threading.Tasks.Task.Wait();Don't use Task.Wait. Use Task.WaitSafely() to ensure we avoid deadlocks.

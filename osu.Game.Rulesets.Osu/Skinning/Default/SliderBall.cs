@@ -195,16 +195,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         public void UpdateProgress(double completionProgress)
         {
-            var newPos = drawableSlider.HitObject.CurvePositionAt(completionProgress);
+            Position = drawableSlider.HitObject.CurvePositionAt(completionProgress);
 
-            var diff = lastPosition.HasValue ? lastPosition.Value - newPos : newPos - drawableSlider.HitObject.CurvePositionAt(completionProgress + 0.01f);
-            if (diff == Vector2.Zero)
+            var diff = lastPosition.HasValue ? lastPosition.Value - Position : Position - drawableSlider.HitObject.CurvePositionAt(completionProgress + 0.01f);
+
+            // Ensure the value is substantially high enough to allow for Atan2 to get a valid angle.
+            if (diff.LengthFast < 0.01f)
                 return;
 
-            Position = newPos;
             ball.Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
-
-            lastPosition = newPos;
+            lastPosition = Position;
         }
 
         private class FollowCircleContainer : CircularContainer

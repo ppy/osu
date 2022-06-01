@@ -20,12 +20,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -41,12 +43,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float alpha_when_invalid = 0.3f;
 
-        [CanBeNull]
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private ScoreProcessor scoreProcessor { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
+        [Resolved]
         private GameplayState gameplayState { get; set; }
 
         [CanBeNull]
@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Play.HUD
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
 
         private JudgementResult lastJudgement;
+        private PerformanceCalculator performanceCalculator;
+        private ScoreInfo scoreInfo;
 
         public PerformancePointsCounter()
         {
@@ -70,7 +72,10 @@ namespace osu.Game.Screens.Play.HUD
 
             if (gameplayState != null)
             {
+                performanceCalculator = gameplayState.Ruleset.CreatePerformanceCalculator();
                 clonedMods = gameplayState.Mods.Select(m => m.DeepClone()).ToArray();
+
+                scoreInfo = new ScoreInfo(gameplayState.Score.ScoreInfo.BeatmapInfo, gameplayState.Score.ScoreInfo.Ruleset) { Mods = clonedMods };
 
                 var gameplayWorkingBeatmap = new GameplayWorkingBeatmap(gameplayState.Beatmap);
                 difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, clonedMods, loadCancellationSource.Token)
@@ -120,19 +125,14 @@ namespace osu.Game.Screens.Play.HUD
 
             var attrib = getAttributeAtTime(judgement);
 
-            if (gameplayState == null || attrib == null)
+            if (gameplayState == null || attrib == null || scoreProcessor == null)
             {
                 IsValid = false;
                 return;
             }
 
-            // awkward but we need to make sure the true mods are not passed to PerformanceCalculator as it makes a mess of track applications.
-            var scoreInfo = gameplayState.Score.ScoreInfo.DeepClone();
-            scoreInfo.Mods = clonedMods;
-
-            var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(attrib, scoreInfo);
-
-            Current.Value = (int)Math.Round(calculator?.Calculate().Total ?? 0, MidpointRounding.AwayFromZero);
+            scoreProcessor.PopulateScore(scoreInfo);
+            Current.Value = (int)Math.Round(performanceCalculator?.Calculate(scoreInfo, attrib).Total ?? 0, MidpointRounding.AwayFromZero);
             IsValid = true;
         }
 
@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Play.HUD
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Text = @"pp",
+                            Text = BeatmapsetsStrings.ShowScoreboardHeaderspp,
                             Font = OsuFont.Numeric.With(size: 8),
                             Padding = new MarginPadding { Bottom = 1.5f }, // align baseline better
                         }

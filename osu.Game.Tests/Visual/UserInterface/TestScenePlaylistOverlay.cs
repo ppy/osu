@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("results filtered correctly",
                 () => playlistOverlay.ChildrenOfType<PlaylistItem>()
                                      .Where(item => item.MatchingFilter)
-                                     .All(item => item.FilterTerms.Any(term => term.Contains("10"))));
+                                     .All(item => item.FilterTerms.Any(term => term.ToString().Contains("10"))));
         }
     }
 }

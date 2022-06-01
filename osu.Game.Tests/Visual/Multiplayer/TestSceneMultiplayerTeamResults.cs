@@ -8,11 +8,23 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Tests.Resources;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerTeamResults : ScreenTestScene
     {
+        [Test]
+        public void TestScaling()
+        {
+            // scheduling is needed as scaling the content immediately causes the entire scene to shake badly, for some odd reason.
+            AddSliderStep("scale", 0.5f, 1.6f, 1f, v => Schedule(() =>
+            {
+                Stack.Scale = new Vector2(v);
+                Stack.Size = new Vector2(1f / v);
+            }));
+        }
+
         [TestCase(7483253, 1048576)]
         [TestCase(1048576, 7483253)]
         [TestCase(1048576, 1048576)]
@@ -26,10 +38,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var beatmapInfo = CreateBeatmap(rulesetInfo).BeatmapInfo;
                 var score = TestResources.CreateTestScoreInfo(beatmapInfo);
 
-                SortedDictionary<int, BindableInt> teamScores = new SortedDictionary<int, BindableInt>
+                SortedDictionary<int, BindableLong> teamScores = new SortedDictionary<int, BindableLong>
                 {
-                    { 0, new BindableInt(team1Score) },
-                    { 1, new BindableInt(team2Score) }
+                    { 0, new BindableLong(team1Score) },
+                    { 1, new BindableLong(team2Score) }
                 };
 
                 Stack.Push(screen = new MultiplayerTeamResultsScreen(score, 1, new PlaylistItem(beatmapInfo), teamScores));

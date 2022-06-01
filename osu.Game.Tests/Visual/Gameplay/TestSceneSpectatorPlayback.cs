@@ -20,15 +20,15 @@ using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Tests.Gameplay;
+using osu.Game.Tests.Mods;
 using osu.Game.Tests.Visual.Spectator;
-using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     CachedDependencies = new[]
                     {
                         (typeof(SpectatorClient), (object)(spectatorClient = new TestSpectatorClient())),
-                        (typeof(GameplayState), new GameplayState(new Beatmap(), new OsuRuleset(), Array.Empty<Mod>()))
+                        (typeof(GameplayState), TestGameplayState.Create(new OsuRuleset()))
                     },
                     Children = new Drawable[]
                     {
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             {
                                 new Drawable[]
                                 {
-                                    recordingManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                                    recordingManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                                     {
                                         Recorder = recorder = new TestReplayRecorder
                                         {
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 },
                                 new Drawable[]
                                 {
-                                    playbackManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                                    playbackManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                                     {
                                         Clock = new FramedClock(manualClock),
                                         ReplayInputHandler = replayHandler = new TestFramedReplayInputHandler(replay)

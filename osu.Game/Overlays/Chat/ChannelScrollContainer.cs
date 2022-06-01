@@ -47,6 +47,12 @@ namespace osu.Game.Overlays.Chat
             updateTrackState();
         }
 
+        public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
+        {
+            base.ScrollTo(value, animated, distanceDecay);
+            updateTrackState();
+        }
+
         public new void ScrollIntoView(Drawable d, bool animated = true)
         {
             base.ScrollIntoView(d, animated);

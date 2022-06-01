@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Tests.Visual.Spectator;
 using osu.Game.Users;
@@ -42,7 +43,8 @@ namespace osu.Game.Tests.Visual.Online
                         CachedDependencies = new (Type, object)[]
                         {
                             (typeof(SpectatorClient), spectatorClient),
-                            (typeof(UserLookupCache), lookupCache)
+                            (typeof(UserLookupCache), lookupCache),
+                            (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Purple)),
                         },
                         Child = currentlyPlaying = new CurrentlyPlayingDisplay
                         {

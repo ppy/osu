@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         public int VertexCount => path.Vertices.Count;
 
-        protected readonly Func<float, double> PositionToDistance;
+        protected readonly Func<float, double> PositionToTime;
 
         protected IReadOnlyList<VertexState> VertexStates => vertexStates;
 
@@ -44,9 +44,9 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         [CanBeNull]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
-        protected EditablePath(Func<float, double> positionToDistance)
+        protected EditablePath(Func<float, double> positionToTime)
         {
-            PositionToDistance = positionToDistance;
+            PositionToTime = positionToTime;
 
             Anchor = Anchor.BottomLeft;
         }
@@ -59,13 +59,13 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             while (InternalChildren.Count < path.Vertices.Count)
                 AddInternal(new VertexPiece());
 
-            double distanceToYFactor = -hitObjectContainer.LengthAtTime(hitObject.StartTime, hitObject.StartTime + 1 / hitObject.Velocity);
+            double timeToYFactor = -hitObjectContainer.LengthAtTime(hitObject.StartTime, hitObject.StartTime + 1);
 
             for (int i = 0; i < VertexCount; i++)
             {
                 var piece = (VertexPiece)InternalChildren[i];
                 var vertex = path.Vertices[i];
-                piece.Position = new Vector2(vertex.X, (float)(vertex.Distance * distanceToYFactor));
+                piece.Position = new Vector2(vertex.X, (float)(vertex.Time * timeToYFactor));
                 piece.UpdateFrom(vertexStates[i]);
             }
         }
@@ -73,14 +73,14 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         public void InitializeFromHitObject(JuiceStream hitObject)
         {
             var sliderPath = hitObject.Path;
-            path.ConvertFromSliderPath(sliderPath);
+            path.ConvertFromSliderPath(sliderPath, hitObject.Velocity);
 
             // If the original slider path has non-linear type segments, resample the vertices at nested hit object times to reduce the number of vertices.
             if (sliderPath.ControlPoints.Any(p => p.Type != null && p.Type != PathType.Linear))
             {
                 path.ResampleVertices(hitObject.NestedHitObjects
                                                .Skip(1).TakeWhile(h => !(h is Fruit)) // Only droplets in the first span are used.
-                                               .Select(h => (h.StartTime - hitObject.StartTime) * hitObject.Velocity));
+                                               .Select(h => h.StartTime - hitObject.StartTime));
             }
 
             vertexStates.Clear();
@@ -92,11 +92,26 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         public void UpdateHitObjectFromPath(JuiceStream hitObject)
         {
-            path.ConvertToSliderPath(hitObject.Path, hitObject.LegacyConvertedY);
+            // The SV setting may need to be changed for the current path.
+            var svBindable = hitObject.DifficultyControlPoint.SliderVelocityBindable;
+            double svToVelocityFactor = hitObject.Velocity / svBindable.Value;
+            double requiredVelocity = path.ComputeRequiredVelocity();
+
+            // The value is pre-rounded here because setting it to the bindable will rounded to the nearest value
+            // but it should be always rounded up to satisfy the required minimum velocity condition.
+            //
+            // This is rounded to integers instead of using the precision of the bindable
+            // because it results in a smaller number of non-redundant control points.
+            //
+            // The value is clamped here by the bindable min and max values.
+            // In case the required velocity is too large, the path is not preserved.
+            svBindable.Value = Math.Ceiling(requiredVelocity / svToVelocityFactor);
+
+            path.ConvertToSliderPath(hitObject.Path, hitObject.LegacyConvertedY, hitObject.Velocity);
 
             if (beatSnapProvider == null) return;
 
-            double endTime = hitObject.StartTime + path.Distance / hitObject.Velocity;
+            double endTime = hitObject.StartTime + path.Duration;
             double snappedEndTime = beatSnapProvider.SnapTime(endTime, hitObject.StartTime);
             hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * hitObject.Velocity;
         }
@@ -108,9 +123,9 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
-        protected int AddVertex(double distance, float x)
+        protected int AddVertex(double time, float x)
         {
-            int index = path.InsertVertex(distance);
+            int index = path.InsertVertex(time);
             path.SetVertexPosition(index, x);
             vertexStates.Insert(index, new VertexState());
 
@@ -138,9 +153,9 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             return true;
         }
 
-        protected void MoveSelectedVertices(double distanceDelta, float xDelta)
+        protected void MoveSelectedVertices(double timeDelta, float xDelta)
         {
-            // Because the vertex list may be reordered due to distance change, the state list must be reordered as well.
+            // Because the vertex list may be reordered due to time change, the state list must be reordered as well.
             previousVertexStates.Clear();
             previousVertexStates.AddRange(vertexStates);
 
@@ -152,11 +167,11 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             for (int i = 1; i < vertexCount; i++)
             {
                 var state = previousVertexStates[i];
-                double distance = state.VertexBeforeChange.Distance;
+                double time = state.VertexBeforeChange.Time;
                 if (state.IsSelected)
-                    distance += distanceDelta;
+                    time += timeDelta;
 
-                int newIndex = path.InsertVertex(Math.Max(0, distance));
+                int newIndex = path.InsertVertex(Math.Max(0, time));
                 vertexStates.Insert(newIndex, state);
             }
 

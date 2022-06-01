@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         public new BindableDouble TimeRange => base.TimeRange;
 
+        public readonly BindableBool LockPlayfieldAspect = new BindableBool(true);
+
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
         protected override bool UserScrollSpeedAdjustment => false;
@@ -78,7 +80,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public DrumTouchInputArea CreateDrumTouchInputArea() => new DrumTouchInputArea();
 
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
+        {
+            LockPlayfieldAspect = { BindTarget = LockPlayfieldAspect }
+        };
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 

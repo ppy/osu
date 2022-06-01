@@ -4,11 +4,11 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -17,79 +17,86 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly TestRulesetSelector selector;
+        private BeatmapRulesetSelector selector;
 
-        public TestSceneBeatmapRulesetSelector()
+        [SetUp]
+        public void SetUp() => Schedule(() => Child = selector = new BeatmapRulesetSelector
         {
-            Add(selector = new TestRulesetSelector());
-        }
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            BeatmapSet = new APIBeatmapSet(),
+        });
 
-        [Resolved]
-        private IRulesetStore rulesets { get; set; }
+        [Test]
+        public void TestDisplay()
+        {
+            AddSliderStep("osu", 0, 100, 0, v => updateBeatmaps(0, v));
+            AddSliderStep("taiko", 0, 100, 0, v => updateBeatmaps(1, v));
+            AddSliderStep("fruits", 0, 100, 0, v => updateBeatmaps(2, v));
+            AddSliderStep("mania", 0, 100, 0, v => updateBeatmaps(3, v));
+
+            void updateBeatmaps(int ruleset, int count)
+            {
+                if (selector == null)
+                    return;
+
+                selector.BeatmapSet = new APIBeatmapSet
+                {
+                    Beatmaps = selector.BeatmapSet.Beatmaps
+                                       .Where(b => b.Ruleset.OnlineID != ruleset)
+                                       .Concat(Enumerable.Range(0, count).Select(_ => new APIBeatmap { RulesetID = ruleset }))
+                                       .ToArray(),
+                };
+            }
+        }
 
         [Test]
         public void TestMultipleRulesetsBeatmapSet()
         {
-            var enabledRulesets = rulesets.AvailableRulesets.Skip(1).Take(2);
-
             AddStep("load multiple rulesets beatmapset", () =>
-            {
-                selector.BeatmapSet = new APIBeatmapSet
-                {
-                    Beatmaps = enabledRulesets.Select(r => new APIBeatmap { RulesetID = r.OnlineID }).ToArray()
-                };
-            });
-
-            var tabItems = selector.TabContainer.TabItems;
-            AddAssert("other rulesets disabled", () => tabItems.Except(tabItems.Where(t => enabledRulesets.Any(r => r.Equals(t.Value)))).All(t => !t.Enabled.Value));
-            AddAssert("left-most ruleset selected", () => tabItems.First(t => t.Enabled.Value).Active.Value);
-        }
-
-        [Test]
-        public void TestSingleRulesetBeatmapSet()
-        {
-            var enabledRuleset = rulesets.AvailableRulesets.Last();
-
-            AddStep("load single ruleset beatmapset", () =>
             {
                 selector.BeatmapSet = new APIBeatmapSet
                 {
                     Beatmaps = new[]
                     {
-                        new APIBeatmap
-                        {
-                            RulesetID = enabledRuleset.OnlineID
-                        }
+                        new APIBeatmap { RulesetID = 1 },
+                        new APIBeatmap { RulesetID = 2 },
                     }
                 };
             });
 
-            AddAssert("single ruleset selected", () => selector.SelectedTab.Value.Equals(enabledRuleset));
+            AddAssert("osu disabled", () => !selector.ChildrenOfType<BeatmapRulesetTabItem>().Single(t => t.Value.OnlineID == 0).Enabled.Value);
+            AddAssert("mania disabled", () => !selector.ChildrenOfType<BeatmapRulesetTabItem>().Single(t => t.Value.OnlineID == 3).Enabled.Value);
+
+            AddAssert("taiko selected", () => selector.ChildrenOfType<BeatmapRulesetTabItem>().Single(t => t.Active.Value).Value.OnlineID == 1);
+        }
+
+        [Test]
+        public void TestSingleRulesetBeatmapSet()
+        {
+            AddStep("load single ruleset beatmapset", () =>
+            {
+                selector.BeatmapSet = new APIBeatmapSet
+                {
+                    Beatmaps = new[] { new APIBeatmap { RulesetID = 3 } }
+                };
+            });
+
+            AddAssert("single ruleset selected", () => selector.ChildrenOfType<BeatmapRulesetTabItem>().Single(t => t.Active.Value).Value.OnlineID == 3);
         }
 
         [Test]
         public void TestEmptyBeatmapSet()
         {
             AddStep("load empty beatmapset", () => selector.BeatmapSet = new APIBeatmapSet());
-
-            AddAssert("no ruleset selected", () => selector.SelectedTab == null);
-            AddAssert("all rulesets disabled", () => selector.TabContainer.TabItems.All(t => !t.Enabled.Value));
+            AddAssert("all rulesets disabled", () => selector.ChildrenOfType<BeatmapRulesetTabItem>().All(t => !t.Active.Value && !t.Enabled.Value));
         }
 
         [Test]
         public void TestNullBeatmapSet()
         {
             AddStep("load null beatmapset", () => selector.BeatmapSet = null);
-
-            AddAssert("no ruleset selected", () => selector.SelectedTab == null);
-            AddAssert("all rulesets disabled", () => selector.TabContainer.TabItems.All(t => !t.Enabled.Value));
-        }
-
-        private class TestRulesetSelector : BeatmapRulesetSelector
-        {
-            public new TabItem<RulesetInfo> SelectedTab => base.SelectedTab;
-
-            public new TabFillFlowContainer TabContainer => base.TabContainer;
+            AddAssert("all rulesets disabled", () => selector.ChildrenOfType<BeatmapRulesetTabItem>().All(t => !t.Active.Value && !t.Enabled.Value));
         }
     }
 }

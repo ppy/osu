@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -287,12 +286,14 @@ namespace osu.Game.Screens.Select
                         {
                             TitleLabel = new OsuSpriteText
                             {
+                                Current = { BindTarget = titleBinding },
                                 Font = OsuFont.GetFont(size: 28, italics: true),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
                             },
                             ArtistLabel = new OsuSpriteText
                             {
+                                Current = { BindTarget = artistBinding },
                                 Font = OsuFont.GetFont(size: 17, italics: true),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
@@ -313,9 +314,6 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 };
-
-                titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
-                artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
 
                 addInfoLabels();
             }
@@ -350,12 +348,6 @@ namespace osu.Game.Screens.Select
                     settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
                     settingChangeTracker.SettingChanged += _ => refreshBPMLabel();
                 }, true);
-            }
-
-            private void setMetadata(string source)
-            {
-                ArtistLabel.Text = artistBinding.Value;
-                TitleLabel.Text = string.IsNullOrEmpty(source) ? titleBinding.Value : source + " — " + titleBinding.Value;
             }
 
             private void addInfoLabels()
@@ -423,13 +415,13 @@ namespace osu.Game.Screens.Select
                 foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                     rate = mod.ApplyToRate(0, rate);
 
-                double bpmMax = beatmap.ControlPointInfo.BPMMaximum * rate;
-                double bpmMin = beatmap.ControlPointInfo.BPMMinimum * rate;
-                double mostCommonBPM = 60000 / beatmap.GetMostCommonBeatLength() * rate;
+                int bpmMax = (int)Math.Round(Math.Round(beatmap.ControlPointInfo.BPMMaximum) * rate);
+                int bpmMin = (int)Math.Round(Math.Round(beatmap.ControlPointInfo.BPMMinimum) * rate);
+                int mostCommonBPM = (int)Math.Round(Math.Round(60000 / beatmap.GetMostCommonBeatLength()) * rate);
 
-                string labelText = Precision.AlmostEquals(bpmMin, bpmMax)
-                    ? $"{bpmMin:0}"
-                    : $"{bpmMin:0}-{bpmMax:0} (mostly {mostCommonBPM:0})";
+                string labelText = bpmMin == bpmMax
+                    ? $"{bpmMin}"
+                    : $"{bpmMin}-{bpmMax} (mostly {mostCommonBPM})";
 
                 bpmLabelContainer.Child = new InfoLabel(new BeatmapStatistic
                 {

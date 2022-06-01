@@ -12,9 +12,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -31,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
 
         #region OsuDropdownMenu
 
-        protected class OsuDropdownMenu : DropdownMenu
+        protected class OsuDropdownMenu : DropdownMenu, IKeyBindingHandler<GlobalAction>
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
@@ -184,14 +187,12 @@ namespace osu.Game.Graphics.UserInterface
 
                 protected override void UpdateBackgroundColour()
                 {
-                    if (!IsPreSelected && !IsSelected)
-                    {
-                        Background.FadeOut(600, Easing.OutQuint);
-                        return;
-                    }
-
-                    Background.FadeIn(100, Easing.OutQuint);
                     Background.FadeColour(IsPreSelected ? BackgroundColourHover : BackgroundColourSelected, 100, Easing.OutQuint);
+
+                    if (IsPreSelected || IsSelected)
+                        Background.FadeIn(100, Easing.OutQuint);
+                    else
+                        Background.FadeOut(600, Easing.OutQuint);
                 }
 
                 protected override void UpdateForegroundColour()
@@ -277,6 +278,23 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             #endregion
+
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                if (e.Repeat) return false;
+
+                if (e.Action == GlobalAction.Back)
+                {
+                    State = MenuState.Closed;
+                    return true;
+                }
+
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+            {
+            }
         }
 
         #endregion

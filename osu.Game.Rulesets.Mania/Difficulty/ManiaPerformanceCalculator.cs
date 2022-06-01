@@ -13,10 +13,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
-        protected new ManiaDifficultyAttributes Attributes => (ManiaDifficultyAttributes)base.Attributes;
-
-        private Mod[] mods;
-
         // Score after being scaled by non-difficulty-increasing mods
         private double scaledScore;
 
@@ -27,39 +23,40 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public ManiaPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
-            : base(ruleset, attributes, score)
+        public ManiaPerformanceCalculator()
+            : base(new ManiaRuleset())
         {
         }
 
-        public override PerformanceAttributes Calculate()
+        protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
         {
-            mods = Score.Mods;
-            scaledScore = Score.TotalScore;
-            countPerfect = Score.Statistics.GetValueOrDefault(HitResult.Perfect);
-            countGreat = Score.Statistics.GetValueOrDefault(HitResult.Great);
-            countGood = Score.Statistics.GetValueOrDefault(HitResult.Good);
-            countOk = Score.Statistics.GetValueOrDefault(HitResult.Ok);
-            countMeh = Score.Statistics.GetValueOrDefault(HitResult.Meh);
-            countMiss = Score.Statistics.GetValueOrDefault(HitResult.Miss);
+            var maniaAttributes = (ManiaDifficultyAttributes)attributes;
 
-            if (Attributes.ScoreMultiplier > 0)
+            scaledScore = score.TotalScore;
+            countPerfect = score.Statistics.GetValueOrDefault(HitResult.Perfect);
+            countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
+            countGood = score.Statistics.GetValueOrDefault(HitResult.Good);
+            countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
+            countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
+            countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+
+            if (maniaAttributes.ScoreMultiplier > 0)
             {
                 // Scale score up, so it's comparable to other keymods
-                scaledScore *= 1.0 / Attributes.ScoreMultiplier;
+                scaledScore *= 1.0 / maniaAttributes.ScoreMultiplier;
             }
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
             // The specific number has no intrinsic meaning and can be adjusted as needed.
             double multiplier = 0.8;
 
-            if (mods.Any(m => m is ModNoFail))
+            if (score.Mods.Any(m => m is ModNoFail))
                 multiplier *= 0.9;
-            if (mods.Any(m => m is ModEasy))
+            if (score.Mods.Any(m => m is ModEasy))
                 multiplier *= 0.5;
 
-            double difficultyValue = computeDifficultyValue();
-            double accValue = computeAccuracyValue(difficultyValue);
+            double difficultyValue = computeDifficultyValue(maniaAttributes);
+            double accValue = computeAccuracyValue(difficultyValue, maniaAttributes);
             double totalValue =
                 Math.Pow(
                     Math.Pow(difficultyValue, 1.1) +
@@ -75,9 +72,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             };
         }
 
-        private double computeDifficultyValue()
+        private double computeDifficultyValue(ManiaDifficultyAttributes attributes)
         {
-            double difficultyValue = Math.Pow(5 * Math.Max(1, Attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
+            double difficultyValue = Math.Pow(5 * Math.Max(1, attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
 
             difficultyValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
 
@@ -97,14 +94,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return difficultyValue;
         }
 
-        private double computeAccuracyValue(double difficultyValue)
+        private double computeAccuracyValue(double difficultyValue, ManiaDifficultyAttributes attributes)
         {
-            if (Attributes.GreatHitWindow <= 0)
+            if (attributes.GreatHitWindow <= 0)
                 return 0;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accuracyValue = Math.Max(0.0, 0.2 - (Attributes.GreatHitWindow - 34) * 0.006667)
+            double accuracyValue = Math.Max(0.0, 0.2 - (attributes.GreatHitWindow - 34) * 0.006667)
                                    * difficultyValue
                                    * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
 

@@ -329,7 +329,7 @@ namespace osu.Game.Overlays.Volume
 
             if (isPrecise)
             {
-                scrollAccumulation += delta * adjust_step * 0.1;
+                scrollAccumulation += delta * adjust_step;
 
                 while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
                 {
@@ -372,12 +372,12 @@ namespace osu.Game.Overlays.Volume
 
             switch (e.Action)
             {
-                case GlobalAction.SelectPrevious:
+                case GlobalAction.SelectPreviousGroup:
                     State = SelectionState.Selected;
                     adjust(1, false);
                     return true;
 
-                case GlobalAction.SelectNext:
+                case GlobalAction.SelectNextGroup:
                     State = SelectionState.Selected;
                     adjust(-1, false);
                     return true;

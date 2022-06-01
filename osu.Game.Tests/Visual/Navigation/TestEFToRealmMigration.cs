@@ -1,9 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using NUnit.Framework;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -23,9 +24,26 @@ namespace osu.Game.Tests.Visual.Navigation
             if (isDisposing)
                 return;
 
-            using (var outStream = LocalStorage.GetStream(DatabaseContextFactory.DATABASE_NAME, FileAccess.Write, FileMode.Create))
+            using (var outStream = LocalStorage.CreateFileSafely(DatabaseContextFactory.DATABASE_NAME))
             using (var stream = TestResources.OpenResource(DatabaseContextFactory.DATABASE_NAME))
                 stream.CopyTo(outStream);
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && RuntimeInformation.OSArchitecture == Architecture.Arm64)
+                Assert.Ignore("EF-to-realm migrations are not supported on M1 ARM architectures.");
+        }
+
+        public override void SetUpSteps()
+        {
+            // base SetUpSteps are executed before the above SetUp, therefore early-return to allow ignoring test properly.
+            // attempting to ignore here would yield a TargetInvocationException instead.
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && RuntimeInformation.OSArchitecture == Architecture.Arm64)
+                return;
+
+            base.SetUpSteps();
         }
 
         [Test]

@@ -21,7 +21,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private uint scheduledPopOutCurrentId;
 
-        private const double pop_out_duration = 150;
+        private const double big_pop_out_duration = 300;
+
+        private const double small_pop_out_duration = 100;
 
         private const double fade_out_duration = 100;
 
@@ -65,32 +67,28 @@ namespace osu.Game.Screens.Play.HUD
 
             Margin = new MarginPadding(10);
 
-            Scale = new Vector2(1.2f);
+            Scale = new Vector2(1.28f);
 
             InternalChildren = new[]
             {
                 counterContainer = new Container
                 {
-                    AutoSizeAxes = Axes.Both,
                     AlwaysPresent = true,
                     Children = new[]
                     {
                         popOutCount = new LegacySpriteText(LegacyFont.Combo)
                         {
                             Alpha = 0,
-                            Margin = new MarginPadding(0.05f),
                             Blending = BlendingParameters.Additive,
                             Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
                             BypassAutoSizeAxes = Axes.Both,
                         },
                         displayedCountSpriteText = new LegacySpriteText(LegacyFont.Combo)
                         {
-                            // Initial text and AlwaysPresent allow the counter to have a size before it first displays a combo.
-                            // This is useful for display in the skin editor.
-                            Text = formatCount(0),
-                            AlwaysPresent = true,
                             Alpha = 0,
+                            AlwaysPresent = true,
+                            Anchor = Anchor.BottomLeft,
+                            BypassAutoSizeAxes = Axes.Both,
                         },
                     }
                 }
@@ -130,8 +128,25 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             ((IHasText)displayedCountSpriteText).Text = formatCount(Current.Value);
+            ((IHasText)popOutCount).Text = formatCount(Current.Value);
 
             Current.BindValueChanged(combo => updateCount(combo.NewValue == 0), true);
+
+            updateLayout();
+        }
+
+        private void updateLayout()
+        {
+            const float font_height_ratio = 0.625f;
+            const float vertical_offset = 9;
+
+            displayedCountSpriteText.OriginPosition = new Vector2(0, font_height_ratio * displayedCountSpriteText.Height + vertical_offset);
+            displayedCountSpriteText.Position = new Vector2(0, -(1 - font_height_ratio) * displayedCountSpriteText.Height + vertical_offset);
+
+            popOutCount.OriginPosition = new Vector2(3, font_height_ratio * popOutCount.Height + vertical_offset); // In stable, the bigger pop out scales a bit to the left
+            popOutCount.Position = new Vector2(0, -(1 - font_height_ratio) * popOutCount.Height + vertical_offset);
+
+            counterContainer.Size = displayedCountSpriteText.Size;
         }
 
         private void updateCount(bool rolling)
@@ -164,18 +179,18 @@ namespace osu.Game.Screens.Play.HUD
         {
             ((IHasText)popOutCount).Text = formatCount(newValue);
 
-            popOutCount.ScaleTo(1.6f);
-            popOutCount.FadeTo(0.75f);
-            popOutCount.MoveTo(Vector2.Zero);
+            popOutCount.ScaleTo(1.56f)
+                       .ScaleTo(1, big_pop_out_duration);
 
-            popOutCount.ScaleTo(1, pop_out_duration);
-            popOutCount.FadeOut(pop_out_duration);
-            popOutCount.MoveTo(displayedCountSpriteText.Position, pop_out_duration);
+            popOutCount.FadeTo(0.6f)
+                       .FadeOut(big_pop_out_duration);
         }
 
         private void transformNoPopOut(int newValue)
         {
             ((IHasText)displayedCountSpriteText).Text = formatCount(newValue);
+
+            counterContainer.Size = displayedCountSpriteText.Size;
 
             displayedCountSpriteText.ScaleTo(1);
         }
@@ -183,8 +198,12 @@ namespace osu.Game.Screens.Play.HUD
         private void transformPopOutSmall(int newValue)
         {
             ((IHasText)displayedCountSpriteText).Text = formatCount(newValue);
-            displayedCountSpriteText.ScaleTo(1.1f);
-            displayedCountSpriteText.ScaleTo(1, pop_out_duration);
+
+            counterContainer.Size = displayedCountSpriteText.Size;
+
+            displayedCountSpriteText.ScaleTo(1).Then()
+                                    .ScaleTo(1.1f, small_pop_out_duration / 2, Easing.In).Then()
+                                    .ScaleTo(1, small_pop_out_duration / 2, Easing.Out);
         }
 
         private void scheduledPopOutSmall(uint id)
@@ -212,7 +231,7 @@ namespace osu.Game.Screens.Play.HUD
             Scheduler.AddDelayed(delegate
             {
                 scheduledPopOutSmall(newTaskId);
-            }, pop_out_duration);
+            }, big_pop_out_duration - 140);
         }
 
         private void onCountRolling(int currentValue, int newValue)

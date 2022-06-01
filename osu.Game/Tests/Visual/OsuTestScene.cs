@@ -115,11 +115,13 @@ namespace osu.Game.Tests.Visual
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            headlessHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
+            var host = parent.Get<GameHost>();
+
+            headlessHostStorage = (host as HeadlessGameHost)?.Storage;
 
             Resources = parent.Get<OsuGameBase>().Resources;
 
-            realm = new Lazy<RealmAccess>(() => new RealmAccess(LocalStorage, "client"));
+            realm = new Lazy<RealmAccess>(() => new RealmAccess(LocalStorage, OsuGameBase.CLIENT_DATABASE_FILENAME, host.UpdateThread));
 
             RecycleLocalStorage(false);
 
@@ -370,6 +372,13 @@ namespace osu.Game.Tests.Visual
             }
 
             protected override Track GetBeatmapTrack() => track;
+
+            public override bool TryTransferTrack(WorkingBeatmap target)
+            {
+                // Our track comes from a local track store that's disposed on finalizer,
+                // therefore it's unsafe to transfer it to another working beatmap.
+                return false;
+            }
 
             public class TrackVirtualStore : AudioCollectionManager<Track>, ITrackStore
             {

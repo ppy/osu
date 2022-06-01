@@ -7,6 +7,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -48,15 +49,15 @@ namespace osu.Game.Screens.Edit.Setup
 
                 creatorTextBox = createTextBox<LabelledTextBox>("Creator", metadata.Author.Username),
                 difficultyTextBox = createTextBox<LabelledTextBox>("Difficulty Name", Beatmap.BeatmapInfo.DifficultyName),
-                sourceTextBox = createTextBox<LabelledTextBox>("Source", metadata.Source),
-                tagsTextBox = createTextBox<LabelledTextBox>("Tags", metadata.Tags)
+                sourceTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoSource, metadata.Source),
+                tagsTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoTags, metadata.Tags)
             };
 
             foreach (var item in Children.OfType<LabelledTextBox>())
                 item.OnCommit += onCommit;
         }
 
-        private TTextBox createTextBox<TTextBox>(string label, string initialValue)
+        private TTextBox createTextBox<TTextBox>(LocalisableString label, string initialValue)
             where TTextBox : LabelledTextBox, new()
             => new TTextBox
             {

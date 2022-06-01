@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// <summary>
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
         /// </summary>
-        public const float DEFAULT_HEIGHT = 212;
+        public const float DEFAULT_HEIGHT = 200;
 
         private Container<HitExplosion> hitExplosionContainer;
         private Container<KiaiHitExplosion> kiaiExplosionContainer;

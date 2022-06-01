@@ -31,7 +31,7 @@ namespace osu.Game.Updater
         private OsuGameBase game { get; set; }
 
         [Resolved]
-        protected NotificationOverlay Notifications { get; private set; }
+        protected INotificationOverlay Notifications { get; private set; }
 
         protected override void LoadComplete()
         {
@@ -94,7 +94,7 @@ namespace osu.Game.Updater
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChangelogOverlay changelog, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours, ChangelogOverlay changelog, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.CheckSquare;
                 IconBackground.Colour = colours.BlueDark;
