@@ -278,11 +278,15 @@ namespace osu.Game.Screens.Edit.Timing
                 using (BeginDelayedSequence(beatLength / 2))
                 {
                     stick.FlashColour(overlayColourProvider.Content1, beatLength, Easing.OutQuint);
-                    Schedule(() =>
+
+                    if (clunk != null)
                     {
-                        clunk.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
-                        clunk?.Play();
-                    });
+                        Schedule(() =>
+                        {
+                            clunk.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
+                            clunk.Play();
+                        });
+                    }
                 }
             }
         }
