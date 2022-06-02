@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
@@ -74,10 +75,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastLastObject, HitObject lastObject, double clockRate)
-            : base(hitObject, lastObject, clockRate)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int position)
+            : base(hitObject, lastObject, clockRate, objects, position)
         {
-            this.lastLastObject = (OsuHitObject)lastLastObject;
+            lastLastObject = (OsuHitObject)Previous(1)?.BaseObject;
             this.lastObject = (OsuHitObject)lastObject;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.

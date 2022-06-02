@@ -25,7 +25,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplier => 0.05;
         private double strainDecayBase => 0.15;
         protected override double DecayWeight => 1.0;
-        protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
 
         private readonly bool hidden;
 
@@ -51,9 +50,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             OsuDifficultyHitObject lastObj = osuCurrent;
 
             // This is iterating backwards in time from the current object.
-            for (int i = 0; i < Previous.Count; i++)
+            for (int i = 0; i < Math.Min(current.Position, 10); i++)
             {
-                var currentObj = (OsuDifficultyHitObject)Previous[i];
+                var currentObj = (OsuDifficultyHitObject)current.Previous(i);
                 var currentHitObject = (OsuHitObject)(currentObj.BaseObject);
 
                 if (!(currentObj.BaseObject is Spinner))
@@ -89,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
-        protected override double CalculateInitialStrain(double time) => currentStrain * strainDecay(time - Previous[0].StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
