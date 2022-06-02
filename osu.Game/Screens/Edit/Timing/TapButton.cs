@@ -15,18 +15,21 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class TapButton : CircularContainer
+    internal class TapButton : CircularContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float SIZE = 140;
 
@@ -56,6 +59,8 @@ namespace osu.Game.Screens.Edit.Timing
         private ScheduledDelegate? resetDelegate;
 
         private const int light_count = 6;
+
+        private readonly List<double> tapTimings = new List<double>();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -257,7 +262,23 @@ namespace osu.Game.Screens.Edit.Timing
             base.OnMouseUp(e);
         }
 
-        private readonly List<double> tapTimings = new List<double>();
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Action == GlobalAction.EditorTapForBPM && !e.Repeat)
+            {
+                // Direct through mouse handling to achieve animation
+                OnMouseDown(new MouseDownEvent(e.CurrentState, MouseButton.Left));
+                return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+            if (e.Action == GlobalAction.EditorTapForBPM)
+                OnMouseUp(new MouseUpEvent(e.CurrentState, MouseButton.Left));
+        }
 
         private void reset()
         {
