@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Chat
     {
         protected virtual float Spacing => 15;
 
-        protected virtual float DateWidth => 225;
+        protected virtual float DateWidth => 205;
 
         protected virtual float LineHeight => 2;
 

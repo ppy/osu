@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float TimestampWidth => 60;
 
-        protected virtual float UsernameWidth => 150;
+        protected virtual float UsernameWidth => 130;
 
         private Color4 usernameColour;
 
@@ -73,6 +73,9 @@ namespace osu.Game.Overlays.Chat
 
         [Resolved]
         private OsuColour colours { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private OverlayColourProvider colourProvider { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -119,6 +122,7 @@ namespace osu.Game.Overlays.Chat
                                             Origin = Anchor.CentreLeft,
                                             Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
                                             Width = TimestampWidth,
+                                            Colour = colourProvider?.Background1 ?? Colour4.White,
                                         },
                                         Drawable.Empty(),
                                         new MessageSender(message.Sender)
@@ -137,16 +141,14 @@ namespace osu.Game.Overlays.Chat
                             ContentFlow = new LinkFlowContainer(t =>
                             {
                                 t.Shadow = false;
+                                t.Font = t.Font.With(size: TextSize);
+                                t.Colour = colourProvider?.Content1 ?? Colour4.White;
+
+                                if (Message.IsAction && senderHasColour)
+                                    t.Colour = usernameColour;
 
                                 if (Message.IsAction)
-                                {
                                     t.Font = OsuFont.GetFont(italics: true);
-
-                                    if (senderHasColour)
-                                        t.Colour = Color4Extensions.FromHex(message.Sender.Colour);
-                                }
-
-                                t.Font = t.Font.With(size: TextSize);
                             })
                             {
                                 AutoSizeAxes = Axes.Y,
