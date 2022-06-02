@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.ProcessInternal(hitObject);
+                    skill.Process(hitObject);
                 }
             }
 
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.ProcessInternal(hitObject);
+                    skill.Process(hitObject);
                 }
 
                 attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
