@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -21,17 +23,17 @@ namespace osu.Game.Screens.Edit.Timing
     public class TapTimingControl : CompositeDrawable
     {
         [Resolved]
-        private EditorClock editorClock { get; set; }
+        private EditorClock editorClock { get; set; } = null!;
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
         [Resolved]
-        private Bindable<ControlPointGroup> selectedGroup { get; set; }
+        private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
 
         private readonly BindableBool isHandlingTapping = new BindableBool();
 
-        private MetronomeDisplay metronome;
+        private MetronomeDisplay metronome = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
@@ -141,14 +143,14 @@ namespace osu.Game.Screens.Edit.Timing
                                         CornerRadius = 15,
                                         Children = new Drawable[]
                                         {
-                                            new LessRoundedButton(FontAwesome.Solid.Stop, Anchor.TopLeft)
+                                            new InlineButton(FontAwesome.Solid.Stop, Anchor.TopLeft)
                                             {
                                                 BackgroundColour = colourProvider.Background1,
                                                 RelativeSizeAxes = Axes.Both,
                                                 Height = 0.49f,
                                                 Action = reset,
                                             },
-                                            new LessRoundedButton(FontAwesome.Solid.Play, Anchor.BottomLeft)
+                                            new InlineButton(FontAwesome.Solid.Play, Anchor.BottomLeft)
                                             {
                                                 BackgroundColour = colourProvider.Background1,
                                                 RelativeSizeAxes = Axes.Both,
@@ -181,21 +183,62 @@ namespace osu.Game.Screens.Edit.Timing
             }, true);
         }
 
-        private class LessRoundedButton : OsuButton
+        private void start()
+        {
+            editorClock.Seek(selectedGroup.Value.Time);
+            editorClock.Start();
+        }
+
+        private void reset()
+        {
+            editorClock.Stop();
+            editorClock.Seek(selectedGroup.Value.Time);
+        }
+
+        private void adjustOffset(double adjust)
+        {
+            // VERY TEMPORARY
+            var currentGroupItems = selectedGroup.Value.ControlPoints.ToArray();
+
+            beatmap.ControlPointInfo.RemoveGroup(selectedGroup.Value);
+
+            double newOffset = selectedGroup.Value.Time + adjust;
+
+            foreach (var cp in currentGroupItems)
+                beatmap.ControlPointInfo.Add(newOffset, cp);
+
+            // the control point might not necessarily exist yet, if currentGroupItems was empty.
+            selectedGroup.Value = beatmap.ControlPointInfo.GroupAt(newOffset, true);
+
+            if (!editorClock.IsRunning)
+                editorClock.Seek(newOffset);
+        }
+
+        private void adjustBpm(double adjust)
+        {
+            var timing = selectedGroup.Value.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
+
+            if (timing == null)
+                return;
+
+            timing.BeatLength = 60000 / (timing.BPM + adjust);
+        }
+
+        private class InlineButton : OsuButton
         {
             private readonly IconUsage icon;
             private readonly Anchor anchor;
 
-            private SpriteIcon spriteIcon;
+            private SpriteIcon spriteIcon = null!;
 
-            public LessRoundedButton(IconUsage icon, Anchor anchor)
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            public InlineButton(IconUsage icon, Anchor anchor)
             {
                 this.icon = icon;
                 this.anchor = anchor;
             }
-
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; }
 
             protected override void LoadComplete()
             {
@@ -241,47 +284,6 @@ namespace osu.Game.Screens.Edit.Timing
                 spriteIcon.FadeColour(colourProvider.Background1, 200, Easing.OutQuint);
                 base.OnHoverLost(e);
             }
-        }
-
-        private void start()
-        {
-            editorClock.Seek(selectedGroup.Value.Time);
-            editorClock.Start();
-        }
-
-        private void adjustOffset(double adjust)
-        {
-            // VERY TEMPORARY
-            var currentGroupItems = selectedGroup.Value.ControlPoints.ToArray();
-
-            beatmap.ControlPointInfo.RemoveGroup(selectedGroup.Value);
-
-            double newOffset = selectedGroup.Value.Time + adjust;
-
-            foreach (var cp in currentGroupItems)
-                beatmap.ControlPointInfo.Add(newOffset, cp);
-
-            // the control point might not necessarily exist yet, if currentGroupItems was empty.
-            selectedGroup.Value = beatmap.ControlPointInfo.GroupAt(newOffset, true);
-
-            if (!editorClock.IsRunning)
-                editorClock.Seek(newOffset);
-        }
-
-        private void adjustBpm(double adjust)
-        {
-            var timing = selectedGroup.Value.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
-
-            if (timing == null)
-                return;
-
-            timing.BeatLength = 60000 / (timing.BPM + adjust);
-        }
-
-        private void reset()
-        {
-            editorClock.Stop();
-            editorClock.Seek(selectedGroup.Value.Time);
         }
     }
 }
