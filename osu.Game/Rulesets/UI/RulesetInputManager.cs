@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.UI
     {
         public readonly KeyBindingContainer<T> KeyBindingContainer;
 
-        private readonly Ruleset ruleset;
-
         [Resolved(CanBeNull = true)]
         private ScoreProcessor scoreProcessor { get; set; }
 
@@ -57,8 +55,6 @@ namespace osu.Game.Rulesets.UI
 
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
-            this.ruleset = ruleset.CreateInstance();
-
             InternalChild = KeyBindingContainer =
                 CreateKeyBindingContainer(ruleset, variant, unique)
                     .WithChild(content = new Container { RelativeSizeAxes = Axes.Both });
@@ -85,7 +81,7 @@ namespace osu.Game.Rulesets.UI
                     break;
 
                 case ReplayStatisticsFrameEvent statisticsStateChangeEvent:
-                    scoreProcessor?.ResetFromReplayFrame(ruleset, statisticsStateChangeEvent.Frame);
+                    scoreProcessor?.ResetFromReplayFrame(statisticsStateChangeEvent.Frame);
                     break;
 
                 default:
