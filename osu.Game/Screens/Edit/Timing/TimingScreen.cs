@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Edit.Timing
 
             private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
+            private RoundedButton addButton;
+
             [Resolved]
             private EditorClock clock { get; set; }
 
@@ -105,9 +107,8 @@ namespace osu.Game.Screens.Edit.Timing
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
                             },
-                            new RoundedButton
+                            addButton = new RoundedButton
                             {
-                                Text = "+ Add at current time",
                                 Action = addNew,
                                 Size = new Vector2(160, 30),
                                 Anchor = Anchor.BottomRight,
@@ -122,7 +123,14 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 base.LoadComplete();
 
-                selectedGroup.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
+                selectedGroup.BindValueChanged(selected =>
+                {
+                    deleteButton.Enabled.Value = selected.NewValue != null;
+
+                    addButton.Text = selected.NewValue != null
+                        ? "+ Clone to current time"
+                        : "+ Add at current time";
+                }, true);
 
                 controlPointGroups.BindTo(Beatmap.ControlPointInfo.Groups);
                 controlPointGroups.BindCollectionChanged((sender, args) =>
@@ -137,6 +145,8 @@ namespace osu.Game.Screens.Edit.Timing
                 base.Update();
 
                 trackActivePoint();
+
+                addButton.Enabled.Value = clock.CurrentTimeAccurate != selectedGroup.Value?.Time;
             }
 
             /// <summary>
