@@ -18,6 +18,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -40,6 +41,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved(canBeNull: true)]
         private Bindable<ControlPointGroup>? selectedGroup { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IBeatSyncProvider? beatSyncSource { get; set; }
 
         private Circle hoverLayer = null!;
 
@@ -299,7 +303,10 @@ namespace osu.Game.Screens.Edit.Timing
                 return;
             }
 
-            double bpm = Math.Round(60000 / ((tapTimings.Last() - tapTimings.Skip(initial_taps_to_ignore).First()) / (tapTimings.Count - initial_taps_to_ignore - 1)));
+            double averageBeatLength = (tapTimings.Last() - tapTimings.Skip(initial_taps_to_ignore).First()) / (tapTimings.Count - initial_taps_to_ignore - 1);
+            double clockRate = beatSyncSource?.Clock?.Rate ?? 1;
+
+            double bpm = Math.Round(60000 / averageBeatLength / clockRate);
 
             bpmText.Text = $"{bpm} BPM";
 
