@@ -8,6 +8,9 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
+    /// <summary>
+    /// Stores the required scoring data that fulfils the minimum requirements for a <see cref="ScoreProcessor"/> to calculate score.
+    /// </summary>
     [MessagePackObject]
     public struct ScoringValues
     {
