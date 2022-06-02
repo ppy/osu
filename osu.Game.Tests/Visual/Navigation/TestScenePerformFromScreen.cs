@@ -86,9 +86,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestOverlaysAlwaysClosed()
         {
-            ChatOverlayV2 chat = null;
+            ChatOverlay chat = null;
             AddUntilStep("is at menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
-            AddUntilStep("wait for chat load", () => (chat = Game.ChildrenOfType<ChatOverlayV2>().SingleOrDefault()) != null);
+            AddUntilStep("wait for chat load", () => (chat = Game.ChildrenOfType<ChatOverlay>().SingleOrDefault()) != null);
 
             AddStep("show chat", () => InputManager.Key(Key.F8));
 
