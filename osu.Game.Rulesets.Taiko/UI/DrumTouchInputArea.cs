@@ -24,8 +24,9 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         // The percent of the drum that extends past the bottom of the screen (set to 0.0f to show the full drum)
         private const float offscreen_percent = 0.35f;
-        private InputDrum touchInputDrum;
-        private Circle drumBackground;
+
+        private readonly InputDrum touchInputDrum;
+        private readonly Circle drumBackground;
 
         private KeyBindingContainer<TaikoAction> keyBindingContainer;
 
@@ -33,9 +34,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private TaikoAction mouseAction;
 
         // A map of (Finger Index OnTouchDown -> Which Taiko action was pressed), so that the corresponding action can be released OnTouchUp is released even if the touch position moved
-        private Dictionary<TouchSource, TaikoAction> touchActions = new Dictionary<TouchSource, TaikoAction>(Enum.GetNames(typeof(TouchSource)).Length);
+        private readonly Dictionary<TouchSource, TaikoAction> touchActions = new Dictionary<TouchSource, TaikoAction>(Enum.GetNames(typeof(TouchSource)).Length);
 
-        private Container visibleComponents;
+        private readonly Container visibleComponents;
 
         public DrumTouchInputArea()
         {
@@ -43,7 +44,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             RelativePositionAxes = Axes.Both;
             Children = new Drawable[]
             {
-                visibleComponents = new Container() {
+                visibleComponents = new Container
+                {
                     Alpha = 0.0f,
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
@@ -51,7 +53,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Origin = Anchor.BottomCentre,
                     Children = new Drawable[]
                     {
-                        drumBackground = new Circle() {
+                        drumBackground = new Circle
+                        {
                             RelativeSizeAxes = Axes.Both,
                             RelativePositionAxes = Axes.Both,
                             Anchor = Anchor.Centre,
@@ -59,7 +62,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                             FillMode = FillMode.Fit,
                             Alpha = 0.9f,
                         },
-                        touchInputDrum = new InputDrum() {
+                        touchInputDrum = new InputDrum
+                        {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -135,9 +139,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             bool centreHit = inputIsCenterHit(inputPosition);
             bool leftSide = inputIsOnLeftSide(inputPosition);
 
-            return centreHit ?
-                (leftSide ? TaikoAction.LeftCentre : TaikoAction.RightCentre) :
-                (leftSide ? TaikoAction.LeftRim : TaikoAction.RightRim);
+            return centreHit ? (leftSide ? TaikoAction.LeftCentre : TaikoAction.RightCentre) : (leftSide ? TaikoAction.LeftRim : TaikoAction.RightRim);
         }
 
         private bool inputIsOnLeftSide(Vector2 inputPosition)
