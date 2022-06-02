@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -67,7 +68,9 @@ namespace osu.Game.Screens.Edit.Setup
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            game.UnregisterImportHandler(this);
+
+            if (game.IsNotNull())
+                game.UnregisterImportHandler(this);
         }
 
         public override Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile);
