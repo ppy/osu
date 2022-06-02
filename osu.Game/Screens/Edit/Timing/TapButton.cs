@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private const int initial_taps_to_ignore = 4;
 
-        private const int max_taps_to_consider = 16;
+        private const int max_taps_to_consider = 128;
 
         private const double transition_length = 500;
 
