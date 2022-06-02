@@ -18,7 +18,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     /// </summary>
     internal class LegacyInputDrum : Container
     {
-        public float CentreSize = 0.5f;
         private LegacyHalfDrum left;
         private LegacyHalfDrum right;
         private Container content;

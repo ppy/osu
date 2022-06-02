@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// An overlay that captures and displays Taiko mouse and touch input.
     /// The boundaries of this overlay defines the interactable area for touch input.
-    /// A secondary InputDrum is attached by this overlay, which defines the circulary boundary which distinguishes "centre" from "rim" hits, and also displays input.
+    /// A secondary InputDrum is attached by this overlay, which defines the circular boundary which distinguishes "centre" from "rim" hits, and also displays input.
     /// </summary>
     public class DrumTouchInputArea : Container
     {
