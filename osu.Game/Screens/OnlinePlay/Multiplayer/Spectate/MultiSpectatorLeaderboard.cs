@@ -20,6 +20,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (!UserScores.TryGetValue(userId, out var data))
                 throw new ArgumentException(@"Provided user is not tracked by this leaderboard", nameof(userId));
 
+            data.ScoreProcessor.ProcessCustomClock = false;
             data.ScoreProcessor.Clock = new FramedClock(clock);
         }
 
