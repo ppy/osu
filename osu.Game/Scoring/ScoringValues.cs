@@ -8,6 +8,9 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
+    /// <summary>
+    /// Stores the required scoring data that fulfils the minimum requirements for a <see cref="ScoreProcessor"/> to calculate score.
+    /// </summary>
     [MessagePackObject]
     public struct ScoringValues
     {
@@ -33,6 +36,6 @@ namespace osu.Game.Scoring
         /// The count of "basic" <see cref="HitObject"/>s. See: <see cref="HitResultExtensions.IsBasic"/>.
         /// </summary>
         [Key(3)]
-        public int HitObjects;
+        public int CountBasicHitObjects;
     }
 }
