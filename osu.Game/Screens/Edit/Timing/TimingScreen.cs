@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -130,6 +131,12 @@ namespace osu.Game.Screens.Edit.Timing
                     table.ControlGroups = controlPointGroups;
                     changeHandler?.SaveState();
                 }, true);
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                selectedGroup.Value = null;
+                return true;
             }
 
             protected override void Update()
