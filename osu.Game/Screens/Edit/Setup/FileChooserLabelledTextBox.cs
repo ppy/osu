@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,10 +29,10 @@ namespace osu.Game.Screens.Edit.Setup
 
         public IEnumerable<string> HandledExtensions => handledExtensions;
 
-        private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
+        private readonly Bindable<FileInfo?> currentFile = new Bindable<FileInfo?>();
 
         [Resolved]
-        private OsuGameBase game { get; set; }
+        private OsuGameBase game { get; set; } = null!;
 
         public FileChooserLabelledTextBox(params string[] handledExtensions)
         {
@@ -45,7 +47,7 @@ namespace osu.Game.Screens.Edit.Setup
             currentFile.BindValueChanged(onFileSelected);
         }
 
-        private void onFileSelected(ValueChangedEvent<FileInfo> file)
+        private void onFileSelected(ValueChangedEvent<FileInfo?> file)
         {
             if (file.NewValue == null)
                 return;
@@ -72,7 +74,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         private class FileChooserPopover : OsuPopover
         {
-            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo> currentFile)
+            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> currentFile)
             {
                 Child = new Container
                 {
