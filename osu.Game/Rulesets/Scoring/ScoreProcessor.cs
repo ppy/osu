@@ -93,7 +93,18 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Scoring values for a perfect play.
         /// </summary>
-        public ScoringValues MaximumScoringValues { get; private set; }
+        public ScoringValues MaximumScoringValues
+        {
+            get
+            {
+                if (!beatmapApplied)
+                    throw new InvalidOperationException($"Cannot access maximum scoring values before calling {nameof(ApplyBeatmap)}.");
+
+                return maximumScoringValues;
+            }
+        }
+
+        private ScoringValues maximumScoringValues;
 
         /// <summary>
         /// Scoring values for the current play assuming all perfect hits.
@@ -255,7 +266,7 @@ namespace osu.Game.Rulesets.Scoring
         private void updateScore()
         {
             Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
-            TotalScore.Value = ComputeScore(Mode.Value, currentScoringValues, MaximumScoringValues);
+            TotalScore.Value = ComputeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
 
         /// <summary>
@@ -406,7 +417,7 @@ namespace osu.Game.Rulesets.Scoring
             lastHitObject = null;
 
             if (storeResults)
-                MaximumScoringValues = currentScoringValues;
+                maximumScoringValues = currentScoringValues;
 
             currentScoringValues = default;
             currentMaximumScoringValues = default;
