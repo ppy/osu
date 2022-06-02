@@ -32,10 +32,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     { PLAYER_2_ID, new ManualClock() }
                 };
 
-                foreach ((int userId, var _) in clocks)
+                foreach ((int userId, _) in clocks)
                 {
                     SpectatorClient.SendStartPlay(userId, 0);
-                    OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = userId });
+                    OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = userId }, true);
                 }
             });
 
