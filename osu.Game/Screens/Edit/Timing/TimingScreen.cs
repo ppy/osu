@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -139,6 +140,8 @@ namespace osu.Game.Screens.Edit.Timing
                 trackActivePoint();
             }
 
+            private Type trackedType;
+
             /// <summary>
             /// Given the user has selected a control point group, we want to track any group which is
             /// active at the current point in time which matches the type the user has selected.
@@ -149,16 +152,27 @@ namespace osu.Game.Screens.Edit.Timing
             private void trackActivePoint()
             {
                 // For simplicity only match on the first type of the active control point.
-                var selectedPointType = selectedGroup.Value?.ControlPoints.FirstOrDefault()?.GetType();
+                if (selectedGroup.Value == null)
+                    trackedType = null;
+                else
+                {
+                    // If the selected group only has one control point, update the tracking type.
+                    if (selectedGroup.Value.ControlPoints.Count == 1)
+                        trackedType = selectedGroup.Value?.ControlPoints.Single().GetType();
+                    // If the selected group has more than one control point, choose the first as the tracking type
+                    // if we don't already have a singular tracked type.
+                    else if (trackedType == null)
+                        trackedType = selectedGroup.Value?.ControlPoints.FirstOrDefault()?.GetType();
+                }
 
-                if (selectedPointType != null)
+                if (trackedType != null)
                 {
                     // We don't have an efficient way of looking up groups currently, only individual point types.
                     // To improve the efficiency of this in the future, we should reconsider the overall structure of ControlPointInfo.
 
                     // Find the next group which has the same type as the selected one.
                     var found = Beatmap.ControlPointInfo.Groups
-                                       .Where(g => g.ControlPoints.Any(cp => cp.GetType() == selectedPointType))
+                                       .Where(g => g.ControlPoints.Any(cp => cp.GetType() == trackedType))
                                        .LastOrDefault(g => g.Time <= clock.CurrentTimeAccurate);
 
                     if (found != null)
