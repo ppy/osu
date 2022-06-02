@@ -121,8 +121,16 @@ namespace osu.Game.Online.API
 
             if (isFailing) return;
 
-            Logger.Log($@"Performing request {this}", LoggingTarget.Network);
-            WebRequest.Perform();
+            try
+            {
+                Logger.Log($@"Performing request {this}", LoggingTarget.Network);
+                WebRequest.Perform();
+            }
+            catch (OperationCanceledException)
+            {
+                // ignore this. internally Perform is running async and the fail state may have changed since
+                // the last check of `isFailing` above.
+            }
 
             if (isFailing) return;
 
