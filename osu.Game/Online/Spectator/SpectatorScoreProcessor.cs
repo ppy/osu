@@ -10,12 +10,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -109,10 +105,7 @@ namespace osu.Game.Online.Spectator
             spectatorState = userState;
             scoreInfo = new ScoreInfo { Ruleset = rulesetInfo };
             scoreProcessor = ruleset.CreateScoreProcessor();
-
-            // Mods are required for score multiplier.
             scoreProcessor.Mods.Value = userState.Mods.Select(m => m.ToMod(ruleset)).ToArray();
-            scoreProcessor.ApplyBeatmap(new DummyBeatmap());
         }
 
         private void onNewFrames(int incomingUserId, FrameDataBundle bundle)
@@ -163,23 +156,6 @@ namespace osu.Game.Online.Spectator
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (spectatorClient != null)
                 spectatorClient.OnNewFrames -= onNewFrames;
-        }
-
-        private class DummyBeatmap : IBeatmap
-        {
-            public BeatmapInfo BeatmapInfo { get; set; } = new BeatmapInfo();
-            public BeatmapMetadata Metadata { get; } = new BeatmapMetadata();
-            public BeatmapDifficulty Difficulty { get; set; } = new BeatmapDifficulty();
-            public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
-            public List<BreakPeriod> Breaks { get; } = new List<BreakPeriod>();
-            public double TotalBreakTime => 0;
-            public IReadOnlyList<HitObject> HitObjects => Array.Empty<HitObject>();
-
-            public IEnumerable<BeatmapStatistic> GetStatistics() => Array.Empty<BeatmapStatistic>();
-
-            public double GetMostCommonBeatLength() => 0;
-
-            public IBeatmap Clone() => throw new NotImplementedException();
         }
 
         private class TimedFrame : IComparable<TimedFrame>
