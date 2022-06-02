@@ -62,13 +62,15 @@ namespace osu.Game.Screens.Edit.Timing
 
         private ScheduledDelegate? resetDelegate;
 
-        private const int light_count = 6;
+        private const int light_count = 8;
 
         private const int initial_taps_to_ignore = 4;
 
         private const int max_taps_to_consider = 8;
 
         private const double transition_length = 500;
+
+        private const float angular_light_gap = 0.007f;
 
         private readonly List<double> tapTimings = new List<double>();
 
@@ -185,7 +187,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 var light = new Light
                 {
-                    Rotation = i * (360f / light_count)
+                    Rotation = (i + 1) * (360f / light_count) + 360 * angular_light_gap / 2,
                 };
 
                 lights.Add(light);
@@ -336,6 +338,7 @@ namespace osu.Game.Screens.Edit.Timing
                 light.Hide();
 
             tapTimings.Clear();
+            currentLight = 0;
             IsHandlingTapping.Value = false;
         }
 
@@ -357,14 +360,12 @@ namespace osu.Game.Screens.Edit.Timing
 
                 Size = new Vector2(0.98f); // Avoid bleed into masking edge.
 
-                const float angular_gap = 0.007f;
-
                 InternalChildren = new Drawable[]
                 {
                     new CircularProgress
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Current = { Value = 1f / light_count - angular_gap },
+                        Current = { Value = 1f / light_count - angular_light_gap },
                         Colour = colourProvider.Background2,
                     },
                     fillContent = new Container
@@ -377,7 +378,7 @@ namespace osu.Game.Screens.Edit.Timing
                             new CircularProgress
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Current = { Value = 1f / light_count - angular_gap },
+                                Current = { Value = 1f / light_count - angular_light_gap },
                                 Blending = BlendingParameters.Additive
                             },
                             // Please do not try and make sense of this.
