@@ -33,6 +33,6 @@ namespace osu.Game.Scoring
         /// The count of "basic" <see cref="HitObject"/>s. See: <see cref="HitResultExtensions.IsBasic"/>.
         /// </summary>
         [Key(3)]
-        public int HitObjects;
+        public int CountBasicHitObjects;
     }
 }
