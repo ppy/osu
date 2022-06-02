@@ -49,9 +49,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 Mods = mods,
                 GreatHitWindow = Math.Ceiling(getHitWindow300(mods) / clockRate),
                 ScoreMultiplier = getScoreMultiplier(mods),
-                MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
+                MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
                 Skills = skills
             };
+        }
+
+        private static int maxComboForObject(HitObject hitObject)
+        {
+            if (hitObject is HoldNote hold)
+                return 1 + (int)((hold.EndTime - hold.StartTime) / 100);
+
+            return 1;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
