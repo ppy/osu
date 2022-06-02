@@ -273,8 +273,7 @@ namespace osu.Game.Rulesets.Scoring
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
-            extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
-            current.MaxCombo = scoreInfo.MaxCombo;
+            ExtractScoringValues(scoreInfo, out var current, out var maximum);
 
             return ComputeScore(mode, current, maximum);
         }
@@ -297,8 +296,7 @@ namespace osu.Game.Rulesets.Scoring
             if (!beatmapApplied)
                 throw new InvalidOperationException($"Cannot compute partial score without calling {nameof(ApplyBeatmap)}.");
 
-            extractScoringValues(scoreInfo.Statistics, out var current, out _);
-            current.MaxCombo = scoreInfo.MaxCombo;
+            ExtractScoringValues(scoreInfo, out var current, out _);
 
             return ComputeScore(mode, current, MaximumScoringValues);
         }
@@ -323,7 +321,7 @@ namespace osu.Game.Rulesets.Scoring
             double accuracyRatio = scoreInfo.Accuracy;
             double comboRatio = maxAchievableCombo > 0 ? (double)scoreInfo.MaxCombo / maxAchievableCombo : 1;
 
-            extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
+            ExtractScoringValues(scoreInfo, out var current, out var maximum);
 
             // For legacy osu!mania scores, a full-GREAT score has 100% accuracy. If combined with a full-combo, the score becomes indistinguishable from a full-PERFECT score.
             // To get around this, the accuracy ratio is always recalculated based on the hit statistics rather than trusting the score.
