@@ -93,7 +93,18 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Scoring values for a perfect play.
         /// </summary>
-        public ScoringValues MaximumScoringValues { get; private set; }
+        public ScoringValues MaximumScoringValues
+        {
+            get
+            {
+                if (!beatmapApplied)
+                    throw new InvalidOperationException($"Cannot access maximum scoring values before calling {nameof(ApplyBeatmap)}.");
+
+                return maximumScoringValues;
+            }
+        }
+
+        private ScoringValues maximumScoringValues;
 
         /// <summary>
         /// Scoring values for the current play assuming all perfect hits.
@@ -200,7 +211,7 @@ namespace osu.Game.Rulesets.Scoring
                 scoringValues.BaseScore += result.IsHit() ? Judgement.ToNumericResult(result) : 0;
 
             if (result.IsBasic())
-                scoringValues.HitObjects++;
+                scoringValues.CountBasicHitObjects++;
         }
 
         /// <summary>
@@ -249,13 +260,13 @@ namespace osu.Game.Rulesets.Scoring
                 scoringValues.BaseScore -= result.IsHit() ? Judgement.ToNumericResult(result) : 0;
 
             if (result.IsBasic())
-                scoringValues.HitObjects--;
+                scoringValues.CountBasicHitObjects--;
         }
 
         private void updateScore()
         {
             Accuracy.Value = currentMaximumScoringValues.BaseScore > 0 ? currentScoringValues.BaseScore / currentMaximumScoringValues.BaseScore : 1;
-            TotalScore.Value = ComputeScore(Mode.Value, currentScoringValues, MaximumScoringValues);
+            TotalScore.Value = ComputeScore(Mode.Value, currentScoringValues, maximumScoringValues);
         }
 
         /// <summary>
@@ -273,8 +284,7 @@ namespace osu.Game.Rulesets.Scoring
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
-            extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
-            current.MaxCombo = scoreInfo.MaxCombo;
+            ExtractScoringValues(scoreInfo, out var current, out var maximum);
 
             return ComputeScore(mode, current, maximum);
         }
@@ -297,8 +307,7 @@ namespace osu.Game.Rulesets.Scoring
             if (!beatmapApplied)
                 throw new InvalidOperationException($"Cannot compute partial score without calling {nameof(ApplyBeatmap)}.");
 
-            extractScoringValues(scoreInfo.Statistics, out var current, out _);
-            current.MaxCombo = scoreInfo.MaxCombo;
+            ExtractScoringValues(scoreInfo, out var current, out _);
 
             return ComputeScore(mode, current, MaximumScoringValues);
         }
@@ -323,7 +332,7 @@ namespace osu.Game.Rulesets.Scoring
             double accuracyRatio = scoreInfo.Accuracy;
             double comboRatio = maxAchievableCombo > 0 ? (double)scoreInfo.MaxCombo / maxAchievableCombo : 1;
 
-            extractScoringValues(scoreInfo.Statistics, out var current, out var maximum);
+            ExtractScoringValues(scoreInfo, out var current, out var maximum);
 
             // For legacy osu!mania scores, a full-GREAT score has 100% accuracy. If combined with a full-combo, the score becomes indistinguishable from a full-PERFECT score.
             // To get around this, the accuracy ratio is always recalculated based on the hit statistics rather than trusting the score.
@@ -331,7 +340,7 @@ namespace osu.Game.Rulesets.Scoring
             if (scoreInfo.IsLegacyScore && scoreInfo.Ruleset.OnlineID == 3 && maximum.BaseScore > 0)
                 accuracyRatio = current.BaseScore / maximum.BaseScore;
 
-            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.HitObjects);
+            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.CountBasicHitObjects);
         }
 
         /// <summary>
@@ -346,7 +355,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             double accuracyRatio = maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
             double comboRatio = maximum.MaxCombo > 0 ? (double)current.MaxCombo / maximum.MaxCombo : 1;
-            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.HitObjects);
+            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.CountBasicHitObjects);
         }
 
         /// <summary>
@@ -408,7 +417,7 @@ namespace osu.Game.Rulesets.Scoring
             lastHitObject = null;
 
             if (storeResults)
-                MaximumScoringValues = currentScoringValues;
+                maximumScoringValues = currentScoringValues;
 
             currentScoringValues = default;
             currentMaximumScoringValues = default;
@@ -470,11 +479,11 @@ namespace osu.Game.Rulesets.Scoring
         /// This method is useful in a variety of situations, with a few drawbacks that need to be considered:
         /// <list type="bullet">
         ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
-        ///     <item>The current and maximum <see cref="ScoringValues.HitObjects"/> will always be the same value.</item>
+        ///     <item>The current and maximum <see cref="ScoringValues.CountBasicHitObjects"/> will always be the same value.</item>
         /// </list>
         /// Consumers are expected to more accurately fill in the above values through external means.
         /// <para>
-        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.HitObjects"/> for use in
+        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.CountBasicHitObjects"/> for use in
         /// <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoringValues,osu.Game.Scoring.ScoringValues)"/>.
         /// </para>
         /// </remarks>
@@ -495,11 +504,11 @@ namespace osu.Game.Rulesets.Scoring
         /// This method is useful in a variety of situations, with a few drawbacks that need to be considered:
         /// <list type="bullet">
         ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
-        ///     <item>The current and maximum <see cref="ScoringValues.HitObjects"/> will always be the same value.</item>
+        ///     <item>The current and maximum <see cref="ScoringValues.CountBasicHitObjects"/> will always be the same value.</item>
         /// </list>
         /// Consumers are expected to more accurately fill in the above values through external means.
         /// <para>
-        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.HitObjects"/> for use in
+        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.CountBasicHitObjects"/> for use in
         /// <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoringValues,osu.Game.Scoring.ScoringValues)"/>.
         /// </para>
         /// </remarks>
@@ -521,7 +530,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <list type="bullet">
         ///     <item>The current <see cref="ScoringValues.MaxCombo"/> will always be 0.</item>
         ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
-        ///     <item>The current and maximum <see cref="ScoringValues.HitObjects"/> will always be the same value.</item>
+        ///     <item>The current and maximum <see cref="ScoringValues.CountBasicHitObjects"/> will always be the same value.</item>
         /// </list>
         /// Consumers are expected to more accurately fill in the above values (especially the current <see cref="ScoringValues.MaxCombo"/>) via external means (e.g. <see cref="ScoreInfo"/>).
         /// </remarks>
@@ -573,8 +582,8 @@ namespace osu.Game.Rulesets.Scoring
 
                 if (result.IsBasic())
                 {
-                    current.HitObjects += count;
-                    maximum.HitObjects += count;
+                    current.CountBasicHitObjects += count;
+                    maximum.CountBasicHitObjects += count;
                 }
             }
         }

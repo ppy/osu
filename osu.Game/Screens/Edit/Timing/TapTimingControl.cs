@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -17,6 +18,9 @@ namespace osu.Game.Screens.Edit.Timing
     {
         [Resolved]
         private EditorClock editorClock { get; set; }
+
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; }
 
         [Resolved]
         private Bindable<ControlPointGroup> selectedGroup { get; set; }
@@ -44,6 +48,7 @@ namespace osu.Game.Screens.Edit.Timing
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 200),
+                        new Dimension(GridSizeMode.Absolute, 60),
                         new Dimension(GridSizeMode.Absolute, 60),
                     },
                     Content = new[]
@@ -77,7 +82,36 @@ namespace osu.Game.Screens.Edit.Timing
                                         },
                                     }
                                 }
-                            }
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(10),
+                                Children = new Drawable[]
+                                {
+                                    new TimingAdjustButton(1)
+                                    {
+                                        Text = "Offset",
+                                        RelativeSizeAxes = Axes.X,
+                                        Width = 0.48f,
+                                        Height = 50,
+                                        Action = adjustOffset,
+                                    },
+                                    new TimingAdjustButton(0.1)
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        Text = "BPM",
+                                        RelativeSizeAxes = Axes.X,
+                                        Width = 0.48f,
+                                        Height = 50,
+                                        Action = adjustBpm,
+                                    }
+                                }
+                            },
                         },
                         new Drawable[]
                         {
@@ -111,6 +145,35 @@ namespace osu.Game.Screens.Edit.Timing
                     }
                 },
             };
+        }
+
+        private void adjustOffset(double adjust)
+        {
+            // VERY TEMPORARY
+            var currentGroupItems = selectedGroup.Value.ControlPoints.ToArray();
+
+            beatmap.ControlPointInfo.RemoveGroup(selectedGroup.Value);
+
+            double newOffset = selectedGroup.Value.Time + adjust;
+
+            foreach (var cp in currentGroupItems)
+                beatmap.ControlPointInfo.Add(newOffset, cp);
+
+            // the control point might not necessarily exist yet, if currentGroupItems was empty.
+            selectedGroup.Value = beatmap.ControlPointInfo.GroupAt(newOffset, true);
+
+            if (!editorClock.IsRunning)
+                editorClock.Seek(newOffset);
+        }
+
+        private void adjustBpm(double adjust)
+        {
+            var timing = selectedGroup.Value.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
+
+            if (timing == null)
+                return;
+
+            timing.BeatLength = 60000 / (timing.BPM + adjust);
         }
 
         private void tap()
