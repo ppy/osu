@@ -1,3 +1,5 @@
+using System;
+
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
     /// <summary>
@@ -22,6 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <summary>
         /// How many notes between the current and previous identical <see cref="TaikoDifficultyHitObjectColour"/>.
         /// Negative number means that there is no repetition in range.
+        /// If no repetition is found this will have a value of <see cref="max_repetition_interval"/> + 1.
         /// </summary>
         public int RepetitionInterval { get; private set; }
 
@@ -49,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 {
                     Delta = delta,
                     DeltaRunLength = 1,
-                    RepetitionInterval = -1,
+                    RepetitionInterval = max_repetition_interval + 1,
                     previous = previous
                 };
             }
@@ -63,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         {
             if (this.previous == null || this.previous.previous == null)
             {
-                this.RepetitionInterval = -1;
+                this.RepetitionInterval = max_repetition_interval + 1;
                 return;
             }
 
@@ -74,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             {
                 if (other.Delta == this.Delta && other.DeltaRunLength == this.DeltaRunLength)
                 {
-                    this.RepetitionInterval = interval;
+                    this.RepetitionInterval = Math.Max(interval, max_repetition_interval);
                     return;
                 }
                 else
@@ -85,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 other = other.previous;
             }
 
-            this.RepetitionInterval = -1;
+            this.RepetitionInterval = max_repetition_interval + 1;
         }
     }
 }
