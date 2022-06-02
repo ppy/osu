@@ -377,6 +377,9 @@ namespace osu.Game.Screens.Edit.Timing
                                 Current = { Value = 1f / light_count - angular_gap },
                                 Blending = BlendingParameters.Additive
                             },
+                            // Please do not try and make sense of this.
+                            // Getting the visual effect I was going for relies on what I can only imagine is broken implementation
+                            // of `PadExtent`. If that's ever fixed in the future this will likely need to be adjusted.
                             Glow = new CircularProgress
                             {
                                 RelativeSizeAxes = Axes.Both,
