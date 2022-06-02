@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Chat;
 using osuTK.Graphics;
@@ -35,9 +34,6 @@ namespace osu.Game.Overlays.Chat
                     scroll.ScrollbarVisible = value;
             }
         }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
 
         public DrawableChannel(Channel channel)
         {

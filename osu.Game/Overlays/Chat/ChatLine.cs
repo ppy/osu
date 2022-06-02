@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Chat
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.Distributed),
+                        new Dimension(),
                     },
                     Content = new[]
                     {
@@ -247,7 +247,6 @@ namespace osu.Game.Overlays.Chat
                 }
             };
         }
-
 
         private void updateMessageContent()
         {

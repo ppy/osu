@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Chat
             Child = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                RowDimensions = new[] { new Dimension(GridSizeMode.Distributed) },
+                RowDimensions = new[] { new Dimension() },
                 ColumnDimensions = new[]
                 {
                     new Dimension(GridSizeMode.Absolute, DateWidth),
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Chat
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            RowDimensions = new[] { new Dimension(GridSizeMode.Distributed) },
+                            RowDimensions = new[] { new Dimension() },
                             ColumnDimensions = new[]
                             {
                                 new Dimension(),
