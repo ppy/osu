@@ -38,13 +38,13 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
             var req = new GetRoomLeaderboardRequest(roomId.Value ?? 0);
 
-            req.Success += r =>
+            req.Success += r => Schedule(() =>
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
                 SetScores(r.Leaderboard, r.UserScore);
-            };
+            });
 
             return req;
         }

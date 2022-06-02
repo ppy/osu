@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             Add(new Box
             {
-                Colour = colourProvider.Background2,
+                Colour = colourProvider.Background3,
                 RelativeSizeAxes = Axes.Both,
             });
 

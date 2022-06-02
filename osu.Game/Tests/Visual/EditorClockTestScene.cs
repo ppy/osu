@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -20,7 +21,11 @@ namespace osu.Game.Tests.Visual
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         protected readonly BindableBeatDivisor BeatDivisor = new BindableBeatDivisor();
+
+        [Cached]
         protected new readonly EditorClock Clock;
+
+        private readonly Bindable<double> frequencyAdjustment = new BindableDouble(1);
 
         protected virtual bool ScrollUsingMouseWheel => true;
 
@@ -42,14 +47,21 @@ namespace osu.Game.Tests.Visual
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             Beatmap.BindValueChanged(beatmapChanged, true);
+
+            AddSliderStep("editor clock rate", 0.0, 2.0, 1.0, v => frequencyAdjustment.Value = v);
         }
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
+            e.OldValue?.Track.RemoveAdjustment(AdjustableProperty.Frequency, frequencyAdjustment);
+
             Clock.Beatmap = e.NewValue.Beatmap;
             Clock.ChangeSource(e.NewValue.Track);
             Clock.ProcessFrame();
+
+            e.NewValue.Track.AddAdjustment(AdjustableProperty.Frequency, frequencyAdjustment);
         }
 
         protected override void Update()
