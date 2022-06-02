@@ -12,7 +12,7 @@ namespace osu.Game.Tests.Visual.Editing
         public override Drawable CreateTestComponent() => Empty();
 
         [Test]
-        public void TestVisibleRangeViaZoom()
+        public void TestVisibleRangeUpdatesOnZoomChange()
         {
             double initialVisibleRange = 0;
 
@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestVisibleRangeViaTimelineSize()
+        public void TestVisibleRangeConstantOnSizeChange()
         {
             double initialVisibleRange = 0;
 
@@ -37,12 +37,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("get initial range", () => initialVisibleRange = TimelineArea.Timeline.VisibleRange);
 
             AddStep("scale timeline size", () => TimelineArea.Timeline.Width = 2);
-            AddAssert("range doubled", () => TimelineArea.Timeline.VisibleRange == initialVisibleRange * 2);
+            AddAssert("same range", () => TimelineArea.Timeline.VisibleRange == initialVisibleRange);
             AddStep("descale timeline size", () => TimelineArea.Timeline.Width = 0.5f);
-            AddAssert("range halved", () => TimelineArea.Timeline.VisibleRange == initialVisibleRange / 2);
+            AddAssert("same range", () => TimelineArea.Timeline.VisibleRange == initialVisibleRange);
 
             AddStep("restore timeline size", () => TimelineArea.Timeline.Width = 1);
-            AddAssert("range restored", () => TimelineArea.Timeline.VisibleRange == initialVisibleRange);
+            AddAssert("same range", () => TimelineArea.Timeline.VisibleRange == initialVisibleRange);
         }
     }
 }
