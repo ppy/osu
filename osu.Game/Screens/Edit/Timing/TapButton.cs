@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         private const int max_taps_to_consider = 8;
 
+        private const double transition_length = 500;
+
         private readonly List<double> tapTimings = new List<double>();
 
         [BackgroundDependencyLoader]
@@ -212,15 +214,15 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override bool OnHover(HoverEvent e)
         {
-            hoverLayer.FadeIn(500, Easing.OutQuint);
-            textContainer.FadeColour(textColour, 500, Easing.OutQuint);
+            hoverLayer.FadeIn(transition_length, Easing.OutQuint);
+            textContainer.FadeColour(textColour, transition_length, Easing.OutQuint);
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            hoverLayer.FadeOut(500, Easing.OutQuint);
-            textContainer.FadeColour(textColour, 500, Easing.OutQuint);
+            hoverLayer.FadeOut(transition_length, Easing.OutQuint);
+            textContainer.FadeColour(textColour, transition_length, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -265,6 +267,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             scaleContainer.ScaleTo(1, out_duration, Easing.OutQuint);
             innerCircle.ScaleTo(1, out_duration, Easing.OutQuint);
+
             innerCircleHighlight.FadeOut(out_duration, Easing.OutQuint);
 
             resetDelegate = Scheduler.AddDelayed(reset, 1000);
@@ -321,9 +324,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void reset()
         {
-            bpmText.FadeOut(500, Easing.OutQuint);
+            bpmText.FadeOut(transition_length, Easing.OutQuint);
 
-            using (BeginDelayedSequence(tapTimings.Count > 0 ? 500 : 0))
+            using (BeginDelayedSequence(tapTimings.Count > 0 ? transition_length : 0))
             {
                 Schedule(() => bpmText.Text = "the beat!");
                 bpmText.FadeIn(800, Easing.OutQuint);
