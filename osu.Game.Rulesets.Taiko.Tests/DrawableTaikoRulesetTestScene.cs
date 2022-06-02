@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         protected DrawableTaikoRuleset DrawableRuleset { get; private set; }
         protected Container PlayfieldContainer { get; private set; }
 
-        protected ControlPointInfo controlPointInfo { get; private set; } 
+        private ControlPointInfo controlPointInfo { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()

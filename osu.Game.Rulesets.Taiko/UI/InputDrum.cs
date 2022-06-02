@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             private readonly Sprite centre;
             private readonly Sprite centreHit;
 
-            public TaikoHalfDrum(bool flipped, float centre_size)
+            public TaikoHalfDrum(bool flipped, float centreSize)
             {
                 Masking = true;
 
@@ -112,14 +112,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(centre_size)
+                        Size = new Vector2(centreSize)
                     },
                     centreHit = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(centre_size),
+                        Size = new Vector2(centreSize),
                         Alpha = 0,
                         Blending = BlendingParameters.Additive
                     }

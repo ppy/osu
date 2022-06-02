@@ -12,10 +12,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     internal class DrumSamplePlayer : Container, IKeyBindingHandler<TaikoAction>
     {
-        private DrumSampleTriggerSource leftRimSampleTriggerSource;
-        private DrumSampleTriggerSource leftCentreSampleTriggerSource;
-        private DrumSampleTriggerSource rightCentreSampleTriggerSource;
-        private DrumSampleTriggerSource rightRimSampleTriggerSource;
+        private readonly DrumSampleTriggerSource leftRimSampleTriggerSource;
+        private readonly DrumSampleTriggerSource leftCentreSampleTriggerSource;
+        private readonly DrumSampleTriggerSource rightCentreSampleTriggerSource;
+        private readonly DrumSampleTriggerSource rightRimSampleTriggerSource;
 
         public DrumSamplePlayer(HitObjectContainer hitObjectContainer)
         {
@@ -35,12 +35,15 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case TaikoAction.LeftRim:
                     leftRimSampleTriggerSource.Play(HitType.Rim);
                     break;
+
                 case TaikoAction.LeftCentre:
                     leftCentreSampleTriggerSource.Play(HitType.Centre);
                     break;
+
                 case TaikoAction.RightCentre:
                     rightCentreSampleTriggerSource.Play(HitType.Centre);
                     break;
+
                 case TaikoAction.RightRim:
                     rightRimSampleTriggerSource.Play(HitType.Rim);
                     break;

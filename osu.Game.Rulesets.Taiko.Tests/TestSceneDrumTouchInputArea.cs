@@ -28,7 +28,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             List<TaikoHitObject> hitObjects = new List<TaikoHitObject>();
 
-            for (var i = 0; i < NUM_HIT_OBJECTS; i++) {
+            for (int i = 0; i < NUM_HIT_OBJECTS; i++)
+            {
                 hitObjects.Add(new Hit
                 {
                     StartTime = Time.Current + i * HIT_OBJECT_TIME_SPACING_MS,
@@ -36,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     Type = isOdd(i / 2) ? HitType.Centre : HitType.Rim
                 });
             }
-            
+
             var beatmap = new Beatmap<TaikoHitObject>
             {
                 BeatmapInfo = { Ruleset = ruleset },
@@ -46,7 +47,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
             return beatmap;
         }
 
-        private bool isOdd(int number) {
+        private bool isOdd(int number)
+        {
             return number % 2 == 0;
         }
     }

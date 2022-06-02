@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Children = new Drawable[]
                     {
                         new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundLeft), _ => new PlayfieldBackgroundLeft()),
-                        new InputDrum()
+                        new InputDrum
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
