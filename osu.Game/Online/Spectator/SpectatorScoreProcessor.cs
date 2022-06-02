@@ -10,6 +10,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -47,6 +48,17 @@ namespace osu.Game.Online.Spectator
         /// The applied <see cref="Mod"/>s.
         /// </summary>
         public IReadOnlyList<Mod> Mods => scoreProcessor?.Mods.Value ?? Array.Empty<Mod>();
+
+        private IClock? referenceClock;
+
+        /// <summary>
+        /// The clock used to determine the current score.
+        /// </summary>
+        public IClock ReferenceClock
+        {
+            get => referenceClock ?? Clock;
+            set => referenceClock = value;
+        }
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
@@ -131,7 +143,7 @@ namespace osu.Game.Online.Spectator
             Debug.Assert(spectatorState != null);
             Debug.Assert(scoreProcessor != null);
 
-            int frameIndex = replayFrames.BinarySearch(new TimedFrame(Time.Current));
+            int frameIndex = replayFrames.BinarySearch(new TimedFrame(ReferenceClock.CurrentTime));
             if (frameIndex < 0)
                 frameIndex = ~frameIndex;
             frameIndex = Math.Clamp(frameIndex - 1, 0, replayFrames.Count - 1);
