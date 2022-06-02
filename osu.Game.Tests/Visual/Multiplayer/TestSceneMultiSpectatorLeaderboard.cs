@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Online.API.Requests.Responses;
@@ -23,7 +24,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("reset", () =>
             {
-                Clear();
+                leaderboard?.RemoveAndDisposeImmediately();
 
                 clocks = new Dictionary<int, ManualClock>
                 {
