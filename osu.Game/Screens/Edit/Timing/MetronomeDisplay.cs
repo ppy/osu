@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -31,12 +33,16 @@ namespace osu.Game.Screens.Edit.Timing
 
         private IAdjustableClock metronomeClock;
 
+        private Sample clunk;
+
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
+            clunk = audio.Samples.Get(@"Multiplayer/countdown-tick");
+
             const float taper = 25;
             const float swing_vertical_offset = -23;
             const float lower_cover_height = 32;
@@ -269,8 +275,21 @@ namespace osu.Game.Screens.Edit.Timing
 
             if (currentAngle != 0 && Math.Abs(currentAngle - targetAngle) > angle * 1.8f && isSwinging)
             {
-                using (stick.BeginDelayedSequence(beatLength / 2))
+                using (BeginDelayedSequence(beatLength / 2))
+                {
                     stick.FlashColour(overlayColourProvider.Content1, beatLength, Easing.OutQuint);
+
+                    Schedule(() =>
+                    {
+                        var channel = clunk?.GetChannel();
+
+                        if (channel != null)
+                        {
+                            channel.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
+                            channel.Play();
+                        }
+                    });
+                }
             }
         }
     }
