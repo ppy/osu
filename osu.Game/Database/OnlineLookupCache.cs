@@ -91,7 +91,7 @@ namespace osu.Game.Database
             }
         }
 
-        private void performLookup()
+        private async Task performLookup()
         {
             // contains at most 50 unique IDs from tasks, which is used to perform the lookup.
             var nextTaskBatch = new Dictionary<TLookup, List<TaskCompletionSource<TValue>>>();
@@ -127,7 +127,7 @@ namespace osu.Game.Database
 
             // rather than queueing, we maintain our own single-threaded request stream.
             // todo: we probably want retry logic here.
-            api.Perform(request);
+            await api.PerformAsync(request).ConfigureAwait(false);
 
             finishPendingTask();
 
