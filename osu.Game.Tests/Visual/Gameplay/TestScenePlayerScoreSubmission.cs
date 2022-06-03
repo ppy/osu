@@ -167,7 +167,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [TestCase(HitResult.SmallBonus)]
         [TestCase(HitResult.LargeBonus)]
-        public void TestNoSubmissionOnBonusOnlyFail(HitResult type)
+        [TestCase(HitResult.SmallTickHit)]
+        [TestCase(HitResult.LargeTickHit)]
+        public void TestNoSubmissionOnFailWithNonBasicHits(HitResult type)
         {
             prepareTestAPI(true);
 
@@ -215,7 +217,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [TestCase(HitResult.SmallBonus)]
         [TestCase(HitResult.LargeBonus)]
-        public void TestNoSubmissionOnBonusOnlyExit(HitResult type)
+        [TestCase(HitResult.SmallTickHit)]
+        [TestCase(HitResult.LargeTickHit)]
+        public void TestNoSubmissionOnExitWithNonBasicHits(HitResult type)
         {
             prepareTestAPI(true);
 
