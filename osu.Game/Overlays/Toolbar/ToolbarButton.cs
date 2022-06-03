@@ -20,7 +20,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
@@ -83,7 +82,6 @@ namespace osu.Game.Overlays.Toolbar
         private RealmAccess realm { get; set; }
 
         protected ToolbarButton()
-            : base(HoverSampleSet.Toolbar)
         {
             Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;
