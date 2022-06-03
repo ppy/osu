@@ -24,6 +24,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString UnableToRunExclusiveFullscreen => new TranslatableString(getKey(@"unable_to_run_exclusive_fullscreen"), @"Unable to run exclusive fullscreen. You'll still experience some input latency.");
 
+        /// <summary>
+        /// "Running fullscreen on macOS takes full control away from the system, this could lead to system-wide freezes if the game becomes unresponsive."
+        /// </summary>
+        public static LocalisableString FullscreenMacOSNote => new TranslatableString(getKey(@"fullscreen_macos_note"), @"Running fullscreen on macOS takes full control away from the system, this could lead to system-wide freezes if the game becomes unresponsive.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
