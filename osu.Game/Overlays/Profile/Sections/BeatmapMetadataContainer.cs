@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -18,7 +17,6 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly IBeatmapInfo beatmapInfo;
 
         protected BeatmapMetadataContainer(IBeatmapInfo beatmapInfo)
-            : base(HoverSampleSet.Submit)
         {
             this.beatmapInfo = beatmapInfo;
 
