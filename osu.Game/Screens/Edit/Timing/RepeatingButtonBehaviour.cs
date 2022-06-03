@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 
@@ -15,7 +14,7 @@ namespace osu.Game.Screens.Edit.Timing
     /// <summary>
     /// Represents a component that provides the behaviour of triggering button clicks repeatedly while holding with mouse.
     /// </summary>
-    public class RepeatingButtonBehaviour : CompositeDrawable
+    public class RepeatingButtonBehaviour : Component
     {
         private const double initial_delay = 300;
         private const double minimum_delay = 80;
