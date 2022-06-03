@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Select.Options
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
         public BeatmapOptionsButton()
-            : base(HoverSampleSet.Submit)
+            : base(HoverSampleSet.Button)
         {
             Width = width;
             RelativeSizeAxes = Axes.Y;
