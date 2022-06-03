@@ -165,6 +165,24 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
         }
 
+        [TestCase(HitResult.SmallBonus)]
+        [TestCase(HitResult.LargeBonus)]
+        public void TestNoSubmissionOnBonusOnlyFail(HitResult type)
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest(true);
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            addFakeHit(type);
+
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+            AddStep("exit", () => Player.Exit());
+
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
         [Test]
         public void TestSubmissionOnFail()
         {
@@ -190,6 +208,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             createPlayerTest();
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        [TestCase(HitResult.SmallBonus)]
+        [TestCase(HitResult.LargeBonus)]
+        public void TestNoSubmissionOnBonusOnlyExit(HitResult type)
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest();
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            addFakeHit(type);
 
             AddStep("exit", () => Player.Exit());
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
@@ -329,16 +363,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void addFakeHit()
+        private void addFakeHit(HitResult type = HitResult.Great)
         {
             AddUntilStep("wait for first result", () => Player.Results.Count > 0);
 
-            AddStep("force successfuly hit", () =>
+            AddStep($"force {type.ToString().ToLower()} hit", () =>
             {
                 Player.ScoreProcessor.RevertResult(Player.Results.First());
                 Player.ScoreProcessor.ApplyResult(new OsuJudgementResult(Beatmap.Value.Beatmap.HitObjects.First(), new OsuJudgement())
                 {
-                    Type = HitResult.Great,
+                    Type = type,
                 });
             });
         }
