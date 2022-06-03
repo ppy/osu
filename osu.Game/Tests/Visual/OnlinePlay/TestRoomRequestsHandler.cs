@@ -179,9 +179,15 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         private Room createResponseRoom(Room room, bool withParticipants)
         {
             var responseRoom = cloneRoom(room);
+
+            // Password is hidden from the response, and is only propagated via HasPassword.
+            bool hadPassword = responseRoom.HasPassword.Value;
             responseRoom.Password.Value = null;
+            responseRoom.HasPassword.Value = hadPassword;
+
             if (!withParticipants)
                 responseRoom.RecentParticipants.Clear();
+
             return responseRoom;
         }
 
