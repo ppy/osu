@@ -225,15 +225,19 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private void updateScreenModeWarning()
         {
-            if (windowModeDropdown.Current.Value != WindowMode.Fullscreen)
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS)
             {
-                windowModeDropdown.SetNoticeText(GraphicsSettingsStrings.NotFullscreenNote, true);
+                if (windowModeDropdown.Current.Value == WindowMode.Fullscreen)
+                    windowModeDropdown.SetNoticeText(LayoutSettingsStrings.FullscreenMacOSNote, true);
+                else
+                    windowModeDropdown.ClearNoticeText();
+
                 return;
             }
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS)
+            if (windowModeDropdown.Current.Value != WindowMode.Fullscreen)
             {
-                windowModeDropdown.SetNoticeText(LayoutSettingsStrings.FullscreenMacOSNote, true);
+                windowModeDropdown.SetNoticeText(GraphicsSettingsStrings.NotFullscreenNote, true);
                 return;
             }
 
