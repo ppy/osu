@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Rulesets;
@@ -165,8 +166,7 @@ namespace osu.Game.Online.Spectator
         {
             base.Dispose(isDisposing);
 
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (spectatorClient != null)
+            if (spectatorClient.IsNotNull())
                 spectatorClient.OnNewFrames -= onNewFrames;
         }
 
