@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -44,9 +45,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             switch (request)
             {
                 case CreateRoomRequest createRoomRequest:
-                    var apiRoom = new Room();
-
-                    apiRoom.CopyFrom(createRoomRequest.Room);
+                    var apiRoom = cloneRoom(createRoomRequest.Room);
 
                     // Passwords are explicitly not copied between rooms.
                     apiRoom.HasPassword.Value = !string.IsNullOrEmpty(createRoomRequest.Room.Password.Value);
@@ -178,12 +177,13 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         private Room createResponseRoom(Room room, bool withParticipants)
         {
-            var responseRoom = new Room();
-            responseRoom.CopyFrom(room);
+            var responseRoom = cloneRoom(room);
             responseRoom.Password.Value = null;
             if (!withParticipants)
                 responseRoom.RecentParticipants.Clear();
             return responseRoom;
         }
+
+        private Room cloneRoom(Room source) => JsonConvert.DeserializeObject<Room>(JsonConvert.SerializeObject(source));
     }
 }
