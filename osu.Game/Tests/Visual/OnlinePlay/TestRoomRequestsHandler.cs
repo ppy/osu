@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
@@ -184,6 +185,18 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             return responseRoom;
         }
 
-        private Room cloneRoom(Room source) => JsonConvert.DeserializeObject<Room>(JsonConvert.SerializeObject(source));
+        private Room cloneRoom(Room source)
+        {
+            var result = JsonConvert.DeserializeObject<Room>(JsonConvert.SerializeObject(source));
+            Debug.Assert(result != null);
+
+            // Playlist item IDs aren't serialised.
+            if (source.CurrentPlaylistItem.Value != null)
+                result.CurrentPlaylistItem.Value.ID = source.CurrentPlaylistItem.Value.ID;
+            for (int i = 0; i < source.Playlist.Count; i++)
+                result.Playlist[i].ID = source.Playlist[i].ID;
+
+            return result;
+        }
     }
 }
