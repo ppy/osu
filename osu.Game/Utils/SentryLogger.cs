@@ -159,6 +159,7 @@ namespace osu.Game.Utils
                         Game = game.Clock.CurrentTime,
                     };
 
+                    scope.SetTag(@"beatmap", $"{beatmap.OnlineID}");
                     scope.SetTag(@"ruleset", ruleset.ShortName);
                     scope.SetTag(@"os", $"{RuntimeInfo.OS} ({Environment.OSVersion})");
                     scope.SetTag(@"processor count", Environment.ProcessorCount.ToString());
