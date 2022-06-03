@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            hoverSample = audio.Samples.Get($"UI/{HoverSampleSet.Button.GetDescription()}-hover");
+            hoverSample = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-hover");
             notchSample = audio.Samples.Get(@"UI/notch-tick");
             sampleLastPlaybackTime = Time.Current;
 
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Volume
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Name = "Progress under covers for smoothing",
+                                            Name = @"Progress under covers for smoothing",
                                             RelativeSizeAxes = Axes.Both,
                                             Rotation = 180,
                                             Child = volumeCircle = new CircularProgress
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Volume
                                 },
                                 new Circle
                                 {
-                                    Name = "Inner Cover",
+                                    Name = @"Inner Cover",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.Volume
                                 },
                                 new Container
                                 {
-                                    Name = "Progress overlay for glow",
+                                    Name = @"Progress overlay for glow",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
