@@ -75,8 +75,13 @@ namespace osu.Game.Rulesets.Osu.Utils
         public static List<OsuHitObject> RepositionHitObjects(IEnumerable<ObjectPositionInfo> objectPositionInfos)
         {
             List<WorkingObject> workingObjects = objectPositionInfos.Select(o => new WorkingObject(o)).ToList();
+
+            // whether to rotate the current hit object away from edge or place it normally
             bool rotateAwayFromEdge = false;
+            // the furthest index the algorithm has ever gone to
+            // used for keeping track of current progress when backtracking
             int furthestIndex = 0;
+            // the most recent hit object that has been rotated away from edge
             int furthestIndexWithRotation = 0;
 
             for (int i = 0; i < workingObjects.Count; i++)
@@ -115,6 +120,8 @@ namespace osu.Game.Rulesets.Osu.Utils
                     {
                         furthestIndex = i;
                         rotateAwayFromEdge = true;
+                        // the rotation algorithm is deterministic, so there is no reason to backtrack beyond objects
+                        // that have been rotated already
                         i = Math.Max(furthestIndexWithRotation, i - preceding_hitobjects_to_shift);
                         continue;
                     }
