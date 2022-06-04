@@ -434,7 +434,6 @@ namespace osu.Game.Rulesets.Osu.Utils
 
         private class WorkingObject
         {
-            public Vector2 PositionOriginal { get; }
             public Vector2 EndPositionOriginal { get; }
             public Vector2 PositionModified { get; set; }
             public Vector2 EndPositionModified { get; set; }
@@ -445,7 +444,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             public WorkingObject(ObjectPositionInfo positionInfo)
             {
                 PositionInfo = positionInfo;
-                PositionModified = PositionOriginal = HitObject.Position;
+                PositionModified = HitObject.Position;
                 EndPositionModified = EndPositionOriginal = HitObject.EndPosition;
             }
         }
