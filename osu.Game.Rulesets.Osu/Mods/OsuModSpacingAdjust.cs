@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -39,22 +38,21 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override string SettingDescription => ObjectSpacing.IsDefault ? string.Empty : $"{ObjectSpacing.Value:N2}x";
 
+        private const double min_break_duration = 1000;
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             if (!(beatmap is OsuBeatmap osuBeatmap))
                 return;
 
             var positionInfos = OsuHitObjectGenerationUtils.GeneratePositionInfos(osuBeatmap.HitObjects);
-            var firstObjectsAfterBreaks = osuBeatmap.Breaks
-                                                    .Select(period => osuBeatmap.HitObjects.FirstOrDefault(o => o.GetEndTime() >= period.EndTime))
-                                                    .Where(o => o != null)
-                                                    .ToList();
 
             for (int i = 0; i < positionInfos.Count; i++)
             {
                 var positionInfo = positionInfos[i];
 
-                if (i == 0 || positionInfos[i - 1].HitObject is Spinner || firstObjectsAfterBreaks.Contains(positionInfo.HitObject))
+                if (i == 0 || positionInfos[i - 1].HitObject is Spinner ||
+                    positionInfo.HitObject.StartTime - positionInfos[i - 1].HitObject.GetEndTime() > min_break_duration)
                 {
                     positionInfo.StayInPlace = true;
                 }
