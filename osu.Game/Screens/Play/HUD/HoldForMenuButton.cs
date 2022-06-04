@@ -12,13 +12,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -28,20 +29,22 @@ namespace osu.Game.Screens.Play.HUD
 
         public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
-        private readonly Button button;
+        private HoldButton button;
 
-        public Action Action
-        {
-            set => button.Action = value;
-        }
+        public Action Action { get; set; }
 
-        private readonly OsuSpriteText text;
+        private OsuSpriteText text;
 
         public HoldForMenuButton()
         {
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(20, 0);
             Margin = new MarginPadding(10);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(Player player)
+        {
             Children = new Drawable[]
             {
                 text = new OsuSpriteText
@@ -50,25 +53,20 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
-                button = new Button
+                button = new HoldButton(player?.Configuration.AllowRestart == false)
                 {
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
                     HoverLost = () => text.FadeOut(500, Easing.OutQuint),
-                    IsPaused = { BindTarget = IsPaused }
+                    IsPaused = { BindTarget = IsPaused },
+                    Action = () => Action(),
                 }
             };
             AutoSizeAxes = Axes.Both;
         }
 
-        [Resolved]
-        private OsuConfigManager config { get; set; }
-
-        private Bindable<double> activationDelay;
-
         protected override void LoadComplete()
         {
-            activationDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
-            activationDelay.BindValueChanged(v =>
+            button.HoldActivationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
                     ? "hold for menu"
@@ -102,7 +100,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private class Button : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
+        private class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
         {
             private SpriteIcon icon;
             private CircularProgress circularProgress;
@@ -114,6 +112,16 @@ namespace osu.Game.Screens.Play.HUD
 
             public Action HoverGained;
             public Action HoverLost;
+
+            private const double shake_duration = 20;
+
+            private bool pendingAnimation;
+            private ScheduledDelegate shakeOperation;
+
+            public HoldButton(bool isDangerousAction)
+                : base(isDangerousAction)
+            {
+            }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -161,11 +169,38 @@ namespace osu.Game.Screens.Play.HUD
 
             private void bind()
             {
-                circularProgress.Current.BindTo(Progress);
-                Progress.ValueChanged += progress => icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
+                ((IBindable<double>)circularProgress.Current).BindTo(Progress);
+                Progress.ValueChanged += progress =>
+                {
+                    icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
+
+                    if (IsDangerousAction)
+                    {
+                        Colour = Interpolation.ValueAt(progress.NewValue, Color4.White, Color4.Red, 0, 1, Easing.OutQuint);
+
+                        if (progress.NewValue > 0 && progress.NewValue < 1)
+                        {
+                            shakeOperation ??= Scheduler.AddDelayed(shake, shake_duration, true);
+                        }
+                        else
+                        {
+                            Child.MoveTo(Vector2.Zero, shake_duration * 2, Easing.OutQuint);
+                            shakeOperation?.Cancel();
+                            shakeOperation = null;
+                        }
+                    }
+                };
             }
 
-            private bool pendingAnimation;
+            private void shake()
+            {
+                const float shake_magnitude = 8;
+
+                Child.MoveTo(new Vector2(
+                    RNG.NextSingle(-1, 1) * (float)Progress.Value * shake_magnitude,
+                    RNG.NextSingle(-1, 1) * (float)Progress.Value * shake_magnitude
+                ), shake_duration);
+            }
 
             protected override void Confirm()
             {

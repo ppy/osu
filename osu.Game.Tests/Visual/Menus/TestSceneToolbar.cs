@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,6 +23,17 @@ namespace osu.Game.Tests.Visual.Menus
         [Resolved]
         private IRulesetStore rulesets { get; set; }
 
+        private readonly Mock<INotificationOverlay> notifications = new Mock<INotificationOverlay>();
+
+        private readonly BindableInt unreadNotificationCount = new BindableInt();
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.CacheAs(notifications.Object);
+            notifications.SetupGet(n => n.UnreadCount).Returns(unreadNotificationCount);
+        }
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
@@ -31,10 +43,6 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestNotificationCounter()
         {
-            ToolbarNotificationButton notificationButton = null;
-
-            AddStep("retrieve notification button", () => notificationButton = toolbar.ChildrenOfType<ToolbarNotificationButton>().Single());
-
             setNotifications(1);
             setNotifications(2);
             setNotifications(3);
@@ -43,7 +51,7 @@ namespace osu.Game.Tests.Visual.Menus
 
             void setNotifications(int count)
                 => AddStep($"set notification count to {count}",
-                    () => notificationButton.NotificationCount.Value = count);
+                    () => unreadNotificationCount.Value = count);
         }
 
         [TestCase(false)]

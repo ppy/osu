@@ -11,7 +11,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
 using System.Collections.Generic;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -80,7 +82,7 @@ namespace osu.Game.Graphics.UserInterface
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                            Text = "show more".ToUpper(),
+                            Text = CommonStrings.ButtonsShowMore.ToUpper(),
                         },
                         rightIcon = new ChevronIcon
                         {

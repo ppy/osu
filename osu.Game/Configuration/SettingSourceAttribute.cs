@@ -88,6 +88,7 @@ namespace osu.Game.Configuration
                         throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} had an unsupported custom control type ({controlType.ReadableName()})");
 
                     var control = (Drawable)Activator.CreateInstance(controlType);
+                    controlType.GetProperty(nameof(SettingsItem<object>.SettingSourceObject))?.SetValue(control, obj);
                     controlType.GetProperty(nameof(SettingsItem<object>.LabelText))?.SetValue(control, attr.Label);
                     controlType.GetProperty(nameof(SettingsItem<object>.TooltipText))?.SetValue(control, attr.Description);
                     controlType.GetProperty(nameof(SettingsItem<object>.Current))?.SetValue(control, value);

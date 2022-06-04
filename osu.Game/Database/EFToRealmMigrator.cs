@@ -52,7 +52,7 @@ namespace osu.Game.Database
         private OsuConfigManager config { get; set; } = null!;
 
         [Resolved]
-        private NotificationOverlay notificationOverlay { get; set; } = null!;
+        private INotificationOverlay notificationOverlay { get; set; } = null!;
 
         [Resolved]
         private OsuGame game { get; set; } = null!;

@@ -1,6 +1,14 @@
 # EditorConfig is awesome: http://editorconfig.org
 root = true
 
+[*.{csproj,props,targets}]
+charset = utf-8-bom
+end_of_line = crlf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+
 [*.cs]
 end_of_line = crlf
 insert_final_newline = true
@@ -8,7 +16,18 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+#license header
+file_header_template = Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.\nSee the LICENCE file in the repository root for full licence text.
+
 #Roslyn naming styles
+
+#PascalCase for public and protected members
+dotnet_naming_style.pascalcase.capitalization = pascal_case
+dotnet_naming_symbols.public_members.applicable_accessibilities = public,internal,protected,protected_internal,private_protected
+dotnet_naming_symbols.public_members.applicable_kinds = property,method,field,event
+dotnet_naming_rule.public_members_pascalcase.severity = error
+dotnet_naming_rule.public_members_pascalcase.symbols = public_members
+dotnet_naming_rule.public_members_pascalcase.style = pascalcase
 
 #camelCase for private members
 dotnet_naming_style.camelcase.capitalization = camel_case
@@ -172,23 +191,11 @@ csharp_style_prefer_index_operator = false:silent
 csharp_style_prefer_range_operator = false:silent
 csharp_style_prefer_switch_expression = false:none
 
-#Supressing roslyn built-in analyzers
-# Suppress: EC112
+[*.{yaml,yml}]
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
 
-#Private method is unused
-dotnet_diagnostic.IDE0051.severity = silent
-#Private member is unused
-dotnet_diagnostic.IDE0052.severity = silent
-
-#Rules for disposable
-dotnet_diagnostic.IDE0067.severity = none
-dotnet_diagnostic.IDE0068.severity = none
-dotnet_diagnostic.IDE0069.severity = none
-
-#Disable operator overloads requiring alternate named methods
-dotnet_diagnostic.CA2225.severity = none
-
-# Banned APIs
-dotnet_diagnostic.RS0030.severity = error
-
+dotnet_diagnostic.OLOC001.words_in_name = 5
 dotnet_diagnostic.OLOC001.license_header = // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.\n// See the LICENCE file in the repository root for full licence text.

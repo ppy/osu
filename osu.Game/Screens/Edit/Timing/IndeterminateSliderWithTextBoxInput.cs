@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
@@ -105,6 +106,14 @@ namespace osu.Game.Screens.Edit.Timing
             slider.Current.BindValueChanged(val => Current.Value = val.NewValue);
 
             Current.BindValueChanged(_ => updateState(), true);
+        }
+
+        public override bool AcceptsFocus => true;
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+            GetContainingInputManager().ChangeFocus(textBox);
         }
 
         private void updateState()

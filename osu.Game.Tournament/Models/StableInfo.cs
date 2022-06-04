@@ -45,7 +45,7 @@ namespace osu.Game.Tournament.Models
 
         public void SaveChanges()
         {
-            using (var stream = configStorage.GetStream(config_path, FileAccess.Write, FileMode.Create))
+            using (var stream = configStorage.CreateFileSafely(config_path))
             using (var sw = new StreamWriter(stream))
             {
                 sw.Write(JsonConvert.SerializeObject(this,

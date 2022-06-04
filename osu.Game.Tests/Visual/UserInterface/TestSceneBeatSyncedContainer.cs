@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
@@ -82,11 +83,15 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             if (!allowMistimed)
             {
-                AddAssert("trigger is near beat length", () => lastActuationTime != null && lastBeatIndex != null && Precision.AlmostEquals(lastTimingPoint.Time + lastBeatIndex.Value * lastTimingPoint.BeatLength, lastActuationTime.Value, BeatSyncedContainer.MISTIMED_ALLOWANCE));
+                AddAssert("trigger is near beat length",
+                    () => lastActuationTime != null && lastBeatIndex != null && Precision.AlmostEquals(lastTimingPoint.Time + lastBeatIndex.Value * lastTimingPoint.BeatLength, lastActuationTime.Value,
+                        BeatSyncedContainer.MISTIMED_ALLOWANCE));
             }
             else
             {
-                AddAssert("trigger is not near beat length", () => lastActuationTime != null && lastBeatIndex != null && !Precision.AlmostEquals(lastTimingPoint.Time + lastBeatIndex.Value * lastTimingPoint.BeatLength, lastActuationTime.Value, BeatSyncedContainer.MISTIMED_ALLOWANCE));
+                AddAssert("trigger is not near beat length",
+                    () => lastActuationTime != null && lastBeatIndex != null && !Precision.AlmostEquals(lastTimingPoint.Time + lastBeatIndex.Value * lastTimingPoint.BeatLength,
+                        lastActuationTime.Value, BeatSyncedContainer.MISTIMED_ALLOWANCE));
             }
         }
 
@@ -258,24 +263,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 };
             }
 
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                Beatmap.BindValueChanged(_ =>
-                {
-                    timingPointCount.Value = 0;
-                    currentTimingPoint.Value = 0;
-                    beatCount.Value = 0;
-                    currentBeat.Value = 0;
-                    beatsPerMinute.Value = 0;
-                    adjustedBeatLength.Value = 0;
-                    timeUntilNextBeat.Value = 0;
-                    timeSinceLastBeat.Value = 0;
-                }, true);
-            }
-
-            private List<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.ToList();
+            private List<TimingControlPoint> timingPoints => BeatSyncSource.ControlPoints?.TimingPoints.ToList();
 
             private TimingControlPoint getNextTimingPoint(TimingControlPoint current)
             {
@@ -292,7 +280,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (timingPoints.Count == 0) return 0;
 
                 if (timingPoints[^1] == current)
-                    return (int)Math.Ceiling((BeatSyncClock.CurrentTime - current.Time) / current.BeatLength);
+                {
+                    Debug.Assert(BeatSyncSource.Clock != null);
+
+                    return (int)Math.Ceiling((BeatSyncSource.Clock.CurrentTime - current.Time) / current.BeatLength);
+                }
 
                 return (int)Math.Ceiling((getNextTimingPoint(current).Time - current.Time) / current.BeatLength);
             }
@@ -300,9 +292,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override void Update()
             {
                 base.Update();
+
+                Debug.Assert(BeatSyncSource.Clock != null);
+
                 timeUntilNextBeat.Value = TimeUntilNextBeat;
                 timeSinceLastBeat.Value = TimeSinceLastBeat;
-                currentTime.Value = BeatSyncClock.CurrentTime;
+                currentTime.Value = BeatSyncSource.Clock.CurrentTime;
             }
 
             public Action<int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes> NewBeat;

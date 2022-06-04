@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
@@ -17,6 +18,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -55,6 +57,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private TestMultiplayerClient multiplayerClient => multiplayerComponents.MultiplayerClient;
         private TestMultiplayerRoomManager roomManager => multiplayerComponents.RoomManager;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -495,17 +500,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
 
-            AddAssert("Mods match current item", () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
+            AddAssert("Mods match current item",
+                () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
 
             AddStep("Switch required mods", () => ((MultiplayerMatchSongSelect)multiplayerComponents.MultiplayerScreen.CurrentSubScreen).Mods.Value = new Mod[] { new OsuModDoubleTime() });
 
-            AddAssert("Mods don't match current item", () => !SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
+            AddAssert("Mods don't match current item",
+                () => !SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
 
             AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
 
-            AddAssert("Mods match current item", () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
+            AddAssert("Mods match current item",
+                () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
         }
 
         [Test]
@@ -663,6 +671,78 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);
+        }
+
+        [Test]
+        public void TestGameplayExitFlow()
+        {
+            Bindable<double> holdDelay = null;
+
+            AddStep("Set hold delay to zero", () =>
+            {
+                holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
+                holdDelay.Value = 0;
+            });
+
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    }
+                }
+            });
+
+            enterGameplay();
+
+            AddUntilStep("wait for playing", () => this.ChildrenOfType<Player>().FirstOrDefault()?.LocalUserPlaying.Value == true);
+
+            AddStep("attempt exit without hold", () => InputManager.Key(Key.Escape));
+            AddAssert("still in gameplay", () => multiplayerComponents.CurrentScreen is Player);
+
+            AddStep("attempt exit with hold", () => InputManager.PressKey(Key.Escape));
+            AddUntilStep("wait for lounge", () => multiplayerComponents.CurrentScreen is Screens.OnlinePlay.Multiplayer.Multiplayer);
+
+            AddStep("stop holding", () => InputManager.ReleaseKey(Key.Escape));
+            AddStep("set hold delay to default", () => holdDelay.SetDefault());
+        }
+
+        [Test]
+        public void TestGameplayDoesntStartWithNonLoadedUser()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    }
+                }
+            });
+
+            pressReadyButton();
+
+            AddStep("join other user and ready", () =>
+            {
+                multiplayerClient.AddUser(new APIUser { Id = 1234 });
+                multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Ready);
+            });
+
+            AddStep("start match", () =>
+            {
+                multiplayerClient.StartMatch();
+            });
+
+            AddUntilStep("wait for player", () => multiplayerComponents.CurrentScreen is Player);
+
+            AddWaitStep("wait some", 20);
+
+            AddAssert("ensure gameplay hasn't started", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.IsRunning == false);
         }
 
         [Test]

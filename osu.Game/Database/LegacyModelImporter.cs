@@ -24,8 +24,14 @@ namespace osu.Game.Database
         /// <summary>
         /// Select paths to import from stable where all paths should be absolute. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
         /// </summary>
-        protected virtual IEnumerable<string> GetStableImportPaths(Storage storage) => storage.GetDirectories(ImportFromStablePath)
-                                                                                              .Select(path => storage.GetFullPath(path));
+        protected virtual IEnumerable<string> GetStableImportPaths(Storage storage)
+        {
+            if (!storage.ExistsDirectory(ImportFromStablePath))
+                return Enumerable.Empty<string>();
+
+            return storage.GetDirectories(ImportFromStablePath)
+                          .Select(path => storage.GetFullPath(path));
+        }
 
         protected readonly IModelImporter<TModel> Importer;
 
@@ -33,6 +39,8 @@ namespace osu.Game.Database
         {
             Importer = importer;
         }
+
+        public Task<int> GetAvailableCount(StableStorage stableStorage) => Task.Run(() => GetStableImportPaths(PrepareStableStorage(stableStorage)).Count());
 
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {

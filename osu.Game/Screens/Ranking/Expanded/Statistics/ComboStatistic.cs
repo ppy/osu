@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osuTK;
 
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         /// <param name="combo">The combo to be displayed.</param>
         /// <param name="maxCombo">The maximum value of <paramref name="combo"/>.</param>
         public ComboStatistic(int combo, int? maxCombo)
-            : base("combo", combo, maxCombo)
+            : base(BeatmapsetsStrings.ShowScoreboardHeadersCombo, combo, maxCombo)
         {
             isPerfect = combo == maxCombo;
         }

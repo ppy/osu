@@ -9,11 +9,11 @@ using osuTK;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private readonly PatternType convertType;
 
-        public HitObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density,
+        public HitObjectPatternGenerator(LegacyRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density,
                                          PatternType lastStair, IBeatmap originalBeatmap)
             : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
         {

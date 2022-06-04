@@ -5,7 +5,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet;
@@ -23,9 +22,6 @@ namespace osu.Game.Overlays
         public const float RIGHT_WIDTH = 275;
 
         private readonly Bindable<APIBeatmapSet> beatmapSet = new Bindable<APIBeatmapSet>();
-
-        // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
             : base(OverlayColourScheme.Blue)
@@ -69,12 +65,6 @@ namespace osu.Game.Overlays
         {
             base.PopOutComplete();
             beatmapSet.Value = null;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            Hide();
-            return true;
         }
 
         public void FetchAndShowBeatmap(int beatmapId)

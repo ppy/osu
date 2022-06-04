@@ -448,7 +448,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Reapplies the current <see cref="ArmedState"/>.
         /// </summary>
-        protected void RefreshStateTransforms() => updateState(State.Value, true);
+        public void RefreshStateTransforms() => updateState(State.Value, true);
 
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.

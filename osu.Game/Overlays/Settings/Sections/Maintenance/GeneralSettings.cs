@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private SettingsButton undeleteButton;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] LegacyImportManager legacyImportManager, DialogOverlay dialogOverlay)
+        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] LegacyImportManager legacyImportManager, IDialogOverlay dialogOverlay)
         {
             if (legacyImportManager?.SupportsImportFromStable == true)
             {

@@ -6,6 +6,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -24,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class CatchHitObjectComposer : HitObjectComposer<CatchHitObject>
+    public class CatchHitObjectComposer : DistancedHitObjectComposer<CatchHitObject>
     {
         private const float distance_snap_radius = 50;
 
@@ -42,6 +43,10 @@ namespace osu.Game.Rulesets.Catch.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
+            // todo: enable distance spacing once catch supports applying it to its existing distance snap grid implementation.
+            RightSideToolboxContainer.Alpha = 0;
+            DistanceSpacingMultiplier.Disabled = true;
+
             LayerBelowRuleset.Add(new PlayfieldBorder
             {
                 RelativeSizeAxes = Axes.Both,
@@ -85,15 +90,19 @@ namespace osu.Game.Rulesets.Catch.Edit
             new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
         });
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
-            var result = base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
+            var result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
+
             result.ScreenSpacePosition.X = screenSpacePosition.X;
 
-            if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
-                Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
+            if (snapType.HasFlagFast(SnapType.Grids))
             {
-                result = snapResult;
+                if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
+                    Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
+                {
+                    result = snapResult;
+                }
             }
 
             return result;

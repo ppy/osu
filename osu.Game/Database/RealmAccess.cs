@@ -242,7 +242,7 @@ namespace osu.Game.Database
             storage.Delete(Filename);
 
             using (var inputStream = storage.GetStream(recoveryFilename))
-            using (var outputStream = storage.GetStream(Filename, FileAccess.Write, FileMode.Create))
+            using (var outputStream = storage.CreateFileSafely(Filename))
                 inputStream.CopyTo(outputStream);
 
             storage.Delete(recoveryFilename);
@@ -348,6 +348,26 @@ namespace osu.Game.Database
         /// Write changes to realm.
         /// </summary>
         /// <param name="action">The work to run.</param>
+        public T Write<T>(Func<Realm, T> action)
+        {
+            if (ThreadSafety.IsUpdateThread)
+            {
+                total_writes_update.Value++;
+                return Realm.Write(action);
+            }
+            else
+            {
+                total_writes_async.Value++;
+
+                using (var realm = getRealmInstance())
+                    return realm.Write(action);
+            }
+        }
+
+        /// <summary>
+        /// Write changes to realm.
+        /// </summary>
+        /// <param name="action">The work to run.</param>
         public void Write(Action<Realm> action)
         {
             if (ThreadSafety.IsUpdateThread)
@@ -372,7 +392,7 @@ namespace osu.Game.Database
         {
             total_writes_async.Value++;
             using (var realm = getRealmInstance())
-                await realm.WriteAsync(action);
+                await realm.WriteAsync(() => action(realm));
         }
 
         /// <summary>

@@ -7,8 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
@@ -20,8 +22,10 @@ using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -51,7 +55,7 @@ namespace osu.Game
     /// Unlike <see cref="OsuGame"/>, this class will not load any kind of UI, allowing it to be used
     /// for provide dependencies to test cases without interfering with them.
     /// </summary>
-    public partial class OsuGameBase : Framework.Game, ICanAcceptFiles
+    public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
         public const string OSU_PROTOCOL = "osu://";
 
@@ -76,6 +80,9 @@ namespace osu.Game
 
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
+        internal EndpointConfiguration CreateEndpoints() =>
+            UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
         /// <summary>
@@ -85,6 +92,8 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
+        internal const string BUILD_SUFFIX = "lazer";
+
         public virtual string Version
         {
             get
@@ -93,7 +102,7 @@ namespace osu.Game
                     return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
                 var version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
+                return $@"{version.Major}.{version.Minor}.{version.Build}-{BUILD_SUFFIX}";
             }
         }
 
@@ -180,9 +189,21 @@ namespace osu.Game
         /// </summary>
         protected DatabaseContextFactory EFContextFactory { get; private set; }
 
+        /// <summary>
+        /// Number of unhandled exceptions to allow before aborting execution.
+        /// </summary>
+        /// <remarks>
+        /// When an unhandled exception is encountered, an internal count will be decremented.
+        /// If the count hits zero, the game will crash.
+        /// Each second, the count is incremented until reaching the value specified.
+        /// </remarks>
+        protected virtual int UnhandledExceptionsBeforeCrash => DebugUtils.IsDebugBuild ? 0 : 1;
+
         public OsuGameBase()
         {
             Name = @"osu!";
+
+            allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
 
         [BackgroundDependencyLoader]
@@ -228,7 +249,7 @@ namespace osu.Game
                 {
                     if (source != null)
                     {
-                        using (var destination = Storage.GetStream(Path.Combine(backup_folder, $"collection.{migration}.db"), FileAccess.Write, FileMode.CreateNew))
+                        using (var destination = Storage.CreateFileSafely(Path.Combine(backup_folder, $"collection.{migration}.db")))
                             source.CopyTo(destination);
                     }
                 }
@@ -250,7 +271,7 @@ namespace osu.Game
             dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+            EndpointConfiguration endpoints = CreateEndpoints();
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
@@ -408,6 +429,8 @@ namespace osu.Game
             LocalConfig ??= UseDevelopmentServer
                 ? new DevelopmentOsuConfigManager(Storage)
                 : new OsuConfigManager(Storage);
+
+            host.ExceptionThrown += onExceptionThrown;
         }
 
         /// <summary>
@@ -505,6 +528,23 @@ namespace osu.Game
             AvailableMods.Value = dict;
         }
 
+        private int allowableExceptions;
+
+        /// <summary>
+        /// Allows a maximum of one unhandled exception, per second of execution.
+        /// </summary>
+        private bool onExceptionThrown(Exception _)
+        {
+            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
+
+            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
+
+            // restore the stock of allowable exceptions after a short delay.
+            Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
+
+            return continueExecution;
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -514,6 +554,13 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             realm?.Dispose();
+
+            if (Host != null)
+                Host.ExceptionThrown -= onExceptionThrown;
         }
+
+        ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.Beatmap.ControlPointInfo;
+        IClock IBeatSyncProvider.Clock => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track : (IClock)null;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
     }
 }

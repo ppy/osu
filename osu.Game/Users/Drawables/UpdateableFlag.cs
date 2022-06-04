@@ -49,7 +49,7 @@ namespace osu.Game.Users.Drawables
                     {
                         RelativeSizeAxes = Axes.Both
                     },
-                    new HoverClickSounds(HoverSampleSet.Submit)
+                    new HoverClickSounds()
                 }
             };
         }

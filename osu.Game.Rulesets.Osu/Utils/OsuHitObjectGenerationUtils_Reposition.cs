@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             foreach (OsuHitObject hitObject in hitObjects)
             {
                 Vector2 relativePosition = hitObject.Position - previousPosition;
-                float absoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
+                float absoluteAngle = MathF.Atan2(relativePosition.Y, relativePosition.X);
                 float relativeAngle = absoluteAngle - previousAngle;
 
                 ObjectPositionInfo positionInfo;
@@ -168,15 +168,15 @@ namespace osu.Game.Rulesets.Osu.Utils
                     else
                         earliestPosition = beforePrevious?.HitObject.EndPosition ?? playfield_centre;
                     Vector2 relativePosition = previous.HitObject.Position - earliestPosition;
-                    previousAbsoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
+                    previousAbsoluteAngle = MathF.Atan2(relativePosition.Y, relativePosition.X);
                 }
             }
 
             float absoluteAngle = previousAbsoluteAngle + current.PositionInfo.RelativeAngle;
 
             var posRelativeToPrev = new Vector2(
-                current.PositionInfo.DistanceFromPrevious * (float)Math.Cos(absoluteAngle),
-                current.PositionInfo.DistanceFromPrevious * (float)Math.Sin(absoluteAngle)
+                current.PositionInfo.DistanceFromPrevious * MathF.Cos(absoluteAngle),
+                current.PositionInfo.DistanceFromPrevious * MathF.Sin(absoluteAngle)
             );
 
             Vector2 lastEndPosition = previous?.EndPositionModified ?? playfield_centre;
@@ -189,14 +189,14 @@ namespace osu.Game.Rulesets.Osu.Utils
             if (!(current.HitObject is Slider slider))
                 return;
 
-            absoluteAngle = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
+            absoluteAngle = MathF.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
 
             Vector2 centreOfMassOriginal = calculateCentreOfMass(slider);
             Vector2 centreOfMassModified = rotateVector(centreOfMassOriginal, current.PositionInfo.Rotation + absoluteAngle - getSliderRotation(slider));
             if (rotateAwayFromEdge)
                 centreOfMassModified = RotateAwayFromEdge(current.PositionModified, centreOfMassModified);
 
-            float relativeRotation = (float)Math.Atan2(centreOfMassModified.Y, centreOfMassModified.X) - (float)Math.Atan2(centreOfMassOriginal.Y, centreOfMassOriginal.X);
+            float relativeRotation = MathF.Atan2(centreOfMassModified.Y, centreOfMassModified.X) - MathF.Atan2(centreOfMassOriginal.Y, centreOfMassOriginal.X);
             if (!Precision.AlmostEquals(relativeRotation, 0))
                 RotateSlider(slider, relativeRotation);
         }
@@ -341,13 +341,19 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <returns>The centre of mass of the slider.</returns>
         private static Vector2 calculateCentreOfMass(Slider slider)
         {
-            if (slider.Distance < 1) return Vector2.Zero;
+            const double sample_step = 50;
+
+            // just sample the start and end positions if the slider is too short
+            if (slider.Distance <= sample_step)
+            {
+                return Vector2.Divide(slider.Path.PositionAt(1), 2);
+            }
 
             int count = 0;
             Vector2 sum = Vector2.Zero;
             double pathDistance = slider.Distance;
 
-            for (double i = 0; i < pathDistance; i++)
+            for (double i = 0; i < pathDistance; i += sample_step)
             {
                 sum += slider.Path.PositionAt(i / pathDistance);
                 count++;
@@ -364,7 +370,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         private static float getSliderRotation(Slider slider)
         {
             var endPositionVector = slider.Path.PositionAt(1);
-            return (float)Math.Atan2(endPositionVector.Y, endPositionVector.X);
+            return MathF.Atan2(endPositionVector.Y, endPositionVector.X);
         }
 
         public class ObjectPositionInfo

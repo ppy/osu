@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -17,12 +19,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public Flashlight(Mod[] mods)
             : base(mods)
         {
+            hidden = mods.Any(m => m is OsuModHidden);
         }
 
-        private double skillMultiplier => 0.07;
+        private double skillMultiplier => 0.05;
         private double strainDecayBase => 0.15;
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
+
+        private readonly bool hidden;
+
+        private const double max_opacity_bonus = 0.4;
+        private const double hidden_bonus = 0.2;
 
         private double currentStrain;
 
@@ -61,13 +69,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     // We also want to nerf stacks so that only the first object of the stack is accounted for.
                     double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
 
-                    result += stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
+                    // Bonus based on how visible the object is.
+                    double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.OpacityAt(currentHitObject.StartTime, hidden));
+
+                    result += stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
                 }
 
                 lastObj = currentObj;
             }
 
-            return Math.Pow(smallDistNerf * result, 2.0);
+            result = Math.Pow(smallDistNerf * result, 2.0);
+
+            // Additional bonus for Hidden due to there being no approach circles.
+            if (hidden)
+                result *= 1.0 + hidden_bonus;
+
+            return result;
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
