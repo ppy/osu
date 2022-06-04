@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\osu.Android.props" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -13,12 +13,17 @@
     <AssemblyName>osu.Android</AssemblyName>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
-    <EnableLLVM>false</EnableLLVM> <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
+    <EnableLLVM>false</EnableLLVM>
+    <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <MandroidI18n>cjk;mideast;other;rare;west</MandroidI18n>
     <AndroidDexTool>d8</AndroidDexTool>
     <AndroidLinkTool>r8</AndroidLinkTool>
+    <AotAssemblies>false</AotAssemblies>
+    <EnableLLVM>false</EnableLLVM>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <BundleAssemblies>false</BundleAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <AndroidLinkMode>None</AndroidLinkMode>
@@ -38,6 +43,10 @@
     <ProjectReference Include="..\..\osu-framework\osu.Framework.Android\osu.Framework.Android.csproj">
       <Project>{c5bddb48-6717-4830-bd88-d130421149b0}</Project>
       <Name>osu.Framework.Android</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\osu-framework\osu.Framework\osu.Framework.csproj">
+      <Project>{c5bddb48-6711-4830-bd88-d130421149b0}</Project>
+      <Name>osu.Framework</Name>
     </ProjectReference>
     <ProjectReference Include="..\M.Resources\M.Resources.csproj">
       <Project>{0b00e068-854f-4e2b-826e-d6c1cfc02490}</Project>
