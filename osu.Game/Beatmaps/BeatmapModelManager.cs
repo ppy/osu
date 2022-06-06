@@ -130,13 +130,15 @@ namespace osu.Game.Beatmaps
             {
                 Progress = 0,
                 Text = $"Preparing to delete all {HumanisedModelName} videos...",
-                CompletionText = $"Deleted all {HumanisedModelName} videos!",
+                CompletionText = $"No videos found to delete!",
                 State = ProgressNotificationState.Active,
             };
+
             if (!silent)
                 PostNotification?.Invoke(notification);
 
             int i = 0;
+            int deleted = 0;
 
             foreach (var b in items)
             {
@@ -144,13 +146,18 @@ namespace osu.Game.Beatmaps
                     // user requested abort
                     return;
 
-                notification.Text = $"Deleting videos from {HumanisedModelName}s ({++i} of {items.Count})";
-
                 var video = b.Files.FirstOrDefault(f => VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.Ordinal)));
-                if (video != null)
-                    DeleteFile(b, video);
 
-                notification.Progress = (float)i / items.Count;
+                if (video != null)
+                {
+                    DeleteFile(b, video);
+                    deleted++;
+                    notification.CompletionText = $"Deleted {deleted} {HumanisedModelName} video(s)!";
+                }
+
+                notification.Text = $"Deleting videos from {HumanisedModelName}s ({deleted} deleted)";
+
+                notification.Progress = (float)++i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
