@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <param name="notePairDuration">The duration between the current and previous note hit using the same key.</param>
         private static double speedBonus(double notePairDuration)
         {
-            return 175 / (notePairDuration + 100);
+            return Math.Pow(0.4, notePairDuration / 1000);
         }
 
         /// <summary>
@@ -38,7 +39,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 return 0.0;
             }
 
-            double objectStrain = 0.5;
+            double objectStrain = 0;
+            // Console.WriteLine(speedBonus(taikoCurrent.StartTime - keyPrevious.StartTime));
             objectStrain += speedBonus(taikoCurrent.StartTime - keyPrevious.StartTime);
             return objectStrain;
         }

@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
         private const double rhythm_skill_multiplier = 0.017;
-        private const double colour_skill_multiplier = 0.028;
-        private const double stamina_skill_multiplier = 0.021;
+        private const double colour_skill_multiplier = 0.027;
+        private const double stamina_skill_multiplier = 0.017;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -47,13 +47,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             List<DifficultyHitObject> difficultyHitObject = new List<DifficultyHitObject>();
+            List<TaikoDifficultyHitObject> centreObjects = new List<TaikoDifficultyHitObject>();
+            List<TaikoDifficultyHitObject> rimObjects = new List<TaikoDifficultyHitObject>();
+            List<TaikoDifficultyHitObject> noteObjects = new List<TaikoDifficultyHitObject>();
 
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
                 difficultyHitObject.Add(
                     new TaikoDifficultyHitObject(
-                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, difficultyHitObject, difficultyHitObject.Count
-                    )
+                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, difficultyHitObject,
+                        centreObjects, rimObjects, noteObjects, difficultyHitObject.Count)
                 );
             }
 
