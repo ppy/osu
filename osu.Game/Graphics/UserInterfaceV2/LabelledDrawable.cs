@@ -41,7 +41,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected const float CONTENT_PADDING_VERTICAL = 10;
         protected const float CONTENT_PADDING_HORIZONTAL = 15;
-        protected const float CORNER_RADIUS = 15;
+
+        public const float CORNER_RADIUS = 15;
 
         /// <summary>
         /// The component that is being displayed.
@@ -153,7 +154,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load(OverlayColourProvider? colourProvider, OsuColour osuColour)
         {
-            background.Colour = colourProvider?.Background4 ?? Color4Extensions.FromHex(@"1c2125");
+            background.Colour = colourProvider?.Background5 ?? Color4Extensions.FromHex(@"1c2125");
             descriptionText.Colour = osuColour.Yellow;
         }
 

@@ -13,6 +13,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class ShearedToggleButton : ShearedButton
     {
+        private Sample? sampleClick;
         private Sample? sampleOff;
         private Sample? sampleOn;
 
@@ -39,8 +40,9 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleOn = audio.Samples.Get(@"UI/check-on");
-            sampleOff = audio.Samples.Get(@"UI/check-off");
+            sampleClick = audio.Samples.Get(@"UI/default-select");
+            sampleOn = audio.Samples.Get(@"UI/dropdown-open");
+            sampleOff = audio.Samples.Get(@"UI/dropdown-close");
         }
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(sampleSet);
@@ -67,6 +69,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private void playSample()
         {
+            sampleClick?.Play();
+
             if (Active.Value)
                 sampleOn?.Play();
             else

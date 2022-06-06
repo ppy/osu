@@ -34,6 +34,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public void Stop() => IsRunning = false;
 
+        void IAdjustableClock.Start()
+        {
+            // Our running state should only be managed by an ISyncManager, ignore calls from external sources.
+        }
+
+        void IAdjustableClock.Stop()
+        {
+            // Our running state should only be managed by an ISyncManager, ignore calls from external sources.
+        }
+
         public bool Seek(double position)
         {
             CurrentTime = position;

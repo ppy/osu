@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -36,22 +37,66 @@ namespace osu.Game.Database
         [Resolved]
         private CollectionManager collections { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
         [Resolved]
         private IDialogOverlay dialogOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved(canBeNull: true)]
         private DesktopGameHost desktopGameHost { get; set; }
 
         private StableStorage cachedStorage;
 
         public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
-        public async Task ImportFromStableAsync(StableContent content)
+        public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, desktopGameHost);
+
+        public virtual async Task<int> GetImportCount(StableContent content, CancellationToken cancellationToken)
         {
-            var stableStorage = await getStableStorage().ConfigureAwait(false);
+            var stableStorage = GetCurrentStableStorage();
+
+            if (stableStorage == null)
+                return 0;
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            switch (content)
+            {
+                case StableContent.Beatmaps:
+                    return await new LegacyBeatmapImporter(beatmaps).GetAvailableCount(stableStorage);
+
+                case StableContent.Skins:
+                    return await new LegacySkinImporter(skins).GetAvailableCount(stableStorage);
+
+                case StableContent.Collections:
+                    return await collections.GetAvailableCount(stableStorage);
+
+                case StableContent.Scores:
+                    return await new LegacyScoreImporter(scores).GetAvailableCount(stableStorage);
+
+                default:
+                    throw new ArgumentException($"Only one {nameof(StableContent)} flag should be specified.");
+            }
+        }
+
+        public async Task ImportFromStableAsync(StableContent content, bool interactiveLocateIfNotFound = true)
+        {
+            var stableStorage = GetCurrentStableStorage();
+
+            if (stableStorage == null)
+            {
+                if (!interactiveLocateIfNotFound)
+                    return;
+
+                var taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+                Schedule(() => dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource)));
+                string stablePath = await taskCompletionSource.Task.ConfigureAwait(false);
+
+                UpdateStorage(stablePath);
+                stableStorage = GetCurrentStableStorage();
+            }
+
             var importTasks = new List<Task>();
 
             Task beatmapImportTask = Task.CompletedTask;
@@ -70,20 +115,16 @@ namespace osu.Game.Database
             await Task.WhenAll(importTasks.ToArray()).ConfigureAwait(false);
         }
 
-        private async Task<StableStorage> getStableStorage()
+        public StableStorage GetCurrentStableStorage()
         {
             if (cachedStorage != null)
                 return cachedStorage;
 
-            var stableStorage = game.GetStorageForStableInstall();
+            var stableStorage = game?.GetStorageForStableInstall();
             if (stableStorage != null)
                 return cachedStorage = stableStorage;
 
-            var taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Schedule(() => dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource)));
-            string stablePath = await taskCompletionSource.Task.ConfigureAwait(false);
-
-            return cachedStorage = new StableStorage(stablePath, desktopGameHost);
+            return null;
         }
     }
 

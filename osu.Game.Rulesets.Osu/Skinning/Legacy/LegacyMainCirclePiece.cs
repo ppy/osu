@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
 
-        [Resolved(canBeNull: true)]
+        [Resolved(canBeNull: true)] // Can't really be null but required to handle potential of disposal before DI completes.
         private DrawableHitObject? drawableObject { get; set; }
 
         [Resolved]

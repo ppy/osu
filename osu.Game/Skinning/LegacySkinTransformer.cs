@@ -23,7 +23,7 @@ namespace osu.Game.Skinning
         /// The <see cref="ISkin"/> which is being transformed.
         /// </summary>
         [NotNull]
-        protected internal ISkin Skin { get; }
+        public ISkin Skin { get; }
 
         protected LegacySkinTransformer([NotNull] ISkin skin)
         {

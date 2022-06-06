@@ -259,7 +259,7 @@ namespace osu.Game.Tournament
 
         public void PopulateUser(APIUser user, Action success = null, Action failure = null, bool immediate = false)
         {
-            var req = new GetUserRequest(user.Id, Ruleset.Value);
+            var req = new GetUserRequest(user.Id, ladder.Ruleset.Value);
 
             if (immediate)
             {
@@ -321,7 +321,7 @@ namespace osu.Game.Tournament
                     Converters = new JsonConverter[] { new JsonPointConverter() }
                 });
 
-            using (var stream = storage.GetStream(BRACKET_FILENAME, FileAccess.Write, FileMode.Create))
+            using (var stream = storage.CreateFileSafely(BRACKET_FILENAME))
             using (var sw = new StreamWriter(stream))
                 sw.Write(serialisedLadder);
         }

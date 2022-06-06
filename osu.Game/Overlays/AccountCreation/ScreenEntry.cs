@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -69,7 +70,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         usernameTextBox = new OsuTextBox
                         {
-                            PlaceholderText = UsersStrings.LoginUsername,
+                            PlaceholderText = UsersStrings.LoginUsername.ToLower(),
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },
@@ -91,7 +92,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         passwordTextBox = new OsuPasswordTextBox
                         {
-                            PlaceholderText = "password",
+                            PlaceholderText = UsersStrings.LoginPassword.ToLower(),
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this,
                         },

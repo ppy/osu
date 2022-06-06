@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ github.workspace }}/inspectcode
-          key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', '.editorconfig', '.globalconfig') }}
+          key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', '.editorconfig', '.globalconfig', 'CodeAnalysis/*') }}
 
       - name: Dotnet code style
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf -p:EnforceCodeStyleInBuild=true
@@ -77,15 +77,6 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "6.0.x"
-
-      # FIXME: libavformat is not included in Ubuntu. Let's fix that.
-      # https://github.com/ppy/osu-framework/issues/4349
-      # Remove this once https://github.com/actions/virtual-environments/issues/3306 has been resolved.
-      - name: Install libavformat-dev
-        if: ${{matrix.os.fullname == 'ubuntu-latest'}}
-        run: |
-         sudo apt-get update && \
-         sudo apt-get -y install libavformat-dev
 
       - name: Compile
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf

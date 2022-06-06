@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
@@ -21,8 +22,10 @@ using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -52,7 +55,7 @@ namespace osu.Game
     /// Unlike <see cref="OsuGame"/>, this class will not load any kind of UI, allowing it to be used
     /// for provide dependencies to test cases without interfering with them.
     /// </summary>
-    public partial class OsuGameBase : Framework.Game, ICanAcceptFiles
+    public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
         public const string OSU_PROTOCOL = "osu://";
 
@@ -76,6 +79,9 @@ namespace osu.Game
         private const double global_track_volume_adjust = 0.8;
 
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
+
+        internal EndpointConfiguration CreateEndpoints() =>
+            UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -243,7 +249,7 @@ namespace osu.Game
                 {
                     if (source != null)
                     {
-                        using (var destination = Storage.GetStream(Path.Combine(backup_folder, $"collection.{migration}.db"), FileAccess.Write, FileMode.CreateNew))
+                        using (var destination = Storage.CreateFileSafely(Path.Combine(backup_folder, $"collection.{migration}.db")))
                             source.CopyTo(destination);
                     }
                 }
@@ -265,7 +271,7 @@ namespace osu.Game
             dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+            EndpointConfiguration endpoints = CreateEndpoints();
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
@@ -552,5 +558,9 @@ namespace osu.Game
             if (Host != null)
                 Host.ExceptionThrown -= onExceptionThrown;
         }
+
+        ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.Beatmap.ControlPointInfo;
+        IClock IBeatSyncProvider.Clock => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track : (IClock)null;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
     }
 }

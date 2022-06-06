@@ -507,7 +507,7 @@ namespace osu.Game.Tests.Database
                 using (var stream = storage.GetStream(firstFile.File.GetStoragePath()))
                     originalLength = stream.Length;
 
-                using (var stream = storage.GetStream(firstFile.File.GetStoragePath(), FileAccess.Write, FileMode.Create))
+                using (var stream = storage.CreateFileSafely(firstFile.File.GetStoragePath()))
                     stream.WriteByte(0);
 
                 var importedSecondTime = await LoadOszIntoStore(importer, realm.Realm);
@@ -710,7 +710,7 @@ namespace osu.Game.Tests.Database
 
                 var imported = await LoadOszIntoStore(importer, realm.Realm);
 
-                realm.Realm.Write(() =>
+                await realm.Realm.WriteAsync(() =>
                 {
                     foreach (var b in imported.Beatmaps)
                         b.OnlineID = -1;

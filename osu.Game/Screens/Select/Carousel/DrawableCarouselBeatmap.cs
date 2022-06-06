@@ -8,6 +8,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -244,7 +245,7 @@ namespace osu.Game.Screens.Select.Carousel
                 }
 
                 if (hideRequested != null)
-                    items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
+                    items.Add(new OsuMenuItem(CommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
 
                 return items.ToArray();
             }
