@@ -319,7 +319,7 @@ namespace osu.Game.Beatmaps
             });
         }
 
-        public void DeleteVideos()
+        public void DeleteAllVideos()
         {
             realm.Write(r =>
             {

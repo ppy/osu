@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     dialogOverlay?.Push(new MassVideoDeleteConfirmationDialog(() =>
                     {
                         deleteBeatmapVideosButton.Enabled.Value = false;
-                        Task.Run(beatmaps.DeleteVideos).ContinueWith(t => Schedule(() => deleteBeatmapVideosButton.Enabled.Value = true));
+                        Task.Run(beatmaps.DeleteAllVideos).ContinueWith(t => Schedule(() => deleteBeatmapVideosButton.Enabled.Value = true));
                     }));
                 }
             });
