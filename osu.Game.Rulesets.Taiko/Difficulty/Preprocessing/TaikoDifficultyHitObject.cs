@@ -20,6 +20,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// </summary>
         public readonly TaikoDifficultyHitObjectRhythm Rhythm;
 
+        /// <summary>
+        /// Colour data for this hit object. This is used by colour evaluator to calculate colour, but can be used
+        /// differently by other skills in the future.
+        /// </summary>
         public readonly TaikoDifficultyHitObjectColour Colour;
 
         /// <summary>
@@ -45,7 +49,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             HitType = currentHit?.Type;
 
             // Need to be done after HitType is set.
-            Colour = TaikoDifficultyHitObjectColour.GetInstanceFor(this, (TaikoDifficultyHitObject) objects.LastOrDefault());
+            if (HitType != null)
+            {
+                // Get previous hit object, while skipping one that does not have defined colour (sliders and spinners).
+                // Without skipping through these, sliders and spinners would have contributed to a colour change for the next note.
+                TaikoDifficultyHitObject previousHitObject = (TaikoDifficultyHitObject)objects.LastOrDefault();
+                while (previousHitObject != null && previousHitObject.Colour == null)
+                {
+                    previousHitObject = (TaikoDifficultyHitObject)previousHitObject.Previous(0);
+                }
+
+                Colour = TaikoDifficultyHitObjectColour.GetInstanceFor(this);
+            }
+
         }
 
         /// <summary>

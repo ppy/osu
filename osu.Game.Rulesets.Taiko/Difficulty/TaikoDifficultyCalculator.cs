@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
-        private const double rhythm_skill_multiplier = 0.014;
-        private const double colour_skill_multiplier = 0.01;
+        private const double rhythm_skill_multiplier = 0.017;
+        private const double colour_skill_multiplier = 0.028;
         private const double stamina_skill_multiplier = 0.021;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             // Find repetition interval for the final TaikoDifficultyHitObjectColour
             // TODO: Might be a good idea to refactor this
-            ((TaikoDifficultyHitObject)difficultyHitObject.Last()).Colour.FindRepetitionInterval();
+            ((TaikoDifficultyHitObject)difficultyHitObject.Last()).Colour?.FindRepetitionInterval();
             return difficultyHitObject;
         }
 
@@ -76,18 +76,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
 
-            double staminaPenalty = simpleColourPenalty(staminaRating, colourRating);
-            staminaRating *= staminaPenalty;
+            // double staminaPenalty = simpleColourPenalty(staminaRating, colourRating);
+            // staminaRating *= staminaPenalty;
 
             //TODO : This is a temporary fix for the stamina rating of converts, due to their low colour variance.
-            if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0 && colourRating < 0.05)
-            {
-                staminaPenalty *= 0.25;
-            }
+            // if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0 && colourRating < 0.05)
+            // {
+            //     staminaPenalty *= 0.25;
+            // }
 
-            double combinedRating = locallyCombinedDifficulty(colour, rhythm, stamina, staminaPenalty);
+            double combinedRating = locallyCombinedDifficulty(colour, rhythm, stamina);
             double separatedRating = norm(1.5, colourRating, rhythmRating, staminaRating);
-            double starRating = 1.4 * separatedRating + 0.5 * combinedRating;
+            double starRating = 1.9 * combinedRating;
             starRating = rescale(starRating);
 
             HitWindows hitWindows = new TaikoHitWindows();
@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// For each section, the peak strains of all separate skills are combined into a single peak strain for the section.
         /// The resulting partial rating of the beatmap is a weighted sum of the combined peaks (higher peaks are weighted more).
         /// </remarks>
-        private double locallyCombinedDifficulty(Colour colour, Rhythm rhythm, Stamina stamina, double staminaPenalty)
+        private double locallyCombinedDifficulty(Colour colour, Rhythm rhythm, Stamina stamina)
         {
             List<double> peaks = new List<double>();
 
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 double colourPeak = colourPeaks[i] * colour_skill_multiplier;
                 double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
-                double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier * staminaPenalty;
+                double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier;
 
                 double peak = norm(2, colourPeak, rhythmPeak, staminaPeak);
 

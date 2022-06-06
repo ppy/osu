@@ -5,6 +5,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
@@ -17,8 +18,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// </remarks>
     public class Stamina : StrainDecaySkill
     {
-        protected override double SkillMultiplier => 1;
-        protected override double StrainDecayBase => 0.4;
+        protected override double SkillMultiplier => 3.6;
+        protected override double StrainDecayBase => 0;
 
         private readonly SingleKeyStamina[] centreKeyStamina =
         {
@@ -76,7 +77,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             }
 
             TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
-            return getNextSingleKeyStamina(hitObject).StrainValueOf(hitObject);
+            double objectStrain = getNextSingleKeyStamina(hitObject).StrainValueOf(hitObject);
+            // objectStrain *= ColourEvaluator.EvaluateDifficultyOf(current) * 0.3 + 0.7;
+            return objectStrain;
         }
     }
 }
