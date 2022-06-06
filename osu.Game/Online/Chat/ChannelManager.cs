@@ -14,7 +14,7 @@ using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.Chat.Tabs;
+using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
 {
@@ -133,7 +133,9 @@ namespace osu.Game.Online.Chat
 
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
         {
-            if (!(e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+            bool isSelectorChannel = e.NewValue is ChannelListing.ChannelListingChannel;
+
+            if (!isSelectorChannel)
                 JoinChannel(e.NewValue);
         }
 
@@ -420,11 +422,10 @@ namespace osu.Game.Online.Chat
         /// Joins a channel if it has not already been joined. Must be called from the update thread.
         /// </summary>
         /// <param name="channel">The channel to join.</param>
-        /// <param name="setCurrent">Set the channel to join as the current channel if the current channel is null.</param>
         /// <returns>The joined channel. Note that this may not match the parameter channel as it is a backed object.</returns>
-        public Channel JoinChannel(Channel channel, bool setCurrent = true) => joinChannel(channel, true, setCurrent);
+        public Channel JoinChannel(Channel channel) => joinChannel(channel, true);
 
-        private Channel joinChannel(Channel channel, bool fetchInitialMessages = false, bool setCurrent = true)
+        private Channel joinChannel(Channel channel, bool fetchInitialMessages = false)
         {
             if (channel == null) return null;
 
@@ -440,7 +441,7 @@ namespace osu.Game.Online.Chat
                     case ChannelType.Multiplayer:
                         // join is implicit. happens when you join a multiplayer game.
                         // this will probably change in the future.
-                        joinChannel(channel, fetchInitialMessages, setCurrent);
+                        joinChannel(channel, fetchInitialMessages);
                         return channel;
 
                     case ChannelType.PM:
@@ -461,7 +462,7 @@ namespace osu.Game.Online.Chat
 
                     default:
                         var req = new JoinChannelRequest(channel);
-                        req.Success += () => joinChannel(channel, fetchInitialMessages, setCurrent);
+                        req.Success += () => joinChannel(channel, fetchInitialMessages);
                         req.Failure += ex => LeaveChannel(channel);
                         api.Queue(req);
                         return channel;
@@ -473,8 +474,7 @@ namespace osu.Game.Online.Chat
                     this.fetchInitialMessages(channel);
             }
 
-            if (setCurrent)
-                CurrentChannel.Value ??= channel;
+            CurrentChannel.Value ??= channel;
 
             return channel;
         }

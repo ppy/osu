@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
     {
         private readonly Path drawablePath;
 
-        private readonly List<(double Distance, float X)> vertices = new List<(double, float)>();
+        private readonly List<(double Time, float X)> vertices = new List<(double, float)>();
 
         public ScrollingPath()
         {
@@ -35,16 +35,16 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         public void UpdatePathFrom(ScrollingHitObjectContainer hitObjectContainer, JuiceStream hitObject)
         {
-            double distanceToYFactor = -hitObjectContainer.LengthAtTime(hitObject.StartTime, hitObject.StartTime + 1 / hitObject.Velocity);
+            double timeToYFactor = -hitObjectContainer.LengthAtTime(hitObject.StartTime, hitObject.StartTime + 1);
 
-            computeDistanceXs(hitObject);
+            computeTimeXs(hitObject);
             drawablePath.Vertices = vertices
-                                    .Select(v => new Vector2(v.X, (float)(v.Distance * distanceToYFactor)))
+                                    .Select(v => new Vector2(v.X, (float)(v.Time * timeToYFactor)))
                                     .ToArray();
             drawablePath.OriginPosition = drawablePath.PositionInBoundingBox(Vector2.Zero);
         }
 
-        private void computeDistanceXs(JuiceStream hitObject)
+        private void computeTimeXs(JuiceStream hitObject)
         {
             vertices.Clear();
 
@@ -54,17 +54,17 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             if (sliderVertices.Count == 0)
                 return;
 
-            double distance = 0;
+            double time = 0;
             Vector2 lastPosition = Vector2.Zero;
 
             for (int repeat = 0; repeat < hitObject.RepeatCount + 1; repeat++)
             {
                 foreach (var position in sliderVertices)
                 {
-                    distance += Vector2.Distance(lastPosition, position);
+                    time += Vector2.Distance(lastPosition, position) / hitObject.Velocity;
                     lastPosition = position;
 
-                    vertices.Add((distance, position.X));
+                    vertices.Add((time, position.X));
                 }
 
                 sliderVertices.Reverse();

@@ -23,4 +23,4 @@ jobs:
           SENTRY_URL: https://sentry.ppy.sh/
         with:
           environment: production
-          version: ${{ github.ref }}
+          version: osu@${{ github.ref_name }}

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,13 +11,11 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
 using osu.Game.Database;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 
@@ -24,31 +24,21 @@ namespace osu.Game.Screens.Edit.Setup
     /// <summary>
     /// A labelled textbox which reveals an inline file chooser when clicked.
     /// </summary>
-    internal class FileChooserLabelledTextBox : LabelledTextBox, ICanAcceptFiles, IHasPopover
+    internal class FileChooserLabelledTextBox : LabelledTextBoxWithPopover, ICanAcceptFiles
     {
         private readonly string[] handledExtensions;
 
         public IEnumerable<string> HandledExtensions => handledExtensions;
 
-        private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
+        private readonly Bindable<FileInfo?> currentFile = new Bindable<FileInfo?>();
 
         [Resolved]
-        private OsuGameBase game { get; set; }
+        private OsuGameBase game { get; set; } = null!;
 
         public FileChooserLabelledTextBox(params string[] handledExtensions)
         {
             this.handledExtensions = handledExtensions;
         }
-
-        protected override OsuTextBox CreateTextBox() =>
-            new FileChooserOsuTextBox
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.X,
-                CornerRadius = CORNER_RADIUS,
-                OnFocused = this.ShowPopover
-            };
 
         protected override void LoadComplete()
         {
@@ -58,7 +48,7 @@ namespace osu.Game.Screens.Edit.Setup
             currentFile.BindValueChanged(onFileSelected);
         }
 
-        private void onFileSelected(ValueChangedEvent<FileInfo> file)
+        private void onFileSelected(ValueChangedEvent<FileInfo?> file)
         {
             if (file.NewValue == null)
                 return;
@@ -78,34 +68,16 @@ namespace osu.Game.Screens.Edit.Setup
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            game.UnregisterImportHandler(this);
+
+            if (game.IsNotNull())
+                game.UnregisterImportHandler(this);
         }
 
-        internal class FileChooserOsuTextBox : OsuTextBox
-        {
-            public Action OnFocused;
-
-            protected override bool OnDragStart(DragStartEvent e)
-            {
-                // This text box is intended to be "read only" without actually specifying that.
-                // As such we don't want to allow the user to select its content with a drag.
-                return false;
-            }
-
-            protected override void OnFocus(FocusEvent e)
-            {
-                OnFocused?.Invoke();
-                base.OnFocus(e);
-
-                GetContainingInputManager().TriggerFocusContention(this);
-            }
-        }
-
-        public Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile);
+        public override Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile);
 
         private class FileChooserPopover : OsuPopover
         {
-            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo> currentFile)
+            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> currentFile)
             {
                 Child = new Container
                 {

@@ -101,31 +101,16 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         }
 
         [Test]
-        public void TestClampedPositionIsRestored()
+        public void TestSliderVelocityChange()
         {
-            const double velocity = 0.25;
-            double[] times = { 100, 500, 700 };
-            float[] positions = { 100, 100, 100 };
-            addBlueprintStep(times, positions, velocity);
+            double[] times = { 100, 300 };
+            float[] positions = { 200, 300 };
+            addBlueprintStep(times, positions);
+            AddAssert("default slider velocity", () => hitObject.DifficultyControlPoint.SliderVelocityBindable.IsDefault);
 
             addDragStartStep(times[1], positions[1]);
-
-            AddMouseMoveStep(times[1], 200);
-            addVertexCheckStep(3, 1, times[1], 200);
-            addVertexCheckStep(3, 2, times[2], 150);
-
-            AddMouseMoveStep(times[1], 100);
-            addVertexCheckStep(3, 1, times[1], 100);
-            // Stored position is restored.
-            addVertexCheckStep(3, 2, times[2], positions[2]);
-
-            AddMouseMoveStep(times[1], 300);
-            addDragEndStep();
-            addDragStartStep(times[1], 300);
-
-            AddMouseMoveStep(times[1], 100);
-            // Position is different because a changed position is committed when the previous drag is ended.
-            addVertexCheckStep(3, 2, times[2], 250);
+            AddMouseMoveStep(times[1], 400);
+            AddAssert("slider velocity changed", () => !hitObject.DifficultyControlPoint.SliderVelocityBindable.IsDefault);
         }
 
         [Test]
@@ -174,7 +159,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             addAddVertexSteps(500, 150);
             addVertexCheckStep(3, 1, 500, 150);
 
-            addAddVertexSteps(90, 220);
+            addAddVertexSteps(90, 200);
             addVertexCheckStep(4, 1, times[0], positions[0]);
 
             addAddVertexSteps(750, 180);
@@ -234,10 +219,10 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         {
             var path = new JuiceStreamPath();
             for (int i = 1; i < times.Length; i++)
-                path.Add((times[i] - times[0]) * velocity, positions[i] - positions[0]);
+                path.Add(times[i] - times[0], positions[i] - positions[0]);
 
             var sliderPath = new SliderPath();
-            path.ConvertToSliderPath(sliderPath, 0);
+            path.ConvertToSliderPath(sliderPath, 0, velocity);
             addBlueprintStep(times[0], positions[0], sliderPath, velocity);
         }
 
@@ -245,11 +230,11 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
         private void addVertexCheckStep(int count, int index, double time, float x) => AddAssert($"vertex {index} of {count} at {time}, {x}", () =>
         {
-            double expectedDistance = (time - hitObject.StartTime) * hitObject.Velocity;
+            double expectedTime = time - hitObject.StartTime;
             float expectedX = x - hitObject.OriginalX;
             var vertices = getVertices();
             return vertices.Count == count &&
-                   Precision.AlmostEquals(vertices[index].Distance, expectedDistance, 1e-3) &&
+                   Precision.AlmostEquals(vertices[index].Time, expectedTime, 1e-3) &&
                    Precision.AlmostEquals(vertices[index].X, expectedX);
         });
 

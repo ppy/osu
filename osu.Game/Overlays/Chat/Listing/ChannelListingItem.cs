@@ -6,15 +6,19 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osuTK;
 
@@ -28,8 +32,10 @@ namespace osu.Game.Overlays.Chat.Listing
         public readonly Channel Channel;
 
         public bool FilteringActive { get; set; }
-        public IEnumerable<string> FilterTerms => new[] { Channel.Name, Channel.Topic ?? string.Empty };
+        public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Channel.Name, Channel.Topic ?? string.Empty };
         public bool MatchingFilter { set => this.FadeTo(value ? 1f : 0f, 100); }
+
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 
         private Box hoverBox = null!;
         private SpriteIcon checkbox = null!;
@@ -45,14 +51,20 @@ namespace osu.Game.Overlays.Chat.Listing
 
         private const float vertical_margin = 1.5f;
 
+        private Sample? sampleJoin;
+        private Sample? sampleLeave;
+
         public ChannelListingItem(Channel channel)
         {
             Channel = channel;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
+            sampleJoin = audio.Samples.Get(@"UI/check-on");
+            sampleLeave = audio.Samples.Get(@"UI/check-off");
+
             Masking = true;
             CornerRadius = 5;
             RelativeSizeAxes = Axes.X;
@@ -155,7 +167,19 @@ namespace osu.Game.Overlays.Chat.Listing
                 }
             }, true);
 
-            Action = () => (channelJoined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(Channel);
+            Action = () =>
+            {
+                if (channelJoined.Value)
+                {
+                    OnRequestLeave?.Invoke(Channel);
+                    sampleLeave?.Play();
+                }
+                else
+                {
+                    OnRequestJoin?.Invoke(Channel);
+                    sampleJoin?.Play();
+                }
+            };
         }
 
         protected override bool OnHover(HoverEvent e)

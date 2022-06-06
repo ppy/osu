@@ -65,7 +65,7 @@ namespace osu.Game.Stores
         {
             data.Seek(0, SeekOrigin.Begin);
 
-            using (var output = Storage.GetStream(file.GetStoragePath(), FileAccess.Write))
+            using (var output = Storage.CreateFileSafely(file.GetStoragePath()))
                 data.CopyTo(output);
 
             data.Seek(0, SeekOrigin.Begin);

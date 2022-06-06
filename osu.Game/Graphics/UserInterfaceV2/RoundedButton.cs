@@ -2,12 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -26,9 +25,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour colours)
+        private void load(OsuColour colours)
         {
-            DefaultBackgroundColour = overlayColourProvider?.Highlight1 ?? colours.Blue3;
+            // According to flyte, buttons are supposed to have explicit colours for now.
+            // Not sure this is the correct direction, but we haven't decided on an `OverlayColourProvider` stand-in yet.
+            // This is a better default. See `SettingsButton` for an override which uses `OverlayColourProvider`.
+            DefaultBackgroundColour = colours.Blue3;
         }
 
         protected override void LoadComplete()
@@ -39,7 +41,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateCornerRadius() => Content.CornerRadius = DrawHeight / 2;
 
-        public virtual IEnumerable<string> FilterTerms => new[] { Text.ToString() };
+        public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Text };
 
         public bool MatchingFilter
         {

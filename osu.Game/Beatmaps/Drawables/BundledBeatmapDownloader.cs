@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Online;
@@ -83,12 +85,16 @@ namespace osu.Game.Beatmaps.Drawables
                 downloadTrackers.Add(beatmapDownloadTracker);
                 AddInternal(beatmapDownloadTracker);
 
+                // Note that this is downloading the beatmaps even if they are already downloaded.
+                // We could rely more on `BeatmapDownloadTracker`'s exposed state to avoid this.
                 beatmapDownloader.Download(beatmapSet);
             }
         }
 
         private void queueDownloads(string[] sourceFilenames, int? limit = null)
         {
+            Debug.Assert(LoadState == LoadState.NotLoaded);
+
             try
             {
                 // Matches osu-stable, in order to provide new users with roughly the same randomised selection of bundled beatmaps.
