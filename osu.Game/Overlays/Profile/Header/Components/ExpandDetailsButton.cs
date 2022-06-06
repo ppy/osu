@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private Sample sampleOpen;
         private Sample sampleClose;
 
-        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds();
 
         public ExpandDetailsButton()
         {

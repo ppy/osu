@@ -3,14 +3,16 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class IconPill : CircularContainer
+    public abstract class IconPill : CircularContainer, IHasTooltip
     {
         public Vector2 IconSize
         {
@@ -20,7 +22,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private readonly Container iconContainer;
 
-        public IconPill(IconUsage icon)
+        protected IconPill(IconUsage icon)
         {
             AutoSizeAxes = Axes.Both;
             Masking = true;
@@ -47,5 +49,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 },
             };
         }
+
+        public abstract LocalisableString TooltipText { get; }
     }
 }
