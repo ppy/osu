@@ -128,11 +128,11 @@ namespace osu.Game.Tests.Visual.Online
 
             AddAssert("Ensure no adjacent day separators", () =>
             {
-                var indices = chatDisplay.FillFlow.OfType<DrawableChannel.DaySeparator>().Select(ds => chatDisplay.FillFlow.IndexOf(ds));
+                var indices = chatDisplay.FillFlow.OfType<DaySeparator>().Select(ds => chatDisplay.FillFlow.IndexOf(ds));
 
                 foreach (int i in indices)
                 {
-                    if (i < chatDisplay.FillFlow.Count && chatDisplay.FillFlow[i + 1] is DrawableChannel.DaySeparator)
+                    if (i < chatDisplay.FillFlow.Count && chatDisplay.FillFlow[i + 1] is DaySeparator)
                         return false;
                 }
 
