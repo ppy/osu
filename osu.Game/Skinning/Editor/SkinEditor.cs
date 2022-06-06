@@ -322,7 +322,10 @@ namespace osu.Game.Skinning.Editor
 
         protected override void PopIn()
         {
-            this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+            this
+                // align animation to happen after the majority of the ScalingContainer animation completes.
+                .Delay(ScalingContainer.TRANSITION_DURATION * 0.3f)
+                .FadeIn(TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
