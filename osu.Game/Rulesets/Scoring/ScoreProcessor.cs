@@ -460,6 +460,7 @@ namespace osu.Game.Rulesets.Scoring
             currentMaximumScoringValues.BaseScore = maximum.BaseScore;
             currentMaximumScoringValues.MaxCombo = maximum.MaxCombo;
 
+            Combo.Value = frame.Header.Combo;
             HighestCombo.Value = frame.Header.MaxCombo;
 
             scoreResultCounts.Clear();
