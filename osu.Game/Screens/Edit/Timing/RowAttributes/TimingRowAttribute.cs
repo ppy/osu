@@ -7,6 +7,7 @@ using osu.Framework.Extensions;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
@@ -24,9 +25,11 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             Content.Add(text = new AttributeText(Point));
+
+            Background.Colour = colourProvider.Background4;
 
             timeSignature.BindValueChanged(_ => updateText());
             beatLength.BindValueChanged(_ => updateText(), true);

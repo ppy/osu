@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -229,6 +230,8 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 Details.BeatmapInfo = b.NewValue;
                 externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineID}";
+
+                onlineStatusPill.Status = b.NewValue?.Status ?? BeatmapOnlineStatus.None;
             };
         }
 
@@ -272,7 +275,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     featuredArtist.Alpha = setInfo.NewValue.TrackId != null ? 1 : 0;
 
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
-                    onlineStatusPill.Status = setInfo.NewValue.Status;
 
                     downloadButtonsContainer.FadeIn(transition_duration);
                     favouriteButton.FadeIn(transition_duration);

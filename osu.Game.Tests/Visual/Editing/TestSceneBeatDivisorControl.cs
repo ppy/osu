@@ -5,11 +5,13 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -23,7 +25,10 @@ namespace osu.Game.Tests.Visual.Editing
         private BindableBeatDivisor bindableBeatDivisor;
 
         private SliderBar<int> tickSliderBar => beatDivisorControl.ChildrenOfType<SliderBar<int>>().Single();
-        private EquilateralTriangle tickMarkerHead => tickSliderBar.ChildrenOfType<EquilateralTriangle>().Single();
+        private Triangle tickMarkerHead => tickSliderBar.ChildrenOfType<Triangle>().Single();
+
+        [Cached]
+        private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         [SetUp]
         public void SetUp() => Schedule(() =>
