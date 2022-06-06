@@ -43,7 +43,7 @@ namespace osu.Game.Utils
             sentrySession = SentrySdk.Init(options =>
             {
                 // Not setting the dsn will completely disable sentry.
-                if (game.IsDeployedBuild)
+                if (game.IsDeployedBuild && game.CreateEndpoints().WebsiteRootUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
                     options.Dsn = "https://ad9f78529cef40ac874afb95a9aca04e@sentry.ppy.sh/2";
 
                 options.AutoSessionTracking = true;
@@ -159,6 +159,7 @@ namespace osu.Game.Utils
                         Game = game.Clock.CurrentTime,
                     };
 
+                    scope.SetTag(@"beatmap", $"{beatmap.OnlineID}");
                     scope.SetTag(@"ruleset", ruleset.ShortName);
                     scope.SetTag(@"os", $"{RuntimeInfo.OS} ({Environment.OSVersion})");
                     scope.SetTag(@"processor count", Environment.ProcessorCount.ToString());

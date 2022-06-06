@@ -36,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
                     Icon = FontAwesome.Solid.ExternalLinkAlt,
                     RelativeSizeAxes = Axes.Both
                 },
-                new HoverClickSounds(HoverSampleSet.Submit)
+                new HoverClickSounds()
             };
         }
 
