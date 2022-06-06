@@ -52,8 +52,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
                 GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
                 ScoreMultiplier = getScoreMultiplier(mods),
-                MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
+                MaxCombo = beatmap.HitObjects.Sum(maxComboForObject)
             };
+        }
+
+        private static int maxComboForObject(HitObject hitObject)
+        {
+            if (hitObject is HoldNote hold)
+                return 1 + (int)((hold.EndTime - hold.StartTime) / 100);
+
+            return 1;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)

@@ -4,14 +4,11 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -26,31 +23,23 @@ namespace osu.Game.Screens.Edit.Timing
         public Action<double> Action;
 
         private readonly double adjustAmount;
-        private ScheduledDelegate adjustDelegate;
 
         private const int max_multiplier = 10;
-
         private const int adjust_levels = 4;
 
-        private const double initial_delay = 300;
-
-        private const double minimum_delay = 80;
-
         public Container Content { get; set; }
-
-        private double adjustDelay = initial_delay;
 
         private readonly Box background;
 
         private readonly OsuSpriteText text;
-
-        private Sample sample;
 
         public LocalisableString Text
         {
             get => text.Text;
             set => text.Text = value;
         }
+
+        private readonly RepeatingButtonBehaviour repeatBehaviour;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
@@ -82,13 +71,13 @@ namespace osu.Game.Screens.Edit.Timing
                     }
                 }
             });
+
+            AddInternal(repeatBehaviour = new RepeatingButtonBehaviour(this));
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            sample = audio.Samples.Get(@"UI/notch-tick");
-
             background.Colour = colourProvider.Background3;
 
             for (int i = 1; i <= adjust_levels; i++)
@@ -98,55 +87,20 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+        protected override bool OnHover(HoverEvent e) => true;
+
+        protected override bool OnClick(ClickEvent e)
         {
-            beginRepeat();
+            var hoveredBox = Content.OfType<IncrementBox>().FirstOrDefault(d => d.IsHovered);
+            if (hoveredBox == null)
+                return false;
+
+            Action(adjustAmount * hoveredBox.Multiplier);
+
+            hoveredBox.Flash();
+
+            repeatBehaviour.SampleFrequencyModifier = (hoveredBox.Multiplier / max_multiplier) * 0.2;
             return true;
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            adjustDelegate?.Cancel();
-            base.OnMouseUp(e);
-        }
-
-        private void beginRepeat()
-        {
-            adjustDelegate?.Cancel();
-
-            adjustDelay = initial_delay;
-            adjustNext();
-
-            void adjustNext()
-            {
-                var hoveredBox = Content.OfType<IncrementBox>().FirstOrDefault(d => d.IsHovered);
-
-                if (hoveredBox != null)
-                {
-                    Action(adjustAmount * hoveredBox.Multiplier);
-
-                    adjustDelay = Math.Max(minimum_delay, adjustDelay * 0.9f);
-
-                    hoveredBox.Flash();
-
-                    var channel = sample?.GetChannel();
-
-                    if (channel != null)
-                    {
-                        double repeatModifier = 0.05f * (Math.Abs(adjustDelay - initial_delay) / minimum_delay);
-                        double multiplierModifier = (hoveredBox.Multiplier / max_multiplier) * 0.2f;
-
-                        channel.Frequency.Value = 1 + multiplierModifier + repeatModifier;
-                        channel.Play();
-                    }
-                }
-                else
-                {
-                    adjustDelay = initial_delay;
-                }
-
-                adjustDelegate = Scheduler.AddDelayed(adjustNext, adjustDelay);
-            }
         }
 
         private class IncrementBox : CompositeDrawable
@@ -187,7 +141,7 @@ namespace osu.Game.Screens.Edit.Timing
                         Origin = direction,
                         Font = OsuFont.Default.With(size: 10, weight: FontWeight.Bold),
                         Text = $"{(index > 0 ? "+" : "-")}{Math.Abs(Multiplier * amount)}",
-                        Padding = new MarginPadding(5),
+                        Padding = new MarginPadding(2),
                         Alpha = 0,
                     }
                 };
