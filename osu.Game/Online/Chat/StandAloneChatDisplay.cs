@@ -155,9 +155,6 @@ namespace osu.Game.Online.Chat
         {
             public Func<Message, ChatLine> CreateChatLineAction;
 
-            [Resolved]
-            private OsuColour colours { get; set; }
-
             public StandAloneDrawableChannel(Channel channel)
                 : base(channel)
             {
@@ -166,25 +163,40 @@ namespace osu.Game.Online.Chat
             [BackgroundDependencyLoader]
             private void load()
             {
+                // TODO: Remove once DrawableChannel & ChatLine padding is fixed
                 ChatLineFlow.Padding = new MarginPadding { Horizontal = 0 };
             }
 
             protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
 
-            protected override Drawable CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
+            protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new StandAloneDaySeparator(time);
+        }
+
+        protected class StandAloneDaySeparator : DaySeparator
+        {
+            protected override float TextSize => 14;
+            protected override float LineHeight => 1;
+            protected override float Spacing => 10;
+            protected override float DateAlign => 120;
+
+            public StandAloneDaySeparator(DateTimeOffset time)
+                : base(time)
             {
-                TextSize = 14,
-                Colour = colours.Yellow,
-                LineHeight = 1,
-                Padding = new MarginPadding { Horizontal = 10 },
-                Margin = new MarginPadding { Vertical = 5 },
-            };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Height = 25;
+                Colour = colours.Yellow;
+                // TODO: Remove once DrawableChannel & ChatLine padding is fixed
+                Padding = new MarginPadding { Horizontal = 10 };
+            }
         }
 
         protected class StandAloneMessage : ChatLine
         {
             protected override float TextSize => 15;
-
             protected override float HorizontalPadding => 10;
             protected override float MessagePadding => 120;
             protected override float TimestampPadding => 50;
