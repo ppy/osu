@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// as a static function instead of constructor to allow for reusing existing instances.
         /// TODO: findRepetitionInterval needs to be called a final time after all hitObjects have been processed.
         /// </summary>
-        public static TaikoDifficultyHitObjectColour GetInstanceFor(
-            TaikoDifficultyHitObject hitObject, TaikoDifficultyHitObject lastObject)
+        public static TaikoDifficultyHitObjectColour GetInstanceFor(TaikoDifficultyHitObject hitObject)
         {
+            TaikoDifficultyHitObject lastObject = (TaikoDifficultyHitObject) hitObject.Previous(0);
             TaikoDifficultyHitObjectColour previous = lastObject?.Colour;
             bool delta = lastObject == null || hitObject.HitType != lastObject.HitType;
             if (previous != null && delta == previous.Delta)
