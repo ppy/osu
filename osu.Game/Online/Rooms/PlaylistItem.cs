@@ -61,7 +61,13 @@ namespace osu.Game.Online.Rooms
         /// Used for serialising to the API.
         /// </summary>
         [JsonProperty("beatmap_id")]
-        private int onlineBeatmapId => Beatmap.OnlineID;
+        private int onlineBeatmapId
+        {
+            get => Beatmap.OnlineID;
+            // This setter is only required for client-side serialise-then-deserialise operations.
+            // Serialisation is supposed to emit only a `beatmap_id`, but a (non-null) `beatmap` is required on deserialise.
+            set => Beatmap = new APIBeatmap { OnlineID = value };
+        }
 
         /// <summary>
         /// A beatmap representing this playlist item.

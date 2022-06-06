@@ -3,10 +3,12 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -71,14 +73,23 @@ namespace osu.Game.Online.Multiplayer
             }
         }
 
-        protected override Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
+        protected override async Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
         {
             if (!IsConnected.Value)
-                return Task.FromCanceled<MultiplayerRoom>(new CancellationToken(true));
+                throw new OperationCanceledException();
 
             Debug.Assert(connection != null);
 
-            return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty);
+            try
+            {
+                return await connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty);
+            }
+            catch (HubException exception)
+            {
+                if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
+                    connector?.Reconnect();
+                throw;
+            }
         }
 
         protected override Task LeaveRoomInternal()

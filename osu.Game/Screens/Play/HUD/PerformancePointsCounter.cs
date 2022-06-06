@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -80,16 +81,13 @@ namespace osu.Game.Screens.Play.HUD
                 difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, clonedMods, loadCancellationSource.Token)
                                .ContinueWith(task => Schedule(() =>
                                {
-                                   if (task.Exception != null)
-                                       return;
-
                                    timedAttributes = task.GetResultSafely();
 
                                    IsValid = true;
 
                                    if (lastJudgement != null)
                                        onJudgementChanged(lastJudgement);
-                               }));
+                               }), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
         }
 

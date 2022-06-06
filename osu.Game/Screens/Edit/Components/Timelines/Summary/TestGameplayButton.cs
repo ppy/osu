@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
             BackgroundColour = colours.Orange1;
             SpriteText.Colour = colourProvider.Background6;
 
+            Content.CornerRadius = 0;
+
             Text = "Test!";
         }
     }

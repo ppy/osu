@@ -30,8 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             status.BindValueChanged(s =>
             {
-                this.FadeColour(category.Value == RoomCategory.Spotlight ? colours.Pink : s.NewValue.GetAppropriateColour(colours)
-                    , transitionDuration);
+                this.FadeColour(colours.ForRoomCategory(category.Value) ?? s.NewValue.GetAppropriateColour(colours), transitionDuration);
             }, true);
         }
     }

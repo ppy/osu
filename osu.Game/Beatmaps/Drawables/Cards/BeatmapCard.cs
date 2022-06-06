@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         protected readonly BeatmapDownloadTracker DownloadTracker;
 
         protected BeatmapCard(APIBeatmapSet beatmapSet, bool allowExpansion = true)
-            : base(HoverSampleSet.Submit)
+            : base(HoverSampleSet.Button)
         {
             Expanded = new BindableBool { Disabled = !allowExpansion };
 

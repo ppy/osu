@@ -6,7 +6,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables.Cards.Statistics;
 using osu.Game.Graphics;
@@ -245,10 +244,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             });
 
             if (BeatmapSet.HasVideo)
-                leftIconArea.Add(new IconPill(FontAwesome.Solid.Film) { IconSize = new Vector2(20) });
+                leftIconArea.Add(new VideoIconPill { IconSize = new Vector2(20) });
 
             if (BeatmapSet.HasStoryboard)
-                leftIconArea.Add(new IconPill(FontAwesome.Solid.Image) { IconSize = new Vector2(20) });
+                leftIconArea.Add(new StoryboardIconPill { IconSize = new Vector2(20) });
 
             if (BeatmapSet.FeaturedInSpotlight)
             {
