@@ -127,6 +127,9 @@ namespace osu.Game.Skinning.Editor
 
         private void setTarget(OsuScreen target)
         {
+            if (target == null)
+                return;
+
             Debug.Assert(skinEditor != null);
 
             if (!target.IsLoaded)
