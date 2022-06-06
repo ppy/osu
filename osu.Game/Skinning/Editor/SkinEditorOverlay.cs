@@ -15,6 +15,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit.Components;
+using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -35,6 +36,8 @@ namespace osu.Game.Skinning.Editor
         private OsuGame game { get; set; }
 
         private OsuScreen lastTargetScreen;
+
+        private Vector2 lastDrawSize;
 
         public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
@@ -92,18 +95,31 @@ namespace osu.Game.Skinning.Editor
             return base.OnInvalidate(invalidation, source);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (game.DrawSize != lastDrawSize)
+            {
+                lastDrawSize = game.DrawSize;
+                updateScreenSizing();
+            }
+        }
+
         private void updateScreenSizing()
         {
             if (skinEditor?.State.Value != Visibility.Visible) return;
 
-            float relativeSidebarWidth = EditorSidebar.WIDTH / DrawWidth;
-            float relativeToolbarHeight = (SkinEditorSceneLibrary.HEIGHT + SkinEditor.MENU_HEIGHT) / DrawHeight;
+            const float padding = 10;
+
+            float relativeSidebarWidth = (EditorSidebar.WIDTH + padding) / DrawWidth;
+            float relativeToolbarHeight = (SkinEditorSceneLibrary.HEIGHT + SkinEditor.MENU_HEIGHT + padding) / DrawHeight;
 
             var rect = new RectangleF(
                 relativeSidebarWidth,
                 relativeToolbarHeight,
                 1 - relativeSidebarWidth * 2,
-                1f - relativeToolbarHeight);
+                1f - relativeToolbarHeight - padding / DrawHeight);
 
             scalingContainer.SetCustomRect(rect, true);
         }
