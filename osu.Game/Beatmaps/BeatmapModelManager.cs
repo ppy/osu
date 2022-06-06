@@ -130,7 +130,7 @@ namespace osu.Game.Beatmaps
             {
                 Progress = 0,
                 Text = $"Preparing to delete all {HumanisedModelName} videos...",
-                CompletionText = $"No videos found to delete!",
+                CompletionText = "No videos found to delete!",
                 State = ProgressNotificationState.Active,
             };
 
