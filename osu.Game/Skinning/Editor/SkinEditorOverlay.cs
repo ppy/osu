@@ -4,14 +4,17 @@
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit.Components;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -81,15 +84,37 @@ namespace osu.Game.Skinning.Editor
 
         protected override void PopOut() => skinEditor?.Hide();
 
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            if (invalidation.HasFlagFast(Invalidation.DrawSize))
+                Scheduler.AddOnce(updateScreenSizing);
+
+            return base.OnInvalidate(invalidation, source);
+        }
+
+        private void updateScreenSizing()
+        {
+            if (skinEditor?.State.Value != Visibility.Visible) return;
+
+            float relativeSidebarWidth = EditorSidebar.WIDTH / DrawWidth;
+            float relativeToolbarHeight = (SkinEditorSceneLibrary.HEIGHT + SkinEditor.MENU_HEIGHT) / DrawHeight;
+
+            var rect = new RectangleF(
+                relativeSidebarWidth,
+                relativeToolbarHeight,
+                1 - relativeSidebarWidth * 2,
+                1f - relativeToolbarHeight);
+
+            scalingContainer.SetCustomRect(rect, true);
+        }
+
         private void updateComponentVisibility()
         {
             Debug.Assert(skinEditor != null);
 
-            const float toolbar_padding_requirement = 0.18f;
-
             if (skinEditor.State.Value == Visibility.Visible)
             {
-                scalingContainer.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.2f, 0.8f - toolbar_padding_requirement, 0.7f), true);
+                Scheduler.AddOnce(updateScreenSizing);
 
                 game?.Toolbar.Hide();
                 game?.CloseAllOverlays();
