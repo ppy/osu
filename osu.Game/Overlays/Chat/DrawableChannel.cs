@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Bottom = 5 },
                     Child = ChatLineFlow = new FillFlowContainer
                     {
-                        Padding = new MarginPadding { Horizontal = 15 },
+                        Padding = new MarginPadding { Horizontal = 10 },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
