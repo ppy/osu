@@ -4,13 +4,11 @@
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Layout;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens;
@@ -86,14 +84,6 @@ namespace osu.Game.Skinning.Editor
         }
 
         protected override void PopOut() => skinEditor?.Hide();
-
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            if (invalidation.HasFlagFast(Invalidation.DrawSize))
-                Scheduler.AddOnce(updateScreenSizing);
-
-            return base.OnInvalidate(invalidation, source);
-        }
 
         protected override void Update()
         {
