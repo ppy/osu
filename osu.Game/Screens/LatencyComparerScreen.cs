@@ -17,7 +17,6 @@ using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osuTK;
@@ -36,6 +35,8 @@ namespace osu.Game.Screens
         public override bool CursorVisible => false;
 
         public override float BackgroundParallaxAmount => 0;
+
+        private readonly OsuTextFlowContainer explanatoryText;
 
         private readonly Container mainArea;
 
@@ -78,6 +79,20 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopRight,
+                },
+                explanatoryText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    TextAnchor = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Y = 200,
+                    Text = @"Welcome to the latency comparer!
+Use the arrow keys or Z/X to move the square.
+You can click the targets but you don't have to.
+Do whatever you need to try and perceive the difference in latency, then choose your best side.
+",
                 },
                 statusText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 40))
                 {
@@ -126,6 +141,8 @@ namespace osu.Game.Screens
 
         private void recordResult(bool correct)
         {
+            explanatoryText.FadeOut(500, Easing.OutQuint);
+
             if (correct)
                 correctCount++;
 
@@ -198,7 +215,7 @@ namespace osu.Game.Screens
 
             public Action? ReportBetter { get; set; }
 
-            private Drawable background = null!;
+            private Drawable? background;
 
             private readonly int inducedLatency;
 
