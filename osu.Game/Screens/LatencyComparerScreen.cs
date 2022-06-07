@@ -14,8 +14,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -170,13 +172,13 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             int betterSide = RNG.Next(0, 2);
 
-            mainArea.Add(new LatencyArea(betterSide == 1 ? induced_latency / difficulty : 0)
+            mainArea.Add(new LatencyArea(Key.Number1, betterSide == 1 ? induced_latency / difficulty : 0)
             {
                 Width = 0.5f,
                 ReportBetter = () => recordResult(betterSide == 0)
             });
 
-            mainArea.Add(new LatencyArea(betterSide == 0 ? induced_latency / difficulty : 0)
+            mainArea.Add(new LatencyArea(Key.Number2, betterSide == 0 ? induced_latency / difficulty : 0)
             {
                 Width = 0.5f,
                 Anchor = Anchor.TopRight,
@@ -198,7 +200,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 Spacing = new Vector2(20),
                 Children = new Drawable[]
                 {
-                    new Button
+                    new Button(Key.R)
                     {
                         Text = "Increase confidence at current level",
                         Anchor = Anchor.Centre,
@@ -210,32 +212,22 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                             loadNextRound();
                         }
                     },
-                    new Button
+                    new Button(Key.I)
                     {
                         Text = "Increase difficulty",
                         BackgroundColour = colours.Red2,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = () =>
-                        {
-                            changeDifficulty(difficulty + 1);
-                        }
+                        Action = () => changeDifficulty(difficulty + 1)
                     },
-                    new Button
+                    new Button(Key.D)
                     {
                         Text = "Decrease difficulty",
                         BackgroundColour = colours.Green,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Action = () => changeDifficulty(difficulty - 1),
                         Enabled = { Value = difficulty > 1 },
-                        Action = () =>
-                        {
-                            resultsArea.Clear();
-                            correctCount = 0;
-                            targetRoundCount = rounds_to_complete;
-                            difficulty--;
-                            loadNextRound();
-                        }
                     }
                 }
             });
@@ -264,12 +256,14 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             private Drawable? background;
 
+            private readonly Key key;
             private readonly int inducedLatency;
 
             private long frameCount;
 
-            public LatencyArea(int inducedLatency)
+            public LatencyArea(Key key, int inducedLatency)
             {
+                this.key = key;
                 this.inducedLatency = inducedLatency;
 
                 RelativeSizeAxes = Axes.Both;
@@ -302,7 +296,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                             },
                         }
                     },
-                    new Button
+                    new Button(key)
                     {
                         Text = "Feels better",
                         Y = 20,
@@ -459,6 +453,30 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
         public class Button : SettingsButton
         {
+            private readonly Key key;
+
+            public Button(Key key)
+            {
+                this.key = key;
+            }
+
+            public override LocalisableString Text
+            {
+                get => base.Text;
+                set => base.Text = $"{value} (Press {key.ToString().Replace("Number", string.Empty)})";
+            }
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                if (!e.Repeat && e.Key == key)
+                {
+                    TriggerClick();
+                    return true;
+                }
+
+                return base.OnKeyDown(e);
+            }
+
             [Resolved]
             private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
