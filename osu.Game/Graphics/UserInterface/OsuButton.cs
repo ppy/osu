@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class OsuButton : Button
     {
-        public LocalisableString Text
+        public virtual LocalisableString Text
         {
             get => SpriteText?.Text ?? default;
             set
