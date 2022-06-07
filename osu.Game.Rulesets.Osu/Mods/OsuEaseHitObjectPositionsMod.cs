@@ -44,6 +44,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
                 WorkingHitObject = drawable;
+
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:
