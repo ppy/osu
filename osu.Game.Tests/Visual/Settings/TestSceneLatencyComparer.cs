@@ -7,7 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens;
+using osu.Game.Screens.Utility;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -28,11 +28,11 @@ namespace osu.Game.Tests.Visual.Settings
             for (int i = 0; i < 4; i++)
             {
                 clickCorrectUntilResults();
-                AddAssert("check at results", () => !latencyComparer.ChildrenOfType<LatencyComparerScreen.LatencyArea>().Any());
+                AddAssert("check at results", () => !latencyComparer.ChildrenOfType<LatencyArea>().Any());
                 AddStep("hit c to continue", () => InputManager.Key(Key.C));
             }
 
-            AddAssert("check at results", () => !latencyComparer.ChildrenOfType<LatencyComparerScreen.LatencyArea>().Any());
+            AddAssert("check at results", () => !latencyComparer.ChildrenOfType<LatencyArea>().Any());
 
             AddAssert("check no buttons", () => !latencyComparer.ChildrenOfType<OsuButton>().Any());
         }
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddUntilStep("click correct button until results", () =>
             {
                 var latencyArea = latencyComparer
-                                  .ChildrenOfType<LatencyComparerScreen.LatencyArea>()
+                                  .ChildrenOfType<LatencyArea>()
                                   .SingleOrDefault(a => a.TargetFrameRate == 0);
 
                 // reached results

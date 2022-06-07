@@ -9,6 +9,7 @@ using osu.Framework.Screens;
 using osu.Game.Localisation;
 using osu.Game.Screens;
 using osu.Game.Screens.Import;
+using osu.Game.Screens.Utility;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
