@@ -190,7 +190,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
         {
             mainArea.Clear();
 
-            var displayMode = host.Window.CurrentDisplayMode.Value;
+            var displayMode = host.Window?.CurrentDisplayMode.Value;
 
             string exclusive = "unknown";
 
@@ -217,7 +217,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 statusText.AddParagraph(string.Empty);
             }
 
-            statusText.AddParagraph($"Polling: {pollingMax} hz Monitor: {displayMode.RefreshRate:N0} hz Exclusive: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15));
+            statusText.AddParagraph($"Polling: {pollingMax} hz Monitor: {displayMode?.RefreshRate ?? 0:N0} hz Exclusive: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15));
 
             statusText.AddParagraph($"Input: {host.InputThread.Clock.FramesPerSecond} hz "
                                     + $"Update: {host.UpdateThread.Clock.FramesPerSecond} hz "
