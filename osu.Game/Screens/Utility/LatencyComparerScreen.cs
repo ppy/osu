@@ -156,12 +156,12 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             previousActiveHz = host.UpdateThread.ActiveHz;
             config.SetValue(FrameworkSetting.FrameSync, FrameSync.Unlimited);
             host.UpdateThread.ActiveHz = target_host_update_frames;
-            // host.AllowBenchmarkUnlimitedFrames = true;
+            host.AllowBenchmarkUnlimitedFrames = true;
         }
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            // host.AllowBenchmarkUnlimitedFrames = false;
+            host.AllowBenchmarkUnlimitedFrames = false;
             config.SetValue(FrameworkSetting.FrameSync, previousFrameSyncMode);
             host.UpdateThread.ActiveHz = previousActiveHz;
             return base.OnExiting(e);
