@@ -12,13 +12,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Select
 {
-    public class NoResultsPlaceholder : CompositeDrawable
+    public class NoResultsPlaceholder : VisibilityContainer
     {
         private FilterCriteria? filter;
 
@@ -37,6 +38,9 @@ namespace osu.Game.Screens.Select
         {
             set
             {
+                if (filter == value)
+                    return;
+
                 filter = value;
                 Scheduler.AddOnce(updateText);
             }
@@ -63,7 +67,7 @@ namespace osu.Game.Screens.Select
                 },
                 new SpriteIcon
                 {
-                    Icon = FontAwesome.Regular.QuestionCircle,
+                    Icon = FontAwesome.Regular.SadTear,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Margin = new MarginPadding(10),
@@ -71,7 +75,7 @@ namespace osu.Game.Screens.Select
                 },
                 textFlow = new LinkFlowContainer
                 {
-                    Y = 70,
+                    Y = 60,
                     Padding = new MarginPadding(10),
                     TextAnchor = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
@@ -80,23 +84,26 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        public override void Show()
+        protected override void PopIn()
         {
             this.FadeIn(600, Easing.OutQuint);
-
-            this.ScaleTo(0.8f)
-                .ScaleTo(1f, 1000, Easing.OutElastic);
 
             Scheduler.AddOnce(updateText);
         }
 
-        public override void Hide()
+        protected override void PopOut()
         {
             this.FadeOut(200, Easing.OutQuint);
         }
 
         private void updateText()
         {
+            // TODO: Refresh this text when new beatmaps are imported. Right now it won't get up-to-date suggestions.
+
+            // Bounce should play every time the filter criteria is updated.
+            this.ScaleTo(0.9f)
+                .ScaleTo(1f, 1000, Easing.OutElastic);
+
             textFlow.Clear();
 
             if (beatmaps.QueryBeatmapSet(s => !s.Protected && !s.DeletePending) == null)
@@ -104,9 +111,9 @@ namespace osu.Game.Screens.Select
                 textFlow.AddParagraph("No beatmaps found!");
                 textFlow.AddParagraph(string.Empty);
 
-                textFlow.AddParagraph("Consider running the ");
-                textFlow.AddLink("first run setup", () => firstRunSetupOverlay?.Show());
-                textFlow.AddText(" to load or import some beatmaps!");
+                textFlow.AddParagraph("Consider using the \"");
+                textFlow.AddLink(FirstRunSetupOverlayStrings.FirstRunSetupTitle, () => firstRunSetupOverlay?.Show());
+                textFlow.AddText("\" to download or import some beatmaps!");
             }
             else
             {
@@ -131,6 +138,8 @@ namespace osu.Game.Screens.Select
                     textFlow.AddText(" for this query.");
                 }
             }
+
+            // TODO: add clickable link to reset criteria.
         }
     }
 }
