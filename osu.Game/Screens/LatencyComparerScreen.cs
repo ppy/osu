@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -125,7 +126,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     TextAnchor = Anchor.TopCentre,
-                    Y = 200,
+                    Y = 150,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },
@@ -225,12 +226,21 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             float successRate = (float)correctCount / targetRoundCount;
             bool isPass = successRate > 0.8f;
 
-            statusText.AddParagraph($"You scored {correctCount} out of {targetRoundCount} ({successRate:P0})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
-
-            statusText.AddParagraph($"Level {difficulty} (comparing {mapDifficultyToTargetFrameRate(difficulty):N0}hz with {host.UpdateThread.Clock.FramesPerSecond:N0}hz)",
+            statusText.AddParagraph($"You scored {correctCount} out of {targetRoundCount} ({successRate:0%})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
+            statusText.AddParagraph($"Level {difficulty} ({mapDifficultyToTargetFrameRate(difficulty):N0} hz)",
                 cp => cp.Font = OsuFont.Default.With(size: 24));
 
-            statusText.AddParagraph($"Input: {pollingMax}hz Monitor: {displayMode.RefreshRate:N0}hz Exclusive: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15));
+            statusText.AddParagraph(string.Empty);
+            statusText.AddParagraph(string.Empty);
+            statusText.AddIcon(isPass ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.TimesCircle, cp => cp.Colour = isPass ? colours.Green : colours.Red);
+            statusText.AddParagraph(string.Empty);
+
+            statusText.AddParagraph($"Polling: {pollingMax} hz Monitor: {displayMode.RefreshRate:N0} hz Exclusive: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15));
+
+            statusText.AddParagraph($"Input: {host.InputThread.Clock.FramesPerSecond} hz "
+                                    + $"Update: {host.UpdateThread.Clock.FramesPerSecond} hz "
+                                    + $"Draw: {host.DrawThread.Clock.FramesPerSecond} hz"
+                , cp => cp.Font = OsuFont.Default.With(size: 15));
 
             string cannotIncreaseReason = string.Empty;
 
@@ -243,9 +253,12 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             resultsArea.Add(new FillFlowContainer
             {
-                RelativeSizeAxes = Axes.Both,
-                Y = 100,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
                 Spacing = new Vector2(20),
+                Padding = new MarginPadding(20),
                 Children = new Drawable[]
                 {
                     new Button(Key.R)
