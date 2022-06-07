@@ -63,22 +63,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRate);
             HitType = currentHit?.Type;
 
-            // Need to be done after HitType is set.
-            if (HitType != null)
-            {
-                // Get previous hit object, while skipping one that does not have defined colour (sliders and spinners).
-                // Without skipping through these, sliders and spinners would have contributed to a colour change for the next note.
-                TaikoDifficultyHitObject previousHitObject = (TaikoDifficultyHitObject)objects.LastOrDefault();
-                while (previousHitObject != null && previousHitObject.Colour == null)
-                {
-                    previousHitObject = (TaikoDifficultyHitObject)previousHitObject.Previous(0);
-                }
-
-                Colour = TaikoDifficultyHitObjectColour.GetInstanceFor(this);
-                this.NotePosition = noteObjects.Count();
-                noteObjects.Add(this);
-            }
-
             if (HitType == Objects.HitType.Centre)
             {
                 MonoPosition = centreHitObjects.Count();
@@ -90,6 +74,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 MonoPosition = rimHitObjects.Count();
                 rimHitObjects.Add(this);
                 monoDifficultyHitObjects = rimHitObjects;
+            }
+
+            // Need to be done after HitType is set.
+            if (HitType != null)
+            {
+                this.NotePosition = noteObjects.Count();
+                noteObjects.Add(this);
+
+                // Need to be done after NotePosition is set.
+                Colour = TaikoDifficultyHitObjectColour.GetInstanceFor(this);
             }
         }
 

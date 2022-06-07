@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// </summary>
         public static TaikoDifficultyHitObjectColour GetInstanceFor(TaikoDifficultyHitObject hitObject)
         {
-            TaikoDifficultyHitObject lastObject = (TaikoDifficultyHitObject) hitObject.Previous(0);
+            TaikoDifficultyHitObject lastObject = hitObject.PreviousNote(0);
             TaikoDifficultyHitObjectColour previous = lastObject?.Colour;
             bool delta = lastObject == null || hitObject.HitType != lastObject.HitType;
             if (previous != null && delta == previous.Delta)
@@ -75,14 +75,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             TaikoDifficultyHitObjectColour other = this.previous.previous;
             while (other != null && interval < max_repetition_interval)
             {
+                interval += other.DeltaRunLength;
                 if (other.Delta == this.Delta && other.DeltaRunLength == this.DeltaRunLength)
                 {
-                    this.RepetitionInterval = Math.Max(interval, max_repetition_interval);
+                    this.RepetitionInterval = Math.Min(interval, max_repetition_interval);
                     return;
-                }
-                else
-                {
-                    interval += other.DeltaRunLength;
                 }
 
                 other = other.previous;

@@ -16,16 +16,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
             TaikoDifficultyHitObjectColour colour = taikoCurrent.Colour;
             if (colour == null) return 0;
-            double objectStrain = 1;
+            double objectStrain = 1.6;
             if (colour.Delta)
             {
-                objectStrain /= Math.Pow(colour.DeltaRunLength, 0.25);
+                objectStrain /= Math.Pow(colour.DeltaRunLength, 0.7);
             }
             else
             {
-                objectStrain *= sigmoid(colour.DeltaRunLength, 3, 3) * 0.3 + 0.3;
+                objectStrain *= sigmoid(colour.DeltaRunLength, 4, 4) * 0.5 + 0.5;
             }
-            objectStrain *= -sigmoid(colour.RepetitionInterval, 8, 8);
+            objectStrain *= -sigmoid(colour.RepetitionInterval, 8, 8) * 0.5 + 0.5;
             // Console.WriteLine($"{current.StartTime},{colour.GetHashCode()},{colour.Delta},{colour.DeltaRunLength},{colour.RepetitionInterval},{objectStrain}");
             return objectStrain;
         }
