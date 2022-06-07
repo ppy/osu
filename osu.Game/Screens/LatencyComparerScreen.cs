@@ -29,7 +29,7 @@ namespace osu.Game.Screens
     {
         private FrameSync previousFrameSyncMode;
 
-        private readonly OsuSpriteText statusText;
+        private readonly OsuTextFlowContainer statusText;
 
         public override bool HideOverlaysOnEnter => true;
 
@@ -37,7 +37,9 @@ namespace osu.Game.Screens
 
         public override float BackgroundParallaxAmount => 0;
 
-        private readonly Container latencyAreaContainer;
+        private readonly Container mainArea;
+
+        private readonly Container resultsArea;
 
         [Cached]
         private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
@@ -49,7 +51,12 @@ namespace osu.Game.Screens
         {
             InternalChildren = new Drawable[]
             {
-                latencyAreaContainer = new Container
+                new Box
+                {
+                    Colour = overlayColourProvider.Background6,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                mainArea = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -72,11 +79,17 @@ namespace osu.Game.Screens
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopRight,
                 },
-                statusText = new OsuSpriteText
+                statusText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 40))
                 {
-                    Font = OsuFont.Default.With(size: 40),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    TextAnchor = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
+                resultsArea = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
                 },
             };
         }
@@ -109,13 +122,14 @@ namespace osu.Game.Screens
         private const int rounds_to_complete = 10;
 
         private int correctCount;
+        private int targetRoundCount = rounds_to_complete;
 
         private void recordResult(bool correct)
         {
             if (correct)
                 correctCount++;
 
-            if (round < rounds_to_complete)
+            if (round < targetRoundCount)
                 loadNextRound();
             else
             {
@@ -126,21 +140,21 @@ namespace osu.Game.Screens
         private void loadNextRound()
         {
             round++;
-            statusText.Text = $"Round {round} of {rounds_to_complete}";
+            statusText.Text = $"Round {round} of {targetRoundCount}";
 
-            latencyAreaContainer.Clear();
+            mainArea.Clear();
 
             const int induced_latency = 1;
 
             int betterSide = RNG.Next(0, 2);
 
-            latencyAreaContainer.Add(new LatencyArea(betterSide == 1 ? induced_latency : 0)
+            mainArea.Add(new LatencyArea(betterSide == 1 ? induced_latency : 0)
             {
                 Width = 0.5f,
                 ReportBetter = () => recordResult(betterSide == 0)
             });
 
-            latencyAreaContainer.Add(new LatencyArea(betterSide == 0 ? induced_latency : 0)
+            mainArea.Add(new LatencyArea(betterSide == 0 ? induced_latency : 0)
             {
                 Width = 0.5f,
                 Anchor = Anchor.TopRight,
@@ -151,25 +165,27 @@ namespace osu.Game.Screens
 
         private void showResults()
         {
-            AddInternal(new Container
+            mainArea.Clear();
+
+            statusText.Text = $"You scored {correctCount} out of {targetRoundCount} ({(float)correctCount / targetRoundCount:P0})!";
+
+            resultsArea.Add(new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new Box
+                    new Button
                     {
-                        Colour = overlayColourProvider.Background1,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-
-                    new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 40))
-                    {
+                        Text = "Increase confidence",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        TextAnchor = Anchor.TopCentre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Text = $"You scored {correctCount} out of {rounds_to_complete} ({(float)correctCount / rounds_to_complete:P0})!"
+                        Y = 100,
+                        Action = () =>
+                        {
+                            resultsArea.Clear();
+                            targetRoundCount += rounds_to_complete;
+                            loadNextRound();
+                        }
                     }
                 }
             });
@@ -185,6 +201,12 @@ namespace osu.Game.Screens
             private Drawable background = null!;
 
             private readonly int inducedLatency;
+
+            private Container interactivePieces = null!;
+
+            private Button button = null!;
+
+            private long frameCount;
 
             public LatencyArea(int inducedLatency)
             {
@@ -205,17 +227,26 @@ namespace osu.Game.Screens
                         Colour = overlayColourProvider.Background6,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    new LatencyMovableBox
+                    interactivePieces = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        Children = new Drawable[]
+                        {
+                            new LatencyMovableBox
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            new LatencyCursorContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                        }
                     },
-                    new LatencyCursorContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new Button
+                    button = new Button
                     {
                         Text = "Feels better",
+                        Alpha = 0,
                         Y = 20,
                         Width = 0.8f,
                         Anchor = Anchor.TopCentre,
@@ -226,20 +257,11 @@ namespace osu.Game.Screens
 
                 base.LoadComplete();
                 this.FadeInFromZero(500, Easing.OutQuint);
-            }
 
-            public class Button : SettingsButton
-            {
-                [Resolved]
-                private OverlayColourProvider overlayColourProvider { get; set; } = null!;
-
-                protected override void LoadComplete()
+                using (BeginDelayedSequence(500))
                 {
-                    base.LoadComplete();
-
-                    Height = 50;
-                    SpriteText.Colour = overlayColourProvider.Background6;
-                    SpriteText.Font = OsuFont.TorusAlternate.With(size: 34);
+                    interactivePieces.FadeIn(500, Easing.OutQuint);
+                    button.FadeIn(500, Easing.OutQuint);
                 }
             }
 
@@ -255,11 +277,9 @@ namespace osu.Game.Screens
                 base.OnHoverLost(e);
             }
 
-            private long frameCount;
-
             public override bool UpdateSubTree()
             {
-                if (inducedLatency > 0 && ++frameCount % inducedLatency != 0)
+                if (background?.Alpha == 1 && inducedLatency > 0 && ++frameCount % inducedLatency != 0)
                     return false;
 
                 return base.UpdateSubTree();
@@ -367,6 +387,8 @@ namespace osu.Game.Screens
 
                 protected override void Update()
                 {
+                    cursor.Colour = inputManager.CurrentState.Mouse.IsPressed(MouseButton.Left) ? overlayColourProvider.Content1 : overlayColourProvider.Colour2;
+
                     if (IsHovered)
                     {
                         cursor.Position = ToLocalSpace(inputManager.CurrentState.Mouse.Position);
@@ -379,6 +401,21 @@ namespace osu.Game.Screens
 
                     base.Update();
                 }
+            }
+        }
+
+        public class Button : SettingsButton
+        {
+            [Resolved]
+            private OverlayColourProvider overlayColourProvider { get; set; } = null!;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Height = 100;
+                SpriteText.Colour = overlayColourProvider.Background6;
+                SpriteText.Font = OsuFont.TorusAlternate.With(size: 34);
             }
         }
     }
