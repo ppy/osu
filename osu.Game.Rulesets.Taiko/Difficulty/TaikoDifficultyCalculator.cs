@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
         private const double rhythm_skill_multiplier = 0.017;
-        private const double colour_skill_multiplier = 0.027;
-        private const double stamina_skill_multiplier = 0.017;
+        private const double colour_skill_multiplier = 0.026;
+        private const double stamina_skill_multiplier = 0.018;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // }
 
             double combinedRating = locallyCombinedDifficulty(colour, rhythm, stamina);
-            double separatedRating = norm(1.5, colourRating, rhythmRating, staminaRating);
+            // double separatedRating = norm(2, colourRating, rhythmRating, staminaRating);
             double starRating = 1.9 * combinedRating;
             starRating = rescale(starRating);
 
