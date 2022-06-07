@@ -16,6 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 using Realms;
@@ -67,6 +68,7 @@ namespace osu.Game.Overlays.Settings.Sections
                     Action = () => skinEditor?.ToggleVisibility(),
                 },
                 new ExportSkinButton(),
+                new DeleteSkinButton(),
             };
 
             config.BindWith(OsuSetting.Skin, configBindable);
@@ -200,6 +202,38 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     Logger.Log($"Could not export current skin: {e.Message}", level: LogLevel.Error);
                 }
+            }
+        }
+
+        public class DeleteSkinButton : DangerousSettingsButton
+        {
+            [Resolved]
+            private SkinManager skins { get; set; }
+
+            [Resolved(CanBeNull = true)]
+            private IDialogOverlay dialogOverlay { get; set; }
+
+            private Bindable<Skin> currentSkin;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Text = SkinSettingsStrings.DeleteSkinButton;
+                Action = delete;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                currentSkin = skins.CurrentSkin.GetBoundCopy();
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
+            }
+
+            private void delete()
+            {
+                if (dialogOverlay != null)
+                    dialogOverlay.Push(new SkinDeleteDialog(currentSkin.Value));
             }
         }
     }
