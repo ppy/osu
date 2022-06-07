@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
@@ -17,19 +20,21 @@ namespace osu.Game.Screens.Select
 {
     public class NoResultsPlaceholder : CompositeDrawable
     {
-        private FilterCriteria filter;
+        private FilterCriteria? filter;
 
-        private LinkFlowContainer textFlow;
+        private LinkFlowContainer textFlow = null!;
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
-        [Resolved(CanBeNull = true)]
-        private FirstRunSetupOverlay firstRunSetupOverlay { get; set; }
+        [Resolved]
+        private FirstRunSetupOverlay? firstRunSetupOverlay { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         public FilterCriteria Filter
         {
-            get => filter;
             set
             {
                 filter = value;
@@ -108,9 +113,18 @@ namespace osu.Game.Screens.Select
                 textFlow.AddParagraph("No beatmaps match your filter criteria!");
                 textFlow.AddParagraph(string.Empty);
 
-                // TODO: hint when beatmaps are available in another ruleset
-                // TODO: hint when beatmaps are available by toggling "show converted".
-                if (!string.IsNullOrEmpty(filter?.SearchText))
+                if (string.IsNullOrEmpty(filter?.SearchText))
+                {
+                    // TODO: Add realm queries to hint at which ruleset results are available in (and allow clicking to switch).
+                    // TODO: Make this message more certain by ensuring the osu! beatmaps exist before suggesting.
+                    if (filter?.Ruleset.OnlineID > 0 && !filter.AllowConvertedBeatmaps)
+                    {
+                        textFlow.AddParagraph("Beatmaps may be available by ");
+                        textFlow.AddLink("enabling automatic conversion", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
+                        textFlow.AddText("!");
+                    }
+                }
+                else
                 {
                     textFlow.AddParagraph("You can try ");
                     textFlow.AddLink("searching online", LinkAction.SearchBeatmapSet, filter.SearchText);
