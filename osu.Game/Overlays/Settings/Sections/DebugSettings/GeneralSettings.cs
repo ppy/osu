@@ -30,13 +30,18 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 {
                     LabelText = DebugSettingsStrings.BypassFrontToBackPass,
                     Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
+                },
+                new SettingsButton
+                {
+                    Text = DebugSettingsStrings.ImportFiles,
+                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
+                },
+                new SettingsButton
+                {
+                    Text = @"Run latency comparer",
+                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyComparerScreen()))
                 }
             };
-            Add(new SettingsButton
-            {
-                Text = DebugSettingsStrings.ImportFiles,
-                Action = () => performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
-            });
         }
     }
 }
