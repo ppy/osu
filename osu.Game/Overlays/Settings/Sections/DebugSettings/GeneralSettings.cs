@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 new SettingsButton
                 {
                     Text = @"Run latency comparer",
-                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyComparerScreen()))
+                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
                 }
             };
         }
