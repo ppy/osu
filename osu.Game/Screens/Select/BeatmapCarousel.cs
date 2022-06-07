@@ -97,6 +97,8 @@ namespace osu.Game.Screens.Select
 
         protected readonly CarouselScrollContainer Scroll;
 
+        private readonly NoResultsPlaceholder noResultsPlaceholder;
+
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
         // todo: only used for testing, maybe remove.
@@ -170,7 +172,8 @@ namespace osu.Game.Screens.Select
                     Scroll = new CarouselScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
+                    },
+                    noResultsPlaceholder = new NoResultsPlaceholder()
                 }
             };
         }
@@ -648,7 +651,17 @@ namespace osu.Game.Screens.Select
             // First we iterate over all non-filtered carousel items and populate their
             // vertical position data.
             if (revalidateItems)
+            {
                 updateYPositions();
+
+                if (visibleItems.Count == 0)
+                {
+                    noResultsPlaceholder.Filter = activeCriteria;
+                    noResultsPlaceholder.Show();
+                }
+                else
+                    noResultsPlaceholder.Hide();
+            }
 
             // if there is a pending scroll action we apply it without animation and transfer the difference in position to the panels.
             // this is intentionally applied before updating the visible range below, to avoid animating new items (sourced from pool) from locations off-screen, as it looks bad.
