@@ -19,7 +19,9 @@ namespace osu.Game.Tests.Visual.Settings
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
             AddStep("Load screen", () => LoadScreen(latencyCertifier = new LatencyCertifierScreen()));
+            AddUntilStep("wait for load", () => latencyCertifier.IsLoaded);
         }
 
         [Test]
@@ -33,7 +35,6 @@ namespace osu.Game.Tests.Visual.Settings
             }
 
             AddAssert("check at results", () => !latencyCertifier.ChildrenOfType<LatencyArea>().Any());
-
             AddAssert("check no buttons", () => !latencyCertifier.ChildrenOfType<OsuButton>().Any());
         }
 
