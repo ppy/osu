@@ -37,7 +37,7 @@ namespace osu.Game.Screens
 
         public override bool HideOverlaysOnEnter => true;
 
-        public override bool CursorVisible => false;
+        public override bool CursorVisible => mainArea.Count == 0;
 
         public override float BackgroundParallaxAmount => 0;
 
@@ -181,17 +181,15 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             mainArea.Clear();
 
-            const int induced_latency = 500;
-
             int betterSide = RNG.Next(0, 2);
 
-            mainArea.Add(new LatencyArea(Key.Number1, betterSide == 1 ? induced_latency / difficulty : 0)
+            mainArea.Add(new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(difficulty) : 0)
             {
                 Width = 0.5f,
                 ReportBetter = () => recordResult(betterSide == 0)
             });
 
-            mainArea.Add(new LatencyArea(Key.Number2, betterSide == 0 ? induced_latency / difficulty : 0)
+            mainArea.Add(new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(difficulty) : 0)
             {
                 Width = 0.5f,
                 Anchor = Anchor.TopRight,
@@ -218,7 +216,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             statusText.AddParagraph($"You scored {correctCount} out of {targetRoundCount} ({successRate:P0})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
 
-            statusText.AddParagraph($"Level {difficulty} (comparing {host.UpdateThread.Clock.FramesPerSecond:N0}hz and {mapDifficultyToTargetFrameRate(difficulty):N0}hz)",
+            statusText.AddParagraph($"Level {difficulty} (comparing {mapDifficultyToTargetFrameRate(difficulty):N0}hz with {host.UpdateThread.Clock.FramesPerSecond:N0}hz)",
                 cp => cp.Font = OsuFont.Default.With(size: 15));
 
             statusText.AddParagraph($"Refresh rate: {displayMode.RefreshRate:N0} ExclusiveFullscren: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15));
@@ -229,7 +227,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 cannotIncreaseReason = "You didn't score high enough (over 80% required)!";
             else if (mapDifficultyToTargetFrameRate(difficulty + 1) > target_host_update_frames)
                 cannotIncreaseReason = "You've reached the limits of this comparison mode.";
-            else if (mapDifficultyToTargetFrameRate(difficulty + 1) < host.UpdateThread.ActiveHz)
+            else if (mapDifficultyToTargetFrameRate(difficulty + 1) > Clock.FramesPerSecond)
                 cannotIncreaseReason = "Game is not running fast enough to test this level";
 
             resultsArea.Add(new FillFlowContainer
@@ -244,13 +242,14 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         Text = "Increase confidence at current level",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        TooltipText = "The longer you chain, the more sure you will be!",
                         Action = () =>
                         {
                             resultsArea.Clear();
                             targetRoundCount += rounds_to_complete;
                             loadNextRound();
-                        }
+                        },
+                        TooltipText = isPass ? "The longer you chain, the more sure you will be!" : "You've reached your limits",
+                        Enabled = { Value = string.IsNullOrEmpty(cannotIncreaseReason) },
                     },
                     new Button(Key.I)
                     {
@@ -334,14 +333,12 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             private Drawable? background;
 
             private readonly Key key;
-            private readonly int inducedLatency;
+            private readonly int targetFrameRate;
 
-            private long frameCount;
-
-            public LatencyArea(Key key, int inducedLatency)
+            public LatencyArea(Key key, int targetFrameRate)
             {
                 this.key = key;
-                this.inducedLatency = inducedLatency;
+                this.targetFrameRate = targetFrameRate;
 
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
@@ -358,6 +355,15 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         Colour = overlayColourProvider.Background6,
                         RelativeSizeAxes = Axes.Both,
                     },
+                    new Button(key)
+                    {
+                        Text = "Feels better",
+                        Y = 20,
+                        Width = 0.8f,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Action = () => ReportBetter?.Invoke(),
+                    },
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -372,15 +378,6 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                                 RelativeSizeAxes = Axes.Both,
                             },
                         }
-                    },
-                    new Button(key)
-                    {
-                        Text = "Feels better",
-                        Y = 20,
-                        Width = 0.8f,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Action = () => ReportBetter?.Invoke(),
                     },
                 };
             }
@@ -397,10 +394,15 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 base.OnHoverLost(e);
             }
 
+            private double lastFrameTime;
+
             public override bool UpdateSubTree()
             {
-                if (background?.Alpha == 1 && inducedLatency > 0 && ++frameCount % inducedLatency != 0)
+                double elapsed = Clock.CurrentTime - lastFrameTime;
+                if (targetFrameRate > 0 && elapsed < 1000.0 / targetFrameRate)
                     return false;
+
+                lastFrameTime = Clock.CurrentTime;
 
                 return base.UpdateSubTree();
             }
