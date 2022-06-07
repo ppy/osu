@@ -5,7 +5,9 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -44,7 +46,7 @@ namespace osu.Game.Screens
 
         private readonly OsuTextFlowContainer explanatoryText;
 
-        private readonly Container mainArea;
+        private readonly Container<LatencyArea> mainArea;
 
         private readonly Container resultsArea;
 
@@ -85,7 +87,7 @@ namespace osu.Game.Screens
                     Colour = overlayColourProvider.Background6,
                     RelativeSizeAxes = Axes.Both,
                 },
-                mainArea = new Container
+                mainArea = new Container<LatencyArea>
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -118,6 +120,7 @@ namespace osu.Game.Screens
                     Text = @"Welcome to the latency comparer!
 Use the arrow keys, Z/X/J/K to move the square.
 You can click the targets but you don't have to.
+Use the Tab key to change focus.
 Do whatever you need to try and perceive the difference in latency, then choose your best side.
 ",
                 },
@@ -171,6 +174,20 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             loadNextRound();
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Tab:
+                    var firstArea = mainArea.FirstOrDefault(a => !a.IsActiveArea.Value);
+                    if (firstArea != null)
+                        firstArea.IsActiveArea.Value = true;
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
         private void recordResult(bool correct)
         {
             explanatoryText.FadeOut(500, Easing.OutQuint);
@@ -198,7 +215,8 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             mainArea.Add(new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(difficulty) : 0)
             {
                 Width = 0.5f,
-                ReportBetter = () => recordResult(betterSide == 0)
+                ReportBetter = () => recordResult(betterSide == 0),
+                IsActiveArea = { Value = true }
             });
 
             mainArea.Add(new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(difficulty) : 0)
@@ -208,6 +226,15 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 Origin = Anchor.TopRight,
                 ReportBetter = () => recordResult(betterSide == 1)
             });
+
+            foreach (var area in mainArea)
+            {
+                area.IsActiveArea.BindValueChanged(active =>
+                {
+                    if (active.NewValue)
+                        mainArea.Children.First(a => a != area).IsActiveArea.Value = false;
+                });
+            }
         }
 
         private void showResults()
@@ -361,6 +388,8 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             private readonly Key key;
             private readonly int targetFrameRate;
 
+            public readonly BindableBool IsActiveArea = new BindableBool();
+
             public LatencyArea(Key key, int targetFrameRate)
             {
                 this.key = key;
@@ -395,29 +424,28 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new LatencyMovableBox
+                            new LatencyMovableBox(IsActiveArea)
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            new LatencyCursorContainer
+                            new LatencyCursorContainer(IsActiveArea)
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
                         }
                     },
                 };
+
+                IsActiveArea.BindValueChanged(active =>
+                {
+                    background.FadeColour(active.NewValue ? overlayColourProvider.Background4 : overlayColourProvider.Background6, 200, Easing.OutQuint);
+                }, true);
             }
 
             protected override bool OnHover(HoverEvent e)
             {
-                background.FadeColour(overlayColourProvider.Background4, 200, Easing.OutQuint);
+                IsActiveArea.Value = true;
                 return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                background.FadeColour(overlayColourProvider.Background6, 200, Easing.OutQuint);
-                base.OnHoverLost(e);
             }
 
             private double lastFrameTime;
@@ -438,8 +466,15 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 private Box box = null!;
                 private InputManager inputManager = null!;
 
+                private readonly BindableBool isActive;
+
                 [Resolved]
                 private OverlayColourProvider overlayColourProvider { get; set; } = null!;
+
+                public LatencyMovableBox(BindableBool isActive)
+                {
+                    this.isActive = isActive;
+                }
 
                 protected override void LoadComplete()
                 {
@@ -465,7 +500,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 {
                     base.Update();
 
-                    if (!IsHovered)
+                    if (!isActive.Value)
                     {
                         lastFrameTime = null;
                         return;
@@ -515,11 +550,14 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 private Circle cursor = null!;
                 private InputManager inputManager = null!;
 
+                private readonly BindableBool isActive;
+
                 [Resolved]
                 private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
-                public LatencyCursorContainer()
+                public LatencyCursorContainer(BindableBool isActive)
                 {
+                    this.isActive = isActive;
                     Masking = true;
                 }
 
@@ -543,7 +581,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 {
                     cursor.Colour = inputManager.CurrentState.Mouse.IsPressed(MouseButton.Left) ? overlayColourProvider.Content1 : overlayColourProvider.Colour2;
 
-                    if (IsHovered)
+                    if (isActive.Value)
                     {
                         cursor.Position = ToLocalSpace(inputManager.CurrentState.Mouse.Position);
                         cursor.Alpha = 1;
