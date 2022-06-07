@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -46,7 +47,18 @@ namespace osu.Game.Screens
         private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
 
         [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
         private FrameworkConfigManager config { get; set; } = null!;
+
+        private const int rounds_to_complete = 5;
+
+        private int round;
+        private int correctCount;
+        private int targetRoundCount = rounds_to_complete;
+
+        private int difficulty = 1;
 
         public LatencyComparerScreen()
         {
@@ -82,12 +94,11 @@ namespace osu.Game.Screens
                 },
                 explanatoryText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     TextAnchor = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Y = 200,
                     Text = @"Welcome to the latency comparer!
 Use the arrow keys or Z/X to move the square.
 You can click the targets but you don't have to.
@@ -96,9 +107,10 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 },
                 statusText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 40))
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     TextAnchor = Anchor.TopCentre,
+                    Y = 200,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },
@@ -132,13 +144,6 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             loadNextRound();
         }
 
-        private int round;
-
-        private const int rounds_to_complete = 10;
-
-        private int correctCount;
-        private int targetRoundCount = rounds_to_complete;
-
         private void recordResult(bool correct)
         {
             explanatoryText.FadeOut(500, Easing.OutQuint);
@@ -157,21 +162,21 @@ Do whatever you need to try and perceive the difference in latency, then choose 
         private void loadNextRound()
         {
             round++;
-            statusText.Text = $"Round {round} of {targetRoundCount}";
+            statusText.Text = $"Difficulty {difficulty}\nRound {round} of {targetRoundCount}";
 
             mainArea.Clear();
 
-            const int induced_latency = 1;
+            const int induced_latency = 500;
 
             int betterSide = RNG.Next(0, 2);
 
-            mainArea.Add(new LatencyArea(betterSide == 1 ? induced_latency : 0)
+            mainArea.Add(new LatencyArea(betterSide == 1 ? induced_latency / difficulty : 0)
             {
                 Width = 0.5f,
                 ReportBetter = () => recordResult(betterSide == 0)
             });
 
-            mainArea.Add(new LatencyArea(betterSide == 0 ? induced_latency : 0)
+            mainArea.Add(new LatencyArea(betterSide == 0 ? induced_latency / difficulty : 0)
             {
                 Width = 0.5f,
                 Anchor = Anchor.TopRight,
@@ -186,26 +191,68 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             statusText.Text = $"You scored {correctCount} out of {targetRoundCount} ({(float)correctCount / targetRoundCount:P0})!";
 
-            resultsArea.Add(new Container
+            resultsArea.Add(new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Y = 100,
+                Spacing = new Vector2(20),
                 Children = new Drawable[]
                 {
                     new Button
                     {
-                        Text = "Increase confidence",
+                        Text = "Increase confidence at current level",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Y = 100,
                         Action = () =>
                         {
                             resultsArea.Clear();
                             targetRoundCount += rounds_to_complete;
                             loadNextRound();
                         }
+                    },
+                    new Button
+                    {
+                        Text = "Increase difficulty",
+                        BackgroundColour = colours.Red2,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Action = () =>
+                        {
+                            changeDifficulty(difficulty + 1);
+                        }
+                    },
+                    new Button
+                    {
+                        Text = "Decrease difficulty",
+                        BackgroundColour = colours.Green,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Enabled = { Value = difficulty > 1 },
+                        Action = () =>
+                        {
+                            resultsArea.Clear();
+                            correctCount = 0;
+                            targetRoundCount = rounds_to_complete;
+                            difficulty--;
+                            loadNextRound();
+                        }
                     }
                 }
             });
+        }
+
+        private void changeDifficulty(int diff)
+        {
+            Debug.Assert(diff > 0);
+
+            resultsArea.Clear();
+
+            correctCount = 0;
+            round = 0;
+
+            targetRoundCount = rounds_to_complete;
+            difficulty = diff;
+            loadNextRound();
         }
 
         public class LatencyArea : CompositeDrawable
@@ -218,10 +265,6 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             private Drawable? background;
 
             private readonly int inducedLatency;
-
-            private Container interactivePieces = null!;
-
-            private Button button = null!;
 
             private long frameCount;
 
@@ -244,10 +287,9 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         Colour = overlayColourProvider.Background6,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    interactivePieces = new Container
+                    new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
                         Children = new Drawable[]
                         {
                             new LatencyMovableBox
@@ -260,10 +302,9 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                             },
                         }
                     },
-                    button = new Button
+                    new Button
                     {
                         Text = "Feels better",
-                        Alpha = 0,
                         Y = 20,
                         Width = 0.8f,
                         Anchor = Anchor.TopCentre,
@@ -271,15 +312,6 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         Action = () => ReportBetter?.Invoke(),
                     },
                 };
-
-                base.LoadComplete();
-                this.FadeInFromZero(500, Easing.OutQuint);
-
-                using (BeginDelayedSequence(500))
-                {
-                    interactivePieces.FadeIn(500, Easing.OutQuint);
-                    button.FadeIn(500, Easing.OutQuint);
-                }
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -344,7 +376,11 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                     {
                         float movementAmount = (float)(Clock.CurrentTime - lastFrameTime) / 400;
 
-                        foreach (var key in inputManager.CurrentState.Keyboard.Keys)
+                        var buttons = inputManager.CurrentState.Keyboard.Keys;
+
+                        box.Colour = buttons.HasAnyButtonPressed ? overlayColourProvider.Content1 : overlayColourProvider.Colour1;
+
+                        foreach (var key in buttons)
                         {
                             switch (key)
                             {
