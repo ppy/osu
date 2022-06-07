@@ -15,9 +15,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
+using osu.Framework.Platform.Windows;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -30,6 +31,7 @@ namespace osu.Game.Screens
     public class LatencyComparerScreen : OsuScreen
     {
         private FrameSync previousFrameSyncMode;
+        private double previousActiveHz;
 
         private readonly OsuTextFlowContainer statusText;
 
@@ -44,6 +46,11 @@ namespace osu.Game.Screens
         private readonly Container mainArea;
 
         private readonly Container resultsArea;
+
+        /// <summary>
+        /// The rate at which the game host should attempt to run.
+        /// </summary>
+        private const int target_host_update_frames = 4000;
 
         [Cached]
         private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
@@ -61,6 +68,9 @@ namespace osu.Game.Screens
         private int targetRoundCount = rounds_to_complete;
 
         private int difficulty = 1;
+
+        [Resolved]
+        private GameHost host { get; set; } = null!;
 
         public LatencyComparerScreen()
         {
@@ -128,7 +138,9 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             base.OnEntering(e);
 
             previousFrameSyncMode = config.Get<FrameSync>(FrameworkSetting.FrameSync);
+            previousActiveHz = host.UpdateThread.ActiveHz;
             config.SetValue(FrameworkSetting.FrameSync, FrameSync.Unlimited);
+            host.UpdateThread.ActiveHz = target_host_update_frames;
             // host.AllowBenchmarkUnlimitedFrames = true;
         }
 
@@ -136,6 +148,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
         {
             // host.AllowBenchmarkUnlimitedFrames = false;
             config.SetValue(FrameworkSetting.FrameSync, previousFrameSyncMode);
+            host.UpdateThread.ActiveHz = previousActiveHz;
             return base.OnExiting(e);
         }
 
@@ -191,7 +204,33 @@ Do whatever you need to try and perceive the difference in latency, then choose 
         {
             mainArea.Clear();
 
-            statusText.Text = $"You scored {correctCount} out of {targetRoundCount} ({(float)correctCount / targetRoundCount:P0})!";
+            var displayMode = host.Window.CurrentDisplayMode.Value;
+
+            string exclusive = "unknown";
+
+            if (host.Window is WindowsWindow windowsWindow)
+                exclusive = windowsWindow.FullscreenCapability.ToString();
+
+            statusText.Clear();
+
+            float successRate = (float)correctCount / targetRoundCount;
+            bool isPass = successRate > 0.8f;
+
+            statusText.AddParagraph($"You scored {correctCount} out of {targetRoundCount} ({successRate:P0})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
+
+            statusText.AddParagraph($"Level {difficulty} (comparing {host.UpdateThread.Clock.FramesPerSecond:N0}hz and {mapDifficultyToTargetFrameRate(difficulty):N0}hz)",
+                cp => cp.Font = OsuFont.Default.With(size: 15));
+
+            statusText.AddParagraph($"Refresh rate: {displayMode.RefreshRate:N0} ExclusiveFullscren: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15));
+
+            string cannotIncreaseReason = string.Empty;
+
+            if (!isPass)
+                cannotIncreaseReason = "You didn't score high enough (over 80% required)!";
+            else if (mapDifficultyToTargetFrameRate(difficulty + 1) > target_host_update_frames)
+                cannotIncreaseReason = "You've reached the limits of this comparison mode.";
+            else if (mapDifficultyToTargetFrameRate(difficulty + 1) < host.UpdateThread.ActiveHz)
+                cannotIncreaseReason = "Game is not running fast enough to test this level";
 
             resultsArea.Add(new FillFlowContainer
             {
@@ -205,6 +244,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         Text = "Increase confidence at current level",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        TooltipText = "The longer you chain, the more sure you will be!",
                         Action = () =>
                         {
                             resultsArea.Clear();
@@ -218,16 +258,17 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         BackgroundColour = colours.Red2,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = () => changeDifficulty(difficulty + 1)
+                        Action = () => changeDifficulty(difficulty + 1),
+                        Enabled = { Value = string.IsNullOrEmpty(cannotIncreaseReason) },
+                        TooltipText = cannotIncreaseReason
                     },
                     new Button(Key.D)
                     {
-                        Text = "Decrease difficulty",
+                        Text = difficulty == 1 ? "Restart" : "Decrease difficulty",
                         BackgroundColour = colours.Green,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = () => changeDifficulty(difficulty - 1),
-                        Enabled = { Value = difficulty > 1 },
+                        Action = () => changeDifficulty(Math.Max(difficulty - 1, 1)),
                     }
                 }
             });
@@ -245,6 +286,42 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             targetRoundCount = rounds_to_complete;
             difficulty = diff;
             loadNextRound();
+        }
+
+        private static int mapDifficultyToTargetFrameRate(int difficulty)
+        {
+            switch (difficulty)
+            {
+                case 1:
+                    return 15;
+
+                case 2:
+                    return 30;
+
+                case 3:
+                    return 45;
+
+                case 4:
+                    return 60;
+
+                case 5:
+                    return 120;
+
+                case 6:
+                    return 240;
+
+                case 7:
+                    return 480;
+
+                case 8:
+                    return 720;
+
+                case 9:
+                    return 960;
+
+                default:
+                    return 1000 + ((difficulty - 10) * 500);
+            }
         }
 
         public class LatencyArea : CompositeDrawable
