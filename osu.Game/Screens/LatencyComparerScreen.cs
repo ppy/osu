@@ -96,7 +96,7 @@ namespace osu.Game.Screens
                 {
                     Name = "separator",
                     Colour = ColourInfo.GradientHorizontal(overlayColourProvider.Background6, overlayColourProvider.Background6.Opacity(0)),
-                    Width = 50,
+                    Width = 100,
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopLeft,
@@ -105,7 +105,7 @@ namespace osu.Game.Screens
                 {
                     Name = "separator",
                     Colour = ColourInfo.GradientHorizontal(overlayColourProvider.Background6.Opacity(0), overlayColourProvider.Background6),
-                    Width = 50,
+                    Width = 100,
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopRight,
