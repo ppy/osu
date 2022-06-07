@@ -13,6 +13,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -24,6 +25,7 @@ using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osuTK;
@@ -66,11 +68,13 @@ namespace osu.Game.Screens
 
         private const int rounds_to_complete = 5;
 
+        private const int rounds_to_complete_certified = 20;
+
         private int round;
         private int correctCount;
         private int targetRoundCount = rounds_to_complete;
 
-        private int difficulty = 1;
+        private int difficultyLevel = 1;
 
         private double lastPoll;
         private int pollingMax;
@@ -124,6 +128,10 @@ Use the Tab key to change focus.
 Do whatever you need to try and perceive the difference in latency, then choose your best side.
 ",
                 },
+                resultsArea = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 statusText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 40))
                 {
                     Anchor = Anchor.TopCentre,
@@ -132,10 +140,6 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                     Y = 150,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                },
-                resultsArea = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
                 },
             };
         }
@@ -206,20 +210,20 @@ Do whatever you need to try and perceive the difference in latency, then choose 
         private void loadNextRound()
         {
             round++;
-            statusText.Text = $"Difficulty {difficulty}\nRound {round} of {targetRoundCount}";
+            statusText.Text = $"Level {difficultyLevel}\nRound {round} of {targetRoundCount}";
 
             mainArea.Clear();
 
             int betterSide = RNG.Next(0, 2);
 
-            mainArea.Add(new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(difficulty) : 0)
+            mainArea.Add(new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(difficultyLevel) : 0)
             {
                 Width = 0.5f,
                 ReportBetter = () => recordResult(betterSide == 0),
                 IsActiveArea = { Value = true }
             });
 
-            mainArea.Add(new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(difficulty) : 0)
+            mainArea.Add(new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(difficultyLevel) : 0)
             {
                 Width = 0.5f,
                 Anchor = Anchor.TopRight,
@@ -251,16 +255,22 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             statusText.Clear();
 
             float successRate = (float)correctCount / targetRoundCount;
-            bool isPass = successRate > 0.8f;
+            bool isPass = successRate == 1;
 
             statusText.AddParagraph($"You scored {correctCount} out of {targetRoundCount} ({successRate:0%})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
-            statusText.AddParagraph($"Level {difficulty} ({mapDifficultyToTargetFrameRate(difficulty):N0} hz)",
+            statusText.AddParagraph($"Level {difficultyLevel} ({mapDifficultyToTargetFrameRate(difficultyLevel):N0} hz)",
                 cp => cp.Font = OsuFont.Default.With(size: 24));
 
             statusText.AddParagraph(string.Empty);
             statusText.AddParagraph(string.Empty);
             statusText.AddIcon(isPass ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.TimesCircle, cp => cp.Colour = isPass ? colours.Green : colours.Red);
             statusText.AddParagraph(string.Empty);
+
+            if (!isPass && difficultyLevel > 1)
+            {
+                statusText.AddParagraph("To complete certification, decrease the difficulty level until you can get 20 tests correct in a row!", cp => cp.Font = OsuFont.Default.With(size: 24));
+                statusText.AddParagraph(string.Empty);
+            }
 
             statusText.AddParagraph($"Polling: {pollingMax} hz Monitor: {displayMode.RefreshRate:N0} hz Exclusive: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15));
 
@@ -269,13 +279,55 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                                     + $"Draw: {host.DrawThread.Clock.FramesPerSecond} hz"
                 , cp => cp.Font = OsuFont.Default.With(size: 15));
 
+            int certificationRemaining = !isPass ? rounds_to_complete_certified : rounds_to_complete_certified - correctCount;
+
+            if (isPass && certificationRemaining <= 0)
+            {
+                Drawable background;
+                Drawable certifiedText;
+
+                resultsArea.AddRange(new[]
+                {
+                    background = new Box
+                    {
+                        Colour = overlayColourProvider.Background4,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    (certifiedText = new OsuSpriteText
+                    {
+                        Alpha = 0,
+                        Font = OsuFont.TorusAlternate.With(size: 80, weight: FontWeight.Bold),
+                        Text = "Certified!",
+                        Blending = BlendingParameters.Additive,
+                    }).WithEffect(new GlowEffect
+                    {
+                        Colour = overlayColourProvider.Colour1,
+                    }).With(e =>
+                    {
+                        e.Anchor = Anchor.Centre;
+                        e.Origin = Anchor.Centre;
+                    })
+                });
+
+                background.FadeInFromZero(1000, Easing.OutQuint);
+
+                certifiedText.FadeInFromZero(500, Easing.InQuint);
+
+                certifiedText
+                    .ScaleTo(10)
+                    .ScaleTo(1, 600, Easing.InQuad)
+                    .Then()
+                    .ScaleTo(1.05f, 10000, Easing.OutQuint);
+                return;
+            }
+
             string cannotIncreaseReason = string.Empty;
 
             if (!isPass)
-                cannotIncreaseReason = "You didn't score high enough (over 80% required)!";
-            else if (mapDifficultyToTargetFrameRate(difficulty + 1) > target_host_update_frames)
+                cannotIncreaseReason = "You didn't get a perfect score.";
+            else if (mapDifficultyToTargetFrameRate(difficultyLevel + 1) > target_host_update_frames)
                 cannotIncreaseReason = "You've reached the limits of this comparison mode.";
-            else if (mapDifficultyToTargetFrameRate(difficulty + 1) > Clock.FramesPerSecond)
+            else if (mapDifficultyToTargetFrameRate(difficultyLevel + 1) > Clock.FramesPerSecond)
                 cannotIncreaseReason = "Game is not running fast enough to test this level";
 
             resultsArea.Add(new FillFlowContainer
@@ -288,9 +340,27 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 Padding = new MarginPadding(20),
                 Children = new Drawable[]
                 {
+                    new Button(Key.Enter)
+                    {
+                        Text = "Continue to next level",
+                        BackgroundColour = colours.Red2,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Action = () => changeDifficulty(difficultyLevel + 1),
+                        Enabled = { Value = string.IsNullOrEmpty(cannotIncreaseReason) },
+                        TooltipText = cannotIncreaseReason
+                    },
+                    new Button(Key.D)
+                    {
+                        Text = difficultyLevel == 1 ? "Retry" : "Return to last level",
+                        BackgroundColour = colours.Green,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Action = () => changeDifficulty(Math.Max(difficultyLevel - 1, 1)),
+                    },
                     new Button(Key.R)
                     {
-                        Text = "Increase confidence at current level",
+                        Text = $"Continue towards certification at this level ({certificationRemaining} more)",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Action = () =>
@@ -299,27 +369,9 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                             targetRoundCount += rounds_to_complete;
                             loadNextRound();
                         },
-                        TooltipText = isPass ? "The longer you chain, the more sure you will be!" : "You've reached your limits",
-                        Enabled = { Value = string.IsNullOrEmpty(cannotIncreaseReason) },
+                        TooltipText = isPass ? $"Chain {rounds_to_complete_certified} to confirm your perception!" : "You've reached your limits. Go to the previous level to complete certification!",
+                        Enabled = { Value = isPass },
                     },
-                    new Button(Key.I)
-                    {
-                        Text = "Increase difficulty",
-                        BackgroundColour = colours.Red2,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Action = () => changeDifficulty(difficulty + 1),
-                        Enabled = { Value = string.IsNullOrEmpty(cannotIncreaseReason) },
-                        TooltipText = cannotIncreaseReason
-                    },
-                    new Button(Key.D)
-                    {
-                        Text = difficulty == 1 ? "Restart" : "Decrease difficulty",
-                        BackgroundColour = colours.Green,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Action = () => changeDifficulty(Math.Max(difficulty - 1, 1)),
-                    }
                 }
             });
         }
@@ -336,7 +388,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             lastPoll = 0;
 
             targetRoundCount = rounds_to_complete;
-            difficulty = diff;
+            difficultyLevel = diff;
             loadNextRound();
         }
 
