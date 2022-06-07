@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         private static Vector2 clampSliderToPlayfield(WorkingObject workingObject)
         {
             var slider = (Slider)workingObject.HitObject;
-            var possibleMovementBounds = calculatePossibleMovementBounds(slider);
+            var possibleMovementBounds = CalculatePossibleMovementBounds(slider);
 
             var previousPosition = workingObject.PositionModified;
 
@@ -212,10 +212,13 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Calculates a <see cref="RectangleF"/> which contains all of the possible movements of the slider (in relative X/Y coordinates)
         /// such that the entire slider is inside the playfield.
         /// </summary>
+        /// <param name="slider">The <see cref="Slider"/> for which to calculate a movement bounding box.</param>
+        /// <param name="accountForFollowCircleRadius">Whether the movement bounding box should account for the slider's follow circle. Defaults to true.</param>
+        /// <returns>A <see cref="RectangleF"/> which contains all of the possible movements of the slider such that the entire slider is inside the playfield.</returns>
         /// <remarks>
         /// If the slider is larger than the playfield, the returned <see cref="RectangleF"/> may have negative width/height.
         /// </remarks>
-        private static RectangleF calculatePossibleMovementBounds(Slider slider)
+        public static RectangleF CalculatePossibleMovementBounds(Slider slider, bool accountForFollowCircleRadius = true)
         {
             var pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
@@ -236,14 +239,17 @@ namespace osu.Game.Rulesets.Osu.Utils
                 maxY = MathF.Max(maxY, pos.Y);
             }
 
-            // Take the circle radius into account.
-            float radius = (float)slider.Radius;
+            if (accountForFollowCircleRadius)
+            {
+                // Take the circle radius into account.
+                float radius = (float)slider.Radius;
 
-            minX -= radius;
-            minY -= radius;
+                minX -= radius;
+                minY -= radius;
 
-            maxX += radius;
-            maxY += radius;
+                maxX += radius;
+                maxY += radius;
+            }
 
             // Given the bounding box of the slider (via min/max X/Y),
             // the amount that the slider can move to the left is minX (with the sign flipped, since positive X is to the right),

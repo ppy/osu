@@ -6,6 +6,9 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Osu.Utils;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -19,21 +22,35 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModMagnetised)).ToArray();
 
         [SettingSource("Repulsion strength", "How strong the repulsion is.", 0)]
-        public BindableFloat RepulsionStrength { get; } = new BindableFloat(0.5f)
+        public override BindableFloat EasementStrength { get; } = new BindableFloat(0.5f)
         {
             Precision = 0.05f,
             MinValue = 0.05f,
             MaxValue = 1.0f,
         };
 
-        protected override Vector2 DestinationVector => new Vector2(
-            2 * WorkingHitObject.X - CursorPosition.X,
-            2 * WorkingHitObject.Y - CursorPosition.Y
-        );
-
-        public OsuModRepel()
+        protected override Vector2 DestinationVector
         {
-            EasementStrength.BindTo(RepulsionStrength);
+            get
+            {
+                float x = Math.Clamp(2 * WorkingHitObject.X - CursorPosition.X, 0, OsuPlayfield.BASE_SIZE.X);
+                float y = Math.Clamp(2 * WorkingHitObject.Y - CursorPosition.Y, 0, OsuPlayfield.BASE_SIZE.Y);
+
+                if (WorkingHitObject.HitObject is Slider slider)
+                {
+                    var possibleMovementBounds = OsuHitObjectGenerationUtils.CalculatePossibleMovementBounds(slider, false);
+
+                    x = possibleMovementBounds.Width < 0
+                        ? x
+                        : Math.Clamp(x, possibleMovementBounds.Left, possibleMovementBounds.Right);
+
+                    y = possibleMovementBounds.Height < 0
+                        ? y
+                        : Math.Clamp(y, possibleMovementBounds.Top, possibleMovementBounds.Bottom);
+                }
+
+                return new Vector2(x, y);
+            }
         }
     }
 }
