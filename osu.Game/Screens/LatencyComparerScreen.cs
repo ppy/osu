@@ -442,10 +442,10 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 }, true);
             }
 
-            protected override bool OnHover(HoverEvent e)
+            protected override bool OnMouseMove(MouseMoveEvent e)
             {
                 IsActiveArea.Value = true;
-                return base.OnHover(e);
+                return base.OnMouseMove(e);
             }
 
             private double lastFrameTime;
