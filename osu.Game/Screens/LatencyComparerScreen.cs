@@ -116,7 +116,7 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Text = @"Welcome to the latency comparer!
-Use the arrow keys or Z/X to move the square.
+Use the arrow keys, Z/X/J/K to move the square.
 You can click the targets but you don't have to.
 Do whatever you need to try and perceive the difference in latency, then choose your best side.
 ",
@@ -483,10 +483,12 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         {
                             switch (key)
                             {
+                                case Key.K:
                                 case Key.Up:
                                     box.Y = MathHelper.Clamp(box.Y - movementAmount, 0.1f, 0.9f);
                                     break;
 
+                                case Key.J:
                                 case Key.Down:
                                     box.Y = MathHelper.Clamp(box.Y + movementAmount, 0.1f, 0.9f);
                                     break;
