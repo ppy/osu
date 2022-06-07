@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Select
 
         private BeatmapInfoWedge beatmapInfoWedge;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved]
