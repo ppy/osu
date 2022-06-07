@@ -69,6 +69,9 @@ namespace osu.Game.Screens
 
         private int difficulty = 1;
 
+        private double lastPoll;
+        private int pollingMax;
+
         [Resolved]
         private GameHost host { get; set; } = null!;
 
@@ -131,6 +134,14 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                     RelativeSizeAxes = Axes.Both,
                 },
             };
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            if (lastPoll > 0)
+                pollingMax = (int)Math.Max(pollingMax, 1000 / (Clock.CurrentTime - lastPoll));
+            lastPoll = Clock.CurrentTime;
+            return base.OnMouseMove(e);
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -217,9 +228,9 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             statusText.AddParagraph($"You scored {correctCount} out of {targetRoundCount} ({successRate:P0})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
 
             statusText.AddParagraph($"Level {difficulty} (comparing {mapDifficultyToTargetFrameRate(difficulty):N0}hz with {host.UpdateThread.Clock.FramesPerSecond:N0}hz)",
-                cp => cp.Font = OsuFont.Default.With(size: 15));
+                cp => cp.Font = OsuFont.Default.With(size: 24));
 
-            statusText.AddParagraph($"Refresh rate: {displayMode.RefreshRate:N0} ExclusiveFullscren: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15));
+            statusText.AddParagraph($"Input: {pollingMax}hz Monitor: {displayMode.RefreshRate:N0}hz Exclusive: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15));
 
             string cannotIncreaseReason = string.Empty;
 
@@ -281,6 +292,8 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             correctCount = 0;
             round = 0;
+            pollingMax = 0;
+            lastPoll = 0;
 
             targetRoundCount = rounds_to_complete;
             difficulty = diff;
