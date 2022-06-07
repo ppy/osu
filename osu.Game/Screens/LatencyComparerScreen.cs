@@ -358,7 +358,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         Origin = Anchor.Centre,
                         Action = () => changeDifficulty(Math.Max(difficultyLevel - 1, 1)),
                     },
-                    new Button(Key.R)
+                    new Button(Key.C)
                     {
                         Text = $"Continue towards certification at this level ({certificationRemaining} more)",
                         Anchor = Anchor.Centre,
@@ -438,14 +438,15 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             private Drawable? background;
 
             private readonly Key key;
-            private readonly int targetFrameRate;
+
+            public readonly int TargetFrameRate;
 
             public readonly BindableBool IsActiveArea = new BindableBool();
 
             public LatencyArea(Key key, int targetFrameRate)
             {
                 this.key = key;
-                this.targetFrameRate = targetFrameRate;
+                TargetFrameRate = targetFrameRate;
 
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
@@ -505,7 +506,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             public override bool UpdateSubTree()
             {
                 double elapsed = Clock.CurrentTime - lastFrameTime;
-                if (targetFrameRate > 0 && elapsed < 1000.0 / targetFrameRate)
+                if (TargetFrameRate > 0 && elapsed < 1000.0 / TargetFrameRate)
                     return false;
 
                 lastFrameTime = Clock.CurrentTime;

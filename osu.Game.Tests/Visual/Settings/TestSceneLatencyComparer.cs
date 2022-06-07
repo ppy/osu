@@ -3,17 +3,55 @@
 
 #nullable enable
 
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Settings
 {
     public class TestSceneLatencyComparer : ScreenTestScene
     {
-        [Test]
-        public void TestBasic()
+        private LatencyComparerScreen latencyComparer = null!;
+
+        public override void SetUpSteps()
         {
-            AddStep("Load screen", () => LoadScreen(new LatencyComparerScreen()));
+            base.SetUpSteps();
+            AddStep("Load screen", () => LoadScreen(latencyComparer = new LatencyComparerScreen()));
+        }
+
+        [Test]
+        public void TestCertification()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                clickCorrectUntilResults();
+                AddAssert("check at results", () => !latencyComparer.ChildrenOfType<LatencyComparerScreen.LatencyArea>().Any());
+                AddStep("hit c to continue", () => InputManager.Key(Key.C));
+            }
+
+            AddAssert("check at results", () => !latencyComparer.ChildrenOfType<LatencyComparerScreen.LatencyArea>().Any());
+
+            AddAssert("check no buttons", () => !latencyComparer.ChildrenOfType<OsuButton>().Any());
+        }
+
+        private void clickCorrectUntilResults()
+        {
+            AddUntilStep("click correct button until results", () =>
+            {
+                var latencyArea = latencyComparer
+                                  .ChildrenOfType<LatencyComparerScreen.LatencyArea>()
+                                  .SingleOrDefault(a => a.TargetFrameRate == 0);
+
+                // reached results
+                if (latencyArea == null)
+                    return true;
+
+                latencyArea.ChildrenOfType<OsuButton>().Single().TriggerClick();
+                return false;
+            });
         }
     }
 }
