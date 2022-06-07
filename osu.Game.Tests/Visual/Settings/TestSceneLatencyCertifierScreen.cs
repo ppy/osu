@@ -12,14 +12,14 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public class TestSceneLatencyComparer : ScreenTestScene
+    public class TestSceneLatencyCertifierScreen : ScreenTestScene
     {
-        private LatencyComparerScreen latencyComparer = null!;
+        private LatencyCertifierScreen latencyCertifier = null!;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
-            AddStep("Load screen", () => LoadScreen(latencyComparer = new LatencyComparerScreen()));
+            AddStep("Load screen", () => LoadScreen(latencyCertifier = new LatencyCertifierScreen()));
         }
 
         [Test]
@@ -28,20 +28,20 @@ namespace osu.Game.Tests.Visual.Settings
             for (int i = 0; i < 4; i++)
             {
                 clickCorrectUntilResults();
-                AddAssert("check at results", () => !latencyComparer.ChildrenOfType<LatencyArea>().Any());
+                AddAssert("check at results", () => !latencyCertifier.ChildrenOfType<LatencyArea>().Any());
                 AddStep("hit c to continue", () => InputManager.Key(Key.C));
             }
 
-            AddAssert("check at results", () => !latencyComparer.ChildrenOfType<LatencyArea>().Any());
+            AddAssert("check at results", () => !latencyCertifier.ChildrenOfType<LatencyArea>().Any());
 
-            AddAssert("check no buttons", () => !latencyComparer.ChildrenOfType<OsuButton>().Any());
+            AddAssert("check no buttons", () => !latencyCertifier.ChildrenOfType<OsuButton>().Any());
         }
 
         private void clickCorrectUntilResults()
         {
             AddUntilStep("click correct button until results", () =>
             {
-                var latencyArea = latencyComparer
+                var latencyArea = latencyCertifier
                                   .ChildrenOfType<LatencyArea>()
                                   .SingleOrDefault(a => a.TargetFrameRate == 0);
 

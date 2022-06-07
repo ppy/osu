@@ -29,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Utility
 {
-    public class LatencyComparerScreen : OsuScreen
+    public class LatencyCertifierScreen : OsuScreen
     {
         private FrameSync previousFrameSyncMode;
         private double previousActiveHz;
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Utility
         [Resolved]
         private GameHost host { get; set; } = null!;
 
-        public LatencyComparerScreen()
+        public LatencyCertifierScreen()
         {
             InternalChildren = new Drawable[]
             {
@@ -117,9 +117,8 @@ namespace osu.Game.Screens.Utility
                     TextAnchor = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Text = @"Welcome to the latency comparer!
+                    Text = @"Welcome to the latency certifier!
 Use the arrow keys, Z/X/J/K to move the square.
-You can click the targets but you don't have to.
 Use the Tab key to change focus.
 Do whatever you need to try and perceive the difference in latency, then choose your best side.
 ",
