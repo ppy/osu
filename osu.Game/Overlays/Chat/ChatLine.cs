@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Chat
 
         private bool messageHasColour => Message.IsAction && senderHasColour;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private ChannelManager? chatManager { get; set; }
 
         [Resolved]
@@ -258,7 +258,7 @@ namespace osu.Game.Overlays.Chat
                 this.sender = sender;
             }
 
-            [BackgroundDependencyLoader(true)]
+            [BackgroundDependencyLoader]
             private void load(UserProfileOverlay? profile, ChannelManager? chatManager)
             {
                 Action = () => profile?.ShowUser(sender);
