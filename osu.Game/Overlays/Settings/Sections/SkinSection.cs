@@ -232,8 +232,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
             private void delete()
             {
-                if (dialogOverlay != null)
-                    dialogOverlay.Push(new SkinDeleteDialog(currentSkin.Value));
+                dialogOverlay?.Push(new SkinDeleteDialog(currentSkin.Value));
             }
         }
     }
