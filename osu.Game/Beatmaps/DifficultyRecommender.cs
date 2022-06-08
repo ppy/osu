@@ -67,12 +67,10 @@ namespace osu.Game.Beatmaps
             if (api.LocalUser.Value.RulesetsStatistics == null)
                 return;
 
-            foreach (var statistic in api.LocalUser.Value.RulesetsStatistics)
+            foreach (var kvp in api.LocalUser.Value.RulesetsStatistics)
             {
-                decimal? pp = api.LocalUser.Value.RulesetsStatistics[statistic.Key].PP;
                 // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
-                double recommended = Math.Pow((double)(pp ?? 0), 0.4) * 0.195;
-                recommendedDifficultyMapping[statistic.Key] = recommended;
+                recommendedDifficultyMapping[kvp.Key] = Math.Pow((double)(kvp.Value.PP ?? 0), 0.4) * 0.195;
             }
         }
 
