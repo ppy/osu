@@ -29,6 +29,8 @@ namespace osu.Game.Skinning.Editor
     {
         public const double TRANSITION_DURATION = 500;
 
+        public const float MENU_HEIGHT = 40;
+
         public readonly BindableList<ISkinnableDrawable> SelectedComponents = new BindableList<ISkinnableDrawable>();
 
         protected override bool StartHidden => true;
@@ -78,8 +80,6 @@ namespace osu.Game.Skinning.Editor
         {
             RelativeSizeAxes = Axes.Both;
 
-            const float menu_height = 40;
-
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -102,7 +102,7 @@ namespace osu.Game.Skinning.Editor
                                 Name = "Menu container",
                                 RelativeSizeAxes = Axes.X,
                                 Depth = float.MinValue,
-                                Height = menu_height,
+                                Height = MENU_HEIGHT,
                                 Children = new Drawable[]
                                 {
                                     new EditorMenuBar
@@ -322,7 +322,10 @@ namespace osu.Game.Skinning.Editor
 
         protected override void PopIn()
         {
-            this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+            this
+                // align animation to happen after the majority of the ScalingContainer animation completes.
+                .Delay(ScalingContainer.TRANSITION_DURATION * 0.3f)
+                .FadeIn(TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
