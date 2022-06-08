@@ -256,12 +256,12 @@ namespace osu.Game.Screens.Select.Carousel
             return new ToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
             {
                 if (s)
-                    collection.Beatmaps.Add(beatmapInfo);
+                    collection.Beatmaps.Add(beatmapInfo.MD5Hash);
                 else
-                    collection.Beatmaps.Remove(beatmapInfo);
+                    collection.Beatmaps.Remove(beatmapInfo.MD5Hash);
             })
             {
-                State = { Value = collection.Beatmaps.Contains(beatmapInfo) }
+                State = { Value = collection.Beatmaps.Contains(beatmapInfo.MD5Hash) }
             };
         }
 
