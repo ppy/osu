@@ -32,7 +32,11 @@ namespace osu.Game.Screens.Select
                     new PopupDialogDangerousButton
                     {
                         Text = @"Yes. Totally. Delete it.",
-                        Action = () => {
+                        Action = () =>
+                        {
+                            if (manager == null)
+                                return;
+
                             manager.Delete(s);
                             manager.CurrentSkinInfo.Value = DefaultSkin.CreateInfo().ToLiveUnmanaged();
                         },
