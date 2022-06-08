@@ -5,48 +5,38 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Skinning;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Database;
 
 namespace osu.Game.Screens.Select
 {
     public class SkinDeleteDialog : PopupDialog
     {
-        private SkinManager manager;
-
-        [BackgroundDependencyLoader]
-        private void load(SkinManager skinManager)
-        {
-            manager = skinManager;
-        }
+        [Resolved]
+        private SkinManager manager { get; set; }
 
         public SkinDeleteDialog(Skin skin)
         {
-            skin.SkinInfo.PerformRead(s =>
+            BodyText = skin.SkinInfo.Value.Name;
+            Icon = FontAwesome.Regular.TrashAlt;
+            HeaderText = @"Confirm deletion of";
+            Buttons = new PopupDialogButton[]
             {
-                BodyText = s.Name;
-
-                Icon = FontAwesome.Regular.TrashAlt;
-                HeaderText = @"Confirm deletion of";
-                Buttons = new PopupDialogButton[]
+                new PopupDialogDangerousButton
                 {
-                    new PopupDialogDangerousButton
+                    Text = @"Yes. Totally. Delete it.",
+                    Action = () =>
                     {
-                        Text = @"Yes. Totally. Delete it.",
-                        Action = () =>
-                        {
-                            if (manager == null)
-                                return;
+                        if (manager == null)
+                            return;
 
-                            manager.Delete(s);
-                            manager.CurrentSkinInfo.Value = DefaultSkin.CreateInfo().ToLiveUnmanaged();
-                        },
+                        manager.Delete(skin.SkinInfo.Value);
+                        manager.CurrentSkinInfo.SetDefault();
                     },
-                    new PopupDialogCancelButton
-                    {
-                        Text = @"Firetruck, I didn't mean to!",
-                    },
-                };
-            });
+                },
+                new PopupDialogCancelButton
+                {
+                    Text = @"Firetruck, I didn't mean to!",
+                },
+            };
         }
     }
 }
