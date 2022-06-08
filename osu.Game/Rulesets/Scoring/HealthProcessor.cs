@@ -33,6 +33,15 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public bool HasFailed { get; private set; }
 
+        /// <summary>
+        /// Immediately triggers a failure for this HealthProcessor.
+        /// </summary>
+        public void TriggerFailure()
+        {
+            if (Failed?.Invoke() != false)
+                HasFailed = true;
+        }
+
         protected override void ApplyResultInternal(JudgementResult result)
         {
             result.HealthAtJudgement = Health.Value;
@@ -44,10 +53,7 @@ namespace osu.Game.Rulesets.Scoring
             Health.Value += GetHealthIncreaseFor(result);
 
             if (meetsAnyFailCondition(result))
-            {
-                if (Failed?.Invoke() != false)
-                    HasFailed = true;
-            }
+                TriggerFailure();
         }
 
         protected override void RevertResultInternal(JudgementResult result)
