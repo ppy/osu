@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -176,6 +177,36 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("open notification overlay", () => testContainer.NotificationOverlay.Show());
             AddAssert("1 notification fired", () => testContainer.NotificationOverlay.UnreadCount.Value == 1);
+        }
+
+        /// <summary>
+        /// Ensures that <see cref="MessageNotifier"/> handles channels which have not been or could not be resolved (i.e. <see cref="Channel.Id"/> = 0).
+        /// </summary>
+        [Test]
+        public void TestSendInUnresolvedChannel()
+        {
+            int i = 1;
+            Channel unresolved = null;
+
+            AddRepeatStep("join unresolved channels", () => testContainer.ChannelManager.JoinChannel(unresolved = new Channel(new APIUser
+            {
+                Id = 100 + i,
+                Username = $"Foreign #{i++}",
+            })), 5);
+
+            AddStep("send message in unresolved channel", () =>
+            {
+                Debug.Assert(unresolved.Id == 0);
+
+                unresolved.AddLocalEcho(new LocalEchoMessage
+                {
+                    Sender = API.LocalUser.Value,
+                    ChannelId = unresolved.Id,
+                    Content = "Some message",
+                });
+            });
+
+            AddAssert("no notifications fired", () => testContainer.NotificationOverlay.UnreadCount.Value == 0);
         }
 
         private void receiveMessage(APIUser sender, Channel channel, string content) => channel.AddNewMessages(createMessage(sender, channel, content));
