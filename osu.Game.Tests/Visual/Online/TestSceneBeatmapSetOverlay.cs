@@ -98,6 +98,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddAssert("status is loved", () => overlay.ChildrenOfType<BeatmapSetOnlineStatusPill>().Single().Status == BeatmapOnlineStatus.Loved);
             AddAssert("scores container is visible", () => overlay.ChildrenOfType<ScoresContainer>().Single().Alpha == 1);
+            AddAssert("mod selector is visible", () => overlay.ChildrenOfType<LeaderboardModSelector>().Single().Alpha == 1);
 
             AddStep("go to second beatmap", () => overlay.ChildrenOfType<BeatmapPicker.DifficultySelectorButton>().ElementAt(1).TriggerClick());
 
