@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -26,33 +28,6 @@ namespace osu.Game.Overlays.Chat
 {
     public class ChatLine : CompositeDrawable
     {
-        protected virtual float TextSize => 20;
-
-        protected virtual float Spacing => 15;
-
-        protected virtual float TimestampWidth => 60;
-
-        protected virtual float UsernameWidth => 130;
-
-        private Color4 usernameColour;
-
-        private OsuSpriteText timestamp;
-
-        public ChatLine(Message message)
-        {
-            Message = message;
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-        }
-
-        [Resolved(CanBeNull = true)]
-        private ChannelManager chatManager { get; set; }
-
-        private Message message;
-        private OsuSpriteText username;
-
-        public LinkFlowContainer ContentFlow { get; private set; }
-
         public Message Message
         {
             get => message;
@@ -69,10 +44,40 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
+        public LinkFlowContainer ContentFlow { get; private set; } = null!;
+
+        protected virtual float TextSize => 20;
+
+        protected virtual float Spacing => 15;
+
+        protected virtual float TimestampWidth => 60;
+
+        protected virtual float UsernameWidth => 130;
+
+        private Color4 usernameColour;
+
+        private OsuSpriteText timestamp = null!;
+
+        private Message message = null!;
+
+        private OsuSpriteText username = null!;
+
+        private Container? highlight;
+
         private bool senderHasColour => !string.IsNullOrEmpty(message.Sender.Colour);
 
+        [Resolved(CanBeNull = true)]
+        private ChannelManager? chatManager { get; set; }
+
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
+
+        public ChatLine(Message message)
+        {
+            Message = message;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -150,8 +155,6 @@ namespace osu.Game.Overlays.Chat
             updateMessageContent();
             FinishTransforms(true);
         }
-
-        private Container highlight;
 
         /// <summary>
         /// Performs a highlight animation on this <see cref="ChatLine"/>.
@@ -250,10 +253,10 @@ namespace osu.Game.Overlays.Chat
         {
             private readonly APIUser sender;
 
-            private Action startChatAction;
+            private Action startChatAction = null!;
 
             [Resolved]
-            private IAPIProvider api { get; set; }
+            private IAPIProvider api { get; set; } = null!;
 
             public MessageSender(APIUser sender)
             {
@@ -261,7 +264,7 @@ namespace osu.Game.Overlays.Chat
             }
 
             [BackgroundDependencyLoader(true)]
-            private void load(UserProfileOverlay profile, ChannelManager chatManager)
+            private void load(UserProfileOverlay? profile, ChannelManager? chatManager)
             {
                 Action = () => profile?.ShowUser(sender);
                 startChatAction = () => chatManager?.OpenPrivateChannel(sender);
