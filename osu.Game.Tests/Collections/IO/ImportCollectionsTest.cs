@@ -50,10 +50,10 @@ namespace osu.Game.Tests.Collections.IO
                     Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
                     Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
-                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.Zero);
+                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.EqualTo(1));
 
                     Assert.That(osu.CollectionManager.Collections[1].Name.Value, Is.EqualTo("Second"));
-                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.Zero);
+                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.EqualTo(12));
                 }
                 finally
                 {
