@@ -66,6 +66,8 @@ namespace osu.Game.Overlays.Chat
 
         private bool senderHasColour => !string.IsNullOrEmpty(message.Sender.Colour);
 
+        private bool messageHasColour => Message.IsAction && senderHasColour;
+
         [Resolved(CanBeNull = true)]
         private ChannelManager? chatManager { get; set; }
 
@@ -80,7 +82,7 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider? colourProvider)
         {
             usernameColour = senderHasColour
                 ? Color4Extensions.FromHex(message.Sender.Colour)
@@ -113,6 +115,7 @@ namespace osu.Game.Overlays.Chat
                                     Origin = Anchor.CentreLeft,
                                     Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
                                     MaxWidth = TimestampWidth,
+                                    Colour = colourProvider?.Background1 ?? Colour4.White,
                                 },
                                 new MessageSender(message.Sender)
                                 {
@@ -128,16 +131,8 @@ namespace osu.Game.Overlays.Chat
                         ContentFlow = new LinkFlowContainer(t =>
                         {
                             t.Shadow = false;
-
-                            if (Message.IsAction)
-                            {
-                                t.Font = OsuFont.GetFont(italics: true);
-
-                                if (senderHasColour)
-                                    t.Colour = Color4Extensions.FromHex(message.Sender.Colour);
-                            }
-
-                            t.Font = t.Font.With(size: TextSize);
+                            t.Font = t.Font.With(size: TextSize, italics: Message.IsAction);
+                            t.Colour = messageHasColour ? Color4Extensions.FromHex(message.Sender.Colour) : colourProvider?.Content1 ?? Colour4.White;
                         })
                         {
                             AutoSizeAxes = Axes.Y,
