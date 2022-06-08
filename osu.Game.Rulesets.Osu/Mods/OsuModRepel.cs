@@ -22,12 +22,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModMagnetised)).ToArray();
 
         [SettingSource("Repulsion strength", "How strong the repulsion is.", 0)]
-        public override BindableFloat EasementStrength { get; } = new BindableFloat(0.5f)
+        public override BindableFloat EasementStrength { get; } = new BindableFloat(0.6f)
         {
             Precision = 0.05f,
             MinValue = 0.05f,
             MaxValue = 1.0f,
         };
+
+        protected override float EasementStrengthMultiplier => 0.8f;
 
         protected override Vector2 DestinationVector
         {
