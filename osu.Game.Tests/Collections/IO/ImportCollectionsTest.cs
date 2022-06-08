@@ -49,6 +49,11 @@ namespace osu.Game.Tests.Collections.IO
 
                     Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
+                    // Even with no beatmaps imported, collections are tracking the hashes and will continue to.
+                    // In the future this whole mechanism will be replaced with having the collections in realm,
+                    // but until that happens it makes rough sense that we want to track not-yet-imported beatmaps
+                    // and have them associate with collections if/when they become available.
+
                     Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
                     Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.EqualTo(1));
 
