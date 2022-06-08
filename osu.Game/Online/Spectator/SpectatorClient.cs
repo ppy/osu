@@ -39,7 +39,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// The states of all users currently being watched.
         /// </summary>
-        public IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
+        public virtual IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
 
         /// <summary>
         /// A global list of all players currently playing.
@@ -172,6 +172,7 @@ namespace osu.Game.Online.Spectator
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
                 currentState.State = SpectatedUserState.Playing;
+                currentState.MaximumScoringValues = state.ScoreProcessor.MaximumScoringValues;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
