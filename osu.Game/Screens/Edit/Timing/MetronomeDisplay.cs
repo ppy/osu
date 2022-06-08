@@ -38,6 +38,8 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; }
 
+        public bool EnableClicking { get; set; } = true;
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
@@ -281,6 +283,9 @@ namespace osu.Game.Screens.Edit.Timing
 
                     Schedule(() =>
                     {
+                        if (!EnableClicking)
+                            return;
+
                         var channel = clunk?.GetChannel();
 
                         if (channel != null)

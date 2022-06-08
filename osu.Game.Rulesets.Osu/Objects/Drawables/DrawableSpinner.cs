@@ -79,7 +79,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     Result = { BindTarget = SpinsPerMinute },
                 },
-                ticks = new Container<DrawableSpinnerTick>(),
+                ticks = new Container<DrawableSpinnerTick>
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new AspectContainer
                 {
                     Anchor = Anchor.Centre,

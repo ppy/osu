@@ -4,6 +4,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -224,6 +225,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private void updateScreenModeWarning()
         {
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS)
+            {
+                if (windowModeDropdown.Current.Value == WindowMode.Fullscreen)
+                    windowModeDropdown.SetNoticeText(LayoutSettingsStrings.FullscreenMacOSNote, true);
+                else
+                    windowModeDropdown.ClearNoticeText();
+
+                return;
+            }
+
             if (windowModeDropdown.Current.Value != WindowMode.Fullscreen)
             {
                 windowModeDropdown.SetNoticeText(GraphicsSettingsStrings.NotFullscreenNote, true);

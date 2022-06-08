@@ -31,12 +31,12 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="ppy.LocalisationAnalyser" Version="2022.417.0">
+    <PackageReference Include="ppy.LocalisationAnalyser" Version="2022.607.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Realm" Version="10.11.2" />
-    <PackageReference Include="ppy.osu.Framework" Version="2022.530.0" />
+    <PackageReference Include="Realm" Version="10.14.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2022.605.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2022.527.0" />
     <PackageReference Include="Sentry" Version="3.17.1" />
     <PackageReference Include="SharpCompress" Version="0.31.0" />

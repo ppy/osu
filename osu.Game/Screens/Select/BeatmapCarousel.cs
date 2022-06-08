@@ -10,6 +10,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -633,7 +634,7 @@ namespace osu.Game.Screens.Select
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
             // handles the vertical size of the carousel changing (ie. on window resize when aspect ratio has changed).
-            if ((invalidation & Invalidation.Layout) > 0)
+            if (invalidation.HasFlagFast(Invalidation.DrawSize))
                 itemsCache.Invalidate();
 
             return base.OnInvalidate(invalidation, source);
