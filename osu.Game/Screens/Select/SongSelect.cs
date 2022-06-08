@@ -28,7 +28,6 @@ using osuTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
@@ -37,7 +36,6 @@ using osu.Game.Graphics.UserInterface;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Game.Screens.Play;
-using osu.Game.Database;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
@@ -58,8 +56,6 @@ namespace osu.Game.Screens.Select
         protected virtual bool ControlGlobalMusic => true;
 
         protected virtual bool ShowFooter => true;
-
-        protected virtual bool DisplayStableImportPrompt => legacyImportManager?.SupportsImportFromStable == true;
 
         public override bool? AllowTrackAdjustments => true;
 
@@ -94,13 +90,12 @@ namespace osu.Game.Screens.Select
         protected Container LeftArea { get; private set; }
 
         private BeatmapInfoWedge beatmapInfoWedge;
-        private IDialogOverlay dialogOverlay;
+
+        [Resolved(canBeNull: true)]
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private LegacyImportManager legacyImportManager { get; set; }
 
         protected ModSelectOverlay ModSelect { get; private set; }
 
@@ -127,7 +122,7 @@ namespace osu.Game.Screens.Select
         internal IOverlayManager OverlayManager { get; private set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, IDialogOverlay dialog, OsuColour colours, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
+        private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -289,26 +284,9 @@ namespace osu.Game.Screens.Select
                 BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
             }
 
-            dialogOverlay = dialog;
-
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = audio.Samples.Get(@"SongSelect/select-expand");
             SampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
-
-            if (dialogOverlay != null)
-            {
-                Schedule(() =>
-                {
-                    // if we have no beatmaps, let's prompt the user to import from over a stable install if he has one.
-                    if (beatmaps.QueryBeatmapSet(s => !s.Protected && !s.DeletePending) == null && DisplayStableImportPrompt)
-                    {
-                        dialogOverlay.Push(new ImportFromStablePopup(() =>
-                        {
-                            Task.Run(() => legacyImportManager.ImportFromStableAsync(StableContent.All));
-                        }));
-                    }
-                });
-            }
         }
 
         protected override void LoadComplete()
