@@ -31,20 +31,25 @@ namespace osu.Game.Overlays.Music
 
             foreach (var item in items.OfType<PlaylistItem>())
             {
-                var beatmapHashes = item.Model.Value.Beatmaps.Select(b => b.MD5Hash);
-
-                bool contained = false;
-
-                foreach (string hash in beatmapHashes)
+                if (criteria.Collection == null)
+                    item.InSelectedCollection = true;
+                else
                 {
-                    if (criteria.Collection?.Beatmaps.Contains(hash) == true)
-                    {
-                        contained = true;
-                        break;
-                    }
-                }
+                    var beatmapHashes = item.Model.Value.Beatmaps.Select(b => b.MD5Hash);
 
-                item.InSelectedCollection = contained;
+                    bool contained = false;
+
+                    foreach (string hash in beatmapHashes)
+                    {
+                        if (criteria.Collection?.Beatmaps.Contains(hash) == true)
+                        {
+                            contained = true;
+                            break;
+                        }
+                    }
+
+                    item.InSelectedCollection = contained;
+                }
             }
 
             items.SearchTerm = criteria.SearchText;
