@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             bool firstDeltaSwitch = false;
 
-            int historicalNoteCount = Math.Min(current.Position, 32);
+            int historicalNoteCount = Math.Min(current.Index, 32);
 
             int rhythmStart = 0;
 
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // derive strainTime for calculation
             var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuPrevObj = current.Position > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
+            var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
 
             double strainTime = osuCurrObj.StrainTime;
             double greatWindowFull = greatWindow * 2;
