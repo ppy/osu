@@ -96,6 +96,7 @@ namespace osu.Game.Tests.Visual.Ranking
             beatmap.Metadata.Author = author;
             beatmap.Metadata.Title = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap title";
             beatmap.Metadata.Artist = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap artist";
+            beatmap.DifficultyName = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong difficulty name";
 
             return beatmap;
         }

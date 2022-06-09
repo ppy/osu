@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -28,7 +27,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>, IStateful<SelectionState>
+    public class VolumeMeter : Container, IStateful<SelectionState>
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
@@ -80,7 +79,7 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            hoverSample = audio.Samples.Get($"UI/{HoverSampleSet.Button.GetDescription()}-hover");
+            hoverSample = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-hover");
             notchSample = audio.Samples.Get(@"UI/notch-tick");
             sampleLastPlaybackTime = Time.Current;
 
@@ -132,7 +131,7 @@ namespace osu.Game.Overlays.Volume
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Name = "Progress under covers for smoothing",
+                                            Name = @"Progress under covers for smoothing",
                                             RelativeSizeAxes = Axes.Both,
                                             Rotation = 180,
                                             Child = volumeCircle = new CircularProgress
@@ -144,7 +143,7 @@ namespace osu.Game.Overlays.Volume
                                 },
                                 new Circle
                                 {
-                                    Name = "Inner Cover",
+                                    Name = @"Inner Cover",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
@@ -153,7 +152,7 @@ namespace osu.Game.Overlays.Volume
                                 },
                                 new Container
                                 {
-                                    Name = "Progress overlay for glow",
+                                    Name = @"Progress overlay for glow",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
@@ -329,7 +328,7 @@ namespace osu.Game.Overlays.Volume
 
             if (isPrecise)
             {
-                scrollAccumulation += delta * adjust_step * 0.1;
+                scrollAccumulation += delta * adjust_step;
 
                 while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
                 {
@@ -363,27 +362,6 @@ namespace osu.Game.Overlays.Volume
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-        }
-
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-        {
-            if (!IsHovered)
-                return false;
-
-            switch (e.Action)
-            {
-                case GlobalAction.SelectPreviousGroup:
-                    State = SelectionState.Selected;
-                    adjust(1, false);
-                    return true;
-
-                case GlobalAction.SelectNextGroup:
-                    State = SelectionState.Selected;
-                    adjust(-1, false);
-                    return true;
-            }
-
-            return false;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)

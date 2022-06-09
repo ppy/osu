@@ -16,13 +16,15 @@ namespace osu.Game.Screens.Edit.Components
     /// </summary>
     internal class EditorSidebar : Container<EditorSidebarSection>
     {
+        public const float WIDTH = 250;
+
         private readonly Box background;
 
         protected override Container<EditorSidebarSection> Content { get; }
 
         public EditorSidebar()
         {
-            Width = 250;
+            Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]

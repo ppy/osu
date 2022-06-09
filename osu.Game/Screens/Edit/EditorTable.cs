@@ -99,6 +99,15 @@ namespace osu.Game.Screens.Edit
                 colourSelected = colours.Colour3;
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                // Reduce flicker of rows when offset is being changed rapidly.
+                // Probably need to reconsider this.
+                FinishTransforms(true);
+            }
+
             private bool selected;
 
             public bool Selected
