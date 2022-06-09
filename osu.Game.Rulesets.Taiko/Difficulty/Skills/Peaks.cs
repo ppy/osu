@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private const double colour_skill_multiplier = 0.37 * final_multiplier;
         private const double stamina_skill_multiplier = 0.37 * final_multiplier;
 
-        private const double final_multiplier = 0.04625;
+        private const double final_multiplier = 0.047;
 
         private readonly Rhythm rhythm;
         private readonly Colour colour;
