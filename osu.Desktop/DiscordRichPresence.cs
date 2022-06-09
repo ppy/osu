@@ -31,7 +31,7 @@ namespace osu.Desktop
         private IBindable<APIUser> user;
 
         [Resolved]
-        private IAPIProvider provider { get; set; }
+        private IAPIProvider api { get; set; }
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
@@ -60,7 +60,8 @@ namespace osu.Desktop
 
             config.BindWith(OsuSetting.DiscordRichPresence, privacyMode);
 
-            (user = provider.LocalUser.GetBoundCopy()).BindValueChanged(u =>
+            user = api.LocalUser.GetBoundCopy();
+            user.BindValueChanged(u =>
             {
                 status.UnbindBindings();
                 status.BindTo(u.NewValue.Status);
