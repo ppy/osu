@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // Find the previous hit object hit by the current key, which is two notes of the same colour prior.
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
             TaikoDifficultyHitObject keyPrevious = taikoCurrent.PreviousMono(1);
+
             if (keyPrevious == null)
             {
                 // There is no previous hit object hit by the current key

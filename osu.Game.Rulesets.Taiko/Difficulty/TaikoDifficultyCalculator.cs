@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
+        private const double difficulty_multiplier = 1.9;
+
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
@@ -29,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             return new Skill[]
             {
-                new CombinedStrain(mods)
+                new Peaks(mods)
             };
         }
 
@@ -68,13 +70,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods };
 
-            var combined = (CombinedStrain)skills[0];
+            var combined = (Peaks)skills[0];
 
-            double colourRating = combined.ColourDifficultyValue;
-            double rhythmRating = combined.RhythmDifficultyValue;
-            double staminaRating = combined.StaminaDifficultyValue;
+            double colourRating = Math.Sqrt(combined.ColourDifficultyValue * difficulty_multiplier);
+            double rhythmRating = Math.Sqrt(combined.RhythmDifficultyValue * difficulty_multiplier);
+            double staminaRating = Math.Sqrt(combined.StaminaDifficultyValue * difficulty_multiplier);
 
-            double starRating = rescale(1.9 * combined.DifficultyValue());
+            double combinedRating = combined.DifficultyValue();
+            double starRating = rescale(combinedRating * difficulty_multiplier);
 
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
@@ -86,6 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 StaminaDifficulty = staminaRating,
                 RhythmDifficulty = rhythmRating,
                 ColourDifficulty = colourRating,
+                PeakDifficulty = combinedRating,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
             };

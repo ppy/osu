@@ -7,22 +7,24 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
-    public class CombinedStrain : Skill
+    public class Peaks : Skill
     {
-        private const double final_multiplier = 0.04625;
         private const double rhythm_skill_multiplier = 0.32 * final_multiplier;
         private const double colour_skill_multiplier = 0.37 * final_multiplier;
         private const double stamina_skill_multiplier = 0.37 * final_multiplier;
 
-        private Rhythm rhythm;
-        private Colour colour;
-        private Stamina stamina;
+        private const double final_multiplier = 0.04625;
+
+        private readonly Rhythm rhythm;
+        private readonly Colour colour;
+        private readonly Stamina stamina;
 
         public double ColourDifficultyValue => colour.DifficultyValue() * colour_skill_multiplier;
         public double RhythmDifficultyValue => rhythm.DifficultyValue() * rhythm_skill_multiplier;
         public double StaminaDifficultyValue => stamina.DifficultyValue() * stamina_skill_multiplier;
 
-        public CombinedStrain(Mod[] mods) : base(mods)
+        public Peaks(Mod[] mods)
+            : base(mods)
         {
             rhythm = new Rhythm(mods);
             colour = new Colour(mods);
