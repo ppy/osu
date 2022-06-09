@@ -213,16 +213,16 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             if (!isPass && difficultyLevel > 1)
             {
-                statusText.AddParagraph("To complete certification, decrease the difficulty level until you can get 20 tests correct in a row!", cp => cp.Font = OsuFont.Default.With(size: 24));
+                statusText.AddParagraph("To complete certification, decrease the difficulty level until you can get 20 tests correct in a row!", cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold));
                 statusText.AddParagraph(string.Empty);
             }
 
-            statusText.AddParagraph($"Polling: {pollingMax} hz Monitor: {displayMode?.RefreshRate ?? 0:N0} hz Exclusive: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15));
+            statusText.AddParagraph($"Polling: {pollingMax} hz Monitor: {displayMode?.RefreshRate ?? 0:N0} hz Exclusive: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
 
             statusText.AddParagraph($"Input: {host.InputThread.Clock.FramesPerSecond} hz "
                                     + $"Update: {host.UpdateThread.Clock.FramesPerSecond} hz "
                                     + $"Draw: {host.DrawThread.Clock.FramesPerSecond} hz"
-                , cp => cp.Font = OsuFont.Default.With(size: 15));
+                , cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
 
             int certificationRemaining = !isPass ? rounds_to_complete_certified : rounds_to_complete_certified - correctCount;
 
@@ -247,11 +247,20 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                     }).WithEffect(new GlowEffect
                     {
                         Colour = overlayColourProvider.Colour1,
+                        PadExtent = true
                     }).With(e =>
                     {
                         e.Anchor = Anchor.Centre;
                         e.Origin = Anchor.Centre;
-                    })
+                    }),
+                    new OsuSpriteText
+                    {
+                        Text = $"You should use a frame limiter with update rate of {mapDifficultyToTargetFrameRate(difficultyLevel + 1)} hz (or fps) for best results!",
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold),
+                        Y = 80,
+                    }
                 });
 
                 background.FadeInFromZero(1000, Easing.OutQuint);
