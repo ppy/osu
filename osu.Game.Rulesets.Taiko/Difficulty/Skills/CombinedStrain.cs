@@ -9,9 +9,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class CombinedStrain : Skill
     {
-        private const double rhythm_skill_multiplier = 0.017;
-        private const double colour_skill_multiplier = 0.026;
-        private const double stamina_skill_multiplier = 0.018;
+        private const double final_multiplier = 0.00925;
+        private const double rhythm_skill_multiplier = 1.6 * final_multiplier;
+        private const double colour_skill_multiplier = 1.85 * final_multiplier;
+        private const double stamina_skill_multiplier = 1.85 * final_multiplier;
 
         private Rhythm rhythm;
         private Colour colour;
@@ -63,7 +64,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
                 double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier;
 
-                double peak = norm(2, colourPeak, rhythmPeak, staminaPeak);
+                double peak = norm(1.5, colourPeak, staminaPeak);
+                peak = norm(2, peak, rhythmPeak);
 
                 // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
                 // These sections will not contribute to the difficulty.
