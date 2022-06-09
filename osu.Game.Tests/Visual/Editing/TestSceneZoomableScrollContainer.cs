@@ -44,7 +44,12 @@ namespace osu.Game.Tests.Visual.Editing
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = OsuColour.Gray(30)
                             },
-                            scrollContainer = new ZoomableScrollContainer { RelativeSizeAxes = Axes.Both }
+                            scrollContainer = new ZoomableScrollContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                            }
                         }
                     },
                     new MenuCursor()
@@ -62,7 +67,15 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestWidthInitialization()
         {
-            AddAssert("Inner container width was initialized", () => innerBox.DrawWidth > 0);
+            AddAssert("Inner container width was initialized", () => innerBox.DrawWidth == scrollContainer.DrawWidth);
+        }
+
+        [Test]
+        public void TestWidthUpdatesOnDrawSizeChanges()
+        {
+            AddStep("Shrink scroll container", () => scrollContainer.Width = 0.5f);
+            AddAssert("Scroll container width shrunk", () => scrollContainer.DrawWidth == scrollContainer.Parent.DrawWidth / 2);
+            AddAssert("Inner container width matches scroll container", () => innerBox.DrawWidth == scrollContainer.DrawWidth);
         }
 
         [Test]

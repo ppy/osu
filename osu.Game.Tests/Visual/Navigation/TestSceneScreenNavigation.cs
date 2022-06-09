@@ -609,8 +609,6 @@ namespace osu.Game.Tests.Visual.Navigation
             public ModSelectOverlay ModSelectOverlay => ModSelect;
 
             public BeatmapOptionsOverlay BeatmapOptionsOverlay => BeatmapOptions;
-
-            protected override bool DisplayStableImportPrompt => false;
         }
     }
 }

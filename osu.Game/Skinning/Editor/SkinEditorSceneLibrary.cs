@@ -27,6 +27,8 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinEditorSceneLibrary : CompositeDrawable
     {
+        public const float HEIGHT = BUTTON_HEIGHT + padding * 2;
+
         public const float BUTTON_HEIGHT = 40;
 
         private const float padding = 10;
@@ -42,7 +44,7 @@ namespace osu.Game.Skinning.Editor
 
         public SkinEditorSceneLibrary()
         {
-            Height = BUTTON_HEIGHT + padding * 2;
+            Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]

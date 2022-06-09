@@ -54,6 +54,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ExportSkinButton => new TranslatableString(getKey(@"export_skin_button"), @"Export selected skin");
 
+        /// <summary>
+        /// "Delete selected skin"
+        /// </summary>
+        public static LocalisableString DeleteSkinButton => new TranslatableString(getKey(@"delete_skin_button"), @"Delete selected skin");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

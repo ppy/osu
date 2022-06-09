@@ -82,7 +82,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
-            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(GameplayState.Ruleset.RulesetInfo, ScoreProcessor, users), l =>
+            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(users), l =>
             {
                 if (!LoadedBeatmapSuccessfully)
                     return;
