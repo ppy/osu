@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -65,6 +67,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 get
                 {
+                    if (BeatmapModelManager.VIDEO_EXTENSIONS.Contains(File.Extension))
+                        return FontAwesome.Regular.FileVideo;
+
                     switch (File.Extension)
                     {
                         case @".ogg":
@@ -76,12 +81,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         case @".jpeg":
                         case @".png":
                             return FontAwesome.Regular.FileImage;
-
-                        case @".mp4":
-                        case @".avi":
-                        case @".mov":
-                        case @".flv":
-                            return FontAwesome.Regular.FileVideo;
 
                         default:
                             return FontAwesome.Regular.File;

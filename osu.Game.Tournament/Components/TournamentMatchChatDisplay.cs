@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Tournament.IPC;
@@ -29,7 +30,7 @@ namespace osu.Game.Tournament.Components
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(MatchIPCInfo ipc)
+        private void load(MatchIPCInfo ipc, IAPIProvider api)
         {
             if (ipc != null)
             {
@@ -45,7 +46,7 @@ namespace osu.Game.Tournament.Components
 
                     if (manager == null)
                     {
-                        AddInternal(manager = new ChannelManager { HighPollRate = { Value = true } });
+                        AddInternal(manager = new ChannelManager(api) { HighPollRate = { Value = true } });
                         Channel.BindTo(manager.CurrentChannel);
                     }
 

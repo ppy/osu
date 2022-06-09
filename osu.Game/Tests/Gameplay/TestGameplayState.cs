@@ -26,7 +26,10 @@ namespace osu.Game.Tests.Gameplay
             var workingBeatmap = new TestWorkingBeatmap(beatmap);
             var playableBeatmap = workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-            return new GameplayState(playableBeatmap, ruleset, mods, score);
+            var scoreProcessor = ruleset.CreateScoreProcessor();
+            scoreProcessor.ApplyBeatmap(playableBeatmap);
+
+            return new GameplayState(playableBeatmap, ruleset, mods, score, scoreProcessor);
         }
     }
 }
