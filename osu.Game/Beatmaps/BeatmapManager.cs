@@ -319,6 +319,15 @@ namespace osu.Game.Beatmaps
             });
         }
 
+        public void DeleteAllVideos()
+        {
+            realm.Write(r =>
+            {
+                var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
+                beatmapModelManager.DeleteVideos(items.ToList());
+            });
+        }
+
         public void UndeleteAll()
         {
             realm.Run(r => beatmapModelManager.Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));

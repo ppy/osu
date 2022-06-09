@@ -159,6 +159,8 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Origin = Anchor.TopCentre,
                                         Text = beatmap.DifficultyName,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
+                                        MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                                        Truncate = true,
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
                                     {

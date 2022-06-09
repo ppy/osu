@@ -78,7 +78,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 }
             });
 
-            if (!(source.FindProvider(s => s.GetTexture("spinner-top") != null) is DefaultLegacySkin))
+            var topProvider = source.FindProvider(s => s.GetTexture("spinner-top") != null);
+
+            if (topProvider is LegacySkinTransformer transformer && !(transformer.Skin is DefaultLegacySkin))
             {
                 AddInternal(ApproachCircle = new Sprite
                 {

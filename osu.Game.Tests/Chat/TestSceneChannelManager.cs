@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Chat
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            var container = new ChannelManagerContainer();
+            var container = new ChannelManagerContainer(API);
             Child = container;
             channelManager = container.ChannelManager;
         });
@@ -145,11 +145,11 @@ namespace osu.Game.Tests.Chat
         private class ChannelManagerContainer : CompositeDrawable
         {
             [Cached]
-            public ChannelManager ChannelManager { get; } = new ChannelManager();
+            public ChannelManager ChannelManager { get; }
 
-            public ChannelManagerContainer()
+            public ChannelManagerContainer(IAPIProvider apiProvider)
             {
-                InternalChild = ChannelManager;
+                InternalChild = ChannelManager = new ChannelManager(apiProvider);
             }
         }
     }
