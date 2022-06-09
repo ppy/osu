@@ -53,8 +53,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// TODO: This argument list is getting long, we might want to refactor this into a static method that create
         ///       all <see cref="DifficultyHitObject"/>s from a <see cref="IBeatmap"/>.
         public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate,
-        List<DifficultyHitObject> objects, List<TaikoDifficultyHitObject> centreHitObjects, List<TaikoDifficultyHitObject> rimHitObjects,
-        List<TaikoDifficultyHitObject> noteObjects, int position)
+            List<DifficultyHitObject> objects,
+            List<TaikoDifficultyHitObject> centreHitObjects,
+            List<TaikoDifficultyHitObject> rimHitObjects,
+            List<TaikoDifficultyHitObject> noteObjects, int position)
             : base(hitObject, lastObject, clockRate, objects, position)
         {
             var currentHit = hitObject as Hit;
@@ -65,26 +67,25 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             if (HitType == Objects.HitType.Centre)
             {
-                MonoPosition = centreHitObjects.Count();
+                MonoPosition = centreHitObjects.Count;
                 centreHitObjects.Add(this);
                 monoDifficultyHitObjects = centreHitObjects;
             }
             else if (HitType == Objects.HitType.Rim)
             {
-                MonoPosition = rimHitObjects.Count();
+                MonoPosition = rimHitObjects.Count;
                 rimHitObjects.Add(this);
                 monoDifficultyHitObjects = rimHitObjects;
             }
 
             // Need to be done after HitType is set.
-            if (HitType != null)
-            {
-                this.NotePosition = noteObjects.Count();
-                noteObjects.Add(this);
+            if (HitType == null) return;
 
-                // Need to be done after NotePosition is set.
-                Colour = TaikoDifficultyHitObjectColour.GetInstanceFor(this);
-            }
+            NotePosition = noteObjects.Count;
+            noteObjects.Add(this);
+
+            // Need to be done after NotePosition is set.
+            Colour = TaikoDifficultyHitObjectColour.GetInstanceFor(this);
         }
 
         /// <summary>
