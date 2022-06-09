@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (WorkingHitObject.HitObject is Slider slider)
                 {
-                    var possibleMovementBounds = OsuHitObjectGenerationUtils.CalculatePossibleMovementBounds(slider, false);
+                    var possibleMovementBounds = OsuHitObjectGenerationUtils.CalculatePossibleMovementBounds(slider);
 
                     x = possibleMovementBounds.Width < 0
                         ? x
