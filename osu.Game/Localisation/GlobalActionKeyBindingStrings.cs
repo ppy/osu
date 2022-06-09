@@ -210,7 +210,7 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleInGameInterface => new TranslatableString(getKey(@"toggle_in_game_interface"), @"Toggle in-game interface");
 
         /// <summary>
-        /// "Toggle Mod Select"
+        /// "Toggle mod select"
         /// </summary>
         public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle mod select");
 
@@ -299,6 +299,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ToggleChatFocus => new TranslatableString(getKey(@"toggle_chat_focus"), @"Toggle chat focus");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
