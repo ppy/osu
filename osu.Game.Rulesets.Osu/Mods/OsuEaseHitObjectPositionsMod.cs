@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay) };
 
-        public abstract BindableFloat EasementStrength { get; }
-        protected virtual float EasementStrengthMultiplier => 1.0f;
+        public abstract BindableFloat EasingStrength { get; }
+        protected virtual float EasingStrengthMultiplier => 1.0f;
         protected Vector2 CursorPosition;
         protected DrawableHitObject WorkingHitObject;
         protected abstract Vector2 DestinationVector { get; }
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void easeHitObjectPositionToVector(DrawableHitObject hitObject, Vector2 destination)
         {
-            double dampLength = Interpolation.Lerp(3000, 40, EasementStrength.Value * EasementStrengthMultiplier);
+            double dampLength = Interpolation.Lerp(3000, 40, EasingStrength.Value * EasingStrengthMultiplier);
 
             float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, gameplayClock.ElapsedFrameTime);
             float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, gameplayClock.ElapsedFrameTime);

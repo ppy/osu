@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         protected override Vector2 DestinationVector => CursorPosition;
 
         [SettingSource("Attraction strength", "How strong the pull is.", 0)]
-        public override BindableFloat EasementStrength { get; } = new BindableFloat(0.5f)
+        public override BindableFloat EasingStrength { get; } = new BindableFloat(0.5f)
         {
             Precision = 0.05f,
             MinValue = 0.05f,
