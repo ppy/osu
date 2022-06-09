@@ -4,7 +4,9 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -17,6 +19,28 @@ namespace osu.Game.Tests.Visual.Editing
     public class TestSceneTimelineHitObjectBlueprint : TimelineTestScene
     {
         public override Drawable CreateTestComponent() => new TimelineBlueprintContainer(Composer);
+
+        [Test]
+        public void TestContextMenu()
+        {
+            TimelineHitObjectBlueprint blueprint;
+
+            AddStep("add object", () =>
+            {
+                EditorBeatmap.Clear();
+                EditorBeatmap.Add(new HitCircle { StartTime = 3000 });
+            });
+
+            AddStep("click object", () =>
+            {
+                blueprint = this.ChildrenOfType<TimelineHitObjectBlueprint>().Single();
+                InputManager.MoveMouseTo(blueprint);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+            AddAssert("context menu open", () => this.ChildrenOfType<OsuContextMenu>().SingleOrDefault()?.State == MenuState.Open);
+        }
 
         [Test]
         public void TestDisallowZeroDurationObjects()

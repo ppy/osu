@@ -85,6 +85,8 @@ namespace osu.Game.Beatmaps.Drawables
                 downloadTrackers.Add(beatmapDownloadTracker);
                 AddInternal(beatmapDownloadTracker);
 
+                // Note that this is downloading the beatmaps even if they are already downloaded.
+                // We could rely more on `BeatmapDownloadTracker`'s exposed state to avoid this.
                 beatmapDownloader.Download(beatmapSet);
             }
         }
