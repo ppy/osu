@@ -38,9 +38,9 @@ namespace osu.Game.Overlays
         private LoadingLayer loading = null!;
         private ChannelListing channelListing = null!;
         private ChatTextBar textBar = null!;
-        private Container<ChatOverlayDrawableChannel> currentChannelContainer = null!;
+        private Container<DrawableChannel> currentChannelContainer = null!;
 
-        private readonly Dictionary<Channel, ChatOverlayDrawableChannel> loadedChannels = new Dictionary<Channel, ChatOverlayDrawableChannel>();
+        private readonly Dictionary<Channel, DrawableChannel> loadedChannels = new Dictionary<Channel, DrawableChannel>();
 
         protected IEnumerable<DrawableChannel> DrawableChannels => loadedChannels.Values;
 
@@ -126,7 +126,7 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.Both,
                             Colour = colourProvider.Background4,
                         },
-                        currentChannelContainer = new Container<ChatOverlayDrawableChannel>
+                        currentChannelContainer = new Container<DrawableChannel>
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
@@ -313,7 +313,7 @@ namespace osu.Game.Overlays
                     loading.Show();
 
                     // Ensure the drawable channel is stored before async load to prevent double loading
-                    ChatOverlayDrawableChannel drawableChannel = CreateDrawableChannel(newChannel);
+                    DrawableChannel drawableChannel = CreateDrawableChannel(newChannel);
                     loadedChannels.Add(newChannel, drawableChannel);
 
                     LoadComponentAsync(drawableChannel, loadedDrawable =>
@@ -338,7 +338,7 @@ namespace osu.Game.Overlays
                 channelManager.MarkChannelAsRead(newChannel);
         }
 
-        protected virtual ChatOverlayDrawableChannel CreateDrawableChannel(Channel newChannel) => new ChatOverlayDrawableChannel(newChannel);
+        protected virtual DrawableChannel CreateDrawableChannel(Channel newChannel) => new DrawableChannel(newChannel);
 
         private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
@@ -361,7 +361,7 @@ namespace osu.Game.Overlays
 
                         if (loadedChannels.ContainsKey(channel))
                         {
-                            ChatOverlayDrawableChannel loaded = loadedChannels[channel];
+                            DrawableChannel loaded = loadedChannels[channel];
                             loadedChannels.Remove(channel);
                             // DrawableChannel removed from cache must be manually disposed
                             loaded.Dispose();

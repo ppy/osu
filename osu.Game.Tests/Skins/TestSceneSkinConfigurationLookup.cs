@@ -59,11 +59,13 @@ namespace osu.Game.Tests.Skins
             AddAssert("Check float parse lookup", () => requester.GetConfig<string, float>("FloatTest")?.Value == 1.1f);
         }
 
-        [Test]
-        public void TestBoolLookup()
+        [TestCase("0", false)]
+        [TestCase("1", true)]
+        [TestCase("2", true)] // https://github.com/ppy/osu/issues/18579
+        public void TestBoolLookup(string originalValue, bool expectedParsedValue)
         {
-            AddStep("Add config values", () => userSource.Configuration.ConfigDictionary["BoolTest"] = "1");
-            AddAssert("Check bool parse lookup", () => requester.GetConfig<string, bool>("BoolTest")?.Value == true);
+            AddStep("Add config values", () => userSource.Configuration.ConfigDictionary["BoolTest"] = originalValue);
+            AddAssert("Check bool parse lookup", () => requester.GetConfig<string, bool>("BoolTest")?.Value == expectedParsedValue);
         }
 
         [Test]

@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -50,6 +52,8 @@ namespace osu.Game.Screens.Edit.Timing
             private ControlPointTable table;
 
             private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
+
+            private RoundedButton addButton;
 
             [Resolved]
             private EditorClock clock { get; set; }
@@ -105,9 +109,8 @@ namespace osu.Game.Screens.Edit.Timing
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
                             },
-                            new RoundedButton
+                            addButton = new RoundedButton
                             {
-                                Text = "+ Add at current time",
                                 Action = addNew,
                                 Size = new Vector2(160, 30),
                                 Anchor = Anchor.BottomRight,
@@ -122,7 +125,14 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 base.LoadComplete();
 
-                selectedGroup.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
+                selectedGroup.BindValueChanged(selected =>
+                {
+                    deleteButton.Enabled.Value = selected.NewValue != null;
+
+                    addButton.Text = selected.NewValue != null
+                        ? "+ Clone to current time"
+                        : "+ Add at current time";
+                }, true);
 
                 controlPointGroups.BindTo(Beatmap.ControlPointInfo.Groups);
                 controlPointGroups.BindCollectionChanged((sender, args) =>
@@ -132,12 +142,22 @@ namespace osu.Game.Screens.Edit.Timing
                 }, true);
             }
 
+            protected override bool OnClick(ClickEvent e)
+            {
+                selectedGroup.Value = null;
+                return true;
+            }
+
             protected override void Update()
             {
                 base.Update();
 
                 trackActivePoint();
+
+                addButton.Enabled.Value = clock.CurrentTimeAccurate != selectedGroup.Value?.Time;
             }
+
+            private Type trackedType;
 
             /// <summary>
             /// Given the user has selected a control point group, we want to track any group which is
@@ -149,16 +169,27 @@ namespace osu.Game.Screens.Edit.Timing
             private void trackActivePoint()
             {
                 // For simplicity only match on the first type of the active control point.
-                var selectedPointType = selectedGroup.Value?.ControlPoints.FirstOrDefault()?.GetType();
+                if (selectedGroup.Value == null)
+                    trackedType = null;
+                else
+                {
+                    // If the selected group only has one control point, update the tracking type.
+                    if (selectedGroup.Value.ControlPoints.Count == 1)
+                        trackedType = selectedGroup.Value?.ControlPoints.Single().GetType();
+                    // If the selected group has more than one control point, choose the first as the tracking type
+                    // if we don't already have a singular tracked type.
+                    else if (trackedType == null)
+                        trackedType = selectedGroup.Value?.ControlPoints.FirstOrDefault()?.GetType();
+                }
 
-                if (selectedPointType != null)
+                if (trackedType != null)
                 {
                     // We don't have an efficient way of looking up groups currently, only individual point types.
                     // To improve the efficiency of this in the future, we should reconsider the overall structure of ControlPointInfo.
 
                     // Find the next group which has the same type as the selected one.
                     var found = Beatmap.ControlPointInfo.Groups
-                                       .Where(g => g.ControlPoints.Any(cp => cp.GetType() == selectedPointType))
+                                       .Where(g => g.ControlPoints.Any(cp => cp.GetType() == trackedType))
                                        .LastOrDefault(g => g.Time <= clock.CurrentTimeAccurate);
 
                     if (found != null)
@@ -189,7 +220,7 @@ namespace osu.Game.Screens.Edit.Timing
                     // Try and create matching types from the currently selected control point.
                     var selected = selectedGroup.Value;
 
-                    if (selected != null)
+                    if (selected != null && selected != group)
                     {
                         foreach (var controlPoint in selected.ControlPoints)
                         {
