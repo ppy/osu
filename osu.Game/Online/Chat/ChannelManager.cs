@@ -61,8 +61,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        private readonly IAPIProvider api;
 
         [Resolved]
         private UserLookupCache users { get; set; }
@@ -71,8 +70,9 @@ namespace osu.Game.Online.Chat
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
-        public ChannelManager()
+        public ChannelManager(IAPIProvider api)
         {
+            this.api = api;
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
 

@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
 
             Schedule(() =>
             {
-                Child = testContainer = new TestContainer(new[] { publicChannel, privateMessageChannel })
+                Child = testContainer = new TestContainer(API, new[] { publicChannel, privateMessageChannel })
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
@@ -229,7 +229,7 @@ namespace osu.Game.Tests.Visual.Online
         private class TestContainer : Container
         {
             [Cached]
-            public ChannelManager ChannelManager { get; } = new ChannelManager();
+            public ChannelManager ChannelManager { get; }
 
             [Cached(typeof(INotificationOverlay))]
             public NotificationOverlay NotificationOverlay { get; } = new NotificationOverlay
@@ -245,9 +245,10 @@ namespace osu.Game.Tests.Visual.Online
 
             private readonly Channel[] channels;
 
-            public TestContainer(Channel[] channels)
+            public TestContainer(IAPIProvider api, Channel[] channels)
             {
                 this.channels = channels;
+                ChannelManager = new ChannelManager(api);
             }
 
             [BackgroundDependencyLoader]

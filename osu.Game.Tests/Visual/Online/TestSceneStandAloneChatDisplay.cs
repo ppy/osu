@@ -11,6 +11,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Chat;
 using osuTK.Input;
@@ -44,17 +45,22 @@ namespace osu.Game.Tests.Visual.Online
             Id = 5,
         };
 
-        [Cached]
-        private ChannelManager channelManager = new ChannelManager();
+        private ChannelManager channelManager;
 
         private TestStandAloneChatDisplay chatDisplay;
         private int messageIdSequence;
 
         private Channel testChannel;
 
-        public TestSceneStandAloneChatDisplay()
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Add(channelManager);
+            Add(channelManager = new ChannelManager(parent.Get<IAPIProvider>()));
+
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            dependencies.Cache(channelManager);
+
+            return dependencies;
         }
 
         [SetUp]
