@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 Mod = new OsuModMagnetised
                 {
-                    EasementStrength = { Value = strength },
+                    EasingStrength = { Value = strength },
                 },
                 PassCondition = () => true,
                 Autoplay = false,
