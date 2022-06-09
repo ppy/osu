@@ -9,10 +9,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class CombinedStrain : Skill
     {
-        private const double final_multiplier = 0.00925;
-        private const double rhythm_skill_multiplier = 1.6 * final_multiplier;
-        private const double colour_skill_multiplier = 1.85 * final_multiplier;
-        private const double stamina_skill_multiplier = 1.85 * final_multiplier;
+        private const double final_multiplier = 0.04625;
+        private const double rhythm_skill_multiplier = 0.32 * final_multiplier;
+        private const double colour_skill_multiplier = 0.37 * final_multiplier;
+        private const double stamina_skill_multiplier = 0.37 * final_multiplier;
 
         private Rhythm rhythm;
         private Colour colour;
