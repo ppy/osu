@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModEasyWithExtraLives), typeof(ModPerfect) }).ToArray();
         public override bool RequiresConfiguration => false;
+        public override string SettingDescription => base.SettingDescription.Replace(MinimumAccuracy.Value.ToString(), MinimumAccuracy.Value.ToString("##%"));
 
         [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsSlider<double, PercentSlider>))]
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
