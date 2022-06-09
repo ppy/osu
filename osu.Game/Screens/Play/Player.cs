@@ -518,10 +518,14 @@ namespace osu.Game.Screens.Play
                     return null;
                 }
             }
+            catch (OperationCanceledException)
+            {
+                // Load has been cancelled. No logging is required.
+                return null;
+            }
             catch (Exception e)
             {
-                if (this.IsCurrentScreen())
-                    Logger.Error(e, "Could not load beatmap successfully!");
+                Logger.Error(e, "Could not load beatmap successfully!");
                 //couldn't load, hard abort!
                 return null;
             }
