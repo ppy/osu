@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Utils;
 using osu.Game.Rulesets.Osu.Objects;
@@ -17,7 +16,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Repel";
         public override string Acronym => "RP";
-        public override IconUsage? Icon => FontAwesome.Solid.ExpandArrowsAlt;
         public override string Description => "Run away!";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModMagnetised)).ToArray();
 
