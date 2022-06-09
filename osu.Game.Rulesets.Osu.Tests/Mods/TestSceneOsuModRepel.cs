@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 Mod = new OsuModRepel
                 {
-                    EasingStrength = { Value = strength },
+                    RepulsionStrength = { Value = strength },
                 },
                 PassCondition = () => true,
                 Autoplay = false,
