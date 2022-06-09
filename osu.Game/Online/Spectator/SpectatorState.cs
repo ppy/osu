@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using MessagePack;
 using osu.Game.Online.API;
+using osu.Game.Scoring;
 
 namespace osu.Game.Online.Spectator
 {
@@ -26,6 +27,9 @@ namespace osu.Game.Online.Spectator
 
         [Key(3)]
         public SpectatedUserState State { get; set; }
+
+        [Key(4)]
+        public ScoringValues MaximumScoringValues { get; set; }
 
         public bool Equals(SpectatorState other)
         {

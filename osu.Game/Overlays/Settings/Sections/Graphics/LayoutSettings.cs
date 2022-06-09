@@ -4,6 +4,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Framework.Platform.Windows;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -34,9 +36,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private Bindable<Size> sizeFullscreen;
 
         private readonly BindableList<Size> resolutions = new BindableList<Size>(new[] { new Size(9999, 9999) });
+        private readonly IBindable<FullscreenCapability> fullscreenCapability = new Bindable<FullscreenCapability>(FullscreenCapability.Capable);
 
         [Resolved]
         private OsuGameBase game { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         private SettingsDropdown<Size> resolutionDropdown;
         private SettingsDropdown<Display> displayDropdown;
@@ -64,6 +70,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 currentDisplay.BindTo(host.Window.CurrentDisplayBindable);
                 windowModes.BindTo(host.Window.SupportedWindowModes);
             }
+
+            if (host.Window is WindowsWindow windowsWindow)
+                fullscreenCapability.BindTo(windowsWindow.FullscreenCapability);
 
             Children = new Drawable[]
             {
@@ -139,6 +148,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     }
                 },
             };
+
+            fullscreenCapability.BindValueChanged(_ => Schedule(updateScreenModeWarning), true);
         }
 
         protected override void LoadComplete()
@@ -150,8 +161,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             windowModeDropdown.Current.BindValueChanged(mode =>
             {
                 updateDisplayModeDropdowns();
-
-                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? GraphicsSettingsStrings.NotFullscreenNote : default;
+                updateScreenModeWarning();
             }, true);
 
             windowModes.BindCollectionChanged((sender, args) =>
@@ -210,6 +220,48 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                 scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
                 scalingSettings.ForEach(s => s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything);
+            }
+        }
+
+        private void updateScreenModeWarning()
+        {
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS)
+            {
+                if (windowModeDropdown.Current.Value == WindowMode.Fullscreen)
+                    windowModeDropdown.SetNoticeText(LayoutSettingsStrings.FullscreenMacOSNote, true);
+                else
+                    windowModeDropdown.ClearNoticeText();
+
+                return;
+            }
+
+            if (windowModeDropdown.Current.Value != WindowMode.Fullscreen)
+            {
+                windowModeDropdown.SetNoticeText(GraphicsSettingsStrings.NotFullscreenNote, true);
+                return;
+            }
+
+            if (host.Window is WindowsWindow)
+            {
+                switch (fullscreenCapability.Value)
+                {
+                    case FullscreenCapability.Unknown:
+                        windowModeDropdown.SetNoticeText(LayoutSettingsStrings.CheckingForFullscreenCapabilities, true);
+                        break;
+
+                    case FullscreenCapability.Capable:
+                        windowModeDropdown.SetNoticeText(LayoutSettingsStrings.OsuIsRunningExclusiveFullscreen);
+                        break;
+
+                    case FullscreenCapability.Incapable:
+                        windowModeDropdown.SetNoticeText(LayoutSettingsStrings.UnableToRunExclusiveFullscreen, true);
+                        break;
+                }
+            }
+            else
+            {
+                // We can only detect exclusive fullscreen status on windows currently.
+                windowModeDropdown.ClearNoticeText();
             }
         }
 

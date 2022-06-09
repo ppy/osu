@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
@@ -40,10 +41,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved(canBeNull: true)]
         private IFrameBasedClock editorClock { get; set; }
 
+        private readonly LayoutValue zoomedContentWidthCache = new LayoutValue(Invalidation.DrawSize);
+
         public ZoomableScrollContainer()
             : base(Direction.Horizontal)
         {
             base.Content.Add(zoomedContent = new Container { RelativeSizeAxes = Axes.Y });
+
+            AddLayout(zoomedContentWidthCache);
         }
 
         private float minZoom = 1;
@@ -103,12 +108,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected override void LoadComplete()
+        protected override void Update()
         {
-            base.LoadComplete();
+            base.Update();
 
-            // This width only gets updated on the application of a transform, so this needs to be initialized here.
-            updateZoomedContentWidth();
+            if (!zoomedContentWidthCache.IsValid)
+                updateZoomedContentWidth();
         }
 
         protected override bool OnScroll(ScrollEvent e)
@@ -128,7 +133,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return base.OnScroll(e);
         }
 
-        private void updateZoomedContentWidth() => zoomedContent.Width = DrawWidth * currentZoom;
+        private void updateZoomedContentWidth()
+        {
+            zoomedContent.Width = DrawWidth * currentZoom;
+            zoomedContentWidthCache.Validate();
+        }
 
         private float zoomTarget = 1;
 
@@ -199,8 +208,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 float targetOffset = expectedWidth * (focusPoint / contentSize) - focusOffset;
 
                 d.currentZoom = newZoom;
-
                 d.updateZoomedContentWidth();
+
                 // Temporarily here to make sure ScrollTo gets the correct DrawSize for scrollable area.
                 // TODO: Make sure draw size gets invalidated properly on the framework side, and remove this once it is.
                 d.Invalidate(Invalidation.DrawSize);

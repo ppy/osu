@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Online
                 RelativeSizeAxes = Axes.Both,
                 CachedDependencies = new (Type, object)[]
                 {
-                    (typeof(ChannelManager), channelManager = new ChannelManager()),
+                    (typeof(ChannelManager), channelManager = new ChannelManager(API)),
                 },
                 Children = new Drawable[]
                 {
@@ -469,6 +469,8 @@ namespace osu.Game.Tests.Visual.Online
                 chatOverlay.Show();
             });
 
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
+
             waitForChannel1Visible();
             AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
             waitForChannel2Visible();
@@ -570,15 +572,15 @@ namespace osu.Game.Tests.Visual.Online
 
             public SlowLoadingDrawableChannel GetSlowLoadingChannel(Channel channel) => DrawableChannels.OfType<SlowLoadingDrawableChannel>().Single(c => c.Channel == channel);
 
-            protected override ChatOverlayDrawableChannel CreateDrawableChannel(Channel newChannel)
+            protected override DrawableChannel CreateDrawableChannel(Channel newChannel)
             {
                 return SlowLoading
                     ? new SlowLoadingDrawableChannel(newChannel)
-                    : new ChatOverlayDrawableChannel(newChannel);
+                    : new DrawableChannel(newChannel);
             }
         }
 
-        private class SlowLoadingDrawableChannel : ChatOverlayDrawableChannel
+        private class SlowLoadingDrawableChannel : DrawableChannel
         {
             public readonly ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
 
