@@ -5,7 +5,6 @@ using System;
 using System.Globalization;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -19,7 +18,6 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Accuracy Challenge";
         public override string Acronym => "AC";
         public override string Description => "Fail the map if you don't maintain a certain accuracy.";
-        public override IconUsage? Icon => FontAwesome.Solid.Calculator;
         public override ModType Type => ModType.DifficultyIncrease;
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModEasyWithExtraLives), typeof(ModPerfect) }).ToArray();
