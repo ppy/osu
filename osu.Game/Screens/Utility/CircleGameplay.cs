@@ -218,6 +218,9 @@ namespace osu.Game.Screens.Utility
                 if (!IsActive.Value)
                     return false;
 
+                if (Math.Abs(Clock.CurrentTime - HitTime) > 200)
+                    return false;
+
                 if (IsHovered)
                     attemptHit();
                 return base.OnKeyDown(e);
@@ -239,6 +242,10 @@ namespace osu.Game.Screens.Utility
             {
                 if (HitEvent != null)
                     return;
+
+                // in case it was hit outside of display range, show immediately
+                // so the user isn't confused.
+                this.FadeIn();
 
                 approach.Expire();
 
