@@ -90,8 +90,6 @@ namespace osu.Game.Screens.Utility
         private double lastPoll;
         private int pollingMax;
 
-        private readonly FillFlowContainer settings;
-
         [Resolved]
         private GameHost host { get; set; } = null!;
 
@@ -130,7 +128,7 @@ namespace osu.Game.Screens.Utility
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopRight,
                 },
-                settings = new FillFlowContainer
+                new FillFlowContainer
                 {
                     Name = "Settings",
                     AutoSizeAxes = Axes.Y,
@@ -140,13 +138,43 @@ namespace osu.Game.Screens.Utility
                     Direction = FillDirection.Vertical,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Child = explanatoryText = new LinkFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                    Children = new Drawable[]
                     {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        TextAnchor = Anchor.TopCentre,
+                        explanatoryText = new LinkFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                        {
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            TextAnchor = Anchor.TopCentre,
+                        },
+                        new SettingsSlider<double>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 400,
+                            LabelText = "bpm",
+                            Current = SampleBPM
+                        },
+                        new SettingsSlider<float>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 400,
+                            LabelText = "visual spacing",
+                            Current = SampleVisualSpacing
+                        },
+                        new SettingsSlider<double>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 400,
+                            LabelText = "approach rate",
+                            Current = SampleApproachRate
+                        },
                     },
                 },
                 resultsArea = new Container
@@ -227,6 +255,7 @@ namespace osu.Game.Screens.Utility
         private void showResults()
         {
             mainArea.Clear();
+            resultsArea.Clear();
 
             var displayMode = host.Window?.CurrentDisplayMode.Value;
 
@@ -442,37 +471,6 @@ namespace osu.Game.Screens.Utility
                         mainArea.Children.First(a => a != area).IsActiveArea.Value = false;
                 });
             }
-
-            settings.AddRange(new Drawable[]
-            {
-                new SettingsSlider<double>
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.None,
-                    Width = 400,
-                    LabelText = "bpm",
-                    Current = SampleBPM
-                },
-                new SettingsSlider<float>
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.None,
-                    Width = 400,
-                    LabelText = "visual spacing",
-                    Current = SampleVisualSpacing
-                },
-                new SettingsSlider<double>
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.None,
-                    Width = 400,
-                    LabelText = "approach rate",
-                    Current = SampleApproachRate
-                },
-            });
         }
 
         private void recordResult(bool correct)
