@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Utility
             this.key = key;
         }
 
-        public override LocalisableString Text
+        public new LocalisableString Text
         {
             get => base.Text;
             set => base.Text = $"{value} (Press {key.ToString().Replace("Number", string.Empty)})";
