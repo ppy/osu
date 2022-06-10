@@ -25,7 +25,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The <see cref="BeatmapInfo.MD5Hash"/>es of beatmaps contained by the collection.
         /// </summary>
-        public readonly BindableList<string> Beatmaps = new BindableList<string>();
+        public readonly BindableList<string> BeatmapHashes = new BindableList<string>();
 
         /// <summary>
         /// The date when this collection was last modified.
@@ -34,7 +34,7 @@ namespace osu.Game.Collections
 
         public BeatmapCollection()
         {
-            Beatmaps.CollectionChanged += (_, __) => onChange();
+            BeatmapHashes.CollectionChanged += (_, __) => onChange();
             Name.ValueChanged += _ => onChange();
         }
 
