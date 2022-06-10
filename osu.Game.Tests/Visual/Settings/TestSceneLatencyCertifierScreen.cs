@@ -29,22 +29,46 @@ namespace osu.Game.Tests.Visual.Settings
         {
             for (int i = 0; i < 4; i++)
             {
-                clickCorrectUntilResults();
-                AddAssert("check at results", () => !latencyCertifier.ChildrenOfType<LatencyArea>().Any());
-                AddStep("hit c to continue", () => InputManager.Key(Key.C));
+                int difficulty = i + 1;
+
+                checkDifficulty(difficulty);
+                clickUntilResults(true);
+                continueFromResults();
             }
 
+            checkDifficulty(5);
+            clickUntilResults(false);
+            continueFromResults();
+            checkDifficulty(4);
+
+            clickUntilResults(false);
+            continueFromResults();
+            checkDifficulty(3);
+
+            clickUntilResults(true);
             AddAssert("check at results", () => !latencyCertifier.ChildrenOfType<LatencyArea>().Any());
             AddAssert("check no buttons", () => !latencyCertifier.ChildrenOfType<OsuButton>().Any());
+            checkDifficulty(3);
         }
 
-        private void clickCorrectUntilResults()
+        private void continueFromResults()
+        {
+            AddAssert("check at results", () => !latencyCertifier.ChildrenOfType<LatencyArea>().Any());
+            AddStep("hit enter to continue", () => InputManager.Key(Key.Enter));
+        }
+
+        private void checkDifficulty(int difficulty)
+        {
+            AddAssert($"difficulty is {difficulty}", () => latencyCertifier.DifficultyLevel == difficulty);
+        }
+
+        private void clickUntilResults(bool clickCorrect)
         {
             AddUntilStep("click correct button until results", () =>
             {
                 var latencyArea = latencyCertifier
                                   .ChildrenOfType<LatencyArea>()
-                                  .SingleOrDefault(a => a.TargetFrameRate == null);
+                                  .SingleOrDefault(a => clickCorrect ? a.TargetFrameRate == null : a.TargetFrameRate != null);
 
                 // reached results
                 if (latencyArea == null)
