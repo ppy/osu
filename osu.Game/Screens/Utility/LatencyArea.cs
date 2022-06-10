@@ -108,20 +108,6 @@ namespace osu.Game.Screens.Utility
                         };
                         break;
 
-                    case LatencyVisualMode.ScrollingGameplay:
-                        visualContent.Children = new Drawable[]
-                        {
-                            new ScrollingGameplay
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                            new LatencyCursorContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                        };
-                        break;
-
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

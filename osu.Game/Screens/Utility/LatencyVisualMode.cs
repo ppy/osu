@@ -7,7 +7,6 @@ namespace osu.Game.Screens.Utility
     public enum LatencyVisualMode
     {
         CircleGameplay,
-        ScrollingGameplay,
         Simple,
     }
 }
