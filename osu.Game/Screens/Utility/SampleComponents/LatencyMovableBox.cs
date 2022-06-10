@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Utility.SampleComponents
                             box.Y = MathHelper.Clamp(box.Y - movementAmount, 0.1f, 0.9f);
                             break;
 
-                        case Key.K:
+                        case Key.J:
                         case Key.Down:
                             box.Y = MathHelper.Clamp(box.Y + movementAmount, 0.1f, 0.9f);
                             break;

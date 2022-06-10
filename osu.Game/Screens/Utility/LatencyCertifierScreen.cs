@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Utility
 
         public override float BackgroundParallaxAmount => 0;
 
-        private readonly OsuTextFlowContainer explanatoryText;
+        private readonly LinkFlowContainer explanatoryText;
 
         private readonly Container<LatencyArea> mainArea;
 
@@ -134,25 +134,19 @@ namespace osu.Game.Screens.Utility
                 {
                     Name = "Settings",
                     AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
+                    Width = 800,
                     Padding = new MarginPadding(10),
                     Spacing = new Vector2(2),
                     Direction = FillDirection.Vertical,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Child = explanatoryText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                    Child = explanatoryText = new LinkFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                     {
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         TextAnchor = Anchor.TopCentre,
-                        Text = @"Welcome to the latency certifier!
-Use the arrow keys, Z/X/F/J to control the display.
-Use the Tab key to change focus.
-Change display modes with Space.
-Do whatever you need to try and perceive the difference in latency, then choose your best side.
-",
                     },
                 },
                 resultsArea = new Container
@@ -169,6 +163,12 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                     AutoSizeAxes = Axes.Y,
                 },
             };
+
+            explanatoryText.AddParagraph(@"Welcome to the latency certifier!");
+            explanatoryText.AddParagraph(@"Do whatever you need to try and perceive the difference in latency, then choose your best side. Read more about the methodology ");
+            explanatoryText.AddLink("here", "https://github.com/ppy/osu/wiki/Latency-and-unlimited-frame-rates");
+            explanatoryText.AddParagraph(@"Use the arrow keys or Z/X/F/J to control the display.");
+            explanatoryText.AddParagraph(@"Tab key to change focus. Space to change display mode");
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
