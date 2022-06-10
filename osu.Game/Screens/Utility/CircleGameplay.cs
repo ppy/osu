@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Utility
         private void hit(HitEvent h)
         {
             hitEvents.Add(h);
-            unstableRate.Text = $"UR: {hitEvents.CalculateUnstableRate()}";
+            unstableRate.Text = $"UR: {hitEvents.CalculateUnstableRate():N0}";
         }
 
         public class SampleHitCircle : LatencySampleComponent
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Utility
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OsuColour colours)
             {
                 InternalChildren = new Drawable[]
                 {
@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Utility
                     },
                     approach = new CircularContainer
                     {
-                        BorderColour = OverlayColourProvider.Colour1,
+                        BorderColour = colours.Blue,
                         Size = new Vector2(size),
                         Masking = true,
                         BorderThickness = 4,
@@ -180,8 +180,6 @@ namespace osu.Game.Screens.Utility
                     },
                 };
             }
-
-            protected override bool OnHover(HoverEvent e) => true;
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
