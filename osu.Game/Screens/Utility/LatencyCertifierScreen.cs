@@ -66,9 +66,9 @@ namespace osu.Game.Screens.Utility
 
         private const int rounds_to_complete_certified = 20;
 
-        private int round;
-        private int correctCount;
-        private int targetRoundCount = rounds_to_complete;
+        private int attemptsAtCurrentDifficulty;
+        private int correctAtCurrentDifficulty;
+        private int totalRoundForNextResultsScreen = rounds_to_complete;
 
         private int difficultyLevel = 1;
 
@@ -199,10 +199,10 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             statusText.Clear();
 
-            float successRate = (float)correctCount / targetRoundCount;
+            float successRate = (float)correctAtCurrentDifficulty / totalRoundForNextResultsScreen;
             bool isPass = successRate == 1;
 
-            statusText.AddParagraph($"You scored {correctCount} out of {targetRoundCount} ({successRate:0%})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
+            statusText.AddParagraph($"You scored {correctAtCurrentDifficulty} out of {totalRoundForNextResultsScreen} ({successRate:0%})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
             statusText.AddParagraph($"Level {difficultyLevel} ({mapDifficultyToTargetFrameRate(difficultyLevel):N0} hz)",
                 cp => cp.Font = OsuFont.Default.With(size: 24));
 
@@ -213,18 +213,20 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             if (!isPass && difficultyLevel > 1)
             {
-                statusText.AddParagraph("To complete certification, decrease the difficulty level until you can get 20 tests correct in a row!", cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold));
+                statusText.AddParagraph("To complete certification, decrease the difficulty level until you can get 20 tests correct in a row!",
+                    cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold));
                 statusText.AddParagraph(string.Empty);
             }
 
-            statusText.AddParagraph($"Polling: {pollingMax} hz Monitor: {displayMode?.RefreshRate ?? 0:N0} hz Exclusive: {exclusive}", cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
+            statusText.AddParagraph($"Polling: {pollingMax} hz Monitor: {displayMode?.RefreshRate ?? 0:N0} hz Exclusive: {exclusive}",
+                cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
 
             statusText.AddParagraph($"Input: {host.InputThread.Clock.FramesPerSecond} hz "
                                     + $"Update: {host.UpdateThread.Clock.FramesPerSecond} hz "
                                     + $"Draw: {host.DrawThread.Clock.FramesPerSecond} hz"
                 , cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
 
-            int certificationRemaining = !isPass ? rounds_to_complete_certified : rounds_to_complete_certified - correctCount;
+            int certificationRemaining = !isPass ? rounds_to_complete_certified : rounds_to_complete_certified - correctAtCurrentDifficulty;
 
             if (isPass && certificationRemaining <= 0)
             {
@@ -320,7 +322,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         Action = () =>
                         {
                             resultsArea.Clear();
-                            targetRoundCount += rounds_to_complete;
+                            totalRoundForNextResultsScreen += rounds_to_complete;
                             loadNextRound();
                         },
                         TooltipText = isPass ? $"Chain {rounds_to_complete_certified} to confirm your perception!" : "You've reached your limits. Go to the previous level to complete certification!",
@@ -336,12 +338,13 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             resultsArea.Clear();
 
-            correctCount = 0;
-            round = 0;
+            correctAtCurrentDifficulty = 0;
+            attemptsAtCurrentDifficulty = 0;
+
             pollingMax = 0;
             lastPoll = 0;
 
-            targetRoundCount = rounds_to_complete;
+            totalRoundForNextResultsScreen = rounds_to_complete;
             difficultyLevel = difficulty;
 
             loadNextRound();
@@ -349,8 +352,8 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
         private void loadNextRound()
         {
-            round++;
-            statusText.Text = $"Level {difficultyLevel}\nRound {round} of {targetRoundCount}";
+            attemptsAtCurrentDifficulty++;
+            statusText.Text = $"Level {difficultyLevel}\nRound {attemptsAtCurrentDifficulty} of {totalRoundForNextResultsScreen}";
 
             mainArea.Clear();
 
@@ -389,9 +392,9 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             explanatoryText.FadeOut(500, Easing.OutQuint);
 
             if (correct)
-                correctCount++;
+                correctAtCurrentDifficulty++;
 
-            if (round < targetRoundCount)
+            if (attemptsAtCurrentDifficulty < totalRoundForNextResultsScreen)
                 loadNextRound();
             else
                 showResults();
