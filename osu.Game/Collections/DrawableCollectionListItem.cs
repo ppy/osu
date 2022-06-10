@@ -225,7 +225,7 @@ namespace osu.Game.Collections
             {
                 background.FlashColour(Color4.White, 150);
 
-                if (collection.Beatmaps.Count == 0)
+                if (collection.BeatmapHashes.Count == 0)
                     deleteCollection();
                 else
                     dialogOverlay?.Push(new DeleteCollectionDialog(collection, deleteCollection));
