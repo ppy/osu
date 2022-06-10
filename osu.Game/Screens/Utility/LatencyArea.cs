@@ -16,6 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Utility
 {
+    [Cached]
     public class LatencyArea : CompositeDrawable
     {
         [Resolved]
@@ -82,11 +83,11 @@ namespace osu.Game.Screens.Utility
                     case LatencyVisualMode.Simple:
                         visualContent.Children = new Drawable[]
                         {
-                            new LatencyMovableBox(IsActiveArea)
+                            new LatencyMovableBox
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            new LatencyCursorContainer(IsActiveArea)
+                            new LatencyCursorContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
@@ -100,7 +101,7 @@ namespace osu.Game.Screens.Utility
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            new LatencyCursorContainer(IsActiveArea)
+                            new LatencyCursorContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
@@ -114,7 +115,7 @@ namespace osu.Game.Screens.Utility
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            new LatencyCursorContainer(IsActiveArea)
+                            new LatencyCursorContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },

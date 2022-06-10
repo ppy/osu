@@ -8,13 +8,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Utility.SampleComponents;
 using osuTK;
 using osuTK.Graphics;
 
@@ -141,7 +142,7 @@ namespace osu.Game.Screens.Utility
             unstableRate.Text = $"{hitEvents.CalculateUnstableRate():N1}";
         }
 
-        public class SampleHitCircle : CompositeDrawable
+        public class SampleHitCircle : LatencySampleComponent
         {
             public HitEvent? HitEvent;
 
@@ -198,6 +199,8 @@ namespace osu.Game.Screens.Utility
                 };
             }
 
+            protected override bool OnHover(HoverEvent e) => true;
+
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 if (HitEvent != null)
@@ -205,6 +208,37 @@ namespace osu.Game.Screens.Utility
 
                 if (Math.Abs(Clock.CurrentTime - HitTime) > 200)
                     return false;
+
+                attemptHit();
+                return true;
+            }
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                if (!IsActive.Value)
+                    return false;
+
+                if (IsHovered)
+                    attemptHit();
+                return base.OnKeyDown(e);
+            }
+
+            protected override void UpdateAtLimitedRate(InputState inputState)
+            {
+                if (HitEvent == null)
+                {
+                    approach.Scale = new Vector2(1 + (float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / approach_rate_milliseconds.Value, 0, 100));
+                    Alpha = (float)MathHelper.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
+
+                    if (Clock.CurrentTime > HitTime + 200)
+                        Expire();
+                }
+            }
+
+            private void attemptHit() => Schedule(() =>
+            {
+                if (HitEvent != null)
+                    return;
 
                 approach.Expire();
 
@@ -220,23 +254,7 @@ namespace osu.Game.Screens.Utility
                 Hit?.Invoke(HitEvent.Value);
 
                 this.Delay(200).Expire();
-
-                return true;
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                if (HitEvent == null)
-                {
-                    approach.Scale = new Vector2(1 + (float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / approach_rate_milliseconds.Value, 0, 100));
-                    Alpha = (float)MathHelper.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
-
-                    if (Clock.CurrentTime > HitTime + 200)
-                        Expire();
-                }
-            }
+            });
         }
     }
 }

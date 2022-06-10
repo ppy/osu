@@ -2,39 +2,23 @@
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable enable
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Game.Overlays;
+using osu.Framework.Input.States;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Utility.SampleComponents
 {
-    public class LatencyMovableBox : CompositeDrawable
+    public class LatencyMovableBox : LatencySampleComponent
     {
         private Box box = null!;
-        private InputManager inputManager = null!;
-
-        private readonly BindableBool isActive;
-
-        [Resolved]
-        private OverlayColourProvider overlayColourProvider { get; set; } = null!;
-
-        public LatencyMovableBox(BindableBool isActive)
-        {
-            this.isActive = isActive;
-        }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            inputManager = GetContainingInputManager();
 
             InternalChild = box = new Box
             {
@@ -42,7 +26,7 @@ namespace osu.Game.Screens.Utility.SampleComponents
                 RelativePositionAxes = Axes.Both,
                 Position = new Vector2(0.5f),
                 Origin = Anchor.Centre,
-                Colour = overlayColourProvider.Colour1,
+                Colour = OverlayColourProvider.Colour1,
             };
         }
 
@@ -50,14 +34,12 @@ namespace osu.Game.Screens.Utility.SampleComponents
 
         private double? lastFrameTime;
 
-        protected override void Update()
+        protected override void UpdateAtLimitedRate(InputState inputState)
         {
-            base.Update();
-
-            if (!isActive.Value)
+            if (!IsActive.Value)
             {
                 lastFrameTime = null;
-                box.Colour = overlayColourProvider.Colour1;
+                box.Colour = OverlayColourProvider.Colour1;
                 return;
             }
 
@@ -65,9 +47,9 @@ namespace osu.Game.Screens.Utility.SampleComponents
             {
                 float movementAmount = (float)(Clock.CurrentTime - lastFrameTime) / 400;
 
-                var buttons = inputManager.CurrentState.Keyboard.Keys;
+                var buttons = inputState.Keyboard.Keys;
 
-                box.Colour = buttons.HasAnyButtonPressed ? overlayColourProvider.Content1 : overlayColourProvider.Colour1;
+                box.Colour = buttons.HasAnyButtonPressed ? OverlayColourProvider.Content1 : OverlayColourProvider.Colour1;
 
                 foreach (var key in buttons)
                 {
