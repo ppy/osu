@@ -14,6 +14,10 @@ namespace osu.Game.Screens.Utility.SampleComponents
 {
     public abstract class LatencySampleComponent : CompositeDrawable
     {
+        protected readonly BindableDouble SampleBPM = new BindableDouble();
+        protected readonly BindableDouble SampleApproachRate = new BindableDouble();
+        protected readonly BindableFloat SampleVisualSpacing = new BindableFloat();
+
         protected readonly BindableBool IsActive = new BindableBool();
 
         private InputManager inputManager = null!;
@@ -23,6 +27,14 @@ namespace osu.Game.Screens.Utility.SampleComponents
 
         [Resolved]
         protected OverlayColourProvider OverlayColourProvider { get; private set; } = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(LatencyCertifierScreen latencyCertifierScreen)
+        {
+            SampleBPM.BindTo(latencyCertifierScreen.SampleBPM);
+            SampleApproachRate.BindTo(latencyCertifierScreen.SampleApproachRate);
+            SampleVisualSpacing.BindTo(latencyCertifierScreen.SampleVisualSpacing);
+        }
 
         protected override void LoadComplete()
         {
