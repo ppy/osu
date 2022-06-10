@@ -44,7 +44,6 @@ namespace osu.Game.Tests.Visual.Settings
 
             clickUntilResults(true);
             AddAssert("check at results", () => !latencyCertifier.ChildrenOfType<LatencyArea>().Any());
-            AddAssert("check no buttons", () => !latencyCertifier.ChildrenOfType<OsuButton>().Any());
             checkDifficulty(1);
         }
 
