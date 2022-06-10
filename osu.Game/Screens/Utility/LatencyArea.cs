@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable enable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -27,11 +28,11 @@ namespace osu.Game.Screens.Utility
 
         private readonly Key key;
 
-        public readonly int TargetFrameRate;
+        public readonly int? TargetFrameRate;
 
         public readonly BindableBool IsActiveArea = new BindableBool();
 
-        public LatencyArea(Key key, int targetFrameRate)
+        public LatencyArea(Key key, int? targetFrameRate)
         {
             this.key = key;
             TargetFrameRate = targetFrameRate;
@@ -94,7 +95,7 @@ namespace osu.Game.Screens.Utility
         public override bool UpdateSubTree()
         {
             double elapsed = Clock.CurrentTime - lastFrameTime;
-            if (TargetFrameRate > 0 && elapsed < 1000.0 / TargetFrameRate)
+            if (TargetFrameRate.HasValue && elapsed < 1000.0 / TargetFrameRate)
                 return false;
 
             lastFrameTime = Clock.CurrentTime;
