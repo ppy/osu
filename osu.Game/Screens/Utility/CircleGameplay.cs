@@ -4,14 +4,11 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -20,13 +17,19 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Utility
 {
-    public class CircleGameplay : BeatSyncedContainer
+    public class CircleGameplay : CompositeDrawable
     {
         private int nextLocation;
 
         private OsuSpriteText unstableRate = null!;
 
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
+
+        private int? lastGeneratedBeat;
+
+        private const double beat_length = 500;
+        private const double approach_rate_milliseconds = 100;
+        private const float spacing = 0.1f;
 
         protected override void LoadComplete()
         {
@@ -43,15 +46,25 @@ namespace osu.Game.Screens.Utility
             };
         }
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        protected override void Update()
         {
-            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+            base.Update();
 
+            int nextBeat = (int)(Clock.CurrentTime / beat_length);
+
+            if (lastGeneratedBeat == null || nextBeat != lastGeneratedBeat)
+            {
+                // generate four beats ahead to allow time for beats to display.
+                newBeat(nextBeat + 4);
+                lastGeneratedBeat = nextBeat;
+            }
+        }
+
+        private void newBeat(int index)
+        {
             nextLocation++;
 
             Vector2 location;
-
-            const float spacing = 0.1f;
 
             const float spacing_low = 0.5f - spacing;
             const float spacing_high = 0.5f + spacing;
@@ -75,7 +88,7 @@ namespace osu.Game.Screens.Utility
                     break;
             }
 
-            AddInternal(new SampleHitCircle(Clock.CurrentTime + timingPoint.BeatLength)
+            AddInternal(new SampleHitCircle(index * beat_length)
             {
                 RelativePositionAxes = Axes.Both,
                 Position = location,
@@ -112,6 +125,8 @@ namespace osu.Game.Screens.Utility
                 Origin = Anchor.Centre;
 
                 AutoSizeAxes = Axes.Both;
+
+                AlwaysPresent = true;
 
                 InternalChildren = new Drawable[]
                 {
@@ -171,9 +186,10 @@ namespace osu.Game.Screens.Utility
             {
                 base.Update();
 
-                approach.Scale = new Vector2((float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / 60, 1, 100));
+                approach.Scale = new Vector2(1 + (float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / approach_rate_milliseconds, 0, 100));
+                Alpha = (float)MathHelper.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
 
-                if (Clock.CurrentTime > HitTime + 80)
+                if (Clock.CurrentTime > HitTime + 200)
                     Expire();
             }
         }
