@@ -4,6 +4,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,7 +18,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Utility.SampleComponents;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Utility
 {
@@ -150,8 +150,8 @@ namespace osu.Game.Screens.Utility
 
             public readonly double HitTime;
 
-            private readonly CircularContainer approach;
-            private readonly Circle circle;
+            private CircularContainer approach = null!;
+            private Circle circle = null!;
 
             private const float size = 100;
 
@@ -163,23 +163,25 @@ namespace osu.Game.Screens.Utility
                 HitTime = hitTime;
 
                 Origin = Anchor.Centre;
-
                 AutoSizeAxes = Axes.Both;
-
                 AlwaysPresent = true;
+            }
 
+            [BackgroundDependencyLoader]
+            private void load()
+            {
                 InternalChildren = new Drawable[]
                 {
                     circle = new Circle
                     {
-                        Colour = Color4.White,
+                        Colour = OverlayColourProvider.Content1,
                         Size = new Vector2(size),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
                     approach = new CircularContainer
                     {
-                        BorderColour = Color4.Yellow,
+                        BorderColour = OverlayColourProvider.Colour1,
                         Size = new Vector2(size),
                         Masking = true,
                         BorderThickness = 4,
@@ -189,7 +191,6 @@ namespace osu.Game.Screens.Utility
                         {
                             new Box
                             {
-                                Colour = Color4.Black,
                                 Alpha = 0,
                                 AlwaysPresent = true,
                                 RelativeSizeAxes = Axes.Both,
