@@ -95,10 +95,10 @@ namespace osu.Game.Collections
             beatmaps.CollectionChanged -= filterBeatmapsChanged;
 
             if (filter.OldValue?.Collection != null)
-                beatmaps.UnbindFrom(filter.OldValue.Collection.Beatmaps);
+                beatmaps.UnbindFrom(filter.OldValue.Collection.BeatmapHashes);
 
             if (filter.NewValue?.Collection != null)
-                beatmaps.BindTo(filter.NewValue.Collection.Beatmaps);
+                beatmaps.BindTo(filter.NewValue.Collection.BeatmapHashes);
 
             beatmaps.CollectionChanged += filterBeatmapsChanged;
 
@@ -208,7 +208,7 @@ namespace osu.Game.Collections
             public CollectionDropdownMenuItem(MenuItem item)
                 : base(item)
             {
-                collectionBeatmaps = Item.Collection?.Beatmaps.GetBoundCopy();
+                collectionBeatmaps = Item.Collection?.BeatmapHashes.GetBoundCopy();
                 collectionName = Item.CollectionName.GetBoundCopy();
             }
 

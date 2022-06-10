@@ -169,10 +169,10 @@ namespace osu.Game.Collections
                         if (existing == null)
                             Collections.Add(existing = new BeatmapCollection { Name = { Value = newCol.Name.Value } });
 
-                        foreach (string newBeatmap in newCol.Beatmaps)
+                        foreach (string newBeatmap in newCol.BeatmapHashes)
                         {
-                            if (!existing.Beatmaps.Contains(newBeatmap))
-                                existing.Beatmaps.Add(newBeatmap);
+                            if (!existing.BeatmapHashes.Contains(newBeatmap))
+                                existing.BeatmapHashes.Add(newBeatmap);
                         }
                     }
 
@@ -222,7 +222,7 @@ namespace osu.Game.Collections
 
                             string checksum = sr.ReadString();
 
-                            collection.Beatmaps.Add(checksum);
+                            collection.BeatmapHashes.Add(checksum);
                         }
 
                         if (notification != null)
@@ -293,7 +293,7 @@ namespace osu.Game.Collections
                             {
                                 sw.Write(c.Name.Value);
 
-                                string[] beatmapsCopy = c.Beatmaps.ToArray();
+                                string[] beatmapsCopy = c.BeatmapHashes.ToArray();
 
                                 sw.Write(beatmapsCopy.Length);
 
