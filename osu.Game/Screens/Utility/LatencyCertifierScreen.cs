@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -61,6 +62,8 @@ namespace osu.Game.Screens.Utility
 
         [Resolved]
         private FrameworkConfigManager config { get; set; } = null!;
+
+        private readonly Bindable<LatencyVisualMode> visualMode = new Bindable<LatencyVisualMode>();
 
         private const int rounds_to_complete = 5;
 
@@ -124,8 +127,9 @@ namespace osu.Game.Screens.Utility
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Text = @"Welcome to the latency certifier!
-Use the arrow keys, Z/X/J/K to move the square.
+Use the arrow keys, Z/X/F/J to control the display.
 Use the Tab key to change focus.
+Change display modes with Space.
 Do whatever you need to try and perceive the difference in latency, then choose your best side.
 ",
                 },
@@ -182,6 +186,10 @@ Do whatever you need to try and perceive the difference in latency, then choose 
         {
             switch (e.Key)
             {
+                case Key.Space:
+                    visualMode.Value = (LatencyVisualMode)(((int)visualMode.Value + 1) % 3);
+                    return true;
+
                 case Key.Tab:
                     var firstArea = mainArea.FirstOrDefault(a => !a.IsActiveArea.Value);
                     if (firstArea != null)
@@ -301,7 +309,9 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                             isCertifying = true;
                             changeDifficulty(DifficultyLevel - 1);
                         },
-                        TooltipText = isPass ? $"Chain {rounds_to_complete_certified} rounds to confirm your perception!" : "You've reached your limits. Go to the previous level to complete certification!",
+                        TooltipText = isPass
+                            ? $"Chain {rounds_to_complete_certified} rounds to confirm your perception!"
+                            : "You've reached your limits. Go to the previous level to complete certification!",
                     });
                 }
             }
@@ -386,12 +396,14 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : (int?)null)
                 {
                     Width = 0.5f,
+                    VisualMode = { BindTarget = visualMode },
                     IsActiveArea = { Value = true },
                     ReportUserBest = () => recordResult(betterSide == 0),
                 },
                 new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : (int?)null)
                 {
                     Width = 0.5f,
+                    VisualMode = { BindTarget = visualMode },
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     ReportUserBest = () => recordResult(betterSide == 1)
