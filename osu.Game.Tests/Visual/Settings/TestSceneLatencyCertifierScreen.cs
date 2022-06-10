@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 var latencyArea = latencyCertifier
                                   .ChildrenOfType<LatencyArea>()
-                                  .SingleOrDefault(a => a.TargetFrameRate == 0);
+                                  .SingleOrDefault(a => a.TargetFrameRate == null);
 
                 // reached results
                 if (latencyArea == null)
