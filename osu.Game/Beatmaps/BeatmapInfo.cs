@@ -90,6 +90,7 @@ namespace osu.Game.Beatmaps
 
         public double StarRating { get; set; }
 
+        [Indexed]
         public string MD5Hash { get; set; } = string.Empty;
 
         [JsonIgnore]
