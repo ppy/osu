@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Immediately triggers a failure on the loaded <see cref="HealthProcessor"/>.
         /// </summary>
-        protected void TriggerArbitraryFailure() => healthProcessorInternal.TriggerFailure();
+        protected void TriggerFailure() => healthProcessorInternal.TriggerFailure();
 
         /// <summary>
         /// Determines whether <paramref name="result"/> should trigger a failure. Called every time a
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mods
         /// <remarks>
         /// This method should only be used to trigger failures based on <paramref name="result"/>.
         /// Using outside values to evaluate failure may introduce event ordering discrepancies, use
-        /// an <see cref="IApplicableMod"/> with <see cref="TriggerArbitraryFailure"/> instead.
+        /// an <see cref="IApplicableMod"/> with <see cref="TriggerFailure"/> instead.
         /// </remarks>
         protected abstract bool FailCondition(HealthProcessor healthProcessor, JudgementResult result);
     }
