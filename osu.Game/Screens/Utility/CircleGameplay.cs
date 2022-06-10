@@ -51,22 +51,27 @@ namespace osu.Game.Screens.Utility
 
             Vector2 location;
 
+            const float spacing = 0.1f;
+
+            const float spacing_low = 0.5f - spacing;
+            const float spacing_high = 0.5f + spacing;
+
             switch (nextLocation % 4)
             {
                 default:
-                    location = new Vector2(0.25f, 0.25f);
+                    location = new Vector2(spacing_low, spacing_low);
                     break;
 
                 case 1:
-                    location = new Vector2(0.75f, 0.75f);
+                    location = new Vector2(spacing_high, spacing_high);
                     break;
 
                 case 2:
-                    location = new Vector2(0.75f, 0.25f);
+                    location = new Vector2(spacing_high, spacing_low);
                     break;
 
                 case 3:
-                    location = new Vector2(0.25f, 0.75f);
+                    location = new Vector2(spacing_low, spacing_high);
                     break;
             }
 
@@ -96,6 +101,9 @@ namespace osu.Game.Screens.Utility
             private readonly Circle circle;
 
             private const float size = 100;
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+                => circle.ReceivePositionalInputAt(screenSpacePos);
 
             public SampleHitCircle(double hitTime)
             {
@@ -163,7 +171,7 @@ namespace osu.Game.Screens.Utility
             {
                 base.Update();
 
-                approach.Scale = new Vector2((float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / 40, 1, 100));
+                approach.Scale = new Vector2((float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / 60, 1, 100));
 
                 if (Clock.CurrentTime > HitTime + 80)
                     Expire();
