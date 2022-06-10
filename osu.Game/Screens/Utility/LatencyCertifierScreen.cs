@@ -52,8 +52,8 @@ namespace osu.Game.Screens.Utility
         private readonly Container resultsArea;
 
         public readonly BindableDouble SampleBPM = new BindableDouble(120) { MinValue = 60, MaxValue = 300 };
-        public readonly BindableDouble SampleApproachRate = new BindableDouble(100) { MinValue = 50, MaxValue = 500 };
-        public readonly BindableFloat SampleVisualSpacing = new BindableFloat(0.2f) { MinValue = 0.05f, MaxValue = 0.3f };
+        public readonly BindableDouble SampleApproachRate = new BindableDouble(9) { MinValue = 5, MaxValue = 12, Precision = 0.1 };
+        public readonly BindableFloat SampleVisualSpacing = new BindableFloat(0.5f) { MinValue = 0f, MaxValue = 1, Precision = 0.1f };
 
         /// <summary>
         /// The rate at which the game host should attempt to run.
