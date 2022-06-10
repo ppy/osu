@@ -38,6 +38,36 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public readonly HitType? HitType;
 
         /// <summary>
+        /// Creates a list of <see cref="TaikoDifficultyHitObject"/>s from a <see cref="IBeatmap"/>s.
+        /// TODO: Review this - this is moved here from TaikoDifficultyCalculator so that TaikoDifficultyCalculator can
+        ///       have less knowledge of implementation details (i.e. creating all the different hitObject lists, and
+        ///       calling FindRepetitionInterval for the final object). The down side of this is
+        ///       TaikoDifficultyHitObejct.CreateDifficultyHitObjects is now pretty much a proxy for this.
+        /// </summary>
+        /// <param name="beatmap">The beatmap from which the list of <see cref="TaikoDifficultyHitObject"/> is created.</param>
+        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        public static List<DifficultyHitObject> Create(IBeatmap beatmap, double clockRate)
+        {
+            List<DifficultyHitObject> difficultyHitObject = new List<DifficultyHitObject>();
+            List<TaikoDifficultyHitObject> centreObjects = new List<TaikoDifficultyHitObject>();
+            List<TaikoDifficultyHitObject> rimObjects = new List<TaikoDifficultyHitObject>();
+            List<TaikoDifficultyHitObject> noteObjects = new List<TaikoDifficultyHitObject>();
+
+            for (int i = 2; i < beatmap.HitObjects.Count; i++)
+            {
+                difficultyHitObject.Add(
+                    new TaikoDifficultyHitObject(
+                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, difficultyHitObject,
+                        centreObjects, rimObjects, noteObjects, difficultyHitObject.Count)
+                );
+            }
+
+            // Find repetition interval for the final TaikoDifficultyHitObjectColour
+            ((TaikoDifficultyHitObject)difficultyHitObject.Last()).Colour?.FindRepetitionInterval();
+            return difficultyHitObject;
+        }
+
+        /// <summary>
         /// Creates a new difficulty hit object.
         /// </summary>
         /// <param name="hitObject">The gameplay <see cref="HitObject"/> associated with this difficulty object.</param>
@@ -52,7 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         ///
         /// TODO: This argument list is getting long, we might want to refactor this into a static method that create
         ///       all <see cref="DifficultyHitObject"/>s from a <see cref="IBeatmap"/>.
-        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate,
+        private TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate,
             List<DifficultyHitObject> objects,
             List<TaikoDifficultyHitObject> centreHitObjects,
             List<TaikoDifficultyHitObject> rimHitObjects,
