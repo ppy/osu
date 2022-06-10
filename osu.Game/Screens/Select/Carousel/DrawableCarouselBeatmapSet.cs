@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             TernaryState state;
 
-            int countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
+            int countExisting = beatmapSet.Beatmaps.Count(b => collection.BeatmapHashes.Contains(b.MD5Hash));
 
             if (countExisting == beatmapSet.Beatmaps.Count)
                 state = TernaryState.True;
@@ -261,14 +261,14 @@ namespace osu.Game.Screens.Select.Carousel
                     switch (s)
                     {
                         case TernaryState.True:
-                            if (collection.Beatmaps.Contains(b))
+                            if (collection.BeatmapHashes.Contains(b.MD5Hash))
                                 continue;
 
-                            collection.Beatmaps.Add(b);
+                            collection.BeatmapHashes.Add(b.MD5Hash);
                             break;
 
                         case TernaryState.False:
-                            collection.Beatmaps.Remove(b);
+                            collection.BeatmapHashes.Remove(b.MD5Hash);
                             break;
                     }
                 }

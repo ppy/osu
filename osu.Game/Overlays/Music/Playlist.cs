@@ -30,7 +30,15 @@ namespace osu.Game.Overlays.Music
             var items = (SearchContainer<RearrangeableListItem<Live<BeatmapSetInfo>>>)ListContainer;
 
             foreach (var item in items.OfType<PlaylistItem>())
-                item.InSelectedCollection = criteria.Collection?.Beatmaps.Any(b => item.Model.ID == b.BeatmapSet?.ID) ?? true;
+            {
+                if (criteria.Collection == null)
+                    item.InSelectedCollection = true;
+                else
+                {
+                    item.InSelectedCollection = item.Model.Value.Beatmaps.Select(b => b.MD5Hash)
+                                                    .Any(criteria.Collection.BeatmapHashes.Contains);
+                }
+            }
 
             items.SearchTerm = criteria.SearchText;
         }
