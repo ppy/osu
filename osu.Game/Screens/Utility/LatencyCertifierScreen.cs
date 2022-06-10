@@ -282,7 +282,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             if (!isPass)
                 cannotIncreaseReason = "You didn't get a perfect score.";
             else if (mapDifficultyToTargetFrameRate(difficultyLevel + 1) > target_host_update_frames)
-                cannotIncreaseReason = "You've reached the limits of this comparison mode.";
+                cannotIncreaseReason = "You've reached the maximum level.";
             else if (mapDifficultyToTargetFrameRate(difficultyLevel + 1) > Clock.FramesPerSecond)
                 cannotIncreaseReason = "Game is not running fast enough to test this level";
 
