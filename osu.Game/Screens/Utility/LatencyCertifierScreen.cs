@@ -203,7 +203,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             bool isPass = successRate == 1;
 
             statusText.AddParagraph($"You scored {correctAtCurrentDifficulty} out of {totalRoundForNextResultsScreen} ({successRate:0%})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
-            statusText.AddParagraph($"Level {difficultyLevel} ({mapDifficultyToTargetFrameRate(difficultyLevel):N0} hz)",
+            statusText.AddParagraph($"Level {difficultyLevel} ({mapDifficultyToTargetFrameRate(difficultyLevel):N0} Hz)",
                 cp => cp.Font = OsuFont.Default.With(size: 24));
 
             statusText.AddParagraph(string.Empty);
@@ -218,12 +218,12 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 statusText.AddParagraph(string.Empty);
             }
 
-            statusText.AddParagraph($"Polling: {pollingMax} hz Monitor: {displayMode?.RefreshRate ?? 0:N0} hz Exclusive: {exclusive}",
+            statusText.AddParagraph($"Polling: {pollingMax} Hz Monitor: {displayMode?.RefreshRate ?? 0:N0} Hz Exclusive: {exclusive}",
                 cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
 
-            statusText.AddParagraph($"Input: {host.InputThread.Clock.FramesPerSecond} hz "
-                                    + $"Update: {host.UpdateThread.Clock.FramesPerSecond} hz "
-                                    + $"Draw: {host.DrawThread.Clock.FramesPerSecond} hz"
+            statusText.AddParagraph($"Input: {host.InputThread.Clock.FramesPerSecond} Hz "
+                                    + $"Update: {host.UpdateThread.Clock.FramesPerSecond} Hz "
+                                    + $"Draw: {host.DrawThread.Clock.FramesPerSecond} Hz"
                 , cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
 
             int certificationRemaining = !isPass ? rounds_to_complete_certified : rounds_to_complete_certified - correctAtCurrentDifficulty;
@@ -257,7 +257,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                     }),
                     new OsuSpriteText
                     {
-                        Text = $"You should use a frame limiter with update rate of {mapDifficultyToTargetFrameRate(difficultyLevel + 1)} hz (or fps) for best results!",
+                        Text = $"You should use a frame limiter with update rate of {mapDifficultyToTargetFrameRate(difficultyLevel + 1)} Hz (or fps) for best results!",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold),
