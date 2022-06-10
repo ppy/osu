@@ -27,28 +27,19 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestCertification()
         {
-            for (int i = 0; i < 4; i++)
-            {
-                int difficulty = i + 1;
-
-                checkDifficulty(difficulty);
-                clickUntilResults(true);
-                continueFromResults();
-            }
-
-            checkDifficulty(5);
-            clickUntilResults(false);
+            checkDifficulty(1);
+            clickUntilResults(true);
             continueFromResults();
-            checkDifficulty(4);
+            checkDifficulty(2);
 
             clickUntilResults(false);
             continueFromResults();
-            checkDifficulty(3);
+            checkDifficulty(1);
 
             clickUntilResults(true);
             AddAssert("check at results", () => !latencyCertifier.ChildrenOfType<LatencyArea>().Any());
             AddAssert("check no buttons", () => !latencyCertifier.ChildrenOfType<OsuButton>().Any());
-            checkDifficulty(3);
+            checkDifficulty(1);
         }
 
         private void continueFromResults()
