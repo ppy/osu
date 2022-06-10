@@ -3,31 +3,25 @@
 
 #nullable enable
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.States;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Utility.SampleComponents
 {
-    public class LatencyCursorContainer : CompositeDrawable
+    public class LatencyCursorContainer : LatencySampleComponent
     {
         private Circle cursor = null!;
-        private InputManager inputManager = null!;
-
-        private readonly BindableBool isActive;
 
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
-        public LatencyCursorContainer(BindableBool isActive)
+        public LatencyCursorContainer()
         {
-            this.isActive = isActive;
             Masking = true;
         }
 
@@ -41,27 +35,23 @@ namespace osu.Game.Screens.Utility.SampleComponents
                 Origin = Anchor.Centre,
                 Colour = overlayColourProvider.Colour2,
             };
-
-            inputManager = GetContainingInputManager();
         }
 
         protected override bool OnHover(HoverEvent e) => false;
 
-        protected override void Update()
+        protected override void UpdateAtLimitedRate(InputState inputState)
         {
-            cursor.Colour = inputManager.CurrentState.Mouse.IsPressed(MouseButton.Left) ? overlayColourProvider.Content1 : overlayColourProvider.Colour2;
+            cursor.Colour = inputState.Mouse.IsPressed(MouseButton.Left) ? overlayColourProvider.Content1 : overlayColourProvider.Colour2;
 
-            if (isActive.Value)
+            if (IsActive.Value)
             {
-                cursor.Position = ToLocalSpace(inputManager.CurrentState.Mouse.Position);
+                cursor.Position = ToLocalSpace(inputState.Mouse.Position);
                 cursor.Alpha = 1;
             }
             else
             {
                 cursor.Alpha = 0;
             }
-
-            base.Update();
         }
     }
 }
