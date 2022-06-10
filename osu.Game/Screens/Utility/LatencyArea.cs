@@ -145,6 +145,7 @@ namespace osu.Game.Screens.Utility
                 if (!isActive.Value)
                 {
                     lastFrameTime = null;
+                    box.Colour = overlayColourProvider.Colour1;
                     return;
                 }
 
