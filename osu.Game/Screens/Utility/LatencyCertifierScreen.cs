@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Utility
         [Resolved]
         private FrameworkConfigManager config { get; set; } = null!;
 
-        private readonly Bindable<LatencyVisualMode> visualMode = new Bindable<LatencyVisualMode>();
+        public readonly Bindable<LatencyVisualMode> VisualMode = new Bindable<LatencyVisualMode>();
 
         private const int rounds_to_complete = 5;
 
@@ -187,7 +187,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             switch (e.Key)
             {
                 case Key.Space:
-                    visualMode.Value = (LatencyVisualMode)(((int)visualMode.Value + 1) % 3);
+                    VisualMode.Value = (LatencyVisualMode)(((int)VisualMode.Value + 1) % 3);
                     return true;
 
                 case Key.Tab:
@@ -396,14 +396,14 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : (int?)null)
                 {
                     Width = 0.5f,
-                    VisualMode = { BindTarget = visualMode },
+                    VisualMode = { BindTarget = VisualMode },
                     IsActiveArea = { Value = true },
                     ReportUserBest = () => recordResult(betterSide == 0),
                 },
                 new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : (int?)null)
                 {
                     Width = 0.5f,
-                    VisualMode = { BindTarget = visualMode },
+                    VisualMode = { BindTarget = VisualMode },
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     ReportUserBest = () => recordResult(betterSide == 1)
