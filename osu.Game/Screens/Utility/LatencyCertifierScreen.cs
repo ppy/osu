@@ -25,11 +25,13 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Utility
 {
+    [Cached]
     public class LatencyCertifierScreen : OsuScreen
     {
         private FrameSync previousFrameSyncMode;
@@ -48,6 +50,10 @@ namespace osu.Game.Screens.Utility
         private readonly Container<LatencyArea> mainArea;
 
         private readonly Container resultsArea;
+
+        public readonly BindableDouble SampleBPM = new BindableDouble(120) { MinValue = 60, MaxValue = 300 };
+        public readonly BindableDouble SampleApproachRate = new BindableDouble(100) { MinValue = 50, MaxValue = 500 };
+        public readonly BindableFloat SampleVisualSpacing = new BindableFloat(0.2f) { MinValue = 0.05f, MaxValue = 0.3f };
 
         /// <summary>
         /// The rate at which the game host should attempt to run.
@@ -83,6 +89,8 @@ namespace osu.Game.Screens.Utility
 
         private double lastPoll;
         private int pollingMax;
+
+        private readonly FillFlowContainer settings;
 
         [Resolved]
         private GameHost host { get; set; } = null!;
@@ -122,19 +130,30 @@ namespace osu.Game.Screens.Utility
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopRight,
                 },
-                explanatoryText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                settings = new FillFlowContainer
                 {
+                    Name = "Settings",
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Padding = new MarginPadding(10),
+                    Spacing = new Vector2(2),
+                    Direction = FillDirection.Vertical,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    TextAnchor = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Text = @"Welcome to the latency certifier!
+                    Child = explanatoryText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                    {
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        TextAnchor = Anchor.TopCentre,
+                        Text = @"Welcome to the latency certifier!
 Use the arrow keys, Z/X/F/J to control the display.
 Use the Tab key to change focus.
 Change display modes with Space.
 Do whatever you need to try and perceive the difference in latency, then choose your best side.
 ",
+                    },
                 },
                 resultsArea = new Container
                 {
@@ -423,6 +442,37 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                         mainArea.Children.First(a => a != area).IsActiveArea.Value = false;
                 });
             }
+
+            settings.AddRange(new Drawable[]
+            {
+                new SettingsSlider<double>
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.None,
+                    Width = 400,
+                    LabelText = "bpm",
+                    Current = SampleBPM
+                },
+                new SettingsSlider<float>
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.None,
+                    Width = 400,
+                    LabelText = "visual spacing",
+                    Current = SampleVisualSpacing
+                },
+                new SettingsSlider<double>
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.None,
+                    Width = 400,
+                    LabelText = "approach rate",
+                    Current = SampleApproachRate
+                },
+            });
         }
 
         private void recordResult(bool correct)

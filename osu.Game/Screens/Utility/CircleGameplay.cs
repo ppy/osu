@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,7 +12,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Utility.SampleComponents;
@@ -21,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Utility
 {
-    public class CircleGameplay : CompositeDrawable
+    public class CircleGameplay : LatencySampleComponent
     {
         private int nextLocation;
 
@@ -31,9 +29,7 @@ namespace osu.Game.Screens.Utility
 
         private double? lastGeneratedBeatTime;
 
-        private static readonly BindableDouble beat_length = new BindableDouble(500) { MinValue = 200, MaxValue = 1000 };
-        private static readonly BindableDouble approach_rate_milliseconds = new BindableDouble(100) { MinValue = 50, MaxValue = 500 };
-        private static readonly BindableFloat spacing = new BindableFloat(0.2f) { MinValue = 0.05f, MaxValue = 0.4f };
+        private Container circles = null!;
 
         protected override void LoadComplete()
         {
@@ -41,33 +37,6 @@ namespace osu.Game.Screens.Utility
 
             InternalChildren = new Drawable[]
             {
-                new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Y,
-                    Width = 400,
-                    Spacing = new Vector2(2),
-                    Direction = FillDirection.Vertical,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Children = new Drawable[]
-                    {
-                        new SettingsSlider<double>
-                        {
-                            LabelText = "time spacing",
-                            Current = beat_length
-                        },
-                        new SettingsSlider<float>
-                        {
-                            LabelText = "visual spacing",
-                            Current = spacing
-                        },
-                        new SettingsSlider<double>
-                        {
-                            LabelText = "approach time",
-                            Current = approach_rate_milliseconds
-                        },
-                    }
-                },
                 unstableRate = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
@@ -75,22 +44,31 @@ namespace osu.Game.Screens.Utility
                     Font = OsuFont.Default.With(size: 24),
                     Y = -100,
                 },
+                circles = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
             };
+
+            SampleBPM.BindValueChanged(_ =>
+            {
+                circles.Clear();
+                lastGeneratedBeatTime = null;
+            });
         }
 
-        protected override void Update()
+        protected override void UpdateAtLimitedRate(InputState inputState)
         {
-            base.Update();
+            double beatLength = 60000 / SampleBPM.Value;
+
+            int nextBeat = (int)(Clock.CurrentTime / beatLength) + 1;
 
             // We want to generate a few hit objects ahead of the current time (to allow them to animate).
-
-            int nextBeat = (int)(Clock.CurrentTime / beat_length.Value) + 1;
-
-            double generateUpTo = (nextBeat + 2) * beat_length.Value;
+            double generateUpTo = (nextBeat + 2) * beatLength;
 
             while (lastGeneratedBeatTime == null || lastGeneratedBeatTime < generateUpTo)
             {
-                double time = ++nextBeat * beat_length.Value;
+                double time = ++nextBeat * beatLength;
 
                 if (time <= lastGeneratedBeatTime)
                     continue;
@@ -106,8 +84,8 @@ namespace osu.Game.Screens.Utility
 
             Vector2 location;
 
-            float spacingLow = 0.5f - spacing.Value;
-            float spacingHigh = 0.5f + spacing.Value;
+            float spacingLow = 0.5f - SampleVisualSpacing.Value;
+            float spacingHigh = 0.5f + SampleVisualSpacing.Value;
 
             switch (nextLocation % 4)
             {
@@ -128,7 +106,7 @@ namespace osu.Game.Screens.Utility
                     break;
             }
 
-            AddInternal(new SampleHitCircle(time)
+            circles.Add(new SampleHitCircle(time)
             {
                 RelativePositionAxes = Axes.Both,
                 Position = location,
@@ -139,7 +117,7 @@ namespace osu.Game.Screens.Utility
         private void hit(HitEvent h)
         {
             hitEvents.Add(h);
-            unstableRate.Text = $"{hitEvents.CalculateUnstableRate():N1}";
+            unstableRate.Text = $"UR: {hitEvents.CalculateUnstableRate()}";
         }
 
         public class SampleHitCircle : LatencySampleComponent
@@ -231,7 +209,7 @@ namespace osu.Game.Screens.Utility
             {
                 if (HitEvent == null)
                 {
-                    approach.Scale = new Vector2(1 + (float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / approach_rate_milliseconds.Value, 0, 100));
+                    approach.Scale = new Vector2(1 + (float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / SampleApproachRate.Value, 0, 100));
                     Alpha = (float)MathHelper.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
 
                     if (Clock.CurrentTime > HitTime + 200)
