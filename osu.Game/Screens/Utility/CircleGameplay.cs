@@ -203,6 +203,9 @@ namespace osu.Game.Screens.Utility
                 if (HitEvent != null)
                     return false;
 
+                if (Math.Abs(Clock.CurrentTime - HitTime) > 200)
+                    return false;
+
                 approach.Expire();
 
                 circle
@@ -225,11 +228,14 @@ namespace osu.Game.Screens.Utility
             {
                 base.Update();
 
-                approach.Scale = new Vector2(1 + (float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / approach_rate_milliseconds.Value, 0, 100));
-                Alpha = (float)MathHelper.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
+                if (HitEvent == null)
+                {
+                    approach.Scale = new Vector2(1 + (float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / approach_rate_milliseconds.Value, 0, 100));
+                    Alpha = (float)MathHelper.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
 
-                if (Clock.CurrentTime > HitTime + 200)
-                    Expire();
+                    if (Clock.CurrentTime > HitTime + 200)
+                        Expire();
+                }
             }
         }
     }
