@@ -35,20 +35,8 @@ namespace osu.Game.Overlays.Music
                     item.InSelectedCollection = true;
                 else
                 {
-                    var beatmapHashes = item.Model.Value.Beatmaps.Select(b => b.MD5Hash);
-
-                    bool contained = false;
-
-                    foreach (string hash in beatmapHashes)
-                    {
-                        if (criteria.Collection?.Beatmaps.Contains(hash) == true)
-                        {
-                            contained = true;
-                            break;
-                        }
-                    }
-
-                    item.InSelectedCollection = contained;
+                    item.InSelectedCollection = item.Model.Value.Beatmaps.Select(b => b.MD5Hash)
+                                                    .Any(criteria.Collection.Beatmaps.Contains);
                 }
             }
 
