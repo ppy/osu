@@ -13,7 +13,7 @@ namespace osu.Game.Collections
         public DeleteCollectionDialog(BeatmapCollection collection, Action deleteAction)
         {
             HeaderText = "Confirm deletion of";
-            BodyText = $"{collection.Name.Value} ({"beatmap".ToQuantity(collection.Beatmaps.Count)})";
+            BodyText = $"{collection.Name.Value} ({"beatmap".ToQuantity(collection.BeatmapHashes.Count)})";
 
             Icon = FontAwesome.Regular.TrashAlt;
 
