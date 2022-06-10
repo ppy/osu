@@ -358,13 +358,13 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
             mainArea.AddRange(new[]
             {
-                new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(difficultyLevel) : 0)
+                new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(difficultyLevel) : (int?)null)
                 {
                     Width = 0.5f,
                     IsActiveArea = { Value = true },
                     ReportUserBest = () => recordResult(betterSide == 0),
                 },
-                new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(difficultyLevel) : 0)
+                new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(difficultyLevel) : (int?)null)
                 {
                     Width = 0.5f,
                     Anchor = Anchor.TopRight,
