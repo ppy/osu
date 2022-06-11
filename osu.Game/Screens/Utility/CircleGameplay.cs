@@ -120,7 +120,10 @@ namespace osu.Game.Screens.Utility
         private void hit(HitEvent h)
         {
             hitEvents.Add(h);
-            unstableRate.Text = $"UR: {hitEvents.CalculateUnstableRate():N0}";
+
+            // Disabled to keep things simple based on internal feedback nothing it's not helpful.
+            // Can be reconsidered in the future.
+            // unstableRate.Text = $"UR: {hitEvents.CalculateUnstableRate():N0}";
         }
 
         public class SampleHitCircle : LatencySampleComponent
