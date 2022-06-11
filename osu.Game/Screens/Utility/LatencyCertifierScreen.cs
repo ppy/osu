@@ -241,7 +241,8 @@ namespace osu.Game.Screens.Utility
             switch (e.Key)
             {
                 case Key.Space:
-                    VisualMode.Value = (LatencyVisualMode)(((int)VisualMode.Value + 1) % 3);
+                    int availableModes = Enum.GetValues(typeof(LatencyVisualMode)).Length;
+                    VisualMode.Value = (LatencyVisualMode)(((int)VisualMode.Value + 1) % availableModes);
                     return true;
 
                 case Key.Tab:
