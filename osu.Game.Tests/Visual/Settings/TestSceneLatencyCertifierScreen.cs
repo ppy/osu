@@ -25,6 +25,12 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
+        public void TestSimple()
+        {
+            AddStep("set visual mode to simple", () => latencyCertifier.VisualMode.Value = LatencyVisualMode.Simple);
+        }
+
+        [Test]
         public void TestCircleGameplay()
         {
             AddStep("set visual mode to circles", () => latencyCertifier.VisualMode.Value = LatencyVisualMode.CircleGameplay);
