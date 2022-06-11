@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Utility
 
             explanatoryText.AddParagraph(@"Welcome to the latency certifier!");
             explanatoryText.AddParagraph(@"Do whatever you need to try and perceive the difference in latency, then choose your best side. Read more about the methodology ");
-            explanatoryText.AddLink("here", "https://github.com/ppy/osu/wiki/Latency-and-unlimited-frame-rates");
+            explanatoryText.AddLink("here", "https://github.com/ppy/osu/wiki/Latency-and-unlimited-frame-rates#methodology");
             explanatoryText.AddParagraph(@"Use the arrow keys or Z/X/F/J to control the display.");
             explanatoryText.AddParagraph(@"Tab key to change focus. Space to change display mode");
         }
