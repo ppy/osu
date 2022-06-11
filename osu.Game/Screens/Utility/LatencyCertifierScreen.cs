@@ -147,7 +147,7 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (lastPoll > 0)
+            if (lastPoll > 0 && Clock.CurrentTime != lastPoll)
                 pollingMax = (int)Math.Max(pollingMax, 1000 / (Clock.CurrentTime - lastPoll));
             lastPoll = Clock.CurrentTime;
             return base.OnMouseMove(e);
