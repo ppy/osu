@@ -135,6 +135,7 @@ namespace osu.Game.Screens.Utility
             private Circle circle = null!;
 
             private const float size = 100;
+            private const float duration = 200;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
                 => circle.ReceivePositionalInputAt(screenSpacePos);
@@ -186,7 +187,7 @@ namespace osu.Game.Screens.Utility
                 if (HitEvent != null)
                     return false;
 
-                if (Math.Abs(Clock.CurrentTime - HitTime) > 200)
+                if (Math.Abs(Clock.CurrentTime - HitTime) > duration)
                     return false;
 
                 attemptHit();
@@ -198,7 +199,7 @@ namespace osu.Game.Screens.Utility
                 if (!IsActive.Value)
                     return false;
 
-                if (Math.Abs(Clock.CurrentTime - HitTime) > 200)
+                if (Math.Abs(Clock.CurrentTime - HitTime) > duration)
                     return false;
 
                 if (IsHovered)
@@ -215,7 +216,7 @@ namespace osu.Game.Screens.Utility
                     approach.Scale = new Vector2(1 + 4 * (float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / preempt, 0, 100));
                     Alpha = (float)MathHelper.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
 
-                    if (Clock.CurrentTime > HitTime + 200)
+                    if (Clock.CurrentTime > HitTime + duration)
                         Expire();
                 }
             }
@@ -232,8 +233,8 @@ namespace osu.Game.Screens.Utility
                 approach.Expire();
 
                 circle
-                    .FadeOut(200)
-                    .ScaleTo(1.5f, 200);
+                    .FadeOut(duration)
+                    .ScaleTo(1.5f, duration);
 
                 HitEvent = new HitEvent(Clock.CurrentTime - HitTime, HitResult.Good, new HitObject
                 {
@@ -242,7 +243,7 @@ namespace osu.Game.Screens.Utility
 
                 Hit?.Invoke(HitEvent.Value);
 
-                this.Delay(200).Expire();
+                this.Delay(duration).Expire();
             });
         }
     }
