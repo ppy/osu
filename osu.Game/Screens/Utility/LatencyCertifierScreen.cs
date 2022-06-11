@@ -90,6 +90,8 @@ namespace osu.Game.Screens.Utility
         private double lastPoll;
         private int pollingMax;
 
+        private readonly FillFlowContainer settings;
+
         [Resolved]
         private GameHost host { get; set; } = null!;
 
@@ -128,7 +130,7 @@ namespace osu.Game.Screens.Utility
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopRight,
                 },
-                new FillFlowContainer
+                settings = new FillFlowContainer
                 {
                     Name = "Settings",
                     AutoSizeAxes = Axes.Y,
@@ -256,6 +258,7 @@ namespace osu.Game.Screens.Utility
         {
             mainArea.Clear();
             resultsArea.Clear();
+            settings.Hide();
 
             var displayMode = host.Window?.CurrentDisplayMode.Value;
 
@@ -437,6 +440,8 @@ namespace osu.Game.Screens.Utility
 
         private void loadNextRound()
         {
+            settings.Show();
+
             attemptsAtCurrentDifficulty++;
             statusText.Text = $"Level {DifficultyLevel}\nRound {attemptsAtCurrentDifficulty} of {totalRoundForNextResultsScreen}";
 
