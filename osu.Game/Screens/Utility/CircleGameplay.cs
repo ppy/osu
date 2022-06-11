@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable enable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -12,7 +13,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Utility.SampleComponents;
@@ -23,8 +23,6 @@ namespace osu.Game.Screens.Utility
     public class CircleGameplay : LatencySampleComponent
     {
         private int nextLocation;
-
-        private OsuSpriteText unstableRate = null!;
 
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
 
@@ -38,13 +36,6 @@ namespace osu.Game.Screens.Utility
 
             InternalChildren = new Drawable[]
             {
-                unstableRate = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.Default.With(size: 24),
-                    Y = -100,
-                },
                 circles = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -120,10 +111,6 @@ namespace osu.Game.Screens.Utility
         private void hit(HitEvent h)
         {
             hitEvents.Add(h);
-
-            // Disabled to keep things simple based on internal feedback nothing it's not helpful.
-            // Can be reconsidered in the future.
-            // unstableRate.Text = $"UR: {hitEvents.CalculateUnstableRate():N0}";
         }
 
         public class SampleHitCircle : LatencySampleComponent
