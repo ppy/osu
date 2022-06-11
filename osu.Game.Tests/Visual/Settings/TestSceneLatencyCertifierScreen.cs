@@ -31,6 +31,12 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
+        public void TestCycleVisualModes()
+        {
+            AddRepeatStep("cycle mode", () => InputManager.Key(Key.Space), 6);
+        }
+
+        [Test]
         public void TestCertification()
         {
             checkDifficulty(1);
