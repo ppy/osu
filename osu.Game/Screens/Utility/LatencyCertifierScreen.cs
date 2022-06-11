@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -24,11 +25,13 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Utility
 {
+    [Cached]
     public class LatencyCertifierScreen : OsuScreen
     {
         private FrameSync previousFrameSyncMode;
@@ -42,11 +45,15 @@ namespace osu.Game.Screens.Utility
 
         public override float BackgroundParallaxAmount => 0;
 
-        private readonly OsuTextFlowContainer explanatoryText;
+        private readonly LinkFlowContainer explanatoryText;
 
         private readonly Container<LatencyArea> mainArea;
 
         private readonly Container resultsArea;
+
+        public readonly BindableDouble SampleBPM = new BindableDouble(120) { MinValue = 60, MaxValue = 300, Precision = 1 };
+        public readonly BindableDouble SampleApproachRate = new BindableDouble(9) { MinValue = 5, MaxValue = 12, Precision = 0.1 };
+        public readonly BindableFloat SampleVisualSpacing = new BindableFloat(0.5f) { MinValue = 0f, MaxValue = 1, Precision = 0.1f };
 
         /// <summary>
         /// The rate at which the game host should attempt to run.
@@ -61,6 +68,8 @@ namespace osu.Game.Screens.Utility
 
         [Resolved]
         private FrameworkConfigManager config { get; set; } = null!;
+
+        public readonly Bindable<LatencyVisualMode> VisualMode = new Bindable<LatencyVisualMode>();
 
         private const int rounds_to_complete = 5;
 
@@ -81,8 +90,13 @@ namespace osu.Game.Screens.Utility
         private double lastPoll;
         private int pollingMax;
 
+        private readonly FillFlowContainer settings;
+
         [Resolved]
         private GameHost host { get; set; } = null!;
+
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
 
         public LatencyCertifierScreen()
         {
@@ -116,18 +130,54 @@ namespace osu.Game.Screens.Utility
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopRight,
                 },
-                explanatoryText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                settings = new FillFlowContainer
                 {
+                    Name = "Settings",
+                    AutoSizeAxes = Axes.Y,
+                    Width = 800,
+                    Padding = new MarginPadding(10),
+                    Spacing = new Vector2(2),
+                    Direction = FillDirection.Vertical,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    TextAnchor = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Text = @"Welcome to the latency certifier!
-Use the arrow keys, Z/X/J/K to move the square.
-Use the Tab key to change focus.
-Do whatever you need to try and perceive the difference in latency, then choose your best side.
-",
+                    Children = new Drawable[]
+                    {
+                        explanatoryText = new LinkFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
+                        {
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            TextAnchor = Anchor.TopCentre,
+                        },
+                        new SettingsSlider<double>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 400,
+                            LabelText = "bpm",
+                            Current = SampleBPM
+                        },
+                        new SettingsSlider<float>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 400,
+                            LabelText = "visual spacing",
+                            Current = SampleVisualSpacing
+                        },
+                        new SettingsSlider<double>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 400,
+                            LabelText = "approach rate",
+                            Current = SampleApproachRate
+                        },
+                    },
                 },
                 resultsArea = new Container
                 {
@@ -143,6 +193,12 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                     AutoSizeAxes = Axes.Y,
                 },
             };
+
+            explanatoryText.AddParagraph(@"Welcome to the latency certifier!");
+            explanatoryText.AddParagraph(@"Do whatever you need to try and perceive the difference in latency, then choose your best side. Read more about the methodology ");
+            explanatoryText.AddLink("here", "https://github.com/ppy/osu/wiki/Latency-and-unlimited-frame-rates#methodology");
+            explanatoryText.AddParagraph(@"Use the arrow keys or Z/X/F/J to control the display.");
+            explanatoryText.AddParagraph(@"Tab key to change focus. Space to change display mode");
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -162,6 +218,8 @@ Do whatever you need to try and perceive the difference in latency, then choose 
             config.SetValue(FrameworkSetting.FrameSync, FrameSync.Unlimited);
             host.UpdateThread.ActiveHz = target_host_update_frames;
             host.AllowBenchmarkUnlimitedFrames = true;
+
+            musicController.Stop();
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -182,6 +240,11 @@ Do whatever you need to try and perceive the difference in latency, then choose 
         {
             switch (e.Key)
             {
+                case Key.Space:
+                    int availableModes = Enum.GetValues(typeof(LatencyVisualMode)).Length;
+                    VisualMode.Value = (LatencyVisualMode)(((int)VisualMode.Value + 1) % availableModes);
+                    return true;
+
                 case Key.Tab:
                     var firstArea = mainArea.FirstOrDefault(a => !a.IsActiveArea.Value);
                     if (firstArea != null)
@@ -195,6 +258,8 @@ Do whatever you need to try and perceive the difference in latency, then choose 
         private void showResults()
         {
             mainArea.Clear();
+            resultsArea.Clear();
+            settings.Hide();
 
             var displayMode = host.Window?.CurrentDisplayMode.Value;
 
@@ -301,7 +366,9 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                             isCertifying = true;
                             changeDifficulty(DifficultyLevel - 1);
                         },
-                        TooltipText = isPass ? $"Chain {rounds_to_complete_certified} rounds to confirm your perception!" : "You've reached your limits. Go to the previous level to complete certification!",
+                        TooltipText = isPass
+                            ? $"Chain {rounds_to_complete_certified} rounds to confirm your perception!"
+                            : "You've reached your limits. Go to the previous level to complete certification!",
                     });
                 }
             }
@@ -374,6 +441,8 @@ Do whatever you need to try and perceive the difference in latency, then choose 
 
         private void loadNextRound()
         {
+            settings.Show();
+
             attemptsAtCurrentDifficulty++;
             statusText.Text = $"Level {DifficultyLevel}\nRound {attemptsAtCurrentDifficulty} of {totalRoundForNextResultsScreen}";
 
@@ -386,12 +455,14 @@ Do whatever you need to try and perceive the difference in latency, then choose 
                 new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : (int?)null)
                 {
                     Width = 0.5f,
+                    VisualMode = { BindTarget = VisualMode },
                     IsActiveArea = { Value = true },
                     ReportUserBest = () => recordResult(betterSide == 0),
                 },
                 new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : (int?)null)
                 {
                     Width = 0.5f,
+                    VisualMode = { BindTarget = VisualMode },
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     ReportUserBest = () => recordResult(betterSide == 1)
