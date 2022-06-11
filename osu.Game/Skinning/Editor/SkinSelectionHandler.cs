@@ -180,7 +180,7 @@ namespace osu.Game.Skinning.Editor
         protected override void DeleteItems(IEnumerable<ISkinnableDrawable> items) =>
             skinEditor.DeleteItems(items.ToArray());
 
-        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
+        protected internal override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
             var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchors())
             {
