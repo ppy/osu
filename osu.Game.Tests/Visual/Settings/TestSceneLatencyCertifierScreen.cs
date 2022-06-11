@@ -25,6 +25,24 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
+        public void TestSimple()
+        {
+            AddStep("set visual mode to simple", () => latencyCertifier.VisualMode.Value = LatencyVisualMode.Simple);
+        }
+
+        [Test]
+        public void TestCircleGameplay()
+        {
+            AddStep("set visual mode to circles", () => latencyCertifier.VisualMode.Value = LatencyVisualMode.CircleGameplay);
+        }
+
+        [Test]
+        public void TestCycleVisualModes()
+        {
+            AddRepeatStep("cycle mode", () => InputManager.Key(Key.Space), 6);
+        }
+
+        [Test]
         public void TestCertification()
         {
             checkDifficulty(1);
@@ -38,7 +56,6 @@ namespace osu.Game.Tests.Visual.Settings
 
             clickUntilResults(true);
             AddAssert("check at results", () => !latencyCertifier.ChildrenOfType<LatencyArea>().Any());
-            AddAssert("check no buttons", () => !latencyCertifier.ChildrenOfType<OsuButton>().Any());
             checkDifficulty(1);
         }
 
