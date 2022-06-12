@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
 
             AddStep("descale blueprint container", () => this.ChildrenOfType<HitObjectComposer>().Single().Scale = new Vector2(0.5f));
-            AddStep("move mouse to bottom-right", () => InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.BottomRight + new Vector2(20)));
+            AddStep("move mouse to bottom-right", () => InputManager.MoveMouseTo(blueprintContainer.ToScreenSpace(blueprintContainer.LayoutRectangle.BottomRight + new Vector2(10))));
 
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
 
