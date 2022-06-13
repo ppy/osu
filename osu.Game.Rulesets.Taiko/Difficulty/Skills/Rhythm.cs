@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                     if (!samePattern(start, mostRecentPatternsToCompare))
                         continue;
 
-                    int notesSince = hitObject.Position - rhythmHistory[start].Position;
+                    int notesSince = hitObject.Index - rhythmHistory[start].Index;
                     penalty *= repetitionPenalty(notesSince);
                     break;
                 }
