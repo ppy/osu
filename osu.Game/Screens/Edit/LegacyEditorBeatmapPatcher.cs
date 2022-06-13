@@ -7,9 +7,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using DiffPlex;
+using DiffPlex.Model;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Skinning;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
@@ -32,61 +34,99 @@ namespace osu.Game.Screens.Edit
         {
             // Diff the beatmaps
             var result = new Differ().CreateLineDiffs(readString(currentState), readString(newState), true, false);
+            IBeatmap newBeatmap = null;
+
+            editorBeatmap.BeginChange();
+            processHitObjects(result, () => newBeatmap ??= readBeatmap(newState));
+            processTimingPoints(result, () => newBeatmap ??= readBeatmap(newState));
+            editorBeatmap.EndChange();
+        }
+
+        private void processTimingPoints(DiffResult result, Func<IBeatmap> getNewBeatmap)
+        {
+            findChangedIndices(result, LegacyDecoder<Beatmap>.Section.TimingPoints, out var removedIndices, out var addedIndices);
+
+            if (removedIndices.Count == 0 && addedIndices.Count == 0)
+                return;
+
+            // Due to conversion from legacy to non-legacy control points, it becomes difficult to diff control points correctly.
+            // So instead _all_ control points are reloaded if _any_ control point is changed.
+
+            var newControlPoints = EditorBeatmap.ConvertControlPoints(getNewBeatmap().ControlPointInfo);
+
+            editorBeatmap.ControlPointInfo.Clear();
+            foreach (var point in newControlPoints.AllControlPoints)
+                editorBeatmap.ControlPointInfo.Add(point.Time, point);
+        }
+
+        private void processHitObjects(DiffResult result, Func<IBeatmap> getNewBeatmap)
+        {
+            findChangedIndices(result, LegacyDecoder<Beatmap>.Section.HitObjects, out var removedIndices, out var addedIndices);
+
+            foreach (int removed in removedIndices)
+                editorBeatmap.RemoveAt(removed);
+
+            if (addedIndices.Count > 0)
+            {
+                var newBeatmap = getNewBeatmap();
+
+                foreach (int i in addedIndices)
+                    editorBeatmap.Insert(i, newBeatmap.HitObjects[i]);
+            }
+        }
+
+        private void findChangedIndices(DiffResult result, LegacyDecoder<Beatmap>.Section section, out List<int> removedIndices, out List<int> addedIndices)
+        {
+            removedIndices = new List<int>();
+            addedIndices = new List<int>();
 
             // Find the index of [HitObject] sections. Lines changed prior to this index are ignored.
-            int oldHitObjectsIndex = Array.IndexOf(result.PiecesOld, "[HitObjects]");
-            int newHitObjectsIndex = Array.IndexOf(result.PiecesNew, "[HitObjects]");
+            int oldSectionStartIndex = Array.IndexOf(result.PiecesOld, $"[{section}]");
+            int oldSectionEndIndex = Array.FindIndex(result.PiecesOld, oldSectionStartIndex + 1, s => s.StartsWith(@"[", StringComparison.Ordinal));
 
-            Debug.Assert(oldHitObjectsIndex >= 0);
-            Debug.Assert(newHitObjectsIndex >= 0);
+            if (oldSectionEndIndex == -1)
+                oldSectionEndIndex = result.PiecesOld.Length;
 
-            var toRemove = new List<int>();
-            var toAdd = new List<int>();
+            int newSectionStartIndex = Array.IndexOf(result.PiecesNew, $"[{section}]");
+            int newSectionEndIndex = Array.FindIndex(result.PiecesNew, newSectionStartIndex + 1, s => s.StartsWith(@"[", StringComparison.Ordinal));
+
+            if (newSectionEndIndex == -1)
+                newSectionEndIndex = result.PiecesOld.Length;
+
+            Debug.Assert(oldSectionStartIndex >= 0);
+            Debug.Assert(newSectionStartIndex >= 0);
 
             foreach (var block in result.DiffBlocks)
             {
-                // Removed hitobjects
+                // Removed indices
                 for (int i = 0; i < block.DeleteCountA; i++)
                 {
-                    int hoIndex = block.DeleteStartA + i - oldHitObjectsIndex - 1;
+                    int objectIndex = block.DeleteStartA + i;
 
-                    if (hoIndex < 0)
+                    if (objectIndex <= oldSectionStartIndex || objectIndex >= oldSectionEndIndex)
                         continue;
 
-                    toRemove.Add(hoIndex);
+                    removedIndices.Add(objectIndex - oldSectionStartIndex - 1);
                 }
 
-                // Added hitobjects
+                // Added indices
                 for (int i = 0; i < block.InsertCountB; i++)
                 {
-                    int hoIndex = block.InsertStartB + i - newHitObjectsIndex - 1;
+                    int objectIndex = block.InsertStartB + i;
 
-                    if (hoIndex < 0)
+                    if (objectIndex <= newSectionStartIndex || objectIndex >= newSectionEndIndex)
                         continue;
 
-                    toAdd.Add(hoIndex);
+                    addedIndices.Add(objectIndex - newSectionStartIndex - 1);
                 }
             }
 
             // Sort the indices to ensure that removal + insertion indices don't get jumbled up post-removal or post-insertion.
             // This isn't strictly required, but the differ makes no guarantees about order.
-            toRemove.Sort();
-            toAdd.Sort();
+            removedIndices.Sort();
+            addedIndices.Sort();
 
-            editorBeatmap.BeginChange();
-
-            // Apply the changes.
-            for (int i = toRemove.Count - 1; i >= 0; i--)
-                editorBeatmap.RemoveAt(toRemove[i]);
-
-            if (toAdd.Count > 0)
-            {
-                IBeatmap newBeatmap = readBeatmap(newState);
-                foreach (int i in toAdd)
-                    editorBeatmap.Insert(i, newBeatmap.HitObjects[i]);
-            }
-
-            editorBeatmap.EndChange();
+            removedIndices.Reverse();
         }
 
         private string readString(byte[] state) => Encoding.UTF8.GetString(state);
