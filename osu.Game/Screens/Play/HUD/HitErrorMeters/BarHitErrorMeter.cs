@@ -400,9 +400,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             const int arrow_move_duration = 800;
 
-            const int judgement_fade_in_duration = 100;
-            const int judgement_fade_out_duration = 5000;
-
             if (!judgement.IsHit || judgement.HitObject.HitWindows?.WindowFor(HitResult.Miss) == 0)
                 return;
 
@@ -423,26 +420,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 }
             }
 
-            var judgementLine = new JudgementLine
+            judgementsContainer.Add(new JudgementLine
             {
                 JudgementLineThickness = { BindTarget = JudgementLineThickness },
                 Y = getRelativeJudgementPosition(judgement.TimeOffset),
                 Colour = GetColourForHitResult(judgement.Type),
-                Alpha = 0,
-                Width = 0,
-            };
-
-            judgementsContainer.Add(judgementLine);
-
-            // Importantly, transforms should be applied in this method rather than constructed drawables
-            // to ensure that they are applied even when the `HitErrorMeter` is hidden (see `AlwaysPresent` usage).
-            judgementLine
-                .FadeTo(0.6f, judgement_fade_in_duration, Easing.OutQuint)
-                .ResizeWidthTo(1, judgement_fade_in_duration, Easing.OutQuint)
-                .Then()
-                .FadeOut(judgement_fade_out_duration)
-                .ResizeWidthTo(0, judgement_fade_out_duration, Easing.InQuint)
-                .Expire();
+            });
 
             arrow.MoveToY(
                 getRelativeJudgementPosition(floatingAverage = floatingAverage * 0.9 + judgement.TimeOffset * 0.1)
@@ -473,9 +456,23 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             protected override void LoadComplete()
             {
+                const int judgement_fade_in_duration = 100;
+                const int judgement_fade_out_duration = 5000;
+
                 base.LoadComplete();
 
+                Alpha = 0;
+                Width = 0;
+
                 JudgementLineThickness.BindValueChanged(thickness => Height = thickness.NewValue, true);
+
+                this
+                    .FadeTo(0.6f, judgement_fade_in_duration, Easing.OutQuint)
+                    .ResizeWidthTo(1, judgement_fade_in_duration, Easing.OutQuint)
+                    .Then()
+                    .FadeOut(judgement_fade_out_duration)
+                    .ResizeWidthTo(0, judgement_fade_out_duration, Easing.InQuint)
+                    .Expire();
             }
         }
 
