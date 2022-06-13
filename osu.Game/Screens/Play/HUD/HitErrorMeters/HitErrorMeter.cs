@@ -31,13 +31,14 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private void load(DrawableRuleset drawableRuleset)
         {
             HitWindows = drawableRuleset?.FirstAvailableHitWindows ?? HitWindows.Empty;
+
+            // This is to allow the visual state to be correct after HUD comes visible after being hidden.
+            AlwaysPresent = true;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            AlwaysPresent = true;
 
             if (gameplayClockContainer != null)
                 gameplayClockContainer.OnSeek += Clear;
