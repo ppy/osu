@@ -130,6 +130,8 @@ namespace osu.Game.Screens.Edit
             removedIndices.Sort();
             addedIndices.Sort();
 
+            // The expected usage of this returned list is to iterate from the start to the end of the list, such that
+            // these indices need to appear in reverse order for the usage to not have to deal with decrementing indices.
             removedIndices.Reverse();
         }
 
