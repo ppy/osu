@@ -82,14 +82,18 @@ namespace osu.Game.Screens.Edit
 
             // Find the index of [HitObject] sections. Lines changed prior to this index are ignored.
             int oldSectionStartIndex = Array.IndexOf(result.PiecesOld, $"[{section}]");
-            int oldSectionEndIndex = Array.FindIndex(result.PiecesOld, oldSectionStartIndex + 1, s => s.StartsWith('['));
+            if (oldSectionStartIndex == -1)
+                return;
 
+            int oldSectionEndIndex = Array.FindIndex(result.PiecesOld, oldSectionStartIndex + 1, s => s.StartsWith('['));
             if (oldSectionEndIndex == -1)
                 oldSectionEndIndex = result.PiecesOld.Length;
 
             int newSectionStartIndex = Array.IndexOf(result.PiecesNew, $"[{section}]");
-            int newSectionEndIndex = Array.FindIndex(result.PiecesNew, newSectionStartIndex + 1, s => s.StartsWith('['));
+            if (newSectionStartIndex == -1)
+                return;
 
+            int newSectionEndIndex = Array.FindIndex(result.PiecesNew, newSectionStartIndex + 1, s => s.StartsWith('['));
             if (newSectionEndIndex == -1)
                 newSectionEndIndex = result.PiecesNew.Length;
 
