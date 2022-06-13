@@ -117,9 +117,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
                 {
                     if (highPrecision.NewValue)
-                        highPrecisionMouse.WarningText = MouseSettingsStrings.HighPrecisionPlatformWarning;
+                        highPrecisionMouse.SetNoticeText(MouseSettingsStrings.HighPrecisionPlatformWarning, true);
                     else
-                        highPrecisionMouse.WarningText = null;
+                        highPrecisionMouse.ClearNoticeText();
                 }
             }, true);
         }

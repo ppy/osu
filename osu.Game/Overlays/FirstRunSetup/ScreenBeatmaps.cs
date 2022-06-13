@@ -154,12 +154,15 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             var downloadTracker = tutorialDownloader.DownloadTrackers.First();
 
+            downloadTracker.State.BindValueChanged(state =>
+            {
+                if (state.NewValue == DownloadState.LocallyAvailable)
+                    downloadTutorialButton.Complete();
+            }, true);
+
             downloadTracker.Progress.BindValueChanged(progress =>
             {
                 downloadTutorialButton.SetProgress(progress.NewValue, false);
-
-                if (progress.NewValue == 1)
-                    downloadTutorialButton.Complete();
             }, true);
         }
 

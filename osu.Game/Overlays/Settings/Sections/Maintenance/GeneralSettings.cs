@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private SettingsButton deleteSkinsButton;
         private SettingsButton restoreButton;
         private SettingsButton undeleteButton;
+        private SettingsButton deleteBeatmapVideosButton;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] LegacyImportManager legacyImportManager, IDialogOverlay dialogOverlay)
@@ -54,6 +55,19 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         deleteBeatmapsButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Delete()).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
+                    }));
+                }
+            });
+
+            Add(deleteBeatmapVideosButton = new DangerousSettingsButton
+            {
+                Text = MaintenanceSettingsStrings.DeleteAllBeatmapVideos,
+                Action = () =>
+                {
+                    dialogOverlay?.Push(new MassVideoDeleteConfirmationDialog(() =>
+                    {
+                        deleteBeatmapVideosButton.Enabled.Value = false;
+                        Task.Run(beatmaps.DeleteAllVideos).ContinueWith(t => Schedule(() => deleteBeatmapVideosButton.Enabled.Value = true));
                     }));
                 }
             });

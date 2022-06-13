@@ -128,7 +128,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             foreach (var room in roomFlow)
             {
-                roomFlow.SetLayoutPosition(room, room.Room.Category.Value == RoomCategory.Spotlight
+                roomFlow.SetLayoutPosition(room, room.Room.Category.Value > RoomCategory.Normal
                     // Always show spotlight playlists at the top of the listing.
                     ? float.MinValue
                     : -(room.Room.RoomID.Value ?? 0));

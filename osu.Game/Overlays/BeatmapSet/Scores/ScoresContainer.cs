@@ -242,8 +242,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 modSelector.DeselectAll();
             else
                 getScores();
-
-            modSelector.FadeTo(userIsSupporter ? 1 : 0);
         }
 
         private void getScores()
@@ -253,14 +251,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             noScoresPlaceholder.Hide();
 
-            if (Beatmap.Value == null || Beatmap.Value.OnlineID <= 0 || (Beatmap.Value.BeatmapSet as IBeatmapSetOnlineInfo)?.Status <= BeatmapOnlineStatus.Pending)
+            if (Beatmap.Value == null || Beatmap.Value.OnlineID <= 0 || (Beatmap.Value.Status <= BeatmapOnlineStatus.Pending))
             {
                 Scores = null;
                 Hide();
                 return;
             }
 
-            if (scope.Value != BeatmapLeaderboardScope.Global && !userIsSupporter)
+            if ((scope.Value != BeatmapLeaderboardScope.Global || modSelector.SelectedMods.Count > 0) && !userIsSupporter)
             {
                 Scores = null;
                 notSupporterPlaceholder.Show();
