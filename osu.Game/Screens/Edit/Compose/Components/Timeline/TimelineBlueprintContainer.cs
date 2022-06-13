@@ -33,9 +33,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<HitObject> placement;
         private SelectionBlueprint<HitObject> placementBlueprint;
 
-        // We want children within the timeline to be interactable
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => timeline.ScreenSpaceDrawQuad.Contains(screenSpacePos);
-
         public TimelineBlueprintContainer(HitObjectComposer composer)
             : base(composer)
         {
