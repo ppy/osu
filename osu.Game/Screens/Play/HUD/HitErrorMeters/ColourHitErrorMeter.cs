@@ -51,47 +51,37 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Direction = FillDirection.Vertical;
                 LayoutDuration = animation_duration;
                 LayoutEasing = Easing.OutQuint;
+                AlwaysPresent = true;
             }
 
             public void Push(Color4 colour)
             {
-                Add(new HitErrorCircle(colour, drawable_judgement_size));
+                var hitErrorCircle = new HitErrorCircle(colour);
+
+                Add(hitErrorCircle);
+
+                hitErrorCircle.FadeInFromZero(animation_duration, Easing.OutQuint);
+                hitErrorCircle.MoveToY(-drawable_judgement_size);
+                hitErrorCircle.MoveToY(0, animation_duration, Easing.OutQuint);
 
                 if (Children.Count > MAX_DISPLAYED_JUDGEMENTS)
                     Children.FirstOrDefault(c => !c.IsRemoved)?.Remove();
             }
         }
 
-        internal class HitErrorCircle : Container
+        internal class HitErrorCircle : Circle
         {
             public bool IsRemoved { get; private set; }
 
-            private readonly Circle circle;
-
-            public HitErrorCircle(Color4 colour, int size)
+            public HitErrorCircle(Color4 colour)
             {
-                Size = new Vector2(size);
-                Child = circle = new Circle
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    Colour = colour
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                circle.FadeInFromZero(animation_duration, Easing.OutQuint);
-                circle.MoveToY(-DrawSize.Y);
-                circle.MoveToY(0, animation_duration, Easing.OutQuint);
+                Colour = colour;
+                Size = new Vector2(drawable_judgement_size);
             }
 
             public void Remove()
             {
                 IsRemoved = true;
-
                 this.FadeOut(animation_duration, Easing.OutQuint).Expire();
             }
         }

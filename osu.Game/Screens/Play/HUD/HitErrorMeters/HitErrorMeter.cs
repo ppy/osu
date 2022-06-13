@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             base.LoadComplete();
 
+            AlwaysPresent = true;
+
             if (gameplayClockContainer != null)
                 gameplayClockContainer.OnSeek += Clear;
 
