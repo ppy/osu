@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit
             int newSectionEndIndex = Array.FindIndex(result.PiecesNew, newSectionStartIndex + 1, s => s.StartsWith('['));
 
             if (newSectionEndIndex == -1)
-                newSectionEndIndex = result.PiecesOld.Length;
+                newSectionEndIndex = result.PiecesNew.Length;
 
             Debug.Assert(oldSectionStartIndex >= 0);
             Debug.Assert(newSectionStartIndex >= 0);
