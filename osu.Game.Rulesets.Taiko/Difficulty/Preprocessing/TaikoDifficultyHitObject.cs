@@ -17,9 +17,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     public class TaikoDifficultyHitObject : DifficultyHitObject
     {
         private readonly IReadOnlyList<TaikoDifficultyHitObject> monoDifficultyHitObjects;
-        public readonly int MonoPosition;
+        public readonly int MonoIndex;
         private readonly IReadOnlyList<TaikoDifficultyHitObject> noteObjects;
-        public readonly int NotePosition;
+        public readonly int NoteIndex;
 
         /// <summary>
         /// The rhythm required to hit this hit object.
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="centreHitObjects">The list of centre (don) <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="rimHitObjects">The list of rim (kat) <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="noteObjects">The list of <see cref="DifficultyHitObject"/>s that is a hit (i.e. not a slider or spinner) in the current beatmap.</param>
-        /// <param name="position">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
+        /// <param name="index">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
         ///
         /// TODO: This argument list is getting long, we might want to refactor this into a static method that create
         ///       all <see cref="DifficultyHitObject"/>s from a <see cref="IBeatmap"/>.
@@ -86,8 +86,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             List<DifficultyHitObject> objects,
             List<TaikoDifficultyHitObject> centreHitObjects,
             List<TaikoDifficultyHitObject> rimHitObjects,
-            List<TaikoDifficultyHitObject> noteObjects, int position)
-            : base(hitObject, lastObject, clockRate, objects, position)
+            List<TaikoDifficultyHitObject> noteObjects, int index)
+            : base(hitObject, lastObject, clockRate, objects, index)
         {
             var currentHit = hitObject as Hit;
             this.noteObjects = noteObjects;
@@ -97,13 +97,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             if (HitType == Objects.HitType.Centre)
             {
-                MonoPosition = centreHitObjects.Count;
+                MonoIndex = centreHitObjects.Count;
                 centreHitObjects.Add(this);
                 monoDifficultyHitObjects = centreHitObjects;
             }
             else if (HitType == Objects.HitType.Rim)
             {
-                MonoPosition = rimHitObjects.Count;
+                MonoIndex = rimHitObjects.Count;
                 rimHitObjects.Add(this);
                 monoDifficultyHitObjects = rimHitObjects;
             }
@@ -111,10 +111,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             // Need to be done after HitType is set.
             if (HitType == null) return;
 
-            NotePosition = noteObjects.Count;
+            NoteIndex = noteObjects.Count;
             noteObjects.Add(this);
 
-            // Need to be done after NotePosition is set.
+            // Need to be done after NoteIndex is set.
             Colour = TaikoDifficultyHitObjectColour.GetInstanceFor(this);
         }
 
@@ -155,12 +155,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             return common_rhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();
         }
 
-        public TaikoDifficultyHitObject PreviousMono(int backwardsIndex) => monoDifficultyHitObjects.ElementAtOrDefault(MonoPosition - (backwardsIndex + 1));
+        public TaikoDifficultyHitObject PreviousMono(int backwardsIndex) => monoDifficultyHitObjects.ElementAtOrDefault(MonoIndex - (backwardsIndex + 1));
 
-        public TaikoDifficultyHitObject NextMono(int forwardsIndex) => monoDifficultyHitObjects.ElementAtOrDefault(MonoPosition + (forwardsIndex + 1));
+        public TaikoDifficultyHitObject NextMono(int forwardsIndex) => monoDifficultyHitObjects.ElementAtOrDefault(MonoIndex + (forwardsIndex + 1));
 
-        public TaikoDifficultyHitObject PreviousNote(int backwardsIndex) => noteObjects.ElementAtOrDefault(NotePosition - (backwardsIndex + 1));
+        public TaikoDifficultyHitObject PreviousNote(int backwardsIndex) => noteObjects.ElementAtOrDefault(NoteIndex - (backwardsIndex + 1));
 
-        public TaikoDifficultyHitObject NextNote(int forwardsIndex) => noteObjects.ElementAtOrDefault(NotePosition + (forwardsIndex + 1));
+        public TaikoDifficultyHitObject NextNote(int forwardsIndex) => noteObjects.ElementAtOrDefault(NoteIndex + (forwardsIndex + 1));
     }
 }
