@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             OsuDifficultyHitObject lastObj = osuCurrent;
 
             // This is iterating backwards in time from the current object.
-            for (int i = 0; i < Math.Min(current.Position, 10); i++)
+            for (int i = 0; i < Math.Min(current.Index, 10); i++)
             {
                 var currentObj = (OsuDifficultyHitObject)current.Previous(i);
                 var currentHitObject = (OsuHitObject)(currentObj.BaseObject);

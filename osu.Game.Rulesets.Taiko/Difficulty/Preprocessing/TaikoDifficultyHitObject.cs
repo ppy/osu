@@ -39,9 +39,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="lastLastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="lastObject"/>.</param>
         /// <param name="clockRate">The rate of the gameplay clock. Modified by speed-changing mods.</param>
         /// <param name="objects">The list of <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
-        /// /// <param name="position">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
-        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, List<DifficultyHitObject> objects, int position)
-            : base(hitObject, lastObject, clockRate, objects, position)
+        /// /// <param name="index">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
+        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+            : base(hitObject, lastObject, clockRate, objects, index)
         {
             var currentHit = hitObject as Hit;
 
