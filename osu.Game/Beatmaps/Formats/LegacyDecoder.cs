@@ -143,7 +143,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected string CleanFilename(string path) => path.Trim('"').ToStandardisedPath();
 
-        protected enum Section
+        public enum Section
         {
             General,
             Editor,
