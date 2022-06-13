@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="selection">The current selection.</param>
         /// <returns>The relevant menu items.</returns>
-        protected internal override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
+        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
         {
             if (SelectedBlueprints.All(b => b.Item is IHasComboInformation))
             {
