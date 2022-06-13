@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using DiffPlex;
@@ -63,8 +62,8 @@ namespace osu.Game.Screens.Edit
         {
             findChangedIndices(result, LegacyDecoder<Beatmap>.Section.HitObjects, out var removedIndices, out var addedIndices);
 
-            foreach (int removed in removedIndices)
-                editorBeatmap.RemoveAt(removed);
+            for (int i = removedIndices.Count - 1; i >= 0; i--)
+                editorBeatmap.RemoveAt(removedIndices[i]);
 
             if (addedIndices.Count > 0)
             {
@@ -80,7 +79,7 @@ namespace osu.Game.Screens.Edit
             removedIndices = new List<int>();
             addedIndices = new List<int>();
 
-            // Find the index of [HitObject] sections. Lines changed prior to this index are ignored.
+            // Find the start and end indices of the relevant section headers in both the old and the new beatmap file. Lines changed outside of the modified ranges are ignored.
             int oldSectionStartIndex = Array.IndexOf(result.PiecesOld, $"[{section}]");
             if (oldSectionStartIndex == -1)
                 return;
@@ -96,9 +95,6 @@ namespace osu.Game.Screens.Edit
             int newSectionEndIndex = Array.FindIndex(result.PiecesNew, newSectionStartIndex + 1, s => s.StartsWith('['));
             if (newSectionEndIndex == -1)
                 newSectionEndIndex = result.PiecesNew.Length;
-
-            Debug.Assert(oldSectionStartIndex >= 0);
-            Debug.Assert(newSectionStartIndex >= 0);
 
             foreach (var block in result.DiffBlocks)
             {
@@ -129,10 +125,6 @@ namespace osu.Game.Screens.Edit
             // This isn't strictly required, but the differ makes no guarantees about order.
             removedIndices.Sort();
             addedIndices.Sort();
-
-            // The expected usage of this returned list is to iterate from the start to the end of the list, such that
-            // these indices need to appear in reverse order for the usage to not have to deal with decrementing indices.
-            removedIndices.Reverse();
         }
 
         private string readString(byte[] state) => Encoding.UTF8.GetString(state);
