@@ -54,16 +54,16 @@ namespace osu.Game.Graphics
             switch (typeface)
             {
                 case Typeface.Venera:
-                    return "Venera";
+                    return @"Venera";
 
                 case Typeface.Torus:
-                    return "Torus";
+                    return @"Torus";
 
                 case Typeface.TorusAlternate:
-                    return "Torus-Alternate";
+                    return @"Torus-Alternate";
 
                 case Typeface.Inter:
-                    return "Inter";
+                    return @"Inter";
             }
 
             return null;
