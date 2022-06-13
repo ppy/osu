@@ -14,7 +14,6 @@ using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.News
@@ -29,7 +28,6 @@ namespace osu.Game.Overlays.News
         private TextFlowContainer main;
 
         public NewsCard(APINewsPost post)
-            : base(HoverSampleSet.Submit)
         {
             this.post = post;
 
