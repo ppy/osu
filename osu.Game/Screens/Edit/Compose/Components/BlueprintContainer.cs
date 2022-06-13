@@ -11,14 +11,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 using osuTK.Input;
@@ -29,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// A container which provides a "blueprint" display of items.
     /// Includes selection and manipulation support via a <see cref="Components.SelectionHandler{T}"/>.
     /// </summary>
-    public abstract class BlueprintContainer<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
+    public abstract class BlueprintContainer<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
         where T : class
     {
         protected DragBox DragBox { get; private set; }
@@ -534,31 +531,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             movementBlueprints = null;
 
             return true;
-        }
-
-        #endregion
-
-        #region Context Menu
-
-        public MenuItem[] ContextMenuItems
-        {
-            get
-            {
-                var selectedBlueprints = SelectionHandler.SelectedBlueprints;
-                if (!selectedBlueprints.Any(b => b.IsHovered))
-                    return Array.Empty<MenuItem>();
-
-                var items = new List<MenuItem>();
-
-                items.AddRange(SelectionHandler.GetContextMenuItemsForSelection(selectedBlueprints));
-
-                if (selectedBlueprints.Count == 1)
-                    items.AddRange(selectedBlueprints[0].ContextMenuItems);
-
-                items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, SelectionHandler.DeleteSelected));
-
-                return items.ToArray();
-            }
         }
 
         #endregion
