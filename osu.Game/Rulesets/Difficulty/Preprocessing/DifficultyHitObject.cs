@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         private readonly IReadOnlyList<DifficultyHitObject> difficultyHitObjects;
 
         /// <summary>
-        /// The position of this <see cref="DifficultyHitObject"/> in the <see cref="difficultyHitObjects"/> list.
+        /// The index of this <see cref="DifficultyHitObject"/> in the list of all <see cref="DifficultyHitObject"/>s.
         /// </summary>
-        public int Position;
+        public int Index;
 
         /// <summary>
         /// The <see cref="HitObject"/> this <see cref="DifficultyHitObject"/> wraps.
@@ -51,11 +51,11 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// <param name="lastObject">The last <see cref="HitObject"/> which occurs before <paramref name="hitObject"/> in the beatmap.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         /// <param name="objects">The list of <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
-        /// <param name="position">The position of this <see cref="DifficultyHitObject"/> in the <see cref="difficultyHitObjects"/> list.</param>
-        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int position)
+        /// <param name="index">The index of this <see cref="DifficultyHitObject"/> in <paramref name="objects"/> list.</param>
+        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
         {
             difficultyHitObjects = objects;
-            Position = position;
+            Index = index;
             BaseObject = hitObject;
             LastObject = lastObject;
             DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;
@@ -63,8 +63,8 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             EndTime = hitObject.GetEndTime() / clockRate;
         }
 
-        public DifficultyHitObject Previous(int backwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Position - (backwardsIndex + 1));
+        public DifficultyHitObject Previous(int backwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Index - (backwardsIndex + 1));
 
-        public DifficultyHitObject Next(int forwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Position + (forwardsIndex + 1));
+        public DifficultyHitObject Next(int forwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Index + (forwardsIndex + 1));
     }
 }

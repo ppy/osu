@@ -521,8 +521,7 @@ namespace osu.Game.Stores
             // for the best or worst, we copy and import files of a new import before checking whether
             // it is a duplicate. so to check if anything has changed, we can just compare all File IDs.
             getIDs(existing.Files).SequenceEqual(getIDs(import.Files)) &&
-            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files)) &&
-            checkAllFilesExist(existing);
+            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files));
 
         private bool checkAllFilesExist(TModel model) =>
             model.Files.All(f => Files.Storage.Exists(f.File.GetStoragePath()));

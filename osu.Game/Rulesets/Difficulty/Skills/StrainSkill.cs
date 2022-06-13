@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         public sealed override void Process(DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
-            if (current.Position == 0)
+            if (current.Index == 0)
                 currentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
 
             while (current.StartTime > currentSectionEnd)

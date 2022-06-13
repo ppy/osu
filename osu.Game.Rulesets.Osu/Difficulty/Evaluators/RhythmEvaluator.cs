@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             bool firstDeltaSwitch = false;
 
-            int historicalNoteCount = Math.Min(current.Position, 32);
+            int historicalNoteCount = Math.Min(current.Index, 32);
 
             int rhythmStart = 0;
 
