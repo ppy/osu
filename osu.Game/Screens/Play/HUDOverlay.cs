@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Play
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
+                    AlwaysPresent = true,
                     Margin = new MarginPadding(10),
                     Spacing = new Vector2(10),
                     AutoSizeAxes = Axes.Both,
@@ -111,7 +112,6 @@ namespace osu.Game.Screens.Play
                     Margin = new MarginPadding(10),
                     Spacing = new Vector2(10),
                     AutoSizeAxes = Axes.Both,
-                    AlwaysPresent = true,
                     LayoutDuration = FADE_DURATION / 2,
                     LayoutEasing = FADE_EASING,
                     Direction = FillDirection.Vertical,
