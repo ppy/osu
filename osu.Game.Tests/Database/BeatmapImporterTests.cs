@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +14,6 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -27,8 +28,6 @@ using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Writers.Zip;
-
-#nullable enable
 
 namespace osu.Game.Tests.Database
 {
@@ -622,7 +621,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapModelManager(realm, storage);
                 using var store = new RealmRulesetStore(realm, storage);
 
-                var imported = await LoadOszIntoStore(importer, realm.Realm);
+                var imported = await LoadOszIntoStore(importer, realm.Realm, batchImport: true);
 
                 deleteBeatmapSet(imported, realm.Realm);
 
@@ -678,7 +677,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealmAsync(async (realm, storage) =>
             {
-                using var importer = new NonOptimisedBeatmapImporter(realm, storage);
+                using var importer = new BeatmapModelManager(realm, storage);
                 using var store = new RealmRulesetStore(realm, storage);
 
                 var imported = await LoadOszIntoStore(importer, realm.Realm);
@@ -960,11 +959,11 @@ namespace osu.Game.Tests.Database
             return realm.All<BeatmapSetInfo>().FirstOrDefault(beatmapSet => beatmapSet.ID == importedSet!.ID);
         }
 
-        public static async Task<BeatmapSetInfo> LoadOszIntoStore(BeatmapImporter importer, Realm realm, string? path = null, bool virtualTrack = false)
+        public static async Task<BeatmapSetInfo> LoadOszIntoStore(BeatmapImporter importer, Realm realm, string? path = null, bool virtualTrack = false, bool batchImport = false)
         {
             string? temp = path ?? TestResources.GetTestBeatmapForImport(virtualTrack);
 
-            var importedSet = await importer.Import(new ImportTask(temp));
+            var importedSet = await importer.Import(new ImportTask(temp), batchImport);
 
             Assert.NotNull(importedSet);
             Debug.Assert(importedSet != null);
@@ -1080,16 +1079,6 @@ namespace osu.Game.Tests.Database
             }
 
             Assert.Fail(failureMessage);
-        }
-
-        public class NonOptimisedBeatmapImporter : BeatmapImporter
-        {
-            public NonOptimisedBeatmapImporter(RealmAccess realm, Storage storage)
-                : base(realm, storage)
-            {
-            }
-
-            protected override bool HasCustomHashFunction => true;
         }
     }
 }

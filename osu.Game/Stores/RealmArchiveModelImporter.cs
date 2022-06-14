@@ -257,7 +257,7 @@ namespace osu.Game.Stores
             bool checkedExisting = false;
             TModel? existing = null;
 
-            if (quickSkipIfExisting && archive != null && !HasCustomHashFunction)
+            if (quickSkipIfExisting && archive != null)
             {
                 // this is a fast bail condition to improve large import performance.
                 item.Hash = computeHashFast(archive);
@@ -374,18 +374,12 @@ namespace osu.Game.Stores
         }
 
         /// <summary>
-        /// Whether the implementation overrides <see cref="ComputeHash"/> with a custom implementation.
-        /// Custom hash implementations must bypass the early exit in the import flow (see <see cref="computeHashFast"/> usage).
-        /// </summary>
-        protected virtual bool HasCustomHashFunction => false;
-
-        /// <summary>
         /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
         /// </summary>
         /// <remarks>
         ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
         /// </remarks>
-        protected virtual string ComputeHash(TModel item)
+        protected string ComputeHash(TModel item)
         {
             // for now, concatenate all hashable files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
