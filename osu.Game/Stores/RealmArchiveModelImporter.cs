@@ -250,7 +250,7 @@ namespace osu.Game.Stores
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, lowPriority, cancellationToken),
+            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler,
                 lowPriority ? import_scheduler_low_priority : import_scheduler);
@@ -318,9 +318,8 @@ namespace osu.Game.Stores
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, CancellationToken cancellationToken = default)
         {
             return Realm.Run(realm =>
             {
