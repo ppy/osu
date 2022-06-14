@@ -41,8 +41,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double currDeltaTime = Math.Max(1, osuCurrObj.DeltaTime);
                 double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
-                double speedRatio = Math.Min(1, currDeltaTime / nextDeltaTime);
-                double windowRatio = Math.Min(1, currDeltaTime / greatWindowFull);
+                double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
+                double speedRatio = Math.Min(1, currDeltaTime / deltaDifference);
+                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / greatWindowFull), 2);
                 doubletapness = Math.Pow(speedRatio, 1 - windowRatio);
             }
 
