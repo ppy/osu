@@ -78,14 +78,7 @@ namespace osu.Game.Stores
             Files = new RealmFileStore(realm, storage);
         }
 
-        public Task Import(params string[] paths)
-        {
-            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
-
-            PostNotification?.Invoke(notification);
-
-            return Import(notification, paths.Select(p => new ImportTask(p)).ToArray());
-        }
+        public Task Import(params string[] paths) => Import(paths.Select(p => new ImportTask(p)).ToArray());
 
         public Task Import(params ImportTask[] tasks)
         {
