@@ -78,22 +78,7 @@ namespace osu.Game.Stores
             Files = new RealmFileStore(realm, storage);
         }
 
-        /// <summary>
-        /// Import one or more <typeparamref name="TModel"/> items from filesystem <paramref name="paths"/>.
-        /// </summary>
-        /// <remarks>
-        /// This will be treated as a low priority import if more than one path is specified; use <see cref="Import(ImportTask[])"/> to always import at standard priority.
-        /// This will post notifications tracking progress.
-        /// </remarks>
-        /// <param name="paths">One or more archive locations on disk.</param>
-        public Task Import(params string[] paths)
-        {
-            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
-
-            PostNotification?.Invoke(notification);
-
-            return Import(notification, paths.Select(p => new ImportTask(p)).ToArray());
-        }
+        public Task Import(params string[] paths) => Import(paths.Select(p => new ImportTask(p)).ToArray());
 
         public Task Import(params ImportTask[] tasks)
         {
@@ -250,7 +235,7 @@ namespace osu.Game.Stores
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, lowPriority, cancellationToken),
+            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler,
                 lowPriority ? import_scheduler_low_priority : import_scheduler);
@@ -259,68 +244,12 @@ namespace osu.Game.Stores
         }
 
         /// <summary>
-        /// Any file extensions which should be included in hash creation.
-        /// Generally should include all file types which determine the file's uniqueness.
-        /// Large files should be avoided if possible.
-        /// </summary>
-        /// <remarks>
-        /// This is only used by the default hash implementation. If <see cref="ComputeHash"/> is overridden, it will not be used.
-        /// </remarks>
-        protected abstract string[] HashableFileTypes { get; }
-
-        internal static void LogForModel(TModel? model, string message, Exception? e = null)
-        {
-            string trimmedHash;
-            if (model == null || !model.IsValid || string.IsNullOrEmpty(model.Hash))
-                trimmedHash = "?????";
-            else
-                trimmedHash = model.Hash.Substring(0, 5);
-
-            string prefix = $"[{trimmedHash}]";
-
-            if (e != null)
-                Logger.Error(e, $"{prefix} {message}", LoggingTarget.Database);
-            else
-                Logger.Log($"{prefix} {message}", LoggingTarget.Database);
-        }
-
-        /// <summary>
-        /// Whether the implementation overrides <see cref="ComputeHash"/> with a custom implementation.
-        /// Custom hash implementations must bypass the early exit in the import flow (see <see cref="computeHashFast"/> usage).
-        /// </summary>
-        protected virtual bool HasCustomHashFunction => false;
-
-        /// <summary>
-        /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
-        /// </summary>
-        /// <remarks>
-        ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
-        /// </remarks>
-        protected virtual string ComputeHash(TModel item)
-        {
-            // for now, concatenate all hashable files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
-
-            foreach (RealmNamedFileUsage file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
-            {
-                using (Stream s = Files.Store.GetStream(file.File.GetStoragePath()))
-                    s.CopyTo(hashable);
-            }
-
-            if (hashable.Length > 0)
-                return hashable.ComputeSHA2Hash();
-
-            return item.Hash;
-        }
-
-        /// <summary>
         /// Silently import an item from a <typeparamref name="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, CancellationToken cancellationToken = default)
         {
             return Realm.Run(realm =>
             {
@@ -418,6 +347,61 @@ namespace osu.Game.Stores
 
                 return (Live<TModel>?)item.ToLive(Realm);
             });
+        }
+
+        /// <summary>
+        /// Any file extensions which should be included in hash creation.
+        /// Generally should include all file types which determine the file's uniqueness.
+        /// Large files should be avoided if possible.
+        /// </summary>
+        /// <remarks>
+        /// This is only used by the default hash implementation. If <see cref="ComputeHash"/> is overridden, it will not be used.
+        /// </remarks>
+        protected abstract string[] HashableFileTypes { get; }
+
+        internal static void LogForModel(TModel? model, string message, Exception? e = null)
+        {
+            string trimmedHash;
+            if (model == null || !model.IsValid || string.IsNullOrEmpty(model.Hash))
+                trimmedHash = "?????";
+            else
+                trimmedHash = model.Hash.Substring(0, 5);
+
+            string prefix = $"[{trimmedHash}]";
+
+            if (e != null)
+                Logger.Error(e, $"{prefix} {message}", LoggingTarget.Database);
+            else
+                Logger.Log($"{prefix} {message}", LoggingTarget.Database);
+        }
+
+        /// <summary>
+        /// Whether the implementation overrides <see cref="ComputeHash"/> with a custom implementation.
+        /// Custom hash implementations must bypass the early exit in the import flow (see <see cref="computeHashFast"/> usage).
+        /// </summary>
+        protected virtual bool HasCustomHashFunction => false;
+
+        /// <summary>
+        /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
+        /// </summary>
+        /// <remarks>
+        ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
+        /// </remarks>
+        protected virtual string ComputeHash(TModel item)
+        {
+            // for now, concatenate all hashable files in the set to create a unique hash.
+            MemoryStream hashable = new MemoryStream();
+
+            foreach (RealmNamedFileUsage file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
+            {
+                using (Stream s = Files.Store.GetStream(file.File.GetStoragePath()))
+                    s.CopyTo(hashable);
+            }
+
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
+
+            return item.Hash;
         }
 
         private string computeHashFast(ArchiveReader reader)
@@ -521,8 +505,7 @@ namespace osu.Game.Stores
             // for the best or worst, we copy and import files of a new import before checking whether
             // it is a duplicate. so to check if anything has changed, we can just compare all File IDs.
             getIDs(existing.Files).SequenceEqual(getIDs(import.Files)) &&
-            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files)) &&
-            checkAllFilesExist(existing);
+            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files));
 
         private bool checkAllFilesExist(TModel model) =>
             model.Files.All(f => Files.Storage.Exists(f.File.GetStoragePath()));

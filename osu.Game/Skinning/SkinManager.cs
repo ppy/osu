@@ -268,37 +268,21 @@ namespace osu.Game.Skinning
             set => skinModelManager.PostImport = value;
         }
 
-        public Task Import(params string[] paths)
-        {
-            return skinModelManager.Import(paths);
-        }
+        public Task Import(params string[] paths) => skinModelManager.Import(paths);
 
-        public Task Import(params ImportTask[] tasks)
-        {
-            return skinModelManager.Import(tasks);
-        }
+        public Task Import(params ImportTask[] tasks) => skinModelManager.Import(tasks);
 
         public IEnumerable<string> HandledExtensions => skinModelManager.HandledExtensions;
 
-        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
-        {
-            return skinModelManager.Import(notification, tasks);
-        }
+        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => skinModelManager.Import(notification, tasks);
 
-        public Task<Live<SkinInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return skinModelManager.Import(task, lowPriority, cancellationToken);
-        }
+        public Task<Live<SkinInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default) => skinModelManager.Import(task, lowPriority, cancellationToken);
 
-        public Task<Live<SkinInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return skinModelManager.Import(archive, lowPriority, cancellationToken);
-        }
+        public Task<Live<SkinInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default) =>
+            skinModelManager.Import(archive, lowPriority, cancellationToken);
 
-        public Live<SkinInfo> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return skinModelManager.Import(item, archive, lowPriority, cancellationToken);
-        }
+        public Live<SkinInfo> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) =>
+            skinModelManager.Import(item, archive, cancellationToken);
 
         #endregion
 
@@ -323,46 +307,22 @@ namespace osu.Game.Skinning
             });
         }
 
+        public bool Delete(SkinInfo item) => skinModelManager.Delete(item);
+
+        public void Delete(List<SkinInfo> items, bool silent = false) => skinModelManager.Delete(items, silent);
+
+        public void Undelete(List<SkinInfo> items, bool silent = false) => skinModelManager.Undelete(items, silent);
+
+        public void Undelete(SkinInfo item) => skinModelManager.Undelete(item);
+
+        public bool IsAvailableLocally(SkinInfo model) => skinModelManager.IsAvailableLocally(model);
+
+        public void ReplaceFile(SkinInfo model, RealmNamedFileUsage file, Stream contents) => skinModelManager.ReplaceFile(model, file, contents);
+
+        public void DeleteFile(SkinInfo model, RealmNamedFileUsage file) => skinModelManager.DeleteFile(model, file);
+
+        public void AddFile(SkinInfo model, Stream contents, string filename) => skinModelManager.AddFile(model, contents, filename);
+
         #endregion
-
-        public bool Delete(SkinInfo item)
-        {
-            return skinModelManager.Delete(item);
-        }
-
-        public void Delete(List<SkinInfo> items, bool silent = false)
-        {
-            skinModelManager.Delete(items, silent);
-        }
-
-        public void Undelete(List<SkinInfo> items, bool silent = false)
-        {
-            skinModelManager.Undelete(items, silent);
-        }
-
-        public void Undelete(SkinInfo item)
-        {
-            skinModelManager.Undelete(item);
-        }
-
-        public bool IsAvailableLocally(SkinInfo model)
-        {
-            return skinModelManager.IsAvailableLocally(model);
-        }
-
-        public void ReplaceFile(SkinInfo model, RealmNamedFileUsage file, Stream contents)
-        {
-            skinModelManager.ReplaceFile(model, file, contents);
-        }
-
-        public void DeleteFile(SkinInfo model, RealmNamedFileUsage file)
-        {
-            skinModelManager.DeleteFile(model, file);
-        }
-
-        public void AddFile(SkinInfo model, Stream contents, string filename)
-        {
-            skinModelManager.AddFile(model, contents, filename);
-        }
     }
 }

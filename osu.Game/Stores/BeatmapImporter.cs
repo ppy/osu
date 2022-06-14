@@ -39,9 +39,6 @@ namespace osu.Game.Stores
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        // protected override bool CheckLocalAvailability(RealmBeatmapSet model, System.Linq.IQueryable<RealmBeatmapSet> items)
-        //     => base.CheckLocalAvailability(model, items) || (model.OnlineID > -1));
-
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 
         protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
