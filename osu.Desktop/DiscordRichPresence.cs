@@ -52,8 +52,6 @@ namespace osu.Desktop
                 SkipIdenticalPresence = false // handles better on discord IPC loss, see updateStatus call in onReady.
             };
 
-            client.RegisterUriScheme();
-
             client.OnReady += onReady;
 
             // safety measure for now, until we performance test / improve backoff for failed connections.
