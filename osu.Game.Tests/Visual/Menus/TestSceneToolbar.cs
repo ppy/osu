@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using JetBrains.Annotations;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
@@ -28,14 +30,14 @@ namespace osu.Game.Tests.Visual.Menus
         [Resolved]
         private IRulesetStore rulesets { get; set; }
 
-        private readonly Mock<INotificationOverlay> notifications = new Mock<INotificationOverlay>();
+        private readonly Mock<TestNotificationOverlay> notifications = new Mock<TestNotificationOverlay>();
 
         private readonly BindableInt unreadNotificationCount = new BindableInt();
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Dependencies.CacheAs(notifications.Object);
+            Dependencies.CacheAs<INotificationOverlay>(notifications.Object);
             notifications.SetupGet(n => n.UnreadCount).Returns(unreadNotificationCount);
         }
 
@@ -125,6 +127,22 @@ namespace osu.Game.Tests.Visual.Menus
         public class TestToolbar : Toolbar
         {
             public new Bindable<OverlayActivation> OverlayActivationMode => base.OverlayActivationMode as Bindable<OverlayActivation>;
+        }
+
+        // interface mocks break hot reload, mocking this stub implementation instead works around it.
+        // see: https://github.com/moq/moq4/issues/1252
+        [UsedImplicitly]
+        public class TestNotificationOverlay : INotificationOverlay
+        {
+            public virtual void Post(Notification notification)
+            {
+            }
+
+            public virtual void Hide()
+            {
+            }
+
+            public virtual IBindable<int> UnreadCount => null;
         }
     }
 }
