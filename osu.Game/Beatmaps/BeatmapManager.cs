@@ -357,7 +357,7 @@ namespace osu.Game.Beatmaps
 
         public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default) => beatmapModelManager.Import(archive, lowPriority, cancellationToken);
 
-        public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) => beatmapModelManager.Import(item, archive, cancellationToken);
+        public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) => beatmapModelManager.Import(item, archive, false, cancellationToken);
 
         public IEnumerable<string> HandledExtensions => beatmapModelManager.HandledExtensions;
 

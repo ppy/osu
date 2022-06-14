@@ -235,7 +235,7 @@ namespace osu.Game.Stores
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, cancellationToken),
+            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, lowPriority, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler,
                 lowPriority ? import_scheduler_low_priority : import_scheduler);
@@ -248,106 +248,104 @@ namespace osu.Game.Stores
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
+        /// <param name="quickSkipIfExisting">If <c>true</c>, imports will be skipped before they begin, given an existing model matches on hash and filenames. Should generally only be used for large batch imports, as it may defy user expectations when updating an existing model.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, CancellationToken cancellationToken = default)
+        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool quickSkipIfExisting = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
-            return Realm.Run(realm =>
+            cancellationToken.ThrowIfCancellationRequested();
+
+            bool checkedExisting = false;
+            TModel? existing = null;
+
+            if (quickSkipIfExisting && archive != null && !HasCustomHashFunction)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                // this is a fast bail condition to improve large import performance.
+                item.Hash = computeHashFast(archive);
 
-                bool checkedExisting = false;
-                TModel? existing = null;
+                checkedExisting = true;
+                existing = CheckForExisting(item, realm);
 
-                if (archive != null && !HasCustomHashFunction)
+                if (existing != null)
                 {
-                    // this is a fast bail condition to improve large import performance.
-                    item.Hash = computeHashFast(archive);
+                    // bare minimum comparisons
+                    //
+                    // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
+                    // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
+                    if (CanSkipImport(existing, item) &&
+                        getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)) &&
+                        checkAllFilesExist(existing))
+                    {
+                        LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
 
-                    checkedExisting = true;
-                    existing = CheckForExisting(item, realm);
+                        using (var transaction = realm.BeginWrite())
+                        {
+                            UndeleteForReuse(existing);
+                            transaction.Commit();
+                        }
+
+                        return existing.ToLive(Realm);
+                    }
+
+                    LogForModel(item, @"Found existing (optimised) but failed pre-check.");
+                }
+            }
+
+            try
+            {
+                LogForModel(item, @"Beginning import...");
+
+                // TODO: do we want to make the transaction this local? not 100% sure, will need further investigation.
+                using (var transaction = realm.BeginWrite())
+                {
+                    if (archive != null)
+                        // TODO: look into rollback of file additions (or delayed commit).
+                        item.Files.AddRange(createFileInfos(archive, Files, realm));
+
+                    item.Hash = ComputeHash(item);
+
+                    // TODO: we may want to run this outside of the transaction.
+                    Populate(item, archive, realm, cancellationToken);
+
+                    if (!checkedExisting)
+                        existing = CheckForExisting(item, realm);
 
                     if (existing != null)
                     {
-                        // bare minimum comparisons
-                        //
-                        // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
-                        // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
-                        if (CanSkipImport(existing, item) &&
-                            getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)) &&
-                            checkAllFilesExist(existing))
+                        if (CanReuseExisting(existing, item))
                         {
-                            LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+                            LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
 
-                            using (var transaction = realm.BeginWrite())
-                            {
-                                UndeleteForReuse(existing);
-                                transaction.Commit();
-                            }
+                            UndeleteForReuse(existing);
+                            transaction.Commit();
 
                             return existing.ToLive(Realm);
                         }
 
-                        LogForModel(item, @"Found existing (optimised) but failed pre-check.");
-                    }
-                }
+                        LogForModel(item, @"Found existing but failed re-use check.");
 
-                try
-                {
-                    LogForModel(item, @"Beginning import...");
-
-                    // TODO: do we want to make the transaction this local? not 100% sure, will need further investigation.
-                    using (var transaction = realm.BeginWrite())
-                    {
-                        if (archive != null)
-                            // TODO: look into rollback of file additions (or delayed commit).
-                            item.Files.AddRange(createFileInfos(archive, Files, realm));
-
-                        item.Hash = ComputeHash(item);
-
-                        // TODO: we may want to run this outside of the transaction.
-                        Populate(item, archive, realm, cancellationToken);
-
-                        if (!checkedExisting)
-                            existing = CheckForExisting(item, realm);
-
-                        if (existing != null)
-                        {
-                            if (CanReuseExisting(existing, item))
-                            {
-                                LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
-
-                                UndeleteForReuse(existing);
-                                transaction.Commit();
-
-                                return existing.ToLive(Realm);
-                            }
-
-                            LogForModel(item, @"Found existing but failed re-use check.");
-
-                            existing.DeletePending = true;
-                        }
-
-                        PreImport(item, realm);
-
-                        // import to store
-                        realm.Add(item);
-
-                        transaction.Commit();
+                        existing.DeletePending = true;
                     }
 
-                    LogForModel(item, @"Import successfully completed!");
-                }
-                catch (Exception e)
-                {
-                    if (!(e is TaskCanceledException))
-                        LogForModel(item, @"Database import or population failed and has been rolled back.", e);
+                    PreImport(item, realm);
 
-                    throw;
+                    // import to store
+                    realm.Add(item);
+
+                    transaction.Commit();
                 }
 
-                return (Live<TModel>?)item.ToLive(Realm);
-            });
-        }
+                LogForModel(item, @"Import successfully completed!");
+            }
+            catch (Exception e)
+            {
+                if (!(e is TaskCanceledException))
+                    LogForModel(item, @"Database import or population failed and has been rolled back.", e);
+
+                throw;
+            }
+
+            return (Live<TModel>?)item.ToLive(Realm);
+        });
 
         /// <summary>
         /// Any file extensions which should be included in hash creation.
