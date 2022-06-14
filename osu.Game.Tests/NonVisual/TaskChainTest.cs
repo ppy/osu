@@ -4,6 +4,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.NonVisual
@@ -42,9 +43,9 @@ namespace osu.Game.Tests.NonVisual
 
             await Task.WhenAll(task1.task, task2.task, task3.task);
 
-            Assert.That(task1.task.Result, Is.EqualTo(1));
-            Assert.That(task2.task.Result, Is.EqualTo(2));
-            Assert.That(task3.task.Result, Is.EqualTo(3));
+            Assert.That(task1.task.GetResultSafely(), Is.EqualTo(1));
+            Assert.That(task2.task.GetResultSafely(), Is.EqualTo(2));
+            Assert.That(task3.task.GetResultSafely(), Is.EqualTo(3));
         }
 
         [Test]
@@ -68,9 +69,9 @@ namespace osu.Game.Tests.NonVisual
             // Wait on both tasks.
             await Task.WhenAll(task1.task, task3.task);
 
-            Assert.That(task1.task.Result, Is.EqualTo(1));
+            Assert.That(task1.task.GetResultSafely(), Is.EqualTo(1));
             Assert.That(task2.task.IsCompleted, Is.False);
-            Assert.That(task3.task.Result, Is.EqualTo(2));
+            Assert.That(task3.task.GetResultSafely(), Is.EqualTo(2));
         }
 
         [Test]

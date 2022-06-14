@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -18,12 +16,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchBeatmapDetailArea : OnlinePlayTestScene
     {
-        [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
-
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; }
-
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
@@ -40,16 +32,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createNewItem()
         {
-            SelectedRoom.Value.Playlist.Add(new PlaylistItem
+            SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
             {
                 ID = SelectedRoom.Value.Playlist.Count,
-                Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                RequiredMods =
+                RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                RequiredMods = new[]
                 {
-                    new OsuModHardRock(),
-                    new OsuModDoubleTime(),
-                    new OsuModAutoplay()
+                    new APIMod(new OsuModHardRock()),
+                    new APIMod(new OsuModDoubleTime()),
+                    new APIMod(new OsuModAutoplay())
                 }
             });
         }

@@ -7,6 +7,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -37,7 +38,10 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(ClickEvent e)
         {
             if (buttons.Contains(e.Button) && Contains(e.ScreenSpaceMousePosition))
-                sampleClick?.Play();
+            {
+                sampleClick.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
+                sampleClick.Play();
+            }
 
             return base.OnClick(e);
         }

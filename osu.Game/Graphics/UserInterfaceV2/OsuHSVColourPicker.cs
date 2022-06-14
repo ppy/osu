@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour osuColour)
         {
-            Background.Colour = colourProvider?.Dark5 ?? osuColour.GreySeafoamDark;
+            Background.Colour = colourProvider?.Dark5 ?? osuColour.GreySeaFoamDark;
 
             Content.Padding = new MarginPadding(spacing);
             Content.Spacing = new Vector2(0, spacing);

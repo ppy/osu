@@ -40,10 +40,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
             {
                 InternalChildren = new Drawable[]
                 {
-                    EditorBeatmap = new EditorBeatmap(new TaikoBeatmap())
+                    EditorBeatmap = new EditorBeatmap(new TaikoBeatmap
                     {
                         BeatmapInfo = { Ruleset = new TaikoRuleset().RulesetInfo }
-                    },
+                    }),
                     new TaikoHitObjectComposer(new TaikoRuleset())
                 };
 

@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.Profile
 
         public abstract string Identifier { get; }
 
-        private readonly FillFlowContainer content;
+        private readonly FillFlowContainer<Drawable> content;
         private readonly Box background;
         private readonly Box underscore;
 
@@ -79,7 +80,9 @@ namespace osu.Game.Overlays.Profile
                                 }
                             }
                         },
-                        content = new FillFlowContainer
+                        // reverse ID flow is required for correct Z-ordering of the content (last item should be front-most).
+                        // particularly important in BeatmapsSection, as it uses beatmap cards, which have expandable overhanging content.
+                        content = new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             Direction = FillDirection.Vertical,
                             AutoSizeAxes = Axes.Y,

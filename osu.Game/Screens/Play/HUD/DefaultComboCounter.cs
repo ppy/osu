@@ -15,9 +15,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class DefaultComboCounter : RollingCounter<int>, ISkinnableDrawable
     {
-        [Resolved(canBeNull: true)]
-        private HUDOverlay hud { get; set; }
-
         public bool UsesFixedAnchor { get; set; }
 
         public DefaultComboCounter()

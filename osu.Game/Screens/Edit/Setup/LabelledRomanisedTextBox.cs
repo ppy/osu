@@ -13,6 +13,8 @@ namespace osu.Game.Screens.Edit.Setup
 
         private class RomanisedTextBox : OsuTextBox
         {
+            protected override bool AllowIme => false;
+
             protected override bool CanAddCharacter(char character)
                 => MetadataUtils.IsRomanised(character);
         }

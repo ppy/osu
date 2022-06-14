@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             {
                 scrollingPath = new ScrollingPath(),
                 nestedOutlineContainer = new NestedOutlineContainer(),
-                editablePath = new SelectionEditablePath(positionToDistance)
+                editablePath = new SelectionEditablePath(positionToTime)
             };
         }
 
@@ -145,10 +145,10 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             return new RectangleF(left, top, right - left, bottom - top).Inflate(objectRadius);
         }
 
-        private double positionToDistance(float relativeYPosition)
+        private double positionToTime(float relativeYPosition)
         {
             double time = HitObjectContainer.TimeAtPosition(relativeYPosition, HitObject.StartTime);
-            return (time - HitObject.StartTime) * HitObject.Velocity;
+            return time - HitObject.StartTime;
         }
 
         private void initializeJuiceStreamPath()

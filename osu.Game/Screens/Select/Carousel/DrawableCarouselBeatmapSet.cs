@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select.Carousel
         private Action<int> viewDetails;
 
         [Resolved(CanBeNull = true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
         private CollectionManager collectionManager { get; set; }
@@ -61,7 +61,11 @@ namespace osu.Game.Screens.Select.Carousel
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapSetOverlay beatmapOverlay)
         {
-            restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
+            restoreHiddenRequested = s =>
+            {
+                foreach (var b in s.Beatmaps)
+                    manager.Restore(b);
+            };
 
             if (beatmapOverlay != null)
                 viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
@@ -214,8 +218,8 @@ namespace osu.Game.Screens.Select.Carousel
                 if (Item.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
-                if (beatmapSet.OnlineID != null && viewDetails != null)
-                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID.Value)));
+                if (beatmapSet.OnlineID > 0 && viewDetails != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID)));
 
                 if (collectionManager != null)
                 {
@@ -241,7 +245,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             TernaryState state;
 
-            int countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
+            int countExisting = beatmapSet.Beatmaps.Count(b => collection.BeatmapHashes.Contains(b.MD5Hash));
 
             if (countExisting == beatmapSet.Beatmaps.Count)
                 state = TernaryState.True;
@@ -257,14 +261,14 @@ namespace osu.Game.Screens.Select.Carousel
                     switch (s)
                     {
                         case TernaryState.True:
-                            if (collection.Beatmaps.Contains(b))
+                            if (collection.BeatmapHashes.Contains(b.MD5Hash))
                                 continue;
 
-                            collection.Beatmaps.Add(b);
+                            collection.BeatmapHashes.Add(b.MD5Hash);
                             break;
 
                         case TernaryState.False:
-                            collection.Beatmaps.Remove(b);
+                            collection.BeatmapHashes.Remove(b.MD5Hash);
                             break;
                     }
                 }

@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override bool Remove(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column - firstColumnIndex).Remove(h);
 
-        public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
+        public void Add(BarLine barLine) => base.Add(new DrawableBarLine(barLine));
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {

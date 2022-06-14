@@ -94,9 +94,9 @@ namespace osu.Game.Screens.Menu
             if (beatIndex < 0)
                 return;
 
-            if (effectPoint.KiaiMode ? beatIndex % 2 == 0 : beatIndex % (int)timingPoint.TimeSignature == 0)
+            if (effectPoint.KiaiMode ? beatIndex % 2 == 0 : beatIndex % timingPoint.TimeSignature.Numerator == 0)
                 flash(leftBox, timingPoint.BeatLength, effectPoint.KiaiMode, amplitudes);
-            if (effectPoint.KiaiMode ? beatIndex % 2 == 1 : beatIndex % (int)timingPoint.TimeSignature == 0)
+            if (effectPoint.KiaiMode ? beatIndex % 2 == 1 : beatIndex % timingPoint.TimeSignature.Numerator == 0)
                 flash(rightBox, timingPoint.BeatLength, effectPoint.KiaiMode, amplitudes);
         }
 

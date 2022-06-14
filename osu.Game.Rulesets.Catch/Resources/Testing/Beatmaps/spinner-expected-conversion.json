@@ -3,71 +3,88 @@
         "StartTime": 18500,
         "Objects": [{
                 "StartTime": 18500,
-                "Position": 65
+                "Position": 65,
+                "HyperDash": false
             },
             {
                 "StartTime": 18559,
-                "Position": 482
+                "Position": 482,
+                "HyperDash": false
             },
             {
                 "StartTime": 18618,
-                "Position": 164
+                "Position": 164,
+                "HyperDash": false
             },
             {
                 "StartTime": 18678,
-                "Position": 315
+                "Position": 315,
+                "HyperDash": false
             },
             {
                 "StartTime": 18737,
-                "Position": 145
+                "Position": 145,
+                "HyperDash": false
             },
             {
                 "StartTime": 18796,
-                "Position": 159
+                "Position": 159,
+                "HyperDash": false
             },
             {
                 "StartTime": 18856,
-                "Position": 310
+                "Position": 310,
+                "HyperDash": false
             },
             {
                 "StartTime": 18915,
-                "Position": 441
+                "Position": 441,
+                "HyperDash": false
             },
             {
                 "StartTime": 18975,
-                "Position": 428
+                "Position": 428,
+                "HyperDash": false
             },
             {
                 "StartTime": 19034,
-                "Position": 243
+                "Position": 243,
+                "HyperDash": false
             },
             {
                 "StartTime": 19093,
-                "Position": 422
+                "Position": 422,
+                "HyperDash": false
             },
             {
                 "StartTime": 19153,
-                "Position": 481
+                "Position": 481,
+                "HyperDash": false
             },
             {
                 "StartTime": 19212,
-                "Position": 104
+                "Position": 104,
+                "HyperDash": false
             },
             {
                 "StartTime": 19271,
-                "Position": 473
+                "Position": 473,
+                "HyperDash": false
             },
             {
                 "StartTime": 19331,
-                "Position": 135
+                "Position": 135,
+                "HyperDash": false
             },
             {
                 "StartTime": 19390,
-                "Position": 360
+                "Position": 360,
+                "HyperDash": false
             },
             {
                 "StartTime": 19450,
-                "Position": 123
+                "Position": 123,
+                "HyperDash": false
             }
         ]
     }]

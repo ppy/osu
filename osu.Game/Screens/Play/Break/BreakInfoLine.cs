@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play.Break
 
         private readonly string prefix;
 
-        public BreakInfoLine(string name, string prefix = @"")
+        public BreakInfoLine(LocalisableString name, string prefix = @"")
         {
             this.prefix = prefix;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play.Break
 
     public class PercentageBreakInfoLine : BreakInfoLine<double>
     {
-        public PercentageBreakInfoLine(string name, string prefix = "")
+        public PercentageBreakInfoLine(LocalisableString name, string prefix = "")
             : base(name, prefix)
         {
         }

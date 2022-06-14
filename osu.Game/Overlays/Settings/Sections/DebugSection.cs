@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
-using osu.Game.Overlays.Settings.Sections.Debug;
+using osu.Game.Overlays.Settings.Sections.DebugSettings;
 
 namespace osu.Game.Overlays.Settings.Sections
 {

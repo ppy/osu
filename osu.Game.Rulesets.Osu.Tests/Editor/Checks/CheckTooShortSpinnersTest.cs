@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
             var beatmap = new Beatmap<HitObject>
             {
                 HitObjects = hitObjects,
-                BeatmapInfo = new BeatmapInfo { BaseDifficulty = new BeatmapDifficulty(beatmapDifficulty) }
+                BeatmapInfo = new BeatmapInfo { Difficulty = new BeatmapDifficulty(beatmapDifficulty) }
             };
 
             return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));

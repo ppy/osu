@@ -12,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -20,14 +21,12 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
-using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Spectate;
 using osu.Game.Users;
 using osuTK;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Screens.Play
 {
@@ -44,10 +43,13 @@ namespace osu.Game.Screens.Play
         private PreviewTrackManager previewTrackManager { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapModelDownloader beatmapDownloader { get; set; }
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private Container beatmapPanelContainer;
         private TriangleButton watchButton;
@@ -70,7 +72,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
             InternalChild = new Container
             {
@@ -85,7 +87,7 @@ namespace osu.Game.Screens.Play
                 {
                     new Box
                     {
-                        Colour = colours.GreySeafoamDark,
+                        Colour = colourProvider.Background5,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new FillFlowContainer
@@ -164,7 +166,7 @@ namespace osu.Game.Screens.Play
             automaticDownload.Current.BindValueChanged(_ => checkForAutomaticDownload());
         }
 
-        protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
+        protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState)
         {
             clearDisplay();
             showBeatmapPanel(spectatorState);
@@ -178,7 +180,7 @@ namespace osu.Game.Screens.Play
             scheduleStart(spectatorGameplayState);
         }
 
-        protected override void EndGameplay(int userId)
+        protected override void EndGameplay(int userId, SpectatorState state)
         {
             scheduledStart?.Cancel();
             immediateSpectatorGameplayState = null;
@@ -226,7 +228,7 @@ namespace osu.Game.Screens.Play
             onlineBeatmapRequest.Success += beatmapSet => Schedule(() =>
             {
                 this.beatmapSet = beatmapSet;
-                beatmapPanelContainer.Child = new GridBeatmapPanel(this.beatmapSet);
+                beatmapPanelContainer.Child = new BeatmapCardNormal(this.beatmapSet, allowExpansion: false);
                 checkForAutomaticDownload();
             });
 
@@ -244,13 +246,13 @@ namespace osu.Game.Screens.Play
             if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmapSet.OnlineID }))
                 return;
 
-            beatmaps.Download(beatmapSet);
+            beatmapDownloader.Download(beatmapSet);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             previewTrackManager.StopAnyPlaying(this);
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
     }
 }

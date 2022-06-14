@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.GreySeafoamDarker;
+            background.Colour = colours.GreySeaFoamDarker;
         }
 
         protected override void LoadComplete()

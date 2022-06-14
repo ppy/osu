@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -16,6 +17,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -44,7 +46,7 @@ namespace osu.Game.Overlays.AccountCreation
         private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
@@ -68,7 +70,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         usernameTextBox = new OsuTextBox
                         {
-                            PlaceholderText = "username",
+                            PlaceholderText = UsersStrings.LoginUsername.ToLower(),
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },
@@ -90,7 +92,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         passwordTextBox = new OsuPasswordTextBox
                         {
-                            PlaceholderText = "password",
+                            PlaceholderText = UsersStrings.LoginPassword.ToLower(),
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this,
                         },
@@ -146,18 +148,18 @@ namespace osu.Game.Overlays.AccountCreation
                 d.Colour = password.Length == 0 ? Color4.White : Interpolation.ValueAt(password.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In);
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             loadingLayer.Hide();
 
             if (host?.OnScreenKeyboardOverlapsGameWindow != true)
-                focusNextTextbox();
+                focusNextTextBox();
         }
 
         private void performRegistration()
         {
-            if (focusNextTextbox())
+            if (focusNextTextBox())
             {
                 registerShake.Shake();
                 return;
@@ -209,19 +211,19 @@ namespace osu.Game.Overlays.AccountCreation
             });
         }
 
-        private bool focusNextTextbox()
+        private bool focusNextTextBox()
         {
-            var nextTextbox = nextUnfilledTextbox();
+            var nextTextBox = nextUnfilledTextBox();
 
-            if (nextTextbox != null)
+            if (nextTextBox != null)
             {
-                Schedule(() => GetContainingInputManager().ChangeFocus(nextTextbox));
+                Schedule(() => GetContainingInputManager().ChangeFocus(nextTextBox));
                 return true;
             }
 
             return false;
         }
 
-        private OsuTextBox nextUnfilledTextbox() => textboxes.FirstOrDefault(t => string.IsNullOrEmpty(t.Text));
+        private OsuTextBox nextUnfilledTextBox() => textboxes.FirstOrDefault(t => string.IsNullOrEmpty(t.Text));
     }
 }

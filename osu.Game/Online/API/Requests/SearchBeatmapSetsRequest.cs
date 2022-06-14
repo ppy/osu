@@ -86,8 +86,8 @@ namespace osu.Game.Online.API.Requests
             if (General != null && General.Any())
                 req.AddParameter("c", string.Join('.', General.Select(e => e.ToString().Underscore())));
 
-            if (ruleset.ID.HasValue)
-                req.AddParameter("m", ruleset.ID.Value.ToString());
+            if (ruleset.OnlineID >= 0)
+                req.AddParameter("m", ruleset.OnlineID.ToString());
 
             req.AddParameter("s", SearchCategory.ToString().ToLowerInvariant());
 

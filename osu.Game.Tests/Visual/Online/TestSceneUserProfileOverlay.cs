@@ -4,8 +4,6 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
@@ -20,9 +18,6 @@ namespace osu.Game.Tests.Visual.Online
 
         private readonly TestUserProfileOverlay profile;
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
         public static readonly APIUser TEST_USER = new APIUser
         {
             Username = @"Somebody",
@@ -34,6 +29,7 @@ namespace osu.Game.Tests.Visual.Online
             ProfileOrder = new[] { "me" },
             Statistics = new UserStatistics
             {
+                IsRanked = true,
                 GlobalRank = 2148,
                 CountryRank = 1,
                 PP = 4567.89m,

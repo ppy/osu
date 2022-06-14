@@ -11,5 +11,7 @@ namespace osu.Game.Database
         [JsonIgnore]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         int ID { get; set; }
+
+        bool IsManaged { get; }
     }
 }

@@ -16,6 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
@@ -24,6 +25,11 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
+        public readonly KeyBindingContainer<T> KeyBindingContainer;
+
+        [Resolved(CanBeNull = true)]
+        private ScoreProcessor scoreProcessor { get; set; }
+
         private ReplayRecorder recorder;
 
         public ReplayRecorder Recorder
@@ -42,8 +48,6 @@ namespace osu.Game.Rulesets.UI
         }
 
         protected override InputState CreateInitialState() => new RulesetInputManagerInputState<T>(base.CreateInitialState());
-
-        protected readonly KeyBindingContainer<T> KeyBindingContainer;
 
         protected override Container<Drawable> Content => content;
 
@@ -66,17 +70,23 @@ namespace osu.Game.Rulesets.UI
 
         public override void HandleInputStateChange(InputStateChangeEvent inputStateChange)
         {
-            if (inputStateChange is ReplayStateChangeEvent<T> replayStateChanged)
+            switch (inputStateChange)
             {
-                foreach (var action in replayStateChanged.ReleasedActions)
-                    KeyBindingContainer.TriggerReleased(action);
+                case ReplayStateChangeEvent<T> stateChangeEvent:
+                    foreach (var action in stateChangeEvent.ReleasedActions)
+                        KeyBindingContainer.TriggerReleased(action);
 
-                foreach (var action in replayStateChanged.PressedActions)
-                    KeyBindingContainer.TriggerPressed(action);
-            }
-            else
-            {
-                base.HandleInputStateChange(inputStateChange);
+                    foreach (var action in stateChangeEvent.PressedActions)
+                        KeyBindingContainer.TriggerPressed(action);
+                    break;
+
+                case ReplayStatisticsFrameEvent statisticsStateChangeEvent:
+                    scoreProcessor?.ResetFromReplayFrame(statisticsStateChangeEvent.Frame);
+                    break;
+
+                default:
+                    base.HandleInputStateChange(inputStateChange);
+                    break;
             }
         }
 
@@ -125,6 +135,17 @@ namespace osu.Game.Rulesets.UI
             }
 
             return base.Handle(e);
+        }
+
+        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
+        {
+            if (mouseDisabled.Value)
+            {
+                // Only propagate positional data when mouse buttons are disabled.
+                e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
+            }
+
+            return base.HandleMouseTouchStateChange(e);
         }
 
         #endregion

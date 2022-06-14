@@ -18,6 +18,7 @@ namespace osu.Game.IPC
             : base(host)
         {
             this.importer = importer;
+
             MessageReceived += msg =>
             {
                 Debug.Assert(importer != null);
@@ -25,6 +26,8 @@ namespace osu.Game.IPC
                 {
                     if (t.Exception != null) throw t.Exception;
                 }, TaskContinuationOptions.OnlyOnFaulted);
+
+                return null;
             };
         }
 

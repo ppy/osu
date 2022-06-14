@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Settings
             };
 
             [SettingSource("Sample number textbox", "Textbox number entry", SettingControlType = typeof(SettingsNumberBox))]
-            public Bindable<int?> IntTextboxBindable { get; } = new Bindable<int?>
+            public Bindable<int?> IntTextBoxBindable { get; } = new Bindable<int?>
             {
                 Default = null,
                 Value = null

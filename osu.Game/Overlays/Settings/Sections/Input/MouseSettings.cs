@@ -67,7 +67,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = MouseSettingsStrings.DisableMouseWheel,
+                    LabelText = MouseSettingsStrings.DisableMouseWheelVolumeAdjust,
+                    TooltipText = MouseSettingsStrings.DisableMouseWheelVolumeAdjustTooltip,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox
@@ -116,9 +117,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
                 {
                     if (highPrecision.NewValue)
-                        highPrecisionMouse.WarningText = MouseSettingsStrings.HighPrecisionPlatformWarning;
+                        highPrecisionMouse.SetNoticeText(MouseSettingsStrings.HighPrecisionPlatformWarning, true);
                     else
-                        highPrecisionMouse.WarningText = null;
+                        highPrecisionMouse.ClearNoticeText();
                 }
             }, true);
         }

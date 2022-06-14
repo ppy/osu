@@ -12,7 +12,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osuTK;
@@ -25,9 +24,6 @@ namespace osu.Game.Tournament.Screens.Editors
 
         protected override BindableList<SeedingResult> Storage => team.SeedingResults;
 
-        [Resolved(canBeNull: true)]
-        private TournamentSceneManager sceneManager { get; set; }
-
         public SeedingEditorScreen(TournamentTeam team, TournamentScreen parentScreen)
             : base(parentScreen)
         {
@@ -37,9 +33,6 @@ namespace osu.Game.Tournament.Screens.Editors
         public class SeedingResultRow : CompositeDrawable, IModelBacked<SeedingResult>
         {
             public SeedingResult Model { get; }
-
-            [Resolved]
-            private LadderInfo ladderInfo { get; set; }
 
             public SeedingResultRow(TournamentTeam team, SeedingResult round)
             {
@@ -226,7 +219,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     }
 
                     [BackgroundDependencyLoader]
-                    private void load(RulesetStore rulesets)
+                    private void load()
                     {
                         beatmapId.Value = Model.ID;
                         beatmapId.BindValueChanged(id =>

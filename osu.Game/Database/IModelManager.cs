@@ -1,11 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using osu.Game.IO;
 
 namespace osu.Game.Database
 {
@@ -16,41 +12,6 @@ namespace osu.Game.Database
     public interface IModelManager<TModel>
         where TModel : class
     {
-        /// <summary>
-        /// Fired when an item is updated.
-        /// </summary>
-        event Action<TModel> ItemUpdated;
-
-        /// <summary>
-        /// Fired when an item is removed.
-        /// </summary>
-        event Action<TModel> ItemRemoved;
-
-        /// <summary>
-        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
-        /// </summary>
-        Task ImportFromStableAsync(StableStorage stableStorage);
-
-        /// <summary>
-        /// Exports an item to a legacy (.zip based) package.
-        /// </summary>
-        /// <param name="item">The item to export.</param>
-        void Export(TModel item);
-
-        /// <summary>
-        /// Exports an item to the given output stream.
-        /// </summary>
-        /// <param name="model">The item to export.</param>
-        /// <param name="outputStream">The output stream to export to.</param>
-        void ExportModelTo(TModel model, Stream outputStream);
-
-        /// <summary>
-        /// Perform an update of the specified item.
-        /// TODO: Support file additions/removals.
-        /// </summary>
-        /// <param name="item">The item to update.</param>
-        void Update(TModel item);
-
         /// <summary>
         /// Delete an item from the manager.
         /// Is a no-op for already deleted items.

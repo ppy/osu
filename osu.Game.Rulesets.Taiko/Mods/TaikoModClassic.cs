@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
+            drawableTaikoRuleset.LockPlayfieldAspect.Value = false;
         }
 
         public void Update(Playfield playfield)

@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Scoring
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Scoring
     /// A component which performs and acts as a central cache for performance calculations of locally databased scores.
     /// Currently not persisted between game sessions.
     /// </summary>
-    public class ScorePerformanceCache : MemoryCachingComponent<ScorePerformanceCache.PerformanceCacheLookup, double?>
+    public class ScorePerformanceCache : MemoryCachingComponent<ScorePerformanceCache.PerformanceCacheLookup, PerformanceAttributes>
     {
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
@@ -27,24 +28,22 @@ namespace osu.Game.Scoring
         /// </summary>
         /// <param name="score">The score to do the calculation on. </param>
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
-        public Task<double?> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default) =>
+        public Task<PerformanceAttributes> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default) =>
             GetAsync(new PerformanceCacheLookup(score), token);
 
-        protected override async Task<double?> ComputeValueAsync(PerformanceCacheLookup lookup, CancellationToken token = default)
+        protected override async Task<PerformanceAttributes> ComputeValueAsync(PerformanceCacheLookup lookup, CancellationToken token = default)
         {
             var score = lookup.ScoreInfo;
 
             var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, token).ConfigureAwait(false);
 
             // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
-            if (attributes.Attributes == null)
+            if (attributes?.Attributes == null)
                 return null;
 
             token.ThrowIfCancellationRequested();
 
-            var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(attributes.Attributes, score);
-
-            return calculator?.Calculate();
+            return score.Ruleset.CreateInstance().CreatePerformanceCalculator()?.Calculate(score, attributes.Value.Attributes);
         }
 
         public readonly struct PerformanceCacheLookup

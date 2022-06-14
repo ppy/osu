@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 namespace osu.Game.Screens.Edit.Verify
 {
     [Cached]
-    public class VerifyScreen : EditorRoundedScreen
+    public class VerifyScreen : EditorScreen
     {
         public readonly Bindable<Issue> SelectedIssue = new Bindable<Issue>();
 
@@ -29,10 +29,9 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load()
         {
-            InterpretedDifficulty.Default = EditorBeatmap.BeatmapInfo.DifficultyRating;
+            InterpretedDifficulty.Default = BeatmapDifficultyCache.GetDifficultyRating(EditorBeatmap.BeatmapInfo.StarRating);
             InterpretedDifficulty.SetDefault();
 
-            IssueList = new IssueList();
             Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -42,13 +41,13 @@ namespace osu.Game.Screens.Edit.Verify
                     ColumnDimensions = new[]
                     {
                         new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 200),
+                        new Dimension(GridSizeMode.Absolute, 250),
                     },
                     Content = new[]
                     {
                         new Drawable[]
                         {
-                            IssueList,
+                            IssueList = new IssueList(),
                             new IssueSettings(),
                         },
                     }

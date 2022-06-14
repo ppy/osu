@@ -3,8 +3,10 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges.Events;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu
@@ -37,6 +39,19 @@ namespace osu.Game.Rulesets.Osu
             if ((e is MouseMoveEvent || e is TouchMoveEvent) && !AllowUserCursorMovement) return false;
 
             return base.Handle(e);
+        }
+
+        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
+        {
+            if (!AllowUserCursorMovement)
+            {
+                // Still allow for forwarding of the "touch" part, but replace the positional data with that of the mouse.
+                // Primarily relied upon by the "autopilot" osu! mod.
+                var touch = new Touch(e.Touch.Source, CurrentState.Mouse.Position);
+                e = new TouchStateChangeEvent(e.State, e.Input, touch, e.IsActive, null);
+            }
+
+            return base.HandleMouseTouchStateChange(e);
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer

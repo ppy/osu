@@ -32,12 +32,12 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 HitObjects = new List<HitObject> { new Hit { Type = HitType.Centre } },
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BaseDifficulty = new BeatmapDifficulty(),
+                    Difficulty = new BeatmapDifficulty(),
                     Metadata = new BeatmapMetadata
                     {
                         Artist = @"Unknown",
                         Title = @"Sample Beatmap",
-                        AuthorString = @"peppy",
+                        Author = { Username = @"peppy" },
                     },
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },

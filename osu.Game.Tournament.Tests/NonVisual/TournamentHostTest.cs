@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
             return tournament;
         }
 
-        public static void WaitForOrAssert(Func<bool> result, string failureMessage, int timeout = 90000)
+        public static void WaitForOrAssert(Func<bool> result, string failureMessage, int timeout = 30000)
         {
             Task task = Task.Run(() =>
             {

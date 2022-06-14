@@ -17,11 +17,11 @@ using osu.Framework.Testing.Input;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osu.Game.Tests.Gameplay;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public TestSceneGameplayCursor()
         {
             var ruleset = new OsuRuleset();
-            gameplayState = new GameplayState(CreateBeatmap(ruleset.RulesetInfo), ruleset, Array.Empty<Mod>());
+            gameplayState = TestGameplayState.Create(ruleset);
 
             AddStep("change background colour", () =>
             {
@@ -118,7 +118,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             public Drawable GetDrawableComponent(ISkinComponent component) => null;
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
             public ISample GetSample(ISampleInfo sampleInfo) => null;
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {

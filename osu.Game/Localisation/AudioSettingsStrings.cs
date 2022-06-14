@@ -30,6 +30,11 @@ namespace osu.Game.Localisation
         public static LocalisableString OutputDevice => new TranslatableString(getKey(@"output_device"), @"Output device");
 
         /// <summary>
+        /// "Hitsound stereo separation"
+        /// </summary>
+        public static LocalisableString PositionalLevel => new TranslatableString(getKey(@"positional_hitsound_audio_level"), @"Hitsound stereo separation");
+
+        /// <summary>
         /// "Master"
         /// </summary>
         public static LocalisableString MasterVolume => new TranslatableString(getKey(@"master_volume"), @"Master");
@@ -64,6 +69,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString OffsetWizard => new TranslatableString(getKey(@"offset_wizard"), @"Offset wizard");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

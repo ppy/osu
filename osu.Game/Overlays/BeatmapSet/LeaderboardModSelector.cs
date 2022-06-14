@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         private void onRulesetChanged(ValueChangedEvent<IRulesetInfo> ruleset)
         {
@@ -57,8 +57,13 @@ namespace osu.Game.Overlays.BeatmapSet
             if (ruleset.NewValue == null)
                 return;
 
+            var rulesetInstance = rulesets.GetRuleset(ruleset.NewValue.OnlineID)?.CreateInstance();
+
+            if (rulesetInstance == null)
+                return;
+
             modsContainer.Add(new ModButton(new ModNoMod()));
-            modsContainer.AddRange(rulesets.GetRuleset(ruleset.NewValue.OnlineID).CreateInstance().AllMods.Where(m => m.UserPlayable).Select(m => new ModButton(m)));
+            modsContainer.AddRange(rulesetInstance.AllMods.Where(m => m.UserPlayable).Select(m => new ModButton(m)));
 
             modsContainer.ForEach(button =>
             {

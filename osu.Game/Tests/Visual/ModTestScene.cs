@@ -5,8 +5,12 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Replays;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual
 {
@@ -50,18 +54,37 @@ namespace osu.Game.Tests.Visual
             return CreateModPlayer(ruleset);
         }
 
-        protected virtual TestPlayer CreateModPlayer(Ruleset ruleset) => new ModTestPlayer(AllowFail);
+        protected virtual TestPlayer CreateModPlayer(Ruleset ruleset) => new ModTestPlayer(currentTestData, AllowFail);
 
         protected class ModTestPlayer : TestPlayer
         {
             private readonly bool allowFail;
+            private readonly ModTestData currentTestData;
 
             protected override bool CheckModsAllowFailure() => allowFail;
 
-            public ModTestPlayer(bool allowFail)
+            public ModTestPlayer(ModTestData data, bool allowFail)
                 : base(false, false)
             {
                 this.allowFail = allowFail;
+                currentTestData = data;
+            }
+
+            protected override void PrepareReplay()
+            {
+                if (currentTestData.Autoplay && currentTestData.ReplayFrames?.Count > 0)
+                    throw new InvalidOperationException(@$"{nameof(ModTestData.Autoplay)} must be false when {nameof(ModTestData.ReplayFrames)} is specified.");
+
+                if (currentTestData.ReplayFrames != null)
+                {
+                    DrawableRuleset?.SetReplayScore(new Score
+                    {
+                        Replay = new Replay { Frames = currentTestData.ReplayFrames },
+                        ScoreInfo = new ScoreInfo { User = new APIUser { Username = @"Test" } },
+                    });
+                }
+
+                base.PrepareReplay();
             }
         }
 
@@ -71,6 +94,12 @@ namespace osu.Game.Tests.Visual
             /// Whether to use a replay to simulate an auto-play. True by default.
             /// </summary>
             public bool Autoplay = true;
+
+            /// <summary>
+            /// The frames to use for replay. <see cref="Autoplay"/> must be set to false.
+            /// </summary>
+            [CanBeNull]
+            public List<ReplayFrame> ReplayFrames;
 
             /// <summary>
             /// The beatmap for this test case.

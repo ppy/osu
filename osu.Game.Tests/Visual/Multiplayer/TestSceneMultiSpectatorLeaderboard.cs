@@ -4,11 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play.HUD;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("reset", () =>
             {
-                Clear();
+                leaderboard?.RemoveAndDisposeImmediately();
 
                 clocks = new Dictionary<int, ManualClock>
                 {
@@ -32,24 +32,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     { PLAYER_2_ID, new ManualClock() }
                 };
 
-                foreach ((int userId, var _) in clocks)
+                foreach ((int userId, _) in clocks)
                 {
-                    SpectatorClient.StartPlay(userId, 0);
-                    OnlinePlayDependencies.Client.AddUser(new APIUser { Id = userId });
+                    SpectatorClient.SendStartPlay(userId, 0);
+                    OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = userId }, true);
                 }
             });
 
             AddStep("create leaderboard", () =>
             {
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
-                var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
-                var scoreProcessor = new OsuScoreProcessor();
-                scoreProcessor.ApplyBeatmap(playable);
 
-                LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, clocks.Keys.Select(id => new MultiplayerRoomUser(id)).ToArray()) { Expanded = { Value = true } }, Add);
+                LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(clocks.Keys.Select(id => new MultiplayerRoomUser(id)).ToArray())
+                {
+                    Expanded = { Value = true }
+                }, Add);
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);
+            AddUntilStep("wait for user population", () => leaderboard.ChildrenOfType<GameplayLeaderboardScore>().Count() == 2);
 
             AddStep("add clock sources", () =>
             {
@@ -67,10 +68,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 // For player 2, send frames in sets of 10.
                 for (int i = 0; i < 100; i++)
                 {
-                    SpectatorClient.SendFrames(PLAYER_1_ID, 1);
+                    SpectatorClient.SendFramesFromUser(PLAYER_1_ID, 1);
 
                     if (i % 10 == 0)
-                        SpectatorClient.SendFrames(PLAYER_2_ID, 10);
+                        SpectatorClient.SendFramesFromUser(PLAYER_2_ID, 10);
                 }
             });
 

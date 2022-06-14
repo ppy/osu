@@ -65,11 +65,6 @@ namespace osu.Game.Localisation
         public static LocalisableString HUDVisibilityMode => new TranslatableString(getKey(@"hud_visibility_mode"), @"HUD overlay visibility mode");
 
         /// <summary>
-        /// "Show difficulty graph on progress bar"
-        /// </summary>
-        public static LocalisableString ShowDifficultyGraph => new TranslatableString(getKey(@"show_difficulty_graph"), @"Show difficulty graph on progress bar");
-
-        /// <summary>
         /// "Show health display even when you can't fail"
         /// </summary>
         public static LocalisableString ShowHealthDisplayWhenCantFail => new TranslatableString(getKey(@"show_health_display_when_cant_fail"), @"Show health display even when you can't fail");
@@ -83,11 +78,6 @@ namespace osu.Game.Localisation
         /// "Always show key overlay"
         /// </summary>
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
-
-        /// <summary>
-        /// "Positional hitsounds"
-        /// </summary>
-        public static LocalisableString PositionalHitsounds => new TranslatableString(getKey(@"positional_hitsounds"), @"Positional hitsounds");
 
         /// <summary>
         /// "Always play first combo break sound"

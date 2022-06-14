@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         private readonly Drawable hitTarget;
 
-        public ColumnHitObjectArea(int columnIndex, HitObjectContainer hitObjectContainer)
+        public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
             : base(hitObjectContainer)
         {
             AddRangeInternal(new[]

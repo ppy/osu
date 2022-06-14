@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,10 +13,11 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
@@ -49,6 +51,13 @@ namespace osu.Game.Overlays.BeatmapListing
         /// </summary>
         public int CurrentPage { get; private set; }
 
+        /// <summary>
+        /// The currently selected <see cref="BeatmapCardSize"/>.
+        /// </summary>
+        public IBindable<BeatmapCardSize> CardSize => cardSize;
+
+        private readonly Bindable<BeatmapCardSize> cardSize = new Bindable<BeatmapCardSize>();
+
         private readonly BeatmapListingSearchControl searchControl;
         private readonly BeatmapListingSortTabControl sortControl;
         private readonly Box sortControlBackground;
@@ -61,8 +70,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IBindable<APIUser> apiUser;
 
         public BeatmapListingFilterControl()
         {
@@ -109,6 +117,13 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Margin = new MarginPadding { Left = 20 }
+                            },
+                            new BeatmapListingCardSizeTabControl
+                            {
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Margin = new MarginPadding { Right = 20 },
+                                Current = { BindTarget = CardSize }
                             }
                         }
                     }
@@ -116,10 +131,13 @@ namespace osu.Game.Overlays.BeatmapListing
             };
         }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, IAPIProvider api)
         {
-            sortControlBackground.Colour = colourProvider.Background5;
+            sortControlBackground.Colour = colourProvider.Background4;
         }
 
         public void Search(string query)
@@ -128,6 +146,8 @@ namespace osu.Game.Overlays.BeatmapListing
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            config.BindWith(OsuSetting.BeatmapListingCardSize, cardSize);
 
             var sortCriteria = sortControl.Current;
             var sortDirection = sortControl.SortDirection;
@@ -151,6 +171,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
             sortCriteria.BindValueChanged(_ => queueUpdateSearch());
             sortDirection.BindValueChanged(_ => queueUpdateSearch());
+
+            apiUser = api.LocalUser.GetBoundCopy();
+            apiUser.BindValueChanged(_ => queueUpdateSearch());
         }
 
         public void TakeFocus() => searchControl.TakeFocus();
@@ -179,6 +202,9 @@ namespace osu.Game.Overlays.BeatmapListing
             SearchStarted?.Invoke();
 
             resetSearch();
+
+            if (!api.IsLoggedIn)
+                return;
 
             queryChangedDebounce = Scheduler.AddDelayed(() =>
             {
@@ -231,12 +257,14 @@ namespace osu.Game.Overlays.BeatmapListing
 
                     if (filters.Any())
                     {
-                        SearchFinished?.Invoke(SearchResult.SupporterOnlyFilters(filters));
+                        var supporterOnlyFilters = SearchResult.SupporterOnlyFilters(filters);
+                        SearchFinished?.Invoke(supporterOnlyFilters);
                         return;
                     }
                 }
 
-                SearchFinished?.Invoke(SearchResult.ResultsReturned(sets));
+                var resultsReturned = SearchResult.ResultsReturned(sets);
+                SearchFinished?.Invoke(resultsReturned);
             };
 
             api.Queue(getSetsRequest);
@@ -300,7 +328,7 @@ namespace osu.Game.Overlays.BeatmapListing
             public static SearchResult ResultsReturned(List<APIBeatmapSet> results) => new SearchResult
             {
                 Type = SearchResultType.ResultsReturned,
-                Results = results
+                Results = results,
             };
 
             public static SearchResult SupporterOnlyFilters(List<LocalisableString> filters) => new SearchResult

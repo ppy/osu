@@ -29,10 +29,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Display toast with lengthy text", () => osd.Display(new LengthyToast()));
             AddAssert("Toast width is greater than 240", () => osd.Child.Width > 240);
 
-            AddRepeatStep("Change toggle (no bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingNoKeybind), 2);
-            AddRepeatStep("Change toggle (with bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingWithKeybind), 2);
-            AddRepeatStep("Change enum (no bind)", () => config.IncrementEnumSetting(TestConfigSetting.EnumSettingNoKeybind), 3);
-            AddRepeatStep("Change enum (with bind)", () => config.IncrementEnumSetting(TestConfigSetting.EnumSettingWithKeybind), 3);
+            AddRepeatStep("Change toggle (no bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingNoKeyBind), 2);
+            AddRepeatStep("Change toggle (with bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingWithKeyBind), 2);
+            AddRepeatStep("Change enum (no bind)", () => config.IncrementEnumSetting(TestConfigSetting.EnumSettingNoKeyBind), 3);
+            AddRepeatStep("Change enum (with bind)", () => config.IncrementEnumSetting(TestConfigSetting.EnumSettingWithKeyBind), 3);
         }
 
         private class TestConfigManager : ConfigManager<TestConfigSetting>
@@ -44,10 +44,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override void InitialiseDefaults()
             {
-                SetDefault(TestConfigSetting.ToggleSettingNoKeybind, false);
-                SetDefault(TestConfigSetting.EnumSettingNoKeybind, EnumSetting.Setting1);
-                SetDefault(TestConfigSetting.ToggleSettingWithKeybind, false);
-                SetDefault(TestConfigSetting.EnumSettingWithKeybind, EnumSetting.Setting1);
+                SetDefault(TestConfigSetting.ToggleSettingNoKeyBind, false);
+                SetDefault(TestConfigSetting.EnumSettingNoKeyBind, EnumSetting.Setting1);
+                SetDefault(TestConfigSetting.ToggleSettingWithKeyBind, false);
+                SetDefault(TestConfigSetting.EnumSettingWithKeyBind, EnumSetting.Setting1);
 
                 base.InitialiseDefaults();
             }
@@ -64,10 +64,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
             {
-                new TrackedSetting<bool>(TestConfigSetting.ToggleSettingNoKeybind, b => new SettingDescription(b, "toggle setting with no keybind", b ? "enabled" : "disabled")),
-                new TrackedSetting<EnumSetting>(TestConfigSetting.EnumSettingNoKeybind, v => new SettingDescription(v, "enum setting with no keybind", v.ToString())),
-                new TrackedSetting<bool>(TestConfigSetting.ToggleSettingWithKeybind, b => new SettingDescription(b, "toggle setting with keybind", b ? "enabled" : "disabled", "fake keybind")),
-                new TrackedSetting<EnumSetting>(TestConfigSetting.EnumSettingWithKeybind, v => new SettingDescription(v, "enum setting with keybind", v.ToString(), "fake keybind")),
+                new TrackedSetting<bool>(TestConfigSetting.ToggleSettingNoKeyBind, b => new SettingDescription(b, "toggle setting with no keybind", b ? "enabled" : "disabled")),
+                new TrackedSetting<EnumSetting>(TestConfigSetting.EnumSettingNoKeyBind, v => new SettingDescription(v, "enum setting with no keybind", v.ToString())),
+                new TrackedSetting<bool>(TestConfigSetting.ToggleSettingWithKeyBind, b => new SettingDescription(b, "toggle setting with keybind", b ? "enabled" : "disabled", "fake keybind")),
+                new TrackedSetting<EnumSetting>(TestConfigSetting.EnumSettingWithKeyBind, v => new SettingDescription(v, "enum setting with keybind", v.ToString(), "fake keybind")),
             };
 
             protected override void PerformLoad()
@@ -79,10 +79,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private enum TestConfigSetting
         {
-            ToggleSettingNoKeybind,
-            EnumSettingNoKeybind,
-            ToggleSettingWithKeybind,
-            EnumSettingWithKeybind
+            ToggleSettingNoKeyBind,
+            EnumSettingNoKeyBind,
+            ToggleSettingWithKeyBind,
+            EnumSettingWithKeyBind
         }
 
         private enum EnumSetting

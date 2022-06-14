@@ -35,9 +35,14 @@ namespace osu.Game.Localisation
         public static LocalisableString ConfineMouseMode => new TranslatableString(getKey(@"confine_mouse_mode"), @"Confine mouse cursor to window");
 
         /// <summary>
-        /// "Disable mouse wheel during gameplay"
+        /// "Disable mouse wheel adjusting volume during gameplay"
         /// </summary>
-        public static LocalisableString DisableMouseWheel => new TranslatableString(getKey(@"disable_mouse_wheel"), @"Disable mouse wheel during gameplay");
+        public static LocalisableString DisableMouseWheelVolumeAdjust => new TranslatableString(getKey(@"disable_mouse_wheel_volume_adjust"), @"Disable mouse wheel adjusting volume during gameplay");
+
+        /// <summary>
+        /// "Volume can still be adjusted using the mouse wheel by holding "Alt""
+        /// </summary>
+        public static LocalisableString DisableMouseWheelVolumeAdjustTooltip => new TranslatableString(getKey(@"disable_mouse_wheel_volume_adjust_tooltip"), @"Volume can still be adjusted using the mouse wheel by holding ""Alt""");
 
         /// <summary>
         /// "Disable mouse buttons during gameplay"

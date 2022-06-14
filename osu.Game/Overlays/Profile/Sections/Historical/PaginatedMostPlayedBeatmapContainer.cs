@@ -19,7 +19,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         public PaginatedMostPlayedBeatmapContainer(Bindable<APIUser> user)
             : base(user, UsersStrings.ShowExtraHistoricalMostPlayedTitle)
         {
-            ItemsPerPage = 5;
         }
 
         [BackgroundDependencyLoader]
@@ -28,10 +27,10 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
-        protected override int GetCount(APIUser user) => user.BeatmapPlaycountsCount;
+        protected override int GetCount(APIUser user) => user.BeatmapPlayCountsCount;
 
-        protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest() =>
-            new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
+        protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest(PaginationParameters pagination) =>
+            new GetUserMostPlayedBeatmapsRequest(User.Value.Id, pagination);
 
         protected override Drawable CreateDrawableItem(APIUserMostPlayedBeatmap mostPlayed) =>
             new DrawableMostPlayedBeatmap(mostPlayed);

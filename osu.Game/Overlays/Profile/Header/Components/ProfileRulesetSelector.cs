@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         public void SetDefaultRuleset(RulesetInfo ruleset)
         {
             foreach (var tabItem in TabContainer)
-                ((ProfileRulesetTabItem)tabItem).IsDefault = ((ProfileRulesetTabItem)tabItem).Value.ID == ruleset.ID;
+                ((ProfileRulesetTabItem)tabItem).IsDefault = ((ProfileRulesetTabItem)tabItem).Value.Equals(ruleset);
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ProfileRulesetTabItem(value);

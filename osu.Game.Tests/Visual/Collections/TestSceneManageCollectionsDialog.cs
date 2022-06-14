@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -35,10 +36,11 @@ namespace osu.Game.Tests.Visual.Collections
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesets, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
 
-            beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+            beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
             base.Content.AddRange(new Drawable[]
             {
@@ -48,7 +50,7 @@ namespace osu.Game.Tests.Visual.Collections
             });
 
             Dependencies.Cache(manager);
-            Dependencies.Cache(dialogOverlay);
+            Dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
         }
 
         [SetUp]
@@ -140,18 +142,17 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("add dropdown", () =>
             {
                 Add(new CollectionFilterDropdown
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        RelativeSizeAxes = Axes.X,
-                        Width = 0.4f,
-                    }
-                );
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.4f,
+                });
             });
             AddStep("add two collections with same name", () => manager.Collections.AddRange(new[]
             {
                 new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "1" }, Beatmaps = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0] } },
+                new BeatmapCollection { Name = { Value = "1" }, BeatmapHashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash } },
             }));
         }
 
@@ -161,7 +162,7 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("add two collections", () => manager.Collections.AddRange(new[]
             {
                 new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "2" }, Beatmaps = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0] } },
+                new BeatmapCollection { Name = { Value = "2" }, BeatmapHashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash } },
             }));
 
             assertCollectionCount(2);
@@ -197,7 +198,7 @@ namespace osu.Game.Tests.Visual.Collections
         {
             AddStep("add two collections", () => manager.Collections.AddRange(new[]
             {
-                new BeatmapCollection { Name = { Value = "1" }, Beatmaps = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0] } },
+                new BeatmapCollection { Name = { Value = "1" }, BeatmapHashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash } },
             }));
 
             assertCollectionCount(1);

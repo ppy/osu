@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -37,9 +38,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private BeatmapInfo exampleBeatmapInfo => new BeatmapInfo
         {
-            RulesetID = 0,
             Ruleset = rulesets.AvailableRulesets.First(),
-            BaseDifficulty = new BeatmapDifficulty
+            Difficulty = new BeatmapDifficulty
             {
                 CircleSize = 7.2f,
                 DrainRate = 3,
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("no mods selected", () => SelectedMods.Value = Array.Empty<Mod>());
 
-            AddAssert("first bar text is Circle Size", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == "Circle Size");
+            AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCs);
             AddAssert("circle size bar is white", () => barIsWhite(advancedStats.FirstValue));
             AddAssert("HP drain bar is white", () => barIsWhite(advancedStats.HpDrain));
             AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.Accuracy));
@@ -68,8 +68,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("set beatmap", () => advancedStats.BeatmapInfo = new BeatmapInfo
             {
-                Ruleset = rulesets.GetRuleset(3),
-                BaseDifficulty = new BeatmapDifficulty
+                Ruleset = rulesets.GetRuleset(3) ?? throw new InvalidOperationException(),
+                Difficulty = new BeatmapDifficulty
                 {
                     CircleSize = 5,
                     DrainRate = 4.3f,
@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 StarRating = 8
             });
 
-            AddAssert("first bar text is Key Count", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == "Key Count");
+            AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCsMania);
         }
 
         [Test]

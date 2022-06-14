@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
         private readonly Box light;
 
         public FooterButton()
-            : base(HoverSampleSet.Button)
+            : base(HoverSampleSet.Toolbar)
         {
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Select
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == Hotkey)
+            if (e.Action == Hotkey && !e.Repeat)
             {
                 TriggerClick();
                 return true;

@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -54,7 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private void load(AudioManager audio)
         {
             sampleSelect = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
-            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Submit.GetDescription()}-select");
+            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-select");
 
             AddRangeInternal(new Drawable[]
             {
@@ -101,7 +102,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public bool FilteringActive { get; set; }
 
-        public IEnumerable<string> FilterTerms => new[] { Room.Name.Value };
+        public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Room.Name.Value };
 
         private bool matchingFilter = true;
 
@@ -128,7 +129,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
             {
-                lounge?.Open(Room.DeepClone());
+                lounge?.OpenCopy(Room);
             })
         };
 
@@ -193,7 +194,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 this.room = room;
             }
 
-            private OsuPasswordTextBox passwordTextbox;
+            private OsuPasswordTextBox passwordTextBox;
             private TriangleButton joinButton;
             private OsuSpriteText errorText;
             private Sample sampleJoinFail;
@@ -218,7 +219,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                passwordTextbox = new OsuPasswordTextBox
+                                passwordTextBox = new OsuPasswordTextBox
                                 {
                                     Width = 200,
                                     PlaceholderText = "password",
@@ -246,21 +247,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             {
                 base.LoadComplete();
 
-                Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
-                passwordTextbox.OnCommit += (_, __) => performJoin();
+                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(passwordTextBox));
+                passwordTextBox.OnCommit += (_, __) => performJoin();
             }
 
             private void performJoin()
             {
-                lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
-                GetContainingInputManager().TriggerFocusContention(passwordTextbox);
+                lounge?.Join(room, passwordTextBox.Text, null, joinFailed);
+                GetContainingInputManager().TriggerFocusContention(passwordTextBox);
             }
 
             private void joinFailed(string error) => Schedule(() =>
             {
-                passwordTextbox.Text = string.Empty;
+                passwordTextBox.Text = string.Empty;
 
-                GetContainingInputManager().ChangeFocus(passwordTextbox);
+                GetContainingInputManager().ChangeFocus(passwordTextBox);
 
                 errorText.Text = error;
                 errorText

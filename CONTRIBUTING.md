@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-Thank you for showing interest in the development of osu!lazer! We aim to provide a good collaborating environment for everyone involved, and as such have decided to list some of the most important things to keep in mind in the process. The guidelines below have been chosen based on past experience.
+Thank you for showing interest in the development of osu!. We aim to provide a good collaborating environment for everyone involved, and as such have decided to list some of the most important things to keep in mind in the process. The guidelines below have been chosen based on past experience.
 
 These are not "official rules" *per se*, but following them will help everyone deal with things in the most efficient manner.
 
@@ -32,7 +32,7 @@ Issues, bug reports and feature suggestions are welcomed, though please keep in 
 
 * **Provide more information when asked to do so.**
 
-  Sometimes when a bug is more elusive or complicated, none of the information listed above will pinpoint a concrete cause of the problem. In this case we will most likely ask you for additional info, such as a Windows Event Log dump or a copy of your local lazer database (`client.db`). Providing that information is beneficial to both parties - we can track down the problem better, and hopefully fix it for you at some point once we know where it is!
+  Sometimes when a bug is more elusive or complicated, none of the information listed above will pinpoint a concrete cause of the problem. In this case we will most likely ask you for additional info, such as a Windows Event Log dump or a copy of your local osu! database (`client.db`). Providing that information is beneficial to both parties - we can track down the problem better, and hopefully fix it for you at some point once we know where it is!
 
 * **When submitting a feature proposal, please describe it in the most understandable way you can.**
 
@@ -54,7 +54,7 @@ Issues, bug reports and feature suggestions are welcomed, though please keep in 
 
 We also welcome pull requests from unaffiliated contributors. The [issue tracker](https://github.com/ppy/osu/issues) should provide plenty of issues that you can work on; we also mark issues that we think would be good for newcomers with the [`good-first-issue`](https://github.com/ppy/osu/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue) label.
 
-However, do keep in mind that the core team is committed to bringing osu!lazer up to par with stable first and foremost, so depending on what your contribution concerns, it might not be merged and released right away. Our approach to managing issues and their priorities is described [in the wiki](https://github.com/ppy/osu/wiki/Project-management).
+However, do keep in mind that the core team is committed to bringing osu!(lazer) up to par with osu!(stable) first and foremost, so depending on what your contribution concerns, it might not be merged and released right away. Our approach to managing issues and their priorities is described [in the wiki](https://github.com/ppy/osu/wiki/Project-management).
 
 Here are some key things to note before jumping in:
 
@@ -128,7 +128,7 @@ Here are some key things to note before jumping in:
 
 * **Don't mistake criticism of code for criticism of your person.**
 
-  As mentioned before, we are highly committed to quality when it comes to the lazer project. This means that contributions from less experienced community members can take multiple rounds of review to get to a mergeable state. We try our utmost best to never conflate a person with the code they authored, and to keep the discussion focused on the code at all times. Please consider our comments and requests a learning experience, and don't treat it as a personal attack.
+  As mentioned before, we are highly committed to quality when it comes to the osu! project. This means that contributions from less experienced community members can take multiple rounds of review to get to a mergeable state. We try our utmost best to never conflate a person with the code they authored, and to keep the discussion focused on the code at all times. Please consider our comments and requests a learning experience, and don't treat it as a personal attack.
 
 * **Feel free to reach out for help.**
 

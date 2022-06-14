@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.IO.Archives;
@@ -23,8 +24,8 @@ namespace osu.Game.Tests.Skins
         [BackgroundDependencyLoader]
         private void load()
         {
-            var imported = skins.Import(new ZipArchiveReader(TestResources.OpenResource("Archives/ogg-skin.osk"))).Result;
-            skin = skins.GetSkin(imported.Value);
+            var imported = skins.Import(new ZipArchiveReader(TestResources.OpenResource("Archives/ogg-skin.osk"))).GetResultSafely();
+            skin = imported.PerformRead(skinInfo => skins.GetSkin(skinInfo));
         }
 
         [Test]

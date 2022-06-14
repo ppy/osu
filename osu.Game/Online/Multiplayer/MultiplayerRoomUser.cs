@@ -48,9 +48,10 @@ namespace osu.Game.Online.Multiplayer
             UserID = userId;
         }
 
-        public bool Equals(MultiplayerRoomUser other)
+        public bool Equals(MultiplayerRoomUser? other)
         {
             if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
             return UserID == other.UserID;
         }
@@ -64,5 +65,21 @@ namespace osu.Game.Online.Multiplayer
         }
 
         public override int GetHashCode() => UserID.GetHashCode();
+
+        /// <summary>
+        /// Whether this user has finished loading and can start gameplay.
+        /// </summary>
+        public bool CanStartGameplay()
+        {
+            switch (State)
+            {
+                case MultiplayerUserState.Loaded:
+                case MultiplayerUserState.ReadyForGameplay:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
     }
 }

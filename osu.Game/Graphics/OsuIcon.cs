@@ -39,10 +39,10 @@ namespace osu.Game.Graphics
         public static IconUsage ListSearch => Get(0xe032);
 
         //osu! playstyles
-        public static IconUsage PlaystyleTablet => Get(0xe02a);
-        public static IconUsage PlaystyleMouse => Get(0xe029);
-        public static IconUsage PlaystyleKeyboard => Get(0xe02b);
-        public static IconUsage PlaystyleTouch => Get(0xe02c);
+        public static IconUsage PlayStyleTablet => Get(0xe02a);
+        public static IconUsage PlayStyleMouse => Get(0xe029);
+        public static IconUsage PlayStyleKeyboard => Get(0xe02b);
+        public static IconUsage PlayStyleTouch => Get(0xe02c);
 
         // osu! difficulties
         public static IconUsage EasyOsu => Get(0xe015);
@@ -77,17 +77,17 @@ namespace osu.Game.Graphics
         public static IconUsage ModAutopilot => Get(0xe03a);
         public static IconUsage ModAuto => Get(0xe03b);
         public static IconUsage ModCinema => Get(0xe03c);
-        public static IconUsage ModDoubletime => Get(0xe03d);
+        public static IconUsage ModDoubleTime => Get(0xe03d);
         public static IconUsage ModEasy => Get(0xe03e);
         public static IconUsage ModFlashlight => Get(0xe03f);
         public static IconUsage ModHalftime => Get(0xe040);
-        public static IconUsage ModHardrock => Get(0xe041);
+        public static IconUsage ModHardRock => Get(0xe041);
         public static IconUsage ModHidden => Get(0xe042);
         public static IconUsage ModNightcore => Get(0xe043);
-        public static IconUsage ModNofail => Get(0xe044);
+        public static IconUsage ModNoFail => Get(0xe044);
         public static IconUsage ModRelax => Get(0xe045);
-        public static IconUsage ModSpunout => Get(0xe046);
-        public static IconUsage ModSuddendeath => Get(0xe047);
+        public static IconUsage ModSpunOut => Get(0xe046);
+        public static IconUsage ModSuddenDeath => Get(0xe047);
         public static IconUsage ModTarget => Get(0xe048);
         public static IconUsage ModBg => Get(0xe04a);
     }

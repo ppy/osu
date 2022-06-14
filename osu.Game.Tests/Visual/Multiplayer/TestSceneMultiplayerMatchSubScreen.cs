@@ -5,18 +5,28 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Taiko.Mods;
+using osu.Game.Rulesets.UI;
+using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
@@ -39,11 +49,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
 
-            importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+
+            importedSet = beatmaps.GetAllUsableBeatmapSets().First();
         }
 
         [SetUp]
@@ -62,22 +74,37 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestCreatedRoom()
         {
-            AddStep("set playlist", () =>
+            AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                 {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 
-            AddStep("click create button", () =>
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+        }
+
+        [Test]
+        public void TestTaikoOnlyMod()
+        {
+            AddStep("add playlist item", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single());
-                InputManager.Click(MouseButton.Left);
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new TaikoRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new TaikoRuleset().RulesetInfo.OnlineID,
+                    AllowedMods = new[] { new APIMod(new TaikoModSwap()) }
+                });
             });
 
-            AddUntilStep("wait for join", () => Client.Room != null);
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddStep("select swap mod", () => MultiplayerClient.ChangeUserMods(API.LocalUser.Value.OnlineID, new[] { new TaikoModSwap() }));
+            AddUntilStep("participant panel has mod", () => this.ChildrenOfType<ParticipantPanel>().Any(p => p.ChildrenOfType<ModIcon>().Any(m => m.Mod is TaikoModSwap)));
         }
 
         [Test]
@@ -87,10 +114,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                 {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 
@@ -102,44 +128,133 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
                 {
-                    Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 
-            AddStep("click create button", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
-            AddUntilStep("wait for room join", () => Client.Room != null);
+            AddUntilStep("wait for room join", () => RoomJoined);
 
             AddStep("join other user (ready)", () =>
             {
-                Client.AddUser(new APIUser { Id = PLAYER_1_ID });
-                Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready);
+                MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID });
+                MultiplayerClient.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready);
             });
 
-            AddStep("click spectate button", () =>
+            ClickButtonWhenEnabled<MultiplayerSpectateButton>();
+
+            AddUntilStep("wait for spectating user state", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
+
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            AddUntilStep("match started", () => MultiplayerClient.Room?.State == MultiplayerRoomState.WaitingForLoad);
+        }
+
+        [Test]
+        public void TestFreeModSelectionHasAllowedMods()
+        {
+            AddStep("add playlist item with allowed mod", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerSpectateButton>().Single());
-                InputManager.Click(MouseButton.Left);
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
+                });
             });
 
-            AddUntilStep("wait for spectating user state", () => Client.LocalUser?.State == MultiplayerUserState.Spectating);
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
-            AddUntilStep("wait for ready button to be enabled", () => this.ChildrenOfType<MultiplayerReadyButton>().Single().ChildrenOfType<ReadyButton>().Single().Enabled.Value);
+            AddUntilStep("wait for join", () => RoomJoined);
 
-            AddStep("click ready button", () =>
+            ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
+
+            AddUntilStep("mod select contents loaded",
+                () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
+            AddUntilStep("mod select contains only double time mod",
+                () => this.ChildrenOfType<UserModSelectOverlay>()
+                          .SingleOrDefault()?
+                          .ChildrenOfType<ModPanel>()
+                          .SingleOrDefault(panel => !panel.Filtered.Value)?.Mod is OsuModDoubleTime);
+        }
+
+        [Test]
+        public void TestModSelectKeyWithAllowedMods()
+        {
+            AddStep("add playlist item with allowed mod", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
-                InputManager.Click(MouseButton.Left);
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
+                });
             });
 
-            AddUntilStep("match started", () => Client.Room?.State == MultiplayerRoomState.WaitingForLoad);
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
+
+            AddUntilStep("mod select shown", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestModSelectKeyWithNoAllowedMods()
+        {
+            AddStep("add playlist item with no allowed mods", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                });
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
+
+            AddWaitStep("wait some", 3);
+            AddAssert("mod select not shown", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestNextPlaylistItemSelectedAfterCompletion()
+        {
+            AddStep("add two playlist items", () =>
+            {
+                SelectedRoom.Value.Playlist.AddRange(new[]
+                {
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    },
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                });
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            AddStep("change user to loaded", () => MultiplayerClient.ChangeState(MultiplayerUserState.Loaded));
+            AddUntilStep("user playing", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Playing);
+            AddStep("abort gameplay", () => MultiplayerClient.AbortGameplay());
+
+            AddUntilStep("last playlist item selected", () =>
+            {
+                var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.APIRoom?.Playlist.Last().ID);
+                return lastItem.IsSelectedItem;
+            });
         }
     }
 }
