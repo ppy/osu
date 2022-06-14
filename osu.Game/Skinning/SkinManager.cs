@@ -281,9 +281,6 @@ namespace osu.Game.Skinning
         public Task<Live<SkinInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default) =>
             skinModelManager.Import(archive, lowPriority, cancellationToken);
 
-        public Live<SkinInfo> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) =>
-            skinModelManager.Import(item, archive, cancellationToken);
-
         #endregion
 
         #region Implementation of IModelManager<SkinInfo>
