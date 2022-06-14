@@ -103,14 +103,12 @@ namespace osu.Desktop
 
                 if (getBeatmap(activity.Value) is IBeatmapInfo beatmap && beatmap.OnlineID > 0)
                 {
-                    string rulesetShortName = (activity.Value as UserActivity.InGame)?.Ruleset.ShortName ?? string.Empty;
-
                     presence.Buttons = new[]
                     {
                         new Button
                         {
                             Label = "View beatmap",
-                            Url = $@"{api.WebsiteRootUrl}/beatmapsets/{beatmap.BeatmapSet?.OnlineID}#{rulesetShortName}/{beatmap.OnlineID}"
+                            Url = $@"{api.WebsiteRootUrl}/beatmapsets/{beatmap.BeatmapSet?.OnlineID}#{ruleset.Value.ShortName}/{beatmap.OnlineID}"
                         }
                     };
                 }
