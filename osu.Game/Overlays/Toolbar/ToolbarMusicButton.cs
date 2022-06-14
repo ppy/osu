@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
@@ -20,6 +21,15 @@ namespace osu.Game.Overlays.Toolbar
         private void load(NowPlayingOverlay music)
         {
             StateContainer = music;
+        }
+
+        [Resolved(canBeNull: true)]
+        private VolumeOverlay volume { get; set; }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            volume?.Adjust(GlobalAction.IncreaseVolume, e.ScrollDelta.Y, e.IsPrecise);
+            return true;
         }
     }
 }
