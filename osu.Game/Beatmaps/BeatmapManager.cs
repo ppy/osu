@@ -374,7 +374,7 @@ namespace osu.Game.Beatmaps
 
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
-            return beatmapModelManager.Import(item, archive, lowPriority, cancellationToken);
+            return beatmapModelManager.Import(item, archive, cancellationToken);
         }
 
         public IEnumerable<string> HandledExtensions => beatmapModelManager.HandledExtensions;

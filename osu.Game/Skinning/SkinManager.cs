@@ -282,7 +282,7 @@ namespace osu.Game.Skinning
             skinModelManager.Import(archive, lowPriority, cancellationToken);
 
         public Live<SkinInfo> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) =>
-            skinModelManager.Import(item, archive, lowPriority, cancellationToken);
+            skinModelManager.Import(item, archive, cancellationToken);
 
         #endregion
 

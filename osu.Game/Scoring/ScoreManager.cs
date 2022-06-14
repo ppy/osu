@@ -280,7 +280,7 @@ namespace osu.Game.Scoring
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreModelManager.Import(notification, tasks);
 
-        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) => scoreModelManager.Import(item, archive, lowPriority, cancellationToken);
+        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) => scoreModelManager.Import(item, archive, cancellationToken);
 
         public bool IsAvailableLocally(ScoreInfo model) => scoreModelManager.IsAvailableLocally(model);
 
