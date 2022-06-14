@@ -35,11 +35,6 @@ namespace osu.Game.Stores
         private const int import_queue_request_concurrency = 1;
 
         /// <summary>
-        /// The size of a batch import operation before considering it a lower priority operation.
-        /// </summary>
-        private const int low_priority_import_batch_size = 1;
-
-        /// <summary>
         /// A singleton scheduler shared by all <see cref="RealmArchiveModelImporter{TModel}"/>.
         /// </summary>
         /// <remarks>
@@ -49,11 +44,11 @@ namespace osu.Game.Stores
         private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
         /// <summary>
-        /// A second scheduler for lower priority imports.
+        /// A second scheduler for batch imports.
         /// For simplicity, these will just run in parallel with normal priority imports, but a future refactor would see this implemented via a custom scheduler/queue.
         /// See https://gist.github.com/peppy/f0e118a14751fc832ca30dd48ba3876b for an incomplete version of this.
         /// </summary>
-        private static readonly ThreadedTaskScheduler import_scheduler_low_priority = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
+        private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
         public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
 
@@ -105,7 +100,7 @@ namespace osu.Game.Stores
 
             var imported = new List<Live<TModel>>();
 
-            bool isLowPriorityImport = tasks.Length > low_priority_import_batch_size;
+            bool isBatchImport = tasks.Length > 1;
 
             try
             {
@@ -115,7 +110,7 @@ namespace osu.Game.Stores
 
                     try
                     {
-                        var model = await Import(task, isLowPriorityImport, notification.CancellationToken).ConfigureAwait(false);
+                        var model = await Import(task, isBatchImport, notification.CancellationToken).ConfigureAwait(false);
 
                         lock (imported)
                         {
@@ -178,16 +173,16 @@ namespace osu.Game.Stores
         /// Note that this bypasses the UI flow and should only be used for special cases or testing.
         /// </summary>
         /// <param name="task">The <see cref="ImportTask"/> containing data about the <typeparamref name="TModel"/> to import.</param>
-        /// <param name="lowPriority">Whether this is a low priority import.</param>
+        /// <param name="batchImport">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        public async Task<Live<TModel>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<Live<TModel>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
-                import = await Import(reader, lowPriority, cancellationToken).ConfigureAwait(false);
+                import = await Import(reader, batchImport, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -210,9 +205,9 @@ namespace osu.Game.Stores
         /// Silently import an item from an <see cref="ArchiveReader"/>.
         /// </summary>
         /// <param name="archive">The archive to be imported.</param>
-        /// <param name="lowPriority">Whether this is a low priority import.</param>
+        /// <param name="batchImport">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<Live<TModel>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<Live<TModel>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -235,10 +230,10 @@ namespace osu.Game.Stores
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, lowPriority, cancellationToken),
+            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, batchImport, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler,
-                lowPriority ? import_scheduler_low_priority : import_scheduler);
+                batchImport ? import_scheduler_batch : import_scheduler);
 
             return await scheduledImport.ConfigureAwait(false);
         }
@@ -248,16 +243,16 @@ namespace osu.Game.Stores
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        /// <param name="quickSkipIfExisting">If <c>true</c>, imports will be skipped before they begin, given an existing model matches on hash and filenames. Should generally only be used for large batch imports, as it may defy user expectations when updating an existing model.</param>
+        /// <param name="batchImport">If <c>true</c>, imports will be skipped before they begin, given an existing model matches on hash and filenames. Should generally only be used for large batch imports, as it may defy user expectations when updating an existing model.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool quickSkipIfExisting = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
+        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             bool checkedExisting = false;
             TModel? existing = null;
 
-            if (quickSkipIfExisting && archive != null)
+            if (batchImport && archive != null)
             {
                 // this is a fast bail condition to improve large import performance.
                 item.Hash = computeHashFast(archive);

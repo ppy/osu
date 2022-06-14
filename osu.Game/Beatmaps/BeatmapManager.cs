@@ -353,9 +353,9 @@ namespace osu.Game.Beatmaps
 
         public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => beatmapModelManager.Import(notification, tasks);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default) => beatmapModelManager.Import(task, lowPriority, cancellationToken);
+        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => beatmapModelManager.Import(task, batchImport, cancellationToken);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default) => beatmapModelManager.Import(archive, lowPriority, cancellationToken);
+        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default) => beatmapModelManager.Import(archive, batchImport, cancellationToken);
 
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) => beatmapModelManager.Import(item, archive, false, cancellationToken);
 
