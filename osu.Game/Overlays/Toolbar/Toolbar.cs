@@ -41,8 +41,6 @@ namespace osu.Game.Overlays.Toolbar
         // Toolbar and its components need keyboard input even when hidden.
         public override bool PropagateNonPositionalInputSubTree => true;
 
-        protected override bool BlockScrollInput => false;
-
         public Toolbar()
         {
             RelativeSizeAxes = Axes.X;
