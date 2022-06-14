@@ -143,6 +143,36 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestProcessingWhileHidden()
+        {
+            AddStep("OD 1", () => recreateDisplay(new OsuHitWindows(), 1));
+
+            AddStep("hide displays", () =>
+            {
+                foreach (var hitErrorMeter in this.ChildrenOfType<HitErrorMeter>())
+                    hitErrorMeter.Hide();
+            });
+
+            AddRepeatStep("hit", () => newJudgement(), ColourHitErrorMeter.MAX_DISPLAYED_JUDGEMENTS * 2);
+
+            AddAssert("bars added", () => this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("circle added", () => this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+
+            AddUntilStep("wait for bars to disappear", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddUntilStep("ensure max circles not exceeded", () =>
+            {
+                return this.ChildrenOfType<ColourHitErrorMeter>()
+                           .All(m => m.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Count() <= ColourHitErrorMeter.MAX_DISPLAYED_JUDGEMENTS);
+            });
+
+            AddStep("show displays", () =>
+            {
+                foreach (var hitErrorMeter in this.ChildrenOfType<HitErrorMeter>())
+                    hitErrorMeter.Show();
+            });
+        }
+
+        [Test]
         public void TestClear()
         {
             AddStep("OD 1", () => recreateDisplay(new OsuHitWindows(), 1));
