@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -12,7 +12,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
-using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -25,25 +24,17 @@ namespace osu.Game.Tests.Editing.Checks
         [SetUp]
         public void Setup()
         {
+            var file = CheckTestHelpers.CreateMockFile("jpg");
+
             check = new CheckBackgroundQuality();
             beatmap = new Beatmap<HitObject>
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    Metadata = new BeatmapMetadata { BackgroundFile = "abc123.jpg" },
+                    Metadata = new BeatmapMetadata { BackgroundFile = file.Filename },
                     BeatmapSet = new BeatmapSetInfo
                     {
-                        Files = new List<BeatmapSetFileInfo>(new[]
-                        {
-                            new BeatmapSetFileInfo
-                            {
-                                Filename = "abc123.jpg",
-                                FileInfo = new FileInfo
-                                {
-                                    Hash = "abcdef"
-                                }
-                            }
-                        })
+                        Files = { file }
                     }
                 }
             };
@@ -54,7 +45,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             // While this is a problem, it is out of scope for this check and is caught by a different one.
             beatmap.Metadata.BackgroundFile = string.Empty;
-            var context = getContext(null, new MemoryStream(System.Array.Empty<byte>()));
+            var context = getContext(null, new MemoryStream(Array.Empty<byte>()));
 
             Assert.That(check.Run(context), Is.Empty);
         }

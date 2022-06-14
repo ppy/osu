@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             showMetadataForBeatmap(() =>
             {
-                var allBeatmapSets = manager.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
+                var allBeatmapSets = manager.GetAllUsableBeatmapSets();
                 if (allBeatmapSets.Count == 0)
                     return manager.DefaultBeatmap;
 
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             }
 
-            public override async Task<StarDifficulty> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo rulesetInfo = null, IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
+            public override async Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo rulesetInfo = null, IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
             {
                 if (blockCalculation)
                     await calculationBlocker.Task.ConfigureAwait(false);

@@ -13,10 +13,7 @@ namespace osu.Game.Screens.Menu
     public class StorageErrorDialog : PopupDialog
     {
         [Resolved]
-        private DialogOverlay dialogOverlay { get; set; }
-
-        [Resolved]
-        private OsuGameBase osuGame { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         public StorageErrorDialog(OsuStorage storage, OsuStorageError error)
         {

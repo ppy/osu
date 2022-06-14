@@ -46,7 +46,10 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup) => null;
+        public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
+            where TLookup : notnull
+            where TValue : notnull
+            => null;
 
         public void Dispose()
         {

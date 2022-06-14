@@ -46,7 +46,7 @@ namespace osu.Game.Collections
             {
                 new Box
                 {
-                    Colour = colours.GreySeafoamDark,
+                    Colour = colours.GreySeaFoamDark,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new Container
@@ -82,7 +82,7 @@ namespace osu.Game.Collections
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
                                             Icon = FontAwesome.Solid.Times,
-                                            Colour = colours.GreySeafoamDarker,
+                                            Colour = colours.GreySeaFoamDarker,
                                             Scale = new Vector2(0.8f),
                                             X = -10,
                                             Action = () => State.Value = Visibility.Hidden
@@ -100,7 +100,7 @@ namespace osu.Game.Collections
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = colours.GreySeafoamDarker
+                                            Colour = colours.GreySeaFoamDarker
                                         },
                                         new DrawableCollectionList
                                         {

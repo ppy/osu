@@ -39,6 +39,14 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestMetadataWithMultipleYears()
+        {
+            AddStep("Add data spanning multiple years", () => sidebar.Metadata.Value = metadata_with_multiple_years);
+            AddUntilStep("2022 month sections exist", () => sidebar.ChildrenOfType<MonthSection>().Any(s => s.Year == 2022));
+            AddUntilStep("2021 month sections exist", () => sidebar.ChildrenOfType<MonthSection>().Any(s => s.Year == 2021));
+        }
+
+        [Test]
         public void TestYearsPanelVisibility()
         {
             AddUntilStep("Years panel is hidden", () => yearsPanel?.Alpha == 0);
@@ -131,6 +139,74 @@ namespace osu.Game.Tests.Visual.Online
                 2013
             },
             NewsPosts = Array.Empty<APINewsPost>()
+        };
+
+        // see https://osu.ppy.sh/docs/index.html#get-news-listing:
+        // "NewsPost collections queried by year will also include posts published in November and December of the previous year if the current date is the same year and before April."
+        private static readonly APINewsSidebar metadata_with_multiple_years = new APINewsSidebar
+        {
+            CurrentYear = 2022,
+            Years = new[]
+            {
+                2022,
+                2021,
+                2020,
+                2019,
+                2018,
+                2017,
+                2016,
+                2015,
+                2014,
+                2013
+            },
+            NewsPosts = new List<APINewsPost>
+            {
+                new APINewsPost
+                {
+                    Title = "(Mar 2022) Short title",
+                    PublishedAt = new DateTime(2022, 3, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Mar 2022) Oh boy that's a long post title I wonder if it will break anything",
+                    PublishedAt = new DateTime(2022, 3, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Feb 2022) Medium title, nothing to see here",
+                    PublishedAt = new DateTime(2022, 2, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Feb 2022) Short title",
+                    PublishedAt = new DateTime(2022, 2, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Jan 2022) Oh boy that's a long post title I wonder if it will break anything",
+                    PublishedAt = new DateTime(2022, 1, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Jan 2022) Medium title, nothing to see here",
+                    PublishedAt = new DateTime(2022, 1, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Jan 2022) Short title",
+                    PublishedAt = new DateTime(2022, 1, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Dec 2021) Surprise, the last year's not gone yet",
+                    PublishedAt = new DateTime(2021, 12, 1)
+                },
+                new APINewsPost
+                {
+                    Title = "(Nov 2021) Same goes for November",
+                    PublishedAt = new DateTime(2021, 11, 1)
+                }
+            }
         };
 
         private class TestNewsSidebar : NewsSidebar

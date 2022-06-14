@@ -29,11 +29,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // bring in updates from selection changes
             EditorBeatmap.HitObjectUpdated += _ => Scheduler.AddOnce(UpdateTernaryStates);
 
-            SelectedItems.BindTo(EditorBeatmap.SelectedHitObjects);
-            SelectedItems.CollectionChanged += (sender, args) =>
-            {
-                Scheduler.AddOnce(UpdateTernaryStates);
-            };
+            SelectedItems.CollectionChanged += (sender, args) => Scheduler.AddOnce(UpdateTernaryStates);
         }
 
         protected override void DeleteItems(IEnumerable<HitObject> items) => EditorBeatmap.RemoveRange(items);

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private const float performance_background_shear = 0.45f;
 
-        protected readonly APIScoreInfo Score;
+        protected readonly APIScore Score;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -36,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        public DrawableProfileScore(APIScoreInfo score)
+        public DrawableProfileScore(APIScore score)
         {
             Score = score;
 
@@ -131,9 +132,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Origin = Anchor.CentreRight,
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(2),
-                                        Children = Score.Mods.Select(mod => new ModIcon(rulesets.GetRuleset(Score.RulesetID).CreateInstance().CreateModFromAcronym(mod.Acronym))
+                                        Children = Score.Mods.Select(mod =>
                                         {
-                                            Scale = new Vector2(0.35f)
+                                            var ruleset = rulesets.GetRuleset(Score.RulesetID) ?? throw new InvalidOperationException();
+
+                                            return new ModIcon(ruleset.CreateInstance().CreateModFromAcronym(mod.Acronym))
+                                            {
+                                                Scale = new Vector2(0.35f)
+                                            };
                                         }).ToList(),
                                     }
                                 }

@@ -20,7 +20,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
@@ -80,10 +79,9 @@ namespace osu.Game.Overlays.Toolbar
         protected FillFlowContainer Flow;
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected ToolbarButton()
-            : base(HoverSampleSet.Toolbar)
         {
             Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;
@@ -190,7 +188,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == Hotkey)
+            if (e.Action == Hotkey && !e.Repeat)
             {
                 TriggerClick();
                 return true;
@@ -207,7 +205,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (Hotkey == null) return;
 
-            var realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
+            var realmKeyBinding = realm.Realm.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value);
 
             if (realmKeyBinding != null)
             {

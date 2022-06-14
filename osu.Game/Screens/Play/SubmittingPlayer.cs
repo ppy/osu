@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
@@ -75,7 +76,7 @@ namespace osu.Game.Screens.Play
 
             api.Queue(req);
 
-            tcs.Task.Wait();
+            tcs.Task.WaitSafely();
             return true;
 
             void handleTokenFailure(Exception exception)
@@ -114,11 +115,12 @@ namespace osu.Game.Screens.Play
             await submitScore(score).ConfigureAwait(false);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            bool exiting = base.OnExiting(next);
+            bool exiting = base.OnExiting(e);
 
-            submitScore(Score.DeepClone());
+            if (LoadedBeatmapSuccessfully)
+                submitScore(Score.DeepClone());
 
             return exiting;
         }
@@ -156,7 +158,9 @@ namespace osu.Game.Screens.Play
 
             request.Success += s =>
             {
-                score.ScoreInfo.OnlineScoreID = s.ID;
+                score.ScoreInfo.OnlineID = s.ID;
+                score.ScoreInfo.Position = s.Position;
+
                 scoreSubmissionSource.SetResult(true);
             };
 

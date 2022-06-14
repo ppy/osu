@@ -3,11 +3,14 @@
 
 #nullable enable
 
+using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Online.Spectator
 {
@@ -46,26 +49,41 @@ namespace osu.Game.Online.Spectator
             }
         }
 
-        protected override Task BeginPlayingInternal(SpectatorState state)
+        protected override async Task BeginPlayingInternal(SpectatorState state)
         {
             if (!IsConnected.Value)
-                return Task.CompletedTask;
+                return;
 
-            return connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), state);
+            Debug.Assert(connection != null);
+
+            try
+            {
+                await connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), state);
+            }
+            catch (HubException exception)
+            {
+                if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
+                    connector?.Reconnect();
+                throw;
+            }
         }
 
-        protected override Task SendFramesInternal(FrameDataBundle data)
+        protected override Task SendFramesInternal(FrameDataBundle bundle)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
+            Debug.Assert(connection != null);
+
+            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), bundle);
         }
 
         protected override Task EndPlayingInternal(SpectatorState state)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), state);
         }
@@ -75,6 +93,8 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
         }
 
@@ -82,6 +102,8 @@ namespace osu.Game.Online.Spectator
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.SendAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
         }

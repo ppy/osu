@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.ProcessInternal(hitObject);
+                    skill.Process(hitObject);
                 }
             }
 
@@ -107,7 +108,7 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.ProcessInternal(hitObject);
+                    skill.Process(hitObject);
                 }
 
                 attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
@@ -119,15 +120,23 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
         /// </summary>
+        /// <remarks>
+        /// This can only be used to compute difficulties for legacy mod combinations.
+        /// </remarks>
         /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
-        public IEnumerable<DifficultyAttributes> CalculateAll()
+        public IEnumerable<DifficultyAttributes> CalculateAllLegacyCombinations(CancellationToken cancellationToken = default)
         {
+            var rulesetInstance = ruleset.CreateInstance();
+
             foreach (var combination in CreateDifficultyAdjustmentModCombinations())
             {
-                if (combination is MultiMod multi)
-                    yield return Calculate(multi.Mods);
-                else
-                    yield return Calculate(combination.Yield());
+                Mod classicMod = rulesetInstance.CreateAllMods().SingleOrDefault(m => m is ModClassic);
+
+                var finalCombination = ModUtils.FlattenMod(combination);
+                if (classicMod != null)
+                    finalCombination = finalCombination.Append(classicMod);
+
+                yield return Calculate(finalCombination.ToArray(), cancellationToken);
             }
         }
 
@@ -145,7 +154,11 @@ namespace osu.Game.Rulesets.Difficulty
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
 
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
+            // Only pass through the cancellation token if it's non-default.
+            // This allows for the default timeout to be applied for playable beatmap construction.
+            Beatmap = cancellationToken == default
+                ? beatmap.GetPlayableBeatmap(ruleset, playableMods)
+                : beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
 
             var track = new TrackVirtual(10000);
             playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));

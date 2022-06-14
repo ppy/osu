@@ -131,8 +131,6 @@ namespace osu.Game.Tests.Gameplay
 
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
-
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {
                 switch (lookup)

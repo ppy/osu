@@ -197,7 +197,6 @@ namespace osu.Game.Overlays
                 {
                     dragContainer.Add(playlist);
 
-                    playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
                     playlist.State.BindValueChanged(s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint), true);
 
                     togglePlaylist();
@@ -214,7 +213,8 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
+            beatmap.BindDisabledChanged(_ => Scheduler.AddOnce(beatmapDisabledChanged));
+            beatmapDisabledChanged();
 
             musicController.TrackChanged += trackChanged;
             trackChanged(beatmap.Value);
@@ -318,8 +318,10 @@ namespace osu.Game.Overlays
             };
         }
 
-        private void beatmapDisabledChanged(bool disabled)
+        private void beatmapDisabledChanged()
         {
+            bool disabled = beatmap.Disabled;
+
             if (disabled)
                 playlist?.Hide();
 

@@ -7,7 +7,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -42,9 +41,6 @@ namespace osu.Game.Skinning
         protected IEnumerable<DrawableSample> DrawableSamples => samplesContainer.Select(c => c.Sample).Where(s => s != null);
 
         private readonly AudioContainer<PoolableSkinnableSample> samplesContainer;
-
-        [Resolved]
-        private ISampleStore sampleStore { get; set; }
 
         [Resolved(CanBeNull = true)]
         private IPooledSampleProvider samplePool { get; set; }

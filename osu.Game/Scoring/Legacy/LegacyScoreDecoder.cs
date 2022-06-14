@@ -23,6 +23,8 @@ namespace osu.Game.Scoring.Legacy
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
 
+        private float beatmapOffset;
+
         public Score Parse(Stream stream)
         {
             var score = new Score
@@ -72,6 +74,9 @@ namespace osu.Game.Scoring.Legacy
                 currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
                 scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
+                // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
+                beatmapOffset = currentBeatmap.BeatmapInfo.BeatmapVersion < 5 ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
+
                 /* score.HpGraphString = */
                 sr.ReadString();
 
@@ -80,12 +85,9 @@ namespace osu.Game.Scoring.Legacy
                 byte[] compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
-                    scoreInfo.OnlineScoreID = sr.ReadInt64();
+                    scoreInfo.OnlineID = sr.ReadInt64();
                 else if (version >= 20121008)
-                    scoreInfo.OnlineScoreID = sr.ReadInt32();
-
-                if (scoreInfo.OnlineScoreID <= 0)
-                    scoreInfo.OnlineScoreID = null;
+                    scoreInfo.OnlineID = sr.ReadInt32();
 
                 if (compressedReplay?.Length > 0)
                 {
@@ -140,7 +142,7 @@ namespace osu.Game.Scoring.Legacy
             int countGeki = score.GetCountGeki() ?? 0;
             int countKatu = score.GetCountKatu() ?? 0;
 
-            switch (score.Ruleset.ID)
+            switch (score.Ruleset.OnlineID)
             {
                 case 0:
                 {
@@ -232,7 +234,7 @@ namespace osu.Game.Scoring.Legacy
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
-            float lastTime = 0;
+            float lastTime = beatmapOffset;
             ReplayFrame currentFrame = null;
 
             string[] frames = reader.ReadToEnd().Split(',');

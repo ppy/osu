@@ -62,9 +62,6 @@ namespace osu.Game.Screens.Edit
 
             private readonly Box hoveredBackground;
 
-            [Resolved]
-            private EditorClock clock { get; set; }
-
             public RowBackground(object item)
             {
                 Item = item;
@@ -100,6 +97,15 @@ namespace osu.Game.Screens.Edit
             {
                 hoveredBackground.Colour = colourHover = colours.Background1;
                 colourSelected = colours.Colour3;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                // Reduce flicker of rows when offset is being changed rapidly.
+                // Probably need to reconsider this.
+                FinishTransforms(true);
             }
 
             private bool selected;

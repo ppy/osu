@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.TopRight;
 
                 BackgroundColour = Color4.Black.Opacity(0.7f);
-                MaxHeight = 400;
+                MaxHeight = 200;
             }
 
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item);

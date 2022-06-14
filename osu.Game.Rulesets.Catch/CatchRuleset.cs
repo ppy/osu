@@ -19,7 +19,6 @@ using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 using System;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Rulesets.Catch.Edit;
@@ -182,7 +181,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new CatchLegacySkinTransformer(skin);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new CatchPerformanceCalculator(this, attributes, score);
+        public override PerformanceCalculator CreatePerformanceCalculator() => new CatchPerformanceCalculator();
 
         public int LegacyID => 2;
 

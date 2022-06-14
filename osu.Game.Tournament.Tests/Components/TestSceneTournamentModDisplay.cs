@@ -19,7 +19,7 @@ namespace osu.Game.Tournament.Tests.Components
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         private FillFlowContainer<TournamentBeatmapPanel> fillFlow;
 
@@ -42,7 +42,12 @@ namespace osu.Game.Tournament.Tests.Components
 
         private void success(APIBeatmap beatmap)
         {
-            var mods = rulesets.GetRuleset(Ladder.Ruleset.Value.ID ?? 0).CreateInstance().AllMods;
+            var ruleset = rulesets.GetRuleset(Ladder.Ruleset.Value.OnlineID);
+
+            if (ruleset == null)
+                return;
+
+            var mods = ruleset.CreateInstance().AllMods;
 
             foreach (var mod in mods)
             {

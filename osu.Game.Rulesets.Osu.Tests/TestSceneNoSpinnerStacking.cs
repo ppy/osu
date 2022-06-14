@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BaseDifficulty = new BeatmapDifficulty { OverallDifficulty = 10 },
+                    Difficulty = new BeatmapDifficulty { OverallDifficulty = 10 },
                     Ruleset = ruleset
                 }
             };

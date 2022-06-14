@@ -4,11 +4,9 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users.Drawables
@@ -22,7 +20,7 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public bool OpenOnClick
         {
-            set => clickableArea.Enabled.Value = value;
+            set => clickableArea.Enabled.Value = clickableArea.Action != null && value;
         }
 
         /// <summary>
@@ -53,30 +51,27 @@ namespace osu.Game.Users.Drawables
             Add(clickableArea = new ClickableArea
             {
                 RelativeSizeAxes = Axes.Both,
-                Action = openProfile
             });
+
+            if (user?.Id != APIUser.SYSTEM_USER_ID)
+                clickableArea.Action = openProfile;
         }
 
         [BackgroundDependencyLoader]
-        private void load(LargeTextureStore textures)
+        private void load()
         {
             LoadComponentAsync(new DrawableAvatar(user), clickableArea.Add);
         }
 
         private void openProfile()
         {
-            if (user?.Id > 1)
+            if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
                 game?.ShowUser(user);
         }
 
         private class ClickableArea : OsuClickableContainer
         {
             private LocalisableString tooltip = default_tooltip_text;
-
-            public ClickableArea()
-                : base(HoverSampleSet.Submit)
-            {
-            }
 
             public override LocalisableString TooltipText
             {

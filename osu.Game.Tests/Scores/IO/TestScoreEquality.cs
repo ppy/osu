@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Game.Scoring;
 
@@ -29,8 +30,8 @@ namespace osu.Game.Tests.Scores.IO
         [Test]
         public void TestNonMatchingByPrimaryKey()
         {
-            ScoreInfo score1 = new ScoreInfo { ID = 1 };
-            ScoreInfo score2 = new ScoreInfo { ID = 2 };
+            ScoreInfo score1 = new ScoreInfo { ID = Guid.NewGuid() };
+            ScoreInfo score2 = new ScoreInfo { ID = Guid.NewGuid() };
 
             Assert.That(score1, Is.Not.EqualTo(score2));
         }
@@ -38,26 +39,10 @@ namespace osu.Game.Tests.Scores.IO
         [Test]
         public void TestMatchingByPrimaryKey()
         {
-            ScoreInfo score1 = new ScoreInfo { ID = 1 };
-            ScoreInfo score2 = new ScoreInfo { ID = 1 };
+            Guid id = Guid.NewGuid();
 
-            Assert.That(score1, Is.EqualTo(score2));
-        }
-
-        [Test]
-        public void TestNonMatchingByHash()
-        {
-            ScoreInfo score1 = new ScoreInfo { Hash = "a" };
-            ScoreInfo score2 = new ScoreInfo { Hash = "b" };
-
-            Assert.That(score1, Is.Not.EqualTo(score2));
-        }
-
-        [Test]
-        public void TestMatchingByHash()
-        {
-            ScoreInfo score1 = new ScoreInfo { Hash = "a" };
-            ScoreInfo score2 = new ScoreInfo { Hash = "a" };
+            ScoreInfo score1 = new ScoreInfo { ID = id };
+            ScoreInfo score2 = new ScoreInfo { ID = id };
 
             Assert.That(score1, Is.EqualTo(score2));
         }

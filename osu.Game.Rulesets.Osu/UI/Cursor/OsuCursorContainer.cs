@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private OsuConfigManager config { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, OsuRulesetConfigManager rulesetConfig)
+        private void load(OsuRulesetConfigManager rulesetConfig)
         {
             rulesetConfig?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
         }

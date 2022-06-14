@@ -73,7 +73,7 @@ namespace osu.Game.Beatmaps
                    && TitleUnicode == other.TitleUnicode
                    && Artist == other.Artist
                    && ArtistUnicode == other.ArtistUnicode
-                   && Author == other.Author
+                   && Author.Equals(other.Author)
                    && Source == other.Source
                    && Tags == other.Tags
                    && PreviewTime == other.PreviewTime

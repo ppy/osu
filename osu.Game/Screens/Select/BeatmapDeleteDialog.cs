@@ -20,13 +20,13 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDeleteDialog(BeatmapSetInfo beatmap)
         {
-            BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
+            BodyText = $@"{beatmap.Metadata.Artist} - {beatmap.Metadata.Title}";
 
             Icon = FontAwesome.Regular.TrashAlt;
             HeaderText = @"Confirm deletion of";
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                new PopupDialogDangerousButton
                 {
                     Text = @"Yes. Totally. Delete it.",
                     Action = () => manager?.Delete(beatmap),

@@ -20,17 +20,15 @@ namespace osu.Game.Tests.Visual.Online
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
         private readonly Bindable<UserStatus> status = new Bindable<UserStatus>();
 
-        private UserGridPanel peppy;
-        private TestUserListPanel evast;
+        private UserGridPanel boundPanel1;
+        private TestUserListPanel boundPanel2;
 
         [Resolved]
-        private RulesetStore rulesetStore { get; set; }
+        private IRulesetStore rulesetStore { get; set; }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            UserGridPanel flyte;
-
             activity.Value = null;
             status.Value = null;
 
@@ -56,14 +54,15 @@ namespace osu.Game.Tests.Visual.Online
                         Colour = "99EB47",
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     }),
-                    flyte = new UserGridPanel(new APIUser
+                    new UserGridPanel(new APIUser
                     {
                         Username = @"flyte",
                         Id = 3103765,
                         Country = new Country { FlagName = @"JP" },
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
+                        Status = { Value = new UserStatusOnline() }
                     }) { Width = 300 },
-                    peppy = new UserGridPanel(new APIUser
+                    boundPanel1 = new UserGridPanel(new APIUser
                     {
                         Username = @"peppy",
                         Id = 2,
@@ -72,7 +71,7 @@ namespace osu.Game.Tests.Visual.Online
                         IsSupporter = true,
                         SupportLevel = 3,
                     }) { Width = 300 },
-                    evast = new TestUserListPanel(new APIUser
+                    boundPanel2 = new TestUserListPanel(new APIUser
                     {
                         Username = @"Evast",
                         Id = 8195163,
@@ -84,13 +83,11 @@ namespace osu.Game.Tests.Visual.Online
                 },
             };
 
-            flyte.Status.Value = new UserStatusOnline();
+            boundPanel1.Status.BindTo(status);
+            boundPanel1.Activity.BindTo(activity);
 
-            peppy.Status.BindTo(status);
-            peppy.Activity.BindTo(activity);
-
-            evast.Status.BindTo(status);
-            evast.Activity.BindTo(activity);
+            boundPanel2.Status.BindTo(status);
+            boundPanel2.Activity.BindTo(activity);
         });
 
         [Test]
@@ -121,14 +118,14 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestUserActivityChange()
         {
-            AddAssert("visit message is visible", () => evast.LastVisitMessage.IsPresent);
+            AddAssert("visit message is visible", () => boundPanel2.LastVisitMessage.IsPresent);
             AddStep("set online status", () => status.Value = new UserStatusOnline());
-            AddAssert("visit message is not visible", () => !evast.LastVisitMessage.IsPresent);
+            AddAssert("visit message is not visible", () => !boundPanel2.LastVisitMessage.IsPresent);
             AddStep("set choosing activity", () => activity.Value = new UserActivity.ChoosingBeatmap());
             AddStep("set offline status", () => status.Value = new UserStatusOffline());
-            AddAssert("visit message is visible", () => evast.LastVisitMessage.IsPresent);
+            AddAssert("visit message is visible", () => boundPanel2.LastVisitMessage.IsPresent);
             AddStep("set online status", () => status.Value = new UserStatusOnline());
-            AddAssert("visit message is not visible", () => !evast.LastVisitMessage.IsPresent);
+            AddAssert("visit message is not visible", () => !boundPanel2.LastVisitMessage.IsPresent);
         }
 
         private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(null, rulesetStore.GetRuleset(rulesetId));

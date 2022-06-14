@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             gameplayState = new GameplayState(beatmap, ruleset);
             gameplayState.LastJudgementResult.BindTo(lastJudgementResult);
 
-            scoreProcessor = new ScoreProcessor();
+            scoreProcessor = new ScoreProcessor(ruleset);
 
             Child = dependencyContainer = new DependencyProvidingContainer
             {

@@ -130,6 +130,16 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectNext => new TranslatableString(getKey(@"select_next"), @"Next selection");
 
         /// <summary>
+        /// "Select previous group"
+        /// </summary>
+        public static LocalisableString SelectPreviousGroup => new TranslatableString(getKey(@"select_previous_group"), @"Select previous group");
+
+        /// <summary>
+        /// "Select next group"
+        /// </summary>
+        public static LocalisableString SelectNextGroup => new TranslatableString(getKey(@"select_next_group"), @"Select next group");
+
+        /// <summary>
         /// "Home"
         /// </summary>
         public static LocalisableString Home => new TranslatableString(getKey(@"home"), @"Home");
@@ -165,6 +175,11 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorTimingMode => new TranslatableString(getKey(@"editor_timing_mode"), @"Timing mode");
 
         /// <summary>
+        /// "Tap for BPM"
+        /// </summary>
+        public static LocalisableString EditorTapForBPM => new TranslatableString(getKey(@"editor_tap_for_bpm"), @"Tap for BPM");
+
+        /// <summary>
         /// "Cycle grid display mode"
         /// </summary>
         public static LocalisableString EditorCycleGridDisplayMode => new TranslatableString(getKey(@"editor_cycle_grid_display_mode"), @"Cycle grid display mode");
@@ -195,9 +210,14 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleInGameInterface => new TranslatableString(getKey(@"toggle_in_game_interface"), @"Toggle in-game interface");
 
         /// <summary>
-        /// "Toggle Mod Select"
+        /// "Toggle mod select"
         /// </summary>
-        public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle Mod Select");
+        public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle mod select");
+
+        /// <summary>
+        /// "Deselect all mods"
+        /// </summary>
+        public static LocalisableString DeselectAllMods => new TranslatableString(getKey(@"deselect_all_mods"), @"Deselect all mods");
 
         /// <summary>
         /// "Random"
@@ -230,6 +250,26 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorNudgeRight => new TranslatableString(getKey(@"editor_nudge_right"), @"Nudge selection right");
 
         /// <summary>
+        /// "Flip selection horizontally"
+        /// </summary>
+        public static LocalisableString EditorFlipHorizontally => new TranslatableString(getKey(@"editor_flip_horizontally"), @"Flip selection horizontally");
+
+        /// <summary>
+        /// "Flip selection vertically"
+        /// </summary>
+        public static LocalisableString EditorFlipVertically => new TranslatableString(getKey(@"editor_flip_vertically"), @"Flip selection vertically");
+
+        /// <summary>
+        /// "Increase distance spacing"
+        /// </summary>
+        public static LocalisableString EditorIncreaseDistanceSpacing => new TranslatableString(getKey(@"editor_increase_distance_spacing"), @"Increase distance spacing");
+
+        /// <summary>
+        /// "Decrease distance spacing"
+        /// </summary>
+        public static LocalisableString EditorDecreaseDistanceSpacing => new TranslatableString(getKey(@"editor_decrease_distance_spacing"), @"Decrease distance spacing");
+
+        /// <summary>
         /// "Toggle skin editor"
         /// </summary>
         public static LocalisableString ToggleSkinEditor => new TranslatableString(getKey(@"toggle_skin_editor"), @"Toggle skin editor");
@@ -259,6 +299,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ToggleChatFocus => new TranslatableString(getKey(@"toggle_chat_focus"), @"Toggle chat focus");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

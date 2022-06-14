@@ -14,7 +14,6 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    [Timeout(10000)]
     public class ManiaBeatmapConversionTest : BeatmapConversionTest<ManiaConvertMapping, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";

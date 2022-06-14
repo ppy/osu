@@ -30,17 +30,20 @@ namespace osu.Game.Overlays.Music
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
+        [Resolved]
+        private OsuGame game { get; set; }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
                 return false;
 
-            if (beatmap.Disabled)
-                return false;
-
             switch (e.Action)
             {
                 case GlobalAction.MusicPlay:
+                    if (game.LocalUserPlaying.Value)
+                        return false;
+
                     // use previous state as TogglePause may not update the track's state immediately (state update is run on the audio thread see https://github.com/ppy/osu/issues/9880#issuecomment-674668842)
                     bool wasPlaying = musicController.IsPlaying;
 
@@ -49,11 +52,17 @@ namespace osu.Game.Overlays.Music
                     return true;
 
                 case GlobalAction.MusicNext:
+                    if (beatmap.Disabled)
+                        return false;
+
                     musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast(GlobalActionKeyBindingStrings.MusicNext, e.Action)));
 
                     return true;
 
                 case GlobalAction.MusicPrev:
+                    if (beatmap.Disabled)
+                        return false;
+
                     musicController.PreviousTrack(res =>
                     {
                         switch (res)

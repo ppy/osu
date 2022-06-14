@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original, cancellationToken);
 
-            if (original.BeatmapInfo.RulesetID == 3)
+            if (original.BeatmapInfo.Ruleset.OnlineID == 3)
             {
                 // Post processing step to transform mania hit objects with the same start time into strong hits
                 converted.HitObjects = converted.HitObjects.GroupBy(t => t.StartTime).Select(x =>
@@ -191,6 +191,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override Beatmap<TaikoHitObject> CreateBeatmap() => new TaikoBeatmap();
 
+        // Important to note that this is subclassing a realm object.
+        // Realm doesn't allow this, but for now this can work since we aren't (in theory?) persisting this to the database.
+        // It is only used during beatmap conversion and processing.
         internal class TaikoMultiplierAppliedDifficulty : BeatmapDifficulty
         {
             public TaikoMultiplierAppliedDifficulty(IBeatmapDifficultyInfo difficulty)
@@ -204,6 +207,8 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             }
 
             #region Overrides of BeatmapDifficulty
+
+            public override BeatmapDifficulty Clone() => new TaikoMultiplierAppliedDifficulty(this);
 
             public override void CopyTo(BeatmapDifficulty other)
             {

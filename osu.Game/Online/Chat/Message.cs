@@ -59,7 +59,13 @@ namespace osu.Game.Online.Chat
             return Id.Value.CompareTo(other.Id.Value);
         }
 
-        public virtual bool Equals(Message other) => Id.HasValue && Id == other?.Id;
+        public virtual bool Equals(Message other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id.HasValue && Id == other.Id;
+        }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         public override int GetHashCode() => Id.GetHashCode();

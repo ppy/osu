@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu;
@@ -35,10 +34,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 BeatmapInfo = { AudioLeadIn = leadIn }
             });
 
-            AddAssert($"first frame is {expectedStartTime}", () =>
+            AddStep("check first frame time", () =>
             {
-                Debug.Assert(player.FirstFrameClockTime != null);
-                return Precision.AlmostEquals(player.FirstFrameClockTime.Value, expectedStartTime, lenience_ms);
+                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
+                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
             });
         }
 
@@ -58,10 +57,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
 
-            AddAssert($"first frame is {expectedStartTime}", () =>
+            AddStep("check first frame time", () =>
             {
-                Debug.Assert(player.FirstFrameClockTime != null);
-                return Precision.AlmostEquals(player.FirstFrameClockTime.Value, expectedStartTime, lenience_ms);
+                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
+                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
             });
         }
 
@@ -85,20 +84,21 @@ namespace osu.Game.Tests.Visual.Gameplay
             loopGroup.Scale.Add(Easing.None, -20000, -18000, 0, 1);
 
             var target = addEventToLoop ? loopGroup : sprite.TimelineGroup;
-            target.Alpha.Add(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
+            double targetTime = addEventToLoop ? 20000 : 0;
+            target.Alpha.Add(Easing.None, targetTime + firstStoryboardEvent, targetTime + firstStoryboardEvent + 500, 0, 1);
 
             // these should be ignored due to being in the future.
             sprite.TimelineGroup.Alpha.Add(Easing.None, 18000, 20000, 0, 1);
-            loopGroup.Alpha.Add(Easing.None, 18000, 20000, 0, 1);
+            loopGroup.Alpha.Add(Easing.None, 38000, 40000, 0, 1);
 
             storyboard.GetLayer("Background").Add(sprite);
 
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
 
-            AddAssert($"first frame is {expectedStartTime}", () =>
+            AddStep("check first frame time", () =>
             {
-                Debug.Assert(player.FirstFrameClockTime != null);
-                return Precision.AlmostEquals(player.FirstFrameClockTime.Value, expectedStartTime, lenience_ms);
+                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
+                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
             });
         }
 
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create player", () =>
             {
-                Beatmap.Value = CreateWorkingBeatmap(beatmap, storyboard);
+                Beatmap.Value = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), Audio);
                 LoadScreen(player = new LeadInPlayer());
             });
 
@@ -130,9 +130,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public double GameplayClockTime => GameplayClockContainer.GameplayClock.CurrentTime;
 
-            protected override void Update()
+            protected override void UpdateAfterChildren()
             {
-                base.Update();
+                base.UpdateAfterChildren();
 
                 if (!FirstFrameClockTime.HasValue)
                 {

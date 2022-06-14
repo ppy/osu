@@ -20,16 +20,16 @@ namespace osu.Game.Online.Spectator
         public FrameHeader Header { get; set; }
 
         [Key(1)]
-        public IEnumerable<LegacyReplayFrame> Frames { get; set; }
+        public IList<LegacyReplayFrame> Frames { get; set; }
 
-        public FrameDataBundle(ScoreInfo score, IEnumerable<LegacyReplayFrame> frames)
+        public FrameDataBundle(ScoreInfo score, IList<LegacyReplayFrame> frames)
         {
             Frames = frames;
             Header = new FrameHeader(score);
         }
 
         [JsonConstructor]
-        public FrameDataBundle(FrameHeader header, IEnumerable<LegacyReplayFrame> frames)
+        public FrameDataBundle(FrameHeader header, IList<LegacyReplayFrame> frames)
         {
             Header = header;
             Frames = frames;

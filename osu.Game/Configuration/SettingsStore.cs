@@ -10,11 +10,11 @@ namespace osu.Game.Configuration
         // this class mostly exists as a wrapper to avoid breaking the ruleset API (see usage in RulesetConfigManager).
         // it may cease to exist going forward, depending on how the structure of the config data layer changes.
 
-        public readonly RealmContextFactory Realm;
+        public readonly RealmAccess Realm;
 
-        public SettingsStore(RealmContextFactory realmFactory)
+        public SettingsStore(RealmAccess realm)
         {
-            Realm = realmFactory;
+            Realm = realm;
         }
     }
 }

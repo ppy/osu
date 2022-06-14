@@ -1,20 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
     public class GroupVisualisation : CompositeDrawable
     {
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         public readonly ControlPointGroup Group;
 
         private readonly IBindableList<ControlPoint> controlPoints = new BindableList<ControlPoint>();
@@ -28,12 +24,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
             Group = group;
             X = (float)group.Time;
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
+            // Run in constructor so IsRedundant calls can work correctly.
             controlPoints.BindTo(Group.ControlPoints);
             controlPoints.BindCollectionChanged((_, __) =>
             {
@@ -65,5 +57,11 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 }
             }, true);
         }
+
+        /// <summary>
+        /// For display purposes, check whether the proposed group is made redundant by this visualisation group.
+        /// </summary>
+        public bool IsVisuallyRedundant(ControlPointGroup other) =>
+            other.ControlPoints.All(c => InternalChildren.OfType<IControlPointVisualisation>().Any(c2 => c2.IsVisuallyRedundant(c)));
     }
 }

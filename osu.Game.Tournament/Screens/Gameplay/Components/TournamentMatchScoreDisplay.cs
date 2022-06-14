@@ -11,7 +11,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.IPC;
-using osu.Game.Tournament.Models;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
@@ -91,7 +90,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc)
+        private void load(MatchIPCInfo ipc)
         {
             score1.BindValueChanged(_ => updateScores());
             score1.BindTo(ipc.Score1);

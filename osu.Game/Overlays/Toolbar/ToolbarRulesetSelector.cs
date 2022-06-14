@@ -68,11 +68,17 @@ namespace osu.Game.Overlays.Toolbar
         {
             base.LoadComplete();
 
-            Current.BindDisabledChanged(disabled => this.FadeColour(disabled ? Color4.Gray : Color4.White, 300), true);
-            Current.BindValueChanged(_ => moveLineToCurrent());
+            Current.BindDisabledChanged(_ => Scheduler.AddOnce(currentDisabledChanged));
+            currentDisabledChanged();
 
+            Current.BindValueChanged(_ => moveLineToCurrent());
             // Scheduled to allow the button flow layout to be computed before the line position is updated
             ScheduleAfterChildren(moveLineToCurrent);
+        }
+
+        private void currentDisabledChanged()
+        {
+            this.FadeColour(Current.Disabled ? Color4.Gray : Color4.White, 300);
         }
 
         private bool hasInitialPosition;

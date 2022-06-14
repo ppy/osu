@@ -15,38 +15,17 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// Provides access to the multiple resources offered by a beatmap model (textures, skins, playable beatmaps etc.)
+    /// </summary>
     public interface IWorkingBeatmap
     {
         IBeatmapInfo BeatmapInfo { get; }
-
-        IBeatmapSetInfo BeatmapSetInfo { get; }
-
-        IBeatmapMetadataInfo Metadata { get; }
 
         /// <summary>
         /// Whether the Beatmap has finished loading.
         ///</summary>
         public bool BeatmapLoaded { get; }
-
-        /// <summary>
-        /// Whether the Background has finished loading.
-        ///</summary>
-        public bool BackgroundLoaded { get; }
-
-        /// <summary>
-        /// Whether the Waveform has finished loading.
-        ///</summary>
-        public bool WaveformLoaded { get; }
-
-        /// <summary>
-        /// Whether the Storyboard has finished loading.
-        ///</summary>
-        public bool StoryboardLoaded { get; }
-
-        /// <summary>
-        /// Whether the Skin has finished loading.
-        ///</summary>
-        public bool SkinLoaded { get; }
 
         /// <summary>
         /// Whether the Track has finished loading.
@@ -90,12 +69,31 @@ namespace osu.Game.Beatmaps
         /// have been applied, and <see cref="HitObject"/>s have been fully constructed.
         /// </para>
         /// </summary>
+        /// <remarks>
+        /// By default, the beatmap load process will be interrupted after 10 seconds.
+        /// For finer-grained control over the load process, use the
+        /// <see cref="GetPlayableBeatmap(osu.Game.Rulesets.IRulesetInfo,System.Collections.Generic.IReadOnlyList{osu.Game.Rulesets.Mods.Mod},System.Threading.CancellationToken)"/>
+        /// overload instead.
+        /// </remarks>
         /// <param name="ruleset">The <see cref="RulesetInfo"/> to create a playable <see cref="IBeatmap"/> for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply to the <see cref="IBeatmap"/>.</param>
-        /// <param name="cancellationToken">Cancellation token that cancels the beatmap loading process. If not provided, a default timeout of 10,000ms will be applied to the load process.</param>
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
-        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null, CancellationToken? cancellationToken = null);
+        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null);
+
+        /// <summary>
+        /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
+        /// <para>
+        /// The returned <see cref="IBeatmap"/> is in a playable state - all <see cref="HitObject"/> and <see cref="BeatmapDifficulty"/> <see cref="Mod"/>s
+        /// have been applied, and <see cref="HitObject"/>s have been fully constructed.
+        /// </para>
+        /// </summary>
+        /// <param name="ruleset">The <see cref="RulesetInfo"/> to create a playable <see cref="IBeatmap"/> for.</param>
+        /// <param name="mods">The <see cref="Mod"/>s to apply to the <see cref="IBeatmap"/>.</param>
+        /// <param name="cancellationToken">Cancellation token that cancels the beatmap loading process.</param>
+        /// <returns>The converted <see cref="IBeatmap"/>.</returns>
+        /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
+        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, CancellationToken cancellationToken);
 
         /// <summary>
         /// Load a new audio track instance for this beatmap. This should be called once before accessing <see cref="Track"/>.

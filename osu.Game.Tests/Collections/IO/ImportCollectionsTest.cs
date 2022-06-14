@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Tests.Resources;
@@ -48,11 +49,16 @@ namespace osu.Game.Tests.Collections.IO
 
                     Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
+                    // Even with no beatmaps imported, collections are tracking the hashes and will continue to.
+                    // In the future this whole mechanism will be replaced with having the collections in realm,
+                    // but until that happens it makes rough sense that we want to track not-yet-imported beatmaps
+                    // and have them associate with collections if/when they become available.
+
                     Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
-                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.Zero);
+                    Assert.That(osu.CollectionManager.Collections[0].BeatmapHashes.Count, Is.EqualTo(1));
 
                     Assert.That(osu.CollectionManager.Collections[1].Name.Value, Is.EqualTo("Second"));
-                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.Zero);
+                    Assert.That(osu.CollectionManager.Collections[1].BeatmapHashes.Count, Is.EqualTo(12));
                 }
                 finally
                 {
@@ -75,10 +81,10 @@ namespace osu.Game.Tests.Collections.IO
                     Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
                     Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
-                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.EqualTo(1));
+                    Assert.That(osu.CollectionManager.Collections[0].BeatmapHashes.Count, Is.EqualTo(1));
 
                     Assert.That(osu.CollectionManager.Collections[1].Name.Value, Is.EqualTo("Second"));
-                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.EqualTo(12));
+                    Assert.That(osu.CollectionManager.Collections[1].BeatmapHashes.Count, Is.EqualTo(12));
                 }
                 finally
                 {
@@ -128,8 +134,12 @@ namespace osu.Game.Tests.Collections.IO
         [Test]
         public async Task TestSaveAndReload()
         {
-            using (HeadlessGameHost host = new TestRunHeadlessGameHost("TestSaveAndReload", bypassCleanup: true))
+            string firstRunName;
+
+            using (var host = new CleanRunHeadlessGameHost(bypassCleanup: true))
             {
+                firstRunName = host.Name;
+
                 try
                 {
                     var osu = LoadOsuIntoHost(host, true);
@@ -137,8 +147,8 @@ namespace osu.Game.Tests.Collections.IO
                     await importCollectionsFromStream(osu, TestResources.OpenResource("Collections/collections.db"));
 
                     // Move first beatmap from second collection into the first.
-                    osu.CollectionManager.Collections[0].Beatmaps.Add(osu.CollectionManager.Collections[1].Beatmaps[0]);
-                    osu.CollectionManager.Collections[1].Beatmaps.RemoveAt(0);
+                    osu.CollectionManager.Collections[0].BeatmapHashes.Add(osu.CollectionManager.Collections[1].BeatmapHashes[0]);
+                    osu.CollectionManager.Collections[1].BeatmapHashes.RemoveAt(0);
 
                     // Rename the second collecction.
                     osu.CollectionManager.Collections[1].Name.Value = "Another";
@@ -149,7 +159,8 @@ namespace osu.Game.Tests.Collections.IO
                 }
             }
 
-            using (HeadlessGameHost host = new TestRunHeadlessGameHost("TestSaveAndReload"))
+            // Name matches the automatically chosen name from `CleanRunHeadlessGameHost` above, so we end up using the same storage location.
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost(firstRunName, null))
             {
                 try
                 {
@@ -158,10 +169,10 @@ namespace osu.Game.Tests.Collections.IO
                     Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
                     Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
-                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.EqualTo(2));
+                    Assert.That(osu.CollectionManager.Collections[0].BeatmapHashes.Count, Is.EqualTo(2));
 
                     Assert.That(osu.CollectionManager.Collections[1].Name.Value, Is.EqualTo("Another"));
-                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.EqualTo(11));
+                    Assert.That(osu.CollectionManager.Collections[1].BeatmapHashes.Count, Is.EqualTo(11));
                 }
                 finally
                 {
@@ -174,7 +185,7 @@ namespace osu.Game.Tests.Collections.IO
         {
             // intentionally spin this up on a separate task to avoid disposal deadlocks.
             // see https://github.com/EventStore/EventStore/issues/1179
-            await Task.Run(() => osu.CollectionManager.Import(stream).Wait());
+            await Task.Factory.StartNew(() => osu.CollectionManager.Import(stream).WaitSafely(), TaskCreationOptions.LongRunning);
         }
     }
 }

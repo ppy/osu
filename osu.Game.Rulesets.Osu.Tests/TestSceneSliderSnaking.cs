@@ -9,6 +9,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -46,9 +47,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             => new ClockBackedTestWorkingBeatmap(this.beatmap = beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
 
         [BackgroundDependencyLoader]
-        private void load(RulesetConfigCache configCache)
+        private void load()
         {
-            var config = (OsuRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
+            var config = (OsuRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
             config.BindWith(OsuRulesetSetting.SnakingInSliders, snakingIn);
             config.BindWith(OsuRulesetSetting.SnakingOutSliders, snakingOut);
         }

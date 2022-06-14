@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
@@ -17,7 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    internal class TimelineSelectionHandler : EditorSelectionHandler, IKeyBindingHandler<GlobalAction>
+    internal class TimelineSelectionHandler : EditorSelectionHandler
     {
         [Resolved]
         private Timeline timeline { get; set; }
@@ -27,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         // for now we always allow movement. snapping is provided by the Timeline's "distance" snap implementation
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent) => true;
 
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
@@ -40,11 +39,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     return true;
             }
 
-            return false;
-        }
-
-        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-        {
+            return base.OnPressed(e);
         }
 
         /// <summary>

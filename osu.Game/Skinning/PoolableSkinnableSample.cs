@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -29,9 +28,6 @@ namespace osu.Game.Skinning
         private readonly AudioContainer<DrawableSample> sampleContainer;
         private ISampleInfo sampleInfo;
         private SampleChannel activeChannel;
-
-        [Resolved]
-        private ISampleStore sampleStore { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="PoolableSkinnableSample"/> with no applied <see cref="ISampleInfo"/>.

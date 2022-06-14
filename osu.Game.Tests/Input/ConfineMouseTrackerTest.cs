@@ -18,9 +18,6 @@ namespace osu.Game.Tests.Input
         [Resolved]
         private FrameworkConfigManager frameworkConfigManager { get; set; }
 
-        [Resolved]
-        private OsuConfigManager osuConfigManager { get; set; }
-
         [TestCase(WindowMode.Windowed)]
         [TestCase(WindowMode.Borderless)]
         public void TestDisableConfining(WindowMode windowMode)

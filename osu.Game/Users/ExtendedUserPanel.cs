@@ -53,7 +53,8 @@ namespace osu.Game.Users
 
         protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.Country)
         {
-            Size = new Vector2(39, 26)
+            Size = new Vector2(39, 26),
+            Action = Action,
         };
 
         protected SpriteIcon CreateStatusIcon() => statusIcon = new SpriteIcon

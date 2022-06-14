@@ -151,6 +151,7 @@ namespace osu.Game.Rulesets.Taiko
                     {
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new TaikoModMuted(),
+                        new ModAdaptiveSpeed()
                     };
 
                 default:
@@ -170,7 +171,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new TaikoDifficultyCalculator(RulesetInfo, beatmap);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new TaikoPerformanceCalculator(this, attributes, score);
+        public override PerformanceCalculator CreatePerformanceCalculator() => new TaikoPerformanceCalculator();
 
         public int LegacyID => 1;
 
@@ -213,10 +214,10 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     Columns = new[]
                     {
-                        new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(timedHitEvents)
+                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 250
+                            AutoSizeAxes = Axes.Y
                         }),
                     }
                 },
@@ -224,10 +225,22 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     Columns = new[]
                     {
-                        new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
                         {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }, true),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        {
+                            new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)
-                        }))
+                        }), true)
                     }
                 }
             };

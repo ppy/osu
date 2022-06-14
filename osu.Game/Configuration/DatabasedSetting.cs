@@ -11,6 +11,8 @@ namespace osu.Game.Configuration
     {
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public int? RulesetID { get; set; }
 
         public int? Variant { get; set; }

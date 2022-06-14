@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
@@ -25,7 +24,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
         private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -197,7 +196,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     {
                         row.Add(new Sprite
                         {
-                            Texture = textures.Get($"mods/{mods.ToLower()}"),
+                            Texture = textures.Get($"Mods/{mods.ToLower()}"),
                             Scale = new Vector2(0.5f)
                         });
                     }

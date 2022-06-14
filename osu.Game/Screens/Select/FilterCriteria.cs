@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select
         public OptionalRange<double> Length;
         public OptionalRange<double> BPM;
         public OptionalRange<int> BeatDivisor;
-        public OptionalRange<BeatmapSetOnlineStatus> OnlineStatus;
+        public OptionalRange<BeatmapOnlineStatus> OnlineStatus;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
 

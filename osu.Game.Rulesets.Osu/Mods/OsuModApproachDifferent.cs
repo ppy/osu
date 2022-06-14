@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -26,12 +26,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         public BindableFloat Scale { get; } = new BindableFloat(4)
         {
             Precision = 0.1f,
-            MinValue = 2,
+            MinValue = 1.5f,
             MaxValue = 10,
         };
 
         [SettingSource("Style", "Change the animation style of the approach circles.", 1)]
-        public Bindable<AnimationStyle> Style { get; } = new Bindable<AnimationStyle>();
+        public Bindable<AnimationStyle> Style { get; } = new Bindable<AnimationStyle>(AnimationStyle.Gravity);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
@@ -52,8 +52,17 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             switch (style)
             {
-                default:
+                case AnimationStyle.Linear:
                     return Easing.None;
+
+                case AnimationStyle.Gravity:
+                    return Easing.InBack;
+
+                case AnimationStyle.InOut1:
+                    return Easing.InOutCubic;
+
+                case AnimationStyle.InOut2:
+                    return Easing.InOutQuint;
 
                 case AnimationStyle.Accelerate1:
                     return Easing.In;
@@ -64,9 +73,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case AnimationStyle.Accelerate3:
                     return Easing.InQuint;
 
-                case AnimationStyle.Gravity:
-                    return Easing.InBack;
-
                 case AnimationStyle.Decelerate1:
                     return Easing.Out;
 
@@ -76,16 +82,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case AnimationStyle.Decelerate3:
                     return Easing.OutQuint;
 
-                case AnimationStyle.InOut1:
-                    return Easing.InOutCubic;
-
-                case AnimationStyle.InOut2:
-                    return Easing.InOutQuint;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(style), style, @"Unsupported animation style");
             }
         }
 
         public enum AnimationStyle
         {
+            Linear,
             Gravity,
             InOut1,
             InOut2,

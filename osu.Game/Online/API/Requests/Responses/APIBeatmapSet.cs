@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
+using osu.Game.Models;
 
 #nullable enable
 
@@ -21,7 +22,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineID { get; set; }
 
         [JsonProperty(@"status")]
-        public BeatmapSetOnlineStatus Status { get; set; }
+        public BeatmapOnlineStatus Status { get; set; }
 
         [JsonProperty(@"preview_url")]
         public string Preview { get; set; } = string.Empty;
@@ -40,6 +41,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"nsfw")]
         public bool HasExplicitContent { get; set; }
+
+        [JsonProperty(@"spotlight")]
+        public bool FeaturedInSpotlight { get; set; }
 
         [JsonProperty(@"video")]
         public bool HasVideo { get; set; }
@@ -123,8 +127,11 @@ namespace osu.Game.Online.API.Requests.Responses
             TitleUnicode = TitleUnicode,
             Artist = Artist,
             ArtistUnicode = ArtistUnicode,
-            AuthorID = AuthorID,
-            Author = Author,
+            Author = new RealmUser
+            {
+                OnlineID = Author.OnlineID,
+                Username = Author.Username
+            },
             Source = Source,
             Tags = Tags,
         };
@@ -136,7 +143,7 @@ namespace osu.Game.Online.API.Requests.Responses
         IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => metadata;
 
         DateTimeOffset IBeatmapSetInfo.DateAdded => throw new NotImplementedException();
-        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => throw new NotImplementedException();
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxStarDifficulty => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxLength => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxBPM => BPM;

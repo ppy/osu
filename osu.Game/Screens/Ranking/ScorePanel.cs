@@ -4,6 +4,7 @@
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -79,6 +80,11 @@ namespace osu.Game.Screens.Ranking
         public event Action<PanelState> StateChanged;
 
         /// <summary>
+        /// The position of the score in the rankings.
+        /// </summary>
+        public readonly Bindable<int?> ScorePosition = new Bindable<int?>();
+
+        /// <summary>
         /// An action to be invoked if this <see cref="ScorePanel"/> is clicked while in an expanded state.
         /// </summary>
         public Action PostExpandAction;
@@ -103,6 +109,8 @@ namespace osu.Game.Screens.Ranking
         {
             Score = score;
             displayWithFlair = isNewLocalScore;
+
+            ScorePosition.Value = score.Position;
         }
 
         [BackgroundDependencyLoader]
@@ -211,8 +219,8 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(expanded_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
 
-                    topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
-                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User) { Alpha = 0 });
+                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair) { Alpha = 0 });
 
                     // only the first expanded display should happen with flair.
                     displayWithFlair = false;
@@ -224,8 +232,13 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(contracted_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
 
-                    topLayerContentContainer.Add(topLayerContent = new ContractedPanelTopContent(Score).With(d => d.Alpha = 0));
-                    middleLayerContentContainer.Add(middleLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(topLayerContent = new ContractedPanelTopContent
+                    {
+                        ScorePosition = { BindTarget = ScorePosition },
+                        Alpha = 0
+                    });
+
+                    middleLayerContentContainer.Add(middleLayerContent = new ContractedPanelMiddleContent(Score) { Alpha = 0 });
                     break;
             }
 

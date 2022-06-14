@@ -51,9 +51,26 @@ namespace osu.Game.Tournament.IO
             Logger.Log("Changing tournament storage: " + GetFullPath(string.Empty));
         }
 
+        protected override void ChangeTargetStorage(Storage newStorage)
+        {
+            // due to an unfortunate oversight, on OSes that are sensitive to pathname casing
+            // the custom flags directory needed to be named `Flags` (uppercase),
+            // while custom mods and videos directories needed to be named `mods` and `videos` respectively (lowercase).
+            // to unify handling to uppercase, move any non-compliant directories automatically for the user to migrate.
+            // can be removed 20220528
+            if (newStorage.ExistsDirectory("flags"))
+                AttemptOperation(() => Directory.Move(newStorage.GetFullPath("flags"), newStorage.GetFullPath("Flags")));
+            if (newStorage.ExistsDirectory("mods"))
+                AttemptOperation(() => Directory.Move(newStorage.GetFullPath("mods"), newStorage.GetFullPath("Mods")));
+            if (newStorage.ExistsDirectory("videos"))
+                AttemptOperation(() => Directory.Move(newStorage.GetFullPath("videos"), newStorage.GetFullPath("Videos")));
+
+            base.ChangeTargetStorage(newStorage);
+        }
+
         public IEnumerable<string> ListTournaments() => AllTournaments.GetDirectories(string.Empty);
 
-        public override void Migrate(Storage newStorage)
+        public override bool Migrate(Storage newStorage)
         {
             // this migration only happens once on moving to the per-tournament storage system.
             // listed files are those known at that point in time.
@@ -69,7 +86,7 @@ namespace osu.Game.Tournament.IO
                 DeleteRecursive(source);
             }
 
-            moveFileIfExists("bracket.json", destination);
+            moveFileIfExists(TournamentGameBase.BRACKET_FILENAME, destination);
             moveFileIfExists("drawings.txt", destination);
             moveFileIfExists("drawings_results.txt", destination);
             moveFileIfExists("drawings.ini", destination);
@@ -77,6 +94,8 @@ namespace osu.Game.Tournament.IO
             ChangeTargetStorage(newStorage);
             storageConfig.SetValue(StorageConfig.CurrentTournament, default_tournament);
             storageConfig.Save();
+
+            return true;
         }
 
         private void moveFileIfExists(string file, DirectoryInfo destination)

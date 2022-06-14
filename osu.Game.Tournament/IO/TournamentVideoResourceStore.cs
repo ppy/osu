@@ -9,7 +9,7 @@ namespace osu.Game.Tournament.IO
     public class TournamentVideoResourceStore : NamespacedResourceStore<byte[]>
     {
         public TournamentVideoResourceStore(Storage storage)
-            : base(new StorageBackedResourceStore(storage), "videos")
+            : base(new StorageBackedResourceStore(storage), "Videos")
         {
             AddExtension("m4v");
             AddExtension("avi");

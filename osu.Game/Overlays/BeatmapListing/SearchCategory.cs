@@ -32,6 +32,9 @@ namespace osu.Game.Overlays.BeatmapListing
         [Description("Pending & WIP")]
         Pending,
 
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.StatusWip))]
+        Wip,
+
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.StatusGraveyard))]
         Graveyard,
 

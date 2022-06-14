@@ -13,7 +13,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -39,7 +38,7 @@ namespace osu.Game.Collections
         }
 
         private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
-        private readonly IBindableList<IBeatmapInfo> beatmaps = new BindableList<IBeatmapInfo>();
+        private readonly IBindableList<string> beatmaps = new BindableList<string>();
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
         [Resolved(CanBeNull = true)]
@@ -96,10 +95,10 @@ namespace osu.Game.Collections
             beatmaps.CollectionChanged -= filterBeatmapsChanged;
 
             if (filter.OldValue?.Collection != null)
-                beatmaps.UnbindFrom(filter.OldValue.Collection.Beatmaps);
+                beatmaps.UnbindFrom(filter.OldValue.Collection.BeatmapHashes);
 
             if (filter.NewValue?.Collection != null)
-                beatmaps.BindTo(filter.NewValue.Collection.Beatmaps);
+                beatmaps.BindTo(filter.NewValue.Collection.BeatmapHashes);
 
             beatmaps.CollectionChanged += filterBeatmapsChanged;
 
@@ -194,13 +193,10 @@ namespace osu.Game.Collections
             protected new CollectionFilterMenuItem Item => ((DropdownMenuItem<CollectionFilterMenuItem>)base.Item).Value;
 
             [Resolved]
-            private OsuColour colours { get; set; }
-
-            [Resolved]
             private IBindable<WorkingBeatmap> beatmap { get; set; }
 
             [CanBeNull]
-            private readonly BindableList<IBeatmapInfo> collectionBeatmaps;
+            private readonly BindableList<string> collectionBeatmaps;
 
             [NotNull]
             private readonly Bindable<string> collectionName;
@@ -212,7 +208,7 @@ namespace osu.Game.Collections
             public CollectionDropdownMenuItem(MenuItem item)
                 : base(item)
             {
-                collectionBeatmaps = Item.Collection?.Beatmaps.GetBoundCopy();
+                collectionBeatmaps = Item.Collection?.BeatmapHashes.GetBoundCopy();
                 collectionName = Item.CollectionName.GetBoundCopy();
             }
 
@@ -262,7 +258,7 @@ namespace osu.Game.Collections
             {
                 Debug.Assert(collectionBeatmaps != null);
 
-                beatmapInCollection = collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo);
+                beatmapInCollection = collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo.MD5Hash);
 
                 addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
                 addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
@@ -289,8 +285,8 @@ namespace osu.Game.Collections
             {
                 Debug.Assert(collectionBeatmaps != null);
 
-                if (!collectionBeatmaps.Remove(beatmap.Value.BeatmapInfo))
-                    collectionBeatmaps.Add(beatmap.Value.BeatmapInfo);
+                if (!collectionBeatmaps.Remove(beatmap.Value.BeatmapInfo.MD5Hash))
+                    collectionBeatmaps.Add(beatmap.Value.BeatmapInfo.MD5Hash);
             }
 
             protected override Drawable CreateContent() => content = (Content)base.CreateContent();

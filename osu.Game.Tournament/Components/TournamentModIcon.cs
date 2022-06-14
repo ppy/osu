@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Components
         private readonly string modAcronym;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         public TournamentModIcon(string modAcronym)
         {
@@ -31,7 +31,7 @@ namespace osu.Game.Tournament.Components
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, LadderInfo ladderInfo)
         {
-            var customTexture = textures.Get($"mods/{modAcronym}");
+            var customTexture = textures.Get($"Mods/{modAcronym}");
 
             if (customTexture != null)
             {
@@ -47,7 +47,7 @@ namespace osu.Game.Tournament.Components
                 return;
             }
 
-            var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.ID ?? 0);
+            var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.OnlineID ?? 0);
             var modIcon = ruleset?.CreateInstance().CreateModFromAcronym(modAcronym);
 
             if (modIcon == null)

@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         private readonly APIRecentActivity activity;
 

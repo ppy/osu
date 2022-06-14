@@ -10,6 +10,7 @@ namespace osu.Game.Tests.Visual.Menus
     [TestFixture]
     public class TestSceneIntroWelcome : IntroTestScene
     {
+        protected override bool IntroReliesOnTrack => false;
         protected override IntroScreen CreateScreen() => new IntroWelcome();
 
         public override void TestPlayIntro()

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays.Settings
             set => Control.ItemSource = value;
         }
 
-        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(Control.Items.Select(i => i.ToString()));
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(Control.Items.Select(i => (LocalisableString)i.ToString()));
 
         protected sealed override Drawable CreateControl() => CreateDropdown();
 

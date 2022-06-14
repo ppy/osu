@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
@@ -38,7 +39,12 @@ namespace osu.Game.Online.API
         protected override void PostProcess()
         {
             base.PostProcess();
-            Response = ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
+
+            if (WebRequest != null)
+            {
+                Response = ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
+                Logger.Log($"{GetType()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes", LoggingTarget.Network);
+            }
         }
 
         internal void TriggerSuccess(T result)
@@ -107,13 +113,24 @@ namespace osu.Game.Online.API
             WebRequest = CreateWebRequest();
             WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
+
+            WebRequest.AddHeader("x-api-version", API.APIVersion.ToString(CultureInfo.InvariantCulture));
+
             if (!string.IsNullOrEmpty(API.AccessToken))
                 WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
 
             if (isFailing) return;
 
-            Logger.Log($@"Performing request {this}", LoggingTarget.Network);
-            WebRequest.Perform();
+            try
+            {
+                Logger.Log($@"Performing request {this}", LoggingTarget.Network);
+                WebRequest.Perform();
+            }
+            catch (OperationCanceledException)
+            {
+                // ignore this. internally Perform is running async and the fail state may have changed since
+                // the last check of `isFailing` above.
+            }
 
             if (isFailing) return;
 

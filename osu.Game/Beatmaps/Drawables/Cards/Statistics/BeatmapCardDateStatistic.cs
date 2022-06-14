@@ -41,10 +41,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
             // reference: https://github.com/ppy/osu-web/blob/ef432c11719fd1207bec5f9194b04f0033bdf02c/resources/assets/lib/beatmapset-panel.tsx#L36-L44
             switch (beatmapSetInfo.Status)
             {
-                case BeatmapSetOnlineStatus.Ranked:
-                case BeatmapSetOnlineStatus.Approved:
-                case BeatmapSetOnlineStatus.Loved:
-                case BeatmapSetOnlineStatus.Qualified:
+                case BeatmapOnlineStatus.Ranked:
+                case BeatmapOnlineStatus.Approved:
+                case BeatmapOnlineStatus.Loved:
+                case BeatmapOnlineStatus.Qualified:
                     return beatmapSetInfo.Ranked;
 
                 default:

@@ -19,6 +19,10 @@ namespace osu.Game.Tests.Visual.Menus
             base.SetUpSteps();
 
             AddAssert("no screen offset applied", () => Game.ScreenOffsetContainer.X == 0f);
+
+            // avoids mouse interacting with settings overlay.
+            AddStep("move mouse to centre", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
+
             AddUntilStep("wait for overlays", () => Game.Settings.IsLoaded && Game.Notifications.IsLoaded);
         }
 

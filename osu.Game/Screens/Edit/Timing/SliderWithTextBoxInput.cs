@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,6 +10,8 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
+using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -19,7 +22,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         public SliderWithTextBoxInput(LocalisableString labelText)
         {
-            LabelledTextBox textbox;
+            LabelledTextBox textBox;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -31,9 +34,10 @@ namespace osu.Game.Screens.Edit.Timing
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(20),
                     Children = new Drawable[]
                     {
-                        textbox = new LabelledTextBox
+                        textBox = new LabelledTextBox
                         {
                             Label = labelText,
                         },
@@ -46,7 +50,7 @@ namespace osu.Game.Screens.Edit.Timing
                 },
             };
 
-            textbox.OnCommit += (t, isNew) =>
+            textBox.OnCommit += (t, isNew) =>
             {
                 if (!isNew) return;
 
@@ -66,7 +70,8 @@ namespace osu.Game.Screens.Edit.Timing
 
             Current.BindValueChanged(val =>
             {
-                textbox.Text = val.NewValue.ToString();
+                decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
+                textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
             }, true);
         }
 

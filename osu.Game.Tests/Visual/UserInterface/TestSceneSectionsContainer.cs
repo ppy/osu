@@ -3,45 +3,79 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneSectionsContainer : OsuManualInputManagerTestScene
     {
-        private readonly SectionsContainer<TestSection> container;
+        private SectionsContainer<TestSection> container;
         private float custom;
-        private const float header_height = 100;
 
-        public TestSceneSectionsContainer()
+        private const float header_expandable_height = 300;
+        private const float header_fixed_height = 100;
+
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            container = new SectionsContainer<TestSection>
+            AddStep("setup container", () =>
             {
-                RelativeSizeAxes = Axes.Y,
-                Width = 300,
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                FixedHeader = new Box
+                container = new SectionsContainer<TestSection>
                 {
-                    Alpha = 0.5f,
+                    RelativeSizeAxes = Axes.Y,
                     Width = 300,
-                    Height = header_height,
-                    Colour = Color4.Red
-                }
-            };
-            container.SelectedSection.ValueChanged += section =>
-            {
-                if (section.OldValue != null)
-                    section.OldValue.Selected = false;
-                if (section.NewValue != null)
-                    section.NewValue.Selected = true;
-            };
-            Add(container);
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                };
+
+                container.SelectedSection.ValueChanged += section =>
+                {
+                    if (section.OldValue != null)
+                        section.OldValue.Selected = false;
+                    if (section.NewValue != null)
+                        section.NewValue.Selected = true;
+                };
+
+                Child = container;
+            });
+
+            AddToggleStep("disable expandable header", v => container.ExpandableHeader = v
+                ? null
+                : new TestBox(@"Expandable Header")
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = header_expandable_height,
+                    BackgroundColour = new OsuColour().GreySky,
+                });
+
+            AddToggleStep("disable fixed header", v => container.FixedHeader = v
+                ? null
+                : new TestBox(@"Fixed Header")
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = header_fixed_height,
+                    BackgroundColour = new OsuColour().Red.Opacity(0.5f),
+                });
+
+            AddToggleStep("disable footer", v => container.Footer = v
+                ? null
+                : new TestBox("Footer")
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 200,
+                    BackgroundColour = new OsuColour().Green4,
+                });
         }
 
         [Test]
@@ -71,7 +105,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             const int sections_count = 11;
             float[] alternating = { 0.07f, 0.33f, 0.16f, 0.33f };
-            AddStep("clear", () => container.Clear());
             AddStep("fill with sections", () =>
             {
                 for (int i = 0; i < sections_count; i++)
@@ -84,9 +117,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children[scrollIndex]);
                 AddUntilStep("section top is visible", () =>
                 {
-                    float scrollPosition = container.ChildrenOfType<UserTrackingScrollContainer>().First().Current;
-                    float sectionTop = container.Children[scrollIndex].BoundingBox.Top;
-                    return scrollPosition < sectionTop;
+                    var scrollContainer = container.ChildrenOfType<UserTrackingScrollContainer>().Single();
+                    float sectionPosition = scrollContainer.GetChildPosInContent(container.Children[scrollIndex]);
+                    return scrollContainer.Current < sectionPosition;
                 });
             }
 
@@ -101,15 +134,56 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children[sections_count - 1]);
         }
 
-        private static readonly ColourInfo selected_colour = ColourInfo.GradientVertical(Color4.Yellow, Color4.Gold);
+        [Test]
+        public void TestNavigation()
+        {
+            AddRepeatStep("add sections", () => append(1f), 3);
+            AddUntilStep("wait for load", () => container.Children.Any());
+
+            AddStep("hover sections container", () => InputManager.MoveMouseTo(container));
+            AddStep("press page down", () => InputManager.Key(Key.PageDown));
+            AddUntilStep("scrolled one page down", () =>
+            {
+                var scroll = container.ChildrenOfType<UserTrackingScrollContainer>().First();
+                return Precision.AlmostEquals(scroll.Current, Content.DrawHeight - header_fixed_height, 1f);
+            });
+
+            AddStep("press page down", () => InputManager.Key(Key.PageDown));
+            AddUntilStep("scrolled two pages down", () =>
+            {
+                var scroll = container.ChildrenOfType<UserTrackingScrollContainer>().First();
+                return Precision.AlmostEquals(scroll.Current, (Content.DrawHeight - header_fixed_height) * 2, 1f);
+            });
+
+            AddStep("press page up", () => InputManager.Key(Key.PageUp));
+            AddUntilStep("scrolled one page up", () =>
+            {
+                var scroll = container.ChildrenOfType<UserTrackingScrollContainer>().First();
+                return Precision.AlmostEquals(scroll.Current, Content.DrawHeight - header_fixed_height, 1f);
+            });
+        }
+
+        private static readonly ColourInfo selected_colour = ColourInfo.GradientVertical(new OsuColour().Orange2, new OsuColour().Orange3);
         private static readonly ColourInfo default_colour = ColourInfo.GradientVertical(Color4.White, Color4.DarkGray);
 
         private void append(float multiplier)
         {
-            container.Add(new TestSection
+            float fixedHeaderHeight = container.FixedHeader?.Height ?? 0;
+            float expandableHeaderHeight = container.ExpandableHeader?.Height ?? 0;
+
+            float totalHeaderHeight = expandableHeaderHeight + fixedHeaderHeight;
+            float effectiveHeaderHeight = totalHeaderHeight;
+
+            // if we're in the "next page" of the sections container,
+            // height of the expandable header should not be accounted.
+            var scrollContent = container.ChildrenOfType<UserTrackingScrollContainer>().Single().ScrollContent;
+            if (totalHeaderHeight + scrollContent.Height >= Content.DrawHeight)
+                effectiveHeaderHeight -= expandableHeaderHeight;
+
+            container.Add(new TestSection($"Section #{container.Children.Count + 1}")
             {
                 Width = 300,
-                Height = (container.ChildSize.Y - header_height) * multiplier,
+                Height = (Content.DrawHeight - effectiveHeaderHeight) * multiplier,
                 Colour = default_colour
             });
         }
@@ -120,11 +194,50 @@ namespace osu.Game.Tests.Visual.UserInterface
             InputManager.ScrollVerticalBy(direction);
         }
 
-        private class TestSection : Box
+        private class TestSection : TestBox
         {
             public bool Selected
             {
-                set => Colour = value ? selected_colour : default_colour;
+                set => BackgroundColour = value ? selected_colour : default_colour;
+            }
+
+            public TestSection(string label)
+                : base(label)
+            {
+                BackgroundColour = default_colour;
+            }
+        }
+
+        private class TestBox : Container
+        {
+            private readonly Box background;
+            private readonly OsuSpriteText text;
+
+            public ColourInfo BackgroundColour
+            {
+                set
+                {
+                    background.Colour = value;
+                    text.Colour = OsuColour.ForegroundTextColourFor(value.AverageColour);
+                }
+            }
+
+            public TestBox(string label)
+            {
+                Children = new Drawable[]
+                {
+                    background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    text = new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = label,
+                        Font = OsuFont.Default.With(size: 36),
+                    }
+                };
             }
         }
     }
