@@ -225,10 +225,10 @@ namespace osu.Game.Tests.Online
                     this.testBeatmapManager = testBeatmapManager;
                 }
 
-                public override Live<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, CancellationToken cancellationToken = default)
+                public override Live<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool quickSkipIfExisting = false, CancellationToken cancellationToken = default)
                 {
                     testBeatmapManager.AllowImport.Task.WaitSafely();
-                    return (testBeatmapManager.CurrentImport = base.Import(item, archive, cancellationToken));
+                    return (testBeatmapManager.CurrentImport = base.Import(item, archive, quickSkipIfExisting, cancellationToken));
                 }
             }
         }
