@@ -393,7 +393,6 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
-        [Ignore("intentionally broken by import optimisations")]
         public void TestImportThenImportWithChangedFile()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
@@ -490,7 +489,6 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
-        [Ignore("intentionally broken by import optimisations")]
         public void TestImportCorruptThenImport()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
@@ -502,16 +500,18 @@ namespace osu.Game.Tests.Database
 
                 var firstFile = imported.Files.First();
 
+                var fileStorage = storage.GetStorageForDirectory("files");
+
                 long originalLength;
-                using (var stream = storage.GetStream(firstFile.File.GetStoragePath()))
+                using (var stream = fileStorage.GetStream(firstFile.File.GetStoragePath()))
                     originalLength = stream.Length;
 
-                using (var stream = storage.CreateFileSafely(firstFile.File.GetStoragePath()))
+                using (var stream = fileStorage.CreateFileSafely(firstFile.File.GetStoragePath()))
                     stream.WriteByte(0);
 
                 var importedSecondTime = await LoadOszIntoStore(importer, realm.Realm);
 
-                using (var stream = storage.GetStream(firstFile.File.GetStoragePath()))
+                using (var stream = fileStorage.GetStream(firstFile.File.GetStoragePath()))
                     Assert.AreEqual(stream.Length, originalLength, "Corruption was not fixed on second import");
 
                 // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
