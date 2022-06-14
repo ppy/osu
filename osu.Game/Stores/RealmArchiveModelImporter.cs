@@ -259,61 +259,6 @@ namespace osu.Game.Stores
         }
 
         /// <summary>
-        /// Any file extensions which should be included in hash creation.
-        /// Generally should include all file types which determine the file's uniqueness.
-        /// Large files should be avoided if possible.
-        /// </summary>
-        /// <remarks>
-        /// This is only used by the default hash implementation. If <see cref="ComputeHash"/> is overridden, it will not be used.
-        /// </remarks>
-        protected abstract string[] HashableFileTypes { get; }
-
-        internal static void LogForModel(TModel? model, string message, Exception? e = null)
-        {
-            string trimmedHash;
-            if (model == null || !model.IsValid || string.IsNullOrEmpty(model.Hash))
-                trimmedHash = "?????";
-            else
-                trimmedHash = model.Hash.Substring(0, 5);
-
-            string prefix = $"[{trimmedHash}]";
-
-            if (e != null)
-                Logger.Error(e, $"{prefix} {message}", LoggingTarget.Database);
-            else
-                Logger.Log($"{prefix} {message}", LoggingTarget.Database);
-        }
-
-        /// <summary>
-        /// Whether the implementation overrides <see cref="ComputeHash"/> with a custom implementation.
-        /// Custom hash implementations must bypass the early exit in the import flow (see <see cref="computeHashFast"/> usage).
-        /// </summary>
-        protected virtual bool HasCustomHashFunction => false;
-
-        /// <summary>
-        /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
-        /// </summary>
-        /// <remarks>
-        ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
-        /// </remarks>
-        protected virtual string ComputeHash(TModel item)
-        {
-            // for now, concatenate all hashable files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
-
-            foreach (RealmNamedFileUsage file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
-            {
-                using (Stream s = Files.Store.GetStream(file.File.GetStoragePath()))
-                    s.CopyTo(hashable);
-            }
-
-            if (hashable.Length > 0)
-                return hashable.ComputeSHA2Hash();
-
-            return item.Hash;
-        }
-
-        /// <summary>
         /// Silently import an item from a <typeparamref name="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
@@ -417,6 +362,61 @@ namespace osu.Game.Stores
 
                 return (Live<TModel>?)item.ToLive(Realm);
             });
+        }
+
+        /// <summary>
+        /// Any file extensions which should be included in hash creation.
+        /// Generally should include all file types which determine the file's uniqueness.
+        /// Large files should be avoided if possible.
+        /// </summary>
+        /// <remarks>
+        /// This is only used by the default hash implementation. If <see cref="ComputeHash"/> is overridden, it will not be used.
+        /// </remarks>
+        protected abstract string[] HashableFileTypes { get; }
+
+        internal static void LogForModel(TModel? model, string message, Exception? e = null)
+        {
+            string trimmedHash;
+            if (model == null || !model.IsValid || string.IsNullOrEmpty(model.Hash))
+                trimmedHash = "?????";
+            else
+                trimmedHash = model.Hash.Substring(0, 5);
+
+            string prefix = $"[{trimmedHash}]";
+
+            if (e != null)
+                Logger.Error(e, $"{prefix} {message}", LoggingTarget.Database);
+            else
+                Logger.Log($"{prefix} {message}", LoggingTarget.Database);
+        }
+
+        /// <summary>
+        /// Whether the implementation overrides <see cref="ComputeHash"/> with a custom implementation.
+        /// Custom hash implementations must bypass the early exit in the import flow (see <see cref="computeHashFast"/> usage).
+        /// </summary>
+        protected virtual bool HasCustomHashFunction => false;
+
+        /// <summary>
+        /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
+        /// </summary>
+        /// <remarks>
+        ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
+        /// </remarks>
+        protected virtual string ComputeHash(TModel item)
+        {
+            // for now, concatenate all hashable files in the set to create a unique hash.
+            MemoryStream hashable = new MemoryStream();
+
+            foreach (RealmNamedFileUsage file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
+            {
+                using (Stream s = Files.Store.GetStream(file.File.GetStoragePath()))
+                    s.CopyTo(hashable);
+            }
+
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
+
+            return item.Hash;
         }
 
         private string computeHashFast(ArchiveReader reader)
