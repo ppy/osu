@@ -78,14 +78,6 @@ namespace osu.Game.Stores
             Files = new RealmFileStore(realm, storage);
         }
 
-        /// <summary>
-        /// Import one or more <typeparamref name="TModel"/> items from filesystem <paramref name="paths"/>.
-        /// </summary>
-        /// <remarks>
-        /// This will be treated as a low priority import if more than one path is specified; use <see cref="Import(ImportTask[])"/> to always import at standard priority.
-        /// This will post notifications tracking progress.
-        /// </remarks>
-        /// <param name="paths">One or more archive locations on disk.</param>
         public Task Import(params string[] paths)
         {
             var notification = new ProgressNotification { State = ProgressNotificationState.Active };
