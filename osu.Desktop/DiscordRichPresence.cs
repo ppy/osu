@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -102,11 +103,17 @@ namespace osu.Desktop
                 presence.State = truncate(activity.Value.Status);
                 presence.Details = truncate(getDetails(activity.Value));
 
-                if (getOnlineID(activity.Value) != null)
+                if (getBeatmap(activity.Value) is IBeatmapInfo beatmap && beatmap.OnlineID > 0)
                 {
-                    presence.Buttons = new Button[]
+                    string rulesetShortName = (activity.Value as UserActivity.InGame)?.Ruleset.ShortName ?? string.Empty;
+
+                    presence.Buttons = new[]
                     {
-                        new Button() { Label = "Open Beatmap", Url = $"https://osu.ppy.sh/b/{getOnlineID(activity.Value)}" }
+                        new Button
+                        {
+                            Label = "View beatmap",
+                            Url = $@"{api.WebsiteRootUrl}/beatmapsets/{beatmap.BeatmapSet?.OnlineID}#{rulesetShortName}/{beatmap.OnlineID}"
+                        }
                     };
                 }
                 else
@@ -159,6 +166,20 @@ namespace osu.Desktop
             });
         }
 
+        private IBeatmapInfo getBeatmap(UserActivity activity)
+        {
+            switch (activity)
+            {
+                case UserActivity.InGame game:
+                    return game.BeatmapInfo;
+
+                case UserActivity.Editing edit:
+                    return edit.BeatmapInfo;
+            }
+
+            return null;
+        }
+
         private string getDetails(UserActivity activity)
         {
             switch (activity)
@@ -174,16 +195,6 @@ namespace osu.Desktop
             }
 
             return string.Empty;
-        }
-
-        private int? getOnlineID(UserActivity activity)
-        {
-            if (activity is UserActivity.InGame game && game.BeatmapInfo.OnlineID > 0)
-            {
-                return game.BeatmapInfo.OnlineID;
-            }
-
-            return null;
         }
 
         protected override void Dispose(bool isDisposing)
