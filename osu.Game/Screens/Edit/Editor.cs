@@ -422,6 +422,8 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed) return false;
+
             switch (e.Key)
             {
                 case Key.Left:
