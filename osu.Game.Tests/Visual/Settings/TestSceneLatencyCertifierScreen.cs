@@ -37,6 +37,12 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
+        public void TestScrollingGameplay()
+        {
+            AddStep("set visual mode to scrolling", () => latencyCertifier.VisualMode.Value = LatencyVisualMode.ScrollingGameplay);
+        }
+
+        [Test]
         public void TestCycleVisualModes()
         {
             AddRepeatStep("cycle mode", () => InputManager.Key(Key.Space), 6);
