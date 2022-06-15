@@ -276,13 +276,10 @@ namespace osu.Game.Skinning
 
         public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => skinModelManager.Import(notification, tasks);
 
-        public Task<Live<SkinInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default) => skinModelManager.Import(task, lowPriority, cancellationToken);
+        public Task<Live<SkinInfo>> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => skinModelManager.Import(task, batchImport, cancellationToken);
 
-        public Task<Live<SkinInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default) =>
-            skinModelManager.Import(archive, lowPriority, cancellationToken);
-
-        public Live<SkinInfo> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) =>
-            skinModelManager.Import(item, archive, cancellationToken);
+        public Task<Live<SkinInfo>> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default) =>
+            skinModelManager.Import(archive, batchImport, cancellationToken);
 
         #endregion
 
