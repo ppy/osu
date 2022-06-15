@@ -14,14 +14,20 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class LabelledFileChooser : LabelledTextBoxWithPopover, ICanAcceptFiles
+    /// <summary>
+    /// A labelled drawable displaying file chooser on click, with placeholder text support.
+    /// todo: this should probably not use PopoverTextBox just to display placeholder text, but is the best way for now.
+    /// </summary>
+    internal class LabelledFileChooser : LabelledDrawable<LabelledTextBoxWithPopover.PopoverTextBox>, IHasCurrentValue<string>, ICanAcceptFiles, IHasPopover
     {
         private readonly string[] handledExtensions;
 
@@ -34,13 +40,25 @@ namespace osu.Game.Screens.Edit.Setup
 
         private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
 
-        public override Bindable<string> Current
+        public Bindable<string> Current
         {
             get => current.Current;
             set => current.Current = value;
         }
 
+        public LocalisableString Text
+        {
+            get => Component.PlaceholderText;
+            set => Component.PlaceholderText = value;
+        }
+
+        public CompositeDrawable TabbableContentContainer
+        {
+            set => Component.TabbableContentContainer = value;
+        }
+
         public LabelledFileChooser(params string[] handledExtensions)
+            : base(false)
         {
             this.handledExtensions = handledExtensions;
         }
@@ -78,7 +96,16 @@ namespace osu.Game.Screens.Edit.Setup
                 game.UnregisterImportHandler(this);
         }
 
-        public override Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile);
+        protected override LabelledTextBoxWithPopover.PopoverTextBox CreateComponent() => new LabelledTextBoxWithPopover.PopoverTextBox
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            RelativeSizeAxes = Axes.X,
+            CornerRadius = CORNER_RADIUS,
+            OnFocused = this.ShowPopover,
+        };
+
+        public Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile);
 
         private class FileChooserPopover : OsuPopover
         {

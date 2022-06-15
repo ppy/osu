@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void backgroundChanged(ValueChangedEvent<string> filePath)
         {
-            backgroundChooser.PlaceholderText = string.IsNullOrEmpty(filePath.NewValue)
+            backgroundChooser.Text = string.IsNullOrEmpty(filePath.NewValue)
                 ? "Click to select a background image"
                 : "Click to replace the background image";
 
@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void audioTrackChanged(ValueChangedEvent<string> filePath)
         {
-            audioTrackChooser.PlaceholderText = string.IsNullOrEmpty(filePath.NewValue)
+            audioTrackChooser.Text = string.IsNullOrEmpty(filePath.NewValue)
                 ? "Click to select a track"
                 : "Click to replace the track";
 
