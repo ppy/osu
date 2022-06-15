@@ -26,19 +26,19 @@ namespace osu.Game.Tests.Database
 
                 // normal beatmap folder
                 var beatmap1 = songsStorage.GetStorageForDirectory("beatmap1");
-                beatmap1.CreateFileSafely("beatmap.osu");
+                createFile(beatmap1, "beatmap.osu");
 
                 // songs subdirectory
                 var subdirectory = songsStorage.GetStorageForDirectory("subdirectory");
-                subdirectory.CreateFileSafely(subdirectory.GetFullPath(Path.Combine("beatmap2", "beatmap.osu"), true));
-                subdirectory.CreateFileSafely(subdirectory.GetFullPath(Path.Combine("beatmap3", "beatmap.osu"), true));
-                subdirectory.CreateFileSafely(subdirectory.GetFullPath(Path.Combine("sub-subdirectory", "beatmap4", "beatmap.osu"), true));
+                createFile(subdirectory, Path.Combine("beatmap2", "beatmap.osu"));
+                createFile(subdirectory, Path.Combine("beatmap3", "beatmap.osu"));
+                createFile(subdirectory, Path.Combine("sub-subdirectory", "beatmap4", "beatmap.osu"));
 
                 // songs subdirectory with system file
                 var subdirectory2 = songsStorage.GetStorageForDirectory("subdirectory2");
-                subdirectory2.CreateFileSafely(subdirectory2.GetFullPath(".DS_Store"));
-                subdirectory2.CreateFileSafely(subdirectory2.GetFullPath(Path.Combine("beatmap5", "beatmap.osu"), true));
-                subdirectory2.CreateFileSafely(subdirectory2.GetFullPath(Path.Combine("beatmap6", "beatmap.osu"), true));
+                createFile(subdirectory2, ".DS_Store");
+                createFile(subdirectory2, Path.Combine("beatmap5", "beatmap.osu"));
+                createFile(subdirectory2, Path.Combine("beatmap6", "beatmap.osu"));
 
                 // empty songs subdirectory
                 songsStorage.GetStorageForDirectory("subdirectory3");
@@ -51,6 +51,12 @@ namespace osu.Game.Tests.Database
                 Assert.That(paths.Contains(songsStorage.GetFullPath(Path.Combine("subdirectory", "sub-subdirectory", "beatmap4"))));
                 Assert.That(paths.Contains(songsStorage.GetFullPath(Path.Combine("subdirectory2", "beatmap5"))));
                 Assert.That(paths.Contains(songsStorage.GetFullPath(Path.Combine("subdirectory2", "beatmap6"))));
+            }
+
+            static void createFile(Storage storage, string path)
+            {
+                using (var stream = storage.CreateFileSafely(path))
+                    stream.WriteByte(0);
             }
         }
 
