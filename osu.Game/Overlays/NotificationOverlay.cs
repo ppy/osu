@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -36,8 +37,10 @@ namespace osu.Game.Overlays
         private AudioManager audio { get; set; }
 
         [Resolved(canBeNull: true)]
+        [CanBeNull]
         private FirstRunSetupOverlay firstRunSetup { get; set; }
 
+        [CanBeNull]
         private IBindable<Visibility> firstRunSetupState;
 
         [BackgroundDependencyLoader]
@@ -103,8 +106,10 @@ namespace osu.Game.Overlays
 
             State.ValueChanged += _ => updateProcessingMode();
 
-            firstRunSetupState = firstRunSetup.State.GetBoundCopy();
-            firstRunSetupState.ValueChanged += _ => updateProcessingMode();
+            firstRunSetupState = firstRunSetup?.State.GetBoundCopy();
+
+            if (firstRunSetupState != null)
+                firstRunSetupState.ValueChanged += _ => updateProcessingMode();
 
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
