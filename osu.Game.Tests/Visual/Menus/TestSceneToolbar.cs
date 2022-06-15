@@ -148,7 +148,7 @@ namespace osu.Game.Tests.Visual.Menus
         }
 
         [Test]
-        public void TestVolumeControlViaMusicButton()
+        public void TestVolumeControlViaMusicButtonScroll()
         {
             AddStep("hover toolbar music button", () => InputManager.MoveMouseTo(this.ChildrenOfType<ToolbarMusicButton>().Single()));
 
@@ -157,6 +157,19 @@ namespace osu.Game.Tests.Visual.Menus
             AddRepeatStep("scroll down", () => InputManager.ScrollVerticalBy(-10), 5);
             AddAssert("volume lowered down", () => Audio.Volume.Value < 1);
             AddRepeatStep("scroll up", () => InputManager.ScrollVerticalBy(10), 5);
+            AddAssert("volume raised up", () => Audio.Volume.Value == 1);
+        }
+
+        [Test]
+        public void TestVolumeControlViaMusicButtonArrowKeys()
+        {
+            AddStep("hover toolbar music button", () => InputManager.MoveMouseTo(this.ChildrenOfType<ToolbarMusicButton>().Single()));
+
+            AddStep("reset volume", () => Audio.Volume.Value = 1);
+
+            AddRepeatStep("arrow down", () => InputManager.Key(Key.Down), 5);
+            AddAssert("volume lowered down", () => Audio.Volume.Value < 1);
+            AddRepeatStep("arrow up", () => InputManager.Key(Key.Up), 5);
             AddAssert("volume raised up", () => Audio.Volume.Value == 1);
         }
 
