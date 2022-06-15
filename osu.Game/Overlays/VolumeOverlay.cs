@@ -140,11 +140,16 @@ namespace osu.Game.Overlays
 
         private ScheduledDelegate popOutDelegate;
 
+        public void FocusMasterVolume()
+        {
+            volumeMeters.Select(volumeMeterMaster);
+        }
+
         public override void Show()
         {
             // Focus on the master meter as a default if previously hidden
             if (State.Value == Visibility.Hidden)
-                volumeMeters.Select(volumeMeterMaster);
+                FocusMasterVolume();
 
             if (State.Value == Visibility.Visible)
                 schedulePopOut();
