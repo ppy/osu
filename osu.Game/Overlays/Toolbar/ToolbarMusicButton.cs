@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Toolbar
 
                 case Key.Down:
                     focusForAdjustment();
-                    volume?.Adjust(GlobalAction.IncreaseVolume, -1);
+                    volume?.Adjust(GlobalAction.DecreaseVolume);
                     return true;
             }
 
