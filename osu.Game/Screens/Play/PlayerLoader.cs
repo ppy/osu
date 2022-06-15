@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
         // We show the previous screen status
         protected override UserActivity? InitialActivity => null;
 
-        protected override bool PlayResumeSound => false;
+        protected override bool PlayExitSound => false;
 
         protected BeatmapMetadataDisplay MetadataInfo { get; private set; } = null!;
 
