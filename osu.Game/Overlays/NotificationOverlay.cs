@@ -35,6 +35,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private AudioManager audio { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private FirstRunSetupOverlay firstRunSetup { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -130,7 +133,9 @@ namespace osu.Game.Overlays
             var section = sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)));
             section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
 
-            if (notification.IsImportant)
+            // we don't want important notifications interrupting user on first-run setup.
+            // (this can happen when importing beatmaps inside setup, which posts import notifications)
+            if (notification.IsImportant && firstRunSetup?.State.Value != Visibility.Visible)
                 Show();
 
             updateCounts();
