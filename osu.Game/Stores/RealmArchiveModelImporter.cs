@@ -32,7 +32,16 @@ namespace osu.Game.Stores
     public abstract class RealmArchiveModelImporter<TModel> : IModelImporter<TModel>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
+        /// <summary>
+        /// The maximum number of concurrent imports to run per import scheduler.
+        /// </summary>
         private const int import_queue_request_concurrency = 1;
+
+        /// <summary>
+        /// The minimum number of items in a single import call in order for the import to be processed as a batch.
+        /// Batch imports will apply optimisations preferring speed over consistency when detecting changes in already-imported items.
+        /// </summary>
+        private const int minimum_items_considered_batch_import = 10;
 
         /// <summary>
         /// A singleton scheduler shared by all <see cref="RealmArchiveModelImporter{TModel}"/>.
@@ -100,7 +109,7 @@ namespace osu.Game.Stores
 
             var imported = new List<Live<TModel>>();
 
-            bool isBatchImport = tasks.Length > 1;
+            bool isBatchImport = tasks.Length >= minimum_items_considered_batch_import;
 
             try
             {
