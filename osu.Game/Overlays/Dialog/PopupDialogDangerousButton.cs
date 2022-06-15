@@ -101,9 +101,12 @@ namespace osu.Game.Overlays.Dialog
 
                 lowPassFilter.CutoffTo((int)(progress.NewValue * AudioFilter.MAX_LOWPASS_CUTOFF * 0.5));
 
-                tickSample.Frequency.Value = 1 + progress.NewValue * 0.5f;
-                tickSample.Volume.Value = 0.5f + progress.NewValue / 2f;
-                tickSample.Play();
+                var channel = tickSample.GetChannel();
+
+                channel.Frequency.Value = 1 + progress.NewValue * 0.5f;
+                channel.Volume.Value = 0.5f + progress.NewValue / 2f;
+
+                channel.Play();
 
                 lastTickPlaybackTime = Clock.CurrentTime;
             }
