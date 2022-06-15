@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Rankings
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Size = new Vector2(30, 20)
+                                        Size = new Vector2(28, 20)
                                     },
                                     countryName = new OsuSpriteText
                                     {
