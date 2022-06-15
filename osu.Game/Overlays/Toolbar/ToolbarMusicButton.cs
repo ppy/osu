@@ -8,7 +8,9 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Input.Bindings;
 using osuTK.Graphics;
 
@@ -32,7 +34,7 @@ namespace osu.Game.Overlays.Toolbar
             StateContainer = music;
 
             Flow.Padding = new MarginPadding { Horizontal = Toolbar.HEIGHT / 4 };
-            Flow.Add(new Container
+            Flow.Add(volumeDisplay = new Container
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
@@ -66,20 +68,46 @@ namespace osu.Game.Overlays.Toolbar
         private VolumeOverlay volume { get; set; }
 
         private IBindable<double> globalVolume;
+        private Container volumeDisplay;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             globalVolume = audio.Volume.GetBoundCopy();
-            globalVolume.BindValueChanged(v => volumeBar.Height = (float)v.NewValue, true);
+            globalVolume.BindValueChanged(v => volumeBar.ResizeHeightTo((float)v.NewValue, 200, Easing.OutQuint), true);
         }
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            volume?.FocusMasterVolume();
+            focusForAdjustment();
             volume?.Adjust(GlobalAction.IncreaseVolume, e.ScrollDelta.Y, e.IsPrecise);
             return true;
+        }
+
+        private void focusForAdjustment()
+        {
+            volume?.FocusMasterVolume();
+            expandVolumeBarTemporarily();
+        }
+
+        private TransformSequence<Container> expandTransform;
+        private ScheduledDelegate contractTransform;
+
+        private void expandVolumeBarTemporarily()
+        {
+            // avoid starting a new transform if one is already active.
+            if (expandTransform == null)
+            {
+                expandTransform = volumeDisplay.ResizeWidthTo(6, 500, Easing.OutQuint);
+                expandTransform.Finally(_ => expandTransform = null);
+            }
+
+            contractTransform?.Cancel();
+            contractTransform = Scheduler.AddDelayed(() =>
+            {
+                volumeDisplay.ResizeWidthTo(3f, 500, Easing.OutQuint);
+            }, 1000);
         }
     }
 }
