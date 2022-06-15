@@ -14,7 +14,7 @@ namespace osu.Game.IO
     /// </summary>
     public class StableStorage : DesktopStorage
     {
-        private const string stable_default_songs_path = "Songs";
+        public const string STABLE_DEFAULT_SONGS_PATH = "Songs";
 
         private readonly DesktopGameHost host;
         private readonly Lazy<string> songsPath;
@@ -62,7 +62,7 @@ namespace osu.Game.IO
                 }
             }
 
-            return GetFullPath(stable_default_songs_path);
+            return GetFullPath(STABLE_DEFAULT_SONGS_PATH);
         }
     }
 }
