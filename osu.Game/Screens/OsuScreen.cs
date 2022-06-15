@@ -212,7 +212,7 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            if (PlayExitSound)
+            if (ValidForResume && PlayExitSound)
                 sampleExit?.Play();
 
             if (ValidForResume && logo != null)

@@ -40,8 +40,6 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        protected override bool PlayExitSound => false;
-
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
