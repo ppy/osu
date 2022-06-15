@@ -173,7 +173,7 @@ namespace osu.Game.Stores
         /// Note that this bypasses the UI flow and should only be used for special cases or testing.
         /// </summary>
         /// <param name="task">The <see cref="ImportTask"/> containing data about the <typeparamref name="TModel"/> to import.</param>
-        /// <param name="batchImport">Whether this is a low priority import.</param>
+        /// <param name="batchImport">Whether this import is part of a larger batch.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
         public async Task<Live<TModel>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default)
@@ -205,7 +205,7 @@ namespace osu.Game.Stores
         /// Silently import an item from an <see cref="ArchiveReader"/>.
         /// </summary>
         /// <param name="archive">The archive to be imported.</param>
-        /// <param name="batchImport">Whether this is a low priority import.</param>
+        /// <param name="batchImport">Whether this import is part of a larger batch.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public async Task<Live<TModel>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
         {
