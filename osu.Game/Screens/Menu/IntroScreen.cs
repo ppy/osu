@@ -63,6 +63,8 @@ namespace osu.Game.Screens.Menu
 
         protected virtual string SeeyaSampleName => "Intro/seeya";
 
+        protected override bool PlayExitSound => false;
+
         private LeasedBindable<WorkingBeatmap> beatmap;
 
         private OsuScreen nextScreen;
