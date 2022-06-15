@@ -20,6 +20,12 @@ namespace osu.Game.Graphics.UserInterface
         TabSelect,
 
         [Description("scrolltotop")]
-        ScrollToTop
+        ScrollToTop,
+
+        [Description("dialog-cancel")]
+        DialogCancel,
+
+        [Description("dialog-ok")]
+        DialogOk
     }
 }
