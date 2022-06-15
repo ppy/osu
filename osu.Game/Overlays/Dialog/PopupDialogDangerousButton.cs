@@ -4,10 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
 using osu.Game.Audio.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -53,37 +53,33 @@ namespace osu.Game.Overlays.Dialog
 
             private Sample tickSample;
             private Sample confirmSample;
-            private bool isTicking;
             private double lastTickPlaybackTime;
             private AudioFilter lowPassFilter = null!;
 
             [BackgroundDependencyLoader]
             private void load(AudioManager audio)
             {
-                lowPassFilter = new AudioFilter(audio.SampleMixer);
                 tickSample = audio.Samples.Get(@"UI/dialog-dangerous-tick");
                 confirmSample = audio.Samples.Get(@"UI/dialog-dangerous-select");
+
+                AddInternal(lowPassFilter = new AudioFilter(audio.SampleMixer));
             }
 
-            protected override void Update()
+            protected override void LoadComplete()
             {
-                base.Update();
+                base.LoadComplete();
+                Progress.BindValueChanged(progressChanged);
+            }
 
-                if (!isTicking) return;
-
-                if (Precision.AlmostEquals(Progress.Value, 1))
-                {
-                    confirmSample?.Play();
-                    isTicking = false;
-                }
-
-                if (Clock.CurrentTime - lastTickPlaybackTime >= 30)
-                    playTick(Progress.Value);
+            protected override void Confirm()
+            {
+                lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
+                confirmSample?.Play();
+                base.Confirm();
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
-                startTickSound();
                 BeginConfirm();
                 return true;
             }
@@ -92,34 +88,28 @@ namespace osu.Game.Overlays.Dialog
             {
                 if (!e.HasAnyButtonPressed)
                 {
-                    stopTickSound();
                     AbortConfirm();
                 }
             }
 
-            private void playTick(double progress)
+            private void progressChanged(ValueChangedEvent<double> progress)
             {
-                lowPassFilter.CutoffTo((int)(Progress.Value * AudioFilter.MAX_LOWPASS_CUTOFF * 0.5f));
+                if (progress.NewValue < progress.OldValue)
+                {
+                    lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
+                    return;
+                }
 
-                tickSample.Frequency.Value = 1 + progress * 0.5f;
-                tickSample.Volume.Value = 0.5f + progress / 2f;
-                tickSample.Play();
+                if (Clock.CurrentTime - lastTickPlaybackTime >= 30)
+                {
+                    lowPassFilter.CutoffTo((int)(progress.NewValue * AudioFilter.MAX_LOWPASS_CUTOFF * 0.5));
 
-                lastTickPlaybackTime = Clock.CurrentTime;
-            }
+                    tickSample.Frequency.Value = 1 + progress.NewValue * 0.5f;
+                    tickSample.Volume.Value = 0.5f + progress.NewValue / 2f;
+                    tickSample.Play();
 
-            private void startTickSound()
-            {
-                lowPassFilter.CutoffTo(0);
-                playTick(Progress.Value);
-                isTicking = true;
-            }
-
-            private void stopTickSound()
-            {
-                isTicking = false;
-                lastTickPlaybackTime = Clock.CurrentTime;
-                lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
+                    lastTickPlaybackTime = Clock.CurrentTime;
+                }
             }
         }
     }
