@@ -64,26 +64,28 @@ namespace osu.Game.Screens.Edit.Setup
 
         public bool ChangeBackgroundImage(string path)
         {
-            var info = new FileInfo(path);
+            var source = new FileInfo(path);
 
-            if (!info.Exists)
+            if (!source.Exists)
                 return false;
 
             var set = working.Value.BeatmapSetInfo;
 
+            var destination = new FileInfo($@"bg{source.Extension}");
+
             // remove the previous background for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
+            var oldFile = set.Files.FirstOrDefault(f => Path.GetFileNameWithoutExtension(f.Filename) == destination.Name);
 
-            using (var stream = info.OpenRead())
+            using (var stream = source.OpenRead())
             {
                 if (oldFile != null)
                     beatmaps.DeleteFile(set, oldFile);
 
-                beatmaps.AddFile(set, stream, info.Name);
+                beatmaps.AddFile(set, stream, destination.Name);
             }
 
-            working.Value.Metadata.BackgroundFile = info.Name;
+            working.Value.Metadata.BackgroundFile = destination.Name;
             header.Background.UpdateBackground();
 
             return true;
@@ -91,25 +93,28 @@ namespace osu.Game.Screens.Edit.Setup
 
         public bool ChangeAudioTrack(string path)
         {
-            var info = new FileInfo(path);
+            var source = new FileInfo(path);
 
-            if (!info.Exists)
+            if (!source.Exists)
                 return false;
 
             var set = working.Value.BeatmapSetInfo;
 
+            var destination = new FileInfo($@"audio{source.Extension}");
+
             // remove the previous audio track for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.AudioFile);
+            var oldFile = set.Files.FirstOrDefault(f => Path.GetFileNameWithoutExtension(f.Filename) == destination.Name);
 
-            using (var stream = info.OpenRead())
+            using (var stream = source.OpenRead())
             {
                 if (oldFile != null)
                     beatmaps.DeleteFile(set, oldFile);
-                beatmaps.AddFile(set, stream, info.Name);
+
+                beatmaps.AddFile(set, stream, destination.Name);
             }
 
-            working.Value.Metadata.AudioFile = info.Name;
+            working.Value.Metadata.AudioFile = destination.Name;
 
             music.ReloadCurrentTrack();
 
