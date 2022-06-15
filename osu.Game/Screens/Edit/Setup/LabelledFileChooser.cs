@@ -21,10 +21,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    /// <summary>
-    /// A labelled textbox which reveals an inline file chooser when clicked.
-    /// </summary>
-    internal class FileChooserLabelledTextBox : LabelledTextBoxWithPopover, ICanAcceptFiles
+    internal class LabelledFileChooser : LabelledTextBoxWithPopover, ICanAcceptFiles
     {
         private readonly string[] handledExtensions;
 
@@ -35,7 +32,15 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
 
-        public FileChooserLabelledTextBox(params string[] handledExtensions)
+        private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
+
+        public override Bindable<string> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
+
+        public LabelledFileChooser(params string[] handledExtensions)
         {
             this.handledExtensions = handledExtensions;
         }
