@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using JetBrains.Annotations;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
@@ -28,21 +30,44 @@ namespace osu.Game.Tests.Visual.Menus
         [Resolved]
         private IRulesetStore rulesets { get; set; }
 
-        private readonly Mock<INotificationOverlay> notifications = new Mock<INotificationOverlay>();
+        [Cached]
+        private readonly NowPlayingOverlay nowPlayingOverlay = new NowPlayingOverlay
+        {
+            Anchor = Anchor.TopRight,
+            Origin = Anchor.TopRight,
+            Y = Toolbar.HEIGHT,
+        };
+
+        [Cached]
+        private readonly VolumeOverlay volumeOverlay = new VolumeOverlay
+        {
+            Anchor = Anchor.CentreLeft,
+            Origin = Anchor.CentreLeft,
+        };
+
+        private readonly Mock<TestNotificationOverlay> notifications = new Mock<TestNotificationOverlay>();
 
         private readonly BindableInt unreadNotificationCount = new BindableInt();
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Dependencies.CacheAs(notifications.Object);
+            Dependencies.CacheAs<INotificationOverlay>(notifications.Object);
             notifications.SetupGet(n => n.UnreadCount).Returns(unreadNotificationCount);
         }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = toolbar = new TestToolbar { State = { Value = Visibility.Visible } };
+            Remove(nowPlayingOverlay);
+            Remove(volumeOverlay);
+
+            Children = new Drawable[]
+            {
+                nowPlayingOverlay,
+                volumeOverlay,
+                toolbar = new TestToolbar { State = { Value = Visibility.Visible } },
+            };
         });
 
         [Test]
@@ -122,9 +147,51 @@ namespace osu.Game.Tests.Visual.Menus
             AddAssert("not scrolled", () => scroll.Current == 0);
         }
 
+        [Test]
+        public void TestVolumeControlViaMusicButtonScroll()
+        {
+            AddStep("hover toolbar music button", () => InputManager.MoveMouseTo(this.ChildrenOfType<ToolbarMusicButton>().Single()));
+
+            AddStep("reset volume", () => Audio.Volume.Value = 1);
+
+            AddRepeatStep("scroll down", () => InputManager.ScrollVerticalBy(-10), 5);
+            AddAssert("volume lowered down", () => Audio.Volume.Value < 1);
+            AddRepeatStep("scroll up", () => InputManager.ScrollVerticalBy(10), 5);
+            AddAssert("volume raised up", () => Audio.Volume.Value == 1);
+        }
+
+        [Test]
+        public void TestVolumeControlViaMusicButtonArrowKeys()
+        {
+            AddStep("hover toolbar music button", () => InputManager.MoveMouseTo(this.ChildrenOfType<ToolbarMusicButton>().Single()));
+
+            AddStep("reset volume", () => Audio.Volume.Value = 1);
+
+            AddRepeatStep("arrow down", () => InputManager.Key(Key.Down), 5);
+            AddAssert("volume lowered down", () => Audio.Volume.Value < 1);
+            AddRepeatStep("arrow up", () => InputManager.Key(Key.Up), 5);
+            AddAssert("volume raised up", () => Audio.Volume.Value == 1);
+        }
+
         public class TestToolbar : Toolbar
         {
             public new Bindable<OverlayActivation> OverlayActivationMode => base.OverlayActivationMode as Bindable<OverlayActivation>;
+        }
+
+        // interface mocks break hot reload, mocking this stub implementation instead works around it.
+        // see: https://github.com/moq/moq4/issues/1252
+        [UsedImplicitly]
+        public class TestNotificationOverlay : INotificationOverlay
+        {
+            public virtual void Post(Notification notification)
+            {
+            }
+
+            public virtual void Hide()
+            {
+            }
+
+            public virtual IBindable<int> UnreadCount => null;
         }
     }
 }
