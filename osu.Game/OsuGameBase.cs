@@ -519,7 +519,9 @@ namespace osu.Game
 
             foreach (ModType type in Enum.GetValues(typeof(ModType)))
             {
-                dict[type] = instance.GetModsFor(type).ToList();
+                dict[type] = instance.GetModsFor(type)
+                                     .Where(mod => mod != null)
+                                     .ToList();
             }
 
             if (!SelectedMods.Disabled)
