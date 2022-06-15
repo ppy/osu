@@ -15,7 +15,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Skinning;
-using osu.Game.Stores;
 using osu.Game.Overlays.Notifications;
 
 #nullable enable

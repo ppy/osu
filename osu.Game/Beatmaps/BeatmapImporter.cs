@@ -24,7 +24,6 @@ using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
-using osu.Game.Stores;
 using Realms;
 
 namespace osu.Game.Beatmaps
