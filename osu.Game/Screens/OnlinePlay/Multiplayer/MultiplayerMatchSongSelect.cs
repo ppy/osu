@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -18,11 +21,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class MultiplayerMatchSongSelect : OnlinePlaySongSelect
     {
         [Resolved]
-        private MultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; } = null!;
+
+        [Resolved]
+        private OngoingOperationTracker operationTracker { get; set; } = null!;
 
         private readonly long? itemToEdit;
 
-        private LoadingLayer loadingLayer;
+        private LoadingLayer loadingLayer = null!;
+        private IDisposable? selectionOperation;
 
         /// <summary>
         /// Construct a new instance of multiplayer song select.
@@ -31,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// <param name="itemToEdit">The item to be edited. May be null, in which case a new item will be added to the playlist.</param>
         /// <param name="beatmap">An optional initial beatmap selection to perform.</param>
         /// <param name="ruleset">An optional initial ruleset selection to perform.</param>
-        public MultiplayerMatchSongSelect(Room room, long? itemToEdit = null, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
+        public MultiplayerMatchSongSelect(Room room, long? itemToEdit = null, WorkingBeatmap? beatmap = null, RulesetInfo? ruleset = null)
             : base(room)
         {
             this.itemToEdit = itemToEdit;
@@ -58,6 +65,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
             if (client.Room != null)
             {
+                selectionOperation = operationTracker.BeginOperation();
+
                 loadingLayer.Show();
 
                 var multiplayerItem = new MultiplayerPlaylistItem
@@ -72,18 +81,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
 
-                task.FireAndForget(onSuccess: () => Schedule(() =>
+                task.FireAndForget(onSuccess: () =>
                 {
-                    loadingLayer.Hide();
+                    selectionOperation.Dispose();
 
-                    // If an error or server side trigger occurred this screen may have already exited by external means.
-                    if (this.IsCurrentScreen())
-                        this.Exit();
-                }), onError: _ => Schedule(() =>
+                    Schedule(() =>
+                    {
+                        loadingLayer.Hide();
+
+                        // If an error or server side trigger occurred this screen may have already exited by external means.
+                        if (this.IsCurrentScreen())
+                            this.Exit();
+                    });
+                }, onError: _ =>
                 {
-                    loadingLayer.Hide();
-                    Carousel.AllowSelection = true;
-                }));
+                    selectionOperation.Dispose();
+
+                    Schedule(() =>
+                    {
+                        loadingLayer.Hide();
+                        Carousel.AllowSelection = true;
+                    });
+                });
             }
             else
             {
