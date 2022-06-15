@@ -8,15 +8,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
     internal class ResourcesSection : SetupSection
     {
-        private LabelledTextBox audioTrackTextBox;
-        private LabelledTextBox backgroundTextBox;
+        private LabelledFileChooser audioTrackChooser;
+        private LabelledFileChooser backgroundChooser;
 
         public override LocalisableString Title => "Resources";
 
@@ -40,26 +39,24 @@ namespace osu.Game.Screens.Edit.Setup
         {
             Children = new Drawable[]
             {
-                backgroundTextBox = new FileChooserLabelledTextBox(".jpg", ".jpeg", ".png")
+                backgroundChooser = new LabelledFileChooser(".jpg", ".jpeg", ".png")
                 {
                     Label = "Background",
                     FixedLabelWidth = LABEL_WIDTH,
-                    PlaceholderText = "Click to select a background image",
                     Current = { Value = working.Value.Metadata.BackgroundFile },
                     TabbableContentContainer = this
                 },
-                audioTrackTextBox = new FileChooserLabelledTextBox(".mp3", ".ogg")
+                audioTrackChooser = new LabelledFileChooser(".mp3", ".ogg")
                 {
                     Label = "Audio Track",
                     FixedLabelWidth = LABEL_WIDTH,
-                    PlaceholderText = "Click to select a track",
                     Current = { Value = working.Value.Metadata.AudioFile },
                     TabbableContentContainer = this
                 },
             };
 
-            backgroundTextBox.Current.BindValueChanged(backgroundChanged);
-            audioTrackTextBox.Current.BindValueChanged(audioTrackChanged);
+            backgroundChooser.Current.BindValueChanged(backgroundChanged, true);
+            audioTrackChooser.Current.BindValueChanged(audioTrackChanged, true);
         }
 
         public bool ChangeBackgroundImage(string path)
@@ -124,14 +121,28 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void backgroundChanged(ValueChangedEvent<string> filePath)
         {
-            if (!ChangeBackgroundImage(filePath.NewValue))
-                backgroundTextBox.Current.Value = filePath.OldValue;
+            backgroundChooser.PlaceholderText = string.IsNullOrEmpty(filePath.NewValue)
+                ? "Click to select a background image"
+                : "Click to replace the background image";
+
+            if (filePath.NewValue != filePath.OldValue)
+            {
+                if (!ChangeBackgroundImage(filePath.NewValue))
+                    backgroundChooser.Current.Value = filePath.OldValue;
+            }
         }
 
         private void audioTrackChanged(ValueChangedEvent<string> filePath)
         {
-            if (!ChangeAudioTrack(filePath.NewValue))
-                audioTrackTextBox.Current.Value = filePath.OldValue;
+            audioTrackChooser.PlaceholderText = string.IsNullOrEmpty(filePath.NewValue)
+                ? "Click to select a track"
+                : "Click to replace the track";
+
+            if (filePath.NewValue != filePath.OldValue)
+            {
+                if (!ChangeAudioTrack(filePath.NewValue))
+                    audioTrackChooser.Current.Value = filePath.OldValue;
+            }
         }
     }
 }
