@@ -38,6 +38,8 @@ namespace osu.Game.Overlays
         [Resolved(canBeNull: true)]
         private FirstRunSetupOverlay firstRunSetup { get; set; }
 
+        private IBindable<Visibility> firstRunSetupState;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -84,7 +86,7 @@ namespace osu.Game.Overlays
 
         private void updateProcessingMode()
         {
-            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State.Value == Visibility.Visible;
+            bool enabled = (OverlayActivationMode.Value == OverlayActivation.All && firstRunSetupState?.Value != Visibility.Visible) || State.Value == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
@@ -100,6 +102,10 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             State.ValueChanged += _ => updateProcessingMode();
+
+            firstRunSetupState = firstRunSetup.State.GetBoundCopy();
+            firstRunSetupState.ValueChanged += _ => updateProcessingMode();
+
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
@@ -133,9 +139,7 @@ namespace osu.Game.Overlays
             var section = sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)));
             section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
 
-            // we don't want important notifications interrupting user on first-run setup.
-            // (this can happen when importing beatmaps inside setup, which posts import notifications)
-            if (notification.IsImportant && firstRunSetup?.State.Value != Visibility.Visible)
+            if (notification.IsImportant)
                 Show();
 
             updateCounts();
