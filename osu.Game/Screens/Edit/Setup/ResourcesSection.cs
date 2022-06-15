@@ -43,26 +43,28 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = "Background",
                     FixedLabelWidth = LABEL_WIDTH,
-                    Current = { Value = working.Value.Metadata.BackgroundFile },
                     TabbableContentContainer = this
                 },
                 audioTrackChooser = new LabelledFileChooser(".mp3", ".ogg")
                 {
                     Label = "Audio Track",
                     FixedLabelWidth = LABEL_WIDTH,
-                    Current = { Value = working.Value.Metadata.AudioFile },
                     TabbableContentContainer = this
                 },
             };
+
+            if (!string.IsNullOrEmpty(working.Value.Metadata.BackgroundFile))
+                backgroundChooser.Current.Value = new FileInfo(working.Value.Metadata.BackgroundFile);
+
+            if (!string.IsNullOrEmpty(working.Value.Metadata.AudioFile))
+                audioTrackChooser.Current.Value = new FileInfo(working.Value.Metadata.AudioFile);
 
             backgroundChooser.Current.BindValueChanged(backgroundChanged, true);
             audioTrackChooser.Current.BindValueChanged(audioTrackChanged, true);
         }
 
-        public bool ChangeBackgroundImage(string path)
+        public bool ChangeBackgroundImage(FileInfo source)
         {
-            var source = new FileInfo(path);
-
             if (!source.Exists)
                 return false;
 
@@ -88,10 +90,8 @@ namespace osu.Game.Screens.Edit.Setup
             return true;
         }
 
-        public bool ChangeAudioTrack(string path)
+        public bool ChangeAudioTrack(FileInfo source)
         {
-            var source = new FileInfo(path);
-
             if (!source.Exists)
                 return false;
 
@@ -119,29 +119,29 @@ namespace osu.Game.Screens.Edit.Setup
             return true;
         }
 
-        private void backgroundChanged(ValueChangedEvent<string> filePath)
+        private void backgroundChanged(ValueChangedEvent<FileInfo> file)
         {
-            backgroundChooser.Text = string.IsNullOrEmpty(filePath.NewValue)
+            backgroundChooser.Text = file.NewValue == null
                 ? "Click to select a background image"
                 : "Click to replace the background image";
 
-            if (filePath.NewValue != filePath.OldValue)
+            if (file.NewValue != file.OldValue)
             {
-                if (!ChangeBackgroundImage(filePath.NewValue))
-                    backgroundChooser.Current.Value = filePath.OldValue;
+                if (!ChangeBackgroundImage(file.NewValue))
+                    backgroundChooser.Current.Value = file.OldValue;
             }
         }
 
-        private void audioTrackChanged(ValueChangedEvent<string> filePath)
+        private void audioTrackChanged(ValueChangedEvent<FileInfo> file)
         {
-            audioTrackChooser.Text = string.IsNullOrEmpty(filePath.NewValue)
+            audioTrackChooser.Text = file.NewValue == null
                 ? "Click to select a track"
                 : "Click to replace the track";
 
-            if (filePath.NewValue != filePath.OldValue)
+            if (file.NewValue != file.OldValue)
             {
-                if (!ChangeAudioTrack(filePath.NewValue))
-                    audioTrackChooser.Current.Value = filePath.OldValue;
+                if (!ChangeAudioTrack(file.NewValue))
+                    audioTrackChooser.Current.Value = file.OldValue;
             }
         }
     }

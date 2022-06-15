@@ -27,20 +27,18 @@ namespace osu.Game.Screens.Edit.Setup
     /// A labelled drawable displaying file chooser on click, with placeholder text support.
     /// todo: this should probably not use PopoverTextBox just to display placeholder text, but is the best way for now.
     /// </summary>
-    internal class LabelledFileChooser : LabelledDrawable<LabelledTextBoxWithPopover.PopoverTextBox>, IHasCurrentValue<string>, ICanAcceptFiles, IHasPopover
+    internal class LabelledFileChooser : LabelledDrawable<LabelledTextBoxWithPopover.PopoverTextBox>, IHasCurrentValue<FileInfo?>, ICanAcceptFiles, IHasPopover
     {
         private readonly string[] handledExtensions;
 
         public IEnumerable<string> HandledExtensions => handledExtensions;
 
-        private readonly Bindable<FileInfo?> currentFile = new Bindable<FileInfo?>();
-
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
 
-        private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
+        private readonly BindableWithCurrent<FileInfo?> current = new BindableWithCurrent<FileInfo?>();
 
-        public Bindable<string> Current
+        public Bindable<FileInfo?> Current
         {
             get => current.Current;
             set => current.Current = value;
@@ -68,21 +66,18 @@ namespace osu.Game.Screens.Edit.Setup
             base.LoadComplete();
 
             game.RegisterImportHandler(this);
-            currentFile.BindValueChanged(onFileSelected);
+            Current.BindValueChanged(onFileSelected);
         }
 
         private void onFileSelected(ValueChangedEvent<FileInfo?> file)
         {
-            if (file.NewValue == null)
-                return;
-
-            this.HidePopover();
-            Current.Value = file.NewValue.FullName;
+            if (file.NewValue != null)
+                this.HidePopover();
         }
 
         Task ICanAcceptFiles.Import(params string[] paths)
         {
-            Schedule(() => currentFile.Value = new FileInfo(paths.First()));
+            Schedule(() => Current.Value = new FileInfo(paths.First()));
             return Task.CompletedTask;
         }
 
@@ -105,7 +100,7 @@ namespace osu.Game.Screens.Edit.Setup
             OnFocused = this.ShowPopover,
         };
 
-        public Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile);
+        public Popover GetPopover() => new FileChooserPopover(handledExtensions, Current);
 
         private class FileChooserPopover : OsuPopover
         {
