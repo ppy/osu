@@ -511,23 +511,34 @@ namespace osu.Game
             if (instance == null)
             {
                 // reject the change if the ruleset is not available.
-                Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
+                revertRulesetChange();
                 return;
             }
 
             var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
 
-            foreach (ModType type in Enum.GetValues(typeof(ModType)))
+            try
             {
-                dict[type] = instance.GetModsFor(type)
-                                     .Where(mod => mod != null)
-                                     .ToList();
+                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                {
+                    dict[type] = instance.GetModsFor(type)
+                                         .Where(mod => mod != null)
+                                         .ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Could not load mods for \"{instance.RulesetInfo.Name}\" ruleset. Current ruleset has been rolled back.");
+                revertRulesetChange();
+                return;
             }
 
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
 
             AvailableMods.Value = dict;
+
+            void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }
 
         private int allowableExceptions;
