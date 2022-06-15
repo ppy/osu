@@ -66,8 +66,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 minZoom = value;
 
-                if (Zoom < value)
-                    Zoom = value;
+                // ensure zoom range is in valid state before updating zoom.
+                if (MinZoom < MaxZoom)
+                    Zoom = Zoom;
             }
         }
 
@@ -86,8 +87,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 maxZoom = value;
 
-                if (Zoom > value)
-                    Zoom = value;
+                // ensure zoom range is in valid state before updating zoom.
+                if (MaxZoom > MinZoom)
+                    Zoom = Zoom;
             }
         }
 
