@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Editing
                 using (var zip = ZipArchive.Open(temp))
                     zip.WriteToDirectory(extractedFolder);
 
-                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3"));
+                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(new FileInfo(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3")));
 
                 File.Delete(temp);
                 Directory.Delete(extractedFolder, true);
