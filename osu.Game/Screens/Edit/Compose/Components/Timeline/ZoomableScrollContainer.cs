@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 // ensure zoom range is in valid state before updating zoom.
                 if (MinZoom < MaxZoom)
-                    Zoom = Zoom;
+                    updateZoom();
             }
         }
 
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 // ensure zoom range is in valid state before updating zoom.
                 if (MaxZoom > MinZoom)
-                    Zoom = Zoom;
+                    updateZoom();
             }
         }
 
@@ -99,15 +99,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public float Zoom
         {
             get => zoomTarget;
-            set
-            {
-                value = Math.Clamp(value, MinZoom, MaxZoom);
+            set => updateZoom(value);
+        }
 
-                if (IsLoaded)
-                    setZoomTarget(value, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
-                else
-                    currentZoom = zoomTarget = value;
-            }
+        private void updateZoom(float? value = null)
+        {
+            float newZoom = Math.Clamp(value ?? Zoom, MinZoom, MaxZoom);
+
+            if (IsLoaded)
+                setZoomTarget(newZoom, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
+            else
+                currentZoom = zoomTarget = newZoom;
         }
 
         protected override void Update()
