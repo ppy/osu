@@ -46,8 +46,6 @@ namespace osu.Game.Skinning
 
         private const string unknown_creator_string = @"Unknown";
 
-        protected override bool HasCustomHashFunction => true;
-
         protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
             var skinInfoFile = model.Files.SingleOrDefault(f => f.Filename == skin_info_file);
