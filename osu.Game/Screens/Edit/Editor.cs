@@ -63,6 +63,8 @@ namespace osu.Game.Screens.Edit
 
         public override bool? AllowTrackAdjustments => false;
 
+        protected override bool PlayExitSound => false;
+
         protected bool HasUnsavedChanges
         {
             get
