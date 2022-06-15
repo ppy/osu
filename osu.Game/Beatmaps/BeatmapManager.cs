@@ -21,7 +21,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
-using osu.Game.Stores;
 using osu.Game.Utils;
 
 #nullable enable

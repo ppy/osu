@@ -28,7 +28,6 @@ using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
-using osu.Game.Stores;
 using Realms;
 using Realms.Exceptions;
 

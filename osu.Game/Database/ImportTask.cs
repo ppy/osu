@@ -6,7 +6,6 @@
 using System.IO;
 using osu.Framework.Extensions;
 using osu.Game.IO.Archives;
-using osu.Game.Stores;
 using osu.Game.Utils;
 using SharpCompress.Common;
 
