@@ -77,6 +77,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnScroll(ScrollEvent e)
         {
+            volume?.FocusMasterVolume();
             volume?.Adjust(GlobalAction.IncreaseVolume, e.ScrollDelta.Y, e.IsPrecise);
             return true;
         }
