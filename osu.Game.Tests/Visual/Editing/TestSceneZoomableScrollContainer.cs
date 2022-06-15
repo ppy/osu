@@ -79,6 +79,21 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestZoomRangeUpdate()
+        {
+            AddStep("set zoom to 2", () => scrollContainer.Zoom = 2);
+            AddStep("set min zoom to 5", () => scrollContainer.MinZoom = 5);
+            AddAssert("zoom = 5", () => scrollContainer.Zoom == 5);
+
+            AddStep("set max zoom to 10", () => scrollContainer.MaxZoom = 10);
+            AddAssert("zoom = 5", () => scrollContainer.Zoom == 5);
+
+            AddStep("set min zoom to 20", () => scrollContainer.MinZoom = 20);
+            AddStep("set max zoom to 40", () => scrollContainer.MaxZoom = 40);
+            AddAssert("zoom = 20", () => scrollContainer.Zoom == 20);
+        }
+
+        [Test]
         public void TestZoom0()
         {
             reset();
