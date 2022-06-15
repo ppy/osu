@@ -522,6 +522,8 @@ namespace osu.Game
                 foreach (ModType type in Enum.GetValues(typeof(ModType)))
                 {
                     dict[type] = instance.GetModsFor(type)
+                                         // Rulesets should never return null mods, but let's be defensive just in case.
+                                         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                                          .Where(mod => mod != null)
                                          .ToList();
                 }
