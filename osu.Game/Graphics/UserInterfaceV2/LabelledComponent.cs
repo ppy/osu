@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
         }
 
-        public virtual Bindable<TValue> Current
+        public Bindable<TValue> Current
         {
             get => Component.Current;
             set => Component.Current = value;
