@@ -101,6 +101,9 @@ namespace osu.Game.Tests.Visual.Editing
                 File.Delete(temp);
                 Directory.Delete(extractedFolder, true);
 
+                // ensure audio file is copied to beatmap as "audio.mp3" rather than original filename.
+                Assert.That(Beatmap.Value.Metadata.AudioFile == "audio.mp3");
+
                 return success;
             });
 
