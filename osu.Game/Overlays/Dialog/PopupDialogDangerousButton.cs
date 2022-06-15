@@ -88,28 +88,24 @@ namespace osu.Game.Overlays.Dialog
             {
                 if (!e.HasAnyButtonPressed)
                 {
+                    lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
                     AbortConfirm();
                 }
             }
 
             private void progressChanged(ValueChangedEvent<double> progress)
             {
-                if (progress.NewValue < progress.OldValue)
-                {
-                    lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
-                    return;
-                }
+                if (progress.NewValue < progress.OldValue) return;
 
-                if (Clock.CurrentTime - lastTickPlaybackTime >= 30)
-                {
-                    lowPassFilter.CutoffTo((int)(progress.NewValue * AudioFilter.MAX_LOWPASS_CUTOFF * 0.5));
+                if (Clock.CurrentTime - lastTickPlaybackTime < 30) return;
 
-                    tickSample.Frequency.Value = 1 + progress.NewValue * 0.5f;
-                    tickSample.Volume.Value = 0.5f + progress.NewValue / 2f;
-                    tickSample.Play();
+                lowPassFilter.CutoffTo((int)(progress.NewValue * AudioFilter.MAX_LOWPASS_CUTOFF * 0.5));
 
-                    lastTickPlaybackTime = Clock.CurrentTime;
-                }
+                tickSample.Frequency.Value = 1 + progress.NewValue * 0.5f;
+                tickSample.Volume.Value = 0.5f + progress.NewValue / 2f;
+                tickSample.Play();
+
+                lastTickPlaybackTime = Clock.CurrentTime;
             }
         }
     }
