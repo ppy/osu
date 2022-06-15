@@ -21,7 +21,6 @@ using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Stores;
 using osu.Game.Tests.Resources;
 using Realms;
 using SharpCompress.Archives;

@@ -13,7 +13,6 @@ using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Stores;
 using Realms;
 
 #nullable enable

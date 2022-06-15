@@ -15,7 +15,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Skinning;
-using osu.Game.Stores;
 using osu.Game.Overlays.Notifications;
 
 #nullable enable
@@ -40,8 +39,6 @@ namespace osu.Game.Beatmaps
             : base(realm, storage, onlineLookupQueue)
         {
         }
-
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
 
         /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
