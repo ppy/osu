@@ -1,20 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using Realms;
 
-#nullable enable
-
-namespace osu.Game.Stores
+namespace osu.Game.Database
 {
     /// <summary>
     /// Class which adds all the missing pieces bridging the gap between <see cref="RealmArchiveModelImporter{TModel}"/> and (legacy) ArchiveModelManager.
