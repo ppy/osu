@@ -18,19 +18,19 @@ namespace osu.Game.Database
 
         protected override IEnumerable<string> GetStableImportPaths(Storage storage)
         {
-            foreach (string beatmapDirectory in storage.GetDirectories(string.Empty))
+            foreach (string directory in storage.GetDirectories(string.Empty))
             {
-                var beatmapStorage = storage.GetStorageForDirectory(beatmapDirectory);
+                var directoryStorage = storage.GetStorageForDirectory(directory);
 
-                if (!beatmapStorage.GetFiles(string.Empty).ExcludeSystemFileNames().Any())
+                if (!directoryStorage.GetFiles(string.Empty).ExcludeSystemFileNames().Any())
                 {
                     // if a directory doesn't contain files, attempt looking for beatmaps inside of that directory.
                     // this is a special behaviour in stable for beatmaps only, see https://github.com/ppy/osu/issues/18615.
-                    foreach (string beatmapInDirectory in GetStableImportPaths(beatmapStorage))
-                        yield return beatmapStorage.GetFullPath(beatmapInDirectory);
+                    foreach (string subDirectory in GetStableImportPaths(directoryStorage))
+                        yield return subDirectory;
                 }
                 else
-                    yield return storage.GetFullPath(beatmapDirectory);
+                    yield return storage.GetFullPath(directory);
             }
         }
 
