@@ -86,11 +86,15 @@ namespace osu.Game.Screens.Play
             Children = new Drawable[]
             {
                 CreateFailingLayer(),
-                mainComponents = new MainComponentsContainer(),
+                mainComponents = new MainComponentsContainer
+                {
+                    AlwaysPresent = true,
+                },
                 topRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
+                    AlwaysPresent = true,
                     Margin = new MarginPadding(10),
                     Spacing = new Vector2(10),
                     AutoSizeAxes = Axes.Both,
