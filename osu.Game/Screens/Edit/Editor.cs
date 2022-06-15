@@ -63,9 +63,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool? AllowTrackAdjustments => false;
 
-        protected override bool PlayExitSound => !HasUnsavedChanges && !isChangingDifficulties;
-
-        private bool isChangingDifficulties;
+        protected override bool PlayExitSound => !ExitConfirmed && !switchingDifficulty;
 
         protected bool HasUnsavedChanges
         {
@@ -102,6 +100,8 @@ namespace osu.Game.Screens.Edit
         private bool canSave;
 
         protected bool ExitConfirmed { get; private set; }
+
+        private bool switchingDifficulty;
 
         private string lastSavedHash;
 
@@ -862,7 +862,7 @@ namespace osu.Game.Screens.Edit
 
         private void switchToNewDifficulty(RulesetInfo rulesetInfo, bool createCopy)
         {
-            isChangingDifficulties = true;
+            switchingDifficulty = true;
             loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo, rulesetInfo, createCopy, GetState(rulesetInfo));
         }
 
