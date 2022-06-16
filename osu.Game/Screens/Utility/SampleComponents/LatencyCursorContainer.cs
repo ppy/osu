@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Utility.SampleComponents
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            // CursorContainer implements IRequireHighFrequencyMousePosition, which bypasses limited rate updating, therefore scheduling is required.
+            // Scheduling is required to ensure updating of cursor position happens in limited rate.
             // We can alternatively solve this by a PassThroughInputManager layer inside LatencyArea,
             // but that would mean including input lag to this test, which may not be desired.
             Schedule(() => base.OnMouseMove(e));
