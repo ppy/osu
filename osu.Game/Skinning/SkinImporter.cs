@@ -20,16 +20,20 @@ using Realms;
 
 namespace osu.Game.Skinning
 {
-    public class SkinImporter : RealmArchiveModelManager<SkinInfo>
+    public class SkinImporter : RealmArchiveModelImporter<SkinInfo>
     {
         private const string skin_info_file = "skininfo.json";
 
         private readonly IStorageResourceProvider skinResources;
 
+        private readonly ModelManager<SkinInfo> modelManager;
+
         public SkinImporter(Storage storage, RealmAccess realm, IStorageResourceProvider skinResources)
             : base(storage, realm)
         {
             this.skinResources = skinResources;
+
+            modelManager = new ModelManager<SkinInfo>(storage, realm);
 
             // can be removed 20220420.
             populateMissingHashes();
@@ -154,7 +158,7 @@ namespace osu.Game.Skinning
                             sw.WriteLine(line);
                     }
 
-                    ReplaceFile(existingFile, stream, realm);
+                    modelManager.ReplaceFile(existingFile, stream, realm);
 
                     // can be removed 20220502.
                     if (!ensureIniWasUpdated(item))
@@ -184,7 +188,7 @@ namespace osu.Game.Skinning
                             sw.WriteLine(line);
                     }
 
-                    AddFile(item, stream, @"skin.ini", realm);
+                    modelManager.AddFile(item, stream, @"skin.ini", realm);
                 }
 
                 item.Hash = ComputeHash(item);
@@ -216,7 +220,7 @@ namespace osu.Game.Skinning
                     }
                     catch (Exception e)
                     {
-                        Delete(skin);
+                        modelManager.Delete(skin);
                         Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
                     }
                 }
@@ -234,7 +238,7 @@ namespace osu.Game.Skinning
 
                 using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(skinInfoJson)))
                 {
-                    AddFile(s, streamContent, skin_info_file, s.Realm);
+                    modelManager.AddFile(s, streamContent, skin_info_file, s.Realm);
                 }
 
                 // Then serialise each of the drawable component groups into respective files.
@@ -249,16 +253,14 @@ namespace osu.Game.Skinning
                         var oldFile = s.Files.FirstOrDefault(f => f.Filename == filename);
 
                         if (oldFile != null)
-                            ReplaceFile(oldFile, streamContent, s.Realm);
+                            modelManager.ReplaceFile(oldFile, streamContent, s.Realm);
                         else
-                            AddFile(s, streamContent, filename, s.Realm);
+                            modelManager.AddFile(s, streamContent, filename, s.Realm);
                     }
                 }
 
                 s.Hash = ComputeHash(s);
             });
         }
-
-        public override bool IsAvailableLocally(SkinInfo model) => true; // skins do not have online download support yet.
     }
 }

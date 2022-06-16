@@ -220,7 +220,7 @@ namespace osu.Game.Tests.Online
                 private readonly TestBeatmapManager testBeatmapManager;
 
                 public TestBeatmapImporter(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
-                    : base(databaseAccess, storage, beatmapOnlineLookupQueue)
+                    : base(storage, databaseAccess, beatmapOnlineLookupQueue)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }

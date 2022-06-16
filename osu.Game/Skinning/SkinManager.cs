@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -24,7 +23,6 @@ using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
-using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
 
@@ -38,7 +36,7 @@ namespace osu.Game.Skinning
     /// For gameplay components, see <see cref="RulesetSkinProvidingContainer"/> which adds extra legacy and toggle logic that may affect the lookup process.
     /// </remarks>
     [ExcludeFromDynamicCompile]
-    public class SkinManager : ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>, IModelManager<SkinInfo>, IModelFileManager<SkinInfo, RealmNamedFileUsage>
+    public class SkinManager : ModelManager<SkinInfo>, ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>
     {
         private readonly AudioManager audio;
 
@@ -56,7 +54,6 @@ namespace osu.Game.Skinning
         };
 
         private readonly SkinImporter skinImporter;
-        private readonly RealmAccess realm;
 
         private readonly IResourceStore<byte[]> userFiles;
 
@@ -71,8 +68,8 @@ namespace osu.Game.Skinning
         public Skin DefaultLegacySkin { get; }
 
         public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
+            : base(storage, realm)
         {
-            this.realm = realm;
             this.audio = audio;
             this.scheduler = scheduler;
             this.host = host;
@@ -80,7 +77,10 @@ namespace osu.Game.Skinning
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
 
-            skinImporter = new SkinImporter(storage, realm, this);
+            skinImporter = new SkinImporter(storage, realm, this)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj),
+            };
 
             var defaultSkins = new[]
             {
@@ -115,7 +115,7 @@ namespace osu.Game.Skinning
 
         public void SelectRandomSkin()
         {
-            realm.Run(r =>
+            Realm.Run(r =>
             {
                 // choose from only user skins, removing the current selection to ensure a new one is chosen.
                 var randomChoices = r.All<SkinInfo>().Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
@@ -128,7 +128,7 @@ namespace osu.Game.Skinning
 
                 var chosen = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
 
-                CurrentSkinInfo.Value = chosen.ToLive(realm);
+                CurrentSkinInfo.Value = chosen.ToLive(Realm);
             });
         }
 
@@ -153,7 +153,7 @@ namespace osu.Game.Skinning
                 if (!s.Protected)
                     return false;
 
-                string[] existingSkinNames = realm.Run(r => r.All<SkinInfo>()
+                string[] existingSkinNames = Realm.Run(r => r.All<SkinInfo>()
                                                              .Where(skin => !skin.DeletePending)
                                                              .AsEnumerable()
                                                              .Select(skin => skin.Name).ToArray());
@@ -196,7 +196,7 @@ namespace osu.Game.Skinning
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public Live<SkinInfo> Query(Expression<Func<SkinInfo, bool>> query)
         {
-            return realm.Run(r => r.All<SkinInfo>().FirstOrDefault(query)?.ToLive(realm));
+            return Realm.Run(r => r.All<SkinInfo>().FirstOrDefault(query)?.ToLive(Realm));
         }
 
         public event Action SourceChanged;
@@ -251,17 +251,12 @@ namespace osu.Game.Skinning
         AudioManager IStorageResourceProvider.AudioManager => audio;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<byte[]> IStorageResourceProvider.Files => userFiles;
-        RealmAccess IStorageResourceProvider.RealmAccess => realm;
+        RealmAccess IStorageResourceProvider.RealmAccess => Realm;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
 
         #endregion
 
         #region Implementation of IModelImporter<SkinInfo>
-
-        public Action<Notification> PostNotification
-        {
-            set => skinImporter.PostNotification = value;
-        }
 
         public Action<IEnumerable<Live<SkinInfo>>> PostImport
         {
@@ -283,11 +278,9 @@ namespace osu.Game.Skinning
 
         #endregion
 
-        #region Implementation of IModelManager<SkinInfo>
-
         public void Delete([CanBeNull] Expression<Func<SkinInfo, bool>> filter = null, bool silent = false)
         {
-            realm.Run(r =>
+            Realm.Run(r =>
             {
                 var items = r.All<SkinInfo>()
                              .Where(s => !s.Protected && !s.DeletePending);
@@ -300,26 +293,8 @@ namespace osu.Game.Skinning
                 if (items.Any(s => s.ID == currentUserSkin))
                     scheduler.Add(() => CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged());
 
-                skinImporter.Delete(items.ToList(), silent);
+                Delete(items.ToList(), silent);
             });
         }
-
-        public bool Delete(SkinInfo item) => skinImporter.Delete(item);
-
-        public void Delete(List<SkinInfo> items, bool silent = false) => skinImporter.Delete(items, silent);
-
-        public void Undelete(List<SkinInfo> items, bool silent = false) => skinImporter.Undelete(items, silent);
-
-        public void Undelete(SkinInfo item) => skinImporter.Undelete(item);
-
-        public bool IsAvailableLocally(SkinInfo model) => skinImporter.IsAvailableLocally(model);
-
-        public void ReplaceFile(SkinInfo model, RealmNamedFileUsage file, Stream contents) => skinImporter.ReplaceFile(model, file, contents);
-
-        public void DeleteFile(SkinInfo model, RealmNamedFileUsage file) => skinImporter.DeleteFile(model, file);
-
-        public void AddFile(SkinInfo model, Stream contents, string filename) => skinImporter.AddFile(model, contents, filename);
-
-        #endregion
     }
 }
