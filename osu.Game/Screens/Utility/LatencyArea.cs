@@ -62,6 +62,10 @@ namespace osu.Game.Screens.Utility
                     Colour = overlayColourProvider.Background6,
                     RelativeSizeAxes = Axes.Both,
                 },
+                visualContent = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new ButtonWithKeyBind(key)
                 {
                     Text = "Feels better",
@@ -70,10 +74,6 @@ namespace osu.Game.Screens.Utility
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Action = () => ReportUserBest?.Invoke(),
-                },
-                visualContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
                 },
             };
 
