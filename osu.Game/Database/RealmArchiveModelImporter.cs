@@ -72,7 +72,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
-        public Action<Notification>? PostNotification { protected get; set; }
+        public Action<Notification>? PostNotification { get; set; }
 
         protected RealmArchiveModelImporter(Storage storage, RealmAccess realm)
         {
