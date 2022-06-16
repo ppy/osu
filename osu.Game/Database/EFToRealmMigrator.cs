@@ -132,11 +132,16 @@ namespace osu.Game.Database
 
             Task.Factory.StartNew(() =>
             {
-                realm.CreateBackup(Path.Combine(backup_folder, $"client.{backupSuffix}.realm"), realmBlockOperations);
-
-                // Above call will dispose of the blocking token when done.
-                // Clean up here so we don't accidentally dispose twice.
-                realmBlockOperations = null;
+                try
+                {
+                    realm.CreateBackup(Path.Combine(backup_folder, $"client.{backupSuffix}.realm"), realmBlockOperations);
+                }
+                finally
+                {
+                    // Above call will dispose of the blocking token when done.
+                    // Clean up here so we don't accidentally dispose twice.
+                    realmBlockOperations = null;
+                }
 
                 efContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{backupSuffix}.db"));
 
