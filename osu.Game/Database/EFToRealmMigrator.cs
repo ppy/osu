@@ -133,6 +133,9 @@ namespace osu.Game.Database
             Task.Factory.StartNew(() =>
             {
                 realm.CreateBackup(Path.Combine(backup_folder, $"client.{backupSuffix}.realm"), realmBlockOperations);
+
+                // Above call will dispose of the blocking token when done.
+                // Clean up here so we don't accidentally dispose twice.
                 realmBlockOperations = null;
 
                 efContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{backupSuffix}.db"));
@@ -220,6 +223,7 @@ namespace osu.Game.Database
                 // If we were to not do this, the migration would run another time the next time the user starts the game.
                 deletePreRealmData();
 
+                // If something went wrong and the disposal token wasn't invoked above, ensure it is here.
                 realmBlockOperations?.Dispose();
 
                 migrationCompleted.SetResult(true);
