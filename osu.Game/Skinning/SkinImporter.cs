@@ -20,13 +20,13 @@ using Realms;
 
 namespace osu.Game.Skinning
 {
-    public class SkinModelManager : RealmArchiveModelManager<SkinInfo>
+    public class SkinImporter : RealmArchiveModelManager<SkinInfo>
     {
         private const string skin_info_file = "skininfo.json";
 
         private readonly IStorageResourceProvider skinResources;
 
-        public SkinModelManager(Storage storage, RealmAccess realm, IStorageResourceProvider skinResources)
+        public SkinImporter(Storage storage, RealmAccess realm, IStorageResourceProvider skinResources)
             : base(storage, realm)
         {
             this.skinResources = skinResources;

@@ -55,7 +55,7 @@ namespace osu.Game.Skinning
             Default = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged()
         };
 
-        private readonly SkinModelManager skinModelManager;
+        private readonly SkinImporter skinImporter;
         private readonly RealmAccess realm;
 
         private readonly IResourceStore<byte[]> userFiles;
@@ -80,7 +80,7 @@ namespace osu.Game.Skinning
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
 
-            skinModelManager = new SkinModelManager(storage, realm, this);
+            skinImporter = new SkinImporter(storage, realm, this);
 
             var defaultSkins = new[]
             {
@@ -166,7 +166,7 @@ namespace osu.Game.Skinning
                     Name = NamingUtils.GetNextBestName(existingSkinNames, $@"{s.Name} (modified)")
                 };
 
-                var result = skinModelManager.Import(skinInfo);
+                var result = skinImporter.Import(skinInfo);
 
                 if (result != null)
                 {
@@ -186,7 +186,7 @@ namespace osu.Game.Skinning
             if (!skin.SkinInfo.IsManaged)
                 throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Call {nameof(EnsureMutableSkin)} first.");
 
-            skinModelManager.Save(skin);
+            skinImporter.Save(skin);
         }
 
         /// <summary>
@@ -260,26 +260,26 @@ namespace osu.Game.Skinning
 
         public Action<Notification> PostNotification
         {
-            set => skinModelManager.PostNotification = value;
+            set => skinImporter.PostNotification = value;
         }
 
         public Action<IEnumerable<Live<SkinInfo>>> PostImport
         {
-            set => skinModelManager.PostImport = value;
+            set => skinImporter.PostImport = value;
         }
 
-        public Task Import(params string[] paths) => skinModelManager.Import(paths);
+        public Task Import(params string[] paths) => skinImporter.Import(paths);
 
-        public Task Import(params ImportTask[] tasks) => skinModelManager.Import(tasks);
+        public Task Import(params ImportTask[] tasks) => skinImporter.Import(tasks);
 
-        public IEnumerable<string> HandledExtensions => skinModelManager.HandledExtensions;
+        public IEnumerable<string> HandledExtensions => skinImporter.HandledExtensions;
 
-        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => skinModelManager.Import(notification, tasks);
+        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => skinImporter.Import(notification, tasks);
 
-        public Task<Live<SkinInfo>> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => skinModelManager.Import(task, batchImport, cancellationToken);
+        public Task<Live<SkinInfo>> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => skinImporter.Import(task, batchImport, cancellationToken);
 
         public Task<Live<SkinInfo>> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            skinModelManager.Import(archive, batchImport, cancellationToken);
+            skinImporter.Import(archive, batchImport, cancellationToken);
 
         #endregion
 
@@ -300,25 +300,25 @@ namespace osu.Game.Skinning
                 if (items.Any(s => s.ID == currentUserSkin))
                     scheduler.Add(() => CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged());
 
-                skinModelManager.Delete(items.ToList(), silent);
+                skinImporter.Delete(items.ToList(), silent);
             });
         }
 
-        public bool Delete(SkinInfo item) => skinModelManager.Delete(item);
+        public bool Delete(SkinInfo item) => skinImporter.Delete(item);
 
-        public void Delete(List<SkinInfo> items, bool silent = false) => skinModelManager.Delete(items, silent);
+        public void Delete(List<SkinInfo> items, bool silent = false) => skinImporter.Delete(items, silent);
 
-        public void Undelete(List<SkinInfo> items, bool silent = false) => skinModelManager.Undelete(items, silent);
+        public void Undelete(List<SkinInfo> items, bool silent = false) => skinImporter.Undelete(items, silent);
 
-        public void Undelete(SkinInfo item) => skinModelManager.Undelete(item);
+        public void Undelete(SkinInfo item) => skinImporter.Undelete(item);
 
-        public bool IsAvailableLocally(SkinInfo model) => skinModelManager.IsAvailableLocally(model);
+        public bool IsAvailableLocally(SkinInfo model) => skinImporter.IsAvailableLocally(model);
 
-        public void ReplaceFile(SkinInfo model, RealmNamedFileUsage file, Stream contents) => skinModelManager.ReplaceFile(model, file, contents);
+        public void ReplaceFile(SkinInfo model, RealmNamedFileUsage file, Stream contents) => skinImporter.ReplaceFile(model, file, contents);
 
-        public void DeleteFile(SkinInfo model, RealmNamedFileUsage file) => skinModelManager.DeleteFile(model, file);
+        public void DeleteFile(SkinInfo model, RealmNamedFileUsage file) => skinImporter.DeleteFile(model, file);
 
-        public void AddFile(SkinInfo model, Stream contents, string filename) => skinModelManager.AddFile(model, contents, filename);
+        public void AddFile(SkinInfo model, Stream contents, string filename) => skinImporter.AddFile(model, contents, filename);
 
         #endregion
     }

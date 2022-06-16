@@ -28,7 +28,7 @@ namespace osu.Game.Scoring
         private readonly Scheduler scheduler;
         private readonly Func<BeatmapDifficultyCache> difficulties;
         private readonly OsuConfigManager configManager;
-        private readonly ScoreModelManager scoreModelManager;
+        private readonly ScoreImporter scoreImporter;
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler,
                             Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
@@ -38,10 +38,10 @@ namespace osu.Game.Scoring
             this.difficulties = difficulties;
             this.configManager = configManager;
 
-            scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, realm);
+            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm);
         }
 
-        public Score GetScore(ScoreInfo score) => scoreModelManager.GetScore(score);
+        public Score GetScore(ScoreInfo score) => scoreImporter.GetScore(score);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="ScoreInfo"/>s.
@@ -231,7 +231,7 @@ namespace osu.Game.Scoring
 
         public Action<Notification> PostNotification
         {
-            set => scoreModelManager.PostNotification = value;
+            set => scoreImporter.PostNotification = value;
         }
 
         #endregion
@@ -240,7 +240,7 @@ namespace osu.Game.Scoring
 
         public bool Delete(ScoreInfo item)
         {
-            return scoreModelManager.Delete(item);
+            return scoreImporter.Delete(item);
         }
 
         public void Delete([CanBeNull] Expression<Func<ScoreInfo, bool>> filter = null, bool silent = false)
@@ -253,7 +253,7 @@ namespace osu.Game.Scoring
                 if (filter != null)
                     items = items.Where(filter);
 
-                scoreModelManager.Delete(items.ToList(), silent);
+                scoreImporter.Delete(items.ToList(), silent);
             });
         }
 
@@ -262,27 +262,27 @@ namespace osu.Game.Scoring
             realm.Run(r =>
             {
                 var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID).Scores.ToList();
-                scoreModelManager.Delete(beatmapScores, silent);
+                scoreImporter.Delete(beatmapScores, silent);
             });
         }
 
-        public void Delete(List<ScoreInfo> items, bool silent = false) => scoreModelManager.Delete(items, silent);
+        public void Delete(List<ScoreInfo> items, bool silent = false) => scoreImporter.Delete(items, silent);
 
-        public void Undelete(List<ScoreInfo> items, bool silent = false) => scoreModelManager.Undelete(items, silent);
+        public void Undelete(List<ScoreInfo> items, bool silent = false) => scoreImporter.Undelete(items, silent);
 
-        public void Undelete(ScoreInfo item) => scoreModelManager.Undelete(item);
+        public void Undelete(ScoreInfo item) => scoreImporter.Undelete(item);
 
-        public Task Import(params string[] paths) => scoreModelManager.Import(paths);
+        public Task Import(params string[] paths) => scoreImporter.Import(paths);
 
-        public Task Import(params ImportTask[] tasks) => scoreModelManager.Import(tasks);
+        public Task Import(params ImportTask[] tasks) => scoreImporter.Import(tasks);
 
-        public IEnumerable<string> HandledExtensions => scoreModelManager.HandledExtensions;
+        public IEnumerable<string> HandledExtensions => scoreImporter.HandledExtensions;
 
-        public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreModelManager.Import(notification, tasks);
+        public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreImporter.Import(notification, tasks);
 
-        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => scoreModelManager.Import(item, archive, batchImport, cancellationToken);
+        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => scoreImporter.Import(item, archive, batchImport, cancellationToken);
 
-        public bool IsAvailableLocally(ScoreInfo model) => scoreModelManager.IsAvailableLocally(model);
+        public bool IsAvailableLocally(ScoreInfo model) => scoreImporter.IsAvailableLocally(model);
 
         #endregion
 
@@ -290,7 +290,7 @@ namespace osu.Game.Scoring
 
         public Action<IEnumerable<Live<ScoreInfo>>> PostImport
         {
-            set => scoreModelManager.PostImport = value;
+            set => scoreImporter.PostImport = value;
         }
 
         #endregion
