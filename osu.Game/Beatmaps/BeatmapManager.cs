@@ -1,19 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Online.API;
@@ -22,8 +29,6 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-
-#nullable enable
 
 namespace osu.Game.Beatmaps
 {
@@ -35,14 +40,15 @@ namespace osu.Game.Beatmaps
     {
         public ITrackStore BeatmapTrackStore { get; }
 
-        private readonly BeatmapModelManager beatmapModelManager;
+        private readonly BeatmapImporter beatmapImporter;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue? onlineBeatmapLookupQueue;
 
         private readonly RealmAccess realm;
 
-        public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null, WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
+        public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
+                              WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
         {
             this.realm = realm;
 
@@ -58,19 +64,18 @@ namespace osu.Game.Beatmaps
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            beatmapModelManager = CreateBeatmapModelManager(storage, realm, rulesets, onlineBeatmapLookupQueue);
+            beatmapImporter = CreateBeatmapImporter(storage, realm, rulesets, onlineBeatmapLookupQueue);
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
-
-            beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
         }
 
-        protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap, GameHost? host)
+        protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
+                                                                        GameHost? host)
         {
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
-            new BeatmapModelManager(realm, storage, onlineLookupQueue);
+        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
+            new BeatmapImporter(realm, storage, onlineLookupQueue);
 
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,
@@ -99,7 +104,7 @@ namespace osu.Game.Beatmaps
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
                 b.BeatmapSet = beatmapSet;
 
-            var imported = beatmapModelManager.Import(beatmapSet);
+            var imported = beatmapImporter.Import(beatmapSet);
 
             if (imported == null)
                 throw new InvalidOperationException("Failed to import new beatmap");
@@ -169,12 +174,12 @@ namespace osu.Game.Beatmaps
         private WorkingBeatmap addDifficultyToSet(BeatmapSetInfo targetBeatmapSet, IBeatmap newBeatmap, ISkin beatmapSkin)
         {
             // populate circular beatmap set info <-> beatmap info references manually.
-            // several places like `BeatmapModelManager.Save()` or `GetWorkingBeatmap()`
+            // several places like `Save()` or `GetWorkingBeatmap()`
             // rely on them being freely traversable in both directions for correct operation.
             targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
             newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            beatmapModelManager.Save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin);
+            Save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin);
 
             workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
@@ -255,23 +260,12 @@ namespace osu.Game.Beatmaps
             return realm.Run(r => r.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(realm));
         }
 
-        #region Delegation to BeatmapModelManager (methods which previously existed locally).
-
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmapModelManager.QueryBeatmap(query)?.Detach();
-
-        /// <summary>
-        /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
-        /// </summary>
-        /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
-        /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
-        /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin? beatmapSkin = null) =>
-            beatmapModelManager.Save(info, beatmapContent, beatmapSkin);
+        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => realm.Run(r => r.All<BeatmapInfo>().FirstOrDefault(query)?.Detach());
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -281,28 +275,76 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Fired when a notification should be presented to the user.
         /// </summary>
-        public Action<Notification> PostNotification
+        public Action<Notification>? PostNotification
         {
-            set => beatmapModelManager.PostNotification = value;
+            get => beatmapImporter.PostNotification;
+            set => beatmapImporter.PostNotification = value;
         }
 
-        #endregion
-
-        #region Implementation of IModelManager<BeatmapSetInfo>
-
-        public bool IsAvailableLocally(BeatmapSetInfo model)
+        /// <summary>
+        /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
+        /// </summary>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
+        /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
+        /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
+        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null)
         {
-            return beatmapModelManager.IsAvailableLocally(model);
+            var setInfo = beatmapInfo.BeatmapSet;
+            Debug.Assert(setInfo != null);
+
+            // Difficulty settings must be copied first due to the clone in `Beatmap<>.BeatmapInfo_Set`.
+            // This should hopefully be temporary, assuming said clone is eventually removed.
+
+            // Warning: The directionality here is important. Changes have to be copied *from* beatmapContent (which comes from editor and is being saved)
+            // *to* the beatmapInfo (which is a database model and needs to receive values without the taiko slider velocity multiplier for correct operation).
+            // CopyTo() will undo such adjustments, while CopyFrom() will not.
+            beatmapContent.Difficulty.CopyTo(beatmapInfo.Difficulty);
+
+            // All changes to metadata are made in the provided beatmapInfo, so this should be copied to the `IBeatmap` before encoding.
+            beatmapContent.BeatmapInfo = beatmapInfo;
+
+            using (var stream = new MemoryStream())
+            {
+                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    new LegacyBeatmapEncoder(beatmapContent, beatmapSkin).Encode(sw);
+
+                stream.Seek(0, SeekOrigin.Begin);
+
+                // AddFile generally handles updating/replacing files, but this is a case where the filename may have also changed so let's delete for simplicity.
+                var existingFileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase));
+                string targetFilename = createBeatmapFilenameFromMetadata(beatmapInfo);
+
+                // ensure that two difficulties from the set don't point at the same beatmap file.
+                if (setInfo.Beatmaps.Any(b => b.ID != beatmapInfo.ID && string.Equals(b.Path, targetFilename, StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidOperationException($"{setInfo.GetDisplayString()} already has a difficulty with the name of '{beatmapInfo.DifficultyName}'.");
+
+                if (existingFileInfo != null)
+                    DeleteFile(setInfo, existingFileInfo);
+
+                beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
+                beatmapInfo.Hash = stream.ComputeSHA2Hash();
+
+                AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
+
+                realm.Write(r => setInfo.CopyChangesToRealm(r.Find<BeatmapSetInfo>(setInfo.ID)));
+            }
+
+            workingBeatmapCache.Invalidate(beatmapInfo);
+
+            static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
+            {
+                var metadata = beatmapInfo.Metadata;
+                return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
+            }
         }
 
-        public bool Delete(BeatmapSetInfo item)
+        public void DeleteAllVideos()
         {
-            return beatmapModelManager.Delete(item);
-        }
-
-        public void Delete(List<BeatmapSetInfo> items, bool silent = false)
-        {
-            beatmapModelManager.Delete(items, silent);
+            realm.Write(r =>
+            {
+                var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
+                DeleteVideos(items.ToList());
+            });
         }
 
         public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
@@ -314,51 +356,92 @@ namespace osu.Game.Beatmaps
                 if (filter != null)
                     items = items.Where(filter);
 
-                beatmapModelManager.Delete(items.ToList(), silent);
+                beatmapImporter.Delete(items.ToList(), silent);
             });
         }
 
-        public void DeleteAllVideos()
+        /// <summary>
+        /// Delete videos from a list of beatmaps.
+        /// This will post notifications tracking progress.
+        /// </summary>
+        public void DeleteVideos(List<BeatmapSetInfo> items, bool silent = false)
         {
-            realm.Write(r =>
+            if (items.Count == 0) return;
+
+            var notification = new ProgressNotification
             {
-                var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
-                beatmapModelManager.DeleteVideos(items.ToList());
-            });
+                Progress = 0,
+                Text = $"Preparing to delete all {beatmapImporter.HumanisedModelName} videos...",
+                CompletionText = "No videos found to delete!",
+                State = ProgressNotificationState.Active,
+            };
+
+            if (!silent)
+                PostNotification?.Invoke(notification);
+
+            int i = 0;
+            int deleted = 0;
+
+            foreach (var b in items)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.Ordinal)));
+
+                if (video != null)
+                {
+                    DeleteFile(b, video);
+                    deleted++;
+                    notification.CompletionText = $"Deleted {deleted} {beatmapImporter.HumanisedModelName} video(s)!";
+                }
+
+                notification.Text = $"Deleting videos from {beatmapImporter.HumanisedModelName}s ({deleted} deleted)";
+
+                notification.Progress = (float)++i / items.Count;
+            }
+
+            notification.State = ProgressNotificationState.Completed;
         }
 
         public void UndeleteAll()
         {
-            realm.Run(r => beatmapModelManager.Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
+            realm.Run(r => beatmapImporter.Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
-        public void Undelete(List<BeatmapSetInfo> items, bool silent = false)
-        {
-            beatmapModelManager.Undelete(items, silent);
-        }
+        #region Implementation of IModelManager<BeatmapSetInfo>
 
-        public void Undelete(BeatmapSetInfo item)
-        {
-            beatmapModelManager.Undelete(item);
-        }
+        public bool IsAvailableLocally(BeatmapSetInfo model) => beatmapImporter.IsAvailableLocally(model);
+
+        public bool Delete(BeatmapSetInfo item) => beatmapImporter.Delete(item);
+
+        public void Delete(List<BeatmapSetInfo> items, bool silent = false) => beatmapImporter.Delete(items, silent);
+
+        public void Undelete(List<BeatmapSetInfo> items, bool silent = false) => beatmapImporter.Undelete(items, silent);
+
+        public void Undelete(BeatmapSetInfo item) => beatmapImporter.Undelete(item);
 
         #endregion
 
         #region Implementation of ICanAcceptFiles
 
-        public Task Import(params string[] paths) => beatmapModelManager.Import(paths);
+        public Task Import(params string[] paths) => beatmapImporter.Import(paths);
 
-        public Task Import(params ImportTask[] tasks) => beatmapModelManager.Import(tasks);
+        public Task Import(params ImportTask[] tasks) => beatmapImporter.Import(tasks);
 
-        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => beatmapModelManager.Import(notification, tasks);
+        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => beatmapImporter.Import(notification, tasks);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => beatmapModelManager.Import(task, batchImport, cancellationToken);
+        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) =>
+            beatmapImporter.Import(task, batchImport, cancellationToken);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default) => beatmapModelManager.Import(archive, batchImport, cancellationToken);
+        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default) =>
+            beatmapImporter.Import(archive, batchImport, cancellationToken);
 
-        public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) => beatmapModelManager.Import(item, archive, false, cancellationToken);
+        public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) =>
+            beatmapImporter.Import(item, archive, false, cancellationToken);
 
-        public IEnumerable<string> HandledExtensions => beatmapModelManager.HandledExtensions;
+        public IEnumerable<string> HandledExtensions => beatmapImporter.HandledExtensions;
 
         #endregion
 
@@ -400,17 +483,17 @@ namespace osu.Game.Beatmaps
 
         public void ReplaceFile(BeatmapSetInfo model, RealmNamedFileUsage file, Stream contents)
         {
-            beatmapModelManager.ReplaceFile(model, file, contents);
+            beatmapImporter.ReplaceFile(model, file, contents);
         }
 
         public void DeleteFile(BeatmapSetInfo model, RealmNamedFileUsage file)
         {
-            beatmapModelManager.DeleteFile(model, file);
+            beatmapImporter.DeleteFile(model, file);
         }
 
         public void AddFile(BeatmapSetInfo model, Stream contents, string filename)
         {
-            beatmapModelManager.AddFile(model, contents, filename);
+            beatmapImporter.AddFile(model, contents, filename);
         }
 
         #endregion
@@ -428,7 +511,7 @@ namespace osu.Game.Beatmaps
 
         public Action<IEnumerable<Live<BeatmapSetInfo>>>? PostImport
         {
-            set => beatmapModelManager.PostImport = value;
+            set => beatmapImporter.PostImport = value;
         }
 
         #endregion
