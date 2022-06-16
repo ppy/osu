@@ -10,12 +10,12 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.Common";
 
         /// <summary>
-        /// "Back"
+        /// "返回"
         /// </summary>
-        public static LocalisableString Back => new TranslatableString(getKey(@"llin_back"), @"上一步");
+        public static LocalisableString Back => new TranslatableString(getKey(@"llin_back"), @"返回");
 
         /// <summary>
-        /// "Next"
+        /// "下一步"
         /// </summary>
         public static LocalisableString Next => new TranslatableString(getKey(@"llin_next"), @"下一步");
 
@@ -25,67 +25,67 @@ namespace osu.Game.Localisation
         public static LocalisableString Finish => new TranslatableString(getKey(@"finish"), @"Finish");
 
         /// <summary>
-        /// "Enabled"
+        /// "已启用"
         /// </summary>
         public static LocalisableString Enabled => new TranslatableString(getKey(@"llin_enabled"), @"已启用");
 
         /// <summary>
-        /// "Disabled"
+        /// "已禁用"
         /// </summary>
         public static LocalisableString Disabled => new TranslatableString(getKey(@"llin_disabled"), @"已禁用");
 
         /// <summary>
-        /// "Default"
+        /// "默认"
         /// </summary>
         public static LocalisableString Default => new TranslatableString(getKey(@"default"), @"默认");
 
         /// <summary>
-        /// "Width"
+        /// "宽度"
         /// </summary>
         public static LocalisableString Width => new TranslatableString(getKey(@"width"), @"宽度");
 
         /// <summary>
-        /// "Height"
+        /// "高度"
         /// </summary>
         public static LocalisableString Height => new TranslatableString(getKey(@"height"), @"高度");
 
         /// <summary>
-        /// "Downloading..."
+        /// "下载中..."
         /// </summary>
         public static LocalisableString Downloading => new TranslatableString(getKey(@"downloading"), @"下载中...");
 
         /// <summary>
-        /// "Importing..."
+        /// "导入中..."
         /// </summary>
         public static LocalisableString Importing => new TranslatableString(getKey(@"importing"), @"导入中...");
 
         /// <summary>
-        /// "Deselect All"
+        /// "取消全选"
         /// </summary>
         public static LocalisableString DeselectAll => new TranslatableString(getKey(@"llin_deselect_all"), @"取消全选");
 
         /// <summary>
-        /// "Select All"
+        /// "全选"
         /// </summary>
         public static LocalisableString SelectAll => new TranslatableString(getKey(@"llin_select_all"), @"全选");
 
         /// <summary>
-        /// "Beatmaps"
+        /// "谱面"
         /// </summary>
         public static LocalisableString Beatmaps => new TranslatableString(getKey(@"llin_beatmaps"), @"谱面");
 
         /// <summary>
-        /// "Scores"
+        /// "成绩"
         /// </summary>
         public static LocalisableString Scores => new TranslatableString(getKey(@"llin_scores"), @"成绩");
 
         /// <summary>
-        /// "Skins"
+        /// "皮肤"
         /// </summary>
         public static LocalisableString Skins => new TranslatableString(getKey(@"llin_skins"), @"皮肤");
 
         /// <summary>
-        /// "Collections"
+        /// "收藏夹"
         /// </summary>
         public static LocalisableString Collections => new TranslatableString(getKey(@"llin_collections"), @"收藏夹");
 

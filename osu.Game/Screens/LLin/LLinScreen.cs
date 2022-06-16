@@ -73,6 +73,9 @@ namespace osu.Game.Screens.LLin
         [Cached]
         private CustomColourProvider colourProvider = new CustomColourProvider();
 
+        [Cached]
+        private BeatmapHashResolver hashResolver = new BeatmapHashResolver();
+
         #endregion
 
         #region 音频
@@ -616,6 +619,7 @@ namespace osu.Game.Screens.LLin
 
             InternalChildren = new Drawable[]
             {
+                hashResolver,
                 colourProvider,
                 backgroundLayer = new Container
                 {

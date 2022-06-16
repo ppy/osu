@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
             };
 
-            trayCheckbox.WarningText = "启用再禁用托盘功能可能不会使托盘图标消失，正在设法解决中><";
+            trayCheckbox.SetNoticeText("启用再禁用托盘功能可能不会使托盘图标消失，正在设法解决中><");
         }
     }
 }

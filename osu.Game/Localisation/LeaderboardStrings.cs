@@ -10,37 +10,37 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.Leaderboard";
 
         /// <summary>
-        /// "Couldn't fetch scores!"
+        /// "未能获取分数！"
         /// </summary>
         public static LocalisableString CouldntFetchScores => new TranslatableString(getKey(@"couldnt_fetch_scores"), @"未能获取分数！");
 
         /// <summary>
-        /// "Please select a beatmap!"
+        /// "请选择一张谱面！"
         /// </summary>
-        public static LocalisableString PleaseSelectABeatmap => new TranslatableString(getKey(@"please_select_a_beatmap"), @"请选择一张地图！");
+        public static LocalisableString PleaseSelectABeatmap => new TranslatableString(getKey(@"please_select_a_beatmap"), @"请选择一张谱面！");
 
         /// <summary>
-        /// "Leaderboards are not available for this ruleset!"
+        /// "此游戏模式的排行榜不可用！"
         /// </summary>
         public static LocalisableString LeaderboardsAreNotAvailableForThisRuleset => new TranslatableString(getKey(@"leaderboards_are_not_available_for_this_ruleset"), @"此游戏模式的排行榜不可用！");
 
         /// <summary>
-        /// "Leaderboards are not available for this beatmap!"
+        /// "这张图的排行榜不可用！"
         /// </summary>
         public static LocalisableString LeaderboardsAreNotAvailableForThisBeatmap => new TranslatableString(getKey(@"leaderboards_are_not_available_for_this_beatmap"), @"这张图的排行榜不可用！");
 
         /// <summary>
-        /// "No records yet!"
+        /// "暂无成绩！"
         /// </summary>
         public static LocalisableString NoRecordsYet => new TranslatableString(getKey(@"no_records_yet"), @"暂无成绩！");
 
         /// <summary>
-        /// "Please sign in to view online leaderboards!"
+        /// "请登入来查看排行榜！"
         /// </summary>
         public static LocalisableString PleaseSignInToViewOnlineLeaderboards => new TranslatableString(getKey(@"please_sign_in_to_view_online_leaderboards"), @"请登入来查看排行榜！");
 
         /// <summary>
-        /// "Please invest in an osu!supporter tag to view this leaderboard!"
+        /// "请先成为 osu!supporter 来查看此排行！"
         /// </summary>
         public static LocalisableString PleaseInvestInAnOsuSupporterTagToViewThisLeaderboard => new TranslatableString(getKey(@"please_invest_in_an_osu_supporter_tag_to_view_this_leaderboard"), @"请先成为 osu!supporter 来查看此排行！");
 

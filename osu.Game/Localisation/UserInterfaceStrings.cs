@@ -20,7 +20,7 @@ namespace osu.Game.Localisation
         public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"General");
 
         /// <summary>
-        /// "Rotate cursor when dragging"
+        /// "拖动时旋转光标"
         /// </summary>
         public static LocalisableString CursorRotation => new TranslatableString(getKey(@"cursor_rotation"), @"拖动时旋转光标");
 
@@ -30,7 +30,7 @@ namespace osu.Game.Localisation
         public static LocalisableString MenuCursorSize => new TranslatableString(getKey(@"menu_cursor_size"), @"Menu cursor size");
 
         /// <summary>
-        /// "Parallax"
+        /// "视差"
         /// </summary>
         public static LocalisableString Parallax => new TranslatableString(getKey(@"parallax"), @"视差");
 
@@ -45,12 +45,12 @@ namespace osu.Game.Localisation
         public static LocalisableString MainMenuHeader => new TranslatableString(getKey(@"main_menu_header"), @"Main Menu");
 
         /// <summary>
-        /// "Interface voices"
+        /// "界面声音"
         /// </summary>
         public static LocalisableString InterfaceVoices => new TranslatableString(getKey(@"interface_voices"), @"界面声音");
 
         /// <summary>
-        /// "osu! music theme"
+        /// "osu! 主题音乐"
         /// </summary>
         public static LocalisableString OsuMusicTheme => new TranslatableString(getKey(@"osu_music_theme"), @"osu! 主题音乐");
 
@@ -70,7 +70,7 @@ namespace osu.Game.Localisation
         public static LocalisableString SeasonalBackgrounds => new TranslatableString(getKey(@"seasonal_backgrounds"), @"Seasonal backgrounds");
 
         /// <summary>
-        /// "Changes to this setting will only apply with an active osu!supporter tag."
+        /// "该设置仅对 osu! supporter 有效"
         /// </summary>
         public static LocalisableString NotSupporterNote => new TranslatableString(getKey(@"not_supporter_note"), @"该设置仅对 osu! supporter 有效");
 
@@ -80,12 +80,12 @@ namespace osu.Game.Localisation
         public static LocalisableString SongSelectHeader => new TranslatableString(getKey(@"song_select_header"), @"Song Select");
 
         /// <summary>
-        /// "Right mouse drag to absolute scroll"
+        /// "按住鼠标右键快速滚动"
         /// </summary>
         public static LocalisableString RightMouseScroll => new TranslatableString(getKey(@"right_mouse_scroll"), @"按住鼠标右键快速滚动");
 
         /// <summary>
-        /// "Show converted beatmaps"
+        /// "显示转谱"
         /// </summary>
         public static LocalisableString ShowConvertedBeatmaps => new TranslatableString(getKey(@"show_converted_beatmaps"), @"显示转谱");
 
@@ -109,6 +109,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NoLimit => new TranslatableString(getKey(@"no_limit"), @"no limit");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

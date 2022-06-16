@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.LLin;
@@ -133,6 +134,9 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             selectedpanel = v.NewValue;
         }
 
+        [Resolved]
+        private BeatmapManager bm { get; set; }
+
         private void searchForCurrentSelection()
         {
             prevPanel?.Reset(true);
@@ -144,7 +148,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             }
 
             if (selectedpanel != null
-                && collectionHelper.CurrentCollection.Value.Beatmaps.Count != 0)
+                && collectionHelper.CurrentCollection.Value.BeatmapHashes.Count != 0)
                 selectedpanel.State.Value = ActiveState.Active;
         }
 

@@ -22,7 +22,6 @@ using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;

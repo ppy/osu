@@ -20,12 +20,12 @@ namespace osu.Game.Localisation
         public static LocalisableString AlertsAndPrivacyHeader => new TranslatableString(getKey(@"alerts_and_privacy_header"), @"Alerts and Privacy");
 
         /// <summary>
-        /// "Show a notification when someone mentions your name"
+        /// "当有人提及您的名字时显示通知"
         /// </summary>
         public static LocalisableString NotifyOnMentioned => new TranslatableString(getKey(@"notify_on_mentioned"), @"当有人提及您的名字时显示通知");
 
         /// <summary>
-        /// "Show a notification when you receive a private message"
+        /// "当收到私信时显示通知"
         /// </summary>
         public static LocalisableString NotifyOnPrivateMessage => new TranslatableString(getKey(@"notify_on_private_message"), @"当收到私信时显示通知");
 
@@ -45,22 +45,22 @@ namespace osu.Game.Localisation
         public static LocalisableString WebHeader => new TranslatableString(getKey(@"web_header"), @"Web");
 
         /// <summary>
-        /// "Warn about opening external links"
+        /// "打开外部链接时弹出警告"
         /// </summary>
         public static LocalisableString ExternalLinkWarning => new TranslatableString(getKey(@"external_link_warning"), @"打开外部链接时弹出警告");
 
         /// <summary>
-        /// "Prefer downloads without video"
+        /// "下载谱面时不带视频"
         /// </summary>
         public static LocalisableString PreferNoVideo => new TranslatableString(getKey(@"prefer_no_video"), @"下载谱面时不带视频");
 
         /// <summary>
-        /// "Automatically download beatmaps when spectating"
+        /// "在观看时自动下载谱面"
         /// </summary>
         public static LocalisableString AutomaticallyDownloadWhenSpectating => new TranslatableString(getKey(@"automatically_download_when_spectating"), @"在观看时自动下载谱面");
 
         /// <summary>
-        /// "Show explicit content in search results"
+        /// "在搜索结果中显示敏感内容"
         /// </summary>
         public static LocalisableString ShowExplicitContent => new TranslatableString(getKey(@"show_explicit_content"), @"在搜索结果中显示敏感内容");
 

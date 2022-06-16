@@ -15,22 +15,22 @@ namespace osu.Game.Localisation
         public static LocalisableString DebugSectionHeader => new TranslatableString(getKey(@"debug_section_header"), @"Debug");
 
         /// <summary>
-        /// "General"
+        /// "常规"
         /// </summary>
         public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"常规");
 
         /// <summary>
-        /// "Show log overlay"
+        /// "显示日志叠加层"
         /// </summary>
         public static LocalisableString ShowLogOverlay => new TranslatableString(getKey(@"show_log_overlay"), @"显示日志叠加层");
 
         /// <summary>
-        /// "Bypass front-to-back render pass"
+        /// "总是渲染被遮挡的窗口"
         /// </summary>
         public static LocalisableString BypassFrontToBackPass => new TranslatableString(getKey(@"bypass_front_to_back_pass"), @"总是渲染被遮挡的窗口");
 
         /// <summary>
-        /// "Import files"
+        /// "导入文件"
         /// </summary>
         public static LocalisableString ImportFiles => new TranslatableString(getKey(@"import_files"), @"导入文件");
 
@@ -45,7 +45,7 @@ namespace osu.Game.Localisation
         public static LocalisableString ClearAllCaches => new TranslatableString(getKey(@"clear_all_caches"), @"Clear all caches");
 
         /// <summary>
-        /// "Compact realm"
+        /// "压缩realm存储"
         /// </summary>
         public static LocalisableString CompactRealm => new TranslatableString(getKey(@"compact_realm"), @"压缩realm存储");
 

@@ -30,7 +30,7 @@ namespace osu.Game.Localisation
         public static LocalisableString ThreadingMode => new TranslatableString(getKey(@"threading_mode"), @"Threading mode");
 
         /// <summary>
-        /// "Show FPS"
+        /// "显示帧率"
         /// </summary>
         public static LocalisableString ShowFPS => new TranslatableString(getKey(@"show_fps"), @"显示帧率");
 
@@ -85,7 +85,7 @@ namespace osu.Game.Localisation
         public static LocalisableString VerticalScale => new TranslatableString(getKey(@"vertical_scale"), @"Vertical scale");
 
         /// <summary>
-        /// "Running without fullscreen mode will increase your input latency!"
+        /// "不启用全屏模式会增加你的输入延迟！"
         /// </summary>
         public static LocalisableString NotFullscreenNote => new TranslatableString(getKey(@"not_fullscreen_note"), @"不启用全屏模式会增加你的输入延迟！");
 
@@ -95,12 +95,12 @@ namespace osu.Game.Localisation
         public static LocalisableString DetailSettingsHeader => new TranslatableString(getKey(@"detail_settings_header"), @"Detail Settings");
 
         /// <summary>
-        /// "Storyboard / video"
+        /// "故事板 / 视频"
         /// </summary>
         public static LocalisableString StoryboardVideo => new TranslatableString(getKey(@"storyboard_video"), @"故事板 / 视频");
 
         /// <summary>
-        /// "Hit lighting"
+        /// "击打闪光"
         /// </summary>
         public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"击打闪光");
 
@@ -115,17 +115,17 @@ namespace osu.Game.Localisation
         public static LocalisableString ScreenshotFormat => new TranslatableString(getKey(@"screenshot_format"), @"Screenshot format");
 
         /// <summary>
-        /// "Show menu cursor in screenshots"
+        /// "在截图中显示光标"
         /// </summary>
         public static LocalisableString ShowCursorInScreenshots => new TranslatableString(getKey(@"show_cursor_in_screenshots"), @"在截图中显示光标");
 
         /// <summary>
-        /// "Video"
+        /// "视频"
         /// </summary>
         public static LocalisableString VideoHeader => new TranslatableString(getKey(@"video_header"), @"视频");
 
         /// <summary>
-        /// "Use hardware acceleration"
+        /// "使用硬件加速"
         /// </summary>
         public static LocalisableString UseHardwareAcceleration => new TranslatableString(getKey(@"use_hardware_acceleration"), @"使用硬件加速");
 

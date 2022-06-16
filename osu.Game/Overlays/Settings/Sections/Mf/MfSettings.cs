@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            systemCursor.WarningText = "与高精度模式、数位板功能冲突。\n启用后会导致上述功能失效或光标鬼畜。";
+            systemCursor.SetNoticeText("与高精度模式、数位板功能冲突。\n启用后会导致上述功能失效或光标鬼畜。", true);
         }
     }
 }

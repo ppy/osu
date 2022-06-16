@@ -10,7 +10,7 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.DifficultyMultiplierDisplay";
 
         /// <summary>
-        /// "Difficulty Multiplier"
+        /// "难度倍率"
         /// </summary>
         public static LocalisableString DifficultyMultiplier => new TranslatableString(getKey(@"llin_difficulty_multiplier"), @"难度倍率");
 

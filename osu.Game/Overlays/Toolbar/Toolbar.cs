@@ -73,11 +73,8 @@ namespace osu.Game.Overlays.Toolbar
                 new ToolbarBackground(),
                 new GridContainer
                 {
-                    Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Both,
-                    LayoutDuration = 600,
-                    LayoutEasing = Easing.OutBounce,
-                    Children = new Drawable[]
+                    RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(),
