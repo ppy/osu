@@ -81,6 +81,9 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (!IsHovered)
+                return false;
+
             switch (e.Key)
             {
                 case Key.Up:
