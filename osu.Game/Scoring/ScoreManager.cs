@@ -308,57 +308,23 @@ namespace osu.Game.Scoring
             });
         }
 
-        public void Delete(List<ScoreInfo> items, bool silent = false)
-        {
-            scoreModelManager.Delete(items, silent);
-        }
+        public void Delete(List<ScoreInfo> items, bool silent = false) => scoreModelManager.Delete(items, silent);
 
-        public void Undelete(List<ScoreInfo> items, bool silent = false)
-        {
-            scoreModelManager.Undelete(items, silent);
-        }
+        public void Undelete(List<ScoreInfo> items, bool silent = false) => scoreModelManager.Undelete(items, silent);
 
-        public void Undelete(ScoreInfo item)
-        {
-            scoreModelManager.Undelete(item);
-        }
+        public void Undelete(ScoreInfo item) => scoreModelManager.Undelete(item);
 
-        public Task Import(params string[] paths)
-        {
-            return scoreModelManager.Import(paths);
-        }
+        public Task Import(params string[] paths) => scoreModelManager.Import(paths);
 
-        public Task Import(params ImportTask[] tasks)
-        {
-            return scoreModelManager.Import(tasks);
-        }
+        public Task Import(params ImportTask[] tasks) => scoreModelManager.Import(tasks);
 
         public IEnumerable<string> HandledExtensions => scoreModelManager.HandledExtensions;
 
-        public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
-        {
-            return scoreModelManager.Import(notification, tasks);
-        }
+        public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreModelManager.Import(notification, tasks);
 
-        public Task<Live<ScoreInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return scoreModelManager.Import(task, lowPriority, cancellationToken);
-        }
+        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => scoreModelManager.Import(item, archive, batchImport, cancellationToken);
 
-        public Task<Live<ScoreInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return scoreModelManager.Import(archive, lowPriority, cancellationToken);
-        }
-
-        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return scoreModelManager.Import(item, archive, lowPriority, cancellationToken);
-        }
-
-        public bool IsAvailableLocally(ScoreInfo model)
-        {
-            return scoreModelManager.IsAvailableLocally(model);
-        }
+        public bool IsAvailableLocally(ScoreInfo model) => scoreModelManager.IsAvailableLocally(model);
 
         #endregion
 

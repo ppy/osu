@@ -13,7 +13,7 @@ namespace osu.Game.Collections
         public DeleteCollectionDialog(BeatmapCollection collection, Action deleteAction)
         {
             HeaderText = "请确认是否删除以下收藏夹?";
-            BodyText = $"{collection.Name.Value} ({"beatmap".ToQuantity(collection.Beatmaps.Count)})";
+            BodyText = $"{collection.Name.Value} ({collection.BeatmapHashes.Count}张谱面)";
 
             Icon = FontAwesome.Regular.TrashAlt;
 
@@ -26,7 +26,7 @@ namespace osu.Game.Collections
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"不是...是我点错了><！",
+                    Text = @"不是...我点错了><！",
                 },
             };
         }

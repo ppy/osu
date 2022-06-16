@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Timing
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Padding = new MarginPadding(10);
+            Padding = new MarginPadding(10) { Bottom = 0 };
 
             InternalChildren = new Drawable[]
             {

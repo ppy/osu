@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +15,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -25,9 +26,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 using Realms;
 
-#nullable enable
-
-namespace osu.Game.Stores
+namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
@@ -38,9 +37,6 @@ namespace osu.Game.Stores
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
-
-        // protected override bool CheckLocalAvailability(RealmBeatmapSet model, System.Linq.IQueryable<RealmBeatmapSet> items)
-        //     => base.CheckLocalAvailability(model, items) || (model.OnlineID > -1));
 
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 

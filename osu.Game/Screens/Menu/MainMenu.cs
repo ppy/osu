@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => background;
 
+        protected override bool PlayExitSound => false;
+
         private Bindable<double> holdDelay;
         private Bindable<bool> loginDisplayed;
 

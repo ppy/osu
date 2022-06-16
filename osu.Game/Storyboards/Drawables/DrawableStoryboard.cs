@@ -15,7 +15,6 @@ using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
-using osu.Game.Stores;
 
 namespace osu.Game.Storyboards.Drawables
 {

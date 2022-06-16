@@ -128,12 +128,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 syncManager.AddPlayerClock(instances[i].GameplayClock);
             }
 
-            // Todo: This is not quite correct - it should be per-user to adjust for other mod combinations.
-            var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
-            var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
-            scoreProcessor.ApplyBeatmap(playableBeatmap);
-
-            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(Ruleset.Value, scoreProcessor, users)
+            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(users)
             {
                 Expanded = { Value = true },
             }, l =>
@@ -240,7 +235,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             instance.FadeColour(colours.Gray4, 400, Easing.OutQuint);
             syncManager.RemovePlayerClock(instance.GameplayClock);
-            leaderboard.RemoveClock(userId);
         }
 
         public override bool OnBackButton()

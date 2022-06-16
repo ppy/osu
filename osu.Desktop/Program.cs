@@ -118,6 +118,9 @@ namespace osu.Desktop
             {
                 tools.CreateShortcutForThisExe();
                 tools.CreateUninstallerRegistryEntry();
+            }, onAppUpdate: (version, tools) =>
+            {
+                tools.CreateUninstallerRegistryEntry();
             }, onAppUninstall: (version, tools) =>
             {
                 tools.RemoveShortcutForThisExe();

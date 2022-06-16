@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,16 +15,13 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using Realms;
 
-#nullable enable
-
-namespace osu.Game.Stores
+namespace osu.Game.Database
 {
     /// <summary>
     /// Encapsulates a model store class to give it import functionality.
@@ -32,12 +31,16 @@ namespace osu.Game.Stores
     public abstract class RealmArchiveModelImporter<TModel> : IModelImporter<TModel>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
+        /// <summary>
+        /// The maximum number of concurrent imports to run per import scheduler.
+        /// </summary>
         private const int import_queue_request_concurrency = 1;
 
         /// <summary>
-        /// The size of a batch import operation before considering it a lower priority operation.
+        /// The minimum number of items in a single import call in order for the import to be processed as a batch.
+        /// Batch imports will apply optimisations preferring speed over consistency when detecting changes in already-imported items.
         /// </summary>
-        private const int low_priority_import_batch_size = 1;
+        private const int minimum_items_considered_batch_import = 10;
 
         /// <summary>
         /// A singleton scheduler shared by all <see cref="RealmArchiveModelImporter{TModel}"/>.
@@ -49,11 +52,11 @@ namespace osu.Game.Stores
         private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
         /// <summary>
-        /// A second scheduler for lower priority imports.
+        /// A second scheduler for batch imports.
         /// For simplicity, these will just run in parallel with normal priority imports, but a future refactor would see this implemented via a custom scheduler/queue.
         /// See https://gist.github.com/peppy/f0e118a14751fc832ca30dd48ba3876b for an incomplete version of this.
         /// </summary>
-        private static readonly ThreadedTaskScheduler import_scheduler_low_priority = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
+        private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
         public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
 
@@ -78,22 +81,7 @@ namespace osu.Game.Stores
             Files = new RealmFileStore(realm, storage);
         }
 
-        /// <summary>
-        /// Import one or more <typeparamref name="TModel"/> items from filesystem <paramref name="paths"/>.
-        /// </summary>
-        /// <remarks>
-        /// This will be treated as a low priority import if more than one path is specified; use <see cref="Import(ImportTask[])"/> to always import at standard priority.
-        /// This will post notifications tracking progress.
-        /// </remarks>
-        /// <param name="paths">One or more archive locations on disk.</param>
-        public Task Import(params string[] paths)
-        {
-            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
-
-            PostNotification?.Invoke(notification);
-
-            return Import(notification, paths.Select(p => new ImportTask(p)).ToArray());
-        }
+        public Task Import(params string[] paths) => Import(paths.Select(p => new ImportTask(p)).ToArray());
 
         public Task Import(params ImportTask[] tasks)
         {
@@ -120,7 +108,7 @@ namespace osu.Game.Stores
 
             var imported = new List<Live<TModel>>();
 
-            bool isLowPriorityImport = tasks.Length > low_priority_import_batch_size;
+            bool isBatchImport = tasks.Length >= minimum_items_considered_batch_import;
 
             try
             {
@@ -130,7 +118,7 @@ namespace osu.Game.Stores
 
                     try
                     {
-                        var model = await Import(task, isLowPriorityImport, notification.CancellationToken).ConfigureAwait(false);
+                        var model = await Import(task, isBatchImport, notification.CancellationToken).ConfigureAwait(false);
 
                         lock (imported)
                         {
@@ -193,16 +181,16 @@ namespace osu.Game.Stores
         /// Note that this bypasses the UI flow and should only be used for special cases or testing.
         /// </summary>
         /// <param name="task">The <see cref="ImportTask"/> containing data about the <typeparamref name="TModel"/> to import.</param>
-        /// <param name="lowPriority">Whether this is a low priority import.</param>
+        /// <param name="batchImport">Whether this import is part of a larger batch.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        public async Task<Live<TModel>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<Live<TModel>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
-                import = await Import(reader, lowPriority, cancellationToken).ConfigureAwait(false);
+                import = await Import(reader, batchImport, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -225,9 +213,9 @@ namespace osu.Game.Stores
         /// Silently import an item from an <see cref="ArchiveReader"/>.
         /// </summary>
         /// <param name="archive">The archive to be imported.</param>
-        /// <param name="lowPriority">Whether this is a low priority import.</param>
+        /// <param name="batchImport">Whether this import is part of a larger batch.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<Live<TModel>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<Live<TModel>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -250,13 +238,117 @@ namespace osu.Game.Stores
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, lowPriority, cancellationToken),
+            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, batchImport, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler,
-                lowPriority ? import_scheduler_low_priority : import_scheduler);
+                batchImport ? import_scheduler_batch : import_scheduler);
 
             return await scheduledImport.ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// Silently import an item from a <typeparamref name="TModel"/>.
+        /// </summary>
+        /// <param name="item">The model to be imported.</param>
+        /// <param name="archive">An optional archive to use for model population.</param>
+        /// <param name="batchImport">If <c>true</c>, imports will be skipped before they begin, given an existing model matches on hash and filenames. Should generally only be used for large batch imports, as it may defy user expectations when updating an existing model.</param>
+        /// <param name="cancellationToken">An optional cancellation token.</param>
+        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            bool checkedExisting = false;
+            TModel? existing = null;
+
+            if (batchImport && archive != null)
+            {
+                // this is a fast bail condition to improve large import performance.
+                item.Hash = computeHashFast(archive);
+
+                checkedExisting = true;
+                existing = CheckForExisting(item, realm);
+
+                if (existing != null)
+                {
+                    // bare minimum comparisons
+                    //
+                    // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
+                    // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
+                    if (CanSkipImport(existing, item) &&
+                        getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)) &&
+                        checkAllFilesExist(existing))
+                    {
+                        LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+
+                        using (var transaction = realm.BeginWrite())
+                        {
+                            UndeleteForReuse(existing);
+                            transaction.Commit();
+                        }
+
+                        return existing.ToLive(Realm);
+                    }
+
+                    LogForModel(item, @"Found existing (optimised) but failed pre-check.");
+                }
+            }
+
+            try
+            {
+                LogForModel(item, @"Beginning import...");
+
+                // TODO: do we want to make the transaction this local? not 100% sure, will need further investigation.
+                using (var transaction = realm.BeginWrite())
+                {
+                    if (archive != null)
+                        // TODO: look into rollback of file additions (or delayed commit).
+                        item.Files.AddRange(createFileInfos(archive, Files, realm));
+
+                    item.Hash = ComputeHash(item);
+
+                    // TODO: we may want to run this outside of the transaction.
+                    Populate(item, archive, realm, cancellationToken);
+
+                    if (!checkedExisting)
+                        existing = CheckForExisting(item, realm);
+
+                    if (existing != null)
+                    {
+                        if (CanReuseExisting(existing, item))
+                        {
+                            LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+
+                            UndeleteForReuse(existing);
+                            transaction.Commit();
+
+                            return existing.ToLive(Realm);
+                        }
+
+                        LogForModel(item, @"Found existing but failed re-use check.");
+
+                        existing.DeletePending = true;
+                    }
+
+                    PreImport(item, realm);
+
+                    // import to store
+                    realm.Add(item);
+
+                    transaction.Commit();
+                }
+
+                LogForModel(item, @"Import successfully completed!");
+            }
+            catch (Exception e)
+            {
+                if (!(e is TaskCanceledException))
+                    LogForModel(item, @"Database import or population failed and has been rolled back.", e);
+
+                throw;
+            }
+
+            return (Live<TModel>?)item.ToLive(Realm);
+        });
 
         /// <summary>
         /// Any file extensions which should be included in hash creation.
@@ -285,18 +377,12 @@ namespace osu.Game.Stores
         }
 
         /// <summary>
-        /// Whether the implementation overrides <see cref="ComputeHash"/> with a custom implementation.
-        /// Custom hash implementations must bypass the early exit in the import flow (see <see cref="computeHashFast"/> usage).
-        /// </summary>
-        protected virtual bool HasCustomHashFunction => false;
-
-        /// <summary>
         /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
         /// </summary>
         /// <remarks>
         ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
         /// </remarks>
-        protected virtual string ComputeHash(TModel item)
+        protected string ComputeHash(TModel item)
         {
             // for now, concatenate all hashable files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
@@ -311,113 +397,6 @@ namespace osu.Game.Stores
                 return hashable.ComputeSHA2Hash();
 
             return item.Hash;
-        }
-
-        /// <summary>
-        /// Silently import an item from a <typeparamref name="TModel"/>.
-        /// </summary>
-        /// <param name="item">The model to be imported.</param>
-        /// <param name="archive">An optional archive to use for model population.</param>
-        /// <param name="lowPriority">Whether this is a low priority import.</param>
-        /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return Realm.Run(realm =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                bool checkedExisting = false;
-                TModel? existing = null;
-
-                if (archive != null && !HasCustomHashFunction)
-                {
-                    // this is a fast bail condition to improve large import performance.
-                    item.Hash = computeHashFast(archive);
-
-                    checkedExisting = true;
-                    existing = CheckForExisting(item, realm);
-
-                    if (existing != null)
-                    {
-                        // bare minimum comparisons
-                        //
-                        // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
-                        // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
-                        if (CanSkipImport(existing, item) &&
-                            getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)) &&
-                            checkAllFilesExist(existing))
-                        {
-                            LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
-
-                            using (var transaction = realm.BeginWrite())
-                            {
-                                UndeleteForReuse(existing);
-                                transaction.Commit();
-                            }
-
-                            return existing.ToLive(Realm);
-                        }
-
-                        LogForModel(item, @"Found existing (optimised) but failed pre-check.");
-                    }
-                }
-
-                try
-                {
-                    LogForModel(item, @"Beginning import...");
-
-                    // TODO: do we want to make the transaction this local? not 100% sure, will need further investigation.
-                    using (var transaction = realm.BeginWrite())
-                    {
-                        if (archive != null)
-                            // TODO: look into rollback of file additions (or delayed commit).
-                            item.Files.AddRange(createFileInfos(archive, Files, realm));
-
-                        item.Hash = ComputeHash(item);
-
-                        // TODO: we may want to run this outside of the transaction.
-                        Populate(item, archive, realm, cancellationToken);
-
-                        if (!checkedExisting)
-                            existing = CheckForExisting(item, realm);
-
-                        if (existing != null)
-                        {
-                            if (CanReuseExisting(existing, item))
-                            {
-                                LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
-
-                                UndeleteForReuse(existing);
-                                transaction.Commit();
-
-                                return existing.ToLive(Realm);
-                            }
-
-                            LogForModel(item, @"Found existing but failed re-use check.");
-
-                            existing.DeletePending = true;
-                        }
-
-                        PreImport(item, realm);
-
-                        // import to store
-                        realm.Add(item);
-
-                        transaction.Commit();
-                    }
-
-                    LogForModel(item, @"Import successfully completed!");
-                }
-                catch (Exception e)
-                {
-                    if (!(e is TaskCanceledException))
-                        LogForModel(item, @"Database import or population failed and has been rolled back.", e);
-
-                    throw;
-                }
-
-                return (Live<TModel>?)item.ToLive(Realm);
-            });
         }
 
         private string computeHashFast(ArchiveReader reader)
@@ -521,8 +500,7 @@ namespace osu.Game.Stores
             // for the best or worst, we copy and import files of a new import before checking whether
             // it is a duplicate. so to check if anything has changed, we can just compare all File IDs.
             getIDs(existing.Files).SequenceEqual(getIDs(import.Files)) &&
-            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files)) &&
-            checkAllFilesExist(existing);
+            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files));
 
         private bool checkAllFilesExist(TModel model) =>
             model.Files.All(f => Files.Storage.Exists(f.File.GetStoragePath()));

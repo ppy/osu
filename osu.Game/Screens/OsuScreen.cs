@@ -77,7 +77,7 @@ namespace osu.Game.Screens
 
         private Sample sampleExit;
 
-        protected virtual bool PlayResumeSound => true;
+        protected virtual bool PlayExitSound => true;
 
         public virtual float BackgroundParallaxAmount => 1;
 
@@ -173,9 +173,6 @@ namespace osu.Game.Screens
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
-            if (PlayResumeSound)
-                sampleExit?.Play();
-
             applyArrivingDefaults(true);
 
             // it's feasible to resume to a screen if the target screen never loaded successfully.
@@ -215,6 +212,9 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(ScreenExitEvent e)
         {
+            if (ValidForResume && PlayExitSound)
+                sampleExit?.Play();
+
             if (ValidForResume && logo != null)
                 onExitingLogo();
 
