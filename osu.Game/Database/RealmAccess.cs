@@ -762,7 +762,7 @@ namespace osu.Game.Database
                 {
                     try
                     {
-                        using (var source = storage.GetStream(Filename))
+                        using (var source = storage.GetStream(Filename, mode: FileMode.Open))
                         using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
                             source.CopyTo(destination);
                         return;
