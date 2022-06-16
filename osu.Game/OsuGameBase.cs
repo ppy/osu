@@ -244,15 +244,6 @@ namespace osu.Game
 
                 EFContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.db"));
                 realm.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.realm"));
-
-                using (var source = Storage.GetStream("collection.db"))
-                {
-                    if (source != null)
-                    {
-                        using (var destination = Storage.CreateFileSafely(Path.Combine(backup_folder, $"collection.{migration}.db")))
-                            source.CopyTo(destination);
-                    }
-                }
             }
 
             dependencies.CacheAs(Storage);
