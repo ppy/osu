@@ -38,6 +38,8 @@ namespace osu.Game.Screens.Utility
             return base.OnKeyDown(e);
         }
 
+        protected override bool OnHover(HoverEvent e) => true;
+
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
