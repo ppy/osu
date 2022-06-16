@@ -19,7 +19,7 @@ using Realms;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreModelManager : RealmArchiveModelManager<ScoreInfo>
+    public class ScoreImporter : RealmArchiveModelManager<ScoreInfo>
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
 
@@ -28,7 +28,7 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreModelManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
+        public ScoreImporter(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
             : base(storage, realm)
         {
             this.rulesets = rulesets;
