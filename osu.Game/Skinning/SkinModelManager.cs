@@ -14,7 +14,6 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
-using osu.Game.Stores;
 using Realms;
 
 #nullable enable
@@ -45,8 +44,6 @@ namespace osu.Game.Skinning
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name ?? @"No name" };
 
         private const string unknown_creator_string = @"Unknown";
-
-        protected override bool HasCustomHashFunction => true;
 
         protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {

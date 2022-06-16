@@ -222,11 +222,18 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             }
         }
 
+        [Resolved]
+        private BeatmapHashResolver hashResolver { get; set; }
+
         private void sortBeatmapCollection()
         {
             //From CollectionHelper.cs
-            foreach (var item in Collection.Beatmaps)
+            foreach (string hash in Collection.BeatmapHashes)
             {
+                var item = hashResolver.ResolveHash(hash);
+
+                if (item == null) continue;
+
                 //获取当前BeatmapSet
                 var currentSet = item.BeatmapSet;
 

@@ -49,17 +49,17 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
             if (RuntimeInfo.OS != RuntimeInfo.Platform.Linux)
             {
-                intergrationCheckbox.WarningText = "非Linux平台可能需要自行安装并启用DBus";
+                intergrationCheckbox.SetNoticeText("非Linux平台可能需要自行安装并启用DBus", true);
             }
 
             intergrationCheckbox.Current.BindValueChanged(v =>
             {
-                intergrationCheckbox.WarningText = v.NewValue ? default : "需要重启";
+                intergrationCheckbox.SetNoticeText(v.NewValue ? default : "需要重启", true);
             });
 
             dbusWaitOnlineSlider.Current.BindValueChanged(v =>
             {
-                dbusWaitOnlineSlider.WarningText = v.NewValue == 3000d ? "真得有桌面需要拉这么高的值吗 O.O" : default;
+                dbusWaitOnlineSlider.SetNoticeText(v.NewValue == 3000d ? "真得有桌面需要拉这么高的值吗 O.O" : default);
             }, true);
         }
     }

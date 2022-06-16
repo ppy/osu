@@ -17,6 +17,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Volume;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Overlays
 {
@@ -139,11 +140,16 @@ namespace osu.Game.Overlays
 
         private ScheduledDelegate popOutDelegate;
 
+        public void FocusMasterVolume()
+        {
+            volumeMeters.Select(volumeMeterMaster);
+        }
+
         public override void Show()
         {
             // Focus on the master meter as a default if previously hidden
             if (State.Value == Visibility.Hidden)
-                volumeMeters.Select(volumeMeterMaster);
+                FocusMasterVolume();
 
             if (State.Value == Visibility.Visible)
                 schedulePopOut();
@@ -169,6 +175,30 @@ namespace osu.Game.Overlays
             // keep the scheduled event correctly timed as long as we have movement.
             schedulePopOut();
             return base.OnMouseMove(e);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    Adjust(GlobalAction.PreviousVolumeMeter);
+                    return true;
+
+                case Key.Right:
+                    Adjust(GlobalAction.NextVolumeMeter);
+                    return true;
+
+                case Key.Down:
+                    Adjust(GlobalAction.DecreaseVolume);
+                    return true;
+
+                case Key.Up:
+                    Adjust(GlobalAction.IncreaseVolume);
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
         }
 
         protected override bool OnHover(HoverEvent e)

@@ -28,7 +28,6 @@ using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
-using osu.Game.Stores;
 using Realms;
 using Realms.Exceptions;
 
@@ -392,7 +391,7 @@ namespace osu.Game.Database
         {
             total_writes_async.Value++;
             using (var realm = getRealmInstance())
-                await realm.WriteAsync(action);
+                await realm.WriteAsync(() => action(realm));
         }
 
         /// <summary>

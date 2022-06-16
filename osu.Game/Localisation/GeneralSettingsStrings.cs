@@ -25,19 +25,19 @@ namespace osu.Game.Localisation
         public static LocalisableString LanguageDropdown => new TranslatableString(getKey(@"language_dropdown"), @"Language");
 
         /// <summary>
-        /// "Prefer metadata in original language"
+        /// "偏好以原语言显示谱面信息"
         /// </summary>
         public static LocalisableString PreferOriginalMetadataLanguage => new TranslatableString(getKey(@"prefer_original"), @"偏好以原语言显示谱面信息");
 
         /// <summary>
-        /// "Prefer 24-hour time display"
+        /// "使用24小时制"
         /// </summary>
         public static LocalisableString Prefer24HourTimeDisplay => new TranslatableString(getKey(@"prefer_24_hour_time_display"), @"使用24小时制");
 
         /// <summary>
         /// "Updates"
         /// </summary>
-        public static LocalisableString UpdateHeader => new TranslatableString(getKey(@"update_header"), @"Update");
+        public static LocalisableString UpdateHeader => new TranslatableString(getKey(@"update_header"), @"Updates");
 
         /// <summary>
         /// "Release stream"
@@ -60,7 +60,7 @@ namespace osu.Game.Localisation
         public static LocalisableString ChangeFolderLocation => new TranslatableString(getKey(@"change_folder_location"), @"Change folder location...");
 
         /// <summary>
-        /// "Run setup wizard"
+        /// "打开设置向导"
         /// </summary>
         public static LocalisableString RunSetupWizard => new TranslatableString(getKey(@"llin_run_setup_wizard"), @"打开设置向导");
 

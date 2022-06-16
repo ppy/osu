@@ -16,6 +16,8 @@ namespace osu.Game.Overlays
 
         protected override DashboardOverlayHeader CreateHeader() => new DashboardOverlayHeader();
 
+        public override bool AcceptsFocus => false;
+
         protected override void CreateDisplayToLoad(DashboardOverlayTabs tab)
         {
             switch (tab)

@@ -106,6 +106,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual bool AllowDeselectionDuringDrag => true;
 
+        /// <remarks>
+        /// Positional input must be received outside the container's bounds,
+        /// in order to handle blueprints which are partially offscreen.
+        /// </remarks>
+        /// <seealso cref="SelectionHandler{T}.ReceivePositionalInputAt"/>
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             bool selectionPerformed = performMouseDownActions(e);

@@ -41,6 +41,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override string ShortTitle => "多人游戏";
 
+        protected override bool PlayExitSound => !exitConfirmed;
+
         [Resolved]
         private MultiplayerClient client { get; set; }
 

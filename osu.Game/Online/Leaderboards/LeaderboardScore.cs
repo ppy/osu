@@ -193,7 +193,7 @@ namespace osu.Game.Online.Leaderboards
                                                         {
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
-                                                            Size = new Vector2(30f, 20f),
+                                                            Size = new Vector2(28, 20),
                                                         },
                                                         new DateLabel(Score.Date)
                                                         {

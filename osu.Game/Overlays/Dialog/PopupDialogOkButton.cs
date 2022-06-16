@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Dialog
 {
@@ -12,6 +13,11 @@ namespace osu.Game.Overlays.Dialog
         private void load(OsuColour colours)
         {
             ButtonColour = colours.Pink;
+        }
+
+        public PopupDialogOkButton()
+            : base(HoverSampleSet.DialogOk)
+        {
         }
     }
 }

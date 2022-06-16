@@ -10,7 +10,7 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.BeatmapOffsetControl";
 
         /// <summary>
-        /// "Beatmap offset"
+        /// "谱面本地偏移"
         /// </summary>
         public static LocalisableString BeatmapOffset => new TranslatableString(getKey(@"beatmap_offset"), @"谱面本地偏移");
 

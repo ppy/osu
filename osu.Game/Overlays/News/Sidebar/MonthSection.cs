@@ -18,7 +18,6 @@ using System.Diagnostics;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Platform;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
@@ -129,7 +128,6 @@ namespace osu.Game.Overlays.News.Sidebar
             private readonly APINewsPost post;
 
             public PostButton(APINewsPost post)
-                : base(HoverSampleSet.Submit)
             {
                 this.post = post;
 

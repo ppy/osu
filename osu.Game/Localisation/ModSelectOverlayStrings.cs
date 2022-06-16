@@ -10,17 +10,17 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.ModSelectOverlay";
 
         /// <summary>
-        /// "Mod Select"
+        /// "Mod选择"
         /// </summary>
         public static LocalisableString ModSelectTitle => new TranslatableString(getKey(@"llin_mod_select_title"), @"Mod选择");
 
         /// <summary>
-        /// "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun."
+        /// "游戏Mods提供了多种多样的游玩方式。有一些会对您的分数等产生影响,还有一些仅供娱乐"
         /// </summary>
         public static LocalisableString ModSelectDescription => new TranslatableString(getKey(@"llin_mod_select_description"), @"游戏Mods提供了多种多样的游玩方式。有一些会对您的分数等产生影响,还有一些仅供娱乐");
 
         /// <summary>
-        /// "Mod Customisation"
+        /// "Mod选项"
         /// </summary>
         public static LocalisableString ModCustomisation => new TranslatableString(getKey(@"llin_mod_customisation"), @"Mod选项");
 

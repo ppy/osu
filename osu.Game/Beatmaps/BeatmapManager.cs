@@ -22,7 +22,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
-using osu.Game.Stores;
 using osu.Game.Utils;
 
 #nullable enable
@@ -355,6 +354,15 @@ namespace osu.Game.Beatmaps
             });
         }
 
+        public void DeleteAllVideos()
+        {
+            realm.Write(r =>
+            {
+                var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
+                beatmapModelManager.DeleteVideos(items.ToList());
+            });
+        }
+
         public void UndeleteAll()
         {
             realm.Run(r =>
@@ -381,35 +389,17 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of ICanAcceptFiles
 
-        public Task Import(params string[] paths)
-        {
-            return beatmapModelManager.Import(paths);
-        }
+        public Task Import(params string[] paths) => beatmapModelManager.Import(paths);
 
-        public Task Import(params ImportTask[] tasks)
-        {
-            return beatmapModelManager.Import(tasks);
-        }
+        public Task Import(params ImportTask[] tasks) => beatmapModelManager.Import(tasks);
 
-        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
-        {
-            return beatmapModelManager.Import(notification, tasks);
-        }
+        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => beatmapModelManager.Import(notification, tasks);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return beatmapModelManager.Import(task, lowPriority, cancellationToken);
-        }
+        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => beatmapModelManager.Import(task, batchImport, cancellationToken);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return beatmapModelManager.Import(archive, lowPriority, cancellationToken);
-        }
+        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default) => beatmapModelManager.Import(archive, batchImport, cancellationToken);
 
-        public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return beatmapModelManager.Import(item, archive, lowPriority, cancellationToken);
-        }
+        public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) => beatmapModelManager.Import(item, archive, false, cancellationToken);
 
         public IEnumerable<string> HandledExtensions => beatmapModelManager.HandledExtensions;
 

@@ -55,7 +55,7 @@ namespace osu.Game.Localisation
         public static LocalisableString BackgroundBlur => new TranslatableString(getKey(@"blur"), @"Background blur");
 
         /// <summary>
-        /// "Lighten playfield during breaks"
+        /// "休息段解除背景暗化"
         /// </summary>
         public static LocalisableString LightenDuringBreaks => new TranslatableString(getKey(@"lighten_during_breaks"), @"休息段解除背景暗化");
 
@@ -65,22 +65,22 @@ namespace osu.Game.Localisation
         public static LocalisableString HUDVisibilityMode => new TranslatableString(getKey(@"hud_visibility_mode"), @"HUD overlay visibility mode");
 
         /// <summary>
-        /// "Show health display even when you can't fail"
+        /// "不会失败时仍然显示血量"
         /// </summary>
         public static LocalisableString ShowHealthDisplayWhenCantFail => new TranslatableString(getKey(@"show_health_display_when_cant_fail"), @"不会失败时仍然显示血量");
 
         /// <summary>
-        /// "Fade playfield to red when health is low"
+        /// "当血量低时屏幕变红"
         /// </summary>
         public static LocalisableString FadePlayfieldWhenHealthLow => new TranslatableString(getKey(@"fade_playfield_when_health_low"), @"当血量低时屏幕变红");
 
         /// <summary>
-        /// "Always show key overlay"
+        /// "总是显示按键框"
         /// </summary>
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"总是显示按键框");
 
         /// <summary>
-        /// "Always play first combo break sound"
+        /// "总是播放第一次断连的提示音"
         /// </summary>
         public static LocalisableString AlwaysPlayFirstComboBreak => new TranslatableString(getKey(@"always_play_first_combo_break"), @"总是播放第一次断连的提示音");
 
@@ -90,7 +90,7 @@ namespace osu.Game.Localisation
         public static LocalisableString ScoreDisplayMode => new TranslatableString(getKey(@"score_display_mode"), @"Score display mode");
 
         /// <summary>
-        /// "Disable Windows key during gameplay"
+        /// "在游戏中禁用 Windows 键"
         /// </summary>
         public static LocalisableString DisableWinKey => new TranslatableString(getKey(@"disable_win_key"), @"在游戏中禁用 Windows 键");
 
@@ -100,7 +100,7 @@ namespace osu.Game.Localisation
         public static LocalisableString ModsHeader => new TranslatableString(getKey(@"mods_header"), @"Mods");
 
         /// <summary>
-        /// "Increase visibility of first object when visual impairment mods are enabled"
+        /// "在隐藏 Mod 下显示第一个物件的缩圈"
         /// </summary>
         public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"在隐藏 Mod 下显示第一个物件的缩圈");
 

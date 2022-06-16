@@ -10,6 +10,7 @@ using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.LLin.Misc;
 using osuTK;
 
 namespace Mvis.Plugin.CollectionSupport.Sidebar
@@ -116,6 +117,9 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             collection.BindValueChanged(OnCollectionChanged);
         }
 
+        [Resolved]
+        private BeatmapHashResolver hashResolver { get; set; }
+
         private void OnCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
         {
             var c = v.NewValue;
@@ -129,8 +133,11 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             beatmapSets.Clear();
 
             //From CollectionHelper.cs
-            foreach (var item in c.Beatmaps)
+            foreach (string hash in c.BeatmapHashes)
             {
+                var item = hashResolver.ResolveHash(hash);
+                if (item == null) continue;
+
                 //获取当前BeatmapSet
                 var currentSet = item.BeatmapSet;
 

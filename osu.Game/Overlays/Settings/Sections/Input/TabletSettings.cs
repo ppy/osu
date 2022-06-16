@@ -11,6 +11,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Game.Localisation;
@@ -95,11 +96,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Origin = Anchor.TopCentre,
                             Text = TabletSettingsStrings.NoTabletDetected,
                         },
-                        new SettingsNoticeText(colours)
+                        new LinkFlowContainer(cp => cp.Colour = colours.Yellow)
                         {
                             TextAnchor = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                         }.With(t =>
                         {
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)

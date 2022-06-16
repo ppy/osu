@@ -10,17 +10,17 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.BindingSettings";
 
         /// <summary>
-        /// "Shortcut and gameplay bindings"
+        /// "快捷键和键位绑定"
         /// </summary>
         public static LocalisableString ShortcutAndGameplayBindings => new TranslatableString(getKey(@"shortcut_and_gameplay_bindings"), @"快捷键和键位绑定");
 
         /// <summary>
-        /// "Configure"
+        /// "配置"
         /// </summary>
         public static LocalisableString Configure => new TranslatableString(getKey(@"configure"), @"配置");
 
         /// <summary>
-        /// "change global shortcut keys and gameplay bindings"
+        /// "更改全局快捷键和键位绑定"
         /// </summary>
         public static LocalisableString ChangeBindingsButton => new TranslatableString(getKey(@"change_bindings_button"), @"更改全局快捷键和键位绑定");
 

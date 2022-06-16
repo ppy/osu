@@ -12,11 +12,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
+using osu.Game.Screens.LLin.Misc;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
@@ -260,6 +262,9 @@ namespace Mvis.Plugin.CollectionSupport
             return newBeatmap;
         }
 
+        [Resolved]
+        private BeatmapHashResolver hashResolver { get; set; }
+
         ///<summary>
         ///用来更新<see cref="beatmapList"/>
         ///</summary>
@@ -271,8 +276,16 @@ namespace Mvis.Plugin.CollectionSupport
 
             if (collection == null) return;
 
-            foreach (var item in collection.Beatmaps)
+            foreach (string hash in collection.BeatmapHashes)
             {
+                var item = hashResolver.ResolveHash(hash);
+
+                if (item == null)
+                {
+                    Logger.Log($"{hash}解析到的谱面是null，将不会继续处理此Hash");
+                    continue;
+                }
+
                 //获取当前BeatmapSet
                 var currentSet = item.BeatmapSet;
                 //进行比对，如果beatmapList中不存在，则添加。

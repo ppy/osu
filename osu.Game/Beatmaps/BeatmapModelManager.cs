@@ -15,7 +15,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Skinning;
-using osu.Game.Stores;
+using osu.Game.Overlays.Notifications;
 
 #nullable enable
 
@@ -33,12 +33,12 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
+        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv" };
+
         public BeatmapModelManager(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
             : base(realm, storage, onlineLookupQueue)
         {
         }
-
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
 
         /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
@@ -113,6 +113,51 @@ namespace osu.Game.Beatmaps
                 var existing = r.Find<BeatmapSetInfo>(item.ID);
                 item.CopyChangesToRealm(existing);
             });
+        }
+
+        /// <summary>
+        /// Delete videos from a list of beatmaps.
+        /// This will post notifications tracking progress.
+        /// </summary>
+        public void DeleteVideos(List<BeatmapSetInfo> items, bool silent = false)
+        {
+            if (items.Count == 0) return;
+
+            var notification = new ProgressNotification
+            {
+                Progress = 0,
+                Text = $"Preparing to delete all {HumanisedModelName} videos...",
+                CompletionText = "No videos found to delete!",
+                State = ProgressNotificationState.Active,
+            };
+
+            if (!silent)
+                PostNotification?.Invoke(notification);
+
+            int i = 0;
+            int deleted = 0;
+
+            foreach (var b in items)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                var video = b.Files.FirstOrDefault(f => VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.Ordinal)));
+
+                if (video != null)
+                {
+                    DeleteFile(b, video);
+                    deleted++;
+                    notification.CompletionText = $"Deleted {deleted} {HumanisedModelName} video(s)!";
+                }
+
+                notification.Text = $"Deleting videos from {HumanisedModelName}s ({deleted} deleted)";
+
+                notification.Progress = (float)++i / items.Count;
+            }
+
+            notification.State = ProgressNotificationState.Completed;
         }
     }
 }
