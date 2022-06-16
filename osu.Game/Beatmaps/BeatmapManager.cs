@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, RealmNamedFileUsage>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
+    public class BeatmapManager : ModelManager<BeatmapSetInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         public ITrackStore BeatmapTrackStore { get; }
 
@@ -49,6 +49,7 @@ namespace osu.Game.Beatmaps
 
         public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
+            : base(storage, realm)
         {
             this.realm = realm;
 
@@ -75,7 +76,7 @@ namespace osu.Game.Beatmaps
         }
 
         protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
-            new BeatmapImporter(realm, storage, onlineLookupQueue);
+            new BeatmapImporter(storage, realm, onlineLookupQueue);
 
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,
@@ -273,15 +274,6 @@ namespace osu.Game.Beatmaps
         public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
 
         /// <summary>
-        /// Fired when a notification should be presented to the user.
-        /// </summary>
-        public Action<Notification>? PostNotification
-        {
-            get => beatmapImporter.PostNotification;
-            set => beatmapImporter.PostNotification = value;
-        }
-
-        /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
         /// </summary>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
@@ -356,7 +348,7 @@ namespace osu.Game.Beatmaps
                 if (filter != null)
                     items = items.Where(filter);
 
-                beatmapImporter.Delete(items.ToList(), silent);
+                Delete(items.ToList(), silent);
             });
         }
 
@@ -407,22 +399,8 @@ namespace osu.Game.Beatmaps
 
         public void UndeleteAll()
         {
-            realm.Run(r => beatmapImporter.Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
+            realm.Run(r => Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
-
-        #region Implementation of IModelManager<BeatmapSetInfo>
-
-        public bool IsAvailableLocally(BeatmapSetInfo model) => beatmapImporter.IsAvailableLocally(model);
-
-        public bool Delete(BeatmapSetInfo item) => beatmapImporter.Delete(item);
-
-        public void Delete(List<BeatmapSetInfo> items, bool silent = false) => beatmapImporter.Delete(items, silent);
-
-        public void Undelete(List<BeatmapSetInfo> items, bool silent = false) => beatmapImporter.Undelete(items, silent);
-
-        public void Undelete(BeatmapSetInfo item) => beatmapImporter.Undelete(item);
-
-        #endregion
 
         #region Implementation of ICanAcceptFiles
 
@@ -476,25 +454,6 @@ namespace osu.Game.Beatmaps
 
         void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
         void IWorkingBeatmapCache.Invalidate(BeatmapInfo beatmapInfo) => workingBeatmapCache.Invalidate(beatmapInfo);
-
-        #endregion
-
-        #region Implementation of IModelFileManager<in BeatmapSetInfo,in BeatmapSetFileInfo>
-
-        public void ReplaceFile(BeatmapSetInfo model, RealmNamedFileUsage file, Stream contents)
-        {
-            beatmapImporter.ReplaceFile(model, file, contents);
-        }
-
-        public void DeleteFile(BeatmapSetInfo model, RealmNamedFileUsage file)
-        {
-            beatmapImporter.DeleteFile(model, file);
-        }
-
-        public void AddFile(BeatmapSetInfo model, Stream contents, string filename)
-        {
-            beatmapImporter.AddFile(model, contents, filename);
-        }
 
         #endregion
 

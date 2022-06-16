@@ -22,7 +22,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : IModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
+    public class ScoreManager : ModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
         private readonly RealmAccess realm;
         private readonly Scheduler scheduler;
@@ -32,6 +32,7 @@ namespace osu.Game.Scoring
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler,
                             Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
+            : base(storage, realm)
         {
             this.realm = realm;
             this.scheduler = scheduler;
@@ -227,22 +228,6 @@ namespace osu.Game.Scoring
             }
         }
 
-        #region Implementation of IPostNotifications
-
-        public Action<Notification> PostNotification
-        {
-            set => scoreImporter.PostNotification = value;
-        }
-
-        #endregion
-
-        #region Implementation of IModelManager<ScoreInfo>
-
-        public bool Delete(ScoreInfo item)
-        {
-            return scoreImporter.Delete(item);
-        }
-
         public void Delete([CanBeNull] Expression<Func<ScoreInfo, bool>> filter = null, bool silent = false)
         {
             realm.Run(r =>
@@ -253,7 +238,7 @@ namespace osu.Game.Scoring
                 if (filter != null)
                     items = items.Where(filter);
 
-                scoreImporter.Delete(items.ToList(), silent);
+                Delete(items.ToList(), silent);
             });
         }
 
@@ -262,15 +247,9 @@ namespace osu.Game.Scoring
             realm.Run(r =>
             {
                 var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID).Scores.ToList();
-                scoreImporter.Delete(beatmapScores, silent);
+                Delete(beatmapScores, silent);
             });
         }
-
-        public void Delete(List<ScoreInfo> items, bool silent = false) => scoreImporter.Delete(items, silent);
-
-        public void Undelete(List<ScoreInfo> items, bool silent = false) => scoreImporter.Undelete(items, silent);
-
-        public void Undelete(ScoreInfo item) => scoreImporter.Undelete(item);
 
         public Task Import(params string[] paths) => scoreImporter.Import(paths);
 
@@ -281,10 +260,6 @@ namespace osu.Game.Scoring
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreImporter.Import(notification, tasks);
 
         public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => scoreImporter.Import(item, archive, batchImport, cancellationToken);
-
-        public bool IsAvailableLocally(ScoreInfo model) => scoreImporter.IsAvailableLocally(model);
-
-        #endregion
 
         #region Implementation of IPresentImports<ScoreInfo>
 
