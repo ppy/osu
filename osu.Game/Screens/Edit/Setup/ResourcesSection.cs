@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // remove the previous background for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => Path.GetFileNameWithoutExtension(f.Filename) == destination.Name);
+            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
 
             using (var stream = source.OpenRead())
             {
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // remove the previous audio track for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => Path.GetFileNameWithoutExtension(f.Filename) == destination.Name);
+            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.AudioFile);
 
             using (var stream = source.OpenRead())
             {
