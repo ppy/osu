@@ -310,7 +310,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         public class ScrollingTeam : DrawableTournamentTeam
         {
             public const float WIDTH = 58;
-            public const float HEIGHT = 41;
+            public const float HEIGHT = 44;
 
             private readonly Box outline;
 
