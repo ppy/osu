@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
 
+        private string? chooserPath;
+
         private readonly BindableWithCurrent<FileInfo?> current = new BindableWithCurrent<FileInfo?>();
 
         public Bindable<FileInfo?> Current
@@ -73,6 +75,8 @@ namespace osu.Game.Screens.Edit.Setup
         {
             if (file.NewValue != null)
                 this.HidePopover();
+
+            chooserPath = file.NewValue?.DirectoryName;
         }
 
         Task ICanAcceptFiles.Import(params string[] paths)
@@ -100,16 +104,16 @@ namespace osu.Game.Screens.Edit.Setup
             OnFocused = this.ShowPopover,
         };
 
-        public Popover GetPopover() => new FileChooserPopover(handledExtensions, Current);
+        public Popover GetPopover() => new FileChooserPopover(handledExtensions, Current, chooserPath);
 
         private class FileChooserPopover : OsuPopover
         {
-            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> currentFile)
+            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> currentFile, string? chooserPath)
             {
                 Child = new Container
                 {
                     Size = new Vector2(600, 400),
-                    Child = new OsuFileSelector(currentFile.Value?.DirectoryName, handledExtensions)
+                    Child = new OsuFileSelector(chooserPath, handledExtensions)
                     {
                         RelativeSizeAxes = Axes.Both,
                         CurrentFile = { BindTarget = currentFile }
