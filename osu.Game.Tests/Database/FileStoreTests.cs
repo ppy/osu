@@ -1,16 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Logging;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
-using osu.Game.Stores;
-
-#nullable enable
 
 namespace osu.Game.Tests.Database
 {

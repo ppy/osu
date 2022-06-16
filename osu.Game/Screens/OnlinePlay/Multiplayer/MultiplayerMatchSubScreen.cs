@@ -41,6 +41,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override string ShortTitle => "room";
 
+        protected override bool PlayExitSound => !exitConfirmed;
+
         [Resolved]
         private MultiplayerClient client { get; set; }
 

@@ -53,6 +53,8 @@ namespace osu.Game.Screens.Play
 
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
+        protected override bool PlayExitSound => !isRestarting;
+
         protected override UserActivity InitialActivity => new UserActivity.InSoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         public override float BackgroundParallaxAmount => 0.1f;
@@ -74,6 +76,8 @@ namespace osu.Game.Screens.Play
         protected virtual bool PauseOnFocusLost => true;
 
         public Action RestartRequested;
+
+        private bool isRestarting;
 
         private Bindable<bool> mouseWheelDisabled;
 
@@ -642,6 +646,8 @@ namespace osu.Game.Screens.Play
         {
             if (!Configuration.AllowRestart)
                 return;
+
+            isRestarting = true;
 
             // at the point of restarting the track should either already be paused or the volume should be zero.
             // stopping here is to ensure music doesn't become audible after exiting back to PlayerLoader.
