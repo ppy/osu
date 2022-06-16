@@ -750,9 +750,9 @@ namespace osu.Game.Database
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
-        public void CreateBackup(string backupFilename)
+        public void CreateBackup(string backupFilename, IDisposable? blockAllOperations = null)
         {
-            using (BlockAllOperations())
+            using (blockAllOperations ?? BlockAllOperations())
             {
                 Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
 
