@@ -17,7 +17,6 @@ using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Stores;
 using SharpCompress.Compressors;
 using SharpCompress.Compressors.BZip2;
 

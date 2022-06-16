@@ -30,8 +30,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class ComposeBlueprintContainer : EditorBlueprintContainer
     {
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
         protected new EditorSelectionHandler SelectionHandler => (EditorSelectionHandler)base.SelectionHandler;
