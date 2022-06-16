@@ -132,6 +132,8 @@ namespace osu.Game.Tests.Visual
 
             public new NotificationOverlay Notifications => base.Notifications;
 
+            public new FirstRunSetupOverlay FirstRunOverlay => base.FirstRunOverlay;
+
             public new MusicController MusicController => base.MusicController;
 
             public new OsuConfigManager LocalConfig => base.LocalConfig;
