@@ -145,11 +145,6 @@ namespace osu.Game.Tests.Visual
             {
             }
 
-            protected override BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
-            {
-                return new BeatmapImporter(realm, storage, onlineLookupQueue);
-            }
-
             protected override WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host)
             {
                 return new TestWorkingBeatmapCache(this, audioManager, resources, storage, defaultBeatmap, host);
