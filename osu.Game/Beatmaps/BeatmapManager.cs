@@ -62,6 +62,8 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm, rulesets, onlineBeatmapLookupQueue);
+            beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
+
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
         }
 

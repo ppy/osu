@@ -77,7 +77,10 @@ namespace osu.Game.Skinning
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
 
-            skinImporter = new SkinImporter(storage, realm, this);
+            skinImporter = new SkinImporter(storage, realm, this)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj),
+            };
 
             var defaultSkins = new[]
             {
