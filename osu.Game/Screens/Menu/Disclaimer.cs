@@ -171,6 +171,14 @@ namespace osu.Game.Screens.Menu
             ((IBindable<APIUser>)currentUser).BindTo(api.LocalUser);
         }
 
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            base.OnSuspending(e);
+
+            // Once this screen has finished being displayed, we don't want to unnecessarily handle user change events.
+            currentUser.UnbindAll();
+        }
+
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
