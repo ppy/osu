@@ -10,6 +10,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
@@ -55,6 +56,21 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
 
             moveMouseToObject(() => addedObject);
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+
+            AddUntilStep("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
+            AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Single().State == MenuState.Open);
+        }
+
+        [Test]
+        public void TestSelectAndShowContextMenuOutsideBounds()
+        {
+            var addedObject = new HitCircle { StartTime = 100, Position = OsuPlayfield.BASE_SIZE };
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+
+            AddStep("descale blueprint container", () => this.ChildrenOfType<HitObjectComposer>().Single().Scale = new Vector2(0.5f));
+            AddStep("move mouse to bottom-right", () => InputManager.MoveMouseTo(blueprintContainer.ToScreenSpace(blueprintContainer.LayoutRectangle.BottomRight + new Vector2(10))));
+
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
 
             AddUntilStep("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
