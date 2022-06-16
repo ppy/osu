@@ -29,10 +29,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public IWorkingBeatmapCache? WorkingBeatmapCache { private get; set; }
 
-        public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
-
-        protected override string[] HashableFileTypes => new[] { ".osu" };
-
         public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv" };
 
         public BeatmapModelManager(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
@@ -71,7 +67,7 @@ namespace osu.Game.Beatmaps
 
                 // AddFile generally handles updating/replacing files, but this is a case where the filename may have also changed so let's delete for simplicity.
                 var existingFileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase));
-                string targetFilename = getFilename(beatmapInfo);
+                string targetFilename = createBeatmapFilenameFromMetadata(beatmapInfo);
 
                 // ensure that two difficulties from the set don't point at the same beatmap file.
                 if (setInfo.Beatmaps.Any(b => b.ID != beatmapInfo.ID && string.Equals(b.Path, targetFilename, StringComparison.OrdinalIgnoreCase)))
@@ -83,17 +79,18 @@ namespace osu.Game.Beatmaps
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
-                AddFile(setInfo, stream, getFilename(beatmapInfo));
-                Update(setInfo);
+                AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
+
+                Realm.Write(r => setInfo.CopyChangesToRealm(r.Find<BeatmapSetInfo>(setInfo.ID)));
             }
 
             WorkingBeatmapCache?.Invalidate(beatmapInfo);
-        }
 
-        private static string getFilename(BeatmapInfo beatmapInfo)
-        {
-            var metadata = beatmapInfo.Metadata;
-            return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
+            static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
+            {
+                var metadata = beatmapInfo.Metadata;
+                return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
+            }
         }
 
         /// <summary>
@@ -104,15 +101,6 @@ namespace osu.Game.Beatmaps
         public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query)
         {
             return Realm.Run(realm => realm.All<BeatmapInfo>().FirstOrDefault(query)?.Detach());
-        }
-
-        public void Update(BeatmapSetInfo item)
-        {
-            Realm.Write(r =>
-            {
-                var existing = r.Find<BeatmapSetInfo>(item.ID);
-                item.CopyChangesToRealm(existing);
-            });
         }
 
         /// <summary>
