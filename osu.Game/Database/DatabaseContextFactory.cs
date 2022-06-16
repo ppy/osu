@@ -151,7 +151,7 @@ namespace osu.Game.Database
         {
             Logger.Log($"Creating full EF database backup at {backupFilename}", LoggingTarget.Database);
 
-            using (var source = storage.GetStream(DATABASE_NAME))
+            using (var source = storage.GetStream(DATABASE_NAME, mode: FileMode.Open))
             using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
                 source.CopyTo(destination);
         }
