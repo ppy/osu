@@ -37,7 +37,10 @@ namespace osu.Game.Scoring
             this.difficulties = difficulties;
             this.configManager = configManager;
 
-            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm);
+            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
         }
 
         public Score GetScore(ScoreInfo score) => scoreImporter.GetScore(score);
