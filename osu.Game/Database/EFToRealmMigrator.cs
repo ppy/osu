@@ -133,6 +133,8 @@ namespace osu.Game.Database
             Task.Factory.StartNew(() =>
             {
                 realm.CreateBackup(Path.Combine(backup_folder, $"client.{backupSuffix}.realm"), realmBlockOperations);
+                realmBlockOperations = null;
+
                 efContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{backupSuffix}.db"));
 
                 using (var ef = efContextFactory.Get())
@@ -218,7 +220,7 @@ namespace osu.Game.Database
                 // If we were to not do this, the migration would run another time the next time the user starts the game.
                 deletePreRealmData();
 
-                realmBlockOperations.Dispose();
+                realmBlockOperations?.Dispose();
 
                 migrationCompleted.SetResult(true);
                 efContextFactory.SetMigrationCompletion();
