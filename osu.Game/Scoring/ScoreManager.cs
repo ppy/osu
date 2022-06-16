@@ -253,11 +253,14 @@ namespace osu.Game.Scoring
 
         public Task Import(params ImportTask[] tasks) => scoreImporter.Import(tasks);
 
+        public override bool IsAvailableLocally(ScoreInfo model) => Realm.Run(realm => realm.All<ScoreInfo>().Any(s => s.OnlineID == model.OnlineID));
+
         public IEnumerable<string> HandledExtensions => scoreImporter.HandledExtensions;
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreImporter.Import(notification, tasks);
 
-        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => scoreImporter.Import(item, archive, batchImport, cancellationToken);
+        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) =>
+            scoreImporter.Import(item, archive, batchImport, cancellationToken);
 
         #region Implementation of IPresentImports<ScoreInfo>
 

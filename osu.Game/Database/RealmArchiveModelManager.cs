@@ -199,9 +199,10 @@ namespace osu.Game.Database
             });
         }
 
-        // TODO: implement
         public virtual bool IsAvailableLocally(TModel model) => true;
+
         public Action<Notification>? PostNotification { get; set; }
-        public string HumanisedModelName { get; set; } = "wang";
+
+        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
     }
 }

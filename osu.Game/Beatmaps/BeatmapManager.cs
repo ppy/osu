@@ -359,7 +359,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Progress = 0,
-                Text = $"Preparing to delete all {beatmapImporter.HumanisedModelName} videos...",
+                Text = $"Preparing to delete all {HumanisedModelName} videos...",
                 CompletionText = "No videos found to delete!",
                 State = ProgressNotificationState.Active,
             };
@@ -382,10 +382,10 @@ namespace osu.Game.Beatmaps
                 {
                     DeleteFile(b, video);
                     deleted++;
-                    notification.CompletionText = $"Deleted {deleted} {beatmapImporter.HumanisedModelName} video(s)!";
+                    notification.CompletionText = $"Deleted {deleted} {HumanisedModelName} video(s)!";
                 }
 
-                notification.Text = $"Deleting videos from {beatmapImporter.HumanisedModelName}s ({deleted} deleted)";
+                notification.Text = $"Deleting videos from {HumanisedModelName}s ({deleted} deleted)";
 
                 notification.Progress = (float)++i / items.Count;
             }
@@ -451,6 +451,8 @@ namespace osu.Game.Beatmaps
         void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
         void IWorkingBeatmapCache.Invalidate(BeatmapInfo beatmapInfo) => workingBeatmapCache.Invalidate(beatmapInfo);
 
+        public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID));
+
         #endregion
 
         #region Implementation of IDisposable
@@ -470,5 +472,7 @@ namespace osu.Game.Beatmaps
         }
 
         #endregion
+
+        public override string HumanisedModelName => "beatmap";
     }
 }
