@@ -24,7 +24,6 @@ namespace osu.Game.Scoring
 {
     public class ScoreManager : ModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
-        private readonly RealmAccess realm;
         private readonly Scheduler scheduler;
         private readonly Func<BeatmapDifficultyCache> difficulties;
         private readonly OsuConfigManager configManager;
@@ -34,7 +33,6 @@ namespace osu.Game.Scoring
                             Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
             : base(storage, realm)
         {
-            this.realm = realm;
             this.scheduler = scheduler;
             this.difficulties = difficulties;
             this.configManager = configManager;
@@ -51,7 +49,7 @@ namespace osu.Game.Scoring
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query)
         {
-            return realm.Run(r => r.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
+            return Realm.Run(r => r.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
         }
 
         /// <summary>
@@ -230,7 +228,7 @@ namespace osu.Game.Scoring
 
         public void Delete([CanBeNull] Expression<Func<ScoreInfo, bool>> filter = null, bool silent = false)
         {
-            realm.Run(r =>
+            Realm.Run(r =>
             {
                 var items = r.All<ScoreInfo>()
                              .Where(s => !s.DeletePending);
@@ -244,7 +242,7 @@ namespace osu.Game.Scoring
 
         public void Delete(BeatmapInfo beatmap, bool silent = false)
         {
-            realm.Run(r =>
+            Realm.Run(r =>
             {
                 var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID).Scores.ToList();
                 Delete(beatmapScores, silent);

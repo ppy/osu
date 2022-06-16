@@ -45,14 +45,10 @@ namespace osu.Game.Beatmaps
         private readonly WorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue? onlineBeatmapLookupQueue;
 
-        private readonly RealmAccess realm;
-
         public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
             : base(storage, realm)
         {
-            this.realm = realm;
-
             if (performOnlineLookups)
             {
                 if (api == null)
@@ -192,7 +188,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
         public void Hide(BeatmapInfo beatmapInfo)
         {
-            realm.Run(r =>
+            Realm.Run(r =>
             {
                 using (var transaction = r.BeginWrite())
                 {
@@ -211,7 +207,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap difficulty to restore.</param>
         public void Restore(BeatmapInfo beatmapInfo)
         {
-            realm.Run(r =>
+            Realm.Run(r =>
             {
                 using (var transaction = r.BeginWrite())
                 {
@@ -226,7 +222,7 @@ namespace osu.Game.Beatmaps
 
         public void RestoreAll()
         {
-            realm.Run(r =>
+            Realm.Run(r =>
             {
                 using (var transaction = r.BeginWrite())
                 {
@@ -244,7 +240,7 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
-            return realm.Run(r =>
+            return Realm.Run(r =>
             {
                 r.Refresh();
                 return r.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
@@ -258,7 +254,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public Live<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
         {
-            return realm.Run(r => r.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(realm));
+            return Realm.Run(r => r.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(Realm));
         }
 
         /// <summary>
@@ -266,7 +262,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => realm.Run(r => r.All<BeatmapInfo>().FirstOrDefault(query)?.Detach());
+        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => Realm.Run(r => r.All<BeatmapInfo>().FirstOrDefault(query)?.Detach());
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -318,7 +314,7 @@ namespace osu.Game.Beatmaps
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
-                realm.Write(r => setInfo.CopyChangesToRealm(r.Find<BeatmapSetInfo>(setInfo.ID)));
+                Realm.Write(r => setInfo.CopyChangesToRealm(r.Find<BeatmapSetInfo>(setInfo.ID)));
             }
 
             workingBeatmapCache.Invalidate(beatmapInfo);
@@ -332,7 +328,7 @@ namespace osu.Game.Beatmaps
 
         public void DeleteAllVideos()
         {
-            realm.Write(r =>
+            Realm.Write(r =>
             {
                 var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
                 DeleteVideos(items.ToList());
@@ -341,7 +337,7 @@ namespace osu.Game.Beatmaps
 
         public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
         {
-            realm.Run(r =>
+            Realm.Run(r =>
             {
                 var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
@@ -399,7 +395,7 @@ namespace osu.Game.Beatmaps
 
         public void UndeleteAll()
         {
-            realm.Run(r => Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
+            Realm.Run(r => Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
         #region Implementation of ICanAcceptFiles
@@ -431,7 +427,7 @@ namespace osu.Game.Beatmaps
             // If we seem to be missing files, now is a good time to re-fetch.
             if (importedBeatmap?.BeatmapSet?.Files.Count == 0)
             {
-                realm.Run(r =>
+                Realm.Run(r =>
                 {
                     var refetch = r.Find<BeatmapInfo>(importedBeatmap.ID)?.Detach();
 

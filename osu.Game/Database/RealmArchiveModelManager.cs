@@ -18,7 +18,7 @@ namespace osu.Game.Database
     public class ModelManager<TModel> : IModelManager<TModel>, IModelFileManager<TModel, RealmNamedFileUsage>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
-        protected RealmAccess Realm;
+        protected RealmAccess Realm { get; }
 
         private readonly RealmFileStore realmFileStore;
 
