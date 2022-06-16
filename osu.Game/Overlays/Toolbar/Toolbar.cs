@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Toolbar
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[]
+                    ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(),
