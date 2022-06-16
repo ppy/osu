@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             {
                                                 userFlag = new UpdateableFlag
                                                 {
-                                                    Size = new Vector2(30, 20),
+                                                    Size = new Vector2(28, 20),
                                                     ShowPlaceholderOnNull = false,
                                                 },
                                                 userCountryText = new OsuSpriteText
