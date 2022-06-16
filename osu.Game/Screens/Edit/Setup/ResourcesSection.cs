@@ -59,8 +59,10 @@ namespace osu.Game.Screens.Edit.Setup
             if (!string.IsNullOrEmpty(working.Value.Metadata.AudioFile))
                 audioTrackChooser.Current.Value = new FileInfo(working.Value.Metadata.AudioFile);
 
-            backgroundChooser.Current.BindValueChanged(backgroundChanged, true);
-            audioTrackChooser.Current.BindValueChanged(audioTrackChanged, true);
+            backgroundChooser.Current.BindValueChanged(backgroundChanged);
+            audioTrackChooser.Current.BindValueChanged(audioTrackChanged);
+
+            updatePlaceholderText();
         }
 
         public bool ChangeBackgroundImage(FileInfo source)
@@ -121,28 +123,29 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void backgroundChanged(ValueChangedEvent<FileInfo> file)
         {
-            backgroundChooser.Text = file.NewValue == null
-                ? "Click to select a background image"
-                : "Click to replace the background image";
+            if (!ChangeBackgroundImage(file.NewValue))
+                backgroundChooser.Current.Value = file.OldValue;
 
-            if (file.NewValue != file.OldValue)
-            {
-                if (!ChangeBackgroundImage(file.NewValue))
-                    backgroundChooser.Current.Value = file.OldValue;
-            }
+            updatePlaceholderText();
         }
 
         private void audioTrackChanged(ValueChangedEvent<FileInfo> file)
         {
-            audioTrackChooser.Text = file.NewValue == null
+            if (!ChangeAudioTrack(file.NewValue))
+                audioTrackChooser.Current.Value = file.OldValue;
+
+            updatePlaceholderText();
+        }
+
+        private void updatePlaceholderText()
+        {
+            audioTrackChooser.Text = audioTrackChooser.Current.Value == null
                 ? "Click to select a track"
                 : "Click to replace the track";
 
-            if (file.NewValue != file.OldValue)
-            {
-                if (!ChangeAudioTrack(file.NewValue))
-                    audioTrackChooser.Current.Value = file.OldValue;
-            }
+            backgroundChooser.Text = backgroundChooser.Current.Value == null
+                ? "Click to select a background image"
+                : "Click to replace the background image";
         }
     }
 }
