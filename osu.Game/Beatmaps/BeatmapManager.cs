@@ -439,15 +439,6 @@ namespace osu.Game.Beatmaps
             return workingBeatmapCache.GetWorkingBeatmap(importedBeatmap);
         }
 
-        public WorkingBeatmap GetWorkingBeatmap(Live<BeatmapInfo>? importedBeatmap)
-        {
-            WorkingBeatmap working = workingBeatmapCache.GetWorkingBeatmap(null);
-
-            importedBeatmap?.PerformRead(b => working = workingBeatmapCache.GetWorkingBeatmap(b));
-
-            return working;
-        }
-
         void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
         void IWorkingBeatmapCache.Invalidate(BeatmapInfo beatmapInfo) => workingBeatmapCache.Invalidate(beatmapInfo);
 
