@@ -12,7 +12,7 @@ using SharpCompress.Common;
 namespace osu.Game.Database
 {
     /// <summary>
-    /// An encapsulated import task to be imported to an <see cref="RealmArchiveModelManager{TModel}"/>.
+    /// An encapsulated import task to be imported to an <see cref="RealmArchiveModelImporter{TModel}"/>.
     /// </summary>
     public class ImportTask
     {
