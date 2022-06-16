@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Utility
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.None,
                             Width = 400,
-                            LabelText = "visual spacing",
+                            LabelText = "视觉间隔",
                             Current = SampleVisualSpacing
                         },
                         new SettingsSlider<double>
@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Utility
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.None,
                             Width = 400,
-                            LabelText = "approach rate",
+                            LabelText = "缩圈大小",
                             Current = SampleApproachRate
                         },
                     },
@@ -194,11 +194,12 @@ namespace osu.Game.Screens.Utility
                 },
             };
 
-            explanatoryText.AddParagraph(@"Welcome to the latency certifier!");
-            explanatoryText.AddParagraph(@"Do whatever you need to try and perceive the difference in latency, then choose your best side. Read more about the methodology ");
-            explanatoryText.AddLink("here", "https://github.com/ppy/osu/wiki/Latency-and-unlimited-frame-rates#methodology");
-            explanatoryText.AddParagraph(@"Use the arrow keys or Z/X/F/J to control the display.");
-            explanatoryText.AddParagraph(@"Tab key to change focus. Space to change display mode");
+            explanatoryText.AddParagraph(@"欢迎来到延迟验证器!");
+            explanatoryText.AddParagraph(@"你可以在这里做任何你想做的事来测试延迟, 然后选择你觉得最舒服的一边。 你可以参考一下");
+            explanatoryText.AddLink("这里", "https://github.com/ppy/osu/wiki/Latency-and-unlimited-frame-rates#methodology");
+            explanatoryText.AddParagraph(@"来获取有关该方法的更多信息。");
+            explanatoryText.AddParagraph(@"使用方向键或 Z/X/F/J 来控制显示");
+            explanatoryText.AddParagraph(@"点按Tab改变当前聚焦。 点按Space改变显示模式");
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -273,8 +274,8 @@ namespace osu.Game.Screens.Utility
             float successRate = (float)correctAtCurrentDifficulty / attemptsAtCurrentDifficulty;
             bool isPass = successRate == 1;
 
-            statusText.AddParagraph($"You scored {correctAtCurrentDifficulty} out of {attemptsAtCurrentDifficulty} ({successRate:0%})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
-            statusText.AddParagraph($"Level {DifficultyLevel} ({mapDifficultyToTargetFrameRate(DifficultyLevel):N0} Hz)",
+            statusText.AddParagraph($"你得到了 {correctAtCurrentDifficulty} / {attemptsAtCurrentDifficulty} 分 ({successRate:0%})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
+            statusText.AddParagraph($"第{DifficultyLevel}关 ({mapDifficultyToTargetFrameRate(DifficultyLevel):N0} Hz)",
                 cp => cp.Font = OsuFont.Default.With(size: 24));
 
             statusText.AddParagraph(string.Empty);
@@ -284,17 +285,17 @@ namespace osu.Game.Screens.Utility
 
             if (!isPass && DifficultyLevel > 1)
             {
-                statusText.AddParagraph("To complete certification, the difficulty level will now decrease until you can get 20 rounds correct in a row!",
+                statusText.AddParagraph("为了完成验证，难度等级将会降低一些直到你能连续猜对20次！",
                     cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold));
                 statusText.AddParagraph(string.Empty);
             }
 
-            statusText.AddParagraph($"Polling: {pollingMax} Hz Monitor: {displayMode?.RefreshRate ?? 0:N0} Hz Exclusive: {exclusive}",
+            statusText.AddParagraph($"Polling: {pollingMax} Hz 显示器: {displayMode?.RefreshRate ?? 0:N0} Hz Exclusive: {exclusive}",
                 cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
 
-            statusText.AddParagraph($"Input: {host.InputThread.Clock.FramesPerSecond} Hz "
-                                    + $"Update: {host.UpdateThread.Clock.FramesPerSecond} Hz "
-                                    + $"Draw: {host.DrawThread.Clock.FramesPerSecond} Hz"
+            statusText.AddParagraph($"输入: {host.InputThread.Clock.FramesPerSecond} Hz "
+                                    + $"更新: {host.UpdateThread.Clock.FramesPerSecond} Hz "
+                                    + $"绘制: {host.DrawThread.Clock.FramesPerSecond} Hz"
                 , cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
 
             if (isCertifying && isPass)
@@ -306,9 +307,9 @@ namespace osu.Game.Screens.Utility
             string cannotIncreaseReason = string.Empty;
 
             if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > target_host_update_frames)
-                cannotIncreaseReason = "You've reached the maximum level.";
+                cannotIncreaseReason = "你已抵达最终关卡";
             else if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > Clock.FramesPerSecond)
-                cannotIncreaseReason = "Game is not running fast enough to test this level";
+                cannotIncreaseReason = "游戏还没法跑这么快来测试此关卡";
 
             FillFlowContainer buttonFlow;
 
@@ -326,7 +327,7 @@ namespace osu.Game.Screens.Utility
             {
                 buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
                 {
-                    Text = "Continue to next level",
+                    Text = "继续下一关",
                     BackgroundColour = colours.Green,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -341,8 +342,8 @@ namespace osu.Game.Screens.Utility
                 {
                     buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
                     {
-                        Text = "Retry",
-                        TooltipText = "Are you even trying..?",
+                        Text = "重试",
+                        TooltipText = "你有在尝试吗..?",
                         BackgroundColour = colours.Pink2,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -357,7 +358,7 @@ namespace osu.Game.Screens.Utility
                 {
                     buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
                     {
-                        Text = "Begin certification at last level",
+                        Text = "开始上一关的验证",
                         BackgroundColour = colours.Yellow,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -368,7 +369,7 @@ namespace osu.Game.Screens.Utility
                         },
                         TooltipText = isPass
                             ? $"Chain {rounds_to_complete_certified} rounds to confirm your perception!"
-                            : "You've reached your limits. Go to the previous level to complete certification!",
+                            : "你已经抵达了你的极限。前往上一关来完成验证！",
                     });
                 }
             }
@@ -390,7 +391,7 @@ namespace osu.Game.Screens.Utility
                 {
                     Alpha = 0,
                     Font = OsuFont.TorusAlternate.With(size: 80, weight: FontWeight.Bold),
-                    Text = "Certified!",
+                    Text = "验证完成!",
                     Blending = BlendingParameters.Additive,
                 }).WithEffect(new GlowEffect
                 {
@@ -403,7 +404,7 @@ namespace osu.Game.Screens.Utility
                 }),
                 new OsuSpriteText
                 {
-                    Text = $"You should use a frame limiter with update rate of {mapDifficultyToTargetFrameRate(DifficultyLevel + 1)} Hz (or fps) for best results!",
+                    Text = $"你应该使用频率至少为{mapDifficultyToTargetFrameRate(DifficultyLevel + 1)} Hz (or fps)的帧数限制来获得最佳体验！",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold),
@@ -444,7 +445,7 @@ namespace osu.Game.Screens.Utility
             settings.Show();
 
             attemptsAtCurrentDifficulty++;
-            statusText.Text = $"Level {DifficultyLevel}\nRound {attemptsAtCurrentDifficulty} of {totalRoundForNextResultsScreen}";
+            statusText.Text = $"第 {DifficultyLevel} 关\n第 {attemptsAtCurrentDifficulty} / {totalRoundForNextResultsScreen} 局";
 
             mainArea.Clear();
 

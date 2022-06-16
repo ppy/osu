@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -129,14 +130,14 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                         {
                             new OsuSpriteText
                             {
-                                Text = Beatmap.Metadata.TitleUnicode,
+                                Text = getRomanisableStringFor(Beatmap.Metadata.TitleUnicode, Beatmap.Metadata.Title),
                                 Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true
                             },
                             new OsuSpriteText
                             {
-                                Text = Beatmap.Metadata.ArtistUnicode,
+                                Text = getRomanisableStringFor(Beatmap.Metadata.ArtistUnicode, Beatmap.Metadata.Artist),
                                 Font = OsuFont.GetFont(weight: FontWeight.Bold),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true
@@ -172,6 +173,14 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 else
                     content.BorderColour = colourProvider.Dark1;
             }, true);
+        }
+
+        private RomanisableString getRomanisableStringFor(string original, string romanised)
+        {
+            string original1 = string.IsNullOrEmpty(original) ? romanised : original;
+            string romanised1 = string.IsNullOrEmpty(romanised) ? original : romanised;
+
+            return new RomanisableString(original, romanised1);
         }
 
         private void OnActiveChanged(ValueChangedEvent<bool> v)
