@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
@@ -36,7 +37,14 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
 
-        private string? chooserPath;
+        /// <summary>
+        /// The initial path to use when displaying the <see cref="FileChooserPopover"/>.
+        /// </summary>
+        /// <remarks>
+        /// Uses a <see langword="null"/> value before the first selection is made
+        /// to ensure that the first selection starts at <see cref="GameHost.InitialFileSelectorPath"/>.
+        /// </remarks>
+        private string? initialChooserPath;
 
         private readonly BindableWithCurrent<FileInfo?> current = new BindableWithCurrent<FileInfo?>();
 
@@ -76,7 +84,7 @@ namespace osu.Game.Screens.Edit.Setup
             if (file.NewValue != null)
                 this.HidePopover();
 
-            chooserPath = file.NewValue?.DirectoryName;
+            initialChooserPath = file.NewValue?.DirectoryName;
         }
 
         Task ICanAcceptFiles.Import(params string[] paths)
@@ -104,7 +112,7 @@ namespace osu.Game.Screens.Edit.Setup
             OnFocused = this.ShowPopover,
         };
 
-        public Popover GetPopover() => new FileChooserPopover(handledExtensions, Current, chooserPath);
+        public Popover GetPopover() => new FileChooserPopover(handledExtensions, Current, initialChooserPath);
 
         private class FileChooserPopover : OsuPopover
         {
