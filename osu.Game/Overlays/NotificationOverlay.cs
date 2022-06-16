@@ -1,21 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Linq;
-using JetBrains.Annotations;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays.Notifications;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.Containers;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
 using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
@@ -31,15 +32,15 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        private FlowContainer<NotificationSection> sections;
+        private FlowContainer<NotificationSection> sections = null!;
 
         [Resolved]
-        private AudioManager audio { get; set; }
+        private AudioManager audio { get; set; } = null!;
 
         private readonly IBindable<Visibility> firstRunSetupVisibility = new Bindable<Visibility>();
 
-        [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] FirstRunSetupOverlay firstRunSetup)
+        [BackgroundDependencyLoader]
+        private void load(FirstRunSetupOverlay? firstRunSetup)
         {
             X = WIDTH;
             Width = WIDTH;
@@ -83,11 +84,11 @@ namespace osu.Game.Overlays
                 firstRunSetupVisibility.BindTo(firstRunSetup.State);
         }
 
-        private ScheduledDelegate notificationsEnabler;
+        private ScheduledDelegate? notificationsEnabler;
 
         private void updateProcessingMode()
         {
-            bool enabled = (OverlayActivationMode.Value == OverlayActivation.All && firstRunSetupVisibility?.Value != Visibility.Visible) || State.Value == Visibility.Visible;
+            bool enabled = (OverlayActivationMode.Value == OverlayActivation.All && firstRunSetupVisibility.Value != Visibility.Visible) || State.Value == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
