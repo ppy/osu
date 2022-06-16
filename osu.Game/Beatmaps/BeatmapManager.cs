@@ -173,7 +173,7 @@ namespace osu.Game.Beatmaps
         private WorkingBeatmap addDifficultyToSet(BeatmapSetInfo targetBeatmapSet, IBeatmap newBeatmap, ISkin beatmapSkin)
         {
             // populate circular beatmap set info <-> beatmap info references manually.
-            // several places like `BeatmapImporter.Save()` or `GetWorkingBeatmap()`
+            // several places like `Save()` or `GetWorkingBeatmap()`
             // rely on them being freely traversable in both directions for correct operation.
             targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
             newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
