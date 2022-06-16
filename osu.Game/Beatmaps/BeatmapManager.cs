@@ -260,8 +260,6 @@ namespace osu.Game.Beatmaps
             return realm.Run(r => r.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(realm));
         }
 
-        #region Delegation to BeatmapImporter (methods which previously existed locally).
-
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
         /// </summary>
@@ -281,38 +279,6 @@ namespace osu.Game.Beatmaps
         {
             get => beatmapImporter.PostNotification;
             set => beatmapImporter.PostNotification = value;
-        }
-
-        #endregion
-
-        #region Implementation of IModelManager<BeatmapSetInfo>
-
-        public bool IsAvailableLocally(BeatmapSetInfo model)
-        {
-            return beatmapImporter.IsAvailableLocally(model);
-        }
-
-        public bool Delete(BeatmapSetInfo item)
-        {
-            return beatmapImporter.Delete(item);
-        }
-
-        public void Delete(List<BeatmapSetInfo> items, bool silent = false)
-        {
-            beatmapImporter.Delete(items, silent);
-        }
-
-        public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
-        {
-            realm.Run(r =>
-            {
-                var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
-
-                if (filter != null)
-                    items = items.Where(filter);
-
-                beatmapImporter.Delete(items.ToList(), silent);
-            });
         }
 
         /// <summary>
@@ -381,6 +347,19 @@ namespace osu.Game.Beatmaps
             });
         }
 
+        public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
+        {
+            realm.Run(r =>
+            {
+                var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
+
+                if (filter != null)
+                    items = items.Where(filter);
+
+                beatmapImporter.Delete(items.ToList(), silent);
+            });
+        }
+
         /// <summary>
         /// Delete videos from a list of beatmaps.
         /// This will post notifications tracking progress.
@@ -431,15 +410,17 @@ namespace osu.Game.Beatmaps
             realm.Run(r => beatmapImporter.Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
-        public void Undelete(List<BeatmapSetInfo> items, bool silent = false)
-        {
-            beatmapImporter.Undelete(items, silent);
-        }
+        #region Implementation of IModelManager<BeatmapSetInfo>
 
-        public void Undelete(BeatmapSetInfo item)
-        {
-            beatmapImporter.Undelete(item);
-        }
+        public bool IsAvailableLocally(BeatmapSetInfo model) => beatmapImporter.IsAvailableLocally(model);
+
+        public bool Delete(BeatmapSetInfo item) => beatmapImporter.Delete(item);
+
+        public void Delete(List<BeatmapSetInfo> items, bool silent = false) => beatmapImporter.Delete(items, silent);
+
+        public void Undelete(List<BeatmapSetInfo> items, bool silent = false) => beatmapImporter.Undelete(items, silent);
+
+        public void Undelete(BeatmapSetInfo item) => beatmapImporter.Undelete(item);
 
         #endregion
 
