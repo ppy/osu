@@ -8,8 +8,6 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 
-#nullable enable
-
 namespace osu.Game.Tests.Database
 {
     [TestFixture]

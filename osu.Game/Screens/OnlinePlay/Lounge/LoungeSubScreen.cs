@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -36,6 +38,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     public abstract class LoungeSubScreen : OnlinePlaySubScreen
     {
         public override string Title => "Lounge";
+
+        protected override bool PlayExitSound => false;
 
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {

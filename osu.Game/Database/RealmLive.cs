@@ -7,8 +7,6 @@ using osu.Framework.Development;
 using osu.Framework.Statistics;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Database
 {
     /// <summary>
