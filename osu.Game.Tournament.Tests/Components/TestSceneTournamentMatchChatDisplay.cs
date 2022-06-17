@@ -30,13 +30,13 @@ namespace osu.Game.Tournament.Tests.Components
         private readonly TournamentPlayer redPlayer = new TournamentPlayer
         {
             Username = "BanchoBot",
-            Id = 3,
+            OnlineID = 3,
         };
 
         private readonly TournamentPlayer bluePlayer = new TournamentPlayer
         {
             Username = "Zallius",
-            Id = 4,
+            OnlineID = 4,
         };
 
         [Cached]

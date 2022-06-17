@@ -258,7 +258,7 @@ namespace osu.Game.Tournament
 
         public void PopulatePlayer(TournamentPlayer player, Action success = null, Action failure = null, bool immediate = false)
         {
-            var req = new GetUserRequest(player.Id, ladder.Ruleset.Value);
+            var req = new GetUserRequest(player.OnlineID, ladder.Ruleset.Value);
 
             if (immediate)
             {
@@ -270,7 +270,7 @@ namespace osu.Game.Tournament
                 req.Success += res => { populate(); };
                 req.Failure += _ =>
                 {
-                    player.Id = 1;
+                    player.OnlineID = 1;
                     failure?.Invoke();
                 };
 
@@ -284,7 +284,7 @@ namespace osu.Game.Tournament
                 if (res == null)
                     return;
 
-                player.Id = res.Id;
+                player.OnlineID = res.Id;
 
                 player.Username = res.Username;
                 player.CoverUrl = res.CoverUrl;

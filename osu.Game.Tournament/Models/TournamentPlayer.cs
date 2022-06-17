@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Database;
+using Newtonsoft.Json;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 
@@ -14,7 +14,8 @@ namespace osu.Game.Tournament.Models
     [Serializable]
     public class TournamentPlayer : IUser
     {
-        public int Id { get; set; }
+        [JsonProperty(@"id")]
+        public int OnlineID { get; set; }
 
         public string Username { get; set; } = string.Empty;
 
@@ -37,7 +38,7 @@ namespace osu.Game.Tournament.Models
         {
             var user = new APIUser
             {
-                Id = Id,
+                Id = OnlineID,
                 Username = Username,
                 Country = Country,
                 CoverUrl = CoverUrl,
@@ -51,8 +52,6 @@ namespace osu.Game.Tournament.Models
 
             return user;
         }
-
-        int IHasOnlineID<int>.OnlineID => Id;
 
         bool IUser.IsBot => false;
     }
