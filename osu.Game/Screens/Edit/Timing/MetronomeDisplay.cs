@@ -33,7 +33,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         private IAdjustableClock metronomeClock;
 
-        private Sample clunk;
+        private Sample tick;
+        private Sample tickDownbeat;
+        private Sample latch;
 
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; }
@@ -43,7 +45,9 @@ namespace osu.Game.Screens.Edit.Timing
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            clunk = audio.Samples.Get(@"Multiplayer/countdown-tick");
+            tick = audio.Samples.Get(@"UI/metronome-tick");
+            tickDownbeat = audio.Samples.Get(@"UI/metronome-tick-downbeat");
+            latch = audio.Samples.Get(@"UI/metronome-latch");
 
             const float taper = 25;
             const float swing_vertical_offset = -23;
@@ -248,14 +252,27 @@ namespace osu.Game.Screens.Edit.Timing
             if (BeatSyncSource.Clock?.IsRunning != true && isSwinging)
             {
                 swing.ClearTransforms(true);
+                stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
+                isSwinging = false;
+
+                // instantly latch if pendulum arm is close enough to center (to prevent awkward delayed playback of latch sound)
+                if (Precision.AlmostEquals(swing.Rotation, 0, 1))
+                {
+                    swing.RotateTo(0);
+                    latch?.Play();
+                    return;
+                }
 
                 using (swing.BeginDelayedSequence(350))
                 {
                     swing.RotateTo(0, 1000, Easing.OutQuint);
-                    stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
+                    swing.Delay(250).Schedule(() =>
+                    {
+                        // prevent playing latch sound if metronome has started back up again
+                        if (!isSwinging)
+                            latch?.Play();
+                    });
                 }
-
-                isSwinging = false;
             }
         }
 
@@ -286,13 +303,13 @@ namespace osu.Game.Screens.Edit.Timing
                         if (!EnableClicking)
                             return;
 
-                        var channel = clunk?.GetChannel();
+                        var channel = beatIndex % timingPoint.TimeSignature.Numerator == 0 ? tickDownbeat?.GetChannel() : tick?.GetChannel();
 
-                        if (channel != null)
-                        {
-                            channel.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
-                            channel.Play();
-                        }
+                        if (channel == null)
+                            return;
+
+                        channel.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
+                        channel.Play();
                     });
                 }
             }
