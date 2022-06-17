@@ -6,8 +6,6 @@ using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Skinning;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.Catch.UI
 {
     public class HitExplosion : PoolableDrawableWithLifetime<HitExplosionEntry>
