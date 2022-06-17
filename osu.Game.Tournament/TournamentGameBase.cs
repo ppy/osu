@@ -256,9 +256,9 @@ namespace osu.Game.Tournament
 
         private void updateLoadProgressMessage(string s) => Schedule(() => initialisationText.Text = s);
 
-        public void PopulatePlayer(TournamentPlayer player, Action success = null, Action failure = null, bool immediate = false)
+        public void PopulatePlayer(TournamentUser user, Action success = null, Action failure = null, bool immediate = false)
         {
-            var req = new GetUserRequest(player.OnlineID, ladder.Ruleset.Value);
+            var req = new GetUserRequest(user.OnlineID, ladder.Ruleset.Value);
 
             if (immediate)
             {
@@ -270,7 +270,7 @@ namespace osu.Game.Tournament
                 req.Success += res => { populate(); };
                 req.Failure += _ =>
                 {
-                    player.OnlineID = 1;
+                    user.OnlineID = 1;
                     failure?.Invoke();
                 };
 
@@ -284,12 +284,12 @@ namespace osu.Game.Tournament
                 if (res == null)
                     return;
 
-                player.OnlineID = res.Id;
+                user.OnlineID = res.Id;
 
-                player.Username = res.Username;
-                player.CoverUrl = res.CoverUrl;
-                player.Country = res.Country;
-                player.Rank = res.Statistics?.GlobalRank;
+                user.Username = res.Username;
+                user.CoverUrl = res.CoverUrl;
+                user.Country = res.Country;
+                user.Rank = res.Statistics?.GlobalRank;
 
                 success?.Invoke();
             }

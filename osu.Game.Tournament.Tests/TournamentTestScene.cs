@@ -121,11 +121,11 @@ namespace osu.Game.Tournament.Tests
                     },
                     Players =
                     {
-                        new TournamentPlayer { Username = "Hello", Rank = 12 },
-                        new TournamentPlayer { Username = "Hello", Rank = 16 },
-                        new TournamentPlayer { Username = "Hello", Rank = 20 },
-                        new TournamentPlayer { Username = "Hello", Rank = 24 },
-                        new TournamentPlayer { Username = "Hello", Rank = 30 },
+                        new TournamentUser { Username = "Hello", Rank = 12 },
+                        new TournamentUser { Username = "Hello", Rank = 16 },
+                        new TournamentUser { Username = "Hello", Rank = 20 },
+                        new TournamentUser { Username = "Hello", Rank = 24 },
+                        new TournamentUser { Username = "Hello", Rank = 30 },
                     }
                 }
             },
@@ -138,11 +138,11 @@ namespace osu.Game.Tournament.Tests
                     FullName = { Value = "United States" },
                     Players =
                     {
-                        new TournamentPlayer { Username = "Hello" },
-                        new TournamentPlayer { Username = "Hello" },
-                        new TournamentPlayer { Username = "Hello" },
-                        new TournamentPlayer { Username = "Hello" },
-                        new TournamentPlayer { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
                     }
                 }
             },
