@@ -280,10 +280,10 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load()
                     {
-                        playerId.Value = player.Id;
+                        playerId.Value = player.OnlineID;
                         playerId.BindValueChanged(id =>
                         {
-                            player.Id = id.NewValue ?? 0;
+                            player.OnlineID = id.NewValue ?? 0;
 
                             if (id.NewValue != id.OldValue)
                                 player.Username = string.Empty;
