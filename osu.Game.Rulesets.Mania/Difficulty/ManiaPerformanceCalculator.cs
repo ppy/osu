@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
-        
         private int countPerfect;
         private int countGreat;
         private int countGood;
