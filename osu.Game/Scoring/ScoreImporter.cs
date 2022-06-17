@@ -15,8 +15,6 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Scoring
 {
     public class ScoreImporter : RealmArchiveModelImporter<ScoreInfo>

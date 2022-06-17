@@ -20,8 +20,6 @@ using osu.Game.Users;
 using osu.Game.Utils;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Scoring
 {
     [ExcludeFromDynamicCompile]

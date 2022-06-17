@@ -14,8 +14,6 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Database
 {
     public static class RealmObjectExtensions
