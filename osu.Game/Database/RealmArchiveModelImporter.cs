@@ -13,16 +13,13 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using Realms;
 
-#nullable enable
-
-namespace osu.Game.Stores
+namespace osu.Game.Database
 {
     /// <summary>
     /// Encapsulates a model store class to give it import functionality.
@@ -73,7 +70,7 @@ namespace osu.Game.Stores
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
-        public Action<Notification>? PostNotification { protected get; set; }
+        public Action<Notification>? PostNotification { get; set; }
 
         protected RealmArchiveModelImporter(Storage storage, RealmAccess realm)
         {

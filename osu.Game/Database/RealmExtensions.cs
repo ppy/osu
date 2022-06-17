@@ -4,8 +4,6 @@
 using System;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Database
 {
     public static class RealmExtensions
