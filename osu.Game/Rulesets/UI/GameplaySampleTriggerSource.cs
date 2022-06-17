@@ -56,12 +56,12 @@ namespace osu.Game.Rulesets.UI
             PlaySamples(samples);
         }
 
-        protected void PlaySamples(ISampleInfo[] samples)
+        protected void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
         {
             var hitSound = getNextSample();
             hitSound.Samples = samples;
             hitSound.Play();
-        }
+        });
 
         protected HitObject GetMostValidObject()
         {
