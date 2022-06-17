@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Menu
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
 
-                    Schedule(animateHeart);
+                    Schedule(() => heart?.FlashColour(Color4.White, 750, Easing.OutQuint).Loop());
                 });
 
                 if (supportFlow.IsPresent)
@@ -250,11 +250,6 @@ namespace osu.Game.Screens.Menu
             };
 
             return tips[RNG.Next(0, tips.Length)];
-        }
-
-        private void animateHeart()
-        {
-            heart?.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
     }
 }
