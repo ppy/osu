@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
@@ -26,6 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OngoingOperationTracker operationTracker { get; set; } = null!;
 
+        private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly long? itemToEdit;
 
         private LoadingLayer loadingLayer = null!;
@@ -59,15 +61,32 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             AddInternal(loadingLayer = new LoadingLayer(true));
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            operationInProgress.BindTo(operationTracker.InProgress);
+            operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
+        }
+
+        private void updateLoadingLayer()
+        {
+            if (operationInProgress.Value)
+                loadingLayer.Show();
+            else
+                loadingLayer.Hide();
+        }
+
         protected override void SelectItem(PlaylistItem item)
         {
+            if (operationInProgress.Value)
+                return;
+
             // If the client is already in a room, update via the client.
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
             if (client.Room != null)
             {
                 selectionOperation = operationTracker.BeginOperation();
-
-                loadingLayer.Show();
 
                 var multiplayerItem = new MultiplayerPlaylistItem
                 {
@@ -87,8 +106,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                     Schedule(() =>
                     {
-                        loadingLayer.Hide();
-
                         // If an error or server side trigger occurred this screen may have already exited by external means.
                         if (this.IsCurrentScreen())
                             this.Exit();
@@ -99,7 +116,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                     Schedule(() =>
                     {
-                        loadingLayer.Hide();
                         Carousel.AllowSelection = true;
                     });
                 });
