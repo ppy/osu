@@ -146,16 +146,17 @@ namespace osu.Game.Screens.Menu
                     supportFlow.AddText(" to help support osu!'s development", formatSemiBold);
                 }
 
-                heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
+                supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
+                    heart = t;
+
                     t.Padding = new MarginPadding { Left = 5, Top = 3 };
                     t.Font = t.Font.With(size: 20);
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
-                }).Drawables.First();
 
-                if (IsLoaded)
-                    animateHeart();
+                    Schedule(animateHeart);
+                });
 
                 if (supportFlow.IsPresent)
                     supportFlow.FadeInFromZero(500);
@@ -214,8 +215,6 @@ namespace osu.Game.Screens.Menu
             foreach (var c in textFlow.Children)
                 c.FadeTo(0.001f).Delay(delay += 20).FadeIn(500);
 
-            animateHeart();
-
             this
                 .FadeInFromZero(500)
                 .Then(5500)
@@ -255,7 +254,7 @@ namespace osu.Game.Screens.Menu
 
         private void animateHeart()
         {
-            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
+            heart?.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
     }
 }
