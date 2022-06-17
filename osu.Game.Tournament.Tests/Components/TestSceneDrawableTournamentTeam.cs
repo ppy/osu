@@ -5,7 +5,6 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -26,13 +25,13 @@ namespace osu.Game.Tournament.Tests.Components
                 FullName = { Value = "Australia" },
                 Players =
                 {
-                    new APIUser { Username = "ASecretBox" },
-                    new APIUser { Username = "Dereban" },
-                    new APIUser { Username = "mReKk" },
-                    new APIUser { Username = "uyghti" },
-                    new APIUser { Username = "Parkes" },
-                    new APIUser { Username = "Shiroha" },
-                    new APIUser { Username = "Jordan The Bear" },
+                    new TournamentPlayer { Username = "ASecretBox" },
+                    new TournamentPlayer { Username = "Dereban" },
+                    new TournamentPlayer { Username = "mReKk" },
+                    new TournamentPlayer { Username = "uyghti" },
+                    new TournamentPlayer { Username = "Parkes" },
+                    new TournamentPlayer { Username = "Shiroha" },
+                    new TournamentPlayer { Username = "Jordan The Bear" },
                 }
             };
 

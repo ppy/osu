@@ -27,13 +27,13 @@ namespace osu.Game.Tournament.Tests.Components
             Colour = "f2ca34"
         };
 
-        private readonly APIUser redUser = new APIUser
+        private readonly TournamentPlayer redPlayer = new TournamentPlayer
         {
             Username = "BanchoBot",
             Id = 3,
         };
 
-        private readonly APIUser blueUser = new APIUser
+        private readonly TournamentPlayer bluePlayer = new TournamentPlayer
         {
             Username = "Zallius",
             Id = 4,
@@ -59,11 +59,11 @@ namespace osu.Game.Tournament.Tests.Components
             {
                 Team1 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<APIUser> { redUser } }
+                    Value = new TournamentTeam { Players = new BindableList<TournamentPlayer> { redPlayer } }
                 },
                 Team2 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<APIUser> { blueUser } }
+                    Value = new TournamentTeam { Players = new BindableList<TournamentPlayer> { bluePlayer } }
                 }
             };
 
@@ -82,19 +82,19 @@ namespace osu.Game.Tournament.Tests.Components
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = redUser,
+                Sender = redPlayer.ToUser(),
                 Content = "I am team red."
             }));
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = redUser,
+                Sender = redPlayer.ToUser(),
                 Content = "I plan to win!"
             }));
 
             AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = blueUser,
+                Sender = bluePlayer.ToUser(),
                 Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
             }));
 

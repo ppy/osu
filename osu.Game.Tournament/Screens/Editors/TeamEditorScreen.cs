@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -202,14 +201,14 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 public void CreateNew()
                 {
-                    var user = new APIUser();
-                    team.Players.Add(user);
-                    flow.Add(new PlayerRow(team, user));
+                    var player = new TournamentPlayer();
+                    team.Players.Add(player);
+                    flow.Add(new PlayerRow(team, player));
                 }
 
                 public class PlayerRow : CompositeDrawable
                 {
-                    private readonly APIUser user;
+                    private readonly TournamentPlayer player;
 
                     [Resolved]
                     protected IAPIProvider API { get; private set; }
@@ -217,13 +216,13 @@ namespace osu.Game.Tournament.Screens.Editors
                     [Resolved]
                     private TournamentGameBase game { get; set; }
 
-                    private readonly Bindable<int?> userId = new Bindable<int?>();
+                    private readonly Bindable<int?> playerId = new Bindable<int?>();
 
                     private readonly Container drawableContainer;
 
-                    public PlayerRow(TournamentTeam team, APIUser user)
+                    public PlayerRow(TournamentTeam team, TournamentPlayer player)
                     {
-                        this.user = user;
+                        this.player = player;
 
                         Margin = new MarginPadding(10);
 
@@ -254,7 +253,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "User ID",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Current = userId,
+                                        Current = playerId,
                                     },
                                     drawableContainer = new Container
                                     {
@@ -272,7 +271,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Action = () =>
                                 {
                                     Expire();
-                                    team.Players.Remove(user);
+                                    team.Players.Remove(player);
                                 },
                             }
                         };
@@ -281,27 +280,27 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load()
                     {
-                        userId.Value = user.Id;
-                        userId.BindValueChanged(id =>
+                        playerId.Value = player.Id;
+                        playerId.BindValueChanged(id =>
                         {
-                            user.Id = id.NewValue ?? 0;
+                            player.Id = id.NewValue ?? 0;
 
                             if (id.NewValue != id.OldValue)
-                                user.Username = string.Empty;
+                                player.Username = string.Empty;
 
-                            if (!string.IsNullOrEmpty(user.Username))
+                            if (!string.IsNullOrEmpty(player.Username))
                             {
                                 updatePanel();
                                 return;
                             }
 
-                            game.PopulateUser(user, updatePanel, updatePanel);
+                            game.PopulatePlayer(player, updatePanel, updatePanel);
                         }, true);
                     }
 
                     private void updatePanel()
                     {
-                        drawableContainer.Child = new UserGridPanel(user) { Width = 300 };
+                        drawableContainer.Child = new UserGridPanel(player.ToUser()) { Width = 300 };
                     }
                 }
             }
