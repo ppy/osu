@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.IO;
@@ -154,10 +154,10 @@ namespace osu.Game.Tournament.Tests
             }
         };
 
-        public static APIBeatmap CreateSampleBeatmap() =>
-            new APIBeatmap
+        public static TournamentBeatmap CreateSampleBeatmap() =>
+            new TournamentBeatmap
             {
-                BeatmapSet = new APIBeatmapSet
+                Metadata = new BeatmapMetadata
                 {
                     Title = "Test Title",
                     Artist = "Test Artist",
