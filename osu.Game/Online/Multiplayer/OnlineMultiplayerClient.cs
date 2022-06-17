@@ -202,16 +202,14 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.AddPlaylistItem), item);
         }
 
-        public override async Task EditPlaylistItem(MultiplayerPlaylistItem item)
+        public override Task EditPlaylistItem(MultiplayerPlaylistItem item)
         {
             if (!IsConnected.Value)
-                return;
+                return Task.CompletedTask;
 
             Debug.Assert(connection != null);
 
-            await Task.Delay(10000);
-
-            await connection.InvokeAsync(nameof(IMultiplayerServer.EditPlaylistItem), item);
+            return connection.InvokeAsync(nameof(IMultiplayerServer.EditPlaylistItem), item);
         }
 
         public override Task RemovePlaylistItem(long playlistItemId)
