@@ -10,6 +10,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests.Components
 {
@@ -32,7 +33,7 @@ namespace osu.Game.Tournament.Tests.Components
 
         private void success(APIBeatmap beatmap)
         {
-            Add(new TournamentBeatmapPanel(beatmap)
+            Add(new TournamentBeatmapPanel(new TournamentBeatmap(beatmap))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
