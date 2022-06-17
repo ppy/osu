@@ -11,6 +11,7 @@ using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
@@ -25,8 +26,17 @@ namespace osu.Game.Skinning.Editor
         [Resolved]
         private SkinEditor skinEditor { get; set; }
 
+        /// <summary>
+        /// Whether the <see cref="SkinEditor"/>'s state allows selected blueprints to undergo transformations.
+        /// Used to prevent operations from being performed on unloaded blueprints.
+        /// </summary>
+        private bool allowHandling => skinEditor.State.Value == Visibility.Visible;
+
         public override bool HandleRotation(float angle)
         {
+            if (!allowHandling)
+                return false;
+
             if (SelectedBlueprints.Count == 1)
             {
                 // for single items, rotate around the origin rather than the selection centre.
@@ -53,6 +63,9 @@ namespace osu.Game.Skinning.Editor
 
         public override bool HandleScale(Vector2 scale, Anchor anchor)
         {
+            if (!allowHandling)
+                return false;
+
             // convert scale to screen space
             scale = ToScreenSpace(scale) - ToScreenSpace(Vector2.Zero);
 
@@ -130,6 +143,9 @@ namespace osu.Game.Skinning.Editor
 
         public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
+            if (!allowHandling)
+                return false;
+
             var selectionQuad = getSelectionQuad();
             Vector2 scaleFactor = direction == Direction.Horizontal ? new Vector2(-1, 1) : new Vector2(1, -1);
 
@@ -150,6 +166,9 @@ namespace osu.Game.Skinning.Editor
 
         public override bool HandleMovement(MoveSelectionEvent<ISkinnableDrawable> moveEvent)
         {
+            if (!allowHandling)
+                return false;
+
             foreach (var c in SelectedBlueprints)
             {
                 var item = c.Item;
