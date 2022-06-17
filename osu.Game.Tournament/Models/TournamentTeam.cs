@@ -58,7 +58,7 @@ namespace osu.Game.Tournament.Models
         };
 
         [JsonProperty]
-        public BindableList<TournamentPlayer> Players { get; set; } = new BindableList<TournamentPlayer>();
+        public BindableList<TournamentUser> Players { get; set; } = new BindableList<TournamentUser>();
 
         public TournamentTeam()
         {

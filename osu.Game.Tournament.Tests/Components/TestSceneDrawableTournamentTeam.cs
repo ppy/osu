@@ -25,13 +25,13 @@ namespace osu.Game.Tournament.Tests.Components
                 FullName = { Value = "Australia" },
                 Players =
                 {
-                    new TournamentPlayer { Username = "ASecretBox" },
-                    new TournamentPlayer { Username = "Dereban" },
-                    new TournamentPlayer { Username = "mReKk" },
-                    new TournamentPlayer { Username = "uyghti" },
-                    new TournamentPlayer { Username = "Parkes" },
-                    new TournamentPlayer { Username = "Shiroha" },
-                    new TournamentPlayer { Username = "Jordan The Bear" },
+                    new TournamentUser { Username = "ASecretBox" },
+                    new TournamentUser { Username = "Dereban" },
+                    new TournamentUser { Username = "mReKk" },
+                    new TournamentUser { Username = "uyghti" },
+                    new TournamentUser { Username = "Parkes" },
+                    new TournamentUser { Username = "Shiroha" },
+                    new TournamentUser { Username = "Jordan The Bear" },
                 }
             };
 

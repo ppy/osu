@@ -9,10 +9,10 @@ using osu.Game.Users;
 namespace osu.Game.Tournament.Models
 {
     /// <summary>
-    /// A tournament player, containing simple information about the player.
+    /// A tournament player user, containing simple information about the player.
     /// </summary>
     [Serializable]
-    public class TournamentPlayer : IUser
+    public class TournamentUser : IUser
     {
         [JsonProperty(@"id")]
         public int OnlineID { get; set; }
@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Models
         /// </summary>
         public string CoverUrl { get; set; } = string.Empty;
 
-        public APIUser ToUser()
+        public APIUser ToAPIUser()
         {
             var user = new APIUser
             {

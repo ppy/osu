@@ -201,14 +201,14 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 public void CreateNew()
                 {
-                    var player = new TournamentPlayer();
+                    var player = new TournamentUser();
                     team.Players.Add(player);
                     flow.Add(new PlayerRow(team, player));
                 }
 
                 public class PlayerRow : CompositeDrawable
                 {
-                    private readonly TournamentPlayer player;
+                    private readonly TournamentUser user;
 
                     [Resolved]
                     protected IAPIProvider API { get; private set; }
@@ -220,9 +220,9 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private readonly Container drawableContainer;
 
-                    public PlayerRow(TournamentTeam team, TournamentPlayer player)
+                    public PlayerRow(TournamentTeam team, TournamentUser user)
                     {
-                        this.player = player;
+                        this.user = user;
 
                         Margin = new MarginPadding(10);
 
@@ -271,7 +271,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Action = () =>
                                 {
                                     Expire();
-                                    team.Players.Remove(player);
+                                    team.Players.Remove(user);
                                 },
                             }
                         };
@@ -280,27 +280,27 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load()
                     {
-                        playerId.Value = player.OnlineID;
+                        playerId.Value = user.OnlineID;
                         playerId.BindValueChanged(id =>
                         {
-                            player.OnlineID = id.NewValue ?? 0;
+                            user.OnlineID = id.NewValue ?? 0;
 
                             if (id.NewValue != id.OldValue)
-                                player.Username = string.Empty;
+                                user.Username = string.Empty;
 
-                            if (!string.IsNullOrEmpty(player.Username))
+                            if (!string.IsNullOrEmpty(user.Username))
                             {
                                 updatePanel();
                                 return;
                             }
 
-                            game.PopulatePlayer(player, updatePanel, updatePanel);
+                            game.PopulatePlayer(user, updatePanel, updatePanel);
                         }, true);
                     }
 
                     private void updatePanel()
                     {
-                        drawableContainer.Child = new UserGridPanel(player.ToUser()) { Width = 300 };
+                        drawableContainer.Child = new UserGridPanel(user.ToAPIUser()) { Width = 300 };
                     }
                 }
             }

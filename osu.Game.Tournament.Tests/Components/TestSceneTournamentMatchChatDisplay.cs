@@ -27,13 +27,13 @@ namespace osu.Game.Tournament.Tests.Components
             Colour = "f2ca34"
         };
 
-        private readonly TournamentPlayer redPlayer = new TournamentPlayer
+        private readonly TournamentUser redUser = new TournamentUser
         {
             Username = "BanchoBot",
             OnlineID = 3,
         };
 
-        private readonly TournamentPlayer bluePlayer = new TournamentPlayer
+        private readonly TournamentUser blueUser = new TournamentUser
         {
             Username = "Zallius",
             OnlineID = 4,
@@ -59,11 +59,11 @@ namespace osu.Game.Tournament.Tests.Components
             {
                 Team1 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<TournamentPlayer> { redPlayer } }
+                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { redUser } }
                 },
                 Team2 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<TournamentPlayer> { bluePlayer } }
+                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { blueUser } }
                 }
             };
 
@@ -82,19 +82,19 @@ namespace osu.Game.Tournament.Tests.Components
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = redPlayer.ToUser(),
+                Sender = redUser.ToAPIUser(),
                 Content = "I am team red."
             }));
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = redPlayer.ToUser(),
+                Sender = redUser.ToAPIUser(),
                 Content = "I plan to win!"
             }));
 
             AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = bluePlayer.ToUser(),
+                Sender = blueUser.ToAPIUser(),
                 Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
             }));
 
