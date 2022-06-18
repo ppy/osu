@@ -96,7 +96,7 @@ namespace osu.Game.Tournament.IPC
                                     else
                                     {
                                         beatmapLookupRequest = new GetBeatmapRequest(new APIBeatmap { OnlineID = beatmapId });
-                                        beatmapLookupRequest.Success += b => Beatmap.Value = b;
+                                        beatmapLookupRequest.Success += b => Beatmap.Value = new TournamentBeatmap(b);
                                         API.Queue(beatmapLookupRequest);
                                     }
                                 }

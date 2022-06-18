@@ -42,7 +42,7 @@ namespace osu.Game.Tournament.Tests.Components
                 beatmap.Length = 123456;
                 beatmap.BPM = 133;
 
-                songBar.Beatmap = beatmap;
+                songBar.Beatmap = new TournamentBeatmap(beatmap);
             });
             AddStep("set mods to HR", () => songBar.Mods = LegacyMods.HardRock);
             AddStep("set mods to DT", () => songBar.Mods = LegacyMods.DoubleTime);
