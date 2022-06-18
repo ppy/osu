@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -70,7 +68,7 @@ namespace osu.Game.Overlays.Mods
             Content.Masking = true;
             Content.CornerRadius = CORNER_RADIUS;
             Content.BorderThickness = 2;
-            Content.Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
+            Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
 
             Children = new Drawable[]
             {

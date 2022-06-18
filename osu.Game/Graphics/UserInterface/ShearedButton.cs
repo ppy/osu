@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -68,6 +68,7 @@ namespace osu.Game.Graphics.UserInterface
         private Colour4? lighterColour;
         private Colour4? textColour;
 
+        private readonly Container backgroundLayer;
         private readonly Box flashLayer;
 
         /// <summary>
@@ -85,24 +86,35 @@ namespace osu.Game.Graphics.UserInterface
             Height = 50;
             Padding = new MarginPadding { Horizontal = shear * 50 };
 
-            Content.CornerRadius = 7;
+            const float corner_radius = 7;
+
+            Content.CornerRadius = corner_radius;
             Content.Shear = new Vector2(shear, 0);
             Content.Masking = true;
-            Content.BorderThickness = 2;
             Content.Anchor = Content.Origin = Anchor.Centre;
 
             Children = new Drawable[]
             {
-                background = new Box
+                backgroundLayer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both
-                },
-                text = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.TorusAlternate.With(size: 17),
-                    Shear = new Vector2(-shear, 0)
+                    RelativeSizeAxes = Axes.Both,
+                    CornerRadius = corner_radius,
+                    Masking = true,
+                    BorderThickness = 2,
+                    Children = new Drawable[]
+                    {
+                        background = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        text = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.TorusAlternate.With(size: 17),
+                            Shear = new Vector2(-shear, 0)
+                        },
+                    }
                 },
                 flashLayer = new Box
                 {
@@ -186,7 +198,7 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             background.FadeColour(colourDark, 150, Easing.OutQuint);
-            Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(colourDark, colourLight), 150, Easing.OutQuint);
+            backgroundLayer.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(colourDark, colourLight), 150, Easing.OutQuint);
 
             if (!Enabled.Value)
                 colourText = colourText.Opacity(0.6f);

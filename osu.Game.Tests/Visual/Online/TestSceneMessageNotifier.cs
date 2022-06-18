@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -43,7 +46,7 @@ namespace osu.Game.Tests.Visual.Online
 
             Schedule(() =>
             {
-                Child = testContainer = new TestContainer(new[] { publicChannel, privateMessageChannel })
+                Child = testContainer = new TestContainer(API, new[] { publicChannel, privateMessageChannel })
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
@@ -178,6 +181,36 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("1 notification fired", () => testContainer.NotificationOverlay.UnreadCount.Value == 1);
         }
 
+        /// <summary>
+        /// Ensures that <see cref="MessageNotifier"/> handles channels which have not been or could not be resolved (i.e. <see cref="Channel.Id"/> = 0).
+        /// </summary>
+        [Test]
+        public void TestSendInUnresolvedChannel()
+        {
+            int i = 1;
+            Channel unresolved = null;
+
+            AddRepeatStep("join unresolved channels", () => testContainer.ChannelManager.JoinChannel(unresolved = new Channel(new APIUser
+            {
+                Id = 100 + i,
+                Username = $"Foreign #{i++}",
+            })), 5);
+
+            AddStep("send message in unresolved channel", () =>
+            {
+                Debug.Assert(unresolved.Id == 0);
+
+                unresolved.AddLocalEcho(new LocalEchoMessage
+                {
+                    Sender = API.LocalUser.Value,
+                    ChannelId = unresolved.Id,
+                    Content = "Some message",
+                });
+            });
+
+            AddAssert("no notifications fired", () => testContainer.NotificationOverlay.UnreadCount.Value == 0);
+        }
+
         private void receiveMessage(APIUser sender, Channel channel, string content) => channel.AddNewMessages(createMessage(sender, channel, content));
 
         private Message createMessage(APIUser sender, Channel channel, string content) => new Message(messageIdCounter++)
@@ -198,7 +231,7 @@ namespace osu.Game.Tests.Visual.Online
         private class TestContainer : Container
         {
             [Cached]
-            public ChannelManager ChannelManager { get; } = new ChannelManager();
+            public ChannelManager ChannelManager { get; }
 
             [Cached(typeof(INotificationOverlay))]
             public NotificationOverlay NotificationOverlay { get; } = new NotificationOverlay
@@ -214,9 +247,10 @@ namespace osu.Game.Tests.Visual.Online
 
             private readonly Channel[] channels;
 
-            public TestContainer(Channel[] channels)
+            public TestContainer(IAPIProvider api, Channel[] channels)
             {
                 this.channels = channels;
+                ChannelManager = new ChannelManager(api);
             }
 
             [BackgroundDependencyLoader]

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -15,7 +17,7 @@ namespace osu.Game.Localisation
         public static LocalisableString JoystickGamepad => new TranslatableString(getKey(@"joystick_gamepad"), @"Joystick / Gamepad");
 
         /// <summary>
-        /// "Deadzone Threshold"
+        /// "Deadzone"
         /// </summary>
         public static LocalisableString DeadzoneThreshold => new TranslatableString(getKey(@"deadzone_threshold"), @"Deadzone");
 

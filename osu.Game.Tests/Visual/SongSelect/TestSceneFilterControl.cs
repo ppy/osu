@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -151,10 +153,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
 
-            AddStep("add beatmap to collection", () => collectionManager.Collections[0].Beatmaps.Add(Beatmap.Value.BeatmapInfo));
+            AddStep("add beatmap to collection", () => collectionManager.Collections[0].BeatmapHashes.Add(Beatmap.Value.BeatmapInfo.MD5Hash));
             AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
 
-            AddStep("remove beatmap from collection", () => collectionManager.Collections[0].Beatmaps.Clear());
+            AddStep("remove beatmap from collection", () => collectionManager.Collections[0].BeatmapHashes.Clear());
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
         }
 
@@ -169,11 +171,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
 
             addClickAddOrRemoveButtonStep(1);
-            AddAssert("collection contains beatmap", () => collectionManager.Collections[0].Beatmaps.Contains(Beatmap.Value.BeatmapInfo));
+            AddAssert("collection contains beatmap", () => collectionManager.Collections[0].BeatmapHashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
 
             addClickAddOrRemoveButtonStep(1);
-            AddAssert("collection does not contain beatmap", () => !collectionManager.Collections[0].Beatmaps.Contains(Beatmap.Value.BeatmapInfo));
+            AddAssert("collection does not contain beatmap", () => !collectionManager.Collections[0].BeatmapHashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
         }
 

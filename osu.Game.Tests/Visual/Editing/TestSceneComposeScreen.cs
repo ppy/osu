@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -9,6 +11,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -47,6 +50,7 @@ namespace osu.Game.Tests.Visual.Editing
                     {
                         (typeof(EditorBeatmap), editorBeatmap),
                         (typeof(IBeatSnapProvider), editorBeatmap),
+                        (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Green)),
                     },
                     Child = new ComposeScreen { State = { Value = Visibility.Visible } },
                 };

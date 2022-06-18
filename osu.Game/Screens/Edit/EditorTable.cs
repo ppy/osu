@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -97,6 +99,15 @@ namespace osu.Game.Screens.Edit
             {
                 hoveredBackground.Colour = colourHover = colours.Background1;
                 colourSelected = colours.Colour3;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                // Reduce flicker of rows when offset is being changed rapidly.
+                // Probably need to reconsider this.
+                FinishTransforms(true);
             }
 
             private bool selected;

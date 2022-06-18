@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,12 +65,13 @@ namespace osu.Game.Online.API
 
         public virtual void Queue(APIRequest request)
         {
-            if (HandleRequest?.Invoke(request) != true)
+            Schedule(() =>
             {
-                // this will fail due to not receiving an APIAccess, and trigger a failure on the request.
-                // this is intended - any request in testing that needs non-failures should use HandleRequest.
-                request.Perform(this);
-            }
+                if (HandleRequest?.Invoke(request) != true)
+                {
+                    request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} cannot process this request."));
+                }
+            });
         }
 
         public void Perform(APIRequest request) => HandleRequest?.Invoke(request);

@@ -15,8 +15,6 @@ using osu.Game.IO;
 using osu.Game.Models;
 using osu.Game.Rulesets;
 
-#nullable enable
-
 namespace osu.Game.Tests.Database
 {
     [TestFixture]

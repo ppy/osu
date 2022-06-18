@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -114,9 +116,9 @@ namespace osu.Game.Rulesets.Edit
                                               .WithChild(BlueprintContainer = CreateBlueprintContainer())
                     }
                 },
-                new ExpandingToolboxContainer(80, 200)
+                new ExpandingToolboxContainer(90, 200)
                 {
-                    Padding = new MarginPadding { Left = 10 },
+                    Padding = new MarginPadding(10),
                     Children = new Drawable[]
                     {
                         new EditorToolboxGroup("toolbox (1-9)")

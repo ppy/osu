@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,7 +26,6 @@ using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
-using osu.Game.Stores;
 using Realms;
 using Realms.Exceptions;
 
@@ -392,7 +389,7 @@ namespace osu.Game.Database
         {
             total_writes_async.Value++;
             using (var realm = getRealmInstance())
-                await realm.WriteAsync(action);
+                await realm.WriteAsync(() => action(realm));
         }
 
         /// <summary>
@@ -751,9 +748,9 @@ namespace osu.Game.Database
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
-        public void CreateBackup(string backupFilename)
+        public void CreateBackup(string backupFilename, IDisposable? blockAllOperations = null)
         {
-            using (BlockAllOperations())
+            using (blockAllOperations ?? BlockAllOperations())
             {
                 Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
 
@@ -763,7 +760,7 @@ namespace osu.Game.Database
                 {
                     try
                     {
-                        using (var source = storage.GetStream(Filename))
+                        using (var source = storage.GetStream(Filename, mode: FileMode.Open))
                         using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
                             source.CopyTo(destination);
                         return;

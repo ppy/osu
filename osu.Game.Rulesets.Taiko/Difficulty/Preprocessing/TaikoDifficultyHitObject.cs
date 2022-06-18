@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
@@ -25,11 +28,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public readonly HitType? HitType;
 
         /// <summary>
-        /// The index of the object in the beatmap.
-        /// </summary>
-        public readonly int ObjectIndex;
-
-        /// <summary>
         /// Whether the object should carry a penalty due to being hittable using special techniques
         /// making it easier to do so.
         /// </summary>
@@ -42,16 +40,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="lastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="hitObject"/>.</param>
         /// <param name="lastLastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="lastObject"/>.</param>
         /// <param name="clockRate">The rate of the gameplay clock. Modified by speed-changing mods.</param>
-        /// <param name="objectIndex">The index of the object in the beatmap.</param>
-        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, int objectIndex)
-            : base(hitObject, lastObject, clockRate)
+        /// <param name="objects">The list of <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
+        /// /// <param name="index">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
+        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+            : base(hitObject, lastObject, clockRate, objects, index)
         {
             var currentHit = hitObject as Hit;
 
             Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRate);
             HitType = currentHit?.Type;
-
-            ObjectIndex = objectIndex;
         }
 
         /// <summary>

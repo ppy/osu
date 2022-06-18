@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -175,6 +177,11 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorTimingMode => new TranslatableString(getKey(@"editor_timing_mode"), @"Timing mode");
 
         /// <summary>
+        /// "Tap for BPM"
+        /// </summary>
+        public static LocalisableString EditorTapForBPM => new TranslatableString(getKey(@"editor_tap_for_bpm"), @"Tap for BPM");
+
+        /// <summary>
         /// "Cycle grid display mode"
         /// </summary>
         public static LocalisableString EditorCycleGridDisplayMode => new TranslatableString(getKey(@"editor_cycle_grid_display_mode"), @"Cycle grid display mode");
@@ -205,7 +212,7 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleInGameInterface => new TranslatableString(getKey(@"toggle_in_game_interface"), @"Toggle in-game interface");
 
         /// <summary>
-        /// "Toggle Mod Select"
+        /// "Toggle mod select"
         /// </summary>
         public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle mod select");
 
@@ -294,6 +301,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ToggleChatFocus => new TranslatableString(getKey(@"toggle_chat_focus"), @"Toggle chat focus");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

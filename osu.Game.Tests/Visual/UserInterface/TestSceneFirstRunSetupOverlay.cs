@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -185,7 +187,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("step to next", () => overlay.NextButton.TriggerClick());
 
-            AddAssert("is at known screen", () => overlay.CurrentScreen is ScreenBeatmaps);
+            AddAssert("is at known screen", () => overlay.CurrentScreen is ScreenUIScale);
 
             AddStep("hide", () => overlay.Hide());
             AddAssert("overlay hidden", () => overlay.State.Value == Visibility.Hidden);
@@ -195,7 +197,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("run notification action", () => lastNotification.Activated());
 
             AddAssert("overlay shown", () => overlay.State.Value == Visibility.Visible);
-            AddAssert("is resumed", () => overlay.CurrentScreen is ScreenBeatmaps);
+            AddAssert("is resumed", () => overlay.CurrentScreen is ScreenUIScale);
         }
 
         // interface mocks break hot reload, mocking this stub implementation instead works around it.

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,6 +98,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         #region User Input Handling
+
+        /// <remarks>
+        /// Positional input must be received outside the container's bounds,
+        /// in order to handle blueprints which are partially offscreen.
+        /// </remarks>
+        /// <seealso cref="BlueprintContainer{T}.ReceivePositionalInputAt"/>
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         /// <summary>
         /// Handles the selected items being moved.

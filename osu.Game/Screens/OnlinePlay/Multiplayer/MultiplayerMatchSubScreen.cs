@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -40,6 +42,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public override string Title { get; }
 
         public override string ShortTitle => "room";
+
+        protected override bool PlayExitSound => !exitConfirmed;
 
         [Resolved]
         private MultiplayerClient client { get; set; }

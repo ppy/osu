@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -26,6 +28,8 @@ namespace osu.Game.Rulesets.Edit
     public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider, IScrollBindingHandler<GlobalAction>
         where TObject : HitObject
     {
+        private const float adjust_step = 0.1f;
+
         public Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
         {
             MinValue = 0.1,
@@ -52,7 +56,7 @@ namespace osu.Game.Rulesets.Edit
         {
             AddInternal(RightSideToolboxContainer = new ExpandingToolboxContainer(130, 250)
             {
-                Padding = new MarginPadding { Right = 10 },
+                Padding = new MarginPadding(10),
                 Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -61,7 +65,7 @@ namespace osu.Game.Rulesets.Edit
                     Child = distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
                     {
                         Current = { BindTarget = DistanceSpacingMultiplier },
-                        KeyboardStep = 0.1f,
+                        KeyboardStep = adjust_step,
                     }
                 }
             });
@@ -93,7 +97,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 case GlobalAction.EditorIncreaseDistanceSpacing:
                 case GlobalAction.EditorDecreaseDistanceSpacing:
-                    return adjustDistanceSpacing(e.Action, 0.1f);
+                    return adjustDistanceSpacing(e.Action, adjust_step);
             }
 
             return false;
@@ -109,7 +113,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 case GlobalAction.EditorIncreaseDistanceSpacing:
                 case GlobalAction.EditorDecreaseDistanceSpacing:
-                    return adjustDistanceSpacing(e.Action, e.ScrollAmount * (e.IsPrecise ? 0.01f : 0.1f));
+                    return adjustDistanceSpacing(e.Action, e.ScrollAmount * adjust_step);
             }
 
             return false;

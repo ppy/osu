@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -9,11 +12,16 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Database;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
@@ -24,26 +32,62 @@ namespace osu.Game.Overlays.Dashboard
 {
     internal class CurrentlyPlayingDisplay : CompositeDrawable
     {
+        private const float search_textbox_height = 40;
+        private const float padding = 10;
+
         private readonly IBindableList<int> playingUsers = new BindableList<int>();
 
-        private FillFlowContainer<PlayingUserPanel> userFlow;
+        private SearchContainer<PlayingUserPanel> userFlow;
+        private BasicSearchTextBox searchTextBox;
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = userFlow = new FillFlowContainer<PlayingUserPanel>
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Padding = new MarginPadding(10),
-                Spacing = new Vector2(10),
+                new Box
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = padding * 2 + search_textbox_height,
+                    Colour = colourProvider.Background4,
+                },
+                new Container<BasicSearchTextBox>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Padding = new MarginPadding(padding),
+                    Child = searchTextBox = new BasicSearchTextBox
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Height = search_textbox_height,
+                        ReleaseFocusOnCommit = false,
+                        HoldFocus = true,
+                        PlaceholderText = HomeStrings.SearchPlaceholder,
+                    },
+                },
+                userFlow = new SearchContainer<PlayingUserPanel>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(10),
+                    Padding = new MarginPadding
+                    {
+                        Top = padding * 3 + search_textbox_height,
+                        Bottom = padding,
+                        Right = padding,
+                        Left = padding,
+                    },
+                },
             };
+
+            searchTextBox.Current.ValueChanged += text => userFlow.SearchTerm = text.NewValue;
         }
 
         [Resolved]
@@ -55,6 +99,13 @@ namespace osu.Game.Overlays.Dashboard
 
             playingUsers.BindTo(spectatorClient.PlayingUsers);
             playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
+        }
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+
+            searchTextBox.TakeFocus();
         }
 
         private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
@@ -102,16 +153,33 @@ namespace osu.Game.Overlays.Dashboard
                 panel.Origin = Anchor.TopCentre;
             });
 
-        private class PlayingUserPanel : CompositeDrawable
+        public class PlayingUserPanel : CompositeDrawable, IFilterable
         {
             public readonly APIUser User;
+
+            public IEnumerable<LocalisableString> FilterTerms { get; }
 
             [Resolved(canBeNull: true)]
             private IPerformFromScreenRunner performer { get; set; }
 
+            public bool FilteringActive { set; get; }
+
+            public bool MatchingFilter
+            {
+                set
+                {
+                    if (value)
+                        Show();
+                    else
+                        Hide();
+                }
+            }
+
             public PlayingUserPanel(APIUser user)
             {
                 User = user;
+
+                FilterTerms = new LocalisableString[] { User.Username };
 
                 AutoSizeAxes = Axes.Both;
             }

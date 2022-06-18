@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -173,6 +175,8 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddUntilStep("wait for scores loaded", () =>
                 requestComplete
+                // request handler may need to fire more than once to get scores.
+                && totalCount > 0
                 && resultsScreen.ScorePanelList.GetScorePanels().Count() == totalCount
                 && resultsScreen.ScorePanelList.AllPanelsVisible);
             AddWaitStep("wait for display", 5);

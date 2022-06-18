@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -28,6 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private SettingsButton deleteSkinsButton;
         private SettingsButton restoreButton;
         private SettingsButton undeleteButton;
+        private SettingsButton deleteBeatmapVideosButton;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] LegacyImportManager legacyImportManager, IDialogOverlay dialogOverlay)
@@ -54,6 +57,19 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         deleteBeatmapsButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Delete()).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
+                    }));
+                }
+            });
+
+            Add(deleteBeatmapVideosButton = new DangerousSettingsButton
+            {
+                Text = MaintenanceSettingsStrings.DeleteAllBeatmapVideos,
+                Action = () =>
+                {
+                    dialogOverlay?.Push(new MassVideoDeleteConfirmationDialog(() =>
+                    {
+                        deleteBeatmapVideosButton.Enabled.Value = false;
+                        Task.Run(beatmaps.DeleteAllVideos).ContinueWith(t => Schedule(() => deleteBeatmapVideosButton.Enabled.Value = true));
                     }));
                 }
             });

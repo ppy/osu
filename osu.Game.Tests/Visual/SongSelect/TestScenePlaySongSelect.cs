@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +20,7 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -78,6 +81,37 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddStep("delete all beatmaps", () => manager?.Delete());
+        }
+
+        [Test]
+        public void TestPlaceholderBeatmapPresence()
+        {
+            createSongSelect();
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            addRulesetImportStep(0);
+            AddUntilStep("wait for placeholder hidden", () => getPlaceholder()?.State.Value == Visibility.Hidden);
+
+            AddStep("delete all beatmaps", () => manager?.Delete());
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestPlaceholderConvertSetting()
+        {
+            changeRuleset(2);
+            addRulesetImportStep(0);
+            AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            createSongSelect();
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            AddStep("click link in placeholder", () => getPlaceholder().ChildrenOfType<DrawableLinkCompiler>().First().TriggerClick());
+
+            AddUntilStep("convert setting changed", () => config.Get<bool>(OsuSetting.ShowConvertedBeatmaps));
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -940,6 +974,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         private int getBeatmapIndex(BeatmapSetInfo set, BeatmapInfo info) => set.Beatmaps.IndexOf(info);
+
+        private NoResultsPlaceholder getPlaceholder() => songSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
 
         private int getCurrentBeatmapIndex() => getBeatmapIndex(songSelect.Carousel.SelectedBeatmapSet, songSelect.Carousel.SelectedBeatmapInfo);
 

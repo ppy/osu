@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -30,8 +32,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class ComposeBlueprintContainer : EditorBlueprintContainer
     {
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
         protected new EditorSelectionHandler SelectionHandler => (EditorSelectionHandler)base.SelectionHandler;

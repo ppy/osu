@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -189,6 +192,24 @@ namespace osu.Game.Graphics
         }
 
         /// <summary>
+        /// Retrieves the main accent colour for a <see cref="RoomCategory"/>.
+        /// </summary>
+        public Color4? ForRoomCategory(RoomCategory roomCategory)
+        {
+            switch (roomCategory)
+            {
+                case RoomCategory.Spotlight:
+                    return SpotlightColour;
+
+                case RoomCategory.FeaturedArtist:
+                    return FeaturedArtistColour;
+
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
         /// Returns a foreground text colour that is supposed to contrast well with
         /// the supplied <paramref name="backgroundColour"/>.
         /// </summary>
@@ -360,5 +381,8 @@ namespace osu.Game.Graphics
         public readonly Color4 ChatBlue = Color4Extensions.FromHex(@"17292e");
 
         public readonly Color4 ContextMenuGray = Color4Extensions.FromHex(@"223034");
+
+        public Color4 SpotlightColour => Green2;
+        public Color4 FeaturedArtistColour => Blue2;
     }
 }

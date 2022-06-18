@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Runtime.Versioning;
@@ -112,6 +114,9 @@ namespace osu.Desktop
             SquirrelAwareApp.HandleEvents(onInitialInstall: (version, tools) =>
             {
                 tools.CreateShortcutForThisExe();
+                tools.CreateUninstallerRegistryEntry();
+            }, onAppUpdate: (version, tools) =>
+            {
                 tools.CreateUninstallerRegistryEntry();
             }, onAppUninstall: (version, tools) =>
             {

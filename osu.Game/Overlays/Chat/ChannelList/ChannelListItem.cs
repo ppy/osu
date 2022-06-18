@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -15,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays.Chat.Listing;
 using osu.Game.Users.Drawables;
 using osuTK;
 
@@ -34,7 +33,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         private Box hoverBox = null!;
         private Box selectBox = null!;
         private OsuSpriteText text = null!;
-        private ChannelListItemCloseButton close = null!;
+        private ChannelListItemCloseButton? close;
 
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
@@ -83,7 +82,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         },
                         Content = new[]
                         {
-                            new[]
+                            new Drawable?[]
                             {
                                 createIcon(),
                                 text = new OsuSpriteText
@@ -97,20 +96,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     RelativeSizeAxes = Axes.X,
                                     Truncate = true,
                                 },
-                                new ChannelListItemMentionPill
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Margin = new MarginPadding { Right = 3 },
-                                    Mentions = { BindTarget = Mentions },
-                                },
-                                close = new ChannelListItemCloseButton
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Margin = new MarginPadding { Right = 3 },
-                                    Action = () => OnRequestLeave?.Invoke(Channel),
-                                }
+                                createMentionPill(),
+                                close = createCloseButton(),
                             }
                         },
                     },
@@ -131,21 +118,23 @@ namespace osu.Game.Overlays.Chat.ChannelList
         protected override bool OnHover(HoverEvent e)
         {
             hoverBox.FadeIn(300, Easing.OutQuint);
-            close.FadeIn(300, Easing.OutQuint);
+            close?.FadeIn(300, Easing.OutQuint);
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             hoverBox.FadeOut(200, Easing.OutQuint);
-            close.FadeOut(200, Easing.OutQuint);
+            close?.FadeOut(200, Easing.OutQuint);
+
             base.OnHoverLost(e);
         }
 
-        private Drawable createIcon()
+        private UpdateableAvatar? createIcon()
         {
             if (Channel.Type != ChannelType.PM)
-                return Drawable.Empty();
+                return null;
 
             return new UpdateableAvatar(Channel.Users.First(), isInteractive: false)
             {
@@ -155,6 +144,34 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 Origin = Anchor.CentreLeft,
                 CornerRadius = 10,
                 Masking = true,
+            };
+        }
+
+        private ChannelListItemMentionPill? createMentionPill()
+        {
+            if (isSelector)
+                return null;
+
+            return new ChannelListItemMentionPill
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Margin = new MarginPadding { Right = 3 },
+                Mentions = { BindTarget = Mentions },
+            };
+        }
+
+        private ChannelListItemCloseButton? createCloseButton()
+        {
+            if (isSelector)
+                return null;
+
+            return new ChannelListItemCloseButton
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Margin = new MarginPadding { Right = 3 },
+                Action = () => OnRequestLeave?.Invoke(Channel),
             };
         }
 
@@ -172,5 +189,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             else
                 text.FadeColour(colourProvider.Light3, 200, Easing.OutQuint);
         }
+
+        private bool isSelector => Channel is ChannelListing.ChannelListingChannel;
     }
 }

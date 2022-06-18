@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Database;
 
@@ -27,7 +30,7 @@ namespace osu.Game.Screens.Play
     /// <remarks>
     /// This is intended to be used as a single controller for gameplay, or as a reference source for other <see cref="GameplayClockContainer"/>s.
     /// </remarks>
-    public class MasterGameplayClockContainer : GameplayClockContainer
+    public class MasterGameplayClockContainer : GameplayClockContainer, IBeatSyncProvider
     {
         /// <summary>
         /// Duration before gameplay start time required before skip button displays.
@@ -249,6 +252,10 @@ namespace osu.Game.Screens.Play
             beatmapOffsetSubscription?.Dispose();
             removeSourceClockAdjustments();
         }
+
+        ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;
+        IClock IBeatSyncProvider.Clock => GameplayClock;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
         {

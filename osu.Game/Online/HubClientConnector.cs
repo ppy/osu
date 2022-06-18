@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -20,6 +18,8 @@ namespace osu.Game.Online
 {
     public class HubClientConnector : IHubClientConnector
     {
+        public const string SERVER_SHUTDOWN_MESSAGE = "Server is shutting down.";
+
         /// <summary>
         /// Invoked whenever a new hub connection is built, to configure it before it's started.
         /// </summary>
@@ -64,20 +64,28 @@ namespace osu.Game.Online
             this.preferMessagePack = preferMessagePack;
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(state =>
-            {
-                switch (state.NewValue)
-                {
-                    case APIState.Failing:
-                    case APIState.Offline:
-                        Task.Run(() => disconnect(true));
-                        break;
+            apiState.BindValueChanged(state => connectIfPossible(), true);
+        }
 
-                    case APIState.Online:
-                        Task.Run(connect);
-                        break;
-                }
-            }, true);
+        public void Reconnect()
+        {
+            Logger.Log($"{clientName} reconnecting...", LoggingTarget.Network);
+            Task.Run(connectIfPossible);
+        }
+
+        private void connectIfPossible()
+        {
+            switch (apiState.Value)
+            {
+                case APIState.Failing:
+                case APIState.Offline:
+                    Task.Run(() => disconnect(true));
+                    break;
+
+                case APIState.Online:
+                    Task.Run(connect);
+                    break;
+            }
         }
 
         private async Task connect()

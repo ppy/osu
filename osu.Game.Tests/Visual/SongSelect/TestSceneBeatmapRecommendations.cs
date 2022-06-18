@@ -1,16 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
@@ -23,38 +24,28 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneBeatmapRecommendations : OsuGameTestScene
     {
+        [Resolved]
+        private IRulesetStore rulesetStore { get; set; }
+
         [SetUpSteps]
         public override void SetUpSteps()
         {
-            AddStep("register request handling", () =>
-            {
-                ((DummyAPIAccess)API).HandleRequest = req =>
-                {
-                    switch (req)
-                    {
-                        case GetUserRequest userRequest:
-                            userRequest.TriggerSuccess(getUser(userRequest.Ruleset.OnlineID));
-                            return true;
-                    }
-
-                    return false;
-                };
-            });
-
             base.SetUpSteps();
 
-            APIUser getUser(int? rulesetID)
+            AddStep("populate ruleset statistics", () =>
             {
-                return new APIUser
+                Dictionary<string, UserStatistics> rulesetStatistics = new Dictionary<string, UserStatistics>();
+
+                rulesetStore.AvailableRulesets.Where(ruleset => ruleset.IsLegacyRuleset()).ForEach(rulesetInfo =>
                 {
-                    Username = @"Dummy",
-                    Id = 1001,
-                    Statistics = new UserStatistics
+                    rulesetStatistics[rulesetInfo.ShortName] = new UserStatistics
                     {
-                        PP = getNecessaryPP(rulesetID)
-                    }
-                };
-            }
+                        PP = getNecessaryPP(rulesetInfo.OnlineID)
+                    };
+                });
+
+                API.LocalUser.Value.RulesetsStatistics = rulesetStatistics;
+            });
 
             decimal getNecessaryPP(int? rulesetID)
             {

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
 
@@ -11,6 +13,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// </summary>
     public interface ISpectatorPlayerClock : IFrameBasedClock, IAdjustableClock
     {
+        /// <summary>
+        /// Starts this <see cref="ISpectatorPlayerClock"/>.
+        /// </summary>
+        new void Start();
+
+        /// <summary>
+        /// Stops this <see cref="ISpectatorPlayerClock"/>.
+        /// </summary>
+        new void Stop();
+
         /// <summary>
         /// Whether this clock is waiting on frames to continue playback.
         /// </summary>
