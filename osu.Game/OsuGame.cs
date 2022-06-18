@@ -637,6 +637,12 @@ namespace osu.Game
             Add(performFromMainMenuTask = new PerformFromMenuRunner(action, validScreens, () => ScreenStack.CurrentScreen));
         }
 
+        public override void GracefullyExit()
+        {
+            // Using PerformFromScreen gives the user a chance to interrupt the exit process if needed.
+            PerformFromScreen(menu => menu.Exit());
+        }
+
         /// <summary>
         /// Wait for the game (and target component) to become loaded and then run an action.
         /// </summary>
