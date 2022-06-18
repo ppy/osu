@@ -10,8 +10,6 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 
-#nullable enable
-
 namespace osu.Game.Rulesets
 {
     public abstract class RulesetStore : IDisposable, IRulesetStore

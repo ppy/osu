@@ -16,8 +16,6 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Skinning
 {
     public class SkinImporter : RealmArchiveModelImporter<SkinInfo>

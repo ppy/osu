@@ -7,8 +7,6 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Database;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Input.Bindings
 {
     [MapTo(nameof(KeyBinding))]
