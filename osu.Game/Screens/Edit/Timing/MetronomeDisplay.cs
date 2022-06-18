@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -14,6 +15,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
@@ -36,6 +38,9 @@ namespace osu.Game.Screens.Edit.Timing
         private IAdjustableClock metronomeClock;
 
         private Sample clunk;
+
+        [CanBeNull]
+        private ScheduledDelegate clunkDelegate;
 
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; }
@@ -258,6 +263,9 @@ namespace osu.Game.Screens.Edit.Timing
                 }
 
                 isSwinging = false;
+
+                clunkDelegate?.Cancel();
+                clunkDelegate = null;
             }
         }
 
@@ -283,7 +291,7 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     stick.FlashColour(overlayColourProvider.Content1, beatLength, Easing.OutQuint);
 
-                    Schedule(() =>
+                    clunkDelegate = Schedule(() =>
                     {
                         if (!EnableClicking)
                             return;
