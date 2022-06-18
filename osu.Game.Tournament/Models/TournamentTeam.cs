@@ -1,11 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tournament.Models
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Tournament.Models
         {
             get
             {
-                int[] ranks = Players.Select(p => p.Statistics?.GlobalRank)
+                int[] ranks = Players.Select(p => p.Rank)
                                      .Where(i => i.HasValue)
                                      .Select(i => i.Value)
                                      .ToArray();
@@ -57,7 +58,7 @@ namespace osu.Game.Tournament.Models
         };
 
         [JsonProperty]
-        public BindableList<APIUser> Players { get; set; } = new BindableList<APIUser>();
+        public BindableList<TournamentUser> Players { get; set; } = new BindableList<TournamentUser>();
 
         public TournamentTeam()
         {

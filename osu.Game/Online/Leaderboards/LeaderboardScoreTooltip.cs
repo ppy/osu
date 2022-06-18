@@ -14,8 +14,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 
-#nullable enable
-
 namespace osu.Game.Online.Leaderboards
 {
     public class LeaderboardScoreTooltip : VisibilityContainer, ITooltip<ScoreInfo>

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -234,28 +236,6 @@ namespace osu.Game
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
             Decoder.RegisterDependencies(RulesetStore);
-
-            // Backup is taken here rather than in EFToRealmMigrator to avoid recycling realm contexts
-            // after initial usages below. It can be moved once a direction is established for handling re-subscription.
-            // See https://github.com/ppy/osu/pull/16547 for more discussion.
-            if (EFContextFactory != null)
-            {
-                const string backup_folder = "backups";
-
-                string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-
-                EFContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.db"));
-                realm.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.realm"));
-
-                using (var source = Storage.GetStream("collection.db"))
-                {
-                    if (source != null)
-                    {
-                        using (var destination = Storage.CreateFileSafely(Path.Combine(backup_folder, $"collection.{migration}.db")))
-                            source.CopyTo(destination);
-                    }
-                }
-            }
 
             dependencies.CacheAs(Storage);
 
