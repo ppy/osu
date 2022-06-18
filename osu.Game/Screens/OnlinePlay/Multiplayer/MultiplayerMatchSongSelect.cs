@@ -75,10 +75,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 loadingLayer.Hide();
         }
 
-        protected override void SelectItem(PlaylistItem item)
+        protected override bool SelectItem(PlaylistItem item)
         {
             if (operationInProgress.Value)
-                return;
+                return false;
 
             // If the client is already in a room, update via the client.
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
@@ -124,6 +124,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Playlist.Add(item);
                 this.Exit();
             }
+
+            return true;
         }
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
