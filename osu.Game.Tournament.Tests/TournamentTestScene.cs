@@ -15,8 +15,6 @@ using osu.Game.Tests.Visual;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
-using osu.Game.Users;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tournament.Tests
 {
@@ -123,11 +121,11 @@ namespace osu.Game.Tournament.Tests
                     },
                     Players =
                     {
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 12 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 16 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 20 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 24 } },
-                        new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 30 } },
+                        new TournamentUser { Username = "Hello", Rank = 12 },
+                        new TournamentUser { Username = "Hello", Rank = 16 },
+                        new TournamentUser { Username = "Hello", Rank = 20 },
+                        new TournamentUser { Username = "Hello", Rank = 24 },
+                        new TournamentUser { Username = "Hello", Rank = 30 },
                     }
                 }
             },
@@ -140,11 +138,11 @@ namespace osu.Game.Tournament.Tests
                     FullName = { Value = "United States" },
                     Players =
                     {
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
-                        new APIUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
                     }
                 }
             },
