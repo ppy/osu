@@ -22,7 +22,6 @@ using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osuTK.Input;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tournament
 {
@@ -187,9 +186,7 @@ namespace osu.Game.Tournament
         {
             var playersRequiringPopulation = ladder.Teams
                                                    .SelectMany(t => t.Players)
-                                                   .Where(p => string.IsNullOrEmpty(p.Username)
-                                                               || p.Statistics?.GlobalRank == null
-                                                               || p.Statistics?.CountryRank == null).ToList();
+                                                   .Where(p => string.IsNullOrEmpty(p.Username) || p.Rank == null).ToList();
 
             if (playersRequiringPopulation.Count == 0)
                 return false;
@@ -197,7 +194,7 @@ namespace osu.Game.Tournament
             for (int i = 0; i < playersRequiringPopulation.Count; i++)
             {
                 var p = playersRequiringPopulation[i];
-                PopulateUser(p, immediate: true);
+                PopulatePlayer(p, immediate: true);
                 updateLoadProgressMessage($"Populating user stats ({i} / {playersRequiringPopulation.Count})");
             }
 
@@ -211,7 +208,7 @@ namespace osu.Game.Tournament
         {
             var beatmapsRequiringPopulation = ladder.Rounds
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => string.IsNullOrEmpty(b.Beatmap?.BeatmapSet?.Title) && b.ID > 0).ToList();
+                                                    .Where(b => b.Beatmap?.OnlineID == 0 && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -222,7 +219,7 @@ namespace osu.Game.Tournament
 
                 var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
                 API.Perform(req);
-                b.Beatmap = req.Response ?? new APIBeatmap();
+                b.Beatmap = new TournamentBeatmap(req.Response ?? new APIBeatmap());
 
                 updateLoadProgressMessage($"Populating round beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -238,7 +235,7 @@ namespace osu.Game.Tournament
             var beatmapsRequiringPopulation = ladder.Teams
                                                     .SelectMany(r => r.SeedingResults)
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => string.IsNullOrEmpty(b.Beatmap?.BeatmapSet?.Title) && b.ID > 0).ToList();
+                                                    .Where(b => b.Beatmap?.OnlineID == 0 && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -249,7 +246,7 @@ namespace osu.Game.Tournament
 
                 var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
                 API.Perform(req);
-                b.Beatmap = req.Response ?? new APIBeatmap();
+                b.Beatmap = new TournamentBeatmap(req.Response ?? new APIBeatmap());
 
                 updateLoadProgressMessage($"Populating seeding beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -259,9 +256,9 @@ namespace osu.Game.Tournament
 
         private void updateLoadProgressMessage(string s) => Schedule(() => initialisationText.Text = s);
 
-        public void PopulateUser(APIUser user, Action success = null, Action failure = null, bool immediate = false)
+        public void PopulatePlayer(TournamentUser user, Action success = null, Action failure = null, bool immediate = false)
         {
-            var req = new GetUserRequest(user.Id, ladder.Ruleset.Value);
+            var req = new GetUserRequest(user.OnlineID, ladder.Ruleset.Value);
 
             if (immediate)
             {
@@ -273,7 +270,7 @@ namespace osu.Game.Tournament
                 req.Success += res => { populate(); };
                 req.Failure += _ =>
                 {
-                    user.Id = 1;
+                    user.OnlineID = 1;
                     failure?.Invoke();
                 };
 
@@ -287,12 +284,12 @@ namespace osu.Game.Tournament
                 if (res == null)
                     return;
 
-                user.Id = res.Id;
+                user.OnlineID = res.Id;
 
                 user.Username = res.Username;
-                user.Statistics = res.Statistics;
+                user.CoverUrl = res.CoverUrl;
                 user.Country = res.Country;
-                user.Cover = res.Cover;
+                user.Rank = res.Statistics?.GlobalRank;
 
                 success?.Invoke();
             }
