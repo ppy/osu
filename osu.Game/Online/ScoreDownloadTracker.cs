@@ -9,8 +9,6 @@ using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Scoring;
 
-#nullable enable
-
 namespace osu.Game.Online
 {
     public class ScoreDownloadTracker : DownloadTracker<ScoreInfo>

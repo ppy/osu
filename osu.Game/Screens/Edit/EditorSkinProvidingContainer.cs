@@ -3,8 +3,6 @@
 
 using osu.Game.Skinning;
 
-#nullable enable
-
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
