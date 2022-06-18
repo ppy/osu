@@ -39,8 +39,6 @@ namespace osu.Game.Screens.Utility
 
         public override bool HideOverlaysOnEnter => true;
 
-        public override bool CursorVisible => mainArea.Count == 0;
-
         public override float BackgroundParallaxAmount => 0;
 
         private readonly LinkFlowContainer explanatoryText;
