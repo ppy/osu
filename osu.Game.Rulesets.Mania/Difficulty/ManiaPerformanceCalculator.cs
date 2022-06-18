@@ -62,13 +62,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double computeDifficultyValue(ManiaDifficultyAttributes attributes)
         {
             double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2) // Star rating to pp curve
-                                     * Math.Max(0, 5 * scoreAccuracy - 4) // Accuracy curve
-                                     * (1 + 0.1 * Math.Min(1, totalHits / 1500)); // Length bonus
+                                     * Math.Max(0, 5 * scoreAccuracy - 4) // From 80% accuracy, 1/20th of total pp is awarded per additional 1% accuracy
+                                     * (1 + 0.1 * Math.Min(1, totalHits / 1500)); // Length bonus, capped at 1500 notes
 
             return difficultyValue;
         }
 
         private double totalHits => countPerfect + countOk + countGreat + countGood + countMeh + countMiss;
+
+        /// <summary>
+        /// Accuracy used to weight judgements independently from the score's actual accuracy.
+        /// </summary>
         private double customAccuracy => (countPerfect * 320 + countGreat * 300 + countGood * 200 + countOk * 100 + countMeh * 50) / (totalHits * 320);
     }
 }
