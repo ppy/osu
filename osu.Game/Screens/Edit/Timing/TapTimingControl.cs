@@ -195,6 +195,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void adjustOffset(double adjust)
         {
+            bool wasAtStart = editorClock.CurrentTimeAccurate == selectedGroup.Value.Time;
+
             // VERY TEMPORARY
             var currentGroupItems = selectedGroup.Value.ControlPoints.ToArray();
 
@@ -208,7 +210,7 @@ namespace osu.Game.Screens.Edit.Timing
             // the control point might not necessarily exist yet, if currentGroupItems was empty.
             selectedGroup.Value = beatmap.ControlPointInfo.GroupAt(newOffset, true);
 
-            if (!editorClock.IsRunning)
+            if (!editorClock.IsRunning && wasAtStart)
                 editorClock.Seek(newOffset);
         }
 
