@@ -417,7 +417,7 @@ namespace osu.Game
 
         /// <summary>
         /// Use to programatically exit the game as if the user was triggering via alt-f4.
-        /// Will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// By default, will keep persisting until an exit occurs (exit may be blocked multiple times).
         /// </summary>
         public virtual void GracefullyExit()
         {
