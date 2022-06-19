@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -185,6 +186,38 @@ namespace osu.Game.Rulesets.Osu.Utils
                 length * MathF.Cos(angle),
                 length * MathF.Sin(angle)
             );
+        }
+
+        public static bool IsHitObjectOnBeat(OsuBeatmap beatmap, OsuHitObject hitObject, bool downbeatsOnly = false)
+        {
+            var timingPoints = beatmap.ControlPointInfo.TimingPoints;
+            var currentTimingPoint = timingPoints.Reverse().FirstOrDefault(p => p.Time <= hitObject.StartTime);
+
+            if (currentTimingPoint == null)
+                return false;
+
+            double timeSinceTimingPoint = hitObject.StartTime - currentTimingPoint.Time;
+
+            double length = downbeatsOnly
+                ? currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator
+                : currentTimingPoint.BeatLength;
+
+            return (timeSinceTimingPoint + 1) % length < 2;
+        }
+
+        public static float GetRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
+        {
+            float angle = (float)(3.3 / (1 + 200 * Math.Pow(MathHelper.E, 0.016 * (targetDistance - 466))) + 0.45 + offset);
+            float relativeAngle = MathHelper.Pi - angle;
+            return flowDirection ? -relativeAngle : relativeAngle;
+        }
+
+        public static float RandomGaussian(Random rng, float mean = 0, float stdDev = 1)
+        {
+            double x1 = 1 - rng.NextDouble();
+            double x2 = 1 - rng.NextDouble();
+            double stdNormal = Math.Sqrt(-2 * Math.Log(x1)) * Math.Sin(MathHelper.TwoPi * x2);
+            return mean + stdDev * (float)stdNormal;
         }
     }
 }
