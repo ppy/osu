@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Utils
 
         public static float GetRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
         {
-            float angle = (float)(3.3 / (1 + 200 * Math.Pow(MathHelper.E, 0.016 * (targetDistance - 466))) + 0.45 + offset);
+            float angle = (float)(3 / (1 + 200 * Math.Pow(MathHelper.E, 0.016 * (targetDistance - 466))) + 0.45 + offset);
             float relativeAngle = MathHelper.Pi - angle;
             return flowDirection ? -relativeAngle : relativeAngle;
         }
