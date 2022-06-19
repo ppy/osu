@@ -266,6 +266,7 @@ namespace osu.Game.Screens.Play
                 },
                 FailOverlay = new FailOverlay
                 {
+                    SaveReplay = saveReplay,
                     OnRetry = Restart,
                     OnQuit = () => PerformExit(true),
                 },
@@ -1041,6 +1042,21 @@ namespace osu.Game.Screens.Play
 
             fadeOut();
             return base.OnExiting(e);
+        }
+
+        // Don't know if prepareScoreForResults useful
+        private async void saveReplay()
+        {
+            var scoreCopy = Score.DeepClone();
+            try
+            {
+                await ImportScore(scoreCopy).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, @"Score import failed!");
+            }
+            PerformExit(true);
         }
 
         /// <summary>
