@@ -12,8 +12,6 @@ using osu.Game.IO;
 using osu.Game.Models;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Skinning
 {
     [ExcludeFromDynamicCompile]

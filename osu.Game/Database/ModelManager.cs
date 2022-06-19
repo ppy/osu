@@ -6,28 +6,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using Realms;
 
-#nullable enable
-
-namespace osu.Game.Stores
+namespace osu.Game.Database
 {
-    /// <summary>
-    /// Class which adds all the missing pieces bridging the gap between <see cref="RealmArchiveModelImporter{TModel}"/> and (legacy) ArchiveModelManager.
-    /// </summary>
-    public abstract class RealmArchiveModelManager<TModel> : RealmArchiveModelImporter<TModel>, IModelManager<TModel>, IModelFileManager<TModel, RealmNamedFileUsage>
+    public class ModelManager<TModel> : IModelManager<TModel>, IModelFileManager<TModel, RealmNamedFileUsage>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
+        protected RealmAccess Realm { get; }
+
         private readonly RealmFileStore realmFileStore;
 
-        protected RealmArchiveModelManager(Storage storage, RealmAccess realm)
-            : base(storage, realm)
+        public ModelManager(Storage storage, RealmAccess realm)
         {
             realmFileStore = new RealmFileStore(realm, storage);
+            Realm = realm;
         }
 
         public void DeleteFile(TModel item, RealmNamedFileUsage file) =>
@@ -63,7 +59,7 @@ namespace osu.Game.Stores
         /// <summary>
         /// Delete a file from within an ongoing realm transaction.
         /// </summary>
-        protected void DeleteFile(TModel item, RealmNamedFileUsage file, Realm realm)
+        public void DeleteFile(TModel item, RealmNamedFileUsage file, Realm realm)
         {
             item.Files.Remove(file);
         }
@@ -71,7 +67,7 @@ namespace osu.Game.Stores
         /// <summary>
         /// Replace a file from within an ongoing realm transaction.
         /// </summary>
-        protected void ReplaceFile(RealmNamedFileUsage file, Stream contents, Realm realm)
+        public void ReplaceFile(RealmNamedFileUsage file, Stream contents, Realm realm)
         {
             file.File = realmFileStore.Add(contents, realm);
         }
@@ -79,7 +75,7 @@ namespace osu.Game.Stores
         /// <summary>
         /// Add a file from within an ongoing realm transaction. If the file already exists, it is overwritten.
         /// </summary>
-        protected void AddFile(TModel item, Stream contents, string filename, Realm realm)
+        public void AddFile(TModel item, Stream contents, string filename, Realm realm)
         {
             var existing = item.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase));
 
@@ -201,6 +197,10 @@ namespace osu.Game.Stores
             });
         }
 
-        public abstract bool IsAvailableLocally(TModel model);
+        public virtual bool IsAvailableLocally(TModel model) => true;
+
+        public Action<Notification>? PostNotification { get; set; }
+
+        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
     }
 }

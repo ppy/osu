@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -93,6 +95,15 @@ namespace osu.Game.Rulesets
             return AllMods.FirstOrDefault(m => m is T)?.CreateInstance() as T;
         }
 
+        /// <summary>
+        /// Creates an enumerable with mods that are supported by the ruleset for the supplied <paramref name="type"/>.
+        /// </summary>
+        /// <remarks>
+        /// If there are no applicable mods from the given <paramref name="type"/> in this ruleset,
+        /// then the proper behaviour is to return an empty enumerable.
+        /// <see langword="null"/> mods should not be present in the returned enumerable.
+        /// </remarks>
+        [ItemNotNull]
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         /// <summary>

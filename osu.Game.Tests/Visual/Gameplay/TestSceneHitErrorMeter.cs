@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -140,6 +142,36 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("ignore miss", () => newJudgement(result: HitResult.IgnoreMiss));
             AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
             AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+        }
+
+        [Test]
+        public void TestProcessingWhileHidden()
+        {
+            AddStep("OD 1", () => recreateDisplay(new OsuHitWindows(), 1));
+
+            AddStep("hide displays", () =>
+            {
+                foreach (var hitErrorMeter in this.ChildrenOfType<HitErrorMeter>())
+                    hitErrorMeter.Hide();
+            });
+
+            AddRepeatStep("hit", () => newJudgement(), ColourHitErrorMeter.MAX_DISPLAYED_JUDGEMENTS * 2);
+
+            AddAssert("bars added", () => this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("circle added", () => this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+
+            AddUntilStep("wait for bars to disappear", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddUntilStep("ensure max circles not exceeded", () =>
+            {
+                return this.ChildrenOfType<ColourHitErrorMeter>()
+                           .All(m => m.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Count() <= ColourHitErrorMeter.MAX_DISPLAYED_JUDGEMENTS);
+            });
+
+            AddStep("show displays", () =>
+            {
+                foreach (var hitErrorMeter in this.ChildrenOfType<HitErrorMeter>())
+                    hitErrorMeter.Show();
+            });
         }
 
         [Test]

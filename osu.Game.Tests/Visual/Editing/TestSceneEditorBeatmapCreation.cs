@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -96,10 +98,13 @@ namespace osu.Game.Tests.Visual.Editing
                 using (var zip = ZipArchive.Open(temp))
                     zip.WriteToDirectory(extractedFolder);
 
-                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3"));
+                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(new FileInfo(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3")));
 
                 File.Delete(temp);
                 Directory.Delete(extractedFolder, true);
+
+                // ensure audio file is copied to beatmap as "audio.mp3" rather than original filename.
+                Assert.That(Beatmap.Value.Metadata.AudioFile == "audio.mp3");
 
                 return success;
             });

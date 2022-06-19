@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -57,6 +59,8 @@ namespace osu.Game
     /// </summary>
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
+        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv" };
+
         public const string OSU_PROTOCOL = "osu://";
 
         public const string CLIENT_STREAM_NAME = @"lazer";
@@ -159,7 +163,7 @@ namespace osu.Game
         /// <summary>
         /// Mods available for the current <see cref="Ruleset"/>.
         /// </summary>
-        public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
+        public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>(new Dictionary<ModType, IReadOnlyList<Mod>>());
 
         private BeatmapDifficultyCache difficultyCache;
 
@@ -232,28 +236,6 @@ namespace osu.Game
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
             Decoder.RegisterDependencies(RulesetStore);
-
-            // Backup is taken here rather than in EFToRealmMigrator to avoid recycling realm contexts
-            // after initial usages below. It can be moved once a direction is established for handling re-subscription.
-            // See https://github.com/ppy/osu/pull/16547 for more discussion.
-            if (EFContextFactory != null)
-            {
-                const string backup_folder = "backups";
-
-                string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-
-                EFContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.db"));
-                realm.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.realm"));
-
-                using (var source = Storage.GetStream("collection.db"))
-                {
-                    if (source != null)
-                    {
-                        using (var destination = Storage.CreateFileSafely(Path.Combine(backup_folder, $"collection.{migration}.db")))
-                            source.CopyTo(destination);
-                    }
-                }
-            }
 
             dependencies.CacheAs(Storage);
 
@@ -511,21 +493,36 @@ namespace osu.Game
             if (instance == null)
             {
                 // reject the change if the ruleset is not available.
-                Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
+                revertRulesetChange();
                 return;
             }
 
             var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
 
-            foreach (ModType type in Enum.GetValues(typeof(ModType)))
+            try
             {
-                dict[type] = instance.GetModsFor(type).ToList();
+                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                {
+                    dict[type] = instance.GetModsFor(type)
+                                         // Rulesets should never return null mods, but let's be defensive just in case.
+                                         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                                         .Where(mod => mod != null)
+                                         .ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Could not load mods for \"{instance.RulesetInfo.Name}\" ruleset. Current ruleset has been rolled back.");
+                revertRulesetChange();
+                return;
             }
 
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
 
             AvailableMods.Value = dict;
+
+            void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }
 
         private int allowableExceptions;

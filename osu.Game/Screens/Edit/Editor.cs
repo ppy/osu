@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -63,6 +65,8 @@ namespace osu.Game.Screens.Edit
 
         public override bool? AllowTrackAdjustments => false;
 
+        protected override bool PlayExitSound => !ExitConfirmed && !switchingDifficulty;
+
         protected bool HasUnsavedChanges
         {
             get
@@ -98,6 +102,8 @@ namespace osu.Game.Screens.Edit
         private bool canSave;
 
         protected bool ExitConfirmed { get; private set; }
+
+        private bool switchingDifficulty;
 
         private string lastSavedHash;
 
@@ -422,6 +428,8 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed) return false;
+
             switch (e.Key)
             {
                 case Key.Left:
@@ -855,7 +863,10 @@ namespace osu.Game.Screens.Edit
         }
 
         private void switchToNewDifficulty(RulesetInfo rulesetInfo, bool createCopy)
-            => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo, rulesetInfo, createCopy, GetState(rulesetInfo));
+        {
+            switchingDifficulty = true;
+            loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo, rulesetInfo, createCopy, GetState(rulesetInfo));
+        }
 
         private EditorMenuItem createDifficultySwitchMenu()
         {

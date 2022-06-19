@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
@@ -22,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             CreateNewItem = createNewItem
         };
 
-        protected override void SelectItem(PlaylistItem item)
+        protected override bool SelectItem(PlaylistItem item)
         {
             switch (Playlist.Count)
             {
@@ -37,6 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
 
             this.Exit();
+            return true;
         }
 
         private void createNewItem()

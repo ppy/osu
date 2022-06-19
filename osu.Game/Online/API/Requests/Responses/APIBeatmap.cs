@@ -7,8 +7,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Rulesets;
 
-#nullable enable
-
 namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIBeatmap : IBeatmapInfo, IBeatmapOnlineInfo
