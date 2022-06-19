@@ -9,7 +9,9 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoDrumRollTickJudgement : TaikoJudgement
     {
-        public override HitResult MaxResult => HitResult.SmallTickHit;
+        public bool IsBonus = false;
+
+        public override HitResult MaxResult => IsBonus ? HitResult.LargeBonus : HitResult.SmallTickHit;
 
         protected override double HealthIncreaseFor(HitResult result)
         {

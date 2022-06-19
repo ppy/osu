@@ -4,13 +4,14 @@
 #nullable disable
 
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModClassic : ModClassic, IApplicableToDrawableRuleset<TaikoHitObject>, IUpdatableByPlayfield
+    public class TaikoModClassic : ModClassic, IApplicableToDrawableRuleset<TaikoHitObject>, IUpdatableByPlayfield, IApplicableToHitObject
     {
         private DrawableTaikoRuleset drawableTaikoRuleset;
 
@@ -18,6 +19,14 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
             drawableTaikoRuleset.LockPlayfieldAspect.Value = false;
+        }
+
+        public void ApplyToHitObject(HitObject hitObject)
+        {
+            if (hitObject is DrumRoll drumRoll)
+                drumRoll.SetBonus(true);
+            else if (hitObject is Swell swell)
+                swell.SetBonus(true);
         }
 
         public void Update(Playfield playfield)

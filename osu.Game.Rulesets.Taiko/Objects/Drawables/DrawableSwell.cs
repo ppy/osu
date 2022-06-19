@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (numHits == HitObject.RequiredHits)
-                    ApplyResult(r => r.Type = HitResult.Great);
+                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
             }
             else
             {
@@ -222,7 +222,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult);
+                ApplyResult(r =>
+                {
+                    // With the Classic mod, don't award combo or accuracy for a finished swell.
+                    if (r.Judgement.MaxResult == HitResult.LargeBonus)
+                        r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.LargeBonus : r.Judgement.MinResult;
+                    else
+                        r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult;
+                });
             }
         }
 

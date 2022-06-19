@@ -9,6 +9,10 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoSwellJudgement : TaikoJudgement
     {
+        public bool IsBonus = false;
+
+        public override HitResult MaxResult => IsBonus ? HitResult.LargeBonus : HitResult.Great;
+
         protected override double HealthIncreaseFor(HitResult result)
         {
             switch (result)
