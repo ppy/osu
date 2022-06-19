@@ -83,6 +83,18 @@ namespace osu.Game.Screens.Play
                 SetGameplayStartTime(score.Replay.Frames[0].Time);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.Value > 1
+                && score.Replay.Frames.Count > 0
+                && DrawableRuleset.FrameStableClock.CurrentTime >= score.Replay.Frames[^1].Time)
+            {
+                HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.Value = 1;
+            }
+        }
+
         protected override Score CreateScore(IBeatmap beatmap) => score;
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
