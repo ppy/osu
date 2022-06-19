@@ -7,8 +7,6 @@ using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 
-#nullable enable
-
 namespace osu.Game.Rulesets
 {
     /// <summary>
