@@ -9,6 +9,10 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoDrumRollJudgement : TaikoJudgement
     {
+        public bool IsBonus = false;
+
+        public override HitResult MaxResult => IsBonus ? HitResult.LargeBonus : HitResult.Great;
+
         protected override double HealthIncreaseFor(HitResult result)
         {
             // Drum rolls can be ignored with no health penalty

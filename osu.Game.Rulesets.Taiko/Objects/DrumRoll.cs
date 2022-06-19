@@ -53,6 +53,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public double RequiredGreatHits { get; protected set; }
 
         /// <summary>
+        /// Defines if drum rolls are affected by the Classic mod, making them bonus only.
+        /// </summary>
+        private bool isBonus;
+
+        /// <summary>
         /// The length (in milliseconds) between ticks of this drumroll.
         /// <para>Half of this value is the hit window of the ticks.</para>
         /// </summary>
@@ -106,7 +111,18 @@ namespace osu.Game.Rulesets.Taiko.Objects
             }
         }
 
-        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
+        public void SetBonus(bool bonus)
+        {
+            isBonus = bonus;
+
+            foreach (HitObject hitObject in NestedHitObjects)
+            {
+                if (hitObject is DrumRollTick drumRollTick)
+                    drumRollTick.IsBonus = bonus;
+            }
+        }
+
+        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement { IsBonus = isBonus };
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
