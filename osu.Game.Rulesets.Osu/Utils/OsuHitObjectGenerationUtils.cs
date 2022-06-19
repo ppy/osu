@@ -212,8 +212,8 @@ namespace osu.Game.Rulesets.Osu.Utils
 
         public static float RandomGaussian(Random rng, float mean = 0, float stdDev = 1)
         {
-            double x1 = rng.NextDouble();
-            double x2 = rng.NextDouble();
+            double x1 = 1 - rng.NextDouble();
+            double x2 = 1 - rng.NextDouble();
             double stdNormal = Math.Sqrt(-2 * Math.Log(x1)) * Math.Sin(2 * Math.PI * x2);
             return mean + stdDev * (float)stdNormal;
         }
