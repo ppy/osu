@@ -53,15 +53,10 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public double RequiredGreatHits { get; protected set; }
 
         /// <summary>
-        /// Defines if drum rolls are affected by the Classic mod, making them bonus only.
-        /// </summary>
-        private bool isBonus;
-
-        /// <summary>
         /// The length (in milliseconds) between ticks of this drumroll.
         /// <para>Half of this value is the hit window of the ticks.</para>
         /// </summary>
-        private double tickSpacing = 100;
+        protected double TickSpacing = 100;
 
         private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
 
@@ -74,13 +69,13 @@ namespace osu.Game.Rulesets.Taiko.Objects
             double scoringDistance = base_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
             Velocity = scoringDistance / timingPoint.BeatLength;
 
-            tickSpacing = timingPoint.BeatLength / TickRate;
+            TickSpacing = timingPoint.BeatLength / TickRate;
             overallDifficulty = difficulty.OverallDifficulty;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            createTicks(cancellationToken);
+            CreateTicks(cancellationToken);
 
             RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
             RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
@@ -88,21 +83,21 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.CreateNestedHitObjects(cancellationToken);
         }
 
-        private void createTicks(CancellationToken cancellationToken)
+        protected virtual void CreateTicks(CancellationToken cancellationToken)
         {
-            if (tickSpacing == 0)
+            if (TickSpacing == 0)
                 return;
 
             bool first = true;
 
-            for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
+            for (double t = StartTime; t < EndTime + TickSpacing / 2; t += TickSpacing)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 AddNested(new DrumRollTick
                 {
                     FirstTick = first,
-                    TickSpacing = tickSpacing,
+                    TickSpacing = TickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong
                 });
@@ -111,18 +106,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             }
         }
 
-        public void SetBonus(bool bonus)
-        {
-            isBonus = bonus;
-
-            foreach (HitObject hitObject in NestedHitObjects)
-            {
-                if (hitObject is DrumRollTick drumRollTick)
-                    drumRollTick.IsBonus = bonus;
-            }
-        }
-
-        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement { IsBonus = isBonus };
+        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 

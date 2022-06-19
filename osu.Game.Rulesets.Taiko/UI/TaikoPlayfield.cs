@@ -295,15 +295,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     break;
 
                 default:
-                    // Don't draw judgement results for bonus sliderticks with the Classic mod.
-                    switch (result.Type)
-                    {
-                        case HitResult.IgnoreHit:
-                        case HitResult.IgnoreMiss:
-                        case HitResult.LargeBonus:
-                            return;
-                    }
-
                     judgementContainer.Add(judgementPools[result.Type].Get(j =>
                     {
                         j.Apply(result, judgedObject);

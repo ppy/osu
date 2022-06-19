@@ -27,12 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public double HitWindow => TickSpacing / 2;
 
-        /// <summary>
-        /// Defines if ticks are affected by the Classic mod, making them bonus only.
-        /// </summary>
-        public bool IsBonus = false;
-
-        public override Judgement CreateJudgement() => new TaikoDrumRollTickJudgement { IsBonus = IsBonus };
+        public override Judgement CreateJudgement() => new TaikoDrumRollTickJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
