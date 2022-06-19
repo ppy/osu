@@ -188,6 +188,11 @@ namespace osu.Game.Rulesets.Osu.Utils
             );
         }
 
+        /// <param name="beatmap">The beatmap hitObject is a part of.</param>
+        /// <param name="hitObject">The <see cref="OsuHitObject"/> that should be checked.</param>
+        /// <param name="downbeatsOnly">If true, this method only returns true if hitObject is on a downbeat.
+        /// If false, it returns true if hitObject is on any beat.</param>
+        /// <returns>true if hitObject is on a (down-)beat, false otherwise.</returns>
         public static bool IsHitObjectOnBeat(OsuBeatmap beatmap, OsuHitObject hitObject, bool downbeatsOnly = false)
         {
             var timingPoints = beatmap.ControlPointInfo.TimingPoints;
@@ -205,6 +210,9 @@ namespace osu.Game.Rulesets.Osu.Utils
             return (timeSinceTimingPoint + 1) % length < 2;
         }
 
+        /// <param name="targetDistance">The target distance between the previous and the current <see cref="OsuHitObject"/>.</param>
+        /// <param name="offset">The angle (in rad) by which the target angle should be offset.</param>
+        /// <param name="flowDirection">Whether the relative angle should be positive or negative.</param>
         public static float GetRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
         {
             float angle = (float)(3 / (1 + 200 * Math.Pow(MathHelper.E, 0.016 * (targetDistance - 466))) + 0.45 + offset);
