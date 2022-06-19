@@ -18,18 +18,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             TaikoDifficultyHitObjectColour colour = taikoCurrent.Colour;
             if (colour == null) return 0;
 
-            double objectStrain = 2.1;
+            double objectStrain = 1.85;
 
             if (colour.Delta)
             {
-                objectStrain *= sigmoid(colour.DeltaRunLength, 4, 4) * 0.5 + 0.5;
+                objectStrain *= sigmoid(colour.DeltaRunLength, 3, 3) * 0.5 + 0.5;
             }
             else
             {
                 objectStrain *= sigmoid(colour.DeltaRunLength, 2, 2) * 0.5 + 0.5;
             }
 
-            objectStrain *= -sigmoid(colour.RepetitionInterval, 8, 8) * 0.5 + 0.5;
+            objectStrain *= -sigmoid(colour.RepetitionInterval, 1, 8); // * 0.5 + 0.5;
             // Console.WriteLine($"{current.StartTime},{colour.Delta},{colour.RepetitionInterval},{objectStrain}");
             return objectStrain;
         }
