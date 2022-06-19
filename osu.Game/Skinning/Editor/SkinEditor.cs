@@ -322,6 +322,12 @@ namespace osu.Game.Skinning.Editor
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
 
+        public override void Hide()
+        {
+            base.Hide();
+            SelectedComponents.Clear();
+        }
+
         protected override void PopIn()
         {
             this
