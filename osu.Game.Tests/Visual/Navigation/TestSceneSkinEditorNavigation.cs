@@ -89,6 +89,31 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestComponentsDeselectedOnSkinEditorHide()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+            switchToGameplayScene();
+            AddStep("select all components", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.A);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddStep("toggle skin editor", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.S);
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddUntilStep("no components selected", () => skinEditor.SelectedComponents.Count == 0);
+        }
+
+        [Test]
         public void TestAutoplayCompatibleModsRetainedOnEnteringGameplay()
         {
             advanceToSongSelect();
