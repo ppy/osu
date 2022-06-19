@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// </summary>
         public int RepetitionInterval { get; private set; }
 
+        public TaikoDifficultyHitObjectColour repeatedColour { get; private set; }
+
         /// <summary>
         /// Get the <see cref="TaikoDifficultyHitObjectColour"/> instance for the given hitObject. This is implemented
         /// as a static function instead of constructor to allow for reusing existing instances.
@@ -74,14 +76,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             while (other != null && interval < max_repetition_interval)
             {
-                interval += other.DeltaRunLength;
-
                 if (other.Delta == Delta && other.DeltaRunLength == DeltaRunLength)
                 {
                     RepetitionInterval = Math.Min(interval, max_repetition_interval);
+                    repeatedColour = other;
                     return;
                 }
 
+                interval += other.DeltaRunLength;
                 other = other.previous;
             }
 

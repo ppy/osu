@@ -4,14 +4,15 @@ using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Peaks : Skill
     {
         private const double rhythm_skill_multiplier = 0.32 * final_multiplier;
-        private const double colour_skill_multiplier = 0.37 * final_multiplier;
-        private const double stamina_skill_multiplier = 0.37 * final_multiplier;
+        private const double colour_skill_multiplier = 0.33 * final_multiplier;
+        private const double stamina_skill_multiplier = 0.4 * final_multiplier;
 
         private const double final_multiplier = 0.047;
 
