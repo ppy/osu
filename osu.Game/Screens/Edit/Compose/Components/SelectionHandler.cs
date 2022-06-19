@@ -21,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Input;
 
@@ -103,7 +104,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Positional input must be received outside the container's bounds,
         /// in order to handle blueprints which are partially offscreen.
         /// </remarks>
-        /// <seealso cref="BlueprintContainer{T}.ReceivePositionalInputAt"/>
+        /// <seealso cref="ComposeBlueprintContainer.ReceivePositionalInputAt"/>
+        /// <seealso cref="TimelineBlueprintContainer.ReceivePositionalInputAt"/>
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         /// <summary>
