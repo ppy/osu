@@ -418,13 +418,14 @@ namespace osu.Game
         /// <summary>
         /// Use to programatically exit the game as if the user was triggering via alt-f4.
         /// By default, will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// May be interrupted (see <see cref="OsuGame"/>'s override.
         /// </summary>
-        public virtual void GracefullyExit()
+        public virtual void AttemptExit()
         {
             if (!OnExiting())
                 Exit();
             else
-                Scheduler.AddDelayed(GracefullyExit, 2000);
+                Scheduler.AddDelayed(AttemptExit, 2000);
         }
 
         public bool Migrate(string path)
