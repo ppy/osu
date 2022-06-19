@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         public static bool IsHitObjectOnBeat(OsuBeatmap beatmap, OsuHitObject hitObject, bool downbeatsOnly = false)
         {
             var timingPoints = beatmap.ControlPointInfo.TimingPoints;
-            var currentTimingPoint = timingPoints.Reverse().FirstOrDefault(p => p.Time <= hitObject.StartTime);
+            var currentTimingPoint = timingPoints.LastOrDefault(p => p.Time <= hitObject.StartTime);
 
             if (currentTimingPoint == null)
                 return false;
@@ -210,21 +210,11 @@ namespace osu.Game.Rulesets.Osu.Utils
             return (timeSinceTimingPoint + 1) % length < 2;
         }
 
-        /// <param name="targetDistance">The target distance between the previous and the current <see cref="OsuHitObject"/>.</param>
-        /// <param name="offset">The angle (in rad) by which the target angle should be offset.</param>
-        /// <param name="flowDirection">Whether the relative angle should be positive or negative.</param>
-        public static float GetRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
-        {
-            float angle = (float)(3 / (1 + 200 * Math.Pow(MathHelper.E, 0.016 * (targetDistance - 466))) + 0.45 + offset);
-            float relativeAngle = MathHelper.Pi - angle;
-            return flowDirection ? -relativeAngle : relativeAngle;
-        }
-
         public static float RandomGaussian(Random rng, float mean = 0, float stdDev = 1)
         {
-            double x1 = 1 - rng.NextDouble();
-            double x2 = 1 - rng.NextDouble();
-            double stdNormal = Math.Sqrt(-2 * Math.Log(x1)) * Math.Sin(MathHelper.TwoPi * x2);
+            double x1 = rng.NextDouble();
+            double x2 = rng.NextDouble();
+            double stdNormal = Math.Sqrt(-2 * Math.Log(x1)) * Math.Sin(2 * Math.PI * x2);
             return mean + stdDev * (float)stdNormal;
         }
     }

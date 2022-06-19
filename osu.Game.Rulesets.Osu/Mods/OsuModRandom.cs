@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Osu.Utils;
 
@@ -21,6 +22,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "It never gets boring!";
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTarget)).ToArray();
+
+        private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
         private Random? rng;
 
@@ -43,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 bool invertFlow = false;
 
                 if (i == 0 ||
-                    (positionInfos[i - 1].HitObject.NewCombo && (i <= 1 || !positionInfos[i - 2].HitObject.NewCombo) && (i <= 2 || !positionInfos[i - 3].HitObject.NewCombo)) ||
+                    (positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 && positionInfos[i - 1].HitObject.NewCombo && rng.NextDouble() < 0.6) ||
                     OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject, true) ||
                     (OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject) && rng.NextDouble() < 0.25))
                 {
@@ -63,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     float flowChangeOffset = 0;
                     float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.03f);
 
-                    if (positionInfos[i - 1].HitObject.NewCombo && (i <= 1 || !positionInfos[i - 2].HitObject.NewCombo) && rng.NextDouble() < 0.6)
+                    if (positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 && positionInfos[i - 1].HitObject.NewCombo && rng.NextDouble() < 0.6)
                     {
                         flowChangeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.05f);
 
@@ -72,18 +75,28 @@ namespace osu.Game.Rulesets.Osu.Mods
                     }
 
                     if (invertFlow)
-                        flowDirection ^= true;
+                        flowDirection = !flowDirection;
 
-                    positionInfos[i].RelativeAngle = OsuHitObjectGenerationUtils.GetRelativeTargetAngle(
+                    positionInfos[i].RelativeAngle = getRelativeTargetAngle(
                         positionInfos[i].DistanceFromPrevious,
                         (sequenceOffset + oneTimeOffset) * (float)Math.Sqrt(positionInfos[i].DistanceFromPrevious) +
-                        flowChangeOffset * (float)Math.Sqrt(640 - positionInfos[i].DistanceFromPrevious),
+                        flowChangeOffset * (float)Math.Sqrt(playfield_diagonal - positionInfos[i].DistanceFromPrevious),
                         flowDirection
                     );
                 }
             }
 
             osuBeatmap.HitObjects = OsuHitObjectGenerationUtils.RepositionHitObjects(positionInfos);
+        }
+
+        /// <param name="targetDistance">The target distance between the previous and the current <see cref="OsuHitObject"/>.</param>
+        /// <param name="offset">The angle (in rad) by which the target angle should be offset.</param>
+        /// <param name="flowDirection">Whether the relative angle should be positive or negative.</param>
+        private static float getRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
+        {
+            float angle = (float)(3 / (1 + 200 * Math.Exp(0.016 * (targetDistance - 466))) + 0.45 + offset);
+            float relativeAngle = (float)Math.PI - angle;
+            return flowDirection ? -relativeAngle : relativeAngle;
         }
     }
 }
