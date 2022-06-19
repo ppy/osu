@@ -37,23 +37,51 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var positionInfos = OsuHitObjectGenerationUtils.GeneratePositionInfos(osuBeatmap.HitObjects);
 
-            float rateOfChangeMultiplier = 0;
+            float sequenceOffset = 0;
+            bool flowDirection = false;
 
-            foreach (var positionInfo in positionInfos)
+            for (int i = 0; i < positionInfos.Count; i++)
             {
-                // rateOfChangeMultiplier only changes every 5 iterations in a combo
-                // to prevent shaky-line-shaped streams
-                if (positionInfo.HitObject.IndexInCurrentCombo % 5 == 0)
-                    rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
+                bool invertFlow = false;
 
-                if (positionInfo == positionInfos.First())
+                if (i == 0 ||
+                    (positionInfos[i - 1].HitObject.NewCombo && (i <= 1 || !positionInfos[i - 2].HitObject.NewCombo) && (i <= 2 || !positionInfos[i - 3].HitObject.NewCombo)) ||
+                    OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject, true) ||
+                    (OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject) && rng.NextDouble() < 0.25))
                 {
-                    positionInfo.DistanceFromPrevious = (float)(rng.NextDouble() * OsuPlayfield.BASE_SIZE.Y / 2);
-                    positionInfo.RelativeAngle = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
+                    sequenceOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.02f);
+
+                    if (rng.NextDouble() < 0.6)
+                        invertFlow = true;
+                }
+
+                if (i == 0)
+                {
+                    positionInfos[i].DistanceFromPrevious = (float)(rng.NextDouble() * OsuPlayfield.BASE_SIZE.Y / 2);
+                    positionInfos[i].RelativeAngle = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
                 }
                 else
                 {
-                    positionInfo.RelativeAngle = rateOfChangeMultiplier * 2 * (float)Math.PI * Math.Min(1f, positionInfo.DistanceFromPrevious / (playfield_diagonal * 0.5f));
+                    float flowChangeOffset = 0;
+                    float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.03f);
+
+                    if (positionInfos[i - 1].HitObject.NewCombo && (i <= 1 || !positionInfos[i - 2].HitObject.NewCombo) && rng.NextDouble() < 0.6)
+                    {
+                        flowChangeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.05f);
+
+                        if (rng.NextDouble() < 0.8)
+                            invertFlow = true;
+                    }
+
+                    if (invertFlow)
+                        flowDirection ^= true;
+
+                    positionInfos[i].RelativeAngle = OsuHitObjectGenerationUtils.GetRelativeTargetAngle(
+                        positionInfos[i].DistanceFromPrevious,
+                        (sequenceOffset + oneTimeOffset) * (float)Math.Sqrt(positionInfos[i].DistanceFromPrevious) +
+                        flowChangeOffset * (float)Math.Sqrt(640 - positionInfos[i].DistanceFromPrevious),
+                        flowDirection
+                    );
                 }
             }
 
