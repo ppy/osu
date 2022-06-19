@@ -144,14 +144,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             if (countHit >= HitObject.RequiredGoodHits)
             {
-                ApplyResult(r =>
-                {
-                    // With the Classic mod, don't award points for a finished drum roll, only for ticks.
-                    if (r.Judgement.MaxResult == HitResult.LargeBonus)
-                        r.Type = HitResult.IgnoreMiss;
-                    else
-                        r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Ok;
-                });
+                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Ok);
             }
             else
                 ApplyResult(r => r.Type = r.Judgement.MinResult);

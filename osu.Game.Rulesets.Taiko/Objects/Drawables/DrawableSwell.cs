@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double ring_appear_offset = 100;
 
-        private readonly Container<DrawableSwellTick> ticks;
+        protected readonly Container<DrawableSwellTick> Ticks;
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 }
             });
 
-            AddInternal(ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
+            AddInternal(Ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader]
@@ -132,6 +132,20 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Origin = Anchor.Centre,
             });
 
+        protected void AnimateCompletion(int numHits)
+        {
+            float completion = (float)numHits / HitObject.RequiredHits;
+
+            expandingRing
+                .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
+                .Then()
+                .FadeTo(completion / 8, 2000, Easing.OutQuint);
+
+            MainPiece.Drawable.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
+
+            expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
+        }
+
         protected override void OnFree()
         {
             base.OnFree();
@@ -148,7 +162,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             switch (hitObject)
             {
                 case DrawableSwellTick tick:
-                    ticks.Add(tick);
+                    Ticks.Add(tick);
                     break;
             }
         }
@@ -156,7 +170,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void ClearNestedHitObjects()
         {
             base.ClearNestedHitObjects();
-            ticks.Clear(false);
+            Ticks.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
@@ -176,7 +190,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
                 DrawableSwellTick nextTick = null;
 
-                foreach (var t in ticks)
+                foreach (var t in Ticks)
                 {
                     if (!t.Result.HasResult)
                     {
@@ -187,21 +201,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 nextTick?.TriggerResult(true);
 
-                int numHits = ticks.Count(r => r.IsHit);
+                int numHits = Ticks.Count(r => r.IsHit);
 
-                float completion = (float)numHits / HitObject.RequiredHits;
-
-                expandingRing
-                    .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
-                    .Then()
-                    .FadeTo(completion / 8, 2000, Easing.OutQuint);
-
-                MainPiece.Drawable.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
-
-                expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
+                AnimateCompletion(numHits);
 
                 if (numHits == HitObject.RequiredHits)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyResult(r => r.Type = HitResult.Great);
             }
             else
             {
@@ -210,7 +215,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 int numHits = 0;
 
-                foreach (var tick in ticks)
+                foreach (var tick in Ticks)
                 {
                     if (tick.IsHit)
                     {
@@ -222,14 +227,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(r =>
-                {
-                    // With the Classic mod, don't award combo or accuracy for a finished swell.
-                    if (r.Judgement.MaxResult == HitResult.LargeBonus)
-                        r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.LargeBonus : r.Judgement.MinResult;
-                    else
-                        r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult;
-                });
+                ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult);
             }
         }
 

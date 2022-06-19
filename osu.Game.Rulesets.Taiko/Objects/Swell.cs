@@ -26,16 +26,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public int RequiredHits = 10;
 
-        /// <summary>
-        /// Defines if swells are affected by the Classic mod, making them bonus only.
-        /// </summary>
-        private bool isBonus;
-
-        public void SetBonus(bool bonus)
-        {
-            isBonus = bonus;
-        }
-
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
             base.CreateNestedHitObjects(cancellationToken);
@@ -47,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             }
         }
 
-        public override Judgement CreateJudgement() => new TaikoSwellJudgement { IsBonus = isBonus };
+        public override Judgement CreateJudgement() => new TaikoSwellJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
