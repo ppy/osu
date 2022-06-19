@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject, true) ||
                     (OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject) && rng.NextDouble() < 0.25))
                 {
-                    sequenceOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.02f);
+                    sequenceOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.0015f);
 
                     if (rng.NextDouble() < 0.6)
                         invertFlow = true;
@@ -64,11 +64,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                 else
                 {
                     float flowChangeOffset = 0;
-                    float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.03f);
+                    float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.0015f);
 
                     if (positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 && positionInfos[i - 1].HitObject.NewCombo && rng.NextDouble() < 0.6)
                     {
-                        flowChangeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.05f);
+                        flowChangeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.002f);
 
                         if (rng.NextDouble() < 0.8)
                             invertFlow = true;
@@ -79,8 +79,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     positionInfos[i].RelativeAngle = getRelativeTargetAngle(
                         positionInfos[i].DistanceFromPrevious,
-                        (sequenceOffset + oneTimeOffset) * (float)Math.Sqrt(positionInfos[i].DistanceFromPrevious) +
-                        flowChangeOffset * (float)Math.Sqrt(playfield_diagonal - positionInfos[i].DistanceFromPrevious),
+                        (sequenceOffset + oneTimeOffset) * positionInfos[i].DistanceFromPrevious +
+                        flowChangeOffset * (playfield_diagonal - positionInfos[i].DistanceFromPrevious),
                         flowDirection
                     );
                 }
