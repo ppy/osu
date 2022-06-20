@@ -12,6 +12,6 @@ namespace osu.Game.Database
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<Live<TModel>>>? PostImport { set; }
+        public Action<IEnumerable<Live<TModel>>>? PresentImport { set; }
     }
 }
