@@ -26,29 +26,6 @@ namespace osu.Game.Tests.Visual.Navigation
         private TestPlaySongSelect songSelect;
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
 
-        private void advanceToSongSelect()
-        {
-            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
-            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
-
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
-
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
-        }
-
-        private void openSkinEditor()
-        {
-            AddStep("open skin editor", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.PressKey(Key.ShiftLeft);
-                InputManager.Key(Key.S);
-                InputManager.ReleaseKey(Key.ControlLeft);
-                InputManager.ReleaseKey(Key.ShiftLeft);
-            });
-            AddUntilStep("skin editor loaded", () => skinEditor != null);
-        }
-
         [Test]
         public void TestEditComponentDuringGameplay()
         {
@@ -89,6 +66,24 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestHideSkinEditorWhileDragging()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+            switchToGameplayScene();
+            AddStep("select all components", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.A);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            toggleSkinEditor();
+
+            AddUntilStep("no components selected", () => skinEditor.SelectedComponents.Count == 0);
+        }
+
+        [Test]
         public void TestComponentsDeselectedOnSkinEditorHide()
         {
             advanceToSongSelect();
@@ -101,14 +96,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
 
-            AddStep("toggle skin editor", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.PressKey(Key.ShiftLeft);
-                InputManager.Key(Key.S);
-                InputManager.ReleaseKey(Key.ControlLeft);
-                InputManager.ReleaseKey(Key.ShiftLeft);
-            });
+            toggleSkinEditor();
 
             AddUntilStep("no components selected", () => skinEditor.SelectedComponents.Count == 0);
         }
@@ -169,6 +157,34 @@ namespace osu.Game.Tests.Visual.Navigation
 
             openSkinEditor();
             AddUntilStep("mod overlay closed", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
+        }
+
+        private void advanceToSongSelect()
+        {
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+        }
+
+        private void openSkinEditor()
+        {
+            toggleSkinEditor();
+            AddUntilStep("skin editor loaded", () => skinEditor != null);
+        }
+
+        private void toggleSkinEditor()
+        {
+            AddStep("toggle skin editor", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.S);
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
         }
 
         private void switchToGameplayScene()
