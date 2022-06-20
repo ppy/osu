@@ -167,7 +167,7 @@ namespace osu.Game.Skinning
                     Name = NamingUtils.GetNextBestName(existingSkinNames, $@"{s.Name} (modified)")
                 };
 
-                var result = skinImporter.Import(skinInfo);
+                var result = skinImporter.ImportModel(skinInfo);
 
                 if (result != null)
                 {

@@ -745,7 +745,7 @@ namespace osu.Game.Tests.Database
                     }
                 };
 
-                var imported = importer.Import(toImport);
+                var imported = importer.ImportModel(toImport);
 
                 realm.Run(r => r.Refresh());
 

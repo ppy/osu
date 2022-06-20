@@ -265,7 +265,7 @@ namespace osu.Game.Scoring
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreImporter.Import(notification, tasks);
 
         public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            scoreImporter.Import(item, archive, batchImport, cancellationToken);
+            scoreImporter.ImportModel(item, archive, batchImport, cancellationToken);
 
         #region Implementation of IPresentImports<ScoreInfo>
 
