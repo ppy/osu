@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Specialized;
 using System.Linq;
@@ -12,7 +14,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
@@ -20,19 +21,16 @@ namespace osu.Game.Tournament.Components
 {
     public class TournamentBeatmapPanel : CompositeDrawable
     {
-        public readonly APIBeatmap Beatmap;
+        public readonly TournamentBeatmap Beatmap;
 
         private readonly string mod;
-
-        private const float horizontal_padding = 10;
-        private const float vertical_padding = 10;
 
         public const float HEIGHT = 50;
 
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Box flash;
 
-        public TournamentBeatmapPanel(APIBeatmap beatmap, string mod = null)
+        public TournamentBeatmapPanel(TournamentBeatmap beatmap, string mod = null)
         {
             if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
 
@@ -62,7 +60,7 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
-                    OnlineInfo = Beatmap.BeatmapSet,
+                    OnlineInfo = Beatmap,
                 },
                 new FillFlowContainer
                 {

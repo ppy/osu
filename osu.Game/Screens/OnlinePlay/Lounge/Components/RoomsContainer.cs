@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -77,10 +79,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     bool matchingFilter = true;
 
-                    matchingFilter &= r.Room.Playlist.Count == 0 || criteria.Ruleset == null || r.Room.Playlist.Any(i => i.RulesetID == criteria.Ruleset.OnlineID);
+                    matchingFilter &= criteria.Ruleset == null || r.Room.PlaylistItemStats.Value?.RulesetIDs.Any(id => id == criteria.Ruleset.OnlineID) != false;
 
                     if (!string.IsNullOrEmpty(criteria.SearchString))
-                        matchingFilter &= r.FilterTerms.Any(term => term.Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
+                    {
+                        // Room name isn't translatable, so ToString() is used here for simplicity.
+                        matchingFilter &= r.FilterTerms.Any(term => term.ToString().Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
+                    }
 
                     r.MatchingFilter = matchingFilter;
                 }
@@ -124,7 +129,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void updateSorting()
         {
             foreach (var room in roomFlow)
-                roomFlow.SetLayoutPosition(room, -(room.Room.RoomID.Value ?? 0));
+            {
+                roomFlow.SetLayoutPosition(room, room.Room.Category.Value > RoomCategory.Normal
+                    // Always show spotlight playlists at the top of the listing.
+                    ? float.MinValue
+                    : -(room.Room.RoomID.Value ?? 0));
+            }
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -134,7 +144,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             return base.OnClick(e);
         }
 
-        #region Key selection logic (shared with BeatmapCarousel)
+        #region Key selection logic (shared with BeatmapCarousel and DrawableRoomPlaylist)
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {

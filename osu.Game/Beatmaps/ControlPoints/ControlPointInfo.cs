@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -164,7 +166,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             int closestDivisor = 0;
             double closestTime = double.MaxValue;
 
-            foreach (int divisor in BindableBeatDivisor.VALID_DIVISORS)
+            foreach (int divisor in BindableBeatDivisor.PREDEFINED_DIVISORS)
             {
                 double distanceFromSnap = Math.Abs(time - getClosestSnappedTime(timingPoint, time, divisor));
 

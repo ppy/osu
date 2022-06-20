@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -63,11 +65,6 @@ namespace osu.Game.Localisation
         /// "HUD overlay visibility mode"
         /// </summary>
         public static LocalisableString HUDVisibilityMode => new TranslatableString(getKey(@"hud_visibility_mode"), @"HUD overlay visibility mode");
-
-        /// <summary>
-        /// "Show difficulty graph on progress bar"
-        /// </summary>
-        public static LocalisableString ShowDifficultyGraph => new TranslatableString(getKey(@"show_difficulty_graph"), @"Show difficulty graph on progress bar");
 
         /// <summary>
         /// "Show health display even when you can't fail"

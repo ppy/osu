@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,5 +63,21 @@ namespace osu.Game.Online.Multiplayer
         }
 
         public override int GetHashCode() => UserID.GetHashCode();
+
+        /// <summary>
+        /// Whether this user has finished loading and can start gameplay.
+        /// </summary>
+        public bool CanStartGameplay()
+        {
+            switch (State)
+            {
+                case MultiplayerUserState.Loaded:
+                case MultiplayerUserState.ReadyForGameplay:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
     }
 }

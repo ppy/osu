@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using Newtonsoft.Json;
@@ -45,7 +47,7 @@ namespace osu.Game.Tournament.Models
 
         public void SaveChanges()
         {
-            using (var stream = configStorage.GetStream(config_path, FileAccess.Write, FileMode.Create))
+            using (var stream = configStorage.CreateFileSafely(config_path))
             using (var sw = new StreamWriter(stream))
             {
                 sw.Write(JsonConvert.SerializeObject(this,

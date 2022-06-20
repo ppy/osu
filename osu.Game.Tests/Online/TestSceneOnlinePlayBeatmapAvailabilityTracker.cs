@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -49,7 +51,7 @@ namespace osu.Game.Tests.Online
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, GameHost host)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new TestBeatmapModelDownloader(beatmaps, API));
         }
@@ -118,7 +120,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestBeatmapDownloadingFlow()
         {
-            AddAssert("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapSet));
+            AddUntilStep("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapSet));
             addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
             AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
@@ -132,7 +134,7 @@ namespace osu.Game.Tests.Online
 
             AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
             AddUntilStep("wait for import", () => beatmaps.CurrentImport != null);
-            AddAssert("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapSet));
+            AddUntilStep("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapSet));
             addAvailabilityCheckStep("state is locally available", BeatmapAvailability.LocallyAvailable);
         }
 
@@ -210,25 +212,25 @@ namespace osu.Game.Tests.Online
             {
             }
 
-            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
+            protected override BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
             {
-                return new TestBeatmapModelManager(this, storage, realm, onlineLookupQueue);
+                return new TestBeatmapImporter(this, storage, realm, onlineLookupQueue);
             }
 
-            internal class TestBeatmapModelManager : BeatmapModelManager
+            internal class TestBeatmapImporter : BeatmapImporter
             {
                 private readonly TestBeatmapManager testBeatmapManager;
 
-                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
-                    : base(databaseAccess, storage, beatmapOnlineLookupQueue)
+                public TestBeatmapImporter(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
+                    : base(storage, databaseAccess, beatmapOnlineLookupQueue)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }
 
-                public override Live<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+                public override Live<BeatmapSetInfo> ImportModel(BeatmapSetInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default)
                 {
                     testBeatmapManager.AllowImport.Task.WaitSafely();
-                    return (testBeatmapManager.CurrentImport = base.Import(item, archive, lowPriority, cancellationToken));
+                    return (testBeatmapManager.CurrentImport = base.ImportModel(item, archive, batchImport, cancellationToken));
                 }
             }
         }

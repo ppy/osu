@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -176,7 +178,7 @@ namespace osu.Game.Screens.Menu
 
             private static readonly Color4 transparent_white = Color4.White.Opacity(0.2f);
 
-            private float[] audioData;
+            private readonly float[] audioData = new float[256];
 
             private readonly QuadBatch<TexturedVertex2D> vertexBatch = new QuadBatch<TexturedVertex2D>(100, 10);
 
@@ -192,7 +194,8 @@ namespace osu.Game.Screens.Menu
                 shader = Source.shader;
                 texture = Source.texture;
                 size = Source.DrawSize.X;
-                audioData = Source.frequencyAmplitudes;
+
+                Source.frequencyAmplitudes.AsSpan().CopyTo(audioData);
             }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)

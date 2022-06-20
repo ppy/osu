@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,10 +29,16 @@ namespace osu.Game.Rulesets.Catch.Objects
         public int RepeatCount { get; set; }
 
         [JsonIgnore]
-        public double Velocity { get; private set; }
+        private double velocityFactor;
 
         [JsonIgnore]
-        public double TickDistance { get; private set; }
+        private double tickDistanceFactor;
+
+        [JsonIgnore]
+        public double Velocity => velocityFactor * DifficultyControlPoint.SliderVelocity;
+
+        [JsonIgnore]
+        public double TickDistance => tickDistanceFactor * DifficultyControlPoint.SliderVelocity;
 
         /// <summary>
         /// The length of one span of this <see cref="JuiceStream"/>.
@@ -43,10 +51,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
-
-            Velocity = scoringDistance / timingPoint.BeatLength;
-            TickDistance = scoringDistance / difficulty.SliderTickRate;
+            velocityFactor = base_scoring_distance * difficulty.SliderMultiplier / timingPoint.BeatLength;
+            tickDistanceFactor = base_scoring_distance * difficulty.SliderMultiplier / difficulty.SliderTickRate;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,7 +17,7 @@ namespace osu.Game.Tournament.Tests.Screens
         [BackgroundDependencyLoader]
         private void load(Storage storage)
         {
-            using (var stream = storage.GetStream("drawings.txt", FileAccess.Write))
+            using (var stream = storage.CreateFileSafely("drawings.txt"))
             using (var writer = new StreamWriter(stream))
             {
                 writer.WriteLine("KR : South Korea : KOR");

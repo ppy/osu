@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -14,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// <summary>
         /// Default size of a drawable taiko hit object.
         /// </summary>
-        public const float DEFAULT_SIZE = 0.45f;
+        public const float DEFAULT_SIZE = 0.475f;
 
         public override Judgement CreateJudgement() => new TaikoJudgement();
 

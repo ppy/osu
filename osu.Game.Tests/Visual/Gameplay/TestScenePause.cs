@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -85,7 +87,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
             pauseAndConfirm();
+            AddAssert("player not playing", () => !Player.LocalUserPlaying.Value);
+
             resumeAndConfirm();
+            AddUntilStep("player playing", () => Player.LocalUserPlaying.Value);
         }
 
         [Test]
@@ -389,9 +394,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public void ExitViaQuickExit() => PerformExit(false);
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
-                base.OnEntering(last);
+                base.OnEntering(e);
                 GameplayClockContainer.Stop();
             }
         }

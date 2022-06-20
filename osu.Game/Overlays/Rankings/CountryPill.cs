@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -77,7 +79,7 @@ namespace osu.Game.Overlays.Rankings
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Size = new Vector2(30, 20)
+                                        Size = new Vector2(28, 20)
                                     },
                                     countryName = new OsuSpriteText
                                     {

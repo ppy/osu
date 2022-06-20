@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -17,7 +20,9 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -47,7 +52,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
             // At a point we have isolated interactive test runs enough, this can likely be removed.
-            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(Realm);
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, defaultBeatmap = Beatmap.Default));
 
@@ -68,12 +73,45 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("reset defaults", () =>
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
+
                 Beatmap.SetDefault();
+                SelectedMods.SetDefault();
 
                 songSelect = null;
             });
 
             AddStep("delete all beatmaps", () => manager?.Delete());
+        }
+
+        [Test]
+        public void TestPlaceholderBeatmapPresence()
+        {
+            createSongSelect();
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            addRulesetImportStep(0);
+            AddUntilStep("wait for placeholder hidden", () => getPlaceholder()?.State.Value == Visibility.Hidden);
+
+            AddStep("delete all beatmaps", () => manager?.Delete());
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestPlaceholderConvertSetting()
+        {
+            changeRuleset(2);
+            addRulesetImportStep(0);
+            AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            createSongSelect();
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            AddStep("click link in placeholder", () => getPlaceholder().ChildrenOfType<DrawableLinkCompiler>().First().TriggerClick());
+
+            AddUntilStep("convert setting changed", () => config.Get<bool>(OsuSetting.ShowConvertedBeatmaps));
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -284,14 +322,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestDummy()
         {
             createSongSelect();
-            AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
+            AddUntilStep("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
 
             AddUntilStep("dummy shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap);
 
             addManyTestMaps();
-            AddWaitStep("wait for select", 3);
 
-            AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
+            AddUntilStep("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
         }
 
         [Test]
@@ -299,9 +336,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
             addManyTestMaps();
-            AddWaitStep("wait for add", 3);
 
-            AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
+            AddUntilStep("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
             AddStep(@"Sort by Artist", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Artist));
             AddStep(@"Sort by Title", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Title));
@@ -565,11 +601,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestAutoplayViaCtrlEnter()
+        public void TestAutoplayShortcut()
         {
             addRulesetImportStep(0);
 
             createSongSelect();
+
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
 
             AddStep("press ctrl+enter", () =>
             {
@@ -580,11 +618,65 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
 
-            AddAssert("autoplay enabled", () => songSelect.Mods.Value.FirstOrDefault() is ModAutoplay);
+            AddAssert("autoplay selected", () => songSelect.Mods.Value.Single() is ModAutoplay);
 
             AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
 
-            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
+            AddAssert("no mods selected", () => songSelect.Mods.Value.Count == 0);
+        }
+
+        [Test]
+        public void TestAutoplayShortcutKeepsAutoplayIfSelectedAlready()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
+
+            changeMods(new OsuModAutoplay());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay selected", () => songSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("autoplay still selected", () => songSelect.Mods.Value.Single() is ModAutoplay);
+        }
+
+        [Test]
+        public void TestAutoplayShortcutReturnsInitialModsOnExit()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
+
+            changeMods(new OsuModRelax());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only autoplay selected", () => songSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("relax returned", () => songSelect.Mods.Value.Single() is ModRelax);
         }
 
         [Test]
@@ -604,6 +696,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             addRulesetImportStep(0);
             createSongSelect();
+
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
 
             DrawableCarouselBeatmapSet set = null;
             AddStep("Find the DrawableCarouselBeatmapSet", () =>
@@ -844,6 +938,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
+
             AddStep("present score", () =>
             {
                 // this beatmap change should be overridden by the present.
@@ -858,6 +954,19 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check ruleset is correct for score", () => Ruleset.Value.OnlineID == 0);
         }
 
+        [Test]
+        public void TestModOverlayToggling()
+        {
+            changeRuleset(0);
+            createSongSelect();
+
+            AddStep("toggle mod overlay on", () => InputManager.Key(Key.F1));
+            AddUntilStep("mod overlay shown", () => songSelect.ModSelect.State.Value == Visibility.Visible);
+
+            AddStep("toggle mod overlay off", () => InputManager.Key(Key.F1));
+            AddUntilStep("mod overlay hidden", () => songSelect.ModSelect.State.Value == Visibility.Hidden);
+        }
+
         private void waitForInitialSelection()
         {
             AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
@@ -865,6 +974,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         private int getBeatmapIndex(BeatmapSetInfo set, BeatmapInfo info) => set.Beatmaps.IndexOf(info);
+
+        private NoResultsPlaceholder getPlaceholder() => songSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
 
         private int getCurrentBeatmapIndex() => getBeatmapIndex(songSelect.Carousel.SelectedBeatmapSet, songSelect.Carousel.SelectedBeatmapInfo);
 
@@ -933,6 +1044,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
             public IWorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
+            public new ModSelectOverlay ModSelect => base.ModSelect;
 
             public new void PresentScore(ScoreInfo score) => base.PresentScore(score);
 

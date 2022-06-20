@@ -1,11 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -43,16 +43,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override string ShortTitle => "room";
 
+        protected override bool PlayExitSound => !exitConfirmed;
+
         [Resolved]
         private MultiplayerClient client { get; set; }
 
-        [Resolved]
-        private OngoingOperationTracker ongoingOperationTracker { get; set; }
-
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
-
-        [CanBeNull]
-        private IDisposable readyClickOperation;
 
         private AddItemButton addItemButton;
 
@@ -230,11 +226,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
         }
 
-        protected override Drawable CreateFooter() => new MultiplayerMatchFooter
-        {
-            OnReadyClick = onReadyClick,
-            OnSpectateClick = onSpectateClick
-        };
+        protected override Drawable CreateFooter() => new MultiplayerMatchFooter();
 
         protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
 
@@ -250,18 +242,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         private bool exitConfirmed;
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             // the room may not be left immediately after a disconnection due to async flow,
             // so checking the IsConnected status is also required.
             if (client.Room == null || !client.IsConnected.Value)
             {
                 // room has not been created yet; exit immediately.
-                return base.OnExiting(next);
+                return base.OnExiting(e);
             }
 
             if (!exitConfirmed && dialogOverlay != null)
@@ -280,7 +272,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return true;
             }
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         private ModSettingChangeTracker modSettingChangeTracker;
@@ -293,7 +285,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null)
                 return;
 
-            client.ChangeUserMods(mods.NewValue);
+            client.ChangeUserMods(mods.NewValue).FireAndForget();
 
             modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
             modSettingChangeTracker.SettingChanged += onModSettingsChanged;
@@ -308,7 +300,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (client.Room == null)
                     return;
 
-                client.ChangeUserMods(UserMods.Value);
+                client.ChangeUserMods(UserMods.Value).FireAndForget();
             }, 500);
         }
 
@@ -317,7 +309,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null)
                 return;
 
-            client.ChangeBeatmapAvailability(availability.NewValue);
+            client.ChangeBeatmapAvailability(availability.NewValue).FireAndForget();
 
             if (availability.NewValue.State != DownloadState.LocallyAvailable)
             {
@@ -329,52 +321,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                      && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
             {
                 onLoadRequested();
-            }
-        }
-
-        private void onReadyClick()
-        {
-            Debug.Assert(readyClickOperation == null);
-            readyClickOperation = ongoingOperationTracker.BeginOperation();
-
-            if (client.IsHost && (client.LocalUser?.State == MultiplayerUserState.Ready || client.LocalUser?.State == MultiplayerUserState.Spectating))
-            {
-                client.StartMatch()
-                      .ContinueWith(t =>
-                      {
-                          // accessing Exception here silences any potential errors from the antecedent task
-                          if (t.Exception != null)
-                          {
-                              // gameplay was not started due to an exception; unblock button.
-                              endOperation();
-                          }
-
-                          // gameplay is starting, the button will be unblocked on load requested.
-                      });
-                return;
-            }
-
-            client.ToggleReady()
-                  .ContinueWith(t => endOperation());
-
-            void endOperation()
-            {
-                readyClickOperation?.Dispose();
-                readyClickOperation = null;
-            }
-        }
-
-        private void onSpectateClick()
-        {
-            Debug.Assert(readyClickOperation == null);
-            readyClickOperation = ongoingOperationTracker.BeginOperation();
-
-            client.ToggleSpectate().ContinueWith(t => endOperation());
-
-            void endOperation()
-            {
-                readyClickOperation?.Dispose();
-                readyClickOperation = null;
             }
         }
 
@@ -433,9 +379,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             StartPlay();
-
-            readyClickOperation?.Dispose();
-            readyClickOperation = null;
         }
 
         protected override Screen CreateGameplayScreen()
@@ -449,7 +392,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             switch (client.LocalUser.State)
             {
                 case MultiplayerUserState.Spectating:
-                    return new MultiSpectatorScreen(users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
+                    return new MultiSpectatorScreen(Room, users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
 
                 default:
                     return new MultiplayerPlayerLoader(() => new MultiplayerPlayer(Room, SelectedItem.Value, users));

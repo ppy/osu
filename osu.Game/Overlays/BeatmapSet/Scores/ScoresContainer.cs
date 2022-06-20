@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -78,8 +80,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 // TODO: temporary. should be removed once `OrderByTotalScore` can accept `IScoreInfo`.
                 var beatmapInfo = new BeatmapInfo
                 {
+#pragma warning disable 618
                     MaxCombo = apiBeatmap.MaxCombo,
-                    Status = apiBeatmap.Status
+#pragma warning restore 618
+                    Status = apiBeatmap.Status,
+                    MD5Hash = apiBeatmap.MD5Hash
                 };
 
                 scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
@@ -239,8 +244,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 modSelector.DeselectAll();
             else
                 getScores();
-
-            modSelector.FadeTo(userIsSupporter ? 1 : 0);
         }
 
         private void getScores()
@@ -250,14 +253,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             noScoresPlaceholder.Hide();
 
-            if (Beatmap.Value == null || Beatmap.Value.OnlineID <= 0 || (Beatmap.Value?.BeatmapSet as IBeatmapSetOnlineInfo)?.Status <= BeatmapOnlineStatus.Pending)
+            if (Beatmap.Value == null || Beatmap.Value.OnlineID <= 0 || (Beatmap.Value.Status <= BeatmapOnlineStatus.Pending))
             {
                 Scores = null;
                 Hide();
                 return;
             }
 
-            if (scope.Value != BeatmapLeaderboardScope.Global && !userIsSupporter)
+            if ((scope.Value != BeatmapLeaderboardScope.Global || modSelector.SelectedMods.Count > 0) && !userIsSupporter)
             {
                 Scores = null;
                 notSupporterPlaceholder.Show();

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework;
@@ -183,7 +185,14 @@ namespace osu.Game.Overlays.BeatmapSet
             }
 
             starRatingContainer.FadeOut(100);
-            Beatmap.Value = Difficulties.FirstOrDefault()?.Beatmap;
+
+            // If a selection is already made, try and maintain it.
+            if (Beatmap.Value != null)
+                Beatmap.Value = Difficulties.FirstOrDefault(b => b.Beatmap.OnlineID == Beatmap.Value.OnlineID)?.Beatmap;
+
+            // Else just choose the first available difficulty for now.
+            Beatmap.Value ??= Difficulties.FirstOrDefault()?.Beatmap;
+
             plays.Value = BeatmapSet?.PlayCount ?? 0;
             favourites.Value = BeatmapSet?.FavouriteCount ?? 0;
 

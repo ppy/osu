@@ -1,9 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -73,8 +77,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastLastObject, HitObject lastObject, double clockRate)
-            : base(hitObject, lastObject, clockRate)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+            : base(hitObject, lastObject, clockRate, objects, index)
         {
             this.lastLastObject = (OsuHitObject)lastLastObject;
             this.lastObject = (OsuHitObject)lastObject;
@@ -83,6 +87,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             StrainTime = Math.Max(DeltaTime, min_delta_time);
 
             setDistances(clockRate);
+        }
+
+        public double OpacityAt(double time, bool hidden)
+        {
+            if (time > BaseObject.StartTime)
+            {
+                // Consider a hitobject as being invisible when its start time is passed.
+                // In reality the hitobject will be visible beyond its start time up until its hittable window has passed,
+                // but this is an approximation and such a case is unlikely to be hit where this function is used.
+                return 0.0;
+            }
+
+            double fadeInStartTime = BaseObject.StartTime - BaseObject.TimePreempt;
+            double fadeInDuration = BaseObject.TimeFadeIn;
+
+            if (hidden)
+            {
+                // Taken from OsuModHidden.
+                double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeIn;
+                double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
+
+                return Math.Min
+                (
+                    Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0),
+                    1.0 - Math.Clamp((time - fadeOutStartTime) / fadeOutDuration, 0.0, 1.0)
+                );
+            }
+
+            return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
         }
 
         private void setDistances(double clockRate)

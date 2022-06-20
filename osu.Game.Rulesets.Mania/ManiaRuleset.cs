@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
@@ -53,7 +55,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap, this);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new ManiaPerformanceCalculator(this, attributes, score);
+        public override PerformanceCalculator CreatePerformanceCalculator() => new ManiaPerformanceCalculator();
 
         public const string SHORT_NAME = "mania";
 
@@ -258,6 +260,7 @@ namespace osu.Game.Rulesets.Mania
                     {
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new ManiaModMuted(),
+                        new ModAdaptiveSpeed()
                     };
 
                 default:
@@ -394,6 +397,7 @@ namespace osu.Game.Rulesets.Mania
                 {
                     new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                     {
+                        new AverageHitError(score.HitEvents),
                         new UnstableRate(score.HitEvents)
                     }), true)
                 }

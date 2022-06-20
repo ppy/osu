@@ -1,10 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Runtime.Versioning;
 using osu.Desktop.LegacyIpc;
 using osu.Framework;
 using osu.Framework.Development;
@@ -12,6 +13,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Game.Tournament;
+using Squirrel;
 
 namespace osu.Desktop
 {
@@ -24,6 +26,10 @@ namespace osu.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
+            // run Squirrel first, as the app may exit after these run
+            if (OperatingSystem.IsWindows())
+                setupSquirrel();
+
             // Back up the cwd before DesktopGameHost changes it
             string cwd = Environment.CurrentDirectory;
 
@@ -57,8 +63,6 @@ namespace osu.Desktop
 
             using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = true }))
             {
-                host.ExceptionThrown += handleException;
-
                 if (!host.IsPrimaryInstance)
                 {
                     if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
@@ -104,22 +108,29 @@ namespace osu.Desktop
             }
         }
 
-        private static int allowableExceptions = DebugUtils.IsDebugBuild ? 0 : 1;
-
-        /// <summary>
-        /// Allow a maximum of one unhandled exception, per second of execution.
-        /// </summary>
-        /// <param name="arg"></param>
-        private static bool handleException(Exception arg)
+        [SupportedOSPlatform("windows")]
+        private static void setupSquirrel()
         {
-            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
-
-            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
-
-            // restore the stock of allowable exceptions after a short delay.
-            Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
-
-            return continueExecution;
+            SquirrelAwareApp.HandleEvents(onInitialInstall: (version, tools) =>
+            {
+                tools.CreateShortcutForThisExe();
+                tools.CreateUninstallerRegistryEntry();
+            }, onAppUpdate: (version, tools) =>
+            {
+                tools.CreateUninstallerRegistryEntry();
+            }, onAppUninstall: (version, tools) =>
+            {
+                tools.RemoveShortcutForThisExe();
+                tools.RemoveUninstallerRegistryEntry();
+            }, onEveryRun: (version, tools, firstRun) =>
+            {
+                // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
+                // causes the right-click context menu to function incorrectly.
+                //
+                // This may turn out to be non-required after an alternative solution is implemented.
+                // see https://github.com/clowd/Clowd.Squirrel/issues/24
+                // tools.SetProcessAppUserModelId();
+            });
         }
     }
 }

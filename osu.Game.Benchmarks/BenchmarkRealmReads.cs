@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
@@ -27,7 +29,7 @@ namespace osu.Game.Benchmarks
             storage = new TemporaryNativeStorage("realm-benchmark");
             storage.DeleteDirectory(string.Empty);
 
-            realm = new RealmAccess(storage, "client");
+            realm = new RealmAccess(storage, OsuGameBase.CLIENT_DATABASE_FILENAME);
 
             realm.Run(r =>
             {

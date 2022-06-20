@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -205,7 +207,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                 try
                 {
                     // Write to drawings_results
-                    using (Stream stream = storage.GetStream(results_filename, FileAccess.Write, FileMode.Create))
+                    using (Stream stream = storage.CreateFileSafely(results_filename))
                     using (StreamWriter sw = new StreamWriter(stream))
                     {
                         sw.Write(text);

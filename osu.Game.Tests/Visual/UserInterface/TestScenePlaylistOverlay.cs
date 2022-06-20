@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -89,7 +91,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("results filtered correctly",
                 () => playlistOverlay.ChildrenOfType<PlaylistItem>()
                                      .Where(item => item.MatchingFilter)
-                                     .All(item => item.FilterTerms.Any(term => term.Contains("10"))));
+                                     .All(item => item.FilterTerms.Any(term => term.ToString().Contains("10"))));
         }
     }
 }

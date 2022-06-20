@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -27,10 +29,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             Masking = true;
-            CornerRadius = 5;
 
             OsuCheckbox waveformCheckbox;
             OsuCheckbox controlPointsCheckbox;
@@ -41,7 +42,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("111")
+                    Colour = colourProvider.Background5
                 },
                 new GridContainer
                 {
@@ -55,12 +56,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             {
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
+                                Name = @"Toggle controls",
                                 Children = new Drawable[]
                                 {
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4Extensions.FromHex("222")
+                                        Colour = colourProvider.Background2,
                                     },
                                     new FillFlowContainer
                                     {
@@ -94,12 +96,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             {
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
+                                Name = @"Zoom controls",
                                 Children = new Drawable[]
                                 {
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4Extensions.FromHex("333")
+                                        Colour = colourProvider.Background3,
                                     },
                                     new Container<TimelineButton>
                                     {

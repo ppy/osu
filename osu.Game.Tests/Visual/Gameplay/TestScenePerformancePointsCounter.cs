@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using NUnit.Framework;
@@ -45,7 +47,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             gameplayState = new GameplayState(beatmap, ruleset);
             gameplayState.LastJudgementResult.BindTo(lastJudgementResult);
 
-            scoreProcessor = new ScoreProcessor();
+            scoreProcessor = new ScoreProcessor(ruleset);
 
             Child = dependencyContainer = new DependencyProvidingContainer
             {

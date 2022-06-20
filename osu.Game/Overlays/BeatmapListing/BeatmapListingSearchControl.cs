@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -163,7 +165,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public void TakeFocus() => textBox.TakeFocus();
 
-        private class BeatmapSearchTextBox : SearchTextBox
+        private class BeatmapSearchTextBox : BasicSearchTextBox
         {
             /// <summary>
             /// Any time the text box receives key events (even while masked).

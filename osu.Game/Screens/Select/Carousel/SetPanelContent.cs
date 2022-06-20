@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -16,6 +18,9 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class SetPanelContent : CompositeDrawable
     {
+        // Disallow interacting with difficulty icons on a panel until the panel has been selected.
+        public override bool PropagatePositionalInputSubTree => carouselSet.State.Value == CarouselItemState.Selected;
+
         private readonly CarouselBeatmapSet carouselSet;
 
         public SetPanelContent(CarouselBeatmapSet carouselSet)

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -23,6 +25,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using osuTK.Graphics;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
 
@@ -74,7 +77,7 @@ namespace osu.Game.Tests.Visual
         [TearDownSteps]
         public void TearDownSteps()
         {
-            if (DebugUtils.IsNUnitRunning)
+            if (DebugUtils.IsNUnitRunning && Game != null)
             {
                 AddStep("exit game", () => Game.Exit());
                 AddUntilStep("wait for game exit", () => Game.Parent == null);
@@ -106,6 +109,11 @@ namespace osu.Game.Tests.Visual
 
         protected void ConfirmAtMainMenu() => AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu menu && menu.IsLoaded);
 
+        /// <summary>
+        /// Dismisses any notifications pushed which block from interacting with the game (or block screens from loading, e.g. <see cref="Player"/>).
+        /// </summary>
+        protected void DismissAnyNotifications() => Game.Notifications.State.Value = Visibility.Hidden;
+
         public class TestOsuGame : OsuGame
         {
             public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
@@ -125,6 +133,8 @@ namespace osu.Game.Tests.Visual
             public new SettingsOverlay Settings => base.Settings;
 
             public new NotificationOverlay Notifications => base.Notifications;
+
+            public new FirstRunSetupOverlay FirstRunOverlay => base.FirstRunOverlay;
 
             public new MusicController MusicController => base.MusicController;
 
@@ -156,6 +166,7 @@ namespace osu.Game.Tests.Visual
                 base.LoadComplete();
 
                 LocalConfig.SetValue(OsuSetting.IntroSequence, IntroSequence.Circles);
+                LocalConfig.SetValue(OsuSetting.ShowFirstRunSetup, false);
 
                 API.Login("Rhythm Champion", "osu!");
 

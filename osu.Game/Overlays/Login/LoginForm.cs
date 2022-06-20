@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -13,6 +16,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Overlays.Login
@@ -50,14 +54,14 @@ namespace osu.Game.Overlays.Login
             {
                 username = new OsuTextBox
                 {
-                    PlaceholderText = "username",
+                    PlaceholderText = UsersStrings.LoginUsername.ToLower(),
                     RelativeSizeAxes = Axes.X,
                     Text = api?.ProvidedUsername ?? string.Empty,
                     TabbableContentContainer = this
                 },
                 password = new OsuPasswordTextBox
                 {
-                    PlaceholderText = "password",
+                    PlaceholderText = UsersStrings.LoginPassword.ToLower(),
                     RelativeSizeAxes = Axes.X,
                     TabbableContentContainer = this,
                 },
@@ -88,7 +92,7 @@ namespace osu.Game.Overlays.Login
                             AutoSizeAxes = Axes.Y,
                             Child = new SettingsButton
                             {
-                                Text = "Sign in",
+                                Text = UsersStrings.LoginButton,
                                 Action = performLogin
                             },
                         }

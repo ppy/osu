@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -21,12 +24,14 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -46,7 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
@@ -168,8 +173,90 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
 
+            AddUntilStep("mod select contents loaded",
+                () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
             AddUntilStep("mod select contains only double time mod",
-                () => this.ChildrenOfType<UserModSelectOverlay>().SingleOrDefault()?.ChildrenOfType<ModButton>().SingleOrDefault()?.Mod is OsuModDoubleTime);
+                () => this.ChildrenOfType<UserModSelectOverlay>()
+                          .SingleOrDefault()?
+                          .ChildrenOfType<ModPanel>()
+                          .SingleOrDefault(panel => !panel.Filtered.Value)?.Mod is OsuModDoubleTime);
+        }
+
+        [Test]
+        public void TestModSelectKeyWithAllowedMods()
+        {
+            AddStep("add playlist item with allowed mod", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
+                });
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
+
+            AddUntilStep("mod select shown", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestModSelectKeyWithNoAllowedMods()
+        {
+            AddStep("add playlist item with no allowed mods", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                });
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
+
+            AddWaitStep("wait some", 3);
+            AddAssert("mod select not shown", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestNextPlaylistItemSelectedAfterCompletion()
+        {
+            AddStep("add two playlist items", () =>
+            {
+                SelectedRoom.Value.Playlist.AddRange(new[]
+                {
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    },
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                });
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            AddStep("change user to loaded", () => MultiplayerClient.ChangeState(MultiplayerUserState.Loaded));
+            AddUntilStep("user playing", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Playing);
+            AddStep("abort gameplay", () => MultiplayerClient.AbortGameplay());
+
+            AddUntilStep("last playlist item selected", () =>
+            {
+                var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.APIRoom?.Playlist.Last().ID);
+                return lastItem.IsSelectedItem;
+            });
         }
     }
 }

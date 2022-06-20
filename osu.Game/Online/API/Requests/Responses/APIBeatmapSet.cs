@@ -9,8 +9,6 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
 
-#nullable enable
-
 namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIBeatmapSet : IBeatmapSetOnlineInfo, IBeatmapSetInfo
@@ -41,6 +39,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"nsfw")]
         public bool HasExplicitContent { get; set; }
+
+        [JsonProperty(@"spotlight")]
+        public bool FeaturedInSpotlight { get; set; }
 
         [JsonProperty(@"video")]
         public bool HasVideo { get; set; }
