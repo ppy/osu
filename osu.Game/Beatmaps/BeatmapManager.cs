@@ -101,7 +101,7 @@ namespace osu.Game.Beatmaps
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
                 b.BeatmapSet = beatmapSet;
 
-            var imported = beatmapImporter.Import(beatmapSet);
+            var imported = beatmapImporter.ImportModel(beatmapSet);
 
             if (imported == null)
                 throw new InvalidOperationException("Failed to import new beatmap");
@@ -410,7 +410,7 @@ namespace osu.Game.Beatmaps
             beatmapImporter.Import(task, batchImport, cancellationToken);
 
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(item, archive, false, cancellationToken);
+            beatmapImporter.ImportModel(item, archive, false, cancellationToken);
 
         public IEnumerable<string> HandledExtensions => beatmapImporter.HandledExtensions;
 
