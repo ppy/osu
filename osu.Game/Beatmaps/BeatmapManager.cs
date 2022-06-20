@@ -42,9 +42,10 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue? onlineBeatmapLookupQueue;
+        private readonly BeatmapUpdater? beatmapUpdater;
 
         public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
-                              WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
+                              WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
             : base(storage, realm)
         {
             if (performOnlineLookups)
@@ -52,14 +53,18 @@ namespace osu.Game.Beatmaps
                 if (api == null)
                     throw new ArgumentNullException(nameof(api), "API must be provided if online lookups are required.");
 
+                if (difficultyCache == null)
+                    throw new ArgumentNullException(nameof(difficultyCache), "Difficulty cache must be provided if online lookups are required.");
+
                 onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+                beatmapUpdater = new BeatmapUpdater(this, onlineBeatmapLookupQueue, difficultyCache);
             }
 
             var userResources = new RealmFileStore(realm, storage).Store;
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            beatmapImporter = CreateBeatmapImporter(storage, realm, rulesets, onlineBeatmapLookupQueue);
+            beatmapImporter = CreateBeatmapImporter(storage, realm, rulesets, beatmapUpdater);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -71,8 +76,8 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
-            new BeatmapImporter(storage, realm, onlineLookupQueue);
+        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapUpdater? beatmapUpdater) =>
+            new BeatmapImporter(storage, realm, beatmapUpdater);
 
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,
