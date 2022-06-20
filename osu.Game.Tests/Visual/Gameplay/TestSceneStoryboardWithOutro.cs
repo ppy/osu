@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -53,8 +55,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             CreateTest(null);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("skip outro", () => InputManager.Key(osuTK.Input.Key.Space));
+            AddAssert("player is no longer current screen", () => !Player.IsCurrentScreen());
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
-            AddUntilStep("time less than storyboard duration", () => Player.GameplayClockContainer.GameplayClock.CurrentTime < currentStoryboardDuration);
         }
 
         [Test]
@@ -90,9 +92,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             CreateTest(() =>
             {
                 AddStep("fail on first judgement", () => currentFailConditions = (_, __) => true);
-                AddStep("set storyboard duration to 1.3s", () => currentStoryboardDuration = 1300);
+
+                // Fail occurs at 164ms with the provided beatmap.
+                // Fail animation runs for 2.5s realtime but the gameplay time change is *variable* due to the frequency transform being applied, so we need a bit of lenience.
+                AddStep("set storyboard duration to 0.6s", () => currentStoryboardDuration = 600);
             });
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value == Visibility.Visible);
         }

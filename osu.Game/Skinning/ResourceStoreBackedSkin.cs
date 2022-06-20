@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -36,7 +34,7 @@ namespace osu.Game.Skinning
 
         public ISample? GetSample(ISampleInfo sampleInfo)
         {
-            foreach (var lookup in sampleInfo.LookupNames)
+            foreach (string? lookup in sampleInfo.LookupNames)
             {
                 ISample? sample = samples.Get(lookup);
                 if (sample != null)
@@ -46,7 +44,10 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup) => null;
+        public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
+            where TLookup : notnull
+            where TValue : notnull
+            => null;
 
         public void Dispose()
         {

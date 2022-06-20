@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -27,17 +29,17 @@ namespace osu.Game.Rulesets.Taiko.Tests
             var controlPointInfo = new ControlPointInfo();
             controlPointInfo.Add(0, new TimingControlPoint());
 
-            WorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
+            IWorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
             {
                 HitObjects = new List<HitObject> { new Hit { Type = HitType.Centre } },
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BaseDifficulty = new BeatmapDifficulty(),
+                    Difficulty = new BeatmapDifficulty(),
                     Metadata = new BeatmapMetadata
                     {
                         Artist = @"Unknown",
                         Title = @"Sample Beatmap",
-                        AuthorString = @"peppy",
+                        Author = { Username = @"peppy" },
                     },
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },

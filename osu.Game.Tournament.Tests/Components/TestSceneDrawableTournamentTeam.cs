@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Tests.Visual;
@@ -9,7 +11,6 @@ using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
-using osu.Game.Users;
 
 namespace osu.Game.Tournament.Tests.Components
 {
@@ -24,13 +25,13 @@ namespace osu.Game.Tournament.Tests.Components
                 FullName = { Value = "Australia" },
                 Players =
                 {
-                    new User { Username = "ASecretBox" },
-                    new User { Username = "Dereban" },
-                    new User { Username = "mReKk" },
-                    new User { Username = "uyghti" },
-                    new User { Username = "Parkes" },
-                    new User { Username = "Shiroha" },
-                    new User { Username = "Jordan The Bear" },
+                    new TournamentUser { Username = "ASecretBox" },
+                    new TournamentUser { Username = "Dereban" },
+                    new TournamentUser { Username = "mReKk" },
+                    new TournamentUser { Username = "uyghti" },
+                    new TournamentUser { Username = "Parkes" },
+                    new TournamentUser { Username = "Shiroha" },
+                    new TournamentUser { Username = "Jordan The Bear" },
                 }
             };
 

@@ -1,26 +1,28 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Users;
 using JetBrains.Annotations;
 using osu.Framework.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract class ProfileSubsection : FillFlowContainer
     {
-        protected readonly Bindable<User> User = new Bindable<User>();
+        protected readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
         private readonly LocalisableString headerText;
         private readonly CounterVisibilityState counterVisibilityState;
 
         private ProfileSubsectionHeader header;
 
-        protected ProfileSubsection(Bindable<User> user, LocalisableString? headerText = null, CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+        protected ProfileSubsection(Bindable<APIUser> user, LocalisableString? headerText = null, CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
         {
             this.headerText = headerText ?? string.Empty;
             this.counterVisibilityState = counterVisibilityState;

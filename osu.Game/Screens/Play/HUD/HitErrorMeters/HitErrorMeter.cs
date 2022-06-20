@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -31,6 +33,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private void load(DrawableRuleset drawableRuleset)
         {
             HitWindows = drawableRuleset?.FirstAvailableHitWindows ?? HitWindows.Empty;
+
+            // This is to allow the visual state to be correct after HUD comes visible after being hidden.
+            AlwaysPresent = true;
         }
 
         protected override void LoadComplete()
@@ -40,9 +45,16 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             if (gameplayClockContainer != null)
                 gameplayClockContainer.OnSeek += Clear;
 
-            processor.NewJudgement += OnNewJudgement;
+            processor.NewJudgement += processorNewJudgement;
         }
 
+        // Scheduled as meter implementations are likely going to change/add drawables when reacting to this.
+        private void processorNewJudgement(JudgementResult j) => Schedule(() => OnNewJudgement(j));
+
+        /// <summary>
+        /// Fired when a new judgement arrives.
+        /// </summary>
+        /// <param name="judgement">The new judgement.</param>
         protected abstract void OnNewJudgement(JudgementResult judgement);
 
         protected Color4 GetColourForHitResult(HitResult result)
@@ -84,7 +96,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             base.Dispose(isDisposing);
 
             if (processor != null)
-                processor.NewJudgement -= OnNewJudgement;
+                processor.NewJudgement -= processorNewJudgement;
 
             if (gameplayClockContainer != null)
                 gameplayClockContainer.OnSeek -= Clear;

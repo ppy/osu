@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -75,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private bool checkBreadcrumb()
         {
-            var result = header.TabControlItems.Contains(wikiPageData.Value.Title);
+            bool result = header.TabControlItems.Contains(wikiPageData.Value.Title);
 
             if (wikiPageData.Value.Subtitle != null)
                 result = header.TabControlItems.Contains(wikiPageData.Value.Subtitle) && result;

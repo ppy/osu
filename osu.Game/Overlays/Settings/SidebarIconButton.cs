@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -62,14 +64,14 @@ namespace osu.Game.Overlays.Settings
             {
                 textIconContent = new Container
                 {
-                    Width = Sidebar.DEFAULT_WIDTH,
+                    Width = SettingsSidebar.DEFAULT_WIDTH,
                     RelativeSizeAxes = Axes.Y,
                     Colour = OsuColour.Gray(0.6f),
                     Children = new Drawable[]
                     {
                         headerText = new OsuSpriteText
                         {
-                            Position = new Vector2(Sidebar.DEFAULT_WIDTH + 10, 0),
+                            Position = new Vector2(SettingsSidebar.DEFAULT_WIDTH + 10, 0),
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },

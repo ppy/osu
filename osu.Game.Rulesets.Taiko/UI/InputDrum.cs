@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,7 +14,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -148,9 +149,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 rimHit.Colour = colours.Blue;
                 centreHit.Colour = colours.Pink;
             }
-
-            [Resolved(canBeNull: true)]
-            private GameplayClock gameplayClock { get; set; }
 
             public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Scoring;
@@ -38,7 +40,7 @@ namespace osu.Game.Screens.Select
             HeaderText = "Confirm deletion of local score";
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                new PopupDialogDangerousButton
                 {
                     Text = "Yes. Please.",
                     Action = () => scoreManager?.Delete(score)

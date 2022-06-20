@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -13,6 +15,11 @@ namespace osu.Game.Localisation
         /// "Skin"
         /// </summary>
         public static LocalisableString SkinSectionHeader => new TranslatableString(getKey(@"skin_section_header"), @"Skin");
+
+        /// <summary>
+        /// "Current skin"
+        /// </summary>
+        public static LocalisableString CurrentSkin => new TranslatableString(getKey(@"current_skin"), @"Current skin");
 
         /// <summary>
         /// "Skin layout editor"
@@ -48,6 +55,11 @@ namespace osu.Game.Localisation
         /// "Export selected skin"
         /// </summary>
         public static LocalisableString ExportSkinButton => new TranslatableString(getKey(@"export_skin_button"), @"Export selected skin");
+
+        /// <summary>
+        /// "Delete selected skin"
+        /// </summary>
+        public static LocalisableString DeleteSkinButton => new TranslatableString(getKey(@"delete_skin_button"), @"Delete selected skin");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

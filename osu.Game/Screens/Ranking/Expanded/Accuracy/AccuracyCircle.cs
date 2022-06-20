@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -10,7 +12,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -104,7 +105,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
@@ -213,12 +214,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Padding = new MarginPadding { Vertical = -15, Horizontal = -20 },
                     Children = new[]
                     {
-                        new RankBadge(1f, getRank(ScoreRank.X)),
-                        new RankBadge(0.95f, getRank(ScoreRank.S)),
-                        new RankBadge(0.9f, getRank(ScoreRank.A)),
-                        new RankBadge(0.8f, getRank(ScoreRank.B)),
-                        new RankBadge(0.7f, getRank(ScoreRank.C)),
-                        new RankBadge(0.35f, getRank(ScoreRank.D)),
+                        new RankBadge(1, getRank(ScoreRank.X)),
+                        new RankBadge(0.95, getRank(ScoreRank.S)),
+                        new RankBadge(0.9, getRank(ScoreRank.A)),
+                        new RankBadge(0.8, getRank(ScoreRank.B)),
+                        new RankBadge(0.7, getRank(ScoreRank.C)),
+                        new RankBadge(0.35, getRank(ScoreRank.D)),
                     }
                 },
                 rankText = new RankText(score.Rank)

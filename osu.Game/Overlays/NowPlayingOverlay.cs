@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -197,7 +199,6 @@ namespace osu.Game.Overlays
                 {
                     dragContainer.Add(playlist);
 
-                    playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
                     playlist.State.BindValueChanged(s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint), true);
 
                     togglePlaylist();
@@ -214,7 +215,8 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
+            beatmap.BindDisabledChanged(_ => Scheduler.AddOnce(beatmapDisabledChanged));
+            beatmapDisabledChanged();
 
             musicController.TrackChanged += trackChanged;
             trackChanged(beatmap.Value);
@@ -318,8 +320,10 @@ namespace osu.Game.Overlays
             };
         }
 
-        private void beatmapDisabledChanged(bool disabled)
+        private void beatmapDisabledChanged()
         {
+            bool disabled = beatmap.Disabled;
+
             if (disabled)
                 playlist?.Hide();
 
@@ -366,13 +370,12 @@ namespace osu.Game.Overlays
             private readonly WorkingBeatmap beatmap;
 
             public Background(WorkingBeatmap beatmap = null)
+                : base(cachedFrameBuffer: true)
             {
                 this.beatmap = beatmap;
 
                 Depth = float.MaxValue;
                 RelativeSizeAxes = Axes.Both;
-
-                CacheDrawnFrameBuffer = true;
 
                 Children = new Drawable[]
                 {

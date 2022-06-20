@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -301,8 +303,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
-
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => throw new NotImplementedException();
         }
 
         private class SecondarySource : ISkin
@@ -314,8 +314,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
-
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => throw new NotImplementedException();
         }
 
         [Cached(typeof(ISkinSource))]

@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Database;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Localisation;
@@ -19,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         protected IEnumerable<Framework.Input.Bindings.KeyBinding> Defaults;
 
-        protected RulesetInfo Ruleset;
+        public RulesetInfo Ruleset { get; protected set; }
 
         private readonly int? variant;
 
@@ -31,14 +33,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(RealmContextFactory realmFactory)
+        private void load(RealmAccess realm)
         {
-            var rulesetId = Ruleset?.ID;
+            string rulesetName = Ruleset?.ShortName;
 
-            List<RealmKeyBinding> bindings;
-
-            using (var realm = realmFactory.CreateContext())
-                bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
+            var bindings = realm.Run(r => r.All<RealmKeyBinding>()
+                                           .Where(b => b.RulesetName == rulesetName && b.Variant == variant)
+                                           .Detach());
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
@@ -59,7 +60,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
     }
 
-    public class ResetButton : DangerousTriangleButton
+    public class ResetButton : DangerousSettingsButton
     {
         [BackgroundDependencyLoader]
         private void load()
@@ -76,6 +77,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         // Empty FilterTerms so that the ResetButton is visible only when the whole subsection is visible.
-        public override IEnumerable<string> FilterTerms => Enumerable.Empty<string>();
+        public override IEnumerable<LocalisableString> FilterTerms => Enumerable.Empty<LocalisableString>();
     }
 }

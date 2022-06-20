@@ -3,10 +3,9 @@
 
 using MessagePack;
 
-#nullable enable
-
 namespace osu.Game.Online.Multiplayer.MatchTypes.TeamVersus
 {
+    [MessagePackObject]
     public class ChangeTeamRequest : MatchUserRequest
     {
         [Key(0)]

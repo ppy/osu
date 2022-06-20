@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -68,7 +70,10 @@ namespace osu.Game.Overlays.Settings.Sections
                     break;
 
                 // whitelist the handlers which should be displayed to avoid any weird cases of users touching settings they shouldn't.
-                case JoystickHandler _:
+                case JoystickHandler jh:
+                    section = new JoystickSettings(jh);
+                    break;
+
                 case MidiHandler _:
                     section = new HandlerSection(handler);
                     break;

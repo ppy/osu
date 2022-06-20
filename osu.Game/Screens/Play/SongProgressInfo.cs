@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -82,7 +84,7 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            var time = gameplayClock?.CurrentTime ?? Time.Current;
+            double time = gameplayClock?.CurrentTime ?? Time.Current;
 
             double songCurrentTime = time - startTime;
             int currentPercent = Math.Max(0, Math.Min(100, (int)(songCurrentTime / songLength * 100)));

@@ -4,14 +4,12 @@
 using System;
 using osu.Game.Database;
 
-#nullable enable
-
 namespace osu.Game.Rulesets
 {
     /// <summary>
     /// A representation of a ruleset's metadata.
     /// </summary>
-    public interface IRulesetInfo : IHasOnlineID
+    public interface IRulesetInfo : IHasOnlineID<int>, IEquatable<IRulesetInfo>, IComparable<IRulesetInfo>
     {
         /// <summary>
         /// The user-exposed name of this ruleset.
@@ -28,20 +26,6 @@ namespace osu.Game.Rulesets
         /// </summary>
         string InstantiationInfo { get; }
 
-        Ruleset? CreateInstance()
-        {
-            var type = Type.GetType(InstantiationInfo);
-
-            if (type == null)
-                return null;
-
-            var ruleset = Activator.CreateInstance(type) as Ruleset;
-
-            // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
-            // TODO: figure if we still want/need this after switching to realm.
-            // ruleset.RulesetInfo = this;
-
-            return ruleset;
-        }
+        Ruleset CreateInstance();
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 
 namespace osu.Game.Utils
@@ -37,7 +39,7 @@ namespace osu.Game.Utils
         {
             unchecked
             {
-                var combined = ((ulong)(uint)series << 32) | (uint)seed;
+                ulong combined = ((ulong)(uint)series << 32) | (uint)seed;
                 // The xor operation is to not map (0, 0) to 0.
                 return mix(combined ^ 0x12345678);
             }

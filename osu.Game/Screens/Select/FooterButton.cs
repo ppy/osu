@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osuTK;
 using osuTK.Graphics;
@@ -66,7 +68,7 @@ namespace osu.Game.Screens.Select
         private readonly Box light;
 
         public FooterButton()
-            : base(HoverSampleSet.Button)
+            : base(HoverSampleSet.Toolbar)
         {
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
@@ -174,7 +176,7 @@ namespace osu.Game.Screens.Select
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == Hotkey)
+            if (e.Action == Hotkey && !e.Repeat)
             {
                 TriggerClick();
                 return true;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -107,7 +109,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             set
             {
-                if (score == value)
+                if (score == null && value == null)
+                    return;
+
+                if (score?.Equals(value) == true)
                     return;
 
                 score = value;
@@ -115,8 +120,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 accuracyColumn.Text = value.DisplayAccuracy;
                 maxComboColumn.Text = value.MaxCombo.ToLocalisableString(@"0\x");
 
-                ppColumn.Alpha = value.BeatmapInfo?.Status.GrantsPerformancePoints() == true ? 1 : 0;
-                ppColumn.Text = value.PP?.ToLocalisableString(@"N0");
+                ppColumn.Alpha = value.BeatmapInfo.Status.GrantsPerformancePoints() ? 1 : 0;
+                ppColumn.Text = value.PP?.ToLocalisableString(@"N0") ?? default;
 
                 statisticsColumns.ChildrenEnumerable = value.GetStatisticsForDisplay().Select(createStatisticsColumn);
                 modsColumn.Mods = value.Mods;

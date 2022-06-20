@@ -1,8 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -67,7 +70,14 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
-        public SampleControlPoint SampleControlPoint;
+        /// <summary>
+        /// Any samples which may be used by this hit object that are non-standard.
+        /// This is used only to preload these samples ahead of time.
+        /// </summary>
+        public virtual IList<HitSampleInfo> AuxiliarySamples => ImmutableList<HitSampleInfo>.Empty;
+
+        public SampleControlPoint SampleControlPoint = SampleControlPoint.DEFAULT;
+        public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;
 
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
@@ -86,17 +96,6 @@ namespace osu.Game.Rulesets.Objects
         [JsonIgnore]
         public SlimReadOnlyListWrapper<HitObject> NestedHitObjects => nestedHitObjects.AsSlimReadOnly();
 
-        public HitObject()
-        {
-            StartTimeBindable.ValueChanged += time =>
-            {
-                double offset = time.NewValue - time.OldValue;
-
-                foreach (var nested in nestedHitObjects)
-                    nested.StartTime += offset;
-            };
-        }
-
         /// <summary>
         /// Applies default values to this HitObject.
         /// </summary>
@@ -105,17 +104,24 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
+            var legacyInfo = controlPointInfo as LegacyControlPointInfo;
+
+            if (legacyInfo != null)
+                DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
+            else if (DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                DifficultyControlPoint = new DifficultyControlPoint();
+
+            DifficultyControlPoint.Time = StartTime;
+
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            if (controlPointInfo is LegacyControlPointInfo legacyInfo)
-            {
-                // This is done here since ApplyDefaultsToSelf may be used to determine the end time
-                SampleControlPoint = legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
-            }
-            else
-            {
-                SampleControlPoint ??= SampleControlPoint.DEFAULT;
-            }
+            // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
+            if (legacyInfo != null)
+                SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
+            else if (SampleControlPoint == SampleControlPoint.DEFAULT)
+                SampleControlPoint = new SampleControlPoint();
+
+            SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
 
             nestedHitObjects.Clear();
 
@@ -139,7 +145,28 @@ namespace osu.Game.Rulesets.Objects
             foreach (var h in nestedHitObjects)
                 h.ApplyDefaults(controlPointInfo, difficulty, cancellationToken);
 
+            // `ApplyDefaults()` may be called multiple times on a single hitobject.
+            // to prevent subscribing to `StartTimeBindable.ValueChanged` multiple times with the same callback,
+            // remove the previous subscription (if present) before (re-)registering.
+            StartTimeBindable.ValueChanged -= onStartTimeChanged;
+
+            // this callback must be (re-)registered after default application
+            // to ensure that the read of `this.GetEndTime()` within `onStartTimeChanged` doesn't return an invalid value
+            // if `StartTimeBindable` is changed prior to default application.
+            StartTimeBindable.ValueChanged += onStartTimeChanged;
+
             DefaultsApplied?.Invoke(this);
+
+            void onStartTimeChanged(ValueChangedEvent<double> time)
+            {
+                double offset = time.NewValue - time.OldValue;
+
+                foreach (var nested in nestedHitObjects)
+                    nested.StartTime += offset;
+
+                DifficultyControlPoint.Time = time.NewValue;
+                SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
+            }
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps.ControlPoints;
@@ -46,7 +48,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestAddRedundantDifficulty()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             cpi.Add(0, new DifficultyControlPoint()); // is redundant
             cpi.Add(1000, new DifficultyControlPoint()); // is redundant
@@ -55,7 +57,7 @@ namespace osu.Game.Tests.NonVisual
             Assert.That(cpi.DifficultyPoints.Count, Is.EqualTo(0));
             Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(0));
 
-            cpi.Add(1000, new DifficultyControlPoint { SpeedMultiplier = 2 }); // is not redundant
+            cpi.Add(1000, new DifficultyControlPoint { SliderVelocity = 2 }); // is not redundant
 
             Assert.That(cpi.Groups.Count, Is.EqualTo(1));
             Assert.That(cpi.DifficultyPoints.Count, Is.EqualTo(1));
@@ -159,7 +161,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestAddControlPointToGroup()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             var group = cpi.GroupAt(1000, true);
             Assert.That(cpi.Groups.Count, Is.EqualTo(1));
@@ -174,23 +176,23 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestAddDuplicateControlPointToGroup()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             var group = cpi.GroupAt(1000, true);
             Assert.That(cpi.Groups.Count, Is.EqualTo(1));
 
             group.Add(new DifficultyControlPoint());
-            group.Add(new DifficultyControlPoint { SpeedMultiplier = 2 });
+            group.Add(new DifficultyControlPoint { SliderVelocity = 2 });
 
             Assert.That(group.ControlPoints.Count, Is.EqualTo(1));
             Assert.That(cpi.DifficultyPoints.Count, Is.EqualTo(1));
-            Assert.That(cpi.DifficultyPoints.First().SpeedMultiplier, Is.EqualTo(2));
+            Assert.That(cpi.DifficultyPoints.First().SliderVelocity, Is.EqualTo(2));
         }
 
         [Test]
         public void TestRemoveControlPointFromGroup()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             var group = cpi.GroupAt(1000, true);
             Assert.That(cpi.Groups.Count, Is.EqualTo(1));
@@ -208,14 +210,14 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestOrdering()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             cpi.Add(0, new TimingControlPoint());
             cpi.Add(1000, new TimingControlPoint { BeatLength = 500 });
             cpi.Add(10000, new TimingControlPoint { BeatLength = 200 });
             cpi.Add(5000, new TimingControlPoint { BeatLength = 100 });
-            cpi.Add(3000, new DifficultyControlPoint { SpeedMultiplier = 2 });
-            cpi.GroupAt(7000, true).Add(new DifficultyControlPoint { SpeedMultiplier = 4 });
+            cpi.Add(3000, new DifficultyControlPoint { SliderVelocity = 2 });
+            cpi.GroupAt(7000, true).Add(new DifficultyControlPoint { SliderVelocity = 4 });
             cpi.GroupAt(1000).Add(new SampleControlPoint { SampleVolume = 0 });
             cpi.GroupAt(8000, true).Add(new EffectControlPoint { KiaiMode = true });
 
@@ -230,14 +232,14 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestClear()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             cpi.Add(0, new TimingControlPoint());
             cpi.Add(1000, new TimingControlPoint { BeatLength = 500 });
             cpi.Add(10000, new TimingControlPoint { BeatLength = 200 });
             cpi.Add(5000, new TimingControlPoint { BeatLength = 100 });
-            cpi.Add(3000, new DifficultyControlPoint { SpeedMultiplier = 2 });
-            cpi.GroupAt(7000, true).Add(new DifficultyControlPoint { SpeedMultiplier = 4 });
+            cpi.Add(3000, new DifficultyControlPoint { SliderVelocity = 2 });
+            cpi.GroupAt(7000, true).Add(new DifficultyControlPoint { SliderVelocity = 4 });
             cpi.GroupAt(1000).Add(new SampleControlPoint { SampleVolume = 0 });
             cpi.GroupAt(8000, true).Add(new EffectControlPoint { KiaiMode = true });
 

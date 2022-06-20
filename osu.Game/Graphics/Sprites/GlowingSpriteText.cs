@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -69,12 +71,11 @@ namespace osu.Game.Graphics.Sprites
 
             Children = new Drawable[]
             {
-                new BufferedContainer
+                new BufferedContainer(cachedFrameBuffer: true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BlurSigma = new Vector2(4),
-                    CacheDrawnFrameBuffer = true,
                     RedrawOnScale = false,
                     RelativeSizeAxes = Axes.Both,
                     Blending = BlendingParameters.Additive,

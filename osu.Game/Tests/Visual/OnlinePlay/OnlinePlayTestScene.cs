@@ -1,12 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Database;
+using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
 
@@ -21,17 +27,19 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public IRoomManager RoomManager => OnlinePlayDependencies?.RoomManager;
         public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies?.OngoingOperationTracker;
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies?.AvailabilityTracker;
+        public TestUserLookupCache UserLookupCache => OnlinePlayDependencies?.UserLookupCache;
+        public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies?.BeatmapLookupCache;
 
         /// <summary>
         /// All dependencies required for online play components and screens.
         /// </summary>
         protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies?.OnlinePlayDependencies;
 
-        private DelegatedDependencyContainer dependencies;
-
         protected override Container<Drawable> Content => content;
+
         private readonly Container content;
         private readonly Container drawableDependenciesContainer;
+        private DelegatedDependencyContainer dependencies;
 
         protected OnlinePlayTestScene()
         {
@@ -42,7 +50,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             });
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
             return dependencies;
@@ -55,6 +63,32 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             drawableDependenciesContainer.Clear();
             dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
             drawableDependenciesContainer.AddRange(OnlinePlayDependencies.DrawableComponents);
+
+            var handler = OnlinePlayDependencies.RequestsHandler;
+
+            // Resolving the BeatmapManager in the test scene will inject the game-wide BeatmapManager, while many test scenes cache their own BeatmapManager instead.
+            // To get around this, the BeatmapManager is looked up from the dependencies provided to the children of the test scene instead.
+            var beatmapManager = dependencies.Get<BeatmapManager>();
+
+            ((DummyAPIAccess)API).HandleRequest = request =>
+            {
+                TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+
+                // Because some of the handlers use realm, we need to ensure the game is still alive when firing.
+                // If we don't, a stray `PerformAsync` could hit an `ObjectDisposedException` if running too late.
+                Scheduler.Add(() =>
+                {
+                    bool result = handler.HandleRequest(request, API.LocalUser.Value, beatmapManager);
+                    tcs.SetResult(result);
+                }, false);
+
+#pragma warning disable RS0030
+                // We can't GetResultSafely() here (will fail with "Can't use GetResultSafely from inside an async operation."), but Wait is safe enough due to
+                // the task being a TaskCompletionSource.
+                // Importantly, this doesn't deadlock because of the scheduler call above running inline where feasible (see the `false` argument).
+                return tcs.Task.Result;
+#pragma warning restore RS0030
+            };
         });
 
         /// <summary>

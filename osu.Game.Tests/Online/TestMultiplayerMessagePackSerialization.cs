@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using MessagePack;
 using NUnit.Framework;
 using osu.Game.Online;
@@ -20,7 +22,7 @@ namespace osu.Game.Tests.Online
                 MatchState = new TeamVersusRoomState()
             };
 
-            var serialized = MessagePackSerializer.Serialize(room);
+            byte[] serialized = MessagePackSerializer.Serialize(room);
 
             var deserialized = MessagePackSerializer.Deserialize<MultiplayerRoom>(serialized);
 
@@ -32,19 +34,19 @@ namespace osu.Game.Tests.Online
         {
             var state = new TeamVersusUserState();
 
-            var serialized = MessagePackSerializer.Serialize(typeof(MatchUserState), state);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(MatchUserState), state);
             var deserialized = MessagePackSerializer.Deserialize<MatchUserState>(serialized);
 
             Assert.IsTrue(deserialized is TeamVersusUserState);
         }
 
         [Test]
-        public void TestSerialiseUnionFailsWithSingalR()
+        public void TestSerialiseUnionFailsWithSignalR()
         {
             var state = new TeamVersusUserState();
 
             // SignalR serialises using the actual type, rather than a base specification.
-            var serialized = MessagePackSerializer.Serialize(typeof(TeamVersusUserState), state);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(TeamVersusUserState), state);
 
             // works with explicit type specified.
             MessagePackSerializer.Deserialize<TeamVersusUserState>(serialized);
@@ -59,7 +61,7 @@ namespace osu.Game.Tests.Online
             var state = new TeamVersusUserState();
 
             // SignalR serialises using the actual type, rather than a base specification.
-            var serialized = MessagePackSerializer.Serialize(typeof(TeamVersusUserState), state, SignalRUnionWorkaroundResolver.OPTIONS);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(TeamVersusUserState), state, SignalRUnionWorkaroundResolver.OPTIONS);
 
             // works with explicit type specified.
             MessagePackSerializer.Deserialize<TeamVersusUserState>(serialized);

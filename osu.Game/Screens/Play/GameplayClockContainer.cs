@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -24,7 +26,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Whether gameplay is paused.
         /// </summary>
-        public readonly BindableBool IsPaused = new BindableBool();
+        public readonly BindableBool IsPaused = new BindableBool(true);
 
         /// <summary>
         /// The adjustable source clock used for gameplay. Should be used for seeks and clock control.
@@ -40,6 +42,15 @@ namespace osu.Game.Screens.Play
         /// Invoked when a seek has been performed via <see cref="Seek"/>
         /// </summary>
         public event Action OnSeek;
+
+        /// <summary>
+        /// The time from which the clock should start. Will be seeked to on calling <see cref="Reset"/>.
+        /// </summary>
+        /// <remarks>
+        /// If not set, a value of zero will be used.
+        /// Importantly, the value will be inferred from the current ruleset in <see cref="MasterGameplayClockContainer"/> unless specified.
+        /// </remarks>
+        public double? StartTime { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
@@ -101,21 +112,22 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Stops gameplay.
         /// </summary>
-        public virtual void Stop() => IsPaused.Value = true;
+        public void Stop() => IsPaused.Value = true;
 
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
         /// </summary>
-        public virtual void Reset()
+        /// <param name="startClock">Whether to start the clock immediately, if not already started.</param>
+        public void Reset(bool startClock = false)
         {
-            ensureSourceClockSet();
-            Seek(0);
-
             // Manually stop the source in order to not affect the IsPaused state.
             AdjustableSource.Stop();
 
-            if (!IsPaused.Value)
+            if (!IsPaused.Value || startClock)
                 Start();
+
+            ensureSourceClockSet();
+            Seek(StartTime ?? 0);
         }
 
         /// <summary>

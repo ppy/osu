@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -8,7 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
@@ -62,8 +65,8 @@ namespace osu.Game.Overlays.Toolbar
             switch (state.NewValue)
             {
                 default:
-                    Text = @"Guest";
-                    avatar.User = new User();
+                    Text = UsersStrings.AnonymousUsername;
+                    avatar.User = new APIUser();
                     break;
 
                 case APIState.Online:

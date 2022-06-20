@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,7 +10,7 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
@@ -16,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
     {
         protected override LocalisableString Header => UserInterfaceStrings.MainMenuHeader;
 
-        private IBindable<User> user;
+        private IBindable<APIUser> user;
 
         private SettingsEnumDropdown<BackgroundSource> backgroundSourceDropdown;
 
@@ -61,7 +63,10 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
             user.BindValueChanged(u =>
             {
-                backgroundSourceDropdown.WarningText = u.NewValue?.IsSupporter != true ? UserInterfaceStrings.NotSupporterNote : default;
+                if (u.NewValue?.IsSupporter != true)
+                    backgroundSourceDropdown.SetNoticeText(UserInterfaceStrings.NotSupporterNote, true);
+                else
+                    backgroundSourceDropdown.ClearNoticeText();
             }, true);
         }
     }

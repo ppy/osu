@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -35,10 +38,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesets, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
 
-            beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+            beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
             base.Content.AddRange(new Drawable[]
             {
@@ -149,10 +153,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
 
-            AddStep("add beatmap to collection", () => collectionManager.Collections[0].Beatmaps.Add(Beatmap.Value.BeatmapInfo));
+            AddStep("add beatmap to collection", () => collectionManager.Collections[0].BeatmapHashes.Add(Beatmap.Value.BeatmapInfo.MD5Hash));
             AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
 
-            AddStep("remove beatmap from collection", () => collectionManager.Collections[0].Beatmaps.Clear());
+            AddStep("remove beatmap from collection", () => collectionManager.Collections[0].BeatmapHashes.Clear());
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
         }
 
@@ -167,11 +171,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
 
             addClickAddOrRemoveButtonStep(1);
-            AddAssert("collection contains beatmap", () => collectionManager.Collections[0].Beatmaps.Contains(Beatmap.Value.BeatmapInfo));
+            AddAssert("collection contains beatmap", () => collectionManager.Collections[0].BeatmapHashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
 
             addClickAddOrRemoveButtonStep(1);
-            AddAssert("collection does not contain beatmap", () => !collectionManager.Collections[0].Beatmaps.Contains(Beatmap.Value.BeatmapInfo));
+            AddAssert("collection does not contain beatmap", () => !collectionManager.Collections[0].BeatmapHashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
         }
 
@@ -205,7 +209,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void assertCollectionDropdownContains(string collectionName, bool shouldContain = true) =>
             AddAssert($"collection dropdown {(shouldContain ? "contains" : "does not contain")} '{collectionName}'",
                 // A bit of a roundabout way of going about this, see: https://github.com/ppy/osu-framework/issues/3871 + https://github.com/ppy/osu-framework/issues/3872
-                () => shouldContain == (getCollectionDropdownItems().Any(i => i.ChildrenOfType<FillFlowContainer>().OfType<IHasText>().First().Text == collectionName)));
+                () => shouldContain == (getCollectionDropdownItems().Any(i => i.ChildrenOfType<CompositeDrawable>().OfType<IHasText>().First().Text == collectionName)));
 
         private IconButton getAddOrRemoveButton(int index)
             => getCollectionDropdownItems().ElementAt(index).ChildrenOfType<IconButton>().Single();

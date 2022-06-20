@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -63,7 +66,7 @@ namespace osu.Game.Rulesets.UI
                 CacheAs(ShaderManager = new FallbackShaderManager(ShaderManager, parent.Get<ShaderManager>()));
             }
 
-            RulesetConfigManager = parent.Get<RulesetConfigCache>().GetConfigFor(ruleset);
+            RulesetConfigManager = parent.Get<IRulesetConfigCache>().GetConfigFor(ruleset);
             if (RulesetConfigManager != null)
                 Cache(RulesetConfigManager);
         }
@@ -115,7 +118,7 @@ namespace osu.Game.Rulesets.UI
 
             public Sample Get(string name) => primary.Get(name) ?? fallback.Get(name);
 
-            public Task<Sample> GetAsync(string name) => primary.GetAsync(name) ?? fallback.GetAsync(name);
+            public Task<Sample> GetAsync(string name, CancellationToken cancellationToken = default) => primary.GetAsync(name, cancellationToken) ?? fallback.GetAsync(name, cancellationToken);
 
             public Stream GetStream(string name) => primary.GetStream(name) ?? fallback.GetStream(name);
 

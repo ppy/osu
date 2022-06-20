@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -43,7 +44,7 @@ namespace osu.Game.Graphics
         private Storage storage;
 
         [Resolved]
-        private NotificationOverlay notificationOverlay { get; set; }
+        private INotificationOverlay notificationOverlay { get; set; }
 
         private Sample shutter;
 
@@ -60,6 +61,9 @@ namespace osu.Game.Graphics
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.TakeScreenshot:
@@ -109,51 +113,55 @@ namespace osu.Game.Graphics
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
 
-                var fileName = getFileName();
-                if (fileName == null) return;
+                host.GetClipboard()?.SetImage(image);
 
-                var stream = storage.GetStream(fileName, FileAccess.Write);
+                string filename = getFilename();
 
-                switch (screenshotFormat.Value)
+                if (filename == null) return;
+
+                using (var stream = storage.CreateFileSafely(filename))
                 {
-                    case ScreenshotFormat.Png:
-                        await image.SaveAsPngAsync(stream).ConfigureAwait(false);
-                        break;
+                    switch (screenshotFormat.Value)
+                    {
+                        case ScreenshotFormat.Png:
+                            await image.SaveAsPngAsync(stream).ConfigureAwait(false);
+                            break;
 
-                    case ScreenshotFormat.Jpg:
-                        const int jpeg_quality = 92;
+                        case ScreenshotFormat.Jpg:
+                            const int jpeg_quality = 92;
 
-                        await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
-                        break;
+                            await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
+                            break;
 
-                    default:
-                        throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
+                        default:
+                            throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
+                    }
                 }
 
                 notificationOverlay.Post(new SimpleNotification
                 {
-                    Text = $"{fileName} saved!",
+                    Text = $"{filename} saved!",
                     Activated = () =>
                     {
-                        storage.OpenInNativeExplorer();
+                        storage.PresentFileExternally(filename);
                         return true;
                     }
                 });
             }
         });
 
-        private string getFileName()
+        private string getFilename()
         {
             var dt = DateTime.Now;
-            var fileExt = screenshotFormat.ToString().ToLowerInvariant();
+            string fileExt = screenshotFormat.ToString().ToLowerInvariant();
 
-            var withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
+            string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
             if (!storage.Exists(withoutIndex))
                 return withoutIndex;
 
             for (ulong i = 1; i < ulong.MaxValue; i++)
             {
-                var indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
+                string indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
                 if (!storage.Exists(indexedName))
                     return indexedName;
             }

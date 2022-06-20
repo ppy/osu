@@ -1,20 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics.Sprites
 {
     public class LogoAnimation : Sprite
     {
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, TextureStore textures)
+        private void load(ShaderManager shaders)
         {
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"LogoAnimation");
             RoundedTextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"LogoAnimation"); // Masking isn't supported for now

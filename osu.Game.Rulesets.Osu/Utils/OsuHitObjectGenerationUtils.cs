@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -11,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Utils
 {
-    public static class OsuHitObjectGenerationUtils
+    public static partial class OsuHitObjectGenerationUtils
     {
         // The relative distance to the edge of the playfield before objects' positions should start to "turn around" and curve towards the middle.
         // The closer the hit objects draw to the border, the sharper the turn
@@ -40,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <returns>The new position of the hit object, relative to the previous one.</returns>
         public static Vector2 RotateAwayFromEdge(Vector2 prevObjectPos, Vector2 posRelativeToPrev, float rotationRatio = 0.5f)
         {
-            var relativeRotationDistance = 0f;
+            float relativeRotationDistance = 0f;
 
             if (prevObjectPos.X < playfield_middle.X)
             {
@@ -88,16 +90,16 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <returns>The rotated vector.</returns>
         public static Vector2 RotateVectorTowardsVector(Vector2 initial, Vector2 destination, float rotationRatio)
         {
-            var initialAngleRad = MathF.Atan2(initial.Y, initial.X);
-            var destAngleRad = MathF.Atan2(destination.Y, destination.X);
+            float initialAngleRad = MathF.Atan2(initial.Y, initial.X);
+            float destAngleRad = MathF.Atan2(destination.Y, destination.X);
 
-            var diff = destAngleRad - initialAngleRad;
+            float diff = destAngleRad - initialAngleRad;
 
             while (diff < -MathF.PI) diff += 2 * MathF.PI;
 
             while (diff > MathF.PI) diff -= 2 * MathF.PI;
 
-            var finalAngleRad = initialAngleRad + rotationRatio * diff;
+            float finalAngleRad = initialAngleRad + rotationRatio * diff;
 
             return new Vector2(
                 initial.Length * MathF.Cos(finalAngleRad),
@@ -116,6 +118,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             if (!(osuObject is Slider slider))
                 return;
 
+            // No need to update the head and tail circles, since slider handles that when the new slider path is set
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
             slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
 
@@ -137,6 +140,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             if (!(osuObject is Slider slider))
                 return;
 
+            // No need to update the head and tail circles, since slider handles that when the new slider path is set
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
             slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
 
@@ -145,6 +149,42 @@ namespace osu.Game.Rulesets.Osu.Utils
                 point.Position = new Vector2(point.Position.X, -point.Position.Y);
 
             slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
+        }
+
+        /// <summary>
+        /// Rotate a slider about its start position by the specified angle.
+        /// </summary>
+        /// <param name="slider">The slider to be rotated.</param>
+        /// <param name="rotation">The angle, measured in radians, to rotate the slider by.</param>
+        public static void RotateSlider(Slider slider, float rotation)
+        {
+            void rotateNestedObject(OsuHitObject nested) => nested.Position = rotateVector(nested.Position - slider.Position, rotation) + slider.Position;
+
+            // No need to update the head and tail circles, since slider handles that when the new slider path is set
+            slider.NestedHitObjects.OfType<SliderTick>().ForEach(rotateNestedObject);
+            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(rotateNestedObject);
+
+            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
+            foreach (var point in controlPoints)
+                point.Position = rotateVector(point.Position, rotation);
+
+            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
+        }
+
+        /// <summary>
+        /// Rotate a vector by the specified angle.
+        /// </summary>
+        /// <param name="vector">The vector to be rotated.</param>
+        /// <param name="rotation">The angle, measured in radians, to rotate the vector by.</param>
+        /// <returns>The rotated vector.</returns>
+        private static Vector2 rotateVector(Vector2 vector, float rotation)
+        {
+            float angle = MathF.Atan2(vector.Y, vector.X) + rotation;
+            float length = vector.Length;
+            return new Vector2(
+                length * MathF.Cos(angle),
+                length * MathF.Sin(angle)
+            );
         }
     }
 }

@@ -1,18 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class FollowersButton : ProfileHeaderStatisticsButton
     {
-        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
         public override LocalisableString TooltipText => FriendsStrings.ButtonsDisabled;
 

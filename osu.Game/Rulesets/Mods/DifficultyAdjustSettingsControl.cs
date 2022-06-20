@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -74,10 +76,7 @@ namespace osu.Game.Rulesets.Mods
                 return;
             }
 
-            var difficulty = beatmap.Value.BeatmapInfo.BaseDifficulty;
-
-            if (difficulty == null)
-                return;
+            var difficulty = beatmap.Value.BeatmapInfo.Difficulty;
 
             // generally should always be implemented, else the slider will have a zero default.
             if (difficultyBindable.ReadCurrentFromDifficulty == null)
@@ -108,6 +107,7 @@ namespace osu.Game.Rulesets.Mods
                     {
                         ShowsDefaultIndicator = false,
                         Current = currentNumber,
+                        KeyboardStep = 0.1f,
                     }
                 };
 

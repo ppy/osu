@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using NUnit.Framework;
@@ -43,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private IEnumerable<ColumnType> getResults(StageDefinition definition)
         {
-            for (var i = 0; i < definition.Columns; i++)
+            for (int i = 0; i < definition.Columns; i++)
                 yield return definition.GetTypeOfColumn(i);
         }
     }

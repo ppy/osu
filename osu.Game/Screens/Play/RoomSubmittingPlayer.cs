@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
@@ -34,7 +36,7 @@ namespace osu.Game.Screens.Play
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
         {
             Debug.Assert(Room.RoomID.Value != null);
-            return new SubmitRoomScoreRequest(token, Room.RoomID.Value.Value, PlaylistItem.ID, score.ScoreInfo);
+            return new SubmitRoomScoreRequest(score.ScoreInfo, token, Room.RoomID.Value.Value, PlaylistItem.ID);
         }
     }
 }

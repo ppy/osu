@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -9,9 +11,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Tests.Visual;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Chat
 {
@@ -25,7 +27,7 @@ namespace osu.Game.Tests.Chat
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            var container = new ChannelManagerContainer();
+            var container = new ChannelManagerContainer(API);
             Child = container;
             channelManager = container.ChannelManager;
         });
@@ -133,7 +135,7 @@ namespace osu.Game.Tests.Chat
             }
         }
 
-        private Channel createChannel(int id, ChannelType type) => new Channel(new User())
+        private Channel createChannel(int id, ChannelType type) => new Channel(new APIUser())
         {
             Id = id,
             Name = $"Channel {id}",
@@ -145,11 +147,11 @@ namespace osu.Game.Tests.Chat
         private class ChannelManagerContainer : CompositeDrawable
         {
             [Cached]
-            public ChannelManager ChannelManager { get; } = new ChannelManager();
+            public ChannelManager ChannelManager { get; }
 
-            public ChannelManagerContainer()
+            public ChannelManagerContainer(IAPIProvider apiProvider)
             {
-                InternalChild = ChannelManager;
+                InternalChild = ChannelManager = new ChannelManager(apiProvider);
             }
         }
     }

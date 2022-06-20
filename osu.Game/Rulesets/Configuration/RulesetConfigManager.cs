@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,22 +16,19 @@ namespace osu.Game.Rulesets.Configuration
     public abstract class RulesetConfigManager<TLookup> : ConfigManager<TLookup>, IRulesetConfigManager
         where TLookup : struct, Enum
     {
-        private readonly RealmContextFactory realmFactory;
+        private readonly RealmAccess realm;
 
         private readonly int variant;
 
         private List<RealmRulesetSetting> databasedSettings = new List<RealmRulesetSetting>();
 
-        private readonly int rulesetId;
+        private readonly string rulesetName;
 
         protected RulesetConfigManager(SettingsStore store, RulesetInfo ruleset, int? variant = null)
         {
-            realmFactory = store?.Realm;
+            realm = store?.Realm;
 
-            if (realmFactory != null && !ruleset.ID.HasValue)
-                throw new InvalidOperationException("Attempted to add databased settings for a non-databased ruleset");
-
-            rulesetId = ruleset.ID ?? -1;
+            rulesetName = ruleset.ShortName;
 
             this.variant = variant ?? 0;
 
@@ -40,16 +39,35 @@ namespace osu.Game.Rulesets.Configuration
 
         protected override void PerformLoad()
         {
-            if (realmFactory != null)
+            if (realm != null)
             {
                 // As long as RulesetConfigCache exists, there is no need to subscribe to realm events.
-                databasedSettings = realmFactory.Context.All<RealmRulesetSetting>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
+                databasedSettings = realm.Realm.All<RealmRulesetSetting>().Where(b => b.RulesetName == rulesetName && b.Variant == variant).ToList();
             }
         }
 
+        private readonly HashSet<TLookup> pendingWrites = new HashSet<TLookup>();
+
         protected override bool PerformSave()
         {
-            // do nothing, realm saves immediately
+            TLookup[] changed;
+
+            lock (pendingWrites)
+            {
+                changed = pendingWrites.ToArray();
+                pendingWrites.Clear();
+            }
+
+            realm?.Write(r =>
+            {
+                foreach (var c in changed)
+                {
+                    var setting = r.All<RealmRulesetSetting>().First(s => s.RulesetName == rulesetName && s.Variant == variant && s.Key == c.ToString());
+
+                    setting.Value = ConfigStore[c].ToString();
+                }
+            });
+
             return true;
         }
 
@@ -69,18 +87,19 @@ namespace osu.Game.Rulesets.Configuration
                 {
                     Key = lookup.ToString(),
                     Value = bindable.Value.ToString(),
-                    RulesetID = rulesetId,
+                    RulesetName = rulesetName,
                     Variant = variant,
                 };
 
-                realmFactory?.Context.Write(() => realmFactory.Context.Add(setting));
+                realm?.Realm.Write(() => realm.Realm.Add(setting));
 
                 databasedSettings.Add(setting);
             }
 
             bindable.ValueChanged += b =>
             {
-                realmFactory?.Context.Write(() => setting.Value = b.NewValue.ToString());
+                lock (pendingWrites)
+                    pendingWrites.Add(lookup);
             };
         }
     }

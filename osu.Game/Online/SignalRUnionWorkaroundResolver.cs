@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 
 namespace osu.Game.Online
 {
@@ -20,19 +21,22 @@ namespace osu.Game.Online
         public static readonly MessagePackSerializerOptions OPTIONS =
             MessagePackSerializerOptions.Standard.WithResolver(new SignalRUnionWorkaroundResolver());
 
-        private static readonly Dictionary<Type, IMessagePackFormatter> formatter_map = new Dictionary<Type, IMessagePackFormatter>
-        {
-            { typeof(TeamVersusUserState), new TypeRedirectingFormatter<TeamVersusUserState, MatchUserState>() },
-            { typeof(TeamVersusRoomState), new TypeRedirectingFormatter<TeamVersusRoomState, MatchRoomState>() },
-            { typeof(ChangeTeamRequest), new TypeRedirectingFormatter<ChangeTeamRequest, MatchUserRequest>() },
+        private static readonly IReadOnlyDictionary<Type, IMessagePackFormatter> formatter_map = createFormatterMap();
 
-            // These should not be required. The fallback should work. But something is weird with the way caching is done.
+        private static IReadOnlyDictionary<Type, IMessagePackFormatter> createFormatterMap()
+        {
+            IEnumerable<(Type derivedType, Type baseType)> baseMap = SignalRWorkaroundTypes.BASE_TYPE_MAPPING;
+
+            // This should not be required. The fallback should work. But something is weird with the way caching is done.
             // For future adventurers, I would not advise looking into this further. It's likely not worth the effort.
-            { typeof(MatchUserState), new TypeRedirectingFormatter<MatchUserState, MatchUserState>() },
-            { typeof(MatchRoomState), new TypeRedirectingFormatter<MatchRoomState, MatchRoomState>() },
-            { typeof(MatchUserRequest), new TypeRedirectingFormatter<MatchUserRequest, MatchUserRequest>() },
-            { typeof(MatchServerEvent), new TypeRedirectingFormatter<MatchServerEvent, MatchServerEvent>() },
-        };
+            baseMap = baseMap.Concat(baseMap.Select(t => (t.baseType, t.baseType)).Distinct());
+
+            return new Dictionary<Type, IMessagePackFormatter>(baseMap.Select(t =>
+            {
+                var formatter = (IMessagePackFormatter)Activator.CreateInstance(typeof(TypeRedirectingFormatter<,>).MakeGenericType(t.derivedType, t.baseType));
+                return new KeyValuePair<Type, IMessagePackFormatter>(t.derivedType, formatter);
+            }));
+        }
 
         public IMessagePackFormatter<T> GetFormatter<T>()
         {

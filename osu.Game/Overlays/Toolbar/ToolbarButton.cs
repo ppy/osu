@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,6 +13,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Database;
@@ -19,7 +22,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
@@ -38,6 +40,9 @@ namespace osu.Game.Overlays.Toolbar
 
         [Resolved]
         private TextureStore textures { get; set; }
+
+        [Resolved]
+        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
 
         public void SetIcon(string texture) =>
             SetIcon(new Sprite
@@ -76,10 +81,9 @@ namespace osu.Game.Overlays.Toolbar
         protected FillFlowContainer Flow;
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected ToolbarButton()
-            : base(HoverSampleSet.Toolbar)
         {
             Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;
@@ -159,7 +163,7 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => false;
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -186,7 +190,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == Hotkey)
+            if (e.Action == Hotkey && !e.Repeat)
             {
                 TriggerClick();
                 return true;
@@ -203,11 +207,11 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (Hotkey == null) return;
 
-            var realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
+            var realmKeyBinding = realm.Realm.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value);
 
             if (realmKeyBinding != null)
             {
-                var keyBindingString = realmKeyBinding.KeyCombination.ReadableString();
+                string keyBindingString = keyCombinationProvider.GetReadableString(realmKeyBinding.KeyCombination);
 
                 if (!string.IsNullOrEmpty(keyBindingString))
                     keyBindingTooltip.Text = $" ({keyBindingString})";

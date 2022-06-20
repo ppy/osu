@@ -1,62 +1,152 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Input;
+using osu.Framework.Allocation;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Menu;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Select;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorSaving : OsuGameTestScene
+    public class TestSceneEditorSaving : EditorSavingTestScene
     {
-        private Editor editor => Game.ChildrenOfType<Editor>().FirstOrDefault();
-
-        private EditorBeatmap editorBeatmap => (EditorBeatmap)editor.Dependencies.Get(typeof(EditorBeatmap));
-
-        /// <summary>
-        /// Tests the general expected flow of creating a new beatmap, saving it, then loading it back from song select.
-        /// </summary>
         [Test]
-        public void TestNewBeatmapSaveThenLoad()
+        public void TestCantExitWithoutSaving()
         {
-            AddStep("set default beatmap", () => Game.Beatmap.SetDefault());
+            AddRepeatStep("Exit", () => InputManager.Key(Key.Escape), 10);
+            AddAssert("Editor is still active screen", () => Game.ScreenStack.CurrentScreen is Editor);
+        }
 
-            PushAndConfirm(() => new EditorLoader());
+        [Test]
+        public void TestMetadata()
+        {
+            AddStep("Set artist and title", () =>
+            {
+                EditorBeatmap.BeatmapInfo.Metadata.Artist = "artist";
+                EditorBeatmap.BeatmapInfo.Metadata.Title = "title";
+            });
+            AddStep("Set author", () => EditorBeatmap.BeatmapInfo.Metadata.Author.Username = "author");
+            AddStep("Set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = "difficulty");
 
-            AddUntilStep("wait for editor load", () => editor != null);
+            SaveEditor();
 
-            AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
+            AddAssert("Beatmap has correct metadata", () => EditorBeatmap.BeatmapInfo.Metadata.Artist == "artist" && EditorBeatmap.BeatmapInfo.Metadata.Title == "title");
+            AddAssert("Beatmap has correct author", () => EditorBeatmap.BeatmapInfo.Metadata.Author.Username == "author");
+            AddAssert("Beatmap has correct difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName == "difficulty");
+            AddAssert("Beatmap has correct .osu file path", () => EditorBeatmap.BeatmapInfo.Path == "artist - title (author) [difficulty].osu");
 
-            AddStep("Enter compose mode", () => InputManager.Key(Key.F1));
-            AddUntilStep("Wait for compose mode load", () => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true);
+            ReloadEditorToSameBeatmap();
 
+            AddAssert("Beatmap still has correct metadata", () => EditorBeatmap.BeatmapInfo.Metadata.Artist == "artist" && EditorBeatmap.BeatmapInfo.Metadata.Title == "title");
+            AddAssert("Beatmap still has correct author", () => EditorBeatmap.BeatmapInfo.Metadata.Author.Username == "author");
+            AddAssert("Beatmap still has correct difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName == "difficulty");
+            AddAssert("Beatmap still has correct .osu file path", () => EditorBeatmap.BeatmapInfo.Path == "artist - title (author) [difficulty].osu");
+        }
+
+        [Test]
+        public void TestConfiguration()
+        {
+            double originalTimelineZoom = 0;
+            double changedTimelineZoom = 0;
+
+            AddUntilStep("wait for timeline load", () => Editor.ChildrenOfType<Timeline>().SingleOrDefault()?.IsLoaded == true);
+
+            AddStep("Set beat divisor", () => Editor.Dependencies.Get<BindableBeatDivisor>().Value = 16);
+            AddStep("Set timeline zoom", () =>
+            {
+                originalTimelineZoom = EditorBeatmap.BeatmapInfo.TimelineZoom;
+
+                var timeline = Editor.ChildrenOfType<Timeline>().Single();
+                InputManager.MoveMouseTo(timeline);
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.ScrollVerticalBy(15f);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddAssert("Ensure timeline zoom changed", () =>
+            {
+                changedTimelineZoom = EditorBeatmap.BeatmapInfo.TimelineZoom;
+                return !Precision.AlmostEquals(changedTimelineZoom, originalTimelineZoom);
+            });
+
+            SaveEditor();
+
+            AddAssert("Beatmap has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor == 16);
+            AddAssert("Beatmap has correct timeline zoom", () => EditorBeatmap.BeatmapInfo.TimelineZoom == changedTimelineZoom);
+
+            ReloadEditorToSameBeatmap();
+
+            AddAssert("Beatmap still has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor == 16);
+            AddAssert("Beatmap still has correct timeline zoom", () => EditorBeatmap.BeatmapInfo.TimelineZoom == changedTimelineZoom);
+        }
+
+        [Test]
+        public void TestDifficulty()
+        {
+            AddStep("Set overall difficulty", () => EditorBeatmap.Difficulty.OverallDifficulty = 7);
+
+            SaveEditor();
+
+            AddAssert("Beatmap has correct overall difficulty", () => EditorBeatmap.Difficulty.OverallDifficulty == 7);
+
+            ReloadEditorToSameBeatmap();
+
+            AddAssert("Beatmap still has correct overall difficulty", () => EditorBeatmap.Difficulty.OverallDifficulty == 7);
+        }
+
+        [Test]
+        public void TestHitObjectPlacement()
+        {
+            AddStep("Add timing point", () => EditorBeatmap.ControlPointInfo.Add(500, new TimingControlPoint()));
             AddStep("Change to placement mode", () => InputManager.Key(Key.Number2));
             AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
             AddStep("Place single hitcircle", () => InputManager.Click(MouseButton.Left));
 
-            AddStep("Save and exit", () =>
-            {
-                InputManager.Keys(PlatformAction.Save);
-                InputManager.Key(Key.Escape);
-            });
+            SaveEditor();
 
-            AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
+            AddAssert("Beatmap has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
 
-            PushAndConfirm(() => new PlaySongSelect());
+            // After placement these must be non-default as defaults are read-only.
+            AddAssert("Placed object has non-default control points", () =>
+                EditorBeatmap.HitObjects[0].SampleControlPoint != SampleControlPoint.DEFAULT &&
+                EditorBeatmap.HitObjects[0].DifficultyControlPoint != DifficultyControlPoint.DEFAULT);
 
-            AddUntilStep("Wait for beatmap selected", () => !Game.Beatmap.IsDefault);
-            AddStep("Open options", () => InputManager.Key(Key.F3));
-            AddStep("Enter editor", () => InputManager.Key(Key.Number5));
+            ReloadEditorToSameBeatmap();
 
-            AddUntilStep("Wait for editor load", () => editor != null);
-            AddAssert("Beatmap contains single hitcircle", () => editorBeatmap.HitObjects.Count == 1);
+            AddAssert("Beatmap still has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
+
+            // After placement these must be non-default as defaults are read-only.
+            AddAssert("Placed object still has non-default control points", () =>
+                EditorBeatmap.HitObjects[0].SampleControlPoint != SampleControlPoint.DEFAULT &&
+                EditorBeatmap.HitObjects[0].DifficultyControlPoint != DifficultyControlPoint.DEFAULT);
+        }
+
+        [Test]
+        public void TestExitWithoutSaveFromExistingBeatmap()
+        {
+            const string tags_to_save = "these tags will be saved";
+            const string tags_to_discard = "these tags should be discarded";
+
+            AddStep("Set tags", () => EditorBeatmap.BeatmapInfo.Metadata.Tags = tags_to_save);
+            SaveEditor();
+            AddAssert("Tags saved correctly", () => EditorBeatmap.BeatmapInfo.Metadata.Tags == tags_to_save);
+
+            ReloadEditorToSameBeatmap();
+            AddAssert("Tags saved correctly", () => EditorBeatmap.BeatmapInfo.Metadata.Tags == tags_to_save);
+            AddStep("Set tags again", () => EditorBeatmap.BeatmapInfo.Metadata.Tags = tags_to_discard);
+
+            AddStep("Exit editor", () => Editor.Exit());
+            AddUntilStep("Wait for song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+            AddAssert("Tags reverted correctly", () => Game.Beatmap.Value.BeatmapInfo.Metadata.Tags == tags_to_save);
         }
     }
 }

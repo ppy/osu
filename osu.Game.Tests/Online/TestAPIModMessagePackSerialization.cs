@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using MessagePack;
 using NUnit.Framework;
@@ -90,7 +92,7 @@ namespace osu.Game.Tests.Online
 
             public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new System.NotImplementedException();
 
-            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new System.NotImplementedException();
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new System.NotImplementedException();
 
             public override string Description { get; } = string.Empty;
             public override string ShortName { get; } = string.Empty;

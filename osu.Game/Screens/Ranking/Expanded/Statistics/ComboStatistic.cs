@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osuTK;
 
@@ -25,11 +28,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         /// Creates a new <see cref="ComboStatistic"/>.
         /// </summary>
         /// <param name="combo">The combo to be displayed.</param>
-        /// <param name="isPerfect">Whether this is a perfect combo.</param>
-        public ComboStatistic(int combo, bool isPerfect)
-            : base("combo", combo)
+        /// <param name="maxCombo">The maximum value of <paramref name="combo"/>.</param>
+        public ComboStatistic(int combo, int? maxCombo)
+            : base(BeatmapsetsStrings.ShowScoreboardHeadersCombo, combo, maxCombo)
         {
-            this.isPerfect = isPerfect;
+            isPerfect = combo == maxCombo;
         }
 
         public override void Appear()

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -61,7 +63,6 @@ namespace osu.Game.Tests.NonVisual.Skinning
             public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotSupportedException();
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotSupportedException();
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotSupportedException();
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
         }
 
         private class TestAnimationTimeReference : IAnimationTimeReference

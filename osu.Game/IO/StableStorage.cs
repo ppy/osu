@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -14,7 +16,7 @@ namespace osu.Game.IO
     /// </summary>
     public class StableStorage : DesktopStorage
     {
-        private const string stable_default_songs_path = "Songs";
+        public const string STABLE_DEFAULT_SONGS_PATH = "Songs";
 
         private readonly DesktopGameHost host;
         private readonly Lazy<string> songsPath;
@@ -34,11 +36,17 @@ namespace osu.Game.IO
 
         private string locateSongsDirectory()
         {
-            var configFile = GetFiles(".", $"osu!.{Environment.UserName}.cfg").SingleOrDefault();
+            var configurationFiles = GetFiles(".", $"osu!.{Environment.UserName}.cfg");
 
-            if (configFile != null)
+            // GetFiles returns case insensitive results, so multiple files could exist.
+            // Prefer a case-correct match, but fallback to any available.
+            string usableConfigFile =
+                configurationFiles.FirstOrDefault(f => f.Contains(Environment.UserName, StringComparison.Ordinal))
+                ?? configurationFiles.FirstOrDefault();
+
+            if (usableConfigFile != null)
             {
-                using (var stream = GetStream(configFile))
+                using (var stream = GetStream(usableConfigFile))
                 using (var textReader = new StreamReader(stream))
                 {
                     string line;
@@ -47,7 +55,7 @@ namespace osu.Game.IO
                     {
                         if (!line.StartsWith("BeatmapDirectory", StringComparison.OrdinalIgnoreCase)) continue;
 
-                        var customDirectory = line.Split('=').LastOrDefault()?.Trim();
+                        string customDirectory = line.Split('=').LastOrDefault()?.Trim();
                         if (customDirectory != null && Path.IsPathFullyQualified(customDirectory))
                             return customDirectory;
 
@@ -56,7 +64,7 @@ namespace osu.Game.IO
                 }
             }
 
-            return GetFullPath(stable_default_songs_path);
+            return GetFullPath(STABLE_DEFAULT_SONGS_PATH);
         }
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -40,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private GameplayState gameplayState { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, OsuColour colours)
+        private void load(ISkinSource skin)
         {
             var texture = skin.GetTexture("star2");
             var starBreakAdditive = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.StarBreakAdditive)?.Value ?? new Color4(255, 182, 193, 255);

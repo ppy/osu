@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -77,7 +79,7 @@ namespace osu.Game.Tests.Skins
         public class BeatmapSkinSource : LegacyBeatmapSkin
         {
             public BeatmapSkinSource()
-                : base(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo, null, null)
+                : base(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo, null)
             {
             }
 

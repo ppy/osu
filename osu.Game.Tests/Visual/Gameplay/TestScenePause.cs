@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -85,7 +87,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
             pauseAndConfirm();
+            AddAssert("player not playing", () => !Player.LocalUserPlaying.Value);
+
             resumeAndConfirm();
+            AddUntilStep("player playing", () => Player.LocalUserPlaying.Value);
         }
 
         [Test]
@@ -185,7 +190,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestPauseAfterFail()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("fail overlay shown", () => Player.FailOverlayVisible);
 
             confirmClockRunning(false);
@@ -201,7 +206,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitFromFailedGameplayAfterFailAnimation()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("wait for fail overlay shown", () => Player.FailOverlayVisible);
 
             confirmClockRunning(false);
@@ -213,7 +218,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitFromFailedGameplayDuringFailAnimation()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
 
             // will finish the fail animation and show the fail/pause screen.
             AddStep("attempt exit via pause key", () => Player.ExitViaPause());
@@ -227,7 +232,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestQuickRetryFromFailedGameplay()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddStep("quick retry", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyRetryOverlay>().First().Action?.Invoke());
 
             confirmExited();
@@ -236,7 +241,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestQuickExitFromFailedGameplay()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddStep("quick exit", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyExitOverlay>().First().Action?.Invoke());
 
             confirmExited();
@@ -341,7 +346,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             confirmClockRunning(false);
             confirmNotExited();
-            AddAssert("player not failed", () => !Player.HasFailed);
+            AddAssert("player not failed", () => !Player.GameplayState.HasFailed);
             AddAssert("pause overlay shown", () => Player.PauseOverlayVisible);
         }
 
@@ -389,9 +394,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public void ExitViaQuickExit() => PerformExit(false);
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
-                base.OnEntering(last);
+                base.OnEntering(e);
                 GameplayClockContainer.Stop();
             }
         }

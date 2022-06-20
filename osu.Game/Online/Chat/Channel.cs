@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +10,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Online.Chat
 {
@@ -19,15 +22,15 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// Contains every joined user except the current logged in user. Currently only returned for PM channels.
         /// </summary>
-        public readonly ObservableCollection<User> Users = new ObservableCollection<User>();
+        public readonly ObservableCollection<APIUser> Users = new ObservableCollection<APIUser>();
 
         [JsonProperty(@"users")]
         private int[] userIds
         {
             set
             {
-                foreach (var id in value)
-                    Users.Add(new User { Id = id });
+                foreach (int id in value)
+                    Users.Add(new APIUser { Id = id });
             }
         }
 
@@ -89,6 +92,12 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public Bindable<bool> Joined = new Bindable<bool>();
 
+        /// <summary>
+        /// Signals if there is a message to highlight.
+        /// This is automatically cleared by the associated <see cref="DrawableChannel"/> after highlighting.
+        /// </summary>
+        public Bindable<Message> HighlightedMessage = new Bindable<Message>();
+
         [JsonConstructor]
         public Channel()
         {
@@ -98,7 +107,7 @@ namespace osu.Game.Online.Chat
         /// Create a private messaging channel with the specified user.
         /// </summary>
         /// <param name="user">The user to create the private conversation with.</param>
-        public Channel(User user)
+        public Channel(APIUser user)
         {
             Type = ChannelType.PM;
             Users.Add(user);
@@ -131,7 +140,7 @@ namespace osu.Game.Online.Chat
 
             Messages.AddRange(messages);
 
-            var maxMessageId = messages.Max(m => m.Id);
+            long? maxMessageId = messages.Max(m => m.Id);
             if (maxMessageId > LastMessageId)
                 LastMessageId = maxMessageId;
 

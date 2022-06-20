@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Threading;
@@ -63,9 +65,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
-            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
 
-            double scoringDistance = base_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
+            double scoringDistance = base_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
             Velocity = scoringDistance / timingPoint.BeatLength;
 
             tickSpacing = timingPoint.BeatLength / TickRate;

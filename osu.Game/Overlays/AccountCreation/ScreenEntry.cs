@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -18,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -37,7 +39,7 @@ namespace osu.Game.Overlays.AccountCreation
         private IAPIProvider api { get; set; }
 
         private ShakeContainer registerShake;
-        private IEnumerable<Drawable> characterCheckText;
+        private ITextPart characterCheckText;
 
         private OsuTextBox[] textboxes;
         private LoadingLayer loadingLayer;
@@ -46,7 +48,7 @@ namespace osu.Game.Overlays.AccountCreation
         private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
@@ -70,7 +72,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         usernameTextBox = new OsuTextBox
                         {
-                            PlaceholderText = "username",
+                            PlaceholderText = UsersStrings.LoginUsername.ToLower(),
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },
@@ -92,7 +94,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         passwordTextBox = new OsuPasswordTextBox
                         {
-                            PlaceholderText = "password",
+                            PlaceholderText = UsersStrings.LoginPassword.ToLower(),
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this,
                         },
@@ -136,21 +138,30 @@ namespace osu.Game.Overlays.AccountCreation
             characterCheckText = passwordDescription.AddText("8 characters long");
             passwordDescription.AddText(". Choose something long but also something you will remember, like a line from your favourite song.");
 
-            passwordTextBox.Current.ValueChanged += password => { characterCheckText.ForEach(s => s.Colour = password.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(password.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
+            passwordTextBox.Current.BindValueChanged(_ => updateCharacterCheckTextColour(), true);
+            characterCheckText.DrawablePartsRecreated += _ => updateCharacterCheckTextColour();
         }
 
-        public override void OnEntering(IScreen last)
+        private void updateCharacterCheckTextColour()
         {
-            base.OnEntering(last);
+            string password = passwordTextBox.Text;
+
+            foreach (var d in characterCheckText.Drawables)
+                d.Colour = password.Length == 0 ? Color4.White : Interpolation.ValueAt(password.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In);
+        }
+
+        public override void OnEntering(ScreenTransitionEvent e)
+        {
+            base.OnEntering(e);
             loadingLayer.Hide();
 
             if (host?.OnScreenKeyboardOverlapsGameWindow != true)
-                focusNextTextbox();
+                focusNextTextBox();
         }
 
         private void performRegistration()
         {
-            if (focusNextTextbox())
+            if (focusNextTextBox())
             {
                 registerShake.Shake();
                 return;
@@ -202,19 +213,19 @@ namespace osu.Game.Overlays.AccountCreation
             });
         }
 
-        private bool focusNextTextbox()
+        private bool focusNextTextBox()
         {
-            var nextTextbox = nextUnfilledTextbox();
+            var nextTextBox = nextUnfilledTextBox();
 
-            if (nextTextbox != null)
+            if (nextTextBox != null)
             {
-                Schedule(() => GetContainingInputManager().ChangeFocus(nextTextbox));
+                Schedule(() => GetContainingInputManager().ChangeFocus(nextTextBox));
                 return true;
             }
 
             return false;
         }
 
-        private OsuTextBox nextUnfilledTextbox() => textboxes.FirstOrDefault(t => string.IsNullOrEmpty(t.Text));
+        private OsuTextBox nextUnfilledTextBox() => textboxes.FirstOrDefault(t => string.IsNullOrEmpty(t.Text));
     }
 }

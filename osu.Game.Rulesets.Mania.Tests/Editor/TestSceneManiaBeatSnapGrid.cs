@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -28,7 +30,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private ScrollingTestContainer.TestScrollingInfo scrollingInfo = new ScrollingTestContainer.TestScrollingInfo();
 
         [Cached(typeof(EditorBeatmap))]
-        private EditorBeatmap editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition()));
+        private EditorBeatmap editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition())
+        {
+            BeatmapInfo =
+            {
+                Ruleset = new ManiaRuleset().RulesetInfo
+            }
+        });
 
         private readonly ManiaBeatSnapGrid beatSnapGrid;
 
@@ -91,37 +99,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             set => InternalChild = value;
         }
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override float GetBeatSnapDistanceAt(double referenceTime)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override float DurationToDistance(double referenceTime, double duration)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override double DistanceToDuration(double referenceTime, float distance)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
             throw new System.NotImplementedException();
         }

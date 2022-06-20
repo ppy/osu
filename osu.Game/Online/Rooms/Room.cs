@@ -1,19 +1,22 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.IO.Serialization.Converters;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms.RoomStatuses;
-using osu.Game.Users;
-using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
 {
-    public class Room : IDeepCloneable<Room>
+    [JsonObject(MemberSerialization.OptIn)]
+    public class Room
     {
         [Cached]
         [JsonProperty("id")]
@@ -25,7 +28,7 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         [JsonProperty("host")]
-        public readonly Bindable<User> Host = new Bindable<User>();
+        public readonly Bindable<APIUser> Host = new Bindable<APIUser>();
 
         [Cached]
         [JsonProperty("playlist")]
@@ -35,8 +38,19 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("channel_id")]
         public readonly Bindable<int> ChannelId = new Bindable<int>();
 
+        [JsonProperty("current_playlist_item")]
         [Cached]
-        [JsonIgnore]
+        public readonly Bindable<PlaylistItem> CurrentPlaylistItem = new Bindable<PlaylistItem>();
+
+        [JsonProperty("playlist_item_stats")]
+        [Cached]
+        public readonly Bindable<RoomPlaylistItemStats> PlaylistItemStats = new Bindable<RoomPlaylistItemStats>();
+
+        [JsonProperty("difficulty_range")]
+        [Cached]
+        public readonly Bindable<RoomDifficultyRange> DifficultyRange = new Bindable<RoomDifficultyRange>();
+
+        [Cached]
         public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
 
         // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
@@ -49,19 +63,15 @@ namespace osu.Game.Online.Rooms
         }
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>(new RoomStatusOpen());
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<MatchType> Type = new Bindable<MatchType>();
 
         // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
@@ -74,7 +84,27 @@ namespace osu.Game.Online.Rooms
         }
 
         [Cached]
-        [JsonIgnore]
+        public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
+
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("queue_mode")]
+        private QueueMode queueMode
+        {
+            get => QueueMode.Value;
+            set => QueueMode.Value = value;
+        }
+
+        [Cached]
+        public readonly Bindable<TimeSpan> AutoStartDuration = new Bindable<TimeSpan>();
+
+        [JsonProperty("auto_start_duration")]
+        private ushort autoStartDuration
+        {
+            get => (ushort)AutoStartDuration.Value.TotalSeconds;
+            set => AutoStartDuration.Value = TimeSpan.FromSeconds(value);
+        }
+
+        [Cached]
         public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
 
         [Cached]
@@ -86,7 +116,7 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         [JsonProperty("recent_participants")]
-        public readonly BindableList<User> RecentParticipants = new BindableList<User>();
+        public readonly BindableList<APIUser> RecentParticipants = new BindableList<APIUser>();
 
         [Cached]
         [JsonProperty("participant_count")]
@@ -99,7 +129,6 @@ namespace osu.Game.Online.Rooms
         public readonly Bindable<string> Password = new Bindable<string>();
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
 
         [JsonProperty("duration")]
@@ -130,38 +159,24 @@ namespace osu.Game.Online.Rooms
             set => MaxAttempts.Value = value;
         }
 
-        /// <summary>
-        /// The position of this <see cref="Room"/> in the list. This is not read from or written to the API.
-        /// </summary>
-        [JsonIgnore]
-        public readonly Bindable<long> Position = new Bindable<long>(-1); // Todo: This does not need to exist.
-
         public Room()
         {
             Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
         }
 
         /// <summary>
-        /// Create a copy of this room without online information.
-        /// Should be used to create a local copy of a room for submitting in the future.
+        /// Copies values from another <see cref="Room"/> into this one.
         /// </summary>
-        public Room DeepClone()
-        {
-            var copy = new Room();
-
-            copy.CopyFrom(this);
-            copy.RoomID.Value = null;
-
-            return copy;
-        }
-
+        /// <remarks>
+        /// **Beware**: This will store references between <see cref="Room"/>s.
+        /// </remarks>
+        /// <param name="other">The <see cref="Room"/> to copy values from.</param>
         public void CopyFrom(Room other)
         {
             RoomID.Value = other.RoomID.Value;
             Name.Value = other.Name.Value;
 
-            if (other.Category.Value != RoomCategory.Spotlight)
-                Category.Value = other.Category.Value;
+            Category.Value = other.Category.Value;
 
             if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
                 Host.Value = other.Host.Value;
@@ -175,6 +190,11 @@ namespace osu.Game.Online.Rooms
             ParticipantCount.Value = other.ParticipantCount.Value;
             EndDate.Value = other.EndDate.Value;
             UserScore.Value = other.UserScore.Value;
+            QueueMode.Value = other.QueueMode.Value;
+            AutoStartDuration.Value = other.AutoStartDuration.Value;
+            DifficultyRange.Value = other.DifficultyRange.Value;
+            PlaylistItemStats.Value = other.PlaylistItemStats.Value;
+            CurrentPlaylistItem.Value = other.CurrentPlaylistItem.Value;
 
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
@@ -192,8 +212,6 @@ namespace osu.Game.Online.Rooms
                 RecentParticipants.Clear();
                 RecentParticipants.AddRange(other.RecentParticipants);
             }
-
-            Position.Value = other.Position.Value;
         }
 
         public void RemoveExpiredPlaylistItems()
@@ -205,8 +223,27 @@ namespace osu.Game.Online.Rooms
                 Playlist.RemoveAll(i => i.Expired);
         }
 
-        public bool ShouldSerializeRoomID() => false;
-        public bool ShouldSerializeHost() => false;
-        public bool ShouldSerializeEndDate() => false;
+        [JsonObject(MemberSerialization.OptIn)]
+        public class RoomPlaylistItemStats
+        {
+            [JsonProperty("count_active")]
+            public int CountActive;
+
+            [JsonProperty("count_total")]
+            public int CountTotal;
+
+            [JsonProperty("ruleset_ids")]
+            public int[] RulesetIDs;
+        }
+
+        [JsonObject(MemberSerialization.OptIn)]
+        public class RoomDifficultyRange
+        {
+            [JsonProperty("min")]
+            public double Min;
+
+            [JsonProperty("max")]
+            public double Max;
+        }
     }
 }

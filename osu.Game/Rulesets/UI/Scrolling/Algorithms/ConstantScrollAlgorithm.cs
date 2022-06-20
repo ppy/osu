@@ -1,13 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
     public class ConstantScrollAlgorithm : IScrollAlgorithm
     {
         public double GetDisplayStartTime(double originTime, float offset, double timeRange, float scrollLength)
         {
-            var adjustedTime = TimeAt(-offset, originTime, timeRange, scrollLength);
+            double adjustedTime = TimeAt(-offset, originTime, timeRange, scrollLength);
             return adjustedTime - timeRange;
         }
 

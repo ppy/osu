@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,7 +15,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
-    public class EffectPointVisualisation : CompositeDrawable
+    public class EffectPointVisualisation : CompositeDrawable, IControlPointVisualisation
     {
         private readonly EffectControlPoint effect;
         private Bindable<bool> kiai;
@@ -68,5 +70,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 }
             }, true);
         }
+
+        // kiai sections display duration, so are required to be visualised.
+        public bool IsVisuallyRedundant(ControlPoint other) => other is EffectControlPoint otherEffect && effect.KiaiMode == otherEffect.KiaiMode;
     }
 }

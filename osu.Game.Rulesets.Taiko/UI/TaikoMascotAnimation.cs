@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -122,7 +124,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                 if (skin == null) return;
 
-                foreach (var frameIndex in clear_animation_sequence)
+                foreach (int frameIndex in clear_animation_sequence)
                 {
                     var texture = getAnimationFrame(skin, TaikoMascotAnimationState.Clear, frameIndex);
 

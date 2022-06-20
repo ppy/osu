@@ -1,9 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
 using osu.Framework.Statistics;
@@ -12,21 +13,22 @@ using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using osu.Game.Skinning;
+using SQLitePCL;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace osu.Game.Database
 {
     public class OsuDbContext : DbContext
     {
-        public DbSet<BeatmapInfo> BeatmapInfo { get; set; }
-        public DbSet<BeatmapDifficulty> BeatmapDifficulty { get; set; }
-        public DbSet<BeatmapMetadata> BeatmapMetadata { get; set; }
-        public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
+        public DbSet<EFBeatmapInfo> EFBeatmapInfo { get; set; }
+        public DbSet<EFBeatmapDifficulty> BeatmapDifficulty { get; set; }
+        public DbSet<EFBeatmapMetadata> BeatmapMetadata { get; set; }
+        public DbSet<EFBeatmapSetInfo> EFBeatmapSetInfo { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
-        public DbSet<RulesetInfo> RulesetInfo { get; set; }
-        public DbSet<SkinInfo> SkinInfo { get; set; }
-        public DbSet<ScoreInfo> ScoreInfo { get; set; }
+        public DbSet<EFRulesetInfo> RulesetInfo { get; set; }
+        public DbSet<EFSkinInfo> SkinInfo { get; set; }
+        public DbSet<EFScoreInfo> ScoreInfo { get; set; }
 
         // migrated to realm
         public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
@@ -40,10 +42,10 @@ namespace osu.Game.Database
         static OsuDbContext()
         {
             // required to initialise native SQLite libraries on some platforms.
-            SQLitePCL.Batteries_V2.Init();
+            Batteries_V2.Init();
 
             // https://github.com/aspnet/EntityFrameworkCore/issues/9994#issuecomment-508588678
-            SQLitePCL.raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
+            raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
         }
 
         /// <summary>
@@ -116,7 +118,6 @@ namespace osu.Game.Database
             optionsBuilder
                 // this is required for the time being due to the way we are querying in places like BeatmapStore.
                 // if we ever move to having consumers file their own .Includes, or get eager loading support, this could be re-enabled.
-                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
                 .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10))
                 .UseLoggerFactory(logger.Value);
         }
@@ -125,28 +126,29 @@ namespace osu.Game.Database
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.OnlineBeatmapID).IsUnique();
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
+            modelBuilder.Entity<EFBeatmapInfo>().HasIndex(b => b.OnlineID).IsUnique();
+            modelBuilder.Entity<EFBeatmapInfo>().HasIndex(b => b.MD5Hash);
+            modelBuilder.Entity<EFBeatmapInfo>().HasIndex(b => b.Hash);
 
-            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineBeatmapSetID).IsUnique();
-            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
-            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<EFBeatmapSetInfo>().HasIndex(b => b.OnlineID).IsUnique();
+            modelBuilder.Entity<EFBeatmapSetInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<EFBeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
 
-            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.Hash).IsUnique();
-            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<EFSkinInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<EFSkinInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<EFSkinInfo>().HasMany(s => s.Files).WithOne(f => f.SkinInfo);
 
             modelBuilder.Entity<DatabasedSetting>().HasIndex(b => new { b.RulesetID, b.Variant });
 
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.Hash).IsUnique();
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.ReferenceCount);
 
-            modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Available);
-            modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
+            modelBuilder.Entity<EFRulesetInfo>().HasIndex(b => b.Available);
+            modelBuilder.Entity<EFRulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
 
-            modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
+            modelBuilder.Entity<EFBeatmapInfo>().HasOne(b => b.BaseDifficulty);
 
-            modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.OnlineScoreID).IsUnique();
+            modelBuilder.Entity<EFScoreInfo>().HasIndex(b => b.OnlineID).IsUnique();
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory

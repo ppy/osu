@@ -4,14 +4,16 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Nito.AsyncEx;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
-
-#nullable enable
+using osu.Game.IO;
+using osu.Game.Models;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Database
 {
@@ -26,51 +28,119 @@ namespace osu.Game.Tests.Database
             storage.DeleteDirectory(string.Empty);
         }
 
-        protected void RunTestWithRealm(Action<RealmContextFactory, Storage> testAction, [CallerMemberName] string caller = "")
+        protected void RunTestWithRealm(Action<RealmAccess, OsuStorage> testAction, [CallerMemberName] string caller = "")
         {
-            AsyncContext.Run(() =>
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
-                var testStorage = storage.GetStorageForDirectory(caller);
-
-                using (var realmFactory = new RealmContextFactory(testStorage, caller))
+                host.Run(new RealmTestGame(() =>
                 {
-                    Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
-                    testAction(realmFactory, testStorage);
+                    // ReSharper disable once AccessToDisposedClosure
+                    var testStorage = new OsuStorage(host, storage.GetStorageForDirectory(caller));
 
-                    realmFactory.Dispose();
+                    using (var realm = new RealmAccess(testStorage, OsuGameBase.CLIENT_DATABASE_FILENAME))
+                    {
+                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
+                        testAction(realm, testStorage);
 
-                    Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
-                    realmFactory.Compact();
-                    Logger.Log($"Final database size after compact: {getFileSize(testStorage, realmFactory)}");
-                }
-            });
+                        realm.Dispose();
+
+                        Logger.Log($"Final database size: {getFileSize(testStorage, realm)}");
+                        realm.Compact();
+                        Logger.Log($"Final database size after compact: {getFileSize(testStorage, realm)}");
+                    }
+                }));
+            }
         }
 
-        protected void RunTestWithRealmAsync(Func<RealmContextFactory, Storage, Task> testAction, [CallerMemberName] string caller = "")
+        protected void RunTestWithRealmAsync(Func<RealmAccess, Storage, Task> testAction, [CallerMemberName] string caller = "")
         {
-            AsyncContext.Run(async () =>
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
-                var testStorage = storage.GetStorageForDirectory(caller);
-
-                using (var realmFactory = new RealmContextFactory(testStorage, caller))
+                host.Run(new RealmTestGame(async () =>
                 {
-                    Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
-                    await testAction(realmFactory, testStorage);
+                    var testStorage = storage.GetStorageForDirectory(caller);
 
-                    realmFactory.Dispose();
+                    using (var realm = new RealmAccess(testStorage, OsuGameBase.CLIENT_DATABASE_FILENAME))
+                    {
+                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
+                        await testAction(realm, testStorage);
 
-                    Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
-                    realmFactory.Compact();
-                    Logger.Log($"Final database size after compact: {getFileSize(testStorage, realmFactory)}");
-                }
-            });
+                        realm.Dispose();
+
+                        Logger.Log($"Final database size: {getFileSize(testStorage, realm)}");
+                        realm.Compact();
+                    }
+                }));
+            }
         }
 
-        private static long getFileSize(Storage testStorage, RealmContextFactory realmFactory)
+        protected static BeatmapSetInfo CreateBeatmapSet(RulesetInfo ruleset)
+        {
+            RealmFile createRealmFile() => new RealmFile { Hash = Guid.NewGuid().ToString().ComputeSHA2Hash() };
+
+            var metadata = new BeatmapMetadata
+            {
+                Title = "My Love",
+                Artist = "Kuba Oms"
+            };
+
+            var beatmapSet = new BeatmapSetInfo
+            {
+                Beatmaps =
+                {
+                    new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata) { DifficultyName = "Easy", },
+                    new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata) { DifficultyName = "Normal", },
+                    new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata) { DifficultyName = "Hard", },
+                    new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata) { DifficultyName = "Insane", }
+                },
+                Files =
+                {
+                    new RealmNamedFileUsage(createRealmFile(), "test [easy].osu"),
+                    new RealmNamedFileUsage(createRealmFile(), "test [normal].osu"),
+                    new RealmNamedFileUsage(createRealmFile(), "test [hard].osu"),
+                    new RealmNamedFileUsage(createRealmFile(), "test [insane].osu"),
+                }
+            };
+
+            for (int i = 0; i < 8; i++)
+                beatmapSet.Files.Add(new RealmNamedFileUsage(createRealmFile(), $"hitsound{i}.mp3"));
+
+            foreach (var b in beatmapSet.Beatmaps)
+                b.BeatmapSet = beatmapSet;
+
+            return beatmapSet;
+        }
+
+        protected static RulesetInfo CreateRuleset() =>
+            new RulesetInfo("osu", "osu!", string.Empty, 0) { Available = true };
+
+        private class RealmTestGame : Framework.Game
+        {
+            public RealmTestGame(Func<Task> work)
+            {
+                // ReSharper disable once AsyncVoidLambda
+                Scheduler.Add(async () =>
+                {
+                    await work().ConfigureAwait(true);
+                    Exit();
+                });
+            }
+
+            public RealmTestGame(Action work)
+            {
+                Scheduler.Add(() =>
+                {
+                    work();
+                    Exit();
+                });
+            }
+        }
+
+        private static long getFileSize(Storage testStorage, RealmAccess realm)
         {
             try
             {
-                using (var stream = testStorage.GetStream(realmFactory.Filename))
+                using (var stream = testStorage.GetStream(realm.Filename))
                     return stream?.Length ?? 0;
             }
             catch

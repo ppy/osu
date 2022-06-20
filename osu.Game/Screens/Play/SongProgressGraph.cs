@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,17 +26,17 @@ namespace osu.Game.Screens.Play
                 if (!objects.Any())
                     return;
 
-                var firstHit = objects.First().StartTime;
-                var lastHit = objects.Max(o => o.GetEndTime());
+                double firstHit = objects.First().StartTime;
+                double lastHit = objects.Max(o => o.GetEndTime());
 
                 if (lastHit == 0)
                     lastHit = objects.Last().StartTime;
 
-                var interval = (lastHit - firstHit + 1) / granularity;
+                double interval = (lastHit - firstHit + 1) / granularity;
 
                 foreach (var h in objects)
                 {
-                    var endTime = h.GetEndTime();
+                    double endTime = h.GetEndTime();
 
                     Debug.Assert(endTime >= h.StartTime);
 

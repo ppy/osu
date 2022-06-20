@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,21 +90,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                 if (!(hitObjects[i + 1] is OsuHitObject nextHitObject) || nextHitObject is Spinner)
                     continue;
 
-                var deltaTime = nextHitObject.StartTime - hitObject.GetEndTime();
+                double deltaTime = nextHitObject.StartTime - hitObject.GetEndTime();
 
                 // Ignore objects that are far enough apart in time to not be considered the same pattern.
                 if (deltaTime > pattern_lifetime)
                     continue;
 
                 // Relying on FastInvSqrt is probably good enough here. We'll be taking the difference between distances later, hence square not being sufficient.
-                var distance = (hitObject.StackedEndPosition - nextHitObject.StackedPosition).LengthFast;
+                float distance = (hitObject.StackedEndPosition - nextHitObject.StackedPosition).LengthFast;
 
                 // Ignore stacks and half-stacks, as these are close enough to where they can't be confused for being time-distanced.
                 if (distance < stack_leniency)
                     continue;
 
                 var observedTimeDistance = new ObservedTimeDistance(nextHitObject.StartTime, deltaTime, distance);
-                var expectedDistance = getExpectedDistance(prevObservedTimeDistances, observedTimeDistance);
+                double expectedDistance = getExpectedDistance(prevObservedTimeDistances, observedTimeDistance);
 
                 if (expectedDistance == 0)
                 {
@@ -125,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
         private double getExpectedDistance(IEnumerable<ObservedTimeDistance> prevObservedTimeDistances, ObservedTimeDistance observedTimeDistance)
         {
-            var observations = prevObservedTimeDistances.Count();
+            int observations = prevObservedTimeDistances.Count();
 
             int count = 0;
             double sum = 0;

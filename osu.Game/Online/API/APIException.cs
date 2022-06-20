@@ -1,14 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 
 namespace osu.Game.Online.API
 {
     public class APIException : InvalidOperationException
     {
-        public APIException(string messsage, Exception innerException)
-            : base(messsage, innerException)
+        public APIException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }

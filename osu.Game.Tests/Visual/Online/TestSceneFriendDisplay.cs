@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dashboard.Friends;
 using osu.Game.Users;
@@ -44,9 +47,9 @@ namespace osu.Game.Tests.Visual.Online
             // No need to do anything, fetch is performed automatically.
         }
 
-        private List<User> getUsers() => new List<User>
+        private List<APIUser> getUsers() => new List<APIUser>
         {
-            new User
+            new APIUser
             {
                 Username = "flyte",
                 Id = 3103765,
@@ -55,7 +58,7 @@ namespace osu.Game.Tests.Visual.Online
                 Country = new Country { FlagName = "JP" },
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             },
-            new User
+            new APIUser
             {
                 Username = "peppy",
                 Id = 2,
@@ -66,7 +69,7 @@ namespace osu.Game.Tests.Visual.Online
                 IsSupporter = true,
                 SupportLevel = 3,
             },
-            new User
+            new APIUser
             {
                 Username = "Evast",
                 Id = 8195163,

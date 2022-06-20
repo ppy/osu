@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
@@ -31,7 +33,7 @@ namespace osu.Game.Updater
         private OsuGameBase game { get; set; }
 
         [Resolved]
-        protected NotificationOverlay Notifications { get; private set; }
+        protected INotificationOverlay Notifications { get; private set; }
 
         protected override void LoadComplete()
         {
@@ -39,9 +41,9 @@ namespace osu.Game.Updater
 
             Schedule(() => Task.Run(CheckForUpdateAsync));
 
-            var version = game.Version;
+            string version = game.Version;
 
-            var lastVersion = config.Get<string>(OsuSetting.Version);
+            string lastVersion = config.Get<string>(OsuSetting.Version);
 
             if (game.IsDeployedBuild && version != lastVersion)
             {
@@ -94,10 +96,10 @@ namespace osu.Game.Updater
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChangelogOverlay changelog, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours, ChangelogOverlay changelog, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.CheckSquare;
-                IconBackgound.Colour = colours.BlueDark;
+                IconBackground.Colour = colours.BlueDark;
 
                 Activated = delegate
                 {

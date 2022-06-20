@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
@@ -12,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Hard Rock";
         public override string Acronym => "HR";
-        public override IconUsage? Icon => OsuIcon.ModHardrock;
+        public override IconUsage? Icon => OsuIcon.ModHardRock;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Everything just got a bit harder...";
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModDifficultyAdjust) };

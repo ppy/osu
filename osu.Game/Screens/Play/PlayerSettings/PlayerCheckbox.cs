@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -14,7 +16,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             Nub.AccentColour = colours.Yellow;
             Nub.GlowingAccentColour = colours.YellowLighter;
-            Nub.GlowColour = colours.YellowDarker;
+            Nub.GlowColour = colours.YellowDark;
         }
     }
 }

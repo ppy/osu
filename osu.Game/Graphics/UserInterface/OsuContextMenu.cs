@@ -1,9 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
@@ -41,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OsuColour colours)
         {
             BackgroundColour = colours.ContextMenuGray;
         }

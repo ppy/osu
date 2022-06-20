@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The time signature at this control point.
         /// </summary>
-        public readonly Bindable<TimeSignatures> TimeSignatureBindable = new Bindable<TimeSignatures>(TimeSignatures.SimpleQuadruple) { Default = TimeSignatures.SimpleQuadruple };
+        public readonly Bindable<TimeSignature> TimeSignatureBindable = new Bindable<TimeSignature>(TimeSignature.SimpleQuadruple);
 
         /// <summary>
         /// Default length of a beat in milliseconds. Used whenever there is no beatmap or track playing.
@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The time signature at this control point.
         /// </summary>
-        public TimeSignatures TimeSignature
+        public TimeSignature TimeSignature
         {
             get => TimeSignatureBindable.Value;
             set => TimeSignatureBindable.Value = value;

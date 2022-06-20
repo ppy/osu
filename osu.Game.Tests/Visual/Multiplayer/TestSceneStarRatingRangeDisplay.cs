@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -31,8 +33,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 SelectedRoom.Value.Playlist.AddRange(new[]
                 {
-                    new PlaylistItem { Beatmap = { Value = new BeatmapInfo { StarDifficulty = min } } },
-                    new PlaylistItem { Beatmap = { Value = new BeatmapInfo { StarDifficulty = max } } },
+                    new PlaylistItem(new BeatmapInfo { StarRating = min }),
+                    new PlaylistItem(new BeatmapInfo { StarRating = max }),
                 });
             });
         }

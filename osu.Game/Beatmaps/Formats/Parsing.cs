@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
 
@@ -17,7 +19,7 @@ namespace osu.Game.Beatmaps.Formats
 
         public static float ParseFloat(string input, float parseLimit = (float)MAX_PARSE_VALUE)
         {
-            var output = float.Parse(input, CultureInfo.InvariantCulture);
+            float output = float.Parse(input, CultureInfo.InvariantCulture);
 
             if (output < -parseLimit) throw new OverflowException("Value is too low");
             if (output > parseLimit) throw new OverflowException("Value is too high");
@@ -29,7 +31,7 @@ namespace osu.Game.Beatmaps.Formats
 
         public static double ParseDouble(string input, double parseLimit = MAX_PARSE_VALUE)
         {
-            var output = double.Parse(input, CultureInfo.InvariantCulture);
+            double output = double.Parse(input, CultureInfo.InvariantCulture);
 
             if (output < -parseLimit) throw new OverflowException("Value is too low");
             if (output > parseLimit) throw new OverflowException("Value is too high");
@@ -41,7 +43,7 @@ namespace osu.Game.Beatmaps.Formats
 
         public static int ParseInt(string input, int parseLimit = (int)MAX_PARSE_VALUE)
         {
-            var output = int.Parse(input, CultureInfo.InvariantCulture);
+            int output = int.Parse(input, CultureInfo.InvariantCulture);
 
             if (output < -parseLimit) throw new OverflowException("Value is too low");
             if (output > parseLimit) throw new OverflowException("Value is too high");

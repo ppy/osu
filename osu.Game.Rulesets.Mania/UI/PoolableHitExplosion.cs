@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
@@ -14,9 +16,6 @@ namespace osu.Game.Rulesets.Mania.UI
         public const double DURATION = 200;
 
         public JudgementResult Result { get; private set; }
-
-        [Resolved]
-        private Column column { get; set; }
 
         private SkinnableDrawable skinnableExplosion;
 

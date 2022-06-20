@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +41,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             beatmapSet.Beatmaps
                       .Where(b => !b.Hidden)
+                      .OrderBy(b => b.Ruleset)
+                      .ThenBy(b => b.StarRating)
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
         }
@@ -48,7 +52,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (LastSelected == null || LastSelected.Filtered.Value)
             {
                 if (GetRecommendedBeatmap?.Invoke(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.BeatmapInfo)) is BeatmapInfo recommended)
-                    return Children.OfType<CarouselBeatmap>().First(b => b.BeatmapInfo == recommended);
+                    return Children.OfType<CarouselBeatmap>().First(b => b.BeatmapInfo.Equals(recommended));
             }
 
             return base.GetNextToSelect();
@@ -84,7 +88,7 @@ namespace osu.Game.Screens.Select.Carousel
                     return compareUsingAggregateMax(otherSet, b => b.Length);
 
                 case SortMode.Difficulty:
-                    return compareUsingAggregateMax(otherSet, b => b.StarDifficulty);
+                    return compareUsingAggregateMax(otherSet, b => b.StarRating);
             }
         }
 
@@ -95,8 +99,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private int compareUsingAggregateMax(CarouselBeatmapSet other, Func<BeatmapInfo, double> func)
         {
-            var ourBeatmaps = ValidBeatmaps.Any();
-            var otherBeatmaps = other.ValidBeatmaps.Any();
+            bool ourBeatmaps = ValidBeatmaps.Any();
+            bool otherBeatmaps = other.ValidBeatmaps.Any();
 
             if (!ourBeatmaps && !otherBeatmaps) return 0;
             if (!ourBeatmaps) return -1;

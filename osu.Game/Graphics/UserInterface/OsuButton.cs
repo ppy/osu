@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
+#nullable disable
+
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -34,13 +34,33 @@ namespace osu.Game.Graphics.UserInterface
 
         private Color4? backgroundColour;
 
+        /// <summary>
+        /// Sets a custom background colour to this button, replacing the provided default.
+        /// </summary>
         public Color4 BackgroundColour
         {
-            get => backgroundColour ?? Color4.White;
+            get => backgroundColour ?? defaultBackgroundColour;
             set
             {
                 backgroundColour = value;
                 Background.FadeColour(value);
+            }
+        }
+
+        private Color4 defaultBackgroundColour;
+
+        /// <summary>
+        /// Sets a default background colour to this button.
+        /// </summary>
+        protected Color4 DefaultBackgroundColour
+        {
+            get => defaultBackgroundColour;
+            set
+            {
+                defaultBackgroundColour = value;
+
+                if (backgroundColour == null)
+                    Background.FadeColour(value);
             }
         }
 
@@ -85,27 +105,28 @@ namespace osu.Game.Graphics.UserInterface
 
             if (hoverSounds.HasValue)
                 AddInternal(new HoverClickSounds(hoverSounds.Value));
-
-            Enabled.BindValueChanged(enabledChanged, true);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (backgroundColour == null)
-                BackgroundColour = colours.BlueDark;
-
-            Enabled.ValueChanged += enabledChanged;
-            Enabled.TriggerChange();
+            DefaultBackgroundColour = colours.BlueDark;
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Colour = dimColour;
+            Enabled.BindValueChanged(_ => this.FadeColour(dimColour, 200, Easing.OutQuint));
+        }
+
+        private Color4 dimColour => Enabled.Value ? Color4.White : Color4.Gray;
 
         protected override bool OnClick(ClickEvent e)
         {
             if (Enabled.Value)
-            {
-                Debug.Assert(backgroundColour != null);
-                Background.FlashColour(backgroundColour.Value, 200);
-            }
+                Background.FlashColour(BackgroundColour.Lighten(0.4f), 200);
 
             return base.OnClick(e);
         }
@@ -144,10 +165,5 @@ namespace osu.Game.Graphics.UserInterface
             Anchor = Anchor.Centre,
             Font = OsuFont.GetFont(weight: FontWeight.Bold)
         };
-
-        private void enabledChanged(ValueChangedEvent<bool> e)
-        {
-            this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
-        }
     }
 }

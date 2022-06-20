@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -26,7 +28,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour osuColour)
         {
-            Background.Colour = colourProvider?.Dark5 ?? osuColour.GreySeafoamDark;
+            Background.Colour = colourProvider?.Dark5 ?? osuColour.GreySeaFoamDark;
 
             Content.Padding = new MarginPadding(spacing);
             Content.Spacing = new Vector2(0, spacing);

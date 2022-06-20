@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -17,11 +19,11 @@ using osu.Framework.Testing.Input;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osu.Game.Tests.Gameplay;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -42,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public TestSceneGameplayCursor()
         {
             var ruleset = new OsuRuleset();
-            gameplayState = new GameplayState(CreateBeatmap(ruleset.RulesetInfo), ruleset, Array.Empty<Mod>());
+            gameplayState = TestGameplayState.Create(ruleset);
 
             AddStep("change background colour", () =>
             {
@@ -60,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 config.SetValue(OsuSetting.AutoCursorSize, true);
                 gameplayState.Beatmap.Difficulty.CircleSize = val;
-                Scheduler.AddOnce(() => loadContent(false));
+                Scheduler.AddOnce(loadContent);
             });
 
             AddStep("test cursor container", () => loadContent(false));
@@ -78,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep($"adjust cs to {circleSize}", () => gameplayState.Beatmap.Difficulty.CircleSize = circleSize);
             AddStep("turn on autosizing", () => config.SetValue(OsuSetting.AutoCursorSize, true));
 
-            AddStep("load content", () => loadContent());
+            AddStep("load content", loadContent);
 
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == OsuCursorContainer.GetScaleForCircleSize(circleSize) * userScale);
 
@@ -98,7 +100,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("load content", () => loadContent(false, () => new SkinProvidingContainer(new TopLeftCursorSkin())));
         }
 
-        private void loadContent(bool automated = true, Func<SkinProvidingContainer> skinProvider = null)
+        private void loadContent() => loadContent(false);
+
+        private void loadContent(bool automated, Func<SkinProvidingContainer> skinProvider = null)
         {
             SetContents(_ =>
             {
@@ -116,7 +120,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             public Drawable GetDrawableComponent(ISkinComponent component) => null;
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
             public ISample GetSample(ISampleInfo sampleInfo) => null;
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,10 +57,16 @@ namespace osu.Game.Screens.Select.Carousel
                 updateSelectedIndex();
         }
 
+        private bool addingChildren;
+
         public void AddChildren(IEnumerable<CarouselItem> items)
         {
+            addingChildren = true;
+
             foreach (var i in items)
-                base.AddChild(i);
+                AddChild(i);
+
+            addingChildren = false;
 
             attemptSelection();
         }
@@ -66,7 +74,8 @@ namespace osu.Game.Screens.Select.Carousel
         public override void AddChild(CarouselItem i)
         {
             base.AddChild(i);
-            attemptSelection();
+            if (!addingChildren)
+                attemptSelection();
         }
 
         protected override void ChildItemStateChanged(CarouselItem item, CarouselItemState value)

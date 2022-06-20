@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -29,52 +31,50 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         [Resolved]
         private OsuColour colours { get; set; }
 
+        private OsuClickableContainer clickableContent;
+
         public TeamDisplay(MultiplayerRoomUser user)
         {
             this.user = user;
 
             RelativeSizeAxes = Axes.Y;
-            Width = 15;
+
+            AutoSizeAxes = Axes.X;
 
             Margin = new MarginPadding { Horizontal = 3 };
-
-            Alpha = 0;
-            Scale = new Vector2(0, 1);
         }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            box = new Container
+            InternalChild = clickableContent = new OsuClickableContainer
             {
-                RelativeSizeAxes = Axes.Both,
-                CornerRadius = 5,
-                Masking = true,
+                Width = 15,
+                Alpha = 0,
                 Scale = new Vector2(0, 1),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Child = new Box
+                RelativeSizeAxes = Axes.Y,
+                Child = box = new Container
                 {
-                    Colour = Color4.White,
                     RelativeSizeAxes = Axes.Both,
+                    CornerRadius = 5,
+                    Masking = true,
+                    Scale = new Vector2(0, 1),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Child = new Box
+                    {
+                        Colour = Color4.White,
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
                 }
             };
 
             if (Client.LocalUser?.Equals(user) == true)
             {
-                InternalChild = new OsuClickableContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    TooltipText = "Change team",
-                    Action = changeTeam,
-                    Child = box
-                };
-            }
-            else
-            {
-                InternalChild = box;
+                clickableContent.Action = changeTeam;
+                clickableContent.TooltipText = "Change team";
             }
 
             sampleTeamSwap = audio.Samples.Get(@"Multiplayer/team-swap");
@@ -85,10 +85,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             Client.SendMatchRequest(new ChangeTeamRequest
             {
                 TeamID = ((Client.LocalUser?.MatchState as TeamVersusUserState)?.TeamID + 1) % 2 ?? 0,
-            });
+            }).FireAndForget();
         }
 
-        private int? displayedTeam;
+        public int? DisplayedTeam { get; private set; }
 
         protected override void OnRoomUpdated()
         {
@@ -102,28 +102,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             int? newTeam = (userRoomState as TeamVersusUserState)?.TeamID;
 
-            if (newTeam == displayedTeam)
+            if (newTeam == DisplayedTeam)
                 return;
 
             // only play the sample if an already valid team changes to another valid team.
             // this avoids playing a sound for each user if the match type is changed to/from a team mode.
-            if (newTeam != null && displayedTeam != null)
+            if (newTeam != null && DisplayedTeam != null)
                 sampleTeamSwap?.Play();
 
-            displayedTeam = newTeam;
+            DisplayedTeam = newTeam;
 
-            if (displayedTeam != null)
+            if (DisplayedTeam != null)
             {
-                box.FadeColour(getColourForTeam(displayedTeam.Value), duration, Easing.OutQuint);
+                box.FadeColour(getColourForTeam(DisplayedTeam.Value), duration, Easing.OutQuint);
                 box.ScaleTo(new Vector2(box.Scale.X < 0 ? 1 : -1, 1), duration, Easing.OutQuint);
 
-                this.ScaleTo(Vector2.One, duration, Easing.OutQuint);
-                this.FadeIn(duration);
+                clickableContent.ScaleTo(Vector2.One, duration, Easing.OutQuint);
+                clickableContent.FadeIn(duration);
             }
             else
             {
-                this.ScaleTo(new Vector2(0, 1), duration, Easing.OutQuint);
-                this.FadeOut(duration);
+                clickableContent.ScaleTo(new Vector2(0, 1), duration, Easing.OutQuint);
+                clickableContent.FadeOut(duration);
             }
         }
 

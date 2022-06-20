@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -28,6 +30,8 @@ namespace osu.Game.Rulesets.Taiko.UI
     public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
     {
         public new BindableDouble TimeRange => base.TimeRange;
+
+        public readonly BindableBool LockPlayfieldAspect = new BindableBool(true);
 
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
@@ -70,7 +74,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             return ControlPoints[result];
         }
 
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
+        {
+            LockPlayfieldAspect = { BindTarget = LockPlayfieldAspect }
+        };
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 

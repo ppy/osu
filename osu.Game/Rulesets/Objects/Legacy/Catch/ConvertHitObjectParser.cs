@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Game.Audio;
 using System.Collections.Generic;
@@ -37,7 +39,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
         }
 
         protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
-                                                  List<IList<HitSampleInfo>> nodeSamples)
+                                                  IList<IList<HitSampleInfo>> nodeSamples)
         {
             newCombo |= forceNewCombo;
             comboOffset += extraComboOffset;

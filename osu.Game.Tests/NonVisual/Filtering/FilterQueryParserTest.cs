@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -162,9 +164,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("I want the pp", filterCriteria.SearchText.Trim());
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(BeatmapSetOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
+            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
             Assert.IsTrue(filterCriteria.OnlineStatus.IsLowerInclusive);
-            Assert.AreEqual(BeatmapSetOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
+            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
             Assert.IsTrue(filterCriteria.OnlineStatus.IsUpperInclusive);
         }
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -67,10 +69,12 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("create slider", () =>
             {
-                var tintingSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
+                var tintingSkin = skinManager.GetSkin(DefaultLegacySkin.CreateInfo());
                 tintingSkin.Configuration.ConfigDictionary["AllowSliderBallTint"] = "1";
 
-                Child = new SkinProvidingContainer(tintingSkin)
+                var provider = Ruleset.Value.CreateInstance().CreateLegacySkinProvider(tintingSkin, Beatmap.Value.Beatmap);
+
+                Child = new SkinProvidingContainer(provider)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = dho = new DrawableSlider(prepareObject(new Slider

@@ -1,18 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
@@ -66,6 +68,9 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.Select:
@@ -91,32 +96,12 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         {
         }
 
-        protected class SettingsTextBox : OsuTextBox
-        {
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                BackgroundUnfocused = Color4.Black;
-                BackgroundFocused = Color4.Black;
-            }
-        }
-
-        protected class SettingsNumberTextBox : SettingsTextBox
-        {
-            protected override bool CanAddCharacter(char character) => char.IsNumber(character);
-        }
-
-        protected class SettingsPasswordTextBox : OsuPasswordTextBox
-        {
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                BackgroundUnfocused = Color4.Black;
-                BackgroundFocused = Color4.Black;
-            }
-        }
-
-        protected class SectionContainer : FillFlowContainer<Section>
+        /// <remarks>
+        /// <see cref="ReverseChildIDFillFlowContainer{T}"/> is used to ensure that if the nested <see cref="Section"/>s
+        /// use expanded overhanging content (like an <see cref="OsuDropdown{T}"/>'s dropdown),
+        /// then the overhanging content will be correctly Z-ordered.
+        /// </remarks>
+        protected class SectionContainer : ReverseChildIDFillFlowContainer<Section>
         {
             public SectionContainer()
             {

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -37,7 +39,7 @@ namespace osu.Game.Online.Chat
             base.LoadComplete();
 
             string verb;
-            BeatmapInfo beatmapInfo;
+            IBeatmapInfo beatmapInfo;
 
             switch (api.Activity.Value)
             {
@@ -57,7 +59,7 @@ namespace osu.Game.Online.Chat
                     break;
             }
 
-            var beatmapString = beatmapInfo.OnlineBeatmapID.HasValue ? $"[{api.WebsiteRootUrl}/b/{beatmapInfo.OnlineBeatmapID} {beatmapInfo}]" : beatmapInfo.ToString();
+            string beatmapString = beatmapInfo.OnlineID > 0 ? $"[{api.WebsiteRootUrl}/b/{beatmapInfo.OnlineID} {beatmapInfo}]" : beatmapInfo.ToString();
 
             channelManager.PostMessage($"is {verb} {beatmapString}", true, target);
             Expire();

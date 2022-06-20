@@ -1,19 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osu.Game.Utils;
-using static osu.Game.Users.User;
 
 namespace osu.Game.Users
 {
     public class UserStatistics
     {
         [JsonProperty]
-        public User User;
+        public APIUser User;
 
         [JsonProperty(@"level")]
         public LevelInfo Level;
@@ -27,6 +29,9 @@ namespace osu.Game.Users
             public int Progress;
         }
 
+        [JsonProperty(@"is_ranked")]
+        public bool IsRanked;
+
         [JsonProperty(@"global_rank")]
         public int? GlobalRank;
 
@@ -34,7 +39,7 @@ namespace osu.Game.Users
         public int? CountryRank;
 
         // populated via User model, as that's where the data currently lives.
-        public RankHistoryData RankHistory;
+        public APIRankHistory RankHistory;
 
         [JsonProperty(@"pp")]
         public decimal? PP;
