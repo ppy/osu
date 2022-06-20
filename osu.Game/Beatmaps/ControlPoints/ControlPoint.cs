@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using Newtonsoft.Json;
 using osu.Game.Graphics;
@@ -11,7 +9,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>
+    public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>, IEquatable<ControlPoint>
     {
         /// <summary>
         /// The time at which the control point takes effect.
@@ -48,5 +46,16 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             Time = other.Time;
         }
+
+        public sealed override bool Equals(object? obj)
+            => obj is ControlPoint otherControlPoint
+               && Equals(otherControlPoint);
+
+        public virtual bool Equals(ControlPoint? other)
+            => other != null
+               && Time == other.Time;
+
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        public override int GetHashCode() => Time.GetHashCode();
     }
 }
