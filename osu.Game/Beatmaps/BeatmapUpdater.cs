@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Online.API;
@@ -33,18 +34,9 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Queue a beatmap for background processing.
         /// </summary>
-        public void Queue(int beatmapSetId)
-        {
-            // TODO: implement
-        }
-
-        /// <summary>
-        /// Queue a beatmap for background processing.
-        /// </summary>
         public void Queue(Live<BeatmapSetInfo> beatmap)
         {
-            // For now, just fire off a task.
-            // TODO: Add actual queueing probably.
+            Logger.Log($"Queueing change for local beatmap {beatmap}");
             Task.Factory.StartNew(() => beatmap.PerformRead(Process));
         }
 
