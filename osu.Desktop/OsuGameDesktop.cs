@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,23 +20,26 @@ using osu.Game.Updater;
 using osu.Desktop.Windows;
 using osu.Framework.Threading;
 using osu.Game.IO;
+using osu.Game.IPC;
 
 namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
-        public OsuGameDesktop(string[] args = null)
+        private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
+
+        public OsuGameDesktop(string[]? args = null)
             : base(args)
         {
         }
 
-        public override StableStorage GetStorageForStableInstall()
+        public override StableStorage? GetStorageForStableInstall()
         {
             try
             {
                 if (Host is DesktopGameHost desktopHost)
                 {
-                    string stablePath = getStableInstallPath();
+                    string? stablePath = getStableInstallPath();
                     if (!string.IsNullOrEmpty(stablePath))
                         return new StableStorage(stablePath, desktopHost);
                 }
@@ -51,11 +52,11 @@ namespace osu.Desktop
             return null;
         }
 
-        private string getStableInstallPath()
+        private string? getStableInstallPath()
         {
             static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs")) || File.Exists(Path.Combine(p, "osu!.cfg"));
 
-            string stableInstallPath;
+            string? stableInstallPath;
 
             if (OperatingSystem.IsWindows())
             {
@@ -83,15 +84,15 @@ namespace osu.Desktop
         }
 
         [SupportedOSPlatform("windows")]
-        private string getStableInstallPathFromRegistry()
+        private string? getStableInstallPathFromRegistry()
         {
-            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
+            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu"))
                 return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
         protected override UpdateManager CreateUpdateManager()
         {
-            string packageManaged = Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER");
+            string? packageManaged = Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER");
 
             if (!string.IsNullOrEmpty(packageManaged))
                 return new NoActionUpdateManager();
@@ -118,6 +119,8 @@ namespace osu.Desktop
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
+
+            osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
         }
 
         public override void SetHost(GameHost host)
@@ -135,7 +138,7 @@ namespace osu.Desktop
         }
 
         private readonly List<string> importableFiles = new List<string>();
-        private ScheduledDelegate importSchedule;
+        private ScheduledDelegate? importSchedule;
 
         private void fileDrop(string[] filePaths)
         {
@@ -167,6 +170,12 @@ namespace osu.Desktop
 
                 Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            osuSchemeLinkIPCChannel?.Dispose();
         }
     }
 }
