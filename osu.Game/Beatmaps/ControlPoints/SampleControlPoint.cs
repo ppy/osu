@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public virtual HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
             => hitSampleInfo.With(newBank: hitSampleInfo.Bank ?? SampleBank, newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume);
 
-        public override bool IsRedundant(ControlPoint existing)
+        public override bool IsRedundant(ControlPoint? existing)
             => existing is SampleControlPoint existingSample
                && SampleBank == existingSample.SampleBank
                && SampleVolume == existingSample.SampleVolume;

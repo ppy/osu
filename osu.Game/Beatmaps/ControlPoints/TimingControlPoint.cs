@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public double BPM => 60000 / BeatLength;
 
         // Timing points are never redundant as they can change the time signature.
-        public override bool IsRedundant(ControlPoint existing) => false;
+        public override bool IsRedundant(ControlPoint? existing) => false;
 
         public override void CopyFrom(ControlPoint other)
         {

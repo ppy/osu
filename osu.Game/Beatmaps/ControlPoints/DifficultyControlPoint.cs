@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => SliderVelocityBindable.Value = value;
         }
 
-        public override bool IsRedundant(ControlPoint existing)
+        public override bool IsRedundant(ControlPoint? existing)
             => existing is DifficultyControlPoint existingDifficulty
                && SliderVelocity == existingDifficulty.SliderVelocity;
 
