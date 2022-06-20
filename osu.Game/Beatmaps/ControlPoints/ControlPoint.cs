@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="existing">An existing control point to compare with.</param>
         /// <returns>Whether this <see cref="ControlPoint"/> is redundant when placed alongside <paramref name="existing"/>.</returns>
-        public abstract bool IsRedundant(ControlPoint existing);
+        public abstract bool IsRedundant(ControlPoint? existing);
 
         /// <summary>
         /// Create an unbound copy of this control point.
