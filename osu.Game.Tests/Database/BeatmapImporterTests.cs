@@ -15,7 +15,6 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
-using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -39,10 +38,7 @@ namespace osu.Game.Tests.Database
                 using (var importer = new BeatmapImporter(storage, realm))
                 using (new RealmRulesetStore(realm, storage))
                 {
-                    Live<BeatmapSetInfo>? beatmapSet;
-
-                    using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
-                        beatmapSet = await importer.Import(reader);
+                    var beatmapSet = await importer.Import(new ImportTask(TestResources.GetTestBeatmapStream(), "renatus.osz"));
 
                     Assert.NotNull(beatmapSet);
                     Debug.Assert(beatmapSet != null);
@@ -83,10 +79,7 @@ namespace osu.Game.Tests.Database
                 using (var importer = new BeatmapImporter(storage, realm))
                 using (new RealmRulesetStore(realm, storage))
                 {
-                    Live<BeatmapSetInfo>? beatmapSet;
-
-                    using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
-                        beatmapSet = await importer.Import(reader);
+                    var beatmapSet = await importer.Import(new ImportTask(TestResources.GetTestBeatmapStream(), "renatus.osz"));
 
                     Assert.NotNull(beatmapSet);
                     Debug.Assert(beatmapSet != null);
@@ -146,11 +139,8 @@ namespace osu.Game.Tests.Database
                 {
                     Task.Run(async () =>
                     {
-                        Live<BeatmapSetInfo>? beatmapSet;
-
-                        using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
-                            // ReSharper disable once AccessToDisposedClosure
-                            beatmapSet = await importer.Import(reader);
+                        // ReSharper disable once AccessToDisposedClosure
+                        var beatmapSet = await importer.Import(new ImportTask(TestResources.GetTestBeatmapStream(), "renatus.osz"));
 
                         Assert.NotNull(beatmapSet);
                         Debug.Assert(beatmapSet != null);
@@ -173,13 +163,8 @@ namespace osu.Game.Tests.Database
                 using (var importer = new BeatmapImporter(storage, realm))
                 using (new RealmRulesetStore(realm, storage))
                 {
-                    Live<BeatmapSetInfo>? imported;
-
-                    using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
-                    {
-                        imported = await importer.Import(reader);
-                        EnsureLoaded(realm.Realm);
-                    }
+                    var imported = await importer.Import(new ImportTask(TestResources.GetTestBeatmapStream(), "renatus.osz"));
+                    EnsureLoaded(realm.Realm);
 
                     Assert.AreEqual(1, realm.Realm.All<BeatmapSetInfo>().Count());
 

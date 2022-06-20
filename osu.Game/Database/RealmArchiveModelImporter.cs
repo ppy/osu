@@ -188,7 +188,7 @@ namespace osu.Game.Database
 
             Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
-                import = await Import(reader, batchImport, cancellationToken).ConfigureAwait(false);
+                import = await importFromArchive(reader, batchImport, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -213,7 +213,7 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="batchImport">Whether this import is part of a larger batch.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<Live<TModel>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
+        private async Task<Live<TModel>?> importFromArchive(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
