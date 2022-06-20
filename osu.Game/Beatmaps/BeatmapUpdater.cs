@@ -16,13 +16,13 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public class BeatmapUpdater
     {
-        private readonly BeatmapManager beatmapManager;
+        private readonly IWorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
         private readonly BeatmapDifficultyCache difficultyCache;
 
-        public BeatmapUpdater(BeatmapManager beatmapManager, BeatmapOnlineLookupQueue onlineLookupQueue, BeatmapDifficultyCache difficultyCache)
+        public BeatmapUpdater(IWorkingBeatmapCache workingBeatmapCache, BeatmapOnlineLookupQueue onlineLookupQueue, BeatmapDifficultyCache difficultyCache)
         {
-            this.beatmapManager = beatmapManager;
+            this.workingBeatmapCache = workingBeatmapCache;
             this.onlineLookupQueue = onlineLookupQueue;
             this.difficultyCache = difficultyCache;
         }
@@ -48,17 +48,19 @@ namespace osu.Game.Beatmaps
 
                 foreach (var beatmap in beatmapSet.Beatmaps)
                 {
-                    var working = beatmapManager.GetWorkingBeatmap(beatmap);
-
                     // Because we aren't guaranteed all processing will happen on this thread, it's very hard to use the live realm object.
                     // This can be fixed by adding a synchronous flow to `BeatmapDifficultyCache`.
                     var detachedBeatmap = beatmap.Detach();
 
                     beatmap.StarRating = difficultyCache.GetDifficultyAsync(detachedBeatmap).GetResultSafely()?.Stars ?? 0;
+
+                    var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
                     beatmap.Length = calculateLength(working.Beatmap);
                     beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
                 }
             });
+
+            workingBeatmapCache.Invalidate(beatmapSet);
         }
 
         private double calculateLength(IBeatmap b)
