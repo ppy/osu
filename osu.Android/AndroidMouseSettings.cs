@@ -20,11 +20,11 @@ namespace osu.Android
 
         protected override LocalisableString Header => MouseSettingsStrings.Mouse;
 
-        private Bindable<double> handlerSensitivity;
+        private Bindable<double> handlerSensitivity = null!;
 
-        private Bindable<double> localSensitivity;
+        private Bindable<double> localSensitivity = null!;
 
-        private Bindable<bool> relativeMode;
+        private Bindable<bool> relativeMode = null!;
 
         public AndroidMouseSettings(AndroidMouseHandler mouseHandler)
         {
