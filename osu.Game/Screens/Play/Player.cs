@@ -1044,18 +1044,19 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(e);
         }
 
-        // Don't know if prepareScoreForResults useful
-        private async void saveReplay()
+        private void saveReplay()
         {
             var scoreCopy = Score.DeepClone();
+
             try
             {
-                await ImportScore(scoreCopy).ConfigureAwait(false);
+                ImportScore(scoreCopy).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, @"Score import failed!");
             }
+
             PerformExit(true);
         }
 
