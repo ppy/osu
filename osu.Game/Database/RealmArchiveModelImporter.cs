@@ -549,6 +549,6 @@ namespace osu.Game.Database
                 yield return f.Filename;
         }
 
-        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
+        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLowerInvariant()}";
     }
 }

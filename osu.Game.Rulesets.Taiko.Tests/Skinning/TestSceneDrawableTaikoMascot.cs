@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             createDrawableRuleset();
 
             assertStateAfterResult(new JudgementResult(new Swell(), new TaikoSwellJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Clear);
-            AddUntilStep($"state reverts to {expectedStateAfterClear.ToString().ToLower()}", () => allMascotsIn(expectedStateAfterClear));
+            AddUntilStep($"state reverts to {expectedStateAfterClear.ToString().ToLowerInvariant()}", () => allMascotsIn(expectedStateAfterClear));
         }
 
         private void setBeatmap(bool kiai = false)
@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             TaikoMascotAnimationState[] mascotStates = null;
 
-            AddStep($"{judgementResult.Type.ToString().ToLower()} result for {judgementResult.Judgement.GetType().Name.Humanize(LetterCasing.LowerCase)}",
+            AddStep($"{judgementResult.Type.ToString().ToLowerInvariant()} result for {judgementResult.Judgement.GetType().Name.Humanize(LetterCasing.LowerCase)}",
                 () =>
                 {
                     applyNewResult(judgementResult);
@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     Schedule(() => mascotStates = animatedMascots.Select(mascot => mascot.State.Value).ToArray());
                 });
 
-            AddAssert($"state is {expectedState.ToString().ToLower()}", () => mascotStates.All(state => state == expectedState));
+            AddAssert($"state is {expectedState.ToString().ToLowerInvariant()}", () => mascotStates.All(state => state == expectedState));
         }
 
         private void applyNewResult(JudgementResult judgementResult)
