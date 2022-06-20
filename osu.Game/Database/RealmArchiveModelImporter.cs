@@ -208,8 +208,11 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Silently import an item from an <see cref="ArchiveReader"/>.
+        /// Create and import a model based off the provided <see cref="ArchiveReader"/>.
         /// </summary>
+        /// <remarks>
+        /// This method also handled queueing the import task on a relevant import thread pool.
+        /// </remarks>
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="batchImport">Whether this import is part of a larger batch.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
@@ -225,6 +228,13 @@ namespace osu.Game.Database
 
                 if (model == null)
                     return null;
+
+                var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, batchImport, cancellationToken),
+                    cancellationToken,
+                    TaskCreationOptions.HideScheduler,
+                    batchImport ? import_scheduler_batch : import_scheduler);
+
+                return await scheduledImport.ConfigureAwait(false);
             }
             catch (TaskCanceledException)
             {
@@ -235,13 +245,6 @@ namespace osu.Game.Database
                 LogForModel(model, @$"Model creation of {archive.Name} failed.", e);
                 return null;
             }
-
-            var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, batchImport, cancellationToken),
-                cancellationToken,
-                TaskCreationOptions.HideScheduler,
-                batchImport ? import_scheduler_batch : import_scheduler);
-
-            return await scheduledImport.ConfigureAwait(false);
         }
 
         /// <summary>
