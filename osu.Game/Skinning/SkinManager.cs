@@ -259,9 +259,9 @@ namespace osu.Game.Skinning
 
         #region Implementation of IModelImporter<SkinInfo>
 
-        public Action<IEnumerable<Live<SkinInfo>>> PostImport
+        public Action<IEnumerable<Live<SkinInfo>>> PresentImport
         {
-            set => skinImporter.PostImport = value;
+            set => skinImporter.PresentImport = value;
         }
 
         public Task Import(params string[] paths) => skinImporter.Import(paths);

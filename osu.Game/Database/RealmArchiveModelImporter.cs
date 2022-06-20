@@ -56,7 +56,7 @@ namespace osu.Game.Database
         /// </summary>
         private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
-        public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
+        public abstract IEnumerable<string> HandledExtensions { get; }
 
         protected readonly RealmFileStore Files;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<Live<TModel>>>? PostImport { get; set; }
+        public Action<IEnumerable<Live<TModel>>>? PresentImport { get; set; }
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -158,12 +158,12 @@ namespace osu.Game.Database
                     ? $"Imported {imported.First().GetDisplayString()}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
-                if (imported.Count > 0 && PostImport != null)
+                if (imported.Count > 0 && PresentImport != null)
                 {
                     notification.CompletionText += " Click to view.";
                     notification.CompletionClickAction = () =>
                     {
-                        PostImport?.Invoke(imported);
+                        PresentImport?.Invoke(imported);
                         return true;
                     };
                 }
@@ -338,6 +338,8 @@ namespace osu.Game.Database
                     transaction.Commit();
                 }
 
+                PostImport(item, realm);
+
                 LogForModel(item, @"Import successfully completed!");
             }
             catch (Exception e)
@@ -470,6 +472,15 @@ namespace osu.Game.Database
         /// <param name="model">The model prepared for import.</param>
         /// <param name="realm">The current realm context.</param>
         protected virtual void PreImport(TModel model, Realm realm)
+        {
+        }
+
+        /// <summary>
+        /// Perform any final actions after the import has been committed to the database.
+        /// </summary>
+        /// <param name="model">The model prepared for import.</param>
+        /// <param name="realm">The current realm context.</param>
+        protected virtual void PostImport(TModel model, Realm realm)
         {
         }
 
