@@ -338,6 +338,8 @@ namespace osu.Game.Database
                     transaction.Commit();
                 }
 
+                PostImport(item, realm);
+
                 LogForModel(item, @"Import successfully completed!");
             }
             catch (Exception e)
@@ -470,6 +472,15 @@ namespace osu.Game.Database
         /// <param name="model">The model prepared for import.</param>
         /// <param name="realm">The current realm context.</param>
         protected virtual void PreImport(TModel model, Realm realm)
+        {
+        }
+
+        /// <summary>
+        /// Perform any final actions after the import has been committed to the database.
+        /// </summary>
+        /// <param name="model">The model prepared for import.</param>
+        /// <param name="realm">The current realm context.</param>
+        protected virtual void PostImport(TModel model, Realm realm)
         {
         }
 
