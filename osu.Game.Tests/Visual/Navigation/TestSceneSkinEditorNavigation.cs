@@ -192,10 +192,6 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
-
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
-
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
         }
 
         private void openSkinEditor()
@@ -218,6 +214,9 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private void switchToGameplayScene()
         {
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
             AddStep("Click gameplay scene button", () => skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay").TriggerClick());
 
             AddUntilStep("wait for player", () =>
