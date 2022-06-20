@@ -65,7 +65,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<Live<TModel>>>? PostImport { get; set; }
+        public Action<IEnumerable<Live<TModel>>>? PresentImport { get; set; }
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -158,12 +158,12 @@ namespace osu.Game.Database
                     ? $"Imported {imported.First().GetDisplayString()}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
-                if (imported.Count > 0 && PostImport != null)
+                if (imported.Count > 0 && PresentImport != null)
                 {
                     notification.CompletionText += " Click to view.";
                     notification.CompletionClickAction = () =>
                     {
-                        PostImport?.Invoke(imported);
+                        PresentImport?.Invoke(imported);
                         return true;
                     };
                 }
