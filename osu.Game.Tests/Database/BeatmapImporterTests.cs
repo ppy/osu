@@ -277,6 +277,42 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestImportDirectoryWithEmptyOsuFiles()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                using var importer = new BeatmapImporter(storage, realm);
+                using var store = new RealmRulesetStore(realm, storage);
+
+                string? temp = TestResources.GetTestBeatmapForImport();
+
+                string extractedFolder = $"{temp}_extracted";
+                Directory.CreateDirectory(extractedFolder);
+
+                try
+                {
+                    using (var zip = ZipArchive.Open(temp))
+                        zip.WriteToDirectory(extractedFolder);
+
+                    foreach (var file in new DirectoryInfo(extractedFolder).GetFiles("*.osu"))
+                    {
+                        using (file.Open(FileMode.Create))
+                        {
+                            // empty file.
+                        }
+                    }
+
+                    var imported = await importer.Import(new ImportTask(extractedFolder));
+                    Assert.IsNull(imported);
+                }
+                finally
+                {
+                    Directory.Delete(extractedFolder, true);
+                }
+            });
+        }
+
+        [Test]
         public void TestImportThenImportWithReZip()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
