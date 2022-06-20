@@ -102,9 +102,12 @@ namespace osu.Game.Beatmaps
 
                     beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapOnlineStatus.None;
                     beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
+                    beatmapInfo.OnlineMD5Hash = res.MD5Hash;
                     beatmapInfo.OnlineID = res.OnlineID;
 
                     beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
+
+                    beatmapInfo.LastOnlineUpdate = DateTimeOffset.Now;
 
                     logForModel(set, $"Online retrieval mapped {beatmapInfo} to {res.OnlineBeatmapSetID} / {res.OnlineID}.");
                 }
@@ -190,7 +193,7 @@ namespace osu.Game.Beatmaps
 
                     using (var cmd = db.CreateCommand())
                     {
-                        cmd.CommandText = "SELECT beatmapset_id, beatmap_id, approved, user_id FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineID OR filename = @Path";
+                        cmd.CommandText = "SELECT beatmapset_id, beatmap_id, approved, user_id, checksum FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineID OR filename = @Path";
 
                         cmd.Parameters.Add(new SqliteParameter("@MD5Hash", beatmapInfo.MD5Hash));
                         cmd.Parameters.Add(new SqliteParameter("@OnlineID", beatmapInfo.OnlineID));
@@ -209,8 +212,8 @@ namespace osu.Game.Beatmaps
                                 beatmapInfo.BeatmapSet.Status = status;
                                 beatmapInfo.BeatmapSet.OnlineID = reader.GetInt32(0);
                                 beatmapInfo.OnlineID = reader.GetInt32(1);
-
                                 beatmapInfo.Metadata.Author.OnlineID = reader.GetInt32(3);
+                                beatmapInfo.OnlineMD5Hash = reader.GetString(4);
 
                                 logForModel(set, $"Cached local retrieval for {beatmapInfo}.");
                                 return true;
