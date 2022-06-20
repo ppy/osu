@@ -289,6 +289,8 @@ namespace osu.Game
             dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
 
+            AddInternal(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
+
             BeatmapManager.ProcessBeatmap = set => beatmapUpdater.Process(set);
 
             dependencies.Cache(userCache = new UserLookupCache());
