@@ -357,7 +357,7 @@ namespace osu.Game.Tests.Skins.IO
             }
         }
 
-        private async Task<Live<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ImportTask import = null)
+        private async Task<Live<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ImportTask import)
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
             return await skinManager.Import(import);
