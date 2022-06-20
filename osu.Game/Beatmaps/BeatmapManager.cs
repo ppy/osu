@@ -409,9 +409,6 @@ namespace osu.Game.Beatmaps
         public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) =>
             beatmapImporter.Import(task, batchImport, cancellationToken);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(archive, batchImport, cancellationToken);
-
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) =>
             beatmapImporter.Import(item, archive, false, cancellationToken);
 
