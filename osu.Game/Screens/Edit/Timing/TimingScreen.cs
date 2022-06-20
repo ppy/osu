@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Edit.Timing
                     // Try and create matching types from the currently selected control point.
                     var selected = selectedGroup.Value;
 
-                    if (selected != null && selected != group)
+                    if (selected != null && !ReferenceEquals(selected, group))
                     {
                         foreach (var controlPoint in selected.ControlPoints)
                         {
