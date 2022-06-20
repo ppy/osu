@@ -62,6 +62,7 @@ namespace osu.Game.Database
             {
                 // This isn't used in any current path. May need to reconsider for performance reasons (ie. if we don't expect the incoming stream to be copied out).
                 memoryStream = new MemoryStream(stream.ReadAllBytesToArray());
+                stream.Dispose();
             }
 
             if (ZipUtils.IsZipArchive(memoryStream))
