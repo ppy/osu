@@ -34,7 +34,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double ring_appear_offset = 100;
 
-        protected readonly Container<DrawableSwellTick> Ticks;
+        protected virtual HitResult OkResult => HitResult.Ok;
+        private readonly Container<DrawableSwellTick> ticks;
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 }
             });
 
-            AddInternal(Ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
+            AddInternal(ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader]
@@ -132,20 +133,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Origin = Anchor.Centre,
             });
 
-        protected void AnimateCompletion(int numHits)
-        {
-            float completion = (float)numHits / HitObject.RequiredHits;
-
-            expandingRing
-                .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
-                .Then()
-                .FadeTo(completion / 8, 2000, Easing.OutQuint);
-
-            MainPiece.Drawable.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
-
-            expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
-        }
-
         protected override void OnFree()
         {
             base.OnFree();
@@ -162,7 +149,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             switch (hitObject)
             {
                 case DrawableSwellTick tick:
-                    Ticks.Add(tick);
+                    ticks.Add(tick);
                     break;
             }
         }
@@ -170,7 +157,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void ClearNestedHitObjects()
         {
             base.ClearNestedHitObjects();
-            Ticks.Clear(false);
+            ticks.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
@@ -190,7 +177,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
                 DrawableSwellTick nextTick = null;
 
-                foreach (var t in Ticks)
+                foreach (var t in ticks)
                 {
                     if (!t.Result.HasResult)
                     {
@@ -201,12 +188,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 nextTick?.TriggerResult(true);
 
-                int numHits = Ticks.Count(r => r.IsHit);
+                int numHits = ticks.Count(r => r.IsHit);
 
-                AnimateCompletion(numHits);
+                float completion = (float)numHits / HitObject.RequiredHits;
+
+                expandingRing
+                    .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
+                    .Then()
+                    .FadeTo(completion / 8, 2000, Easing.OutQuint);
+
+                MainPiece.Drawable.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
+
+                expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (numHits == HitObject.RequiredHits)
-                    ApplyResult(r => r.Type = HitResult.Great);
+                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
             }
             else
             {
@@ -215,7 +211,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 int numHits = 0;
 
-                foreach (var tick in Ticks)
+                foreach (var tick in ticks)
                 {
                     if (tick.IsHit)
                     {
@@ -227,7 +223,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult);
+                ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? OkResult : r.Judgement.MinResult);
             }
         }
 
