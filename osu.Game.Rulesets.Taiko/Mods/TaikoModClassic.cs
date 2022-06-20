@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -40,19 +41,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             var hitObjects = taikoBeatmap.HitObjects.Select(ho =>
             {
-                if (ho is DrumRoll drumRoll)
+                switch (ho)
                 {
-                    var newDrumRoll = new ClassicDrumRoll(drumRoll);
-                    return newDrumRoll;
-                }
+                    case DrumRoll drumRoll:
+                        return new ClassicDrumRoll(drumRoll);
 
-                if (ho is Swell swell)
-                {
-                    var newSwell = new ClassicSwell(swell);
-                    return newSwell;
-                }
+                    case Swell swell:
+                        return new ClassicSwell(swell);
 
-                return ho;
+                    default:
+                        return ho;
+                }
             }).ToList();
 
             taikoBeatmap.HitObjects = hitObjects;
@@ -73,33 +72,35 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             public override Judgement CreateJudgement() => new TaikoClassicDrumRollJudgement();
 
-            protected override void CreateTicks(CancellationToken cancellationToken)
+            protected override List<TaikoHitObject> CreateTicks(CancellationToken cancellationToken)
             {
-                if (TickSpacing == 0)
-                    return;
+                List<TaikoHitObject> oldTicks = base.CreateTicks(cancellationToken);
 
-                bool first = true;
-
-                for (double t = StartTime; t < EndTime + TickSpacing / 2; t += TickSpacing)
+                List<TaikoHitObject> newTicks = oldTicks.Select(oldTick =>
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    AddNested(new ClassicDrumRollTick
+                    if (oldTick is DrumRollTick drumRollTick)
                     {
-                        FirstTick = first,
-                        TickSpacing = TickSpacing,
-                        StartTime = t,
-                        IsStrong = IsStrong
-                    });
+                        return new ClassicDrumRollTick(drumRollTick);
+                    }
 
-                    first = false;
-                }
+                    return oldTick;
+                }).ToList();
+
+                return newTicks;
             }
         }
 
         private class ClassicDrumRollTick : DrumRollTick
         {
             public override Judgement CreateJudgement() => new TaikoClassicDrumRollTickJudgement();
+
+            public ClassicDrumRollTick(DrumRollTick original)
+            {
+                StartTime = original.StartTime;
+                Samples = original.Samples;
+                FirstTick = original.FirstTick;
+                TickSpacing = original.TickSpacing;
+            }
         }
 
         private class ClassicSwell : Swell
@@ -118,12 +119,12 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private class TaikoClassicDrumRollJudgement : TaikoDrumRollJudgement
         {
-            public override HitResult MaxResult => HitResult.LargeBonus;
+            public override HitResult MaxResult => HitResult.IgnoreHit;
         }
 
         private class TaikoClassicDrumRollTickJudgement : TaikoDrumRollTickJudgement
         {
-            public override HitResult MaxResult => HitResult.LargeBonus;
+            public override HitResult MaxResult => HitResult.SmallBonus;
         }
 
         private class TaikoClassicSwellJudgement : TaikoSwellJudgement
@@ -143,7 +144,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 if (timeOffset < 0)
                     return;
 
-                ApplyResult(r => r.Type = HitResult.IgnoreMiss);
+                ApplyResult(r => r.Type = HitResult.IgnoreHit);
             }
         }
 
@@ -151,52 +152,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             public override bool DisplayResult => false;
 
-            protected override void CheckForResult(bool userTriggered, double timeOffset)
-            {
-                if (userTriggered)
-                {
-                    DrawableSwellTick nextTick = null;
-
-                    foreach (var t in Ticks)
-                    {
-                        if (!t.Result.HasResult)
-                        {
-                            nextTick = t;
-                            break;
-                        }
-                    }
-
-                    nextTick?.TriggerResult(true);
-
-                    int numHits = Ticks.Count(r => r.IsHit);
-
-                    AnimateCompletion(numHits);
-
-                    if (numHits == HitObject.RequiredHits)
-                        ApplyResult(r => r.Type = HitResult.LargeBonus);
-                }
-                else
-                {
-                    if (timeOffset < 0)
-                        return;
-
-                    int numHits = 0;
-
-                    foreach (var tick in Ticks)
-                    {
-                        if (tick.IsHit)
-                        {
-                            numHits++;
-                            continue;
-                        }
-
-                        if (!tick.Result.HasResult)
-                            tick.TriggerResult(false);
-                    }
-
-                    ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.SmallBonus : HitResult.IgnoreMiss);
-                }
-            }
+            protected override HitResult OkResult => HitResult.SmallBonus;
         }
 
         public void Update(Playfield playfield)

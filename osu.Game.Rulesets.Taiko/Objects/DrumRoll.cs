@@ -5,6 +5,7 @@
 
 using osu.Game.Rulesets.Objects.Types;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -75,7 +76,10 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            CreateTicks(cancellationToken);
+            foreach (TaikoHitObject tick in CreateTicks(cancellationToken))
+            {
+                AddNested(tick);
+            }
 
             RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
             RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
@@ -83,10 +87,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.CreateNestedHitObjects(cancellationToken);
         }
 
-        protected virtual void CreateTicks(CancellationToken cancellationToken)
+        protected virtual List<TaikoHitObject> CreateTicks(CancellationToken cancellationToken)
         {
+            List<TaikoHitObject> ticks = new List<TaikoHitObject>();
+
             if (TickSpacing == 0)
-                return;
+                return ticks;
 
             bool first = true;
 
@@ -94,7 +100,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                AddNested(new DrumRollTick
+                ticks.Add(new DrumRollTick
                 {
                     FirstTick = first,
                     TickSpacing = TickSpacing,
@@ -104,6 +110,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
                 first = false;
             }
+
+            return ticks;
         }
 
         public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
