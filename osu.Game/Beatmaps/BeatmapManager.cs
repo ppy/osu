@@ -454,9 +454,9 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IPostImports<out BeatmapSetInfo>
 
-        public Action<IEnumerable<Live<BeatmapSetInfo>>>? PostImport
+        public Action<IEnumerable<Live<BeatmapSetInfo>>>? PresentImport
         {
-            set => beatmapImporter.PostImport = value;
+            set => beatmapImporter.PresentImport = value;
         }
 
         #endregion

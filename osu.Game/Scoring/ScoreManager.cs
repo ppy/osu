@@ -267,9 +267,9 @@ namespace osu.Game.Scoring
 
         #region Implementation of IPresentImports<ScoreInfo>
 
-        public Action<IEnumerable<Live<ScoreInfo>>> PostImport
+        public Action<IEnumerable<Live<ScoreInfo>>> PresentImport
         {
-            set => scoreImporter.PostImport = value;
+            set => scoreImporter.PresentImport = value;
         }
 
         #endregion
