@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -19,7 +22,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             for (int i = 0; i < 50; i++)
             {
-                SelectedRoom.Value.RecentParticipants.Add(new User
+                SelectedRoom.Value.RecentParticipants.Add(new APIUser
                 {
                     Username = "peppy",
                     Statistics = new UserStatistics { GlobalRank = 1234 },

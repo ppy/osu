@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 namespace osu.Game.Tests.Visual
 {
     /// <summary>
@@ -12,8 +14,11 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            // note that this will override any mod rate application
-            Beatmap.Value.Track.Tempo.Value = Clock.Rate;
+            if (Beatmap.Value.TrackLoaded)
+            {
+                // note that this will override any mod rate application
+                Beatmap.Value.Track.Tempo.Value = Clock.Rate;
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Overlays.BeatmapSet;
 using System.Collections.Specialized;
 using System.Linq;
@@ -26,7 +28,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             LeaderboardModSelector modSelector;
             FillFlowContainer<SpriteText> selectedMods;
-            var ruleset = new Bindable<RulesetInfo>();
+
+            var ruleset = new Bindable<IRulesetInfo>();
 
             Add(selectedMods = new FillFlowContainer<SpriteText>
             {

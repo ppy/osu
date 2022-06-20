@@ -2,23 +2,25 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays.Notifications;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.Containers;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Localisation;
+using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
+using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Overlays
 {
-    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
+    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, INotificationOverlay
     {
         public string IconTexture => "Icons/Hexacons/notification";
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
@@ -28,13 +30,15 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        private FlowContainer<NotificationSection> sections;
+        private FlowContainer<NotificationSection> sections = null!;
 
         [Resolved]
-        private AudioManager audio { get; set; }
+        private AudioManager audio { get; set; } = null!;
+
+        private readonly IBindable<Visibility> firstRunSetupVisibility = new Bindable<Visibility>();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(FirstRunSetupOverlay? firstRunSetup)
         {
             X = WIDTH;
             Width = WIDTH;
@@ -60,7 +64,7 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.X,
                             Children = new[]
                             {
-                                new NotificationSection(@"Notifications", @"Clear All")
+                                new NotificationSection(AccountsStrings.NotificationsTitle, "Clear All")
                                 {
                                     AcceptTypes = new[] { typeof(SimpleNotification) }
                                 },
@@ -73,13 +77,16 @@ namespace osu.Game.Overlays
                     }
                 }
             };
+
+            if (firstRunSetup != null)
+                firstRunSetupVisibility.BindTo(firstRunSetup.State);
         }
 
-        private ScheduledDelegate notificationsEnabler;
+        private ScheduledDelegate? notificationsEnabler;
 
         private void updateProcessingMode()
         {
-            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State.Value == Visibility.Visible;
+            bool enabled = (OverlayActivationMode.Value == OverlayActivation.All && firstRunSetupVisibility.Value != Visibility.Visible) || State.Value == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
@@ -94,11 +101,14 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            State.ValueChanged += _ => updateProcessingMode();
+            State.BindValueChanged(_ => updateProcessingMode());
+            firstRunSetupVisibility.BindValueChanged(_ => updateProcessingMode());
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
-        public readonly BindableInt UnreadCount = new BindableInt();
+        public IBindable<int> UnreadCount => unreadCount;
+
+        private readonly BindableInt unreadCount = new BindableInt();
 
         private int runningDepth;
 
@@ -110,13 +120,11 @@ namespace osu.Game.Overlays
 
         private double? lastSamplePlayback;
 
-        /// <summary>
-        /// Post a new notification for display.
-        /// </summary>
-        /// <param name="notification">The notification to display.</param>
         public void Post(Notification notification) => postScheduler.Add(() =>
         {
             ++runningDepth;
+
+            Logger.Log($"⚠️ {notification.Text}");
 
             notification.Closed += notificationClosed;
 
@@ -181,7 +189,7 @@ namespace osu.Game.Overlays
 
         private void updateCounts()
         {
-            UnreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
+            unreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
         }
 
         private void markAllRead()

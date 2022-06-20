@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -43,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
         protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)
         {
-            var time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
+            double time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
             var pos = column.ScreenSpacePositionAtTime(time);
 
             return new SnapResult(pos, time, column);

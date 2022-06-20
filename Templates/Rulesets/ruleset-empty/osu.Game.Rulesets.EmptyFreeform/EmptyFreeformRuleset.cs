@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,8 +31,8 @@ namespace osu.Game.Rulesets.EmptyFreeform
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) =>
             new EmptyFreeformBeatmapConverter(beatmap, this);
 
-        public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) =>
-            new EmptyFreeformDifficultyCalculator(this, beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) =>
+            new EmptyFreeformDifficultyCalculator(RulesetInfo, beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.EmptyFreeform
                     return new[] { new EmptyFreeformModAutoplay() };
 
                 default:
-                    return new Mod[] { null };
+                    return Array.Empty<Mod>();
             }
         }
 

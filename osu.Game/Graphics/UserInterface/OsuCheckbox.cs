@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -8,23 +10,19 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuCheckbox : Checkbox
     {
-        public Color4 CheckedColor { get; set; } = Color4.Cyan;
-        public Color4 UncheckedColor { get; set; } = Color4.White;
-        public int FadeDuration { get; set; }
-
         /// <summary>
         /// Whether to play sounds when the state changes as a result of user interaction.
         /// </summary>
         protected virtual bool PlaySoundsOnUserChange => true;
 
-        public string LabelText
+        public LocalisableString LabelText
         {
             set
             {
@@ -104,14 +102,12 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             Nub.Glowing = true;
-            Nub.Expanded = true;
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             Nub.Glowing = false;
-            Nub.Expanded = false;
             base.OnHoverLost(e);
         }
 

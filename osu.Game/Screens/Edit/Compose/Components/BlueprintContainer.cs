@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -58,13 +60,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        foreach (var o in args.NewItems)
+                        foreach (object o in args.NewItems)
                             SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Select();
 
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        foreach (var o in args.OldItems)
+                        foreach (object o in args.OldItems)
                             SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Deselect();
 
                         break;
@@ -73,6 +75,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             SelectionHandler = CreateSelectionHandler();
             SelectionHandler.DeselectAll = deselectAll;
+            SelectionHandler.SelectedItems.BindTo(SelectedItems);
 
             AddRangeInternal(new[]
             {
@@ -108,11 +111,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             bool selectionPerformed = performMouseDownActions(e);
-
-            // even if a selection didn't occur, a drag event may still move the selection.
             bool movementPossible = prepareSelectionMovement();
 
-            return selectionPerformed || (e.Button == MouseButton.Left && movementPossible);
+            // check if selection has occurred
+            if (selectionPerformed)
+            {
+                // only unmodified right click should show context menu
+                bool shouldShowContextMenu = e.Button == MouseButton.Right && !e.ShiftPressed && !e.AltPressed && !e.SuperPressed;
+
+                // stop propagation if not showing context menu
+                return !shouldShowContextMenu;
+            }
+
+            // even if a selection didn't occur, a drag event may still move the selection.
+            return e.Button == MouseButton.Left && movementPossible;
         }
 
         protected SelectionBlueprint<T> ClickedBlueprint { get; private set; }
@@ -230,6 +242,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case PlatformAction.SelectAll:
@@ -468,12 +483,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (snapProvider != null)
             {
                 // check for positional snap for every object in selection (for things like object-object snapping)
-                for (var i = 0; i < movementBlueprintOriginalPositions.Length; i++)
+                for (int i = 0; i < movementBlueprintOriginalPositions.Length; i++)
                 {
                     Vector2 originalPosition = movementBlueprintOriginalPositions[i];
                     var testPosition = originalPosition + distanceTravelled;
 
-                    var positionalResult = snapProvider.SnapScreenSpacePositionToValidPosition(testPosition);
+                    var positionalResult = snapProvider.FindSnappedPositionAndTime(testPosition, SnapType.NearbyObjects);
 
                     if (positionalResult.ScreenSpacePosition == testPosition) continue;
 
@@ -492,7 +507,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 movePosition = movementBlueprintOriginalPositions.First() + distanceTravelled;
 
             // Retrieve a snapped position.
-            var result = snapProvider?.SnapScreenSpacePositionToValidTime(movePosition);
+            var result = snapProvider?.FindSnappedPositionAndTime(movePosition, ~SnapType.NearbyObjects);
 
             if (result == null)
             {

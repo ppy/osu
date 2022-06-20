@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -11,6 +13,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Taiko.Objects;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
@@ -24,8 +27,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
     /// </summary>
     public abstract class CirclePiece : BeatSyncedContainer, IHasAccentColour
     {
-        public const float SYMBOL_SIZE = 0.45f;
+        public const float SYMBOL_SIZE = TaikoHitObject.DEFAULT_SIZE;
         public const float SYMBOL_BORDER = 8;
+
         private const double pre_beat_transition_time = 80;
 
         private Color4 accentColour;
@@ -153,7 +157,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             if (!effectPoint.KiaiMode)
                 return;
 
-            if (beatIndex % (int)timingPoint.TimeSignature != 0)
+            if (beatIndex % timingPoint.TimeSignature.Numerator != 0)
                 return;
 
             double duration = timingPoint.BeatLength * 2;

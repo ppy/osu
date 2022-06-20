@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -146,6 +148,9 @@ namespace osu.Game.Screens.Play
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.SkipCutscene:
@@ -270,7 +275,7 @@ namespace osu.Game.Screens.Play
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
 
-                sampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
+                sampleConfirm = audio.Samples.Get(@"UI/submit-select");
 
                 Children = new Drawable[]
                 {

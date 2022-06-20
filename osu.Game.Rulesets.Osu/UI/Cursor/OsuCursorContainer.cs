@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -58,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private OsuConfigManager config { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, OsuRulesetConfigManager rulesetConfig)
+        private void load(OsuRulesetConfigManager rulesetConfig)
         {
             rulesetConfig?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
         }

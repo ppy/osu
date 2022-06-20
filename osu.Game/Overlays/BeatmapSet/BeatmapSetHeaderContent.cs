@@ -1,28 +1,34 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapSetHeaderContent : BeatmapDownloadTrackingComposite
+    public class BeatmapSetHeaderContent : CompositeDrawable
     {
+        public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
+
         private const float transition_duration = 200;
         private const float buttons_height = 45;
         private const float buttons_spacing = 5;
@@ -32,18 +38,23 @@ namespace osu.Game.Overlays.BeatmapSet
         public readonly Details Details;
         public readonly BeatmapPicker Picker;
 
-        private readonly UpdateableBeatmapSetCover cover;
+        private readonly UpdateableOnlineBeatmapSetCover cover;
         private readonly Box coverGradient;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
-        private readonly ExplicitContentBeatmapPill explicitContentPill;
-        private readonly FeaturedArtistBeatmapPill featuredArtistPill;
+
+        private readonly ExplicitContentBeatmapBadge explicitContent;
+        private readonly SpotlightBeatmapBadge spotlight;
+        private readonly FeaturedArtistBeatmapBadge featuredArtist;
+
         private readonly FillFlowContainer downloadButtonsContainer;
         private readonly BeatmapAvailability beatmapAvailability;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         private readonly FavouriteButton favouriteButton;
         private readonly FillFlowContainer fadeContent;
         private readonly LoadingSpinner loading;
+
+        private BeatmapDownloadTracker downloadTracker;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -68,7 +79,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            cover = new UpdateableBeatmapSetCover
+                            cover = new UpdateableOnlineBeatmapSetCover
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Masking = true,
@@ -121,7 +132,14 @@ namespace osu.Game.Overlays.BeatmapSet
                                                 Origin = Anchor.BottomLeft,
                                                 Margin = new MarginPadding { Left = 5, Bottom = 4 }, // To better lineup with the font
                                             },
-                                            explicitContentPill = new ExplicitContentBeatmapPill
+                                            explicitContent = new ExplicitContentBeatmapBadge
+                                            {
+                                                Alpha = 0f,
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Margin = new MarginPadding { Left = 10, Bottom = 4 },
+                                            },
+                                            spotlight = new SpotlightBeatmapBadge
                                             {
                                                 Alpha = 0f,
                                                 Anchor = Anchor.BottomLeft,
@@ -141,7 +159,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             {
                                                 Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true),
                                             },
-                                            featuredArtistPill = new FeaturedArtistBeatmapPill
+                                            featuredArtist = new FeaturedArtistBeatmapBadge
                                             {
                                                 Alpha = 0f,
                                                 Anchor = Anchor.BottomLeft,
@@ -198,6 +216,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             onlineStatusPill = new BeatmapSetOnlineStatusPill
                             {
+                                AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 TextSize = 14,
@@ -212,7 +231,9 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.BeatmapInfo = b.NewValue;
-                externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
+                externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineID}";
+
+                onlineStatusPill.Status = b.NewValue?.Status ?? BeatmapOnlineStatus.None;
             };
         }
 
@@ -220,14 +241,13 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OverlayColourProvider colourProvider)
         {
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
-            onlineStatusPill.BackgroundColour = colourProvider.Background6;
-
-            State.BindValueChanged(_ => updateDownloadButtons());
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
                 Picker.BeatmapSet = rulesetSelector.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
-                cover.BeatmapSet = setInfo.NewValue;
+                cover.OnlineInfo = setInfo.NewValue;
+
+                downloadTracker?.RemoveAndDisposeImmediately();
 
                 if (setInfo.NewValue == null)
                 {
@@ -241,18 +261,22 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
                 else
                 {
+                    downloadTracker = new BeatmapDownloadTracker(setInfo.NewValue);
+                    downloadTracker.State.BindValueChanged(_ => updateDownloadButtons());
+                    AddInternal(downloadTracker);
+
                     fadeContent.FadeIn(500, Easing.OutQuint);
 
                     loading.Hide();
 
-                    title.Text = new RomanisableString(setInfo.NewValue.Metadata.TitleUnicode, setInfo.NewValue.Metadata.Title);
-                    artist.Text = new RomanisableString(setInfo.NewValue.Metadata.ArtistUnicode, setInfo.NewValue.Metadata.Artist);
+                    title.Text = new RomanisableString(setInfo.NewValue.TitleUnicode, setInfo.NewValue.Title);
+                    artist.Text = new RomanisableString(setInfo.NewValue.ArtistUnicode, setInfo.NewValue.Artist);
 
-                    explicitContentPill.Alpha = setInfo.NewValue.OnlineInfo.HasExplicitContent ? 1 : 0;
-                    featuredArtistPill.Alpha = setInfo.NewValue.OnlineInfo.TrackId != null ? 1 : 0;
+                    explicitContent.Alpha = setInfo.NewValue.HasExplicitContent ? 1 : 0;
+                    spotlight.Alpha = setInfo.NewValue.FeaturedInSpotlight ? 1 : 0;
+                    featuredArtist.Alpha = setInfo.NewValue.TrackId != null ? 1 : 0;
 
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
-                    onlineStatusPill.Status = setInfo.NewValue.OnlineInfo.Status;
 
                     downloadButtonsContainer.FadeIn(transition_duration);
                     favouriteButton.FadeIn(transition_duration);
@@ -266,17 +290,17 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             if (BeatmapSet.Value == null) return;
 
-            if ((BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false) && State.Value != DownloadState.LocallyAvailable)
+            if (BeatmapSet.Value.Availability.DownloadDisabled && downloadTracker.State.Value != DownloadState.LocallyAvailable)
             {
                 downloadButtonsContainer.Clear();
                 return;
             }
 
-            switch (State.Value)
+            switch (downloadTracker.State.Value)
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new BeatmapPanelDownloadButton(BeatmapSet.Value)
+                    downloadButtonsContainer.Child = new BeatmapDownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y,
@@ -292,7 +316,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 default:
                     downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value);
-                    if (BeatmapSet.Value.OnlineInfo.HasVideo)
+                    if (BeatmapSet.Value.HasVideo)
                         downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true));
                     break;
             }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -97,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Time.Current < HitObject.StartTime)
                 return;
 
-            var startTime = holdStartTime?.Invoke();
+            double? startTime = holdStartTime?.Invoke();
 
             if (startTime == null || startTime > HitObject.StartTime)
                 ApplyResult(r => r.Type = r.Judgement.MinResult);

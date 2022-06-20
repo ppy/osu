@@ -1,17 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Home
@@ -24,14 +26,14 @@ namespace osu.Game.Overlays.Dashboard.Home
         [Resolved(canBeNull: true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
 
-        protected readonly BeatmapSetInfo SetInfo;
+        protected readonly APIBeatmapSet BeatmapSet;
 
         private Box hoverBackground;
         private SpriteIcon chevron;
 
-        protected DashboardBeatmapPanel(BeatmapSetInfo setInfo)
+        protected DashboardBeatmapPanel(APIBeatmapSet beatmapSet)
         {
-            SetInfo = setInfo;
+            BeatmapSet = beatmapSet;
         }
 
         [BackgroundDependencyLoader]
@@ -77,12 +79,12 @@ namespace osu.Game.Overlays.Dashboard.Home
                                     RelativeSizeAxes = Axes.Both,
                                     Masking = true,
                                     CornerRadius = 6,
-                                    Child = new UpdateableBeatmapSetCover
+                                    Child = new UpdateableOnlineBeatmapSetCover
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        BeatmapSet = SetInfo
+                                        OnlineInfo = BeatmapSet
                                     }
                                 },
                                 new Container
@@ -103,14 +105,14 @@ namespace osu.Game.Overlays.Dashboard.Home
                                                 RelativeSizeAxes = Axes.X,
                                                 Truncate = true,
                                                 Font = OsuFont.GetFont(weight: FontWeight.Regular),
-                                                Text = SetInfo.Metadata.Title
+                                                Text = BeatmapSet.Title
                                             },
                                             new OsuSpriteText
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 Truncate = true,
                                                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
-                                                Text = SetInfo.Metadata.Artist
+                                                Text = BeatmapSet.Artist
                                             },
                                             new LinkFlowContainer(f => f.Font = OsuFont.GetFont(size: 10, weight: FontWeight.Regular))
                                             {
@@ -121,7 +123,7 @@ namespace osu.Game.Overlays.Dashboard.Home
                                             }.With(c =>
                                             {
                                                 c.AddText("by");
-                                                c.AddUserLink(SetInfo.Metadata.Author);
+                                                c.AddUserLink(BeatmapSet.Author);
                                                 c.AddArbitraryDrawable(CreateInfo());
                                             })
                                         }
@@ -143,8 +145,8 @@ namespace osu.Game.Overlays.Dashboard.Home
 
             Action = () =>
             {
-                if (SetInfo.OnlineBeatmapSetID.HasValue)
-                    beatmapOverlay?.FetchAndShowBeatmapSet(SetInfo.OnlineBeatmapSetID.Value);
+                if (BeatmapSet.OnlineID > 0)
+                    beatmapOverlay?.FetchAndShowBeatmapSet(BeatmapSet.OnlineID);
             };
         }
 

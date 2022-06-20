@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -347,7 +349,7 @@ namespace osu.Game.Tests.NonVisual
         {
             for (int i = 0; i < 1000; i++)
             {
-                var time = handler.SetFrameFromTime(destination);
+                double? time = handler.SetFrameFromTime(destination);
                 if (time == null || time == destination)
                     return;
             }

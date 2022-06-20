@@ -1,12 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Tests.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -14,6 +18,9 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public class TestSceneEditorClock : EditorClockTestScene
     {
+        [Cached]
+        private EditorBeatmap editorBeatmap = new EditorBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo));
+
         public TestSceneEditorClock()
         {
             Add(new FillFlowContainer
@@ -37,9 +44,10 @@ namespace osu.Game.Tests.Visual.Editing
             });
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
             // ensure that music controller does not change this beatmap due to it
             // completing naturally as part of the test.

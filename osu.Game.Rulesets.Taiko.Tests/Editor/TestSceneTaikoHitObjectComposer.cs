@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -40,10 +42,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
             {
                 InternalChildren = new Drawable[]
                 {
-                    EditorBeatmap = new EditorBeatmap(new TaikoBeatmap())
+                    EditorBeatmap = new EditorBeatmap(new TaikoBeatmap
                     {
                         BeatmapInfo = { Ruleset = new TaikoRuleset().RulesetInfo }
-                    },
+                    }),
                     new TaikoHitObjectComposer(new TaikoRuleset())
                 };
 

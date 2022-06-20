@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -10,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
@@ -80,7 +81,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     Result = { BindTarget = SpinsPerMinute },
                 },
-                ticks = new Container<DrawableSpinnerTick>(),
+                ticks = new Container<DrawableSpinnerTick>
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new AspectContainer
                 {
                     Anchor = Anchor.Centre,
@@ -122,15 +126,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.LoadSamples();
 
-            var firstSample = HitObject.Samples.FirstOrDefault();
-
-            if (firstSample != null)
-            {
-                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample).With("spinnerspin");
-
-                spinningSample.Samples = new ISampleInfo[] { clone };
-                spinningSample.Frequency.Value = spinning_sample_initial_frequency;
-            }
+            spinningSample.Samples = HitObject.CreateSpinningSamples().Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
+            spinningSample.Frequency.Value = spinning_sample_initial_frequency;
         }
 
         private void updateSpinningSample(ValueChangedEvent<bool> tracking)

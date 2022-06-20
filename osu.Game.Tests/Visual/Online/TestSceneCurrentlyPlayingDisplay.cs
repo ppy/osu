@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -9,7 +11,9 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Tests.Visual.Spectator;
 using osu.Game.Users;
@@ -18,7 +22,7 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneCurrentlyPlayingDisplay : OsuTestScene
     {
-        private readonly User streamingUser = new User { Id = 2, Username = "Test user" };
+        private readonly APIUser streamingUser = new APIUser { Id = 2, Username = "Test user" };
 
         private TestSpectatorClient spectatorClient;
         private CurrentlyPlayingDisplay currentlyPlaying;
@@ -41,7 +45,8 @@ namespace osu.Game.Tests.Visual.Online
                         CachedDependencies = new (Type, object)[]
                         {
                             (typeof(SpectatorClient), spectatorClient),
-                            (typeof(UserLookupCache), lookupCache)
+                            (typeof(UserLookupCache), lookupCache),
+                            (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Purple)),
                         },
                         Child = currentlyPlaying = new CurrentlyPlayingDisplay
                         {
@@ -55,9 +60,9 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestBasicDisplay()
         {
-            AddStep("Add playing user", () => spectatorClient.StartPlay(streamingUser.Id, 0));
+            AddStep("Add playing user", () => spectatorClient.SendStartPlay(streamingUser.Id, 0));
             AddUntilStep("Panel loaded", () => currentlyPlaying.ChildrenOfType<UserGridPanel>()?.FirstOrDefault()?.User.Id == 2);
-            AddStep("Remove playing user", () => spectatorClient.EndPlay(streamingUser.Id));
+            AddStep("Remove playing user", () => spectatorClient.SendEndPlay(streamingUser.Id));
             AddUntilStep("Panel no longer present", () => !currentlyPlaying.ChildrenOfType<UserGridPanel>().Any());
         }
 
@@ -83,13 +88,13 @@ namespace osu.Game.Tests.Visual.Online
                 "pishifat"
             };
 
-            protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
+            protected override Task<APIUser> ComputeValueAsync(int lookup, CancellationToken token = default)
             {
                 // tests against failed lookups
                 if (lookup == 13)
-                    return Task.FromResult<User>(null);
+                    return Task.FromResult<APIUser>(null);
 
-                return Task.FromResult(new User
+                return Task.FromResult(new APIUser
                 {
                     Id = lookup,
                     Username = usernames[lookup % usernames.Length],

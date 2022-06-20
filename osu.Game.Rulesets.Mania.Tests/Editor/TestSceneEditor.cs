@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Tests.Visual;
@@ -24,9 +27,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetConfigCache configCache)
+        private void load()
         {
-            var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
+            var config = (ManiaRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
             config.BindWith(ManiaRulesetSetting.ScrollDirection, direction);
         }
     }

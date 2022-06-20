@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -195,6 +197,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     return;
 
                 ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            }
+
+            public override void OnKilled()
+            {
+                base.OnKilled();
+
+                if (Time.Current > ParentHitObject.HitObject.GetEndTime() && !Judged)
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
             }
 
             public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;

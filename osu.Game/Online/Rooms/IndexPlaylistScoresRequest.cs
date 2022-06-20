@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.IO.Network;
@@ -47,7 +49,7 @@ namespace osu.Game.Online.Rooms
 
                 req.AddCursor(Cursor);
 
-                foreach (var (key, value) in IndexParams.Properties)
+                foreach ((string key, var value) in IndexParams.Properties)
                     req.AddParameter(key, value.ToString());
             }
 

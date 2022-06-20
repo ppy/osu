@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -185,9 +187,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 nextTick?.TriggerResult(true);
 
-                var numHits = ticks.Count(r => r.IsHit);
+                int numHits = ticks.Count(r => r.IsHit);
 
-                var completion = (float)numHits / HitObject.RequiredHits;
+                float completion = (float)numHits / HitObject.RequiredHits;
 
                 expandingRing
                     .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
@@ -273,7 +275,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (Time.Current < HitObject.StartTime)
                 return false;
 
-            var isCentre = e.Action == TaikoAction.LeftCentre || e.Action == TaikoAction.RightCentre;
+            bool isCentre = e.Action == TaikoAction.LeftCentre || e.Action == TaikoAction.RightCentre;
 
             // Ensure alternating centre and rim hits
             if (lastWasCentre == isCentre)

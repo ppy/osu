@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -30,6 +32,11 @@ namespace osu.Game.Localisation
         public static LocalisableString PreferOriginalMetadataLanguage => new TranslatableString(getKey(@"prefer_original"), @"Prefer metadata in original language");
 
         /// <summary>
+        /// "Prefer 24-hour time display"
+        /// </summary>
+        public static LocalisableString Prefer24HourTimeDisplay => new TranslatableString(getKey(@"prefer_24_hour_time_display"), @"Prefer 24-hour time display");
+
+        /// <summary>
         /// "Updates"
         /// </summary>
         public static LocalisableString UpdateHeader => new TranslatableString(getKey(@"update_header"), @"Updates");
@@ -53,6 +60,11 @@ namespace osu.Game.Localisation
         /// "Change folder location..."
         /// </summary>
         public static LocalisableString ChangeFolderLocation => new TranslatableString(getKey(@"change_folder_location"), @"Change folder location...");
+
+        /// <summary>
+        /// "Run setup wizard"
+        /// </summary>
+        public static LocalisableString RunSetupWizard => new TranslatableString(getKey(@"run_setup_wizard"), @"Run setup wizard");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

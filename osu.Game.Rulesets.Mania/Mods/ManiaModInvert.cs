@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +27,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override IconUsage? Icon => FontAwesome.Solid.YinYang;
 
         public override ModType Type => ModType.Conversion;
+
+        public override Type[] IncompatibleMods => new[] { typeof(ManiaModHoldOff) };
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {

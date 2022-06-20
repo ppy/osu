@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,10 +35,8 @@ namespace osu.Game.Storyboards
 
                 foreach (var l in loops)
                 {
-                    if (!(l.EarliestDisplayedTime is double lEarliest))
-                        continue;
-
-                    earliestStartTime = Math.Min(earliestStartTime, lEarliest);
+                    if (l.EarliestDisplayedTime is double loopEarliestDisplayTime)
+                        earliestStartTime = Math.Min(earliestStartTime, l.LoopStartTime + loopEarliestDisplayTime);
                 }
 
                 if (earliestStartTime < double.MaxValue)

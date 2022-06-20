@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -114,7 +117,7 @@ namespace osu.Game.Tests.Rulesets
 
             public Sample Get(string name) => null;
 
-            public Task<Sample> GetAsync(string name) => null;
+            public Task<Sample> GetAsync(string name, CancellationToken cancellationToken = default) => null;
 
             public Stream GetStream(string name) => null;
 

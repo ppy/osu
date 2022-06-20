@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -86,7 +88,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             track.Start();
         }
 
-        private void loadStoryboard(WorkingBeatmap working)
+        private void loadStoryboard(IWorkingBeatmap working)
         {
             if (storyboard != null)
                 storyboardContainer.Remove(storyboard);
@@ -94,7 +96,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
 
-            storyboard = working.Storyboard.CreateDrawable(Beatmap.Value);
+            storyboard = working.Storyboard.CreateDrawable(SelectedMods.Value);
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);
@@ -118,7 +120,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 sb = decoder.Decode(bfr);
             }
 
-            storyboard = sb.CreateDrawable(Beatmap.Value);
+            storyboard = sb.CreateDrawable(SelectedMods.Value);
 
             storyboardContainer.Add(storyboard);
             decoupledClock.ChangeSource(Beatmap.Value.Track);

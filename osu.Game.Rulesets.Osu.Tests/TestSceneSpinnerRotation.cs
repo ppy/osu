@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +32,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneSpinnerRotation : TestSceneOsuPlayer
     {
+        private const double spinner_start_time = 100;
+        private const double spinner_duration = 6000;
+
         [Resolved]
         private AudioManager audioManager { get; set; }
 
@@ -77,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             double finalTrackerRotation = 0, trackerRotationTolerance = 0;
             double finalSpinnerSymbolRotation = 0, spinnerSymbolRotationTolerance = 0;
 
-            addSeekStep(5000);
+            addSeekStep(spinner_start_time + 5000);
             AddStep("retrieve disc rotation", () =>
             {
                 finalTrackerRotation = drawableSpinner.RotationTracker.Rotation;
@@ -90,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
             AddStep("retrieve cumulative disc rotation", () => finalCumulativeTrackerRotation = drawableSpinner.Result.RateAdjustedRotation);
 
-            addSeekStep(2500);
+            addSeekStep(spinner_start_time + 2500);
             AddAssert("disc rotation rewound",
                 // we want to make sure that the rotation at time 2500 is in the same direction as at time 5000, but about half-way in.
                 // due to the exponential damping applied we're allowing a larger margin of error of about 10%
@@ -102,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 // cumulative rotation is not damped, so we're treating it as the "ground truth" and allowing a comparatively smaller margin of error.
                 () => Precision.AlmostEquals(drawableSpinner.Result.RateAdjustedRotation, finalCumulativeTrackerRotation / 2, 100));
 
-            addSeekStep(5000);
+            addSeekStep(spinner_start_time + 5000);
             AddAssert("is disc rotation almost same",
                 () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, finalTrackerRotation, trackerRotationTolerance));
             AddAssert("is symbol rotation almost same",
@@ -140,12 +145,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestSpinnerNormalBonusRewinding()
         {
-            addSeekStep(1000);
+            addSeekStep(spinner_start_time + 1000);
 
             AddAssert("player score matching expected bonus score", () =>
             {
                 // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
-                var totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
+                double totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
                 return totalScore == (int)(drawableSpinner.Result.RateAdjustedRotation / 360) * new SpinnerTick().CreateJudgement().MaxNumericResult;
             });
 
@@ -201,24 +206,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("spm almost same", () => Precision.AlmostEquals(expectedSpm, drawableSpinner.SpinsPerMinute.Value, 2.0));
         }
 
-        private Replay applyRateAdjustment(Replay scoreReplay, double rate) => new Replay
-        {
-            Frames = scoreReplay
-                     .Frames
-                     .Cast<OsuReplayFrame>()
-                     .Select(replayFrame =>
-                     {
-                         var adjustedTime = replayFrame.Time * rate;
-                         return new OsuReplayFrame(adjustedTime, replayFrame.Position, replayFrame.Actions.ToArray());
-                     })
-                     .Cast<ReplayFrame>()
-                     .ToList()
-        };
-
         private void addSeekStep(double time)
         {
             AddStep($"seek to {time}", () => Player.GameplayClockContainer.Seek(time));
-
             AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
         }
 
@@ -241,7 +231,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new Spinner
                 {
                     Position = new Vector2(256, 192),
-                    EndTime = 6000,
+                    StartTime = spinner_start_time,
+                    Duration = spinner_duration
                 },
             }
         };

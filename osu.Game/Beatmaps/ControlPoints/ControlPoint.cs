@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using Newtonsoft.Json;
 using osu.Game.Graphics;
@@ -15,11 +17,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// The time at which the control point takes effect.
         /// </summary>
         [JsonIgnore]
-        public double Time => controlPointGroup?.Time ?? 0;
+        public double Time { get; set; }
 
-        private ControlPointGroup controlPointGroup;
-
-        public void AttachGroup(ControlPointGroup pointGroup) => controlPointGroup = pointGroup;
+        public void AttachGroup(ControlPointGroup pointGroup) => Time = pointGroup.Time;
 
         public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
 
@@ -46,6 +46,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public virtual void CopyFrom(ControlPoint other)
         {
+            Time = other.Time;
         }
     }
 }

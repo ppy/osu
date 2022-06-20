@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -8,18 +9,16 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
     public class BeatmapSetOnlineStatusPill : CircularContainer
     {
-        private readonly OsuSpriteText statusText;
-        private readonly Box background;
+        private BeatmapOnlineStatus status;
 
-        private BeatmapSetOnlineStatus status;
-
-        public BeatmapSetOnlineStatus Status
+        public BeatmapOnlineStatus Status
         {
             get => status;
             set
@@ -29,8 +28,8 @@ namespace osu.Game.Beatmaps.Drawables
 
                 status = value;
 
-                Alpha = value == BeatmapSetOnlineStatus.None ? 0 : 1;
-                statusText.Text = value.GetLocalisableDescription().ToUpper();
+                if (IsLoaded)
+                    updateState();
             }
         }
 
@@ -46,15 +45,17 @@ namespace osu.Game.Beatmaps.Drawables
             set => statusText.Padding = value;
         }
 
-        public Color4 BackgroundColour
-        {
-            get => background.Colour;
-            set => background.Colour = value;
-        }
+        private readonly OsuSpriteText statusText;
+        private readonly Box background;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
+        [Resolved(CanBeNull = true)]
+        private OverlayColourProvider? colourProvider { get; set; }
 
         public BeatmapSetOnlineStatusPill()
         {
-            AutoSizeAxes = Axes.Both;
             Masking = true;
 
             Children = new Drawable[]
@@ -63,7 +64,6 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
-                    Alpha = 0.5f,
                 },
                 statusText = new OsuSpriteText
                 {
@@ -73,7 +73,28 @@ namespace osu.Game.Beatmaps.Drawables
                 },
             };
 
-            Status = BeatmapSetOnlineStatus.None;
+            Status = BeatmapOnlineStatus.None;
+            TextPadding = new MarginPadding { Horizontal = 5, Bottom = 1 };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateState();
+        }
+
+        private void updateState()
+        {
+            Alpha = Status == BeatmapOnlineStatus.None ? 0 : 1;
+
+            statusText.Text = Status.GetLocalisableDescription().ToUpper();
+
+            if (colourProvider != null)
+                statusText.Colour = status == BeatmapOnlineStatus.Graveyard ? colourProvider.Background1 : colourProvider.Background3;
+            else
+                statusText.Colour = status == BeatmapOnlineStatus.Graveyard ? colours.GreySeaFoamLight : Color4.Black;
+
+            background.Colour = OsuColour.ForBeatmapSetOnlineStatus(Status) ?? colourProvider?.Light1 ?? colours.GreySeaFoamLighter;
         }
     }
 }

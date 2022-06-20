@@ -1,11 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Specialized;
+using System.Linq;
 using Humanizer;
+using Humanizer.Localisation;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,6 +18,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -69,6 +75,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             [Resolved(CanBeNull = true)]
             private IRoomManager manager { get; set; }
 
+            [Resolved]
+            private IAPIProvider api { get; set; }
+
             private readonly Room room;
 
             public MatchSettings(Room room)
@@ -77,14 +86,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
                 InternalChildren = new Drawable[]
                 {
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4Extensions.FromHex(@"28242d"),
+                        Colour = colourProvider.Background4
                     },
                     new GridContainer
                     {
@@ -122,7 +131,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                     {
                                                         new Section("Room name")
                                                         {
-                                                            Child = NameField = new SettingsTextBox
+                                                            Child = NameField = new OsuTextBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
@@ -134,24 +143,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Child = DurationField = new DurationDropdown
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                Items = new[]
-                                                                {
-                                                                    TimeSpan.FromMinutes(30),
-                                                                    TimeSpan.FromHours(1),
-                                                                    TimeSpan.FromHours(2),
-                                                                    TimeSpan.FromHours(4),
-                                                                    TimeSpan.FromHours(8),
-                                                                    TimeSpan.FromHours(12),
-                                                                    //TimeSpan.FromHours(16),
-                                                                    TimeSpan.FromHours(24),
-                                                                    TimeSpan.FromDays(3),
-                                                                    TimeSpan.FromDays(7)
-                                                                }
                                                             }
                                                         },
                                                         new Section("Allowed attempts (across all playlist items)")
                                                         {
-                                                            Child = MaxAttemptsField = new SettingsNumberTextBox
+                                                            Child = MaxAttemptsField = new OsuNumberBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
@@ -169,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                         new Section("Max participants")
                                                         {
                                                             Alpha = disabled_alpha,
-                                                            Child = MaxParticipantsField = new SettingsNumberTextBox
+                                                            Child = MaxParticipantsField = new OsuNumberBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
@@ -179,7 +175,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                         new Section("Password (optional)")
                                                         {
                                                             Alpha = disabled_alpha,
-                                                            Child = new SettingsPasswordTextBox
+                                                            Child = new OsuPasswordTextBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
@@ -205,7 +201,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 {
                                                                     new Drawable[]
                                                                     {
-                                                                        playlist = new DrawableRoomPlaylist(true, true) { RelativeSizeAxes = Axes.Both }
+                                                                        playlist = new PlaylistsRoomSettingsPlaylist
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.Both,
+                                                                        }
                                                                     },
                                                                     new Drawable[]
                                                                     {
@@ -256,7 +255,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4Extensions.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
+                                            Colour = colourProvider.Background5
                                         },
                                         new FillFlowContainer
                                         {
@@ -300,8 +299,38 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
+                api.LocalUser.BindValueChanged(populateDurations, true);
+
                 playlist.Items.BindTo(Playlist);
                 Playlist.BindCollectionChanged(onPlaylistChanged, true);
+            }
+
+            private void populateDurations(ValueChangedEvent<APIUser> user)
+            {
+                DurationField.Items = new[]
+                {
+                    TimeSpan.FromMinutes(30),
+                    TimeSpan.FromHours(1),
+                    TimeSpan.FromHours(2),
+                    TimeSpan.FromHours(4),
+                    TimeSpan.FromHours(8),
+                    TimeSpan.FromHours(12),
+                    TimeSpan.FromHours(24),
+                    TimeSpan.FromDays(3),
+                    TimeSpan.FromDays(7),
+                    TimeSpan.FromDays(14),
+                };
+
+                // TODO: show these in the interface at all times.
+                if (user.NewValue.IsSupporter)
+                {
+                    // roughly correct (see https://github.com/Humanizr/Humanizer/blob/18167e56c082449cc4fe805b8429e3127a7b7f93/readme.md?plain=1#L427)
+                    // if we want this to be more accurate we might consider sending an actual end time, not a time span. probably not required though.
+                    const int days_in_month = 31;
+
+                    DurationField.AddDropdownItem(TimeSpan.FromDays(days_in_month));
+                    DurationField.AddDropdownItem(TimeSpan.FromDays(days_in_month * 3));
+                }
             }
 
             protected override void Update()
@@ -340,9 +369,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 Duration.Value = DurationField.Current.Value;
 
-                manager?.CreateRoom(room, onSuccess, onError);
-
                 loadingLayer.Show();
+                manager?.CreateRoom(room, onSuccess, onError);
             }
 
             private void hideError() => ErrorText.FadeOut(50);
@@ -351,9 +379,31 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             private void onError(string text)
             {
-                ErrorText.Text = text;
-                ErrorText.FadeIn(50);
+                // see https://github.com/ppy/osu-web/blob/2c97aaeb64fb4ed97c747d8383a35b30f57428c7/app/Models/Multiplayer/PlaylistItem.php#L48.
+                const string not_found_prefix = "beatmaps not found:";
 
+                if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
+                {
+                    ErrorText.Text = "One or more beatmaps were not available online. Please remove or replace the highlighted items.";
+
+                    int[] invalidBeatmapIDs = text
+                                              .Substring(not_found_prefix.Length + 1)
+                                              .Split(", ")
+                                              .Select(int.Parse)
+                                              .ToArray();
+
+                    foreach (var item in Playlist)
+                    {
+                        if (invalidBeatmapIDs.Contains(item.Beatmap.OnlineID))
+                            item.MarkInvalid();
+                    }
+                }
+                else
+                {
+                    ErrorText.Text = text;
+                }
+
+                ErrorText.FadeIn(50);
                 loadingLayer.Hide();
             }
         }
@@ -381,7 +431,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 Menu.MaxHeight = 100;
             }
 
-            protected override LocalisableString GenerateItemText(TimeSpan item) => item.Humanize();
+            protected override LocalisableString GenerateItemText(TimeSpan item) => item.Humanize(maxUnit: TimeUnit.Month);
         }
     }
 }

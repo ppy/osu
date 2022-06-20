@@ -1,12 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
@@ -30,7 +30,9 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public abstract BindableBool AdjustPitch { get; }
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust) };
+        public override bool ValidForMultiplayerAsFreeMod => false;
+
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed) };
 
         public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
 
@@ -44,7 +46,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        private ITrack track;
+        private IAdjustableAudioComponent track;
 
         protected ModTimeRamp()
         {
@@ -53,7 +55,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
-        public void ApplyToTrack(ITrack track)
+        public void ApplyToTrack(IAdjustableAudioComponent track)
         {
             this.track = track;
 
@@ -61,7 +63,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.TriggerChange();
         }
 
-        public void ApplyToSample(DrawableSample sample)
+        public void ApplyToSample(IAdjustableAudioComponent sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
@@ -88,7 +90,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            applyRateAdjustment(track.CurrentTime);
+            applyRateAdjustment(playfield.Clock.CurrentTime);
         }
 
         /// <summary>

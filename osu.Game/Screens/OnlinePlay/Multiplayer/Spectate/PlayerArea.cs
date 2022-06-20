@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -24,6 +26,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// </summary>
     public class PlayerArea : CompositeDrawable
     {
+        /// <summary>
+        /// Raised after <see cref="Player.StartGameplay"/> is called on <see cref="Player"/>.
+        /// </summary>
+        public event Action OnGameplayStarted;
+
         /// <summary>
         /// Whether a <see cref="Player"/> is loaded in the area.
         /// </summary>
@@ -87,10 +94,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             gameplayContent.Child = new PlayerIsolationContainer(beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.BeatmapInfo), Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = stack = new OsuScreenStack()
+                Child = stack = new OsuScreenStack
+                {
+                    Name = nameof(PlayerArea),
+                }
             };
 
-            stack.Push(new MultiSpectatorPlayerLoader(Score, () => new MultiSpectatorPlayer(Score, GameplayClock)));
+            stack.Push(new MultiSpectatorPlayerLoader(Score, () =>
+            {
+                var player = new MultiSpectatorPlayer(Score, GameplayClock);
+                player.OnGameplayStarted += () => OnGameplayStarted?.Invoke();
+                return player;
+            }));
+
             loadingLayer.Hide();
         }
 

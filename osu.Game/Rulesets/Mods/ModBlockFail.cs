@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Screens.Play;
@@ -25,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
-            overlay.ShowHealthbar.BindTo(showHealthBar);
+            overlay.ShowHealthBar.BindTo(showHealthBar);
         }
     }
 }

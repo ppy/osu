@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -13,7 +15,6 @@ using osu.Game.Tests.Visual;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
-using osu.Game.Users;
 
 namespace osu.Game.Tournament.Tests
 {
@@ -73,19 +74,19 @@ namespace osu.Game.Tournament.Tests
                             {
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmapInfo(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 12345672,
                                     Seed = { Value = 24 },
                                 },
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmapInfo(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 1234567,
                                     Seed = { Value = 12 },
                                 },
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmapInfo(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 1234567,
                                     Seed = { Value = 16 },
                                 }
@@ -99,19 +100,19 @@ namespace osu.Game.Tournament.Tests
                             {
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmapInfo(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 234567,
                                     Seed = { Value = 3 },
                                 },
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmapInfo(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 234567,
                                     Seed = { Value = 6 },
                                 },
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmapInfo(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 234567,
                                     Seed = { Value = 12 },
                                 }
@@ -120,11 +121,11 @@ namespace osu.Game.Tournament.Tests
                     },
                     Players =
                     {
-                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 12 } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 16 } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 20 } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 24 } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 30 } },
+                        new TournamentUser { Username = "Hello", Rank = 12 },
+                        new TournamentUser { Username = "Hello", Rank = 16 },
+                        new TournamentUser { Username = "Hello", Rank = 20 },
+                        new TournamentUser { Username = "Hello", Rank = 24 },
+                        new TournamentUser { Username = "Hello", Rank = 30 },
                     }
                 }
             },
@@ -137,11 +138,11 @@ namespace osu.Game.Tournament.Tests
                     FullName = { Value = "United States" },
                     Players =
                     {
-                        new User { Username = "Hello" },
-                        new User { Username = "Hello" },
-                        new User { Username = "Hello" },
-                        new User { Username = "Hello" },
-                        new User { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
+                        new TournamentUser { Username = "Hello" },
                     }
                 }
             },
@@ -151,8 +152,16 @@ namespace osu.Game.Tournament.Tests
             }
         };
 
-        public static BeatmapInfo CreateSampleBeatmapInfo() =>
-            new BeatmapInfo { Metadata = new BeatmapMetadata { Title = "Test Title", Artist = "Test Artist", ID = RNG.Next(0, 1000000) } };
+        public static TournamentBeatmap CreateSampleBeatmap() =>
+            new TournamentBeatmap
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Title = "Test Title",
+                    Artist = "Test Artist",
+                },
+                OnlineID = RNG.Next(0, 1000000),
+            };
 
         protected override ITestSceneTestRunner CreateRunner() => new TournamentTestSceneTestRunner();
 

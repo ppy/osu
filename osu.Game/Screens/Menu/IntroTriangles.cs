@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -89,17 +91,20 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
+
+            // ensure the background is shown, even if the TriangleIntroSequence failed to do so.
+            background.ApplyToBackground(b => b.Show());
 
             // important as there is a clock attached to a track which will likely be disposed before returning to this screen.
             intro.Expire();
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
             background.FadeOut(100);
         }
 
@@ -133,7 +138,7 @@ namespace osu.Game.Screens.Menu
             private OsuGameBase game { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load()
             {
                 InternalChildren = new Drawable[]
                 {
@@ -393,6 +398,7 @@ namespace osu.Game.Screens.Menu
                 public class OutlineTriangle : BufferedContainer
                 {
                     public OutlineTriangle(bool outlineOnly, float size)
+                        : base(cachedFrameBuffer: true)
                     {
                         Size = new Vector2(size);
 
@@ -414,7 +420,6 @@ namespace osu.Game.Screens.Menu
                         }
 
                         Blending = BlendingParameters.Additive;
-                        CacheDrawnFrameBuffer = true;
                     }
                 }
             }

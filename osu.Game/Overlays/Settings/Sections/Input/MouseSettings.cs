@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -67,7 +69,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = MouseSettingsStrings.DisableMouseWheel,
+                    LabelText = MouseSettingsStrings.DisableMouseWheelVolumeAdjust,
+                    TooltipText = MouseSettingsStrings.DisableMouseWheelVolumeAdjustTooltip,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox
@@ -86,7 +89,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             handlerSensitivity.BindValueChanged(val =>
             {
-                var disabled = localSensitivity.Disabled;
+                bool disabled = localSensitivity.Disabled;
 
                 localSensitivity.Disabled = false;
                 localSensitivity.Value = val.NewValue;
@@ -97,7 +100,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             windowMode.BindValueChanged(mode =>
             {
-                var isFullscreen = mode.NewValue == WindowMode.Fullscreen;
+                bool isFullscreen = mode.NewValue == WindowMode.Fullscreen;
 
                 if (isFullscreen)
                 {
@@ -116,9 +119,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
                 {
                     if (highPrecision.NewValue)
-                        highPrecisionMouse.WarningText = MouseSettingsStrings.HighPrecisionPlatformWarning;
+                        highPrecisionMouse.SetNoticeText(MouseSettingsStrings.HighPrecisionPlatformWarning, true);
                     else
-                        highPrecisionMouse.WarningText = null;
+                        highPrecisionMouse.ClearNoticeText();
                 }
             }, true);
         }

@@ -8,6 +8,7 @@ using osu.Framework.Platform;
 using osu.Game.Input.Bindings;
 using osuTK.Input;
 using osu.Framework.Input.Bindings;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -25,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
             if (!allowImmediateFocus)
                 return;
 
-            Scheduler.Add(() => GetContainingInputManager().ChangeFocus(this), false);
+            Scheduler.Add(() => GetContainingInputManager().ChangeFocus(this));
         }
 
         public new void KillFocus() => base.KillFocus();
@@ -42,13 +43,13 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [Resolved]
-        private GameHost host { get; set; }
+        private GameHost? host { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? colourProvider)
         {
-            BackgroundUnfocused = new Color4(10, 10, 10, 255);
-            BackgroundFocused = new Color4(10, 10, 10, 255);
+            BackgroundUnfocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
+            BackgroundFocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
         }
 
         // We may not be focused yet, but we need to handle keyboard input to be able to request focus
@@ -72,6 +73,9 @@ namespace osu.Game.Graphics.UserInterface
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (!HasFocus) return false;
 
             if (e.Action == GlobalAction.Back)

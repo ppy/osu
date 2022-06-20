@@ -1,14 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays.OSD;
 
 namespace osu.Game.Overlays.Music
@@ -27,37 +32,49 @@ namespace osu.Game.Overlays.Music
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
+        [Resolved]
+        private OsuGame game { get; set; }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (beatmap.Disabled)
+            if (e.Repeat)
                 return false;
 
             switch (e.Action)
             {
                 case GlobalAction.MusicPlay:
+                    if (game.LocalUserPlaying.Value)
+                        return false;
+
                     // use previous state as TogglePause may not update the track's state immediately (state update is run on the audio thread see https://github.com/ppy/osu/issues/9880#issuecomment-674668842)
                     bool wasPlaying = musicController.IsPlaying;
 
                     if (musicController.TogglePause())
-                        onScreenDisplay?.Display(new MusicActionToast(wasPlaying ? "Pause track" : "Play track", e.Action));
+                        onScreenDisplay?.Display(new MusicActionToast(wasPlaying ? ToastStrings.PauseTrack : ToastStrings.PlayTrack, e.Action));
                     return true;
 
                 case GlobalAction.MusicNext:
-                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast("Next track", e.Action)));
+                    if (beatmap.Disabled)
+                        return false;
+
+                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast(GlobalActionKeyBindingStrings.MusicNext, e.Action)));
 
                     return true;
 
                 case GlobalAction.MusicPrev:
+                    if (beatmap.Disabled)
+                        return false;
+
                     musicController.PreviousTrack(res =>
                     {
                         switch (res)
                         {
                             case PreviousTrackResult.Restart:
-                                onScreenDisplay?.Display(new MusicActionToast("Restart track", e.Action));
+                                onScreenDisplay?.Display(new MusicActionToast(ToastStrings.RestartTrack, e.Action));
                                 break;
 
                             case PreviousTrackResult.Previous:
-                                onScreenDisplay?.Display(new MusicActionToast("Previous track", e.Action));
+                                onScreenDisplay?.Display(new MusicActionToast(GlobalActionKeyBindingStrings.MusicPrev, e.Action));
                                 break;
                         }
                     });
@@ -76,8 +93,8 @@ namespace osu.Game.Overlays.Music
         {
             private readonly GlobalAction action;
 
-            public MusicActionToast(string value, GlobalAction action)
-                : base("Music Playback", value, string.Empty)
+            public MusicActionToast(LocalisableString value, GlobalAction action)
+                : base(ToastStrings.MusicPlayback, value, string.Empty)
             {
                 this.action = action;
             }
@@ -85,7 +102,7 @@ namespace osu.Game.Overlays.Music
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
-                ShortcutText.Text = config.LookupKeyBindings(action).ToUpperInvariant();
+                ShortcutText.Text = config.LookupKeyBindings(action).ToUpper();
             }
         }
     }

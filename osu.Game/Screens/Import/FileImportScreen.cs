@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.Import
         private OsuColour colours { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(Storage storage)
+        private void load()
         {
             InternalChild = contentContainer = new Container
             {
@@ -54,7 +55,7 @@ namespace osu.Game.Screens.Import
                 {
                     new Box
                     {
-                        Colour = colours.GreySeafoamDark,
+                        Colour = colours.GreySeaFoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
                     fileSelector = new OsuFileSelector(validFileExtensions: game.HandledExtensions.ToArray())
@@ -72,7 +73,7 @@ namespace osu.Game.Screens.Import
                         {
                             new Box
                             {
-                                Colour = colours.GreySeafoamDarker,
+                                Colour = colours.GreySeaFoamDarker,
                                 RelativeSizeAxes = Axes.Both
                             },
                             new Container
@@ -119,20 +120,20 @@ namespace osu.Game.Screens.Import
             fileSelector.CurrentPath.BindValueChanged(directoryChanged);
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             contentContainer.ScaleTo(0.95f).ScaleTo(1, duration, Easing.OutQuint);
             this.FadeInFromZero(duration);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             contentContainer.ScaleTo(0.95f, duration, Easing.OutQuint);
             this.FadeOut(duration, Easing.OutQuint);
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         private void directoryChanged(ValueChangedEvent<DirectoryInfo> _)

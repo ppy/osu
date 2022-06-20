@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -24,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.CursorRotation,
                     Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
-                new SettingsSlider<float, SizeSlider>
+                new SettingsSlider<float, SizeSlider<float>>
                 {
                     LabelText = UserInterfaceStrings.MenuCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
@@ -35,18 +37,15 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
-                new SettingsSlider<float, TimeSlider>
+                new SettingsSlider<double, TimeSlider>
                 {
+                    ClassicDefault = 0,
                     LabelText = UserInterfaceStrings.HoldToConfirmActivationTime,
-                    Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
+                    Current = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay),
+                    Keywords = new[] { @"delay" },
                     KeyboardStep = 50
                 },
             };
-        }
-
-        private class TimeSlider : OsuSliderBar<float>
-        {
-            public override LocalisableString TooltipText => Current.Value.ToString(@"N0") + "ms";
         }
     }
 }

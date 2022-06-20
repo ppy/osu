@@ -1,19 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
+using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -107,31 +112,45 @@ namespace osu.Game.Tests.Beatmaps
 
         private ConvertResult convert(string name, Mod[] mods)
         {
-            var beatmap = GetBeatmap(name);
-
-            var converterResult = new Dictionary<HitObject, IEnumerable<HitObject>>();
-
-            var working = new ConversionWorkingBeatmap(beatmap)
+            var conversionTask = Task.Factory.StartNew(() =>
             {
-                ConversionGenerated = (o, r, c) =>
-                {
-                    converterResult[o] = r;
-                    OnConversionGenerated(o, r, c);
-                }
-            };
+                var beatmap = GetBeatmap(name);
 
-            working.GetPlayableBeatmap(CreateRuleset().RulesetInfo, mods);
+                string beforeConversion = beatmap.Serialize();
 
-            return new ConvertResult
-            {
-                Mappings = converterResult.Select(r =>
+                var converterResult = new Dictionary<HitObject, IEnumerable<HitObject>>();
+
+                var working = new ConversionWorkingBeatmap(beatmap)
                 {
-                    var mapping = CreateConvertMapping(r.Key);
-                    mapping.StartTime = r.Key.StartTime;
-                    mapping.Objects.AddRange(r.Value.SelectMany(CreateConvertValue));
-                    return mapping;
-                }).ToList()
-            };
+                    ConversionGenerated = (o, r, c) =>
+                    {
+                        converterResult[o] = r;
+                        OnConversionGenerated(o, r, c);
+                    }
+                };
+
+                working.GetPlayableBeatmap(CreateRuleset().RulesetInfo, mods);
+
+                string afterConversion = beatmap.Serialize();
+
+                Assert.AreEqual(beforeConversion, afterConversion, "Conversion altered original beatmap");
+
+                return new ConvertResult
+                {
+                    Mappings = converterResult.Select(r =>
+                    {
+                        var mapping = CreateConvertMapping(r.Key);
+                        mapping.StartTime = r.Key.StartTime;
+                        mapping.Objects.AddRange(r.Value.SelectMany(CreateConvertValue));
+                        return mapping;
+                    }).ToList()
+                };
+            }, TaskCreationOptions.LongRunning);
+
+            if (!conversionTask.Wait(10000))
+                Assert.Fail("Conversion timed out");
+
+            return conversionTask.GetResultSafely();
         }
 
         protected virtual void OnConversionGenerated(HitObject original, IEnumerable<HitObject> result, IBeatmapConverter beatmapConverter)
@@ -143,7 +162,7 @@ namespace osu.Game.Tests.Beatmaps
             using (var resStream = openResource($"{resource_namespace}.{name}{expected_conversion_suffix}.json"))
             using (var reader = new StreamReader(resStream))
             {
-                var contents = reader.ReadToEnd();
+                string contents = reader.ReadToEnd();
                 return JsonConvert.DeserializeObject<ConvertResult>(contents);
             }
         }
@@ -158,7 +177,7 @@ namespace osu.Game.Tests.Beatmaps
                 var beatmap = decoder.Decode(stream);
 
                 var rulesetInstance = CreateRuleset();
-                beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
+                beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.Ruleset.OnlineID == rulesetInstance.RulesetInfo.OnlineID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
                 return beatmap;
             }
@@ -166,7 +185,7 @@ namespace osu.Game.Tests.Beatmaps
 
         private Stream openResource(string name)
         {
-            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path)).AsNonNull();
+            string localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path)).AsNonNull();
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -158,12 +160,12 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 HitObjects = new List<HitObject> { new Hit { Type = HitType.Centre } },
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BaseDifficulty = new BeatmapDifficulty(),
+                    Difficulty = new BeatmapDifficulty(),
                     Metadata = new BeatmapMetadata
                     {
                         Artist = "Unknown",
                         Title = "Sample Beatmap",
-                        AuthorString = "Craftplacer",
+                        Author = { Username = "Craftplacer" },
                     },
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },

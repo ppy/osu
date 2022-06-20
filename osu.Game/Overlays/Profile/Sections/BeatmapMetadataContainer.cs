@@ -1,12 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -15,10 +16,9 @@ namespace osu.Game.Overlays.Profile.Sections
     /// </summary>
     public abstract class BeatmapMetadataContainer : OsuHoverContainer
     {
-        private readonly BeatmapInfo beatmapInfo;
+        private readonly IBeatmapInfo beatmapInfo;
 
-        protected BeatmapMetadataContainer(BeatmapInfo beatmapInfo)
-            : base(HoverSampleSet.Submit)
+        protected BeatmapMetadataContainer(IBeatmapInfo beatmapInfo)
         {
             this.beatmapInfo = beatmapInfo;
 
@@ -30,10 +30,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Action = () =>
             {
-                if (beatmapInfo.OnlineBeatmapID != null)
-                    beatmapSetOverlay?.FetchAndShowBeatmap(beatmapInfo.OnlineBeatmapID.Value);
-                else if (beatmapInfo.BeatmapSet?.OnlineBeatmapSetID != null)
-                    beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmapInfo.BeatmapSet.OnlineBeatmapSetID.Value);
+                beatmapSetOverlay?.FetchAndShowBeatmap(beatmapInfo.OnlineID);
             };
 
             Child = new FillFlowContainer
@@ -43,6 +40,6 @@ namespace osu.Game.Overlays.Profile.Sections
             };
         }
 
-        protected abstract Drawable[] CreateText(BeatmapInfo beatmapInfo);
+        protected abstract Drawable[] CreateText(IBeatmapInfo beatmapInfo);
     }
 }

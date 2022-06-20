@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,10 +10,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         public IBindable<bool> Playing => playButton.Playing;
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             get => playButton.BeatmapSet;
             set => playButton.BeatmapSet = value;

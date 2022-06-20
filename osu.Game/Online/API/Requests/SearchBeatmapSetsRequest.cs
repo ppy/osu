@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -86,8 +88,8 @@ namespace osu.Game.Online.API.Requests
             if (General != null && General.Any())
                 req.AddParameter("c", string.Join('.', General.Select(e => e.ToString().Underscore())));
 
-            if (ruleset.ID.HasValue)
-                req.AddParameter("m", ruleset.ID.Value.ToString());
+            if (ruleset.OnlineID >= 0)
+                req.AddParameter("m", ruleset.OnlineID.ToString());
 
             req.AddParameter("s", SearchCategory.ToString().ToLowerInvariant());
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -348,6 +350,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         {
                             StartTime = time_slider_start,
                             Position = new Vector2(0, 0),
+                            DifficultyControlPoint = new DifficultyControlPoint { SliderVelocity = 0.1f },
                             Path = new SliderPath(PathType.PerfectCurve, new[]
                             {
                                 Vector2.Zero,
@@ -357,12 +360,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                     },
                     BeatmapInfo =
                     {
-                        BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
+                        Difficulty = new BeatmapDifficulty { SliderTickRate = 3 },
                         Ruleset = new OsuRuleset().RulesetInfo
                     },
                 });
-
-                Beatmap.Value.Beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 

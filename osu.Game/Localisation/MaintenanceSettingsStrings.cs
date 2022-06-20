@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -28,6 +30,11 @@ namespace osu.Game.Localisation
         /// "Delete ALL beatmaps"
         /// </summary>
         public static LocalisableString DeleteAllBeatmaps => new TranslatableString(getKey(@"delete_all_beatmaps"), @"Delete ALL beatmaps");
+
+        /// <summary>
+        /// "Delete ALL beatmap videos"
+        /// </summary>
+        public static LocalisableString DeleteAllBeatmapVideos => new TranslatableString(getKey(@"delete_all_beatmap_videos"), @"Delete ALL beatmap videos");
 
         /// <summary>
         /// "Import scores from stable"

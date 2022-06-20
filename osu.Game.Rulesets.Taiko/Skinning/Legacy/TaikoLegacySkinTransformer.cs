@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
@@ -57,6 +59,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     case TaikoSkinComponents.DrumRollTick:
                         return this.GetAnimation("sliderscorepoint", false, false);
 
+                    case TaikoSkinComponents.Swell:
+                        // todo: support taiko legacy swell (https://github.com/ppy/osu/issues/13601).
+                        return null;
+
                     case TaikoSkinComponents.HitTarget:
                         if (GetTexture("taikobigcircle") != null)
                             return new TaikoLegacyHitTarget();
@@ -91,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                     case TaikoSkinComponents.TaikoExplosionOk:
                     case TaikoSkinComponents.TaikoExplosionGreat:
-                        var hitName = getHitName(taikoComponent.Component);
+                        string hitName = getHitName(taikoComponent.Component);
                         var hitSprite = this.GetAnimation(hitName, true, false);
 
                         if (hitSprite != null)
@@ -119,6 +125,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                     case TaikoSkinComponents.Mascot:
                         return new DrawableTaikoMascot();
+
+                    default:
+                        throw new UnsupportedSkinComponentException(component);
                 }
             }
 
@@ -162,10 +171,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             {
                 get
                 {
-                    foreach (var name in base.LookupNames)
+                    foreach (string name in base.LookupNames)
                         yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
 
-                    foreach (var name in base.LookupNames)
+                    foreach (string name in base.LookupNames)
                         yield return name;
                 }
             }

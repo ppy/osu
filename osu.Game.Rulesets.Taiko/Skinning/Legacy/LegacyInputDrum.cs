@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -69,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             // because the right half is flipped, we need to position using width - position to get the true "topleft" origin position
             float negativeScaleAdjust = content.Width / ratio;
 
-            if (skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.1m)
+            if (skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value >= 2.1m)
             {
                 left.Centre.Position = new Vector2(0, taiko_bar_y) * ratio;
                 right.Centre.Position = new Vector2(negativeScaleAdjust - 56, taiko_bar_y) * ratio;

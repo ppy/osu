@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -62,9 +64,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         protected override void Update()
         {
             base.Update();
-            var thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
+            float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
-            var delta = thisAngle - lastAngle;
+            float delta = thisAngle - lastAngle;
 
             if (Tracking)
                 AddRotation(delta);

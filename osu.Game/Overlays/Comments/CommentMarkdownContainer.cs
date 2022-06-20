@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics.Containers.Markdown;
@@ -29,7 +31,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override float GetFontSizeByLevel(int level)
             {
-                var defaultFontSize = base.GetFontSizeByLevel(6);
+                float defaultFontSize = base.GetFontSizeByLevel(6);
 
                 switch (level)
                 {

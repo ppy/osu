@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -90,7 +92,7 @@ namespace osu.Game.Screens.Play.HUD
         private void updateState()
         {
             // Don't display ever if the ruleset is not using a draining health display.
-            var showLayer = HealthProcessor is DrainingHealthProcessor && fadePlayfieldWhenHealthLow.Value && ShowHealth.Value;
+            bool showLayer = HealthProcessor is DrainingHealthProcessor && fadePlayfieldWhenHealthLow.Value && ShowHealth.Value;
             this.FadeTo(showLayer ? 1 : 0, fade_time, Easing.OutQuint);
         }
 

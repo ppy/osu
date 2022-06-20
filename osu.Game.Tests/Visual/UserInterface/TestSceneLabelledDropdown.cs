@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -25,7 +27,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         [Test]
         public void TestLabelledEnumDropdown()
-            => AddStep(@"create dropdown", () => Child = new LabelledEnumDropdown<BeatmapSetOnlineStatus>
+            => AddStep(@"create dropdown", () => Child = new LabelledEnumDropdown<BeatmapOnlineStatus>
             {
                 Label = @"Beatmap status",
                 Description = @"This is a description"

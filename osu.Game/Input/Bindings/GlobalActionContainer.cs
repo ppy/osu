@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -59,6 +61,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
             new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
 
+            new KeyBinding(InputKey.Left, GlobalAction.SelectPreviousGroup),
+            new KeyBinding(InputKey.Right, GlobalAction.SelectNextGroup),
+
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
@@ -76,6 +81,12 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
             new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridDisplayMode),
+            new KeyBinding(new[] { InputKey.F5 }, GlobalAction.EditorTestGameplay),
+            new KeyBinding(new[] { InputKey.T }, GlobalAction.EditorTapForBPM),
+            new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.EditorFlipHorizontally),
+            new KeyBinding(new[] { InputKey.Control, InputKey.J }, GlobalAction.EditorFlipVertically),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.EditorDecreaseDistanceSpacing),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelUp }, GlobalAction.EditorIncreaseDistanceSpacing),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -84,8 +95,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.ExtraMouseButton2, GlobalAction.SkipCutscene),
             new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry),
             new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
+            new KeyBinding(new[] { InputKey.F3 }, GlobalAction.DecreaseScrollSpeed),
+            new KeyBinding(new[] { InputKey.F4 }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
@@ -100,7 +111,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
             new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
             new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
-            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions)
+            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions),
+            new KeyBinding(InputKey.BackSpace, GlobalAction.DeselectAllMods),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -288,6 +300,33 @@ namespace osu.Game.Input.Bindings
         ToggleChatFocus,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridDisplayMode))]
-        EditorCycleGridDisplayMode
+        EditorCycleGridDisplayMode,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestGameplay))]
+        EditorTestGameplay,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorFlipHorizontally))]
+        EditorFlipHorizontally,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorFlipVertically))]
+        EditorFlipVertically,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorIncreaseDistanceSpacing))]
+        EditorIncreaseDistanceSpacing,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDecreaseDistanceSpacing))]
+        EditorDecreaseDistanceSpacing,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPreviousGroup))]
+        SelectPreviousGroup,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNextGroup))]
+        SelectNextGroup,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DeselectAllMods))]
+        DeselectAllMods,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTapForBPM))]
+        EditorTapForBPM,
     }
 }

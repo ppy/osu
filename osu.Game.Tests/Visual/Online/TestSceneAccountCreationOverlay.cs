@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -8,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.AccountCreation;
 using osu.Game.Overlays.Settings;
@@ -20,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
         private readonly Container userPanelArea;
         private readonly AccountCreationOverlay accountCreation;
 
-        private IBindable<User> localUser;
+        private IBindable<APIUser> localUser;
 
         public TestSceneAccountCreationOverlay()
         {

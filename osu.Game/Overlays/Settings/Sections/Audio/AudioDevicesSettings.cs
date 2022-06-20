@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
@@ -28,6 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 dropdown = new AudioDeviceSettingsDropdown
                 {
+                    LabelText = AudioSettingsStrings.OutputDevice,
                     Keywords = new[] { "speaker", "headphone", "output" }
                 }
             };
@@ -46,7 +49,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             var deviceItems = new List<string> { string.Empty };
             deviceItems.AddRange(audio.AudioDeviceNames);
 
-            var preferredDeviceName = audio.AudioDevice.Value;
+            string preferredDeviceName = audio.AudioDevice.Value;
             if (deviceItems.All(kv => kv != preferredDeviceName))
                 deviceItems.Add(preferredDeviceName);
 

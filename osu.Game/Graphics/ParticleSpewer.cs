@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
@@ -109,18 +111,21 @@ namespace osu.Game.Graphics
             {
                 foreach (var p in particles)
                 {
-                    var timeSinceStart = currentTime - p.StartTime;
+                    if (p.Duration == 0)
+                        continue;
+
+                    float timeSinceStart = currentTime - p.StartTime;
 
                     // ignore particles from the future.
                     // these can appear when seeking in replays.
                     if (timeSinceStart < 0) continue;
 
-                    var alpha = p.AlphaAtTime(timeSinceStart);
+                    float alpha = p.AlphaAtTime(timeSinceStart);
                     if (alpha <= 0) continue;
 
                     var pos = p.PositionAtTime(timeSinceStart, gravity, maxDuration);
-                    var scale = p.ScaleAtTime(timeSinceStart);
-                    var angle = p.AngleAtTime(timeSinceStart);
+                    float scale = p.ScaleAtTime(timeSinceStart);
+                    float angle = p.AngleAtTime(timeSinceStart);
 
                     var rect = createDrawRect(pos, scale);
 
@@ -139,8 +144,8 @@ namespace osu.Game.Graphics
 
             private RectangleF createDrawRect(Vector2 position, float scale)
             {
-                var width = Texture.DisplayWidth * scale;
-                var height = Texture.DisplayHeight * scale;
+                float width = Texture.DisplayWidth * scale;
+                float height = Texture.DisplayHeight * scale;
 
                 if (relativePositionAxes.HasFlagFast(Axes.X))
                     position.X *= sourceSize.X;
@@ -188,7 +193,7 @@ namespace osu.Game.Graphics
 
             public Vector2 PositionAtTime(float timeSinceStart, float gravity, float maxDuration)
             {
-                var progress = progressAtTime(timeSinceStart);
+                float progress = progressAtTime(timeSinceStart);
                 var currentGravity = new Vector2(0, gravity * Duration / maxDuration * progress);
 
                 return StartPosition + (Velocity + currentGravity) * timeSinceStart / maxDuration;

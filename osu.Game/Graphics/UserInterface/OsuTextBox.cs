@@ -17,18 +17,13 @@ using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTextBox : BasicTextBox
     {
-        private readonly Sample[] textAddedSamples = new Sample[4];
-        private Sample capsTextAddedSample;
-        private Sample textRemovedSample;
-        private Sample textCommittedSample;
-        private Sample caretMovedSample;
-
         /// <summary>
         /// Whether to allow playing a different samples based on the type of character.
         /// If set to false, the same sample will be used for all characters.
@@ -42,9 +37,16 @@ namespace osu.Game.Graphics.UserInterface
         protected override SpriteText CreatePlaceholder() => new OsuSpriteText
         {
             Font = OsuFont.GetFont(italics: true),
-            Colour = new Color4(180, 180, 180, 255),
             Margin = new MarginPadding { Left = 2 },
         };
+
+        private readonly Sample?[] textAddedSamples = new Sample[4];
+        private Sample? capsTextAddedSample;
+        private Sample? textRemovedSample;
+        private Sample? textCommittedSample;
+        private Sample? caretMovedSample;
+
+        private OsuCaret? caret;
 
         public OsuTextBox()
         {
@@ -56,12 +58,18 @@ namespace osu.Game.Graphics.UserInterface
             Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colour, AudioManager audio)
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? colourProvider, OsuColour colour, AudioManager audio)
         {
-            BackgroundUnfocused = Color4.Black.Opacity(0.5f);
-            BackgroundFocused = OsuColour.Gray(0.3f).Opacity(0.8f);
-            BackgroundCommit = BorderColour = colour.Yellow;
+            BackgroundUnfocused = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+            BackgroundFocused = colourProvider?.Background4 ?? OsuColour.Gray(0.3f).Opacity(0.8f);
+            BackgroundCommit = BorderColour = colourProvider?.Highlight1 ?? colour.Yellow;
+            selectionColour = colourProvider?.Background1 ?? new Color4(249, 90, 255, 255);
+
+            if (caret != null)
+                caret.SelectionColour = selectionColour;
+
+            Placeholder.Colour = colourProvider?.Foreground1 ?? new Color4(180, 180, 180, 255);
 
             for (int i = 0; i < textAddedSamples.Length; i++)
                 textAddedSamples[i] = audio.Samples.Get($@"Keyboard/key-press-{1 + i}");
@@ -72,7 +80,9 @@ namespace osu.Game.Graphics.UserInterface
             caretMovedSample = audio.Samples.Get(@"Keyboard/key-movement");
         }
 
-        protected override Color4 SelectionColour => new Color4(249, 90, 255, 255);
+        private Color4 selectionColour;
+
+        protected override Color4 SelectionColour => selectionColour;
 
         protected override void OnUserTextAdded(string added)
         {
@@ -81,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
             if (added.Any(char.IsUpper) && AllowUniqueCharacterSamples)
                 capsTextAddedSample?.Play();
             else
-                textAddedSamples[RNG.Next(0, 3)]?.Play();
+                playTextAddedSample();
         }
 
         protected override void OnUserTextRemoved(string removed)
@@ -105,6 +115,70 @@ namespace osu.Game.Graphics.UserInterface
             caretMovedSample?.Play();
         }
 
+        protected override void OnImeComposition(string newComposition, int removedTextLength, int addedTextLength, bool caretMoved)
+        {
+            base.OnImeComposition(newComposition, removedTextLength, addedTextLength, caretMoved);
+
+            if (string.IsNullOrEmpty(newComposition))
+            {
+                switch (removedTextLength)
+                {
+                    case 0:
+                        // empty composition event, composition wasn't changed, don't play anything.
+                        return;
+
+                    case 1:
+                        // composition probably ended by pressing backspace, or was cancelled.
+                        textRemovedSample?.Play();
+                        return;
+
+                    default:
+                        // longer text removed, composition ended because it was cancelled.
+                        // could be a different sample if desired.
+                        textRemovedSample?.Play();
+                        return;
+                }
+            }
+
+            if (addedTextLength > 0)
+            {
+                // some text was added, probably due to typing new text or by changing the candidate.
+                playTextAddedSample();
+                return;
+            }
+
+            if (removedTextLength > 0)
+            {
+                // text was probably removed by backspacing.
+                // it's also possible that a candidate that only removed text was changed to.
+                textRemovedSample?.Play();
+                return;
+            }
+
+            if (caretMoved)
+            {
+                // only the caret/selection was moved.
+                caretMovedSample?.Play();
+            }
+        }
+
+        protected override void OnImeResult(string result, bool successful)
+        {
+            base.OnImeResult(result, successful);
+
+            if (successful)
+            {
+                // composition was successfully completed, usually by pressing the enter key.
+                textCommittedSample?.Play();
+            }
+            else
+            {
+                // composition was prematurely ended, eg. by clicking inside the textbox.
+                // could be a different sample if desired.
+                textCommittedSample?.Play();
+            }
+        }
+
         protected override void OnFocus(FocusEvent e)
         {
             BorderThickness = 3;
@@ -124,11 +198,13 @@ namespace osu.Game.Graphics.UserInterface
             Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) },
         };
 
-        protected override Caret CreateCaret() => new OsuCaret
+        protected override Caret CreateCaret() => caret = new OsuCaret
         {
             CaretWidth = CaretWidth,
             SelectionColour = SelectionColour,
         };
+
+        private void playTextAddedSample() => textAddedSamples[RNG.Next(0, textAddedSamples.Length)]?.Play();
 
         private class OsuCaret : Caret
         {

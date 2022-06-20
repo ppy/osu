@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Newtonsoft.Json;
-using osu.Game.Users;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,10 +44,10 @@ namespace osu.Game.Online.API.Requests.Responses
             }
         }
 
-        private List<User> users;
+        private List<APIUser> users;
 
         [JsonProperty(@"users")]
-        public List<User> Users
+        public List<APIUser> Users
         {
             get => users;
             set

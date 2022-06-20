@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -16,7 +18,7 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Rulesets;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Select.Details;
 using osuTK;
 using osuTK.Graphics;
@@ -29,7 +31,7 @@ namespace osu.Game.Screens.Select
         private const float transition_duration = 250;
 
         private readonly AdvancedStats advanced;
-        private readonly UserRatings ratings;
+        private readonly UserRatings ratingsDisplay;
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
         private readonly FailRetryGraph failRetryGraph;
@@ -38,12 +40,13 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IBeatmapInfo beatmapInfo;
 
-        private BeatmapInfo beatmapInfo;
+        private APIFailTimes failTimes;
 
-        public BeatmapInfo BeatmapInfo
+        private int[] ratings;
+
+        public IBeatmapInfo BeatmapInfo
         {
             get => beatmapInfo;
             set
@@ -51,6 +54,12 @@ namespace osu.Game.Screens.Select
                 if (value == beatmapInfo) return;
 
                 beatmapInfo = value;
+
+                var onlineInfo = beatmapInfo as IBeatmapOnlineInfo;
+                var onlineSetInfo = beatmapInfo.BeatmapSet as IBeatmapSetOnlineInfo;
+
+                failTimes = onlineInfo?.FailTimes;
+                ratings = onlineSetInfo?.Ratings;
 
                 Scheduler.AddOnce(updateStatistics);
             }
@@ -110,7 +119,7 @@ namespace osu.Game.Screens.Select
                                                         RelativeSizeAxes = Axes.X,
                                                         Height = 134,
                                                         Padding = new MarginPadding { Horizontal = spacing, Top = spacing },
-                                                        Child = ratings = new UserRatings
+                                                        Child = ratingsDisplay = new UserRatings
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
@@ -149,7 +158,7 @@ namespace osu.Game.Screens.Select
                                         {
                                             new OsuSpriteText
                                             {
-                                                Text = "Points of Failure",
+                                                Text = BeatmapsetsStrings.ShowInfoPointsOfFailure,
                                                 Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                                             },
                                             failRetryGraph = new FailRetryGraph
@@ -171,19 +180,19 @@ namespace osu.Game.Screens.Select
         private void updateStatistics()
         {
             advanced.BeatmapInfo = BeatmapInfo;
-            description.Text = BeatmapInfo?.Version;
-            source.Text = BeatmapInfo?.Metadata?.Source;
-            tags.Text = BeatmapInfo?.Metadata?.Tags;
+            description.Text = BeatmapInfo?.DifficultyName;
+            source.Text = BeatmapInfo?.Metadata.Source;
+            tags.Text = BeatmapInfo?.Metadata.Tags;
 
-            // metrics may have been previously fetched
-            if (BeatmapInfo?.BeatmapSet?.Metrics != null && BeatmapInfo?.Metrics != null)
+            // failTimes may have been previously fetched
+            if (ratings != null && failTimes != null)
             {
                 updateMetrics();
                 return;
             }
 
-            // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
-            if (BeatmapInfo?.OnlineBeatmapID == null || api.State.Value == APIState.Offline)
+            // for now, let's early abort if an OnlineID is not present (should have been populated at import time).
+            if (BeatmapInfo == null || BeatmapInfo.OnlineID <= 0 || api.State.Value == APIState.Offline)
             {
                 updateMetrics();
                 return;
@@ -201,14 +210,8 @@ namespace osu.Game.Screens.Select
                         // the beatmap has been changed since we started the lookup.
                         return;
 
-                    var b = res.ToBeatmapInfo(rulesets);
-
-                    if (requestedBeatmap.BeatmapSet == null)
-                        requestedBeatmap.BeatmapSet = b.BeatmapSet;
-                    else
-                        requestedBeatmap.BeatmapSet.Metrics = b.BeatmapSet.Metrics;
-
-                    requestedBeatmap.Metrics = b.Metrics;
+                    ratings = res.BeatmapSet?.Ratings;
+                    failTimes = res.FailTimes;
 
                     updateMetrics();
                 });
@@ -232,29 +235,28 @@ namespace osu.Game.Screens.Select
 
         private void updateMetrics()
         {
-            var hasRatings = beatmapInfo?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (beatmapInfo?.Metrics?.Retries?.Any() ?? false) || (beatmapInfo?.Metrics?.Fails?.Any() ?? false);
+            bool hasMetrics = (failTimes?.Retries?.Any() ?? false) || (failTimes?.Fails?.Any() ?? false);
 
-            if (hasRatings)
+            if (ratings?.Any() ?? false)
             {
-                ratings.Metrics = beatmapInfo.BeatmapSet.Metrics;
-                ratings.FadeIn(transition_duration);
+                ratingsDisplay.Ratings = ratings;
+                ratingsDisplay.FadeIn(transition_duration);
             }
             else
             {
                 // loading or just has no data server-side.
-                ratings.Metrics = new BeatmapSetMetrics { Ratings = new int[10] };
-                ratings.FadeTo(0.25f, transition_duration);
+                ratingsDisplay.Ratings = new int[10];
+                ratingsDisplay.FadeTo(0.25f, transition_duration);
             }
 
-            if (hasRetriesFails)
+            if (hasMetrics)
             {
-                failRetryGraph.Metrics = beatmapInfo.Metrics;
+                failRetryGraph.FailTimes = failTimes;
                 failRetryContainer.FadeIn(transition_duration);
             }
             else
             {
-                failRetryGraph.Metrics = new BeatmapMetrics
+                failRetryGraph.FailTimes = new APIFailTimes
                 {
                     Fails = new int[100],
                     Retries = new int[100],

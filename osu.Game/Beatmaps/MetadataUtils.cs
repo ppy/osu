@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.Linq;
 using System.Text;
 
@@ -35,7 +33,7 @@ namespace osu.Game.Beatmaps
 
             var stringBuilder = new StringBuilder(str.Length);
 
-            foreach (var c in str)
+            foreach (char c in str)
             {
                 if (IsRomanised(c))
                     stringBuilder.Append(c);

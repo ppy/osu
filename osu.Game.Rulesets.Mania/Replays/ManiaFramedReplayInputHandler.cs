@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
@@ -18,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         protected override bool IsImportant(ManiaReplayFrame frame) => frame.Actions.Any();
 
-        public override void CollectPendingInputs(List<IInput> inputs)
+        protected override void CollectReplayInputs(List<IInput> inputs)
         {
             inputs.Add(new ReplayState<ManiaAction> { PressedActions = CurrentFrame?.Actions ?? new List<ManiaAction>() });
         }

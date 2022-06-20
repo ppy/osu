@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -15,6 +17,7 @@ using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -26,11 +29,14 @@ namespace osu.Game.Beatmaps
         private readonly WeakList<BeatmapManagerWorkingBeatmap> workingCache = new WeakList<BeatmapManagerWorkingBeatmap>();
 
         /// <summary>
+        /// Beatmap files may specify this filename to denote that they don't have an audio track.
+        /// </summary>
+        private const string virtual_track_filename = @"virtual";
+
+        /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
         public readonly WorkingBeatmap DefaultBeatmap;
-
-        public BeatmapModelManager BeatmapManager { private get; set; }
 
         private readonly AudioManager audioManager;
         private readonly IResourceStore<byte[]> resources;
@@ -41,7 +47,8 @@ namespace osu.Game.Beatmaps
         [CanBeNull]
         private readonly GameHost host;
 
-        public WorkingBeatmapCache([NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null, GameHost host = null)
+        public WorkingBeatmapCache(ITrackStore trackStore, AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null,
+                                   GameHost host = null)
         {
             DefaultBeatmap = defaultBeatmap;
 
@@ -50,13 +57,11 @@ namespace osu.Game.Beatmaps
             this.host = host;
             this.files = files;
             largeTextureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(files));
-            trackStore = audioManager.GetTrackStore(files);
+            this.trackStore = trackStore;
         }
 
         public void Invalidate(BeatmapSetInfo info)
         {
-            if (info.Beatmaps == null) return;
-
             foreach (var b in info.Beatmaps)
                 Invalidate(b);
         }
@@ -65,36 +70,34 @@ namespace osu.Game.Beatmaps
         {
             lock (workingCache)
             {
-                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+                var working = workingCache.FirstOrDefault(w => info.Equals(w.BeatmapInfo));
+
                 if (working != null)
+                {
+                    Logger.Log($"Invalidating working beatmap cache for {info}");
                     workingCache.Remove(working);
+                }
             }
         }
 
         public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
-            // if there are no files, presume the full beatmap info has not yet been fetched from the database.
-            if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
-            {
-                int lookupId = beatmapInfo.ID;
-                beatmapInfo = BeatmapManager.QueryBeatmap(b => b.ID == lookupId);
-            }
-
             if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 
             lock (workingCache)
             {
-                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+                var working = workingCache.FirstOrDefault(w => beatmapInfo.Equals(w.BeatmapInfo));
+
                 if (working != null)
                     return working;
 
-                beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
+                beatmapInfo = beatmapInfo.Detach();
 
                 workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
 
                 // best effort; may be higher than expected.
-                GlobalStatistics.Get<int>(nameof(Beatmaps), $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
+                GlobalStatistics.Get<int>("Beatmaps", $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
 
                 return working;
             }
@@ -105,6 +108,7 @@ namespace osu.Game.Beatmaps
         TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
+        RealmAccess IStorageResourceProvider.RealmAccess => null;
         IResourceStore<byte[]> IStorageResourceProvider.Files => files;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);
@@ -140,11 +144,9 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
-
             protected override Texture GetBackground()
             {
-                if (Metadata?.BackgroundFile == null)
+                if (string.IsNullOrEmpty(Metadata?.BackgroundFile))
                     return null;
 
                 try
@@ -160,7 +162,10 @@ namespace osu.Game.Beatmaps
 
             protected override Track GetBeatmapTrack()
             {
-                if (Metadata?.AudioFile == null)
+                if (string.IsNullOrEmpty(Metadata?.AudioFile))
+                    return null;
+
+                if (Metadata.AudioFile == virtual_track_filename)
                     return null;
 
                 try
@@ -176,7 +181,10 @@ namespace osu.Game.Beatmaps
 
             protected override Waveform GetWaveform()
             {
-                if (Metadata?.AudioFile == null)
+                if (string.IsNullOrEmpty(Metadata?.AudioFile))
+                    return null;
+
+                if (Metadata.AudioFile == virtual_track_filename)
                     return null;
 
                 try
@@ -195,13 +203,16 @@ namespace osu.Game.Beatmaps
             {
                 Storyboard storyboard;
 
+                if (BeatmapInfo.Path == null)
+                    return new Storyboard();
+
                 try
                 {
                     using (var stream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path))))
                     {
                         var decoder = Decoder.GetDecoder<Storyboard>(stream);
 
-                        var storyboardFilename = BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
+                        string storyboardFilename = BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
 
                         // todo: support loading from both set-wide storyboard *and* beatmap specific.
                         if (string.IsNullOrEmpty(storyboardFilename))
@@ -228,7 +239,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return new LegacyBeatmapSkin(BeatmapInfo, resources.Files, resources);
+                    return new LegacyBeatmapSkin(BeatmapInfo, resources);
                 }
                 catch (Exception e)
                 {

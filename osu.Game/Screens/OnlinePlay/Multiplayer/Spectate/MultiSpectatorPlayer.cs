@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -59,6 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             protected override void Update()
             {
+                // The SourceClock here is always a CatchUpSpectatorPlayerClock.
                 // The player clock's running state is controlled externally, but the local pausing state needs to be updated to stop gameplay.
                 if (SourceClock.IsRunning)
                     Start();

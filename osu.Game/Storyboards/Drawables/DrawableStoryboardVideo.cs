@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -29,7 +33,7 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader(true)]
         private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            var path = beatmap.Value.BeatmapSetInfo?.Files.Find(f => f.Filename.Equals(Video.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            string path = beatmap.Value.BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.Equals(Video.Path, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
 
             if (path == null)
                 return;

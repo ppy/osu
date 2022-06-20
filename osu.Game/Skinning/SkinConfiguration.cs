@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Game.Beatmaps.Formats;
 using osuTK.Graphics;
@@ -14,10 +16,30 @@ namespace osu.Game.Skinning
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
+        public const decimal LATEST_VERSION = 2.7m;
+
         /// <summary>
         /// Whether to allow <see cref="DefaultComboColours"/> as a fallback list for when no combo colours are provided.
         /// </summary>
         internal bool AllowDefaultComboColoursFallback = true;
+
+        /// <summary>
+        /// Legacy version of this skin.
+        /// </summary>
+        public decimal? LegacyVersion { get; internal set; }
+
+        public enum LegacySetting
+        {
+            Version,
+            ComboPrefix,
+            ComboOverlap,
+            ScorePrefix,
+            ScoreOverlap,
+            HitCirclePrefix,
+            HitCircleOverlap,
+            AnimationFramerate,
+            LayeredHitSounds
+        }
 
         public static List<Color4> DefaultComboColours { get; } = new List<Color4>
         {

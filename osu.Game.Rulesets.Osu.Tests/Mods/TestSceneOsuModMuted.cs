@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -22,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 MuteComboCount = { Value = 0 },
             },
             PassCondition = () => Beatmap.Value.Track.AggregateVolume.Value == 0.0 &&
-                                  Player.ChildrenOfType<Metronome>().SingleOrDefault()?.AggregateVolume.Value == 1.0,
+                                  Player.ChildrenOfType<MetronomeBeat>().SingleOrDefault()?.AggregateVolume.Value == 1.0,
         });
 
         /// <summary>

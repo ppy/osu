@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -203,10 +205,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             {
                 InternalChildren = new Drawable[]
                 {
-                    EditorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 }))
+                    EditorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
                     {
                         BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo }
-                    },
+                    }),
                     Composer = new ManiaHitObjectComposer(new ManiaRuleset())
                 };
 

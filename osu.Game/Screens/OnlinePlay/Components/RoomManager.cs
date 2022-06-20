@@ -1,18 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
@@ -26,12 +27,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         protected IBindable<Room> JoinedRoom => joinedRoom;
         private readonly Bindable<Room> joinedRoom = new Bindable<Room>();
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -111,18 +106,14 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         public void AddOrUpdateRoom(Room room)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
             Debug.Assert(room.RoomID.Value != null);
 
             if (ignoredRooms.Contains(room.RoomID.Value.Value))
                 return;
 
-            room.Position.Value = -room.RoomID.Value.Value;
-
             try
             {
-                foreach (var pi in room.Playlist)
-                    pi.MapObjects(beatmaps, rulesets);
-
                 var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
                 if (existing == null)
                     rooms.Add(room);
@@ -142,16 +133,25 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         public void RemoveRoom(Room room)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             rooms.Remove(room);
             notifyRoomsUpdated();
         }
 
         public void ClearRooms()
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             rooms.Clear();
             notifyRoomsUpdated();
         }
 
-        private void notifyRoomsUpdated() => Scheduler.AddOnce(() => RoomsUpdated?.Invoke());
+        private void notifyRoomsUpdated()
+        {
+            Scheduler.AddOnce(invokeRoomsUpdated);
+
+            void invokeRoomsUpdated() => RoomsUpdated?.Invoke();
+        }
     }
 }

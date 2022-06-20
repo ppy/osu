@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
@@ -25,7 +26,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
         private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -141,9 +142,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
-                                new TournamentSpriteText { Text = beatmap.BeatmapInfo.Metadata.Title, Colour = TournamentGame.TEXT_COLOUR, },
+                                new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Title, Colour = TournamentGame.TEXT_COLOUR, },
                                 new TournamentSpriteText { Text = "by", Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
-                                new TournamentSpriteText { Text = beatmap.BeatmapInfo.Metadata.Artist, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
+                                new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Artist, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                             }
                         },
                         new FillFlowContainer
@@ -197,7 +198,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     {
                         row.Add(new Sprite
                         {
-                            Texture = textures.Get($"mods/{mods.ToLower()}"),
+                            Texture = textures.Get($"Mods/{mods.ToLower()}"),
                             Scale = new Vector2(0.5f)
                         });
                     }
@@ -256,7 +257,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 };
 
                 foreach (var p in team.Players)
-                    fill.Add(new RowDisplay(p.Username, p.Statistics?.GlobalRank?.ToString("\\##,0") ?? "-"));
+                    fill.Add(new RowDisplay(p.Username, p.Rank?.ToString("\\##,0") ?? "-"));
             }
 
             internal class RowDisplay : CompositeDrawable
