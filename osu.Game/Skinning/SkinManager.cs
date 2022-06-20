@@ -24,7 +24,6 @@ using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
-using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
 
@@ -168,7 +167,7 @@ namespace osu.Game.Skinning
                     Name = NamingUtils.GetNextBestName(existingSkinNames, $@"{s.Name} (modified)")
                 };
 
-                var result = skinImporter.Import(skinInfo);
+                var result = skinImporter.ImportModel(skinInfo);
 
                 if (result != null)
                 {
@@ -274,9 +273,6 @@ namespace osu.Game.Skinning
         public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => skinImporter.Import(notification, tasks);
 
         public Task<Live<SkinInfo>> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => skinImporter.Import(task, batchImport, cancellationToken);
-
-        public Task<Live<SkinInfo>> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            skinImporter.Import(archive, batchImport, cancellationToken);
 
         #endregion
 
