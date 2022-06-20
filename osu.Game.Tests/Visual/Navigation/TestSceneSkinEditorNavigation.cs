@@ -8,7 +8,9 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -16,6 +18,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning.Editor;
 using osu.Game.Tests.Beatmaps.IO;
+using osuTK;
 using osuTK.Input;
 using static osu.Game.Tests.Visual.Navigation.TestSceneScreenNavigation;
 
@@ -66,17 +69,22 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
-        public void TestHideSkinEditorWhileDragging()
+        public void TestComponentsDeselectedOnSkinEditorHide()
         {
             advanceToSongSelect();
             openSkinEditor();
             switchToGameplayScene();
+
+            AddUntilStep("wait for components", () => skinEditor.ChildrenOfType<SkinBlueprint>().Any());
+
             AddStep("select all components", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
                 InputManager.Key(Key.A);
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
+
+            AddUntilStep("components selected", () => skinEditor.SelectedComponents.Count > 0);
 
             toggleSkinEditor();
 
@@ -84,21 +92,42 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
-        public void TestComponentsDeselectedOnSkinEditorHide()
+        public void TestSwitchScreenWhileDraggingComponent()
         {
+            Vector2 firstBlueprintCentre = Vector2.Zero;
+            ScheduledDelegate movementDelegate = null;
+
             advanceToSongSelect();
+
             openSkinEditor();
-            switchToGameplayScene();
-            AddStep("select all components", () =>
+
+            AddStep("add skinnable component", () =>
             {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.Key(Key.A);
-                InputManager.ReleaseKey(Key.ControlLeft);
+                skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick();
             });
 
-            toggleSkinEditor();
+            AddUntilStep("newly added component selected", () => skinEditor.SelectedComponents.Count == 1);
 
-            AddUntilStep("no components selected", () => skinEditor.SelectedComponents.Count == 0);
+            AddStep("start drag", () =>
+            {
+                firstBlueprintCentre = skinEditor.ChildrenOfType<SkinBlueprint>().First().ScreenSpaceDrawQuad.Centre;
+
+                InputManager.MoveMouseTo(firstBlueprintCentre);
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("start movement", () => movementDelegate = Scheduler.AddDelayed(() => { InputManager.MoveMouseTo(firstBlueprintCentre += new Vector2(1)); }, 10, true));
+
+            toggleSkinEditor();
+            AddStep("exit song select", () => songSelect.Exit());
+
+            AddUntilStep("wait for blueprints removed", () => !skinEditor.ChildrenOfType<SkinBlueprint>().Any());
+
+            AddStep("stop drag", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                movementDelegate?.Cancel();
+            });
         }
 
         [Test]
