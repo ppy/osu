@@ -239,7 +239,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                             req.Success += res =>
                             {
-                                Model.Beatmap = res;
+                                Model.Beatmap = new TournamentBeatmap(res);
                                 updatePanel();
                             };
 
