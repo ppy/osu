@@ -14,9 +14,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
+using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,14 +24,14 @@ namespace osu.Game.Tournament.Components
 {
     public class SongBar : CompositeDrawable
     {
-        private APIBeatmap beatmap;
+        private TournamentBeatmap beatmap;
 
         public const float HEIGHT = 145 / 2f;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        public APIBeatmap Beatmap
+        public TournamentBeatmap Beatmap
         {
             set
             {

@@ -217,7 +217,11 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
-            AddStep("Click gameplay scene button", () => skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay").TriggerClick());
+            AddStep("Click gameplay scene button", () =>
+            {
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay"));
+                InputManager.Click(MouseButton.Left);
+            });
 
             AddUntilStep("wait for player", () =>
             {

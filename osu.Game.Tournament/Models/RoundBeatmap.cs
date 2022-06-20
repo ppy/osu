@@ -4,7 +4,6 @@
 #nullable disable
 
 using Newtonsoft.Json;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tournament.Models
 {
@@ -14,6 +13,6 @@ namespace osu.Game.Tournament.Models
         public string Mods;
 
         [JsonProperty("BeatmapInfo")]
-        public APIBeatmap Beatmap;
+        public TournamentBeatmap Beatmap;
     }
 }

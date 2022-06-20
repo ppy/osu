@@ -11,6 +11,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
 using osuTK;
 
 namespace osu.Game.Tournament.Tests.Components
@@ -53,7 +54,7 @@ namespace osu.Game.Tournament.Tests.Components
 
             foreach (var mod in mods)
             {
-                fillFlow.Add(new TournamentBeatmapPanel(beatmap, mod.Acronym)
+                fillFlow.Add(new TournamentBeatmapPanel(new TournamentBeatmap(beatmap), mod.Acronym)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
