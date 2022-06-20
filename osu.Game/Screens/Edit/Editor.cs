@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,10 +10,10 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -19,21 +21,23 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Timing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Screens.Edit.Components;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Menus;
-using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
 using osu.Game.Screens.Edit.GameplayTest;
@@ -42,16 +46,14 @@ using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
-using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
-    [Cached(typeof(ISamplePlaybackDisabler))]
     [Cached]
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -62,6 +64,8 @@ namespace osu.Game.Screens.Edit
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         public override bool? AllowTrackAdjustments => false;
+
+        protected override bool PlayExitSound => !ExitConfirmed && !switchingDifficulty;
 
         protected bool HasUnsavedChanges
         {
@@ -84,10 +88,12 @@ namespace osu.Game.Screens.Edit
         private Storage storage { get; set; }
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
+
+        public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
         public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
 
@@ -95,7 +101,9 @@ namespace osu.Game.Screens.Edit
 
         private bool canSave;
 
-        private bool exitConfirmed;
+        protected bool ExitConfirmed { get; private set; }
+
+        private bool switchingDifficulty;
 
         private string lastSavedHash;
 
@@ -112,14 +120,12 @@ namespace osu.Game.Screens.Edit
         private IBeatmap playableBeatmap;
         private EditorBeatmap editorBeatmap;
 
+        private BottomBar bottomBar;
+
         [CanBeNull] // Should be non-null once it can support custom rulesets.
         private EditorChangeHandler changeHandler;
 
-        private EditorMenuBar menuBar;
-
         private DependencyContainer dependencies;
-
-        private TestGameplayButton testGameplayButton;
 
         private bool isNewBeatmap;
 
@@ -135,7 +141,7 @@ namespace osu.Game.Screens.Edit
         public readonly EditorClipboard Clipboard = new EditorClipboard();
 
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         public Editor(EditorLoader loader = null)
         {
@@ -143,7 +149,7 @@ namespace osu.Game.Screens.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
             var loadableBeatmap = Beatmap.Value;
 
@@ -221,7 +227,7 @@ namespace osu.Game.Screens.Edit
             AddInternal(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new[]
+                Children = new Drawable[]
                 {
                     new Container
                     {
@@ -239,115 +245,64 @@ namespace osu.Game.Screens.Edit
                         Name = "Top bar",
                         RelativeSizeAxes = Axes.X,
                         Height = 40,
-                        Child = menuBar = new EditorMenuBar
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            RelativeSizeAxes = Axes.Both,
-                            Mode = { Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose },
-                            Items = new[]
-                            {
-                                new MenuItem("File")
-                                {
-                                    Items = createFileMenuItems()
-                                },
-                                new MenuItem("Edit")
-                                {
-                                    Items = new[]
-                                    {
-                                        undoMenuItem = new EditorMenuItem("Undo", MenuItemType.Standard, Undo),
-                                        redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, Redo),
-                                        new EditorMenuItemSpacer(),
-                                        cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
-                                        copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
-                                        pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
-                                    }
-                                },
-                                new MenuItem("View")
-                                {
-                                    Items = new MenuItem[]
-                                    {
-                                        new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
-                                        new HitAnimationsMenuItem(config.GetBindable<bool>(OsuSetting.EditorHitAnimations))
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    new Container
-                    {
-                        Name = "Bottom bar",
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        RelativeSizeAxes = Axes.X,
-                        Height = 60,
                         Children = new Drawable[]
                         {
-                            new Box
+                            new EditorMenuBar
                             {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = colours.Gray2
-                            },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
-                                Child = new GridContainer
+                                Items = new[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColumnDimensions = new[]
+                                    new MenuItem("File")
                                     {
-                                        new Dimension(GridSizeMode.Absolute, 220),
-                                        new Dimension(),
-                                        new Dimension(GridSizeMode.Absolute, 220),
-                                        new Dimension(GridSizeMode.Absolute, 120),
+                                        Items = createFileMenuItems()
                                     },
-                                    Content = new[]
+                                    new MenuItem(CommonStrings.ButtonsEdit)
                                     {
-                                        new Drawable[]
+                                        Items = new[]
                                         {
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Right = 10 },
-                                                Child = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
-                                            },
-                                            new SummaryTimeline
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                            },
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Left = 10 },
-                                                Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
-                                            },
-                                            testGameplayButton = new TestGameplayButton
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Left = 10 },
-                                                Size = new Vector2(1),
-                                                Action = testGameplay
-                                            }
-                                        },
+                                            undoMenuItem = new EditorMenuItem("Undo", MenuItemType.Standard, Undo),
+                                            redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, Redo),
+                                            new EditorMenuItemSpacer(),
+                                            cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
+                                            copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
+                                            pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
+                                        }
+                                    },
+                                    new MenuItem("View")
+                                    {
+                                        Items = new MenuItem[]
+                                        {
+                                            new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
+                                        }
                                     }
-                                },
-                            }
-                        }
+                                }
+                            },
+                            new EditorScreenSwitcherControl
+                            {
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight,
+                                X = -15,
+                                Current = Mode,
+                            },
+                        },
                     },
+                    bottomBar = new BottomBar(),
                 }
             });
 
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
-
-            menuBar.Mode.ValueChanged += onModeChanged;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             setUpClipboardActionAvailability();
+
+            Mode.Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
+            Mode.BindValueChanged(onModeChanged, true);
         }
 
         /// <summary>
@@ -377,6 +332,24 @@ namespace osu.Game.Screens.Edit
             clock.Seek(state.Time);
             Clipboard.Content.Value = state.ClipboardContent;
         });
+
+        public void TestGameplay()
+        {
+            if (HasUnsavedChanges)
+            {
+                dialogOverlay.Push(new SaveBeforeGameplayTestDialog(() =>
+                {
+                    Save();
+                    pushEditorPlayer();
+                }));
+            }
+            else
+            {
+                pushEditorPlayer();
+            }
+
+            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(this));
+        }
 
         /// <summary>
         /// Saves the currently edited beatmap.
@@ -455,6 +428,8 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed) return false;
+
             switch (e.Key)
             {
                 case Key.Left:
@@ -463,6 +438,44 @@ namespace osu.Game.Screens.Edit
 
                 case Key.Right:
                     seek(e, 1);
+                    return true;
+
+                // Track traversal keys.
+                // Matching osu-stable implementations.
+                case Key.Z:
+                    // Seek to first object time, or track start if already there.
+                    double? firstObjectTime = editorBeatmap.HitObjects.FirstOrDefault()?.StartTime;
+
+                    if (firstObjectTime == null || clock.CurrentTime == firstObjectTime)
+                        clock.Seek(0);
+                    else
+                        clock.Seek(firstObjectTime.Value);
+                    return true;
+
+                case Key.X:
+                    // Restart playback from beginning of track.
+                    clock.Seek(0);
+                    clock.Start();
+                    return true;
+
+                case Key.C:
+                    // Pause or resume.
+                    if (clock.IsRunning)
+                        clock.Stop();
+                    else
+                        clock.Start();
+                    return true;
+
+                case Key.V:
+                    // Seek to last object time, or track end if already there.
+                    // Note that in osu-stable subsequent presses when at track end won't return to last object.
+                    // This has intentionally been changed to make it more useful.
+                    double? lastObjectTime = editorBeatmap.HitObjects.LastOrDefault()?.GetEndTime();
+
+                    if (lastObjectTime == null || clock.CurrentTime == lastObjectTime)
+                        clock.Seek(clock.TrackLength);
+                    else
+                        clock.Seek(lastObjectTime.Value);
                     return true;
             }
 
@@ -488,7 +501,7 @@ namespace osu.Game.Screens.Edit
             if (scrollAccumulation != 0 && Math.Sign(scrollAccumulation) != scrollDirection)
                 scrollAccumulation = scrollDirection * (precision - Math.Abs(scrollAccumulation));
 
-            scrollAccumulation += scrollComponent * (e.IsPrecise ? 0.1 : 1);
+            scrollAccumulation += scrollComponent;
 
             // because we are doing snapped seeking, we need to add up precise scrolls until they accumulate to an arbitrary cut-off.
             while (Math.Abs(scrollAccumulation) >= precision)
@@ -517,27 +530,27 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case GlobalAction.EditorComposeMode:
-                    menuBar.Mode.Value = EditorScreenMode.Compose;
+                    Mode.Value = EditorScreenMode.Compose;
                     return true;
 
                 case GlobalAction.EditorDesignMode:
-                    menuBar.Mode.Value = EditorScreenMode.Design;
+                    Mode.Value = EditorScreenMode.Design;
                     return true;
 
                 case GlobalAction.EditorTimingMode:
-                    menuBar.Mode.Value = EditorScreenMode.Timing;
+                    Mode.Value = EditorScreenMode.Timing;
                     return true;
 
                 case GlobalAction.EditorSetupMode:
-                    menuBar.Mode.Value = EditorScreenMode.SongSetup;
+                    Mode.Value = EditorScreenMode.SongSetup;
                     return true;
 
                 case GlobalAction.EditorVerifyMode:
-                    menuBar.Mode.Value = EditorScreenMode.Verify;
+                    Mode.Value = EditorScreenMode.Verify;
                     return true;
 
                 case GlobalAction.EditorTestGameplay:
-                    testGameplayButton.TriggerClick();
+                    bottomBar.TestGameplayButton.TriggerClick();
                     return true;
 
                 default:
@@ -549,16 +562,16 @@ namespace osu.Game.Screens.Edit
         {
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             dimBackground();
             resetTrack(true);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
             dimBackground();
         }
 
@@ -574,9 +587,9 @@ namespace osu.Game.Screens.Edit
             });
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            if (!exitConfirmed)
+            if (!ExitConfirmed)
             {
                 // dialog overlay may not be available in visual tests.
                 if (dialogOverlay == null)
@@ -585,12 +598,9 @@ namespace osu.Game.Screens.Edit
                     return true;
                 }
 
-                // if the dialog is already displayed, confirm exit with no save.
-                if (dialogOverlay.CurrentDialog is PromptForSaveDialog saveDialog)
-                {
-                    saveDialog.PerformOkAction();
+                // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
+                if (dialogOverlay.CurrentDialog is PromptForSaveDialog)
                     return true;
-                }
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
@@ -605,12 +615,12 @@ namespace osu.Game.Screens.Edit
 
             refetchBeatmap();
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
             clock.Stop();
             refetchBeatmap();
         }
@@ -635,7 +645,7 @@ namespace osu.Game.Screens.Edit
         {
             Save();
 
-            exitConfirmed = true;
+            ExitConfirmed = true;
             this.Exit();
         }
 
@@ -658,7 +668,7 @@ namespace osu.Game.Screens.Edit
                 Beatmap.SetDefault();
             }
 
-            exitConfirmed = true;
+            ExitConfirmed = true;
             this.Exit();
         }
 
@@ -728,6 +738,7 @@ namespace osu.Game.Screens.Edit
                 if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
                 {
                     screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
+
                     currentScreen.Show();
                     return;
                 }
@@ -852,7 +863,10 @@ namespace osu.Game.Screens.Edit
         }
 
         private void switchToNewDifficulty(RulesetInfo rulesetInfo, bool createCopy)
-            => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo, rulesetInfo, createCopy, GetState(rulesetInfo));
+        {
+            switchingDifficulty = true;
+            loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo, rulesetInfo, createCopy, GetState(rulesetInfo));
+        }
 
         private EditorMenuItem createDifficultySwitchMenu()
         {
@@ -885,28 +899,14 @@ namespace osu.Game.Screens.Edit
             loader?.CancelPendingDifficultySwitch();
         }
 
-        private void testGameplay()
-        {
-            if (HasUnsavedChanges)
-            {
-                dialogOverlay.Push(new SaveBeforeGameplayTestDialog(() =>
-                {
-                    Save();
-                    pushEditorPlayer();
-                }));
-            }
-            else
-            {
-                pushEditorPlayer();
-            }
-
-            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(this));
-        }
-
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 
         public double GetBeatLengthAtTime(double referenceTime) => editorBeatmap.GetBeatLengthAtTime(referenceTime);
 
         public int BeatDivisor => beatDivisor.Value;
+
+        ControlPointInfo IBeatSyncProvider.ControlPoints => editorBeatmap.ControlPointInfo;
+        IClock IBeatSyncProvider.Clock => clock;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
     }
 }

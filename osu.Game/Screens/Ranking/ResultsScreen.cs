@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -231,9 +233,9 @@ namespace osu.Game.Screens.Ranking
             lastFetchCompleted = true;
         });
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             ApplyToBackground(b =>
             {
@@ -244,9 +246,9 @@ namespace osu.Game.Screens.Ranking
             bottomPanel.FadeTo(1, 250);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             this.FadeOut(100);

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -87,31 +89,33 @@ namespace osu.Game.Screens.Ranking
                     });
                 }
 
-                button.Enabled.Value = replayAvailability != ReplayAvailability.NotAvailable;
-                updateTooltip();
+                updateState();
             }, true);
 
             State.BindValueChanged(state =>
             {
                 button.State.Value = state.NewValue;
-                updateTooltip();
+                updateState();
             }, true);
         }
 
-        private void updateTooltip()
+        private void updateState()
         {
             switch (replayAvailability)
             {
                 case ReplayAvailability.Local:
                     button.TooltipText = @"watch replay";
+                    button.Enabled.Value = true;
                     break;
 
                 case ReplayAvailability.Online:
                     button.TooltipText = @"download replay";
+                    button.Enabled.Value = true;
                     break;
 
                 default:
                     button.TooltipText = @"replay unavailable";
+                    button.Enabled.Value = false;
                     break;
             }
         }

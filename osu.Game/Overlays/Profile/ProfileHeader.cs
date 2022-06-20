@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -31,7 +33,9 @@ namespace osu.Game.Overlays.Profile
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem(LayoutStrings.HeaderUsersShow);
-            TabControl.AddItem(LayoutStrings.HeaderUsersModding);
+
+            // todo: pending implementation.
+            // TabControl.AddItem(LayoutStrings.HeaderUsersModding);
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }

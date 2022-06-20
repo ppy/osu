@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -62,7 +64,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             {
                 base.LoadComplete();
 
-                RequestDeletion = item => multiplayerClient.RemovePlaylistItem(item.ID);
+                RequestDeletion = item => multiplayerClient.RemovePlaylistItem(item.ID).FireAndForget();
 
                 multiplayerClient.RoomUpdated += onRoomUpdated;
                 onRoomUpdated();

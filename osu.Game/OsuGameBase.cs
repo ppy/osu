@@ -1,14 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
@@ -22,8 +26,11 @@ using osu.Framework.Input.Handlers.Midi;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -54,9 +61,18 @@ namespace osu.Game
     /// Unlike <see cref="OsuGame"/>, this class will not load any kind of UI, allowing it to be used
     /// for provide dependencies to test cases without interfering with them.
     /// </summary>
-    public partial class OsuGameBase : Framework.Game, ICanAcceptFiles
+    public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
+        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv" };
+
+        public const string OSU_PROTOCOL = "osu://";
+
         public const string CLIENT_STREAM_NAME = @"lazer";
+
+        /// <summary>
+        /// The filename of the main client database.
+        /// </summary>
+        public const string CLIENT_DATABASE_FILENAME = @"client.realm";
 
         public const int SAMPLE_CONCURRENCY = 6;
 
@@ -70,7 +86,10 @@ namespace osu.Game
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
 
-        public bool UseDevelopmentServer { get; }
+        public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
+
+        internal EndpointConfiguration CreateEndpoints() =>
+            UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -81,6 +100,8 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
+        internal const string BUILD_SUFFIX = "lazer";
+
         public virtual string Version
         {
             get
@@ -89,7 +110,7 @@ namespace osu.Game
                     return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
                 var version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
+                return $@"{version.Major}.{version.Minor}.{version.Build}-{BUILD_SUFFIX}";
             }
         }
 
@@ -113,7 +134,7 @@ namespace osu.Game
 
         protected SkinManager SkinManager { get; private set; }
 
-        protected RulesetStore RulesetStore { get; private set; }
+        protected RealmRulesetStore RulesetStore { get; private set; }
 
         protected RealmKeyBindingStore KeyBindingStore { get; private set; }
 
@@ -146,7 +167,7 @@ namespace osu.Game
         /// <summary>
         /// Mods available for the current <see cref="Ruleset"/>.
         /// </summary>
-        public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
+        public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>(new Dictionary<ModType, IReadOnlyList<Mod>>());
 
         private BeatmapDifficultyCache difficultyCache;
 
@@ -176,10 +197,21 @@ namespace osu.Game
         /// </summary>
         protected DatabaseContextFactory EFContextFactory { get; private set; }
 
+        /// <summary>
+        /// Number of unhandled exceptions to allow before aborting execution.
+        /// </summary>
+        /// <remarks>
+        /// When an unhandled exception is encountered, an internal count will be decremented.
+        /// If the count hits zero, the game will crash.
+        /// Each second, the count is incremented until reaching the value specified.
+        /// </remarks>
+        protected virtual int UnhandledExceptionsBeforeCrash => DebugUtils.IsDebugBuild ? 0 : 1;
+
         public OsuGameBase()
         {
-            UseDevelopmentServer = DebugUtils.IsDebugBuild;
             Name = @"osu!";
+
+            allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
 
         [BackgroundDependencyLoader]
@@ -202,32 +234,12 @@ namespace osu.Game
             if (Storage.Exists(DatabaseContextFactory.DATABASE_NAME))
                 dependencies.Cache(EFContextFactory = new DatabaseContextFactory(Storage));
 
-            dependencies.Cache(realm = new RealmAccess(Storage, "client", EFContextFactory));
+            dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread, EFContextFactory));
 
-            dependencies.Cache(RulesetStore = new RulesetStore(realm, Storage));
+            dependencies.CacheAs<RulesetStore>(RulesetStore = new RealmRulesetStore(realm, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
-            // Backup is taken here rather than in EFToRealmMigrator to avoid recycling realm contexts
-            // after initial usages below. It can be moved once a direction is established for handling re-subscription.
-            // See https://github.com/ppy/osu/pull/16547 for more discussion.
-            if (EFContextFactory != null)
-            {
-                const string backup_folder = "backups";
-
-                string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-
-                EFContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.db"));
-                realm.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.realm"));
-
-                using (var source = Storage.GetStream("collection.db"))
-                {
-                    if (source != null)
-                    {
-                        using (var destination = Storage.GetStream(Path.Combine(backup_folder, $"collection.{migration}.db"), FileAccess.Write, FileMode.CreateNew))
-                            source.CopyTo(destination);
-                    }
-                }
-            }
+            Decoder.RegisterDependencies(RulesetStore);
 
             dependencies.CacheAs(Storage);
 
@@ -245,7 +257,7 @@ namespace osu.Game
             dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+            EndpointConfiguration endpoints = CreateEndpoints();
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
@@ -256,14 +268,16 @@ namespace osu.Game
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
+            dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
+
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, () => difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
 
-            dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
+            // Add after all the above cache operations as it depends on them.
             AddInternal(difficultyCache);
 
             dependencies.Cache(userCache = new UserLookupCache());
@@ -403,18 +417,21 @@ namespace osu.Game
             LocalConfig ??= UseDevelopmentServer
                 ? new DevelopmentOsuConfigManager(Storage)
                 : new OsuConfigManager(Storage);
+
+            host.ExceptionThrown += onExceptionThrown;
         }
 
         /// <summary>
         /// Use to programatically exit the game as if the user was triggering via alt-f4.
-        /// Will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// By default, will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// May be interrupted (see <see cref="OsuGame"/>'s override).
         /// </summary>
-        public void GracefullyExit()
+        public virtual void AttemptExit()
         {
             if (!OnExiting())
                 Exit();
             else
-                Scheduler.AddDelayed(GracefullyExit, 2000);
+                Scheduler.AddDelayed(AttemptExit, 2000);
         }
 
         public bool Migrate(string path)
@@ -500,21 +517,53 @@ namespace osu.Game
             if (instance == null)
             {
                 // reject the change if the ruleset is not available.
-                Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
+                revertRulesetChange();
                 return;
             }
 
             var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
 
-            foreach (ModType type in Enum.GetValues(typeof(ModType)))
+            try
             {
-                dict[type] = instance.GetModsFor(type).ToList();
+                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                {
+                    dict[type] = instance.GetModsFor(type)
+                                         // Rulesets should never return null mods, but let's be defensive just in case.
+                                         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                                         .Where(mod => mod != null)
+                                         .ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Could not load mods for \"{instance.RulesetInfo.Name}\" ruleset. Current ruleset has been rolled back.");
+                revertRulesetChange();
+                return;
             }
 
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
 
             AvailableMods.Value = dict;
+
+            void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
+        }
+
+        private int allowableExceptions;
+
+        /// <summary>
+        /// Allows a maximum of one unhandled exception, per second of execution.
+        /// </summary>
+        private bool onExceptionThrown(Exception _)
+        {
+            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
+
+            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
+
+            // restore the stock of allowable exceptions after a short delay.
+            Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
+
+            return continueExecution;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -526,6 +575,13 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             realm?.Dispose();
+
+            if (Host != null)
+                Host.ExceptionThrown -= onExceptionThrown;
         }
+
+        ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.Beatmap.ControlPointInfo;
+        IClock IBeatSyncProvider.Clock => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track : (IClock)null;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
     }
 }

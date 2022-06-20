@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -43,7 +44,7 @@ namespace osu.Game.Graphics
         private Storage storage;
 
         [Resolved]
-        private NotificationOverlay notificationOverlay { get; set; }
+        private INotificationOverlay notificationOverlay { get; set; }
 
         private Sample shutter;
 
@@ -118,7 +119,7 @@ namespace osu.Game.Graphics
 
                 if (filename == null) return;
 
-                using (var stream = storage.GetStream(filename, FileAccess.Write))
+                using (var stream = storage.CreateFileSafely(filename))
                 {
                     switch (screenshotFormat.Value)
                     {

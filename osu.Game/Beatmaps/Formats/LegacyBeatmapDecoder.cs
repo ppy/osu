@@ -1,22 +1,33 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyBeatmapDecoder : LegacyDecoder<Beatmap>
     {
+        /// <summary>
+        /// An offset which needs to be applied to old beatmaps (v4 and lower) to correct timing changes that were applied at a game client level.
+        /// </summary>
+        public const int EARLY_VERSION_TIMING_OFFSET = 24;
+
+        internal static RulesetStore RulesetStore;
+
         private Beatmap beatmap;
 
         private ConvertHitObjectParser parser;
@@ -40,8 +51,13 @@ namespace osu.Game.Beatmaps.Formats
         public LegacyBeatmapDecoder(int version = LATEST_VERSION)
             : base(version)
         {
-            // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
-            offset = FormatVersion < 5 ? 24 : 0;
+            if (RulesetStore == null)
+            {
+                Logger.Log($"A {nameof(RulesetStore)} was not provided via {nameof(Decoder)}.{nameof(RegisterDependencies)}; falling back to default {nameof(AssemblyRulesetStore)}.");
+                RulesetStore = new AssemblyRulesetStore();
+            }
+
+            offset = FormatVersion < 5 ? EARLY_VERSION_TIMING_OFFSET : 0;
         }
 
         protected override Beatmap CreateTemplateObject()
@@ -158,7 +174,7 @@ namespace osu.Game.Beatmaps.Formats
                 case @"Mode":
                     int rulesetID = Parsing.ParseInt(pair.Value);
 
-                    beatmap.BeatmapInfo.RulesetID = rulesetID;
+                    beatmap.BeatmapInfo.Ruleset = RulesetStore.GetRuleset(rulesetID) ?? throw new ArgumentException("Ruleset is not available locally.");
 
                     switch (rulesetID)
                     {
@@ -417,9 +433,10 @@ namespace osu.Game.Beatmaps.Formats
                 OmitFirstBarLine = omitFirstBarSignature,
             };
 
-            bool isOsuRuleset = beatmap.BeatmapInfo.Ruleset.OnlineID == 0;
-            // scrolling rulesets use effect points rather than difficulty points for scroll speed adjustments.
-            if (!isOsuRuleset)
+            int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
+
+            // osu!taiko and osu!mania use effect points rather than difficulty points for scroll speed adjustments.
+            if (onlineRulesetID == 1 || onlineRulesetID == 3)
                 effectPoint.ScrollSpeed = speedMultiplier;
 
             addControlPoint(time, effectPoint, timingChange);

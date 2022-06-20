@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -267,7 +269,7 @@ namespace osu.Game.Overlays
 
             TrackChangeDirection direction = TrackChangeDirection.None;
 
-            bool audioEquals = newWorking?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
+            bool audioEquals = newWorking?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) == true;
 
             if (current != null)
             {
@@ -290,15 +292,8 @@ namespace osu.Game.Overlays
 
             current = newWorking;
 
-            if (!audioEquals || CurrentTrack.IsDummyDevice)
-            {
+            if (lastWorking == null || !lastWorking.TryTransferTrack(current))
                 changeTrack();
-            }
-            else
-            {
-                // transfer still valid track to new working beatmap
-                current.TransferTrack(lastWorking.Track);
-            }
 
             TrackChanged?.Invoke(current, direction);
 
@@ -377,6 +372,8 @@ namespace osu.Game.Overlays
             }
         }
 
+        private AudioAdjustments modTrackAdjustments;
+
         /// <summary>
         /// Resets the adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowTrackAdjustments"/> is <c>true</c>.
         /// </summary>
@@ -385,6 +382,7 @@ namespace osu.Game.Overlays
         /// </remarks>
         public void ResetTrackAdjustments()
         {
+            // todo: we probably want a helper method rather than this.
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Balance);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Frequency);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
@@ -392,8 +390,10 @@ namespace osu.Game.Overlays
 
             if (allowTrackAdjustments)
             {
+                CurrentTrack.BindAdjustments(modTrackAdjustments = new AudioAdjustments());
+
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
-                    mod.ApplyToTrack(CurrentTrack);
+                    mod.ApplyToTrack(modTrackAdjustments);
             }
         }
     }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
@@ -165,7 +167,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 new UpdateableFlag(score.User.Country)
                 {
-                    Size = new Vector2(19, 13),
+                    Size = new Vector2(19, 14),
                     ShowPlaceholderOnNull = false,
                 },
                 username,
@@ -173,7 +175,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Text = score.MaxCombo.ToLocalisableString(@"0\x"),
                     Font = OsuFont.GetFont(size: text_size),
+#pragma warning disable 618
                     Colour = score.MaxCombo == score.BeatmapInfo.MaxCombo ? highAccuracyColour : Color4.White
+#pragma warning restore 618
                 }
             };
 

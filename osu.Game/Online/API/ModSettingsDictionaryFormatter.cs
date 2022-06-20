@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 using MessagePack;
 using MessagePack.Formatters;
-using osu.Game.Utils;
+using osu.Game.Configuration;
 
 namespace osu.Game.Online.API
 {
@@ -23,7 +25,7 @@ namespace osu.Game.Online.API
                 var stringBytes = new ReadOnlySequence<byte>(Encoding.UTF8.GetBytes(kvp.Key));
                 writer.WriteString(in stringBytes);
 
-                primitiveFormatter.Serialize(ref writer, ModUtils.GetSettingUnderlyingValue(kvp.Value), options);
+                primitiveFormatter.Serialize(ref writer, kvp.Value.GetUnderlyingSettingValue(), options);
             }
         }
 

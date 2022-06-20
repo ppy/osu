@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,10 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;
-
-            int maxCombo = beatmap.HitObjects.Count;
-            // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
-            maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
+            int maxCombo = beatmap.GetMaxCombo();
 
             int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
@@ -90,16 +89,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
+            List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+
             // The first jump is formed by the first two hitobjects of the map.
             // If the map has less than two OsuHitObjects, the enumerator will not return anything.
             for (int i = 1; i < beatmap.HitObjects.Count; i++)
             {
                 var lastLast = i > 1 ? beatmap.HitObjects[i - 2] : null;
-                var last = beatmap.HitObjects[i - 1];
-                var current = beatmap.HitObjects[i];
-
-                yield return new OsuDifficultyHitObject(current, lastLast, last, clockRate);
+                objects.Add(new OsuDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], lastLast, clockRate, objects, objects.Count));
             }
+
+            return objects;
         }
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
@@ -125,6 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new OsuModEasy(),
             new OsuModHardRock(),
             new OsuModFlashlight(),
+            new MultiMod(new OsuModFlashlight(), new OsuModHidden())
         };
     }
 }

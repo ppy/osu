@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
@@ -35,7 +37,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen() && player.IsLoaded);
-            AddStep("start gameplay", () => ((IMultiplayerClient)MultiplayerClient).MatchStarted());
+            AddStep("start gameplay", () => ((IMultiplayerClient)MultiplayerClient).GameplayStarted());
         }
 
         [Test]

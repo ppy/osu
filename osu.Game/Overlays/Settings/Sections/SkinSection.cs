@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 using Realms;
@@ -64,9 +67,10 @@ namespace osu.Game.Overlays.Settings.Sections
                 new SettingsButton
                 {
                     Text = SkinSettingsStrings.SkinLayoutEditor,
-                    Action = () => skinEditor?.Toggle(),
+                    Action = () => skinEditor?.ToggleVisibility(),
                 },
                 new ExportSkinButton(),
+                new DeleteSkinButton(),
             };
 
             config.BindWith(OsuSetting.Skin, configBindable);
@@ -127,13 +131,19 @@ namespace osu.Game.Overlays.Settings.Sections
                 dropdownItems.Add(skin.ToLive(realm));
             dropdownItems.Insert(protectedCount, random_skin_info);
 
-            skinDropdown.Items = dropdownItems;
+            Schedule(() =>
+            {
+                skinDropdown.Items = dropdownItems;
 
-            updateSelectedSkinFromConfig();
+                updateSelectedSkinFromConfig();
+            });
         }
 
         private void updateSelectedSkinFromConfig()
         {
+            if (!skinDropdown.Items.Any())
+                return;
+
             Live<SkinInfo> skin = null;
 
             if (Guid.TryParse(configBindable.Value, out var configId))
@@ -194,6 +204,37 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     Logger.Log($"Could not export current skin: {e.Message}", level: LogLevel.Error);
                 }
+            }
+        }
+
+        public class DeleteSkinButton : DangerousSettingsButton
+        {
+            [Resolved]
+            private SkinManager skins { get; set; }
+
+            [Resolved(CanBeNull = true)]
+            private IDialogOverlay dialogOverlay { get; set; }
+
+            private Bindable<Skin> currentSkin;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Text = SkinSettingsStrings.DeleteSkinButton;
+                Action = delete;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                currentSkin = skins.CurrentSkin.GetBoundCopy();
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
+            }
+
+            private void delete()
+            {
+                dialogOverlay?.Push(new SkinDeleteDialog(currentSkin.Value));
             }
         }
     }

@@ -1,13 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Models;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
@@ -208,13 +212,19 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestKeyboardNavigation()
         {
             var lowestScore = TestResources.CreateTestScoreInfo();
-            lowestScore.MaxCombo = 100;
+            lowestScore.OnlineID = 3;
+            lowestScore.TotalScore = 0;
+            lowestScore.Statistics = new Dictionary<HitResult, int>();
 
             var middleScore = TestResources.CreateTestScoreInfo();
-            middleScore.MaxCombo = 200;
+            middleScore.OnlineID = 2;
+            middleScore.TotalScore = 0;
+            middleScore.Statistics = new Dictionary<HitResult, int>();
 
             var highestScore = TestResources.CreateTestScoreInfo();
-            highestScore.MaxCombo = 300;
+            highestScore.OnlineID = 1;
+            highestScore.TotalScore = 0;
+            highestScore.Statistics = new Dictionary<HitResult, int>();
 
             createListStep(() => new ScorePanelList());
 

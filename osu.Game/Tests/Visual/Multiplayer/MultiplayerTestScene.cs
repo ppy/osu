@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Online.Rooms;
 using osu.Game.Tests.Beatmaps;
@@ -44,6 +46,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return new Room
             {
                 Name = { Value = "test name" },
+                Type = { Value = MatchType.HeadToHead },
                 Playlist =
                 {
                     new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)

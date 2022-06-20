@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,6 +37,8 @@ namespace osu.Game.Online.API
         public string APIEndpointUrl { get; }
 
         public string WebsiteRootUrl { get; }
+
+        public int APIVersion => 20220217; // We may want to pull this from the game version eventually.
 
         public Exception LastLoginError { get; private set; }
 
@@ -456,7 +460,7 @@ namespace osu.Game.Online.API
         public GuestUser()
         {
             Username = @"Guest";
-            Id = 1;
+            Id = SYSTEM_USER_ID;
         }
     }
 

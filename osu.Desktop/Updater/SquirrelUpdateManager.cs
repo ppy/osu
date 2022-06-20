@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,14 +19,15 @@ using osu.Game.Overlays.Notifications;
 using osuTK;
 using osuTK.Graphics;
 using Squirrel;
-using LogLevel = Splat.LogLevel;
+using Squirrel.SimpleSplat;
 
 namespace osu.Desktop.Updater
 {
+    [SupportedOSPlatform("windows")]
     public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
         private UpdateManager updateManager;
-        private NotificationOverlay notificationOverlay;
+        private INotificationOverlay notificationOverlay;
 
         public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
@@ -34,12 +38,14 @@ namespace osu.Desktop.Updater
         /// </summary>
         private bool updatePending;
 
-        [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification)
-        {
-            notificationOverlay = notification;
+        private readonly SquirrelLogger squirrelLogger = new SquirrelLogger();
 
-            Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
+        [BackgroundDependencyLoader]
+        private void load(INotificationOverlay notifications)
+        {
+            notificationOverlay = notifications;
+
+            SquirrelLocator.CurrentMutable.Register(() => squirrelLogger, typeof(ILogger));
         }
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
@@ -49,9 +55,11 @@ namespace osu.Desktop.Updater
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
 
+            const string github_token = null; // TODO: populate.
+
             try
             {
-                updateManager ??= await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true).ConfigureAwait(false);
+                updateManager ??= new GithubUpdateManager(@"https://github.com/ppy/osu", false, github_token, @"osulazer");
 
                 var info = await updateManager.CheckForUpdate(!useDeltaPatching).ConfigureAwait(false);
 
@@ -146,7 +154,7 @@ namespace osu.Desktop.Updater
                 Activated = () =>
                 {
                     updateManager.PrepareUpdateAsync()
-                                 .ContinueWith(_ => updateManager.Schedule(() => game?.GracefullyExit()));
+                                 .ContinueWith(_ => updateManager.Schedule(() => game?.AttemptExit()));
                     return true;
                 };
             }
@@ -201,11 +209,11 @@ namespace osu.Desktop.Updater
             }
         }
 
-        private class SquirrelLogger : Splat.ILogger, IDisposable
+        private class SquirrelLogger : ILogger, IDisposable
         {
-            public LogLevel Level { get; set; } = LogLevel.Info;
+            public Squirrel.SimpleSplat.LogLevel Level { get; set; } = Squirrel.SimpleSplat.LogLevel.Info;
 
-            public void Write(string message, LogLevel logLevel)
+            public void Write(string message, Squirrel.SimpleSplat.LogLevel logLevel)
             {
                 if (logLevel < Level)
                     return;

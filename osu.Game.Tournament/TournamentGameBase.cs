@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -20,7 +22,6 @@ using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osuTK.Input;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tournament
 {
@@ -64,6 +65,16 @@ namespace osu.Game.Tournament
             Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
             dependencies.CacheAs(new StableInfo(storage));
+        }
+
+        protected override void LoadComplete()
+        {
+            MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
+
+            // we don't want to show the menu cursor as it would appear on stream output.
+            MenuCursorContainer.Cursor.Alpha = 0;
+
+            base.LoadComplete();
 
             Task.Run(readBracket);
         }
@@ -81,9 +92,13 @@ namespace osu.Game.Tournament
 
                 ladder ??= new LadderInfo();
 
-                ladder.Ruleset.Value = ladder.Ruleset.Value != null
+                var resolvedRuleset = ladder.Ruleset.Value != null
                     ? RulesetStore.GetRuleset(ladder.Ruleset.Value.ShortName)
                     : RulesetStore.AvailableRulesets.First();
+
+                // Must set to null initially to avoid the following re-fetch hitting `ShortName` based equality check.
+                ladder.Ruleset.Value = null;
+                ladder.Ruleset.Value = resolvedRuleset;
 
                 bool addedInfo = false;
 
@@ -171,9 +186,7 @@ namespace osu.Game.Tournament
         {
             var playersRequiringPopulation = ladder.Teams
                                                    .SelectMany(t => t.Players)
-                                                   .Where(p => string.IsNullOrEmpty(p.Username)
-                                                               || p.Statistics?.GlobalRank == null
-                                                               || p.Statistics?.CountryRank == null).ToList();
+                                                   .Where(p => string.IsNullOrEmpty(p.Username) || p.Rank == null).ToList();
 
             if (playersRequiringPopulation.Count == 0)
                 return false;
@@ -181,7 +194,7 @@ namespace osu.Game.Tournament
             for (int i = 0; i < playersRequiringPopulation.Count; i++)
             {
                 var p = playersRequiringPopulation[i];
-                PopulateUser(p, immediate: true);
+                PopulatePlayer(p, immediate: true);
                 updateLoadProgressMessage($"Populating user stats ({i} / {playersRequiringPopulation.Count})");
             }
 
@@ -195,7 +208,7 @@ namespace osu.Game.Tournament
         {
             var beatmapsRequiringPopulation = ladder.Rounds
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => string.IsNullOrEmpty(b.Beatmap?.BeatmapSet?.Title) && b.ID > 0).ToList();
+                                                    .Where(b => b.Beatmap?.OnlineID == 0 && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -206,7 +219,7 @@ namespace osu.Game.Tournament
 
                 var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
                 API.Perform(req);
-                b.Beatmap = req.Response ?? new APIBeatmap();
+                b.Beatmap = new TournamentBeatmap(req.Response ?? new APIBeatmap());
 
                 updateLoadProgressMessage($"Populating round beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -222,7 +235,7 @@ namespace osu.Game.Tournament
             var beatmapsRequiringPopulation = ladder.Teams
                                                     .SelectMany(r => r.SeedingResults)
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => string.IsNullOrEmpty(b.Beatmap?.BeatmapSet?.Title) && b.ID > 0).ToList();
+                                                    .Where(b => b.Beatmap?.OnlineID == 0 && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -233,7 +246,7 @@ namespace osu.Game.Tournament
 
                 var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
                 API.Perform(req);
-                b.Beatmap = req.Response ?? new APIBeatmap();
+                b.Beatmap = new TournamentBeatmap(req.Response ?? new APIBeatmap());
 
                 updateLoadProgressMessage($"Populating seeding beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -243,9 +256,9 @@ namespace osu.Game.Tournament
 
         private void updateLoadProgressMessage(string s) => Schedule(() => initialisationText.Text = s);
 
-        public void PopulateUser(APIUser user, Action success = null, Action failure = null, bool immediate = false)
+        public void PopulatePlayer(TournamentUser user, Action success = null, Action failure = null, bool immediate = false)
         {
-            var req = new GetUserRequest(user.Id, Ruleset.Value);
+            var req = new GetUserRequest(user.OnlineID, ladder.Ruleset.Value);
 
             if (immediate)
             {
@@ -257,7 +270,7 @@ namespace osu.Game.Tournament
                 req.Success += res => { populate(); };
                 req.Failure += _ =>
                 {
-                    user.Id = 1;
+                    user.OnlineID = 1;
                     failure?.Invoke();
                 };
 
@@ -271,25 +284,15 @@ namespace osu.Game.Tournament
                 if (res == null)
                     return;
 
-                user.Id = res.Id;
+                user.OnlineID = res.Id;
 
                 user.Username = res.Username;
-                user.Statistics = res.Statistics;
+                user.CoverUrl = res.CoverUrl;
                 user.Country = res.Country;
-                user.Cover = res.Cover;
+                user.Rank = res.Statistics?.GlobalRank;
 
                 success?.Invoke();
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
-
-            // we don't want to show the menu cursor as it would appear on stream output.
-            MenuCursorContainer.Cursor.Alpha = 0;
-
-            base.LoadComplete();
         }
 
         protected virtual void SaveChanges()
@@ -317,7 +320,7 @@ namespace osu.Game.Tournament
                     Converters = new JsonConverter[] { new JsonPointConverter() }
                 });
 
-            using (var stream = storage.GetStream(BRACKET_FILENAME, FileAccess.Write, FileMode.Create))
+            using (var stream = storage.CreateFileSafely(BRACKET_FILENAME))
             using (var sw = new StreamWriter(stream))
                 sw.Write(serialisedLadder);
         }

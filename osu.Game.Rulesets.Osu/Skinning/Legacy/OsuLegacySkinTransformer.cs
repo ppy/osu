@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -33,7 +35,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (osuComponent.Component)
                 {
                     case OsuSkinComponents.FollowPoint:
-                        return this.GetAnimation(component.LookupName, true, false, true, startAtCurrentTime: false);
+                        return this.GetAnimation(component.LookupName, true, true, true, startAtCurrentTime: false);
+
+                    case OsuSkinComponents.SliderScorePoint:
+                        return this.GetAnimation(component.LookupName, false, false);
 
                     case OsuSkinComponents.SliderFollowCircle:
                         var followCircle = this.GetAnimation("sliderfollowcircle", true, true, true);
@@ -123,6 +128,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     case OsuSkinComponents.ApproachCircle:
                         return new LegacyApproachCircle();
+
+                    default:
+                        throw new UnsupportedSkinComponentException(component);
                 }
             }
 

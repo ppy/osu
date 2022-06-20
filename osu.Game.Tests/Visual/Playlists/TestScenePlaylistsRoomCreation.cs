@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -39,7 +41,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using System;
@@ -23,8 +25,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             : base(user, headerText)
         {
             this.type = type;
-
-            ItemsPerPage = 5;
         }
 
         [BackgroundDependencyLoader]
@@ -56,14 +56,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         protected override void OnItemsReceived(List<APIScore> items)
         {
-            if (VisiblePages == 0)
+            if (CurrentPage == null || CurrentPage?.Offset == 0)
                 drawableItemIndex = 0;
 
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<APIScore>> CreateRequest() =>
-            new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
+        protected override APIRequest<List<APIScore>> CreateRequest(PaginationParameters pagination) =>
+            new GetUserScoresRequest(User.Value.Id, type, pagination);
 
         private int drawableItemIndex;
 

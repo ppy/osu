@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,11 +11,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -56,6 +60,8 @@ using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Graphics;
+using Sentry;
+using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Game
 {
@@ -63,7 +69,7 @@ namespace osu.Game
     /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
     /// for initial components that are generally retrieved via DI.
     /// </summary>
-    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo
+    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager
     {
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
@@ -149,7 +155,10 @@ namespace osu.Game
 
         protected SettingsOverlay Settings;
 
+        protected FirstRunSetupOverlay FirstRunOverlay { get; private set; }
+
         private VolumeOverlay volume;
+
         private OsuLogo osuLogo;
 
         private MainMenu menuScreen;
@@ -168,6 +177,7 @@ namespace osu.Game
         private readonly string[] args;
 
         private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
+        private readonly List<OverlayContainer> externalOverlays = new List<OverlayContainer>();
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
@@ -180,21 +190,57 @@ namespace osu.Game
             SentryLogger = new SentryLogger(this);
         }
 
+        #region IOverlayManager
+
+        IBindable<OverlayActivation> IOverlayManager.OverlayActivationMode => OverlayActivationMode;
+
         private void updateBlockingOverlayFade() =>
             ScreenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
 
-        public void AddBlockingOverlay(OverlayContainer overlay)
+        IDisposable IOverlayManager.RegisterBlockingOverlay(OverlayContainer overlayContainer)
+        {
+            if (overlayContainer.Parent != null)
+                throw new ArgumentException($@"Overlays registered via {nameof(IOverlayManager.RegisterBlockingOverlay)} should not be added to the scene graph.");
+
+            if (externalOverlays.Contains(overlayContainer))
+                throw new ArgumentException($@"{overlayContainer} has already been registered via {nameof(IOverlayManager.RegisterBlockingOverlay)} once.");
+
+            externalOverlays.Add(overlayContainer);
+            overlayContent.Add(overlayContainer);
+
+            if (overlayContainer is OsuFocusedOverlayContainer focusedOverlayContainer)
+                focusedOverlays.Add(focusedOverlayContainer);
+
+            return new InvokeOnDisposal(() => unregisterBlockingOverlay(overlayContainer));
+        }
+
+        void IOverlayManager.ShowBlockingOverlay(OverlayContainer overlay)
         {
             if (!visibleBlockingOverlays.Contains(overlay))
                 visibleBlockingOverlays.Add(overlay);
             updateBlockingOverlayFade();
         }
 
-        public void RemoveBlockingOverlay(OverlayContainer overlay) => Schedule(() =>
+        void IOverlayManager.HideBlockingOverlay(OverlayContainer overlay) => Schedule(() =>
         {
             visibleBlockingOverlays.Remove(overlay);
             updateBlockingOverlayFade();
         });
+
+        /// <summary>
+        /// Unregisters a blocking <see cref="OverlayContainer"/> that was not created by <see cref="OsuGame"/> itself.
+        /// </summary>
+        private void unregisterBlockingOverlay(OverlayContainer overlayContainer)
+        {
+            externalOverlays.Remove(overlayContainer);
+
+            if (overlayContainer is OsuFocusedOverlayContainer focusedOverlayContainer)
+                focusedOverlays.Remove(focusedOverlayContainer);
+
+            overlayContainer.Expire();
+        }
+
+        #endregion
 
         /// <summary>
         /// Close all game-wide overlays.
@@ -218,7 +264,7 @@ namespace osu.Game
         {
             dependencies.CacheAs(this);
 
-            dependencies.Cache(SentryLogger);
+            SentryLogger.AttachUser(API.LocalUser);
 
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
@@ -585,16 +631,16 @@ namespace osu.Game
 
         private PerformFromMenuRunner performFromMainMenuTask;
 
-        /// <summary>
-        /// Perform an action only after returning to a specific screen as indicated by <paramref name="validScreens"/>.
-        /// Eagerly tries to exit the current screen until it succeeds.
-        /// </summary>
-        /// <param name="action">The action to perform once we are in the correct state.</param>
-        /// <param name="validScreens">An optional collection of valid screen types. If any of these screens are already current we can perform the action immediately, else the first valid parent will be made current before performing the action. <see cref="MainMenu"/> is used if not specified.</param>
         public void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null)
         {
             performFromMainMenuTask?.Cancel();
             Add(performFromMainMenuTask = new PerformFromMenuRunner(action, validScreens, () => ScreenStack.CurrentScreen));
+        }
+
+        public override void AttemptExit()
+        {
+            // Using PerformFromScreen gives the user a chance to interrupt the exit process if needed.
+            PerformFromScreen(menu => menu.Exit());
         }
 
         /// <summary>
@@ -621,11 +667,14 @@ namespace osu.Game
         }
 
         protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults()
-            => new Dictionary<FrameworkSetting, object>
+        {
+            return new Dictionary<FrameworkSetting, object>
             {
-                // General expectation that osu! starts in fullscreen by default (also gives the most predictable performance)
-                { FrameworkSetting.WindowMode, WindowMode.Fullscreen }
+                // General expectation that osu! starts in fullscreen by default (also gives the most predictable performance).
+                // However, macOS is bound to have issues when using exclusive fullscreen as it takes full control away from OS, therefore borderless is default there.
+                { FrameworkSetting.WindowMode, RuntimeInfo.OS == RuntimeInfo.Platform.macOS ? WindowMode.Borderless : WindowMode.Fullscreen }
             };
+        }
 
         protected override void LoadComplete()
         {
@@ -633,6 +682,14 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
+#if DEBUG
+                if (language == Language.debug)
+                {
+                    Localisation.AddLanguage(Language.debug.ToString(), new DebugLocalisationStore());
+                    continue;
+                }
+#endif
+
                 string cultureCode = language.ToCultureCode();
 
                 try
@@ -654,13 +711,13 @@ namespace osu.Game
             SkinManager.PostNotification = n => Notifications.Post(n);
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
-            BeatmapManager.PostImport = items => PresentBeatmap(items.First().Value);
+            BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
 
             BeatmapDownloader.PostNotification = n => Notifications.Post(n);
             ScoreDownloader.PostNotification = n => Notifications.Post(n);
 
             ScoreManager.PostNotification = n => Notifications.Post(n);
-            ScoreManager.PostImport = items => PresentScore(items.First().Value);
+            ScoreManager.PresentImport = items => PresentScore(items.First().Value);
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
@@ -777,7 +834,7 @@ namespace osu.Game
 
             loadComponentSingleFile(onScreenDisplay, Add, true);
 
-            loadComponentSingleFile(Notifications.With(d =>
+            loadComponentSingleFile<INotificationOverlay>(Notifications.With(d =>
             {
                 d.Anchor = Anchor.TopRight;
                 d.Origin = Anchor.TopRight;
@@ -796,12 +853,13 @@ namespace osu.Game
             loadComponentSingleFile(CreateUpdateManager(), Add, true);
 
             // overlay elements
+            loadComponentSingleFile(FirstRunOverlay = new FirstRunSetupOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
+            loadComponentSingleFile(channelManager = new ChannelManager(API), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
@@ -824,7 +882,7 @@ namespace osu.Game
             }, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
@@ -837,7 +895,8 @@ namespace osu.Game
                 channelManager.HighPollRate.Value =
                     chatOverlay.State.Value == Visibility.Visible
                     || API.Activity.Value is UserActivity.InLobby
-                    || API.Activity.Value is UserActivity.InMultiplayerGame;
+                    || API.Activity.Value is UserActivity.InMultiplayerGame
+                    || API.Activity.Value is UserActivity.SpectatingMultiplayerGame;
             }
 
             Add(difficultyRecommender);
@@ -845,7 +904,7 @@ namespace osu.Game
             Add(new MusicKeyBindingHandler());
 
             // side overlays which cancel each other.
-            var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications };
+            var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay };
 
             foreach (var overlay in singleDisplaySideOverlays)
             {
@@ -870,7 +929,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay, wikiOverlay };
+            var singleDisplayOverlays = new OverlayContainer[] { FirstRunOverlay, chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay, wikiOverlay };
 
             foreach (var overlay in singleDisplayOverlays)
             {
@@ -898,8 +957,20 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 string[] paths = args.Where(a => !a.StartsWith('-')).ToArray();
+
                 if (paths.Length > 0)
-                    Task.Run(() => Import(paths));
+                {
+                    string firstPath = paths.First();
+
+                    if (firstPath.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                    {
+                        HandleLink(firstPath);
+                    }
+                    else
+                    {
+                        Task.Run(() => Import(paths));
+                    }
+                }
             }
         }
 
@@ -968,11 +1039,13 @@ namespace osu.Game
         /// <param name="component">The component to load.</param>
         /// <param name="loadCompleteAction">An action to invoke on load completion (generally to add the component to the hierarchy).</param>
         /// <param name="cache">Whether to cache the component as type <typeparamref name="T"/> into the game dependencies before any scheduling.</param>
-        private T loadComponentSingleFile<T>(T component, Action<T> loadCompleteAction, bool cache = false)
-            where T : Drawable
+        private T loadComponentSingleFile<T>(T component, Action<Drawable> loadCompleteAction, bool cache = false)
+            where T : class
         {
             if (cache)
                 dependencies.CacheAs(component);
+
+            var drawableComponent = component as Drawable ?? throw new ArgumentException($"Component must be a {nameof(Drawable)}", nameof(component));
 
             if (component is OsuFocusedOverlayContainer overlay)
                 focusedOverlays.Add(overlay);
@@ -997,7 +1070,7 @@ namespace osu.Game
                         // Since this is running in a separate thread, it is possible for OsuGame to be disposed after LoadComponentAsync has been called
                         // throwing an exception. To avoid this, the call is scheduled on the update thread, which does not run if IsDisposed = true
                         Task task = null;
-                        var del = new ScheduledDelegate(() => task = LoadComponentAsync(component, loadCompleteAction));
+                        var del = new ScheduledDelegate(() => task = LoadComponentAsync(drawableComponent, loadCompleteAction));
                         Scheduler.Add(del);
 
                         // The delegate won't complete if OsuGame has been disposed in the meantime
@@ -1032,6 +1105,10 @@ namespace osu.Game
 
             switch (e.Action)
             {
+                case GlobalAction.ToggleSkinEditor:
+                    skinEditor.ToggleVisibility();
+                    return true;
+
                 case GlobalAction.ResetInputSettings:
                     Host.ResetInputHandlers();
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
@@ -1043,6 +1120,12 @@ namespace osu.Game
                     return true;
 
                 case GlobalAction.RandomSkin:
+                    // Don't allow random skin selection while in the skin editor.
+                    // This is mainly to stop many "osu! default (modified)" skins being created via the SkinManager.EnsureMutableSkin() path.
+                    // If people want this to work we can potentially avoid selecting default skins when the editor is open, or allow a maximum of one mutable skin somehow.
+                    if (skinEditor.State.Value == Visibility.Visible)
+                        return false;
+
                     SkinManager.SelectRandomSkin();
                     return true;
             }
@@ -1122,13 +1205,23 @@ namespace osu.Game
                 horizontalOffset += (Content.ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - Content.DrawWidth) * SIDE_OVERLAY_OFFSET_RATIO;
 
             ScreenOffsetContainer.X = horizontalOffset;
+            overlayContent.X = horizontalOffset * 1.2f;
 
             MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
-        protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
+        private void screenChanged(IScreen current, IScreen newScreen)
         {
-            skinEditor.Reset();
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.Contexts[@"screen stack"] = new
+                {
+                    Current = newScreen?.GetType().ReadableName(),
+                    Previous = current?.GetType().ReadableName(),
+                };
+
+                scope.SetTag(@"screen", newScreen?.GetType().ReadableName() ?? @"none");
+            });
 
             switch (newScreen)
             {
@@ -1171,13 +1264,15 @@ namespace osu.Game
                 else
                     BackButton.Hide();
             }
+
+            skinEditor.SetTarget((OsuScreen)newScreen);
         }
 
-        private void screenPushed(IScreen lastScreen, IScreen newScreen) => ScreenChanged(lastScreen, newScreen);
+        private void screenPushed(IScreen lastScreen, IScreen newScreen) => screenChanged(lastScreen, newScreen);
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
-            ScreenChanged(lastScreen, newScreen);
+            screenChanged(lastScreen, newScreen);
 
             if (newScreen == null)
                 Exit();

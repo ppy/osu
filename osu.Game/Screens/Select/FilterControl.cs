@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
@@ -139,7 +142,7 @@ namespace osu.Game.Screens.Select
                                             },
                                             new OsuSpriteText
                                             {
-                                                Text = "Sort by",
+                                                Text = SortStrings.Default,
                                                 Font = OsuFont.GetFont(size: 14),
                                                 Margin = new MarginPadding(5),
                                                 Anchor = Anchor.BottomRight,

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Humanizer;
 using System.Collections.Generic;
 using osu.Game.Online.API.Requests.Responses;
@@ -13,8 +15,8 @@ namespace osu.Game.Online.API.Requests
 
         private readonly BeatmapSetType type;
 
-        public GetUserBeatmapsRequest(long userId, BeatmapSetType type, int page = 0, int itemsPerPage = 6)
-            : base(page, itemsPerPage)
+        public GetUserBeatmapsRequest(long userId, BeatmapSetType type, PaginationParameters pagination)
+            : base(pagination)
         {
             this.userId = userId;
             this.type = type;
@@ -29,6 +31,7 @@ namespace osu.Game.Online.API.Requests
         Ranked,
         Loved,
         Pending,
+        Guest,
         Graveyard
     }
 }

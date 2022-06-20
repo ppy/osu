@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -382,7 +384,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     OnDragHandled?.Invoke(e);
 
-                    if (timeline.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition).Time is double time)
+                    if (timeline.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition).Time is double time)
                     {
                         switch (hitObject)
                         {

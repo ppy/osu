@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
@@ -28,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
             if (!allowImmediateFocus)
                 return;
 
-            Scheduler.Add(() => GetContainingInputManager().ChangeFocus(this), false);
+            Scheduler.Add(() => GetContainingInputManager().ChangeFocus(this));
         }
 
         public new void KillFocus() => base.KillFocus();

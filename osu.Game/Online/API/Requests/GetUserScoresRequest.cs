@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.IO.Network;
 using osu.Game.Online.API.Requests.Responses;
@@ -14,8 +16,8 @@ namespace osu.Game.Online.API.Requests
         private readonly ScoreType type;
         private readonly RulesetInfo ruleset;
 
-        public GetUserScoresRequest(long userId, ScoreType type, int page = 0, int itemsPerPage = 5, RulesetInfo ruleset = null)
-            : base(page, itemsPerPage)
+        public GetUserScoresRequest(long userId, ScoreType type, PaginationParameters pagination, RulesetInfo ruleset = null)
+            : base(pagination)
         {
             this.userId = userId;
             this.type = type;

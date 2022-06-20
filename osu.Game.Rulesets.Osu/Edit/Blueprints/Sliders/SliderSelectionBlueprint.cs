@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected PathControlPointVisualiser ControlPointVisualiser { get; private set; }
 
         [Resolved(CanBeNull = true)]
-        private HitObjectComposer composer { get; set; }
+        private IDistanceSnapProvider snapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
         private IPlacementHandler placementHandler { get; set; }
@@ -208,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // Move the control points from the insertion index onwards to make room for the insertion
             controlPoints.Insert(insertionIndex, pathControlPoint);
 
-            HitObject.SnapTo(composer);
+            HitObject.SnapTo(snapProvider);
 
             return pathControlPoint;
         }
@@ -230,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
 
             // Snap the slider to the current beat divisor before checking length validity.
-            HitObject.SnapTo(composer);
+            HitObject.SnapTo(snapProvider);
 
             // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
             if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)

@@ -15,8 +15,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
 
-#nullable enable
-
 namespace osu.Desktop.LegacyIpc
 {
     /// <summary>
@@ -77,10 +75,9 @@ namespace osu.Desktop.LegacyIpc
                 case LegacyIpcDifficultyCalculationRequest req:
                     try
                     {
-                        var ruleset = getLegacyRulesetFromID(req.RulesetId);
-
+                        WorkingBeatmap beatmap = new FlatFileWorkingBeatmap(req.BeatmapFile);
+                        var ruleset = beatmap.BeatmapInfo.Ruleset.CreateInstance();
                         Mod[] mods = ruleset.ConvertFromLegacyMods((LegacyMods)req.Mods).ToArray();
-                        WorkingBeatmap beatmap = new FlatFileWorkingBeatmap(req.BeatmapFile, _ => ruleset);
 
                         return new LegacyIpcDifficultyCalculationResponse
                         {

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -13,6 +15,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
@@ -23,6 +26,7 @@ using osu.Game.Screens.Edit.Setup;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osuTK;
+using osuTK.Input;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 
@@ -63,13 +67,19 @@ namespace osu.Game.Tests.Visual.Editing
             EditorBeatmap editorBeatmap = null;
 
             AddStep("store editor beatmap", () => editorBeatmap = EditorBeatmap);
-            AddStep("exit without save", () =>
+
+            AddStep("exit without save", () => Editor.Exit());
+            AddStep("hold to confirm", () =>
             {
-                Editor.Exit();
-                DialogOverlay.CurrentDialog.PerformOkAction();
+                var confirmButton = DialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogDangerousButton>().First();
+
+                InputManager.MoveMouseTo(confirmButton);
+                InputManager.PressButton(MouseButton.Left);
             });
 
             AddUntilStep("wait for exit", () => !Editor.IsCurrentScreen());
+            AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
+
             AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == editorBeatmap.BeatmapInfo.BeatmapSet.ID)?.Value.DeletePending == true);
         }
 
@@ -88,10 +98,13 @@ namespace osu.Game.Tests.Visual.Editing
                 using (var zip = ZipArchive.Open(temp))
                     zip.WriteToDirectory(extractedFolder);
 
-                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3"));
+                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(new FileInfo(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3")));
 
                 File.Delete(temp);
                 Directory.Delete(extractedFolder, true);
+
+                // ensure audio file is copied to beatmap as "audio.mp3" rather than original filename.
+                Assert.That(Beatmap.Value.Metadata.AudioFile == "audio.mp3");
 
                 return success;
             });

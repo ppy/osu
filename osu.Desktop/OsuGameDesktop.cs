@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,7 +27,6 @@ using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Threading;
 using osu.Game.IO;
 using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Desktop
@@ -103,6 +105,8 @@ namespace osu.Desktop
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
+                    Debug.Assert(OperatingSystem.IsWindows());
+
                     return new SquirrelUpdateManager();
 
                 default:
@@ -146,8 +150,8 @@ namespace osu.Desktop
                 case MouseHandler mh:
                     return new MouseSettings(mh);
 
-                case JoystickHandler _:
-                    return new InputSection.HandlerSection(handler);
+                case JoystickHandler jh:
+                    return new JoystickSettings(jh);
 
                 default:
                     return base.CreateSettingsSubsectionFor(handler);

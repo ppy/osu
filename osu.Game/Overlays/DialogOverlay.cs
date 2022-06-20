@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
@@ -14,7 +16,7 @@ using osu.Game.Audio.Effects;
 
 namespace osu.Game.Overlays
 {
-    public class DialogOverlay : OsuFocusedOverlayContainer
+    public class DialogOverlay : OsuFocusedOverlayContainer, IDialogOverlay
     {
         private readonly Container dialogContainer;
 
@@ -49,18 +51,24 @@ namespace osu.Game.Overlays
         {
             if (dialog == CurrentDialog || dialog.State.Value != Visibility.Visible) return;
 
-            // if any existing dialog is being displayed, dismiss it before showing a new one.
-            CurrentDialog?.Hide();
+            var lastDialog = CurrentDialog;
 
+            // Immediately update the externally accessible property as this may be used for checks even before
+            // a DialogOverlay instance has finished loading.
             CurrentDialog = dialog;
-            CurrentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
 
-            dialogContainer.Add(CurrentDialog);
+            Scheduler.Add(() =>
+            {
+                // if any existing dialog is being displayed, dismiss it before showing a new one.
+                lastDialog?.Hide();
+                dialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
+                dialogContainer.Add(dialog);
 
-            Show();
+                Show();
+            }, false);
         }
 
-        public override bool IsPresent => dialogContainer.Children.Count > 0;
+        public override bool IsPresent => Scheduler.HasPendingTasks || dialogContainer.Children.Count > 0;
 
         protected override bool BlockNonPositionalInput => true;
 
@@ -81,23 +89,16 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            this.FadeIn(PopupDialog.ENTER_DURATION, Easing.OutQuint);
             lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
 
             if (CurrentDialog?.State.Value == Visibility.Visible)
-            {
                 CurrentDialog.Hide();
-                return;
-            }
-
-            this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -17,6 +19,13 @@ namespace osu.Game.Tests.Visual.Editing
 {
     public class TestSceneEditorSaving : EditorSavingTestScene
     {
+        [Test]
+        public void TestCantExitWithoutSaving()
+        {
+            AddRepeatStep("Exit", () => InputManager.Key(Key.Escape), 10);
+            AddAssert("Editor is still active screen", () => Game.ScreenStack.CurrentScreen is Editor);
+        }
+
         [Test]
         public void TestMetadata()
         {
@@ -48,6 +57,8 @@ namespace osu.Game.Tests.Visual.Editing
         {
             double originalTimelineZoom = 0;
             double changedTimelineZoom = 0;
+
+            AddUntilStep("wait for timeline load", () => Editor.ChildrenOfType<Timeline>().SingleOrDefault()?.IsLoaded == true);
 
             AddStep("Set beat divisor", () => Editor.Dependencies.Get<BindableBeatDivisor>().Value = 16);
             AddStep("Set timeline zoom", () =>

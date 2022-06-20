@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +16,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -45,13 +48,15 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        private readonly FreeModSelectOverlay freeModSelectOverlay;
         private readonly Room room;
 
         private WorkingBeatmap initialBeatmap;
         private RulesetInfo initialRuleset;
         private IReadOnlyList<Mod> initialMods;
         private bool itemSelected;
+
+        private readonly FreeModSelectOverlay freeModSelectOverlay;
+        private IDisposable freeModSelectOverlayRegistration;
 
         protected OnlinePlaySongSelect(Room room)
         {
@@ -75,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay
             initialRuleset = Ruleset.Value;
             initialMods = Mods.Value.ToList();
 
-            FooterPanels.Add(freeModSelectOverlay);
+            LoadComponent(freeModSelectOverlay);
         }
 
         protected override void LoadComplete()
@@ -94,6 +99,8 @@ namespace osu.Game.Screens.OnlinePlay
 
             Mods.BindValueChanged(onModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
+
+            freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelectOverlay);
         }
 
         private void onModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -111,8 +118,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected sealed override bool OnStart()
         {
-            itemSelected = true;
-
             var item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
             {
                 RulesetID = Ruleset.Value.OnlineID,
@@ -120,15 +125,21 @@ namespace osu.Game.Screens.OnlinePlay
                 AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()
             };
 
-            SelectItem(item);
-            return true;
+            if (SelectItem(item))
+            {
+                itemSelected = true;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
         /// Invoked when the user has requested a selection of a beatmap.
         /// </summary>
         /// <param name="item">The resultant <see cref="PlaylistItem"/>. This item has not yet been added to the <see cref="Room"/>'s.</param>
-        protected abstract void SelectItem(PlaylistItem item);
+        /// <returns><c>true</c> if a selection occurred.</returns>
+        protected abstract bool SelectItem(PlaylistItem item);
 
         public override bool OnBackButton()
         {
@@ -141,7 +152,7 @@ namespace osu.Game.Screens.OnlinePlay
             return base.OnBackButton();
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             if (!itemSelected)
             {
@@ -150,10 +161,12 @@ namespace osu.Game.Screens.OnlinePlay
                 Mods.Value = initialMods;
             }
 
-            return base.OnExiting(next);
+            freeModSelectOverlay.Hide();
+
+            return base.OnExiting(e);
         }
 
-        protected override ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
+        protected override ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay(OverlayColourScheme.Plum)
         {
             IsValidMod = IsValidMod
         };
@@ -182,5 +195,12 @@ namespace osu.Game.Screens.OnlinePlay
         private bool checkCompatibleFreeMod(Mod mod)
             => Mods.Value.All(m => m.Acronym != mod.Acronym) // Mod must not be contained in the required mods.
                && ModUtils.CheckCompatibleSet(Mods.Value.Append(mod).ToArray()); // Mod must be compatible with all the required mods.
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            freeModSelectOverlayRegistration?.Dispose();
+        }
     }
 }

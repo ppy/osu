@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -17,7 +19,7 @@ namespace osu.Game.Online.Chat
         private GameHost host { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         private Bindable<bool> externalLinkWarning;
 
