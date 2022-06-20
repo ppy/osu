@@ -56,6 +56,8 @@ namespace osu.Game.Beatmaps
             // Before we use below, we want to invalidate.
             workingBeatmapCache.Invalidate(beatmapSet);
 
+            // TODO: this call currently uses the local `online.db` lookup.
+            // We probably don't want this to happen after initial import (as the data may be stale).
             onlineLookupQueue.Update(beatmapSet);
 
             foreach (var beatmap in beatmapSet.Beatmaps)
