@@ -228,13 +228,6 @@ namespace osu.Game.Database
 
                 if (model == null)
                     return null;
-
-                var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, batchImport, cancellationToken),
-                    cancellationToken,
-                    TaskCreationOptions.HideScheduler,
-                    batchImport ? import_scheduler_batch : import_scheduler);
-
-                return await scheduledImport.ConfigureAwait(false);
             }
             catch (TaskCanceledException)
             {
@@ -245,6 +238,13 @@ namespace osu.Game.Database
                 LogForModel(model, @$"Model creation of {archive.Name} failed.", e);
                 return null;
             }
+
+            var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, batchImport, cancellationToken),
+                cancellationToken,
+                TaskCreationOptions.HideScheduler,
+                batchImport ? import_scheduler_batch : import_scheduler);
+
+            return await scheduledImport.ConfigureAwait(false);
         }
 
         /// <summary>
