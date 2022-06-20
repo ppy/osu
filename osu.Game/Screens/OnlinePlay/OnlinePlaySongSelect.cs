@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -116,8 +118,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected sealed override bool OnStart()
         {
-            itemSelected = true;
-
             var item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
             {
                 RulesetID = Ruleset.Value.OnlineID,
@@ -125,15 +125,21 @@ namespace osu.Game.Screens.OnlinePlay
                 AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()
             };
 
-            SelectItem(item);
-            return true;
+            if (SelectItem(item))
+            {
+                itemSelected = true;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
         /// Invoked when the user has requested a selection of a beatmap.
         /// </summary>
         /// <param name="item">The resultant <see cref="PlaylistItem"/>. This item has not yet been added to the <see cref="Room"/>'s.</param>
-        protected abstract void SelectItem(PlaylistItem item);
+        /// <returns><c>true</c> if a selection occurred.</returns>
+        protected abstract bool SelectItem(PlaylistItem item);
 
         public override bool OnBackButton()
         {

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -34,6 +32,12 @@ namespace osu.Game.Tests.Visual.Settings
         public void TestCircleGameplay()
         {
             AddStep("set visual mode to circles", () => latencyCertifier.VisualMode.Value = LatencyVisualMode.CircleGameplay);
+        }
+
+        [Test]
+        public void TestScrollingGameplay()
+        {
+            AddStep("set visual mode to scrolling", () => latencyCertifier.VisualMode.Value = LatencyVisualMode.ScrollingGameplay);
         }
 
         [Test]

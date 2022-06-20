@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
@@ -146,7 +148,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private void switchToGameplayScene()
         {
-            AddStep("Click gameplay scene button", () => skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay").TriggerClick());
+            AddStep("Click gameplay scene button", () =>
+            {
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay"));
+                InputManager.Click(MouseButton.Left);
+            });
 
             AddUntilStep("wait for player", () =>
             {

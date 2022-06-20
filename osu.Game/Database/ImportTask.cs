@@ -1,19 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.IO;
 using osu.Framework.Extensions;
 using osu.Game.IO.Archives;
-using osu.Game.Stores;
 using osu.Game.Utils;
 using SharpCompress.Common;
 
 namespace osu.Game.Database
 {
     /// <summary>
-    /// An encapsulated import task to be imported to an <see cref="RealmArchiveModelManager{TModel}"/>.
+    /// An encapsulated import task to be imported to an <see cref="RealmArchiveModelImporter{TModel}"/>.
     /// </summary>
     public class ImportTask
     {

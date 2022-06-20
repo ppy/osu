@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -310,7 +312,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         public class ScrollingTeam : DrawableTournamentTeam
         {
             public const float WIDTH = 58;
-            public const float HEIGHT = 41;
+            public const float HEIGHT = 44;
 
             private readonly Box outline;
 
