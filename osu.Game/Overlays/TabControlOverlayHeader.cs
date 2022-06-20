@@ -109,15 +109,15 @@ namespace osu.Game.Overlays
                     : base(value)
                 {
                     if (!(Value is Enum enumValue))
-                        Text.Text = Value.ToString().ToLower();
+                        Text.Text = Value.ToString().ToLowerInvariant();
                     else
                     {
                         var localisableDescription = enumValue.GetLocalisableDescription();
                         string nonLocalisableDescription = enumValue.GetDescription();
 
-                        // If localisable == non-localisable, then we must have a basic string, so .ToLower() is used.
+                        // If localisable == non-localisable, then we must have a basic string, so .ToLowerInvariant() is used.
                         Text.Text = localisableDescription.Equals(nonLocalisableDescription)
-                            ? nonLocalisableDescription.ToLower()
+                            ? nonLocalisableDescription.ToLowerInvariant()
                             : localisableDescription;
                     }
 
