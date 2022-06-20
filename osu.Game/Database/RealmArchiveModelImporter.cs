@@ -188,7 +188,7 @@ namespace osu.Game.Database
 
             Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
-                import = await Import(reader, batchImport, cancellationToken).ConfigureAwait(false);
+                import = await importFromArchive(reader, batchImport, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -208,12 +208,15 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Silently import an item from an <see cref="ArchiveReader"/>.
+        /// Create and import a model based off the provided <see cref="ArchiveReader"/>.
         /// </summary>
+        /// <remarks>
+        /// This method also handled queueing the import task on a relevant import thread pool.
+        /// </remarks>
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="batchImport">Whether this import is part of a larger batch.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<Live<TModel>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
+        private async Task<Live<TModel>?> importFromArchive(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -236,7 +239,7 @@ namespace osu.Game.Database
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, batchImport, cancellationToken),
+            var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, batchImport, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler,
                 batchImport ? import_scheduler_batch : import_scheduler);
@@ -251,7 +254,7 @@ namespace osu.Game.Database
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="batchImport">If <c>true</c>, imports will be skipped before they begin, given an existing model matches on hash and filenames. Should generally only be used for large batch imports, as it may defy user expectations when updating an existing model.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
+        public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
