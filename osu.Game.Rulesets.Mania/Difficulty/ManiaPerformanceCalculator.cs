@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double multiplier = 8.0;
 
             if (score.Mods.Any(m => m is ModNoFail))
-                multiplier *= 0.9;
+                multiplier *= 0.75;
             if (score.Mods.Any(m => m is ModEasy))
                 multiplier *= 0.5;
 
