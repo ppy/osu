@@ -139,12 +139,8 @@ namespace osu.Game.Screens.Edit.Timing
                 controlPointGroups.BindTo(Beatmap.ControlPointInfo.Groups);
                 controlPointGroups.BindCollectionChanged((sender, args) =>
                 {
-                    // This AddOnce() works around performance issues from the LegacyEditorBeatmapPatcher re-initialising all control points every undo & redo.
-                    Scheduler.AddOnce(() =>
-                    {
-                        table.ControlGroups = controlPointGroups;
-                        changeHandler?.SaveState();
-                    });
+                    table.ControlGroups = controlPointGroups;
+                    changeHandler?.SaveState();
                 }, true);
             }
 

@@ -6,12 +6,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using DiffPlex;
 using DiffPlex.Model;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Skinning;
@@ -50,14 +52,28 @@ namespace osu.Game.Screens.Edit
             if (removedIndices.Count == 0 && addedIndices.Count == 0)
                 return;
 
-            // Due to conversion from legacy to non-legacy control points, it becomes difficult to diff control points correctly.
-            // So instead _all_ control points are reloaded if _any_ control point is changed.
+            ControlPointInfo newControlPoints = EditorBeatmap.ConvertControlPoints(getNewBeatmap().ControlPointInfo);
 
-            var newControlPoints = EditorBeatmap.ConvertControlPoints(getNewBeatmap().ControlPointInfo);
+            // Remove all groups from the current beatmap which don't have a corresponding equal group in the new beatmap.
+            foreach (var oldGroup in editorBeatmap.ControlPointInfo.Groups.ToArray())
+            {
+                var newGroup = newControlPoints.GroupAt(oldGroup.Time);
 
-            editorBeatmap.ControlPointInfo.Clear();
-            foreach (var point in newControlPoints.AllControlPoints)
-                editorBeatmap.ControlPointInfo.Add(point.Time, point);
+                if (!oldGroup.Equals(newGroup))
+                    editorBeatmap.ControlPointInfo.RemoveGroup(oldGroup);
+            }
+
+            // Add all groups from the new beatmap which don't have a corresponding equal group in the old beatmap.
+            foreach (var newGroup in newControlPoints.Groups)
+            {
+                var oldGroup = editorBeatmap.ControlPointInfo.GroupAt(newGroup.Time);
+
+                if (!newGroup.Equals(oldGroup))
+                {
+                    foreach (var point in newGroup.ControlPoints)
+                        editorBeatmap.ControlPointInfo.Add(newGroup.Time, point);
+                }
+            }
         }
 
         private void processHitObjects(DiffResult result, Func<IBeatmap> getNewBeatmap)
