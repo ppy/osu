@@ -324,6 +324,10 @@ namespace osu.Game.Beatmaps
 
             workingBeatmapCache.Invalidate(beatmapInfo);
 
+            Debug.Assert(beatmapInfo.BeatmapSet != null);
+
+            beatmapUpdater?.Queue(Realm.Run(r => r.Find<BeatmapSetInfo>(setInfo.ID).ToLive(Realm)));
+
             static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
             {
                 var metadata = beatmapInfo.Metadata;
