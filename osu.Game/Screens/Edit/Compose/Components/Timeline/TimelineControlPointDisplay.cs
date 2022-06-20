@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var group in args.OldItems.OfType<ControlPointGroup>())
                         {
-                            var matching = Children.SingleOrDefault(gv => gv.Group == group);
+                            var matching = Children.SingleOrDefault(gv => ReferenceEquals(gv.Group, group));
 
                             matching?.Expire();
                         }

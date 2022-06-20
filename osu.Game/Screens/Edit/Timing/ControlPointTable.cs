@@ -65,7 +65,8 @@ namespace osu.Game.Screens.Edit.Timing
             selectedGroup.BindValueChanged(group =>
             {
                 // TODO: This should scroll the selected row into view.
-                foreach (var b in BackgroundFlow) b.Selected = b.Item == group.NewValue;
+                foreach (var b in BackgroundFlow)
+                    b.Selected = ReferenceEquals(b.Item, group.NewValue);
             }, true);
         }
 
