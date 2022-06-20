@@ -296,7 +296,23 @@ namespace osu.Game.Screens.Select
             base.LoadComplete();
 
             modSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(ModSelect);
+
+            beatmaps.OnInvalidated += workingBeatmapInvalidated;
         }
+
+        private void workingBeatmapInvalidated(WorkingBeatmap working) => Scheduler.AddOnce(w =>
+        {
+            // The global beatmap may have already been updated (ie. by the editor).
+            // Only perform the actual switch if we still need to.
+            if (w == Beatmap.Value)
+            {
+                // Not sure if this refresh is required.
+                var beatmapInfo = beatmaps.QueryBeatmap(b => b.ID == w.BeatmapInfo.ID);
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
+            }
+
+            updateComponentFromBeatmap(Beatmap.Value);
+        }, working);
 
         /// <summary>
         /// Creates the buttons to be displayed in the footer.
@@ -700,6 +716,8 @@ namespace osu.Game.Screens.Select
                 music.TrackChanged -= ensureTrackLooping;
 
             modSelectOverlayRegistration?.Dispose();
+
+            beatmaps.OnInvalidated -= workingBeatmapInvalidated;
         }
 
         /// <summary>
