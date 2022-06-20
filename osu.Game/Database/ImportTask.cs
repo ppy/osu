@@ -33,7 +33,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Construct a new import task from a stream.
+        /// Construct a new import task from a stream. The provided stream will be disposed after reading.
         /// </summary>
         public ImportTask(Stream stream, string filename)
         {
