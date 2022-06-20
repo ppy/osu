@@ -56,7 +56,7 @@ namespace osu.Game.Database
         /// </summary>
         private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
-        public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
+        public abstract IEnumerable<string> HandledExtensions { get; }
 
         protected readonly RealmFileStore Files;
 
