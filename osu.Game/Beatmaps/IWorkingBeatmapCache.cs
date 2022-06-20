@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System;
+
 namespace osu.Game.Beatmaps
 {
     public interface IWorkingBeatmapCache
@@ -25,5 +27,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapInfo">The beatmap info to invalidate any cached entries for.</param>
         void Invalidate(BeatmapInfo beatmapInfo);
+
+        event Action<WorkingBeatmap> OnInvalidated;
     }
 }

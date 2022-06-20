@@ -453,6 +453,12 @@ namespace osu.Game.Beatmaps
         void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
         void IWorkingBeatmapCache.Invalidate(BeatmapInfo beatmapInfo) => workingBeatmapCache.Invalidate(beatmapInfo);
 
+        public event Action<WorkingBeatmap>? OnInvalidated
+        {
+            add => workingBeatmapCache.OnInvalidated += value;
+            remove => workingBeatmapCache.OnInvalidated -= value;
+        }
+
         public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID));
 
         #endregion
