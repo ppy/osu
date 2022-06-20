@@ -12,8 +12,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Tests.Database
 {
     public class RealmLiveTests : RealmTest

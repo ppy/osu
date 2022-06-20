@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -25,26 +24,21 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 using Realms;
 
-#nullable enable
-
-namespace osu.Game.Stores
+namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public abstract class BeatmapImporter : RealmArchiveModelManager<BeatmapSetInfo>, IDisposable
+    public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>, IDisposable
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        // protected override bool CheckLocalAvailability(RealmBeatmapSet model, System.Linq.IQueryable<RealmBeatmapSet> items)
-        //     => base.CheckLocalAvailability(model, items) || (model.OnlineID > -1));
-
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 
-        protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+        public BeatmapImporter(Storage storage, RealmAccess realm, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
             : base(storage, realm)
         {
             this.onlineLookupQueue = onlineLookupQueue;
@@ -167,11 +161,6 @@ namespace osu.Game.Stores
         {
             base.UndeleteForReuse(existing);
             existing.DateAdded = DateTimeOffset.UtcNow;
-        }
-
-        public override bool IsAvailableLocally(BeatmapSetInfo model)
-        {
-            return Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID));
         }
 
         public override string HumanisedModelName => "beatmap";

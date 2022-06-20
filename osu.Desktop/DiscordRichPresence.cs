@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Text;
 using DiscordRPC;
@@ -9,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -99,6 +102,22 @@ namespace osu.Desktop
             {
                 presence.State = truncate(activity.Value.Status);
                 presence.Details = truncate(getDetails(activity.Value));
+
+                if (getBeatmap(activity.Value) is IBeatmapInfo beatmap && beatmap.OnlineID > 0)
+                {
+                    presence.Buttons = new[]
+                    {
+                        new Button
+                        {
+                            Label = "View beatmap",
+                            Url = $@"{api.WebsiteRootUrl}/beatmapsets/{beatmap.BeatmapSet?.OnlineID}#{ruleset.Value.ShortName}/{beatmap.OnlineID}"
+                        }
+                    };
+                }
+                else
+                {
+                    presence.Buttons = null;
+                }
             }
             else
             {
@@ -143,6 +162,20 @@ namespace osu.Desktop
                 mem.Span.CopyTo(span);
                 span[^1] = '…';
             });
+        }
+
+        private IBeatmapInfo getBeatmap(UserActivity activity)
+        {
+            switch (activity)
+            {
+                case UserActivity.InGame game:
+                    return game.BeatmapInfo;
+
+                case UserActivity.Editing edit:
+                    return edit.BeatmapInfo;
+            }
+
+            return null;
         }
 
         private string getDetails(UserActivity activity)

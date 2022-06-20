@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -183,7 +185,7 @@ namespace osu.Game.Online.Leaderboards
                                                         {
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
-                                                            Size = new Vector2(30f, 20f),
+                                                            Size = new Vector2(28, 20),
                                                         },
                                                         new DateLabel(Score.Date)
                                                         {

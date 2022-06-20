@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -62,6 +64,8 @@ namespace osu.Game.Screens.Menu
         private ISample seeya;
 
         protected virtual string SeeyaSampleName => "Intro/seeya";
+
+        protected override bool PlayExitSound => false;
 
         private LeasedBindable<WorkingBeatmap> beatmap;
 

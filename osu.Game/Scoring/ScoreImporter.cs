@@ -13,14 +13,11 @@ using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Stores;
 using Realms;
-
-#nullable enable
 
 namespace osu.Game.Scoring
 {
-    public class ScoreModelManager : RealmArchiveModelManager<ScoreInfo>
+    public class ScoreImporter : RealmArchiveModelImporter<ScoreInfo>
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
 
@@ -29,7 +26,7 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreModelManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
+        public ScoreImporter(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
             : base(storage, realm)
         {
             this.rulesets = rulesets;
@@ -70,11 +67,6 @@ namespace osu.Game.Scoring
 
             if (string.IsNullOrEmpty(model.StatisticsJson))
                 model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
-        }
-
-        public override bool IsAvailableLocally(ScoreInfo model)
-        {
-            return Realm.Run(realm => realm.All<ScoreInfo>().Any(s => s.OnlineID == model.OnlineID));
         }
     }
 }
