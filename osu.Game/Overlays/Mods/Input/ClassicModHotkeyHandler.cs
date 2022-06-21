@@ -30,6 +30,13 @@ namespace osu.Game.Overlays.Mods.Input
             [Key.V] = new[] { typeof(ModAutoplay), typeof(ModCinema) }
         };
 
+        private readonly bool allowIncompatibleSelection;
+
+        public ClassicModHotkeyHandler(bool allowIncompatibleSelection)
+        {
+            this.allowIncompatibleSelection = allowIncompatibleSelection;
+        }
+
         public bool HandleHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods)
         {
             if (!mod_type_lookup.TryGetValue(e.Key, out var typesToMatch))
@@ -46,8 +53,19 @@ namespace osu.Game.Overlays.Mods.Input
                 return true;
             }
 
-            // we're assuming that only one mod from the group can be active at a time.
-            // this is mostly ensured by `IncompatibleMods` definitions, but let's make sure just in case.
+            if (allowIncompatibleSelection)
+            {
+                // easier path - multiple incompatible mods can be active at a time.
+                // this is used in the free mod select overlay.
+                // in this case, just toggle everything.
+                bool anyActive = matchingMods.Any(mod => mod.Active.Value);
+                foreach (var mod in matchingMods)
+                    mod.Active.Value = !anyActive;
+                return true;
+            }
+
+            // we now know there are multiple possible mods to handle, and only one of them can be active at a time.
+            // let's make sure of this just in case.
             Debug.Assert(matchingMods.Count(modState => modState.Active.Value) <= 1);
             int currentSelectedIndex = Array.FindIndex(matchingMods, modState => modState.Active.Value);
 

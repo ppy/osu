@@ -71,8 +71,7 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual ModPanel CreateModPanel(ModState mod) => new ModPanel(mod);
 
-        private Bindable<ModSelectHotkeyStyle> hotkeyStyle = null!;
-        private IModHotkeyHandler hotkeyHandler = null!;
+        private readonly bool allowIncompatibleSelection;
 
         private readonly TextFlowContainer headerText;
         private readonly Box headerBackground;
@@ -83,14 +82,18 @@ namespace osu.Game.Overlays.Mods
 
         private Colour4 accentColour;
 
+        private Bindable<ModSelectHotkeyStyle> hotkeyStyle = null!;
+        private IModHotkeyHandler hotkeyHandler = null!;
+
         private Task? latestLoadTask;
         internal bool ItemsLoaded => latestLoadTask == null;
 
         private const float header_height = 42;
 
-        public ModColumn(ModType modType, bool allowBulkSelection)
+        public ModColumn(ModType modType, bool allowIncompatibleSelection)
         {
             ModType = modType;
+            this.allowIncompatibleSelection = allowIncompatibleSelection;
 
             Width = 320;
             RelativeSizeAxes = Axes.Y;
@@ -198,7 +201,7 @@ namespace osu.Game.Overlays.Mods
 
             createHeaderText();
 
-            if (allowBulkSelection)
+            if (allowIncompatibleSelection)
             {
                 controlContainer.Height = 35;
                 controlContainer.Add(toggleAllCheckbox = new ToggleAllCheckbox(this)
@@ -253,7 +256,7 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             toggleAllCheckbox?.Current.BindValueChanged(_ => updateToggleAllText(), true);
-            hotkeyStyle.BindValueChanged(val => hotkeyHandler = ModHotkeyHandler.Create(ModType, val.NewValue), true);
+            hotkeyStyle.BindValueChanged(val => hotkeyHandler = CreateHotkeyHandler(val.NewValue), true);
             asyncLoadPanels();
         }
 
@@ -426,6 +429,26 @@ namespace osu.Game.Overlays.Mods
         #endregion
 
         #region Keyboard selection support
+
+        /// <summary>
+        /// Creates an appropriate <see cref="IModHotkeyHandler"/> for this column's <see cref="ModType"/> and
+        /// the supplied <paramref name="hotkeyStyle"/>.
+        /// </summary>
+        protected virtual IModHotkeyHandler CreateHotkeyHandler(ModSelectHotkeyStyle hotkeyStyle)
+        {
+            switch (ModType)
+            {
+                case ModType.DifficultyReduction:
+                case ModType.DifficultyIncrease:
+                case ModType.Automation:
+                    return hotkeyStyle == ModSelectHotkeyStyle.Sequential
+                        ? (IModHotkeyHandler)SequentialModHotkeyHandler.Create(ModType)
+                        : new ClassicModHotkeyHandler(allowIncompatibleSelection);
+
+                default:
+                    return new NoopModHotkeyHandler();
+            }
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {

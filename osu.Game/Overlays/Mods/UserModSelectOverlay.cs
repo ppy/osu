@@ -40,8 +40,8 @@ namespace osu.Game.Overlays.Mods
 
         private class UserModColumn : ModColumn
         {
-            public UserModColumn(ModType modType, bool allowBulkSelection)
-                : base(modType, allowBulkSelection)
+            public UserModColumn(ModType modType, bool allowIncompatibleSelection)
+                : base(modType, allowIncompatibleSelection)
             {
             }
 
