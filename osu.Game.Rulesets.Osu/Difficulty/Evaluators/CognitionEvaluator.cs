@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -12,33 +13,43 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
         {
+            if (current.BaseObject is Spinner)
+                return 0;
+
             var currObj = (OsuDifficultyHitObject)current;
             double noteDensity = 1.0;
-            double lastOpacity = 1.0;
-            int forwardsSearch = 0;
 
             double difficulty = 0.0;
 
             // This loop sucks so much lol.
             // Will be replaced in conjuction with the "objects with current visible" and the "currently visible objects" lists
-            while (lastOpacity > 0)
+            for (int i = 0; i < 100; i++)
             {
-                if (currObj.Next(forwardsSearch).IsNull())
+                if (currObj.Next(i + 1).IsNull())
                     break;
 
-                var searchObject = (OsuDifficultyHitObject)currObj.Next(forwardsSearch);
+                var currLoopObj = (OsuDifficultyHitObject)currObj.Next(i);
+                var nextLoopObj = (OsuDifficultyHitObject)currObj.Next(i + 1);
 
-                lastOpacity = searchObject.OpacityAt(currObj.BaseObject.StartTime, false)
-                              * logistic((searchObject.MinimumJumpDistance - 100) / 15);
+                double opacity = currLoopObj.OpacityAt(currObj.BaseObject.StartTime, false);
 
-                noteDensity += lastOpacity;
-                forwardsSearch++;
+                if (opacity == 0)
+                    break;
+
+                // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
+                opacity *= logistic((currLoopObj.MinimumJumpDistance - 100) / 15);
+
+                // Objects that are arranged in a mostly-linear fashion should be easy to read (such as circles in a stream).
+                if (nextLoopObj.Angle.IsNotNull())
+                    opacity *= 1 - Math.Pow(Math.Sin(0.5 * nextLoopObj.Angle.Value), 5);
+
+                noteDensity += opacity;
             }
 
-            double noteDensityDifficulty = noteDensity;
+            double noteDensityDifficulty = 0;
 
             if (hidden)
-                noteDensityDifficulty = Math.Pow(noteDensity, 2.5) * 1.5;
+                noteDensityDifficulty = Math.Pow(noteDensity, 2.5) * 1.2;
 
             difficulty += noteDensityDifficulty;
 

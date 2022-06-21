@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private readonly List<double> difficulties = new List<double>();
         private readonly bool hasHiddenMod;
-        private const double skill_multiplier = 34;
+        private const double skill_multiplier = 17000;
 
         public Cognition(Mod[] mods)
             : base(mods)
@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < difficulties.Count; i++)
                 difficulty += difficulties[i] * weight(i);
 
-            return Math.Pow(difficulty, 0.5);
+            return Math.Pow(difficulty, 1.0 / 3.0);
         }
 
-        private double weight(int x) => x / (x + 200.0);
+        private double weight(int x) => x / (x + 100.0);
     }
 }

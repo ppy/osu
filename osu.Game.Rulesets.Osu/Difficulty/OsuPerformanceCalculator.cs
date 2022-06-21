@@ -229,7 +229,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             cognitionValue *= getComboScalingFactor(attributes);
 
-            // Scale the flashlight value with accuracy _harshly_.
+            // Scale the cognition value with accuracy _harshly_.
             cognitionValue *= accuracy * accuracy;
             // It is important to also consider accuracy difficulty when doing that.
             cognitionValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
