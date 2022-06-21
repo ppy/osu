@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
@@ -219,6 +220,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         private readonly BindableInt interpolatedBpm = new BindableInt();
 
+        private ScheduledDelegate latchDelegate;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -266,12 +269,9 @@ namespace osu.Game.Screens.Edit.Timing
                 using (swing.BeginDelayedSequence(350))
                 {
                     swing.RotateTo(0, 1000, Easing.OutQuint);
-                    swing.Delay(250).Schedule(() =>
-                    {
-                        // prevent playing latch sound if metronome has started back up again
-                        if (!isSwinging)
-                            latch?.Play();
-                    });
+
+                    using (swing.BeginDelayedSequence(250))
+                        latchDelegate = Schedule(() => latch?.Play());
                 }
             }
         }
@@ -286,6 +286,9 @@ namespace osu.Game.Screens.Edit.Timing
                 return;
 
             isSwinging = true;
+
+            latchDelegate?.Cancel();
+            latchDelegate = null;
 
             float currentAngle = swing.Rotation;
             float targetAngle = currentAngle > 0 ? -angle : angle;
