@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osuTK.Input;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Mods.Input
 {
@@ -11,6 +11,6 @@ namespace osu.Game.Overlays.Mods.Input
     /// </summary>
     public class ClassicModHotkeyHandler : IModHotkeyHandler
     {
-        public bool HandleHotkeyPressed(Key hotkey, IEnumerable<ModState> availableMods) => false; // TODO
+        public bool HandleHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods) => false; // TODO
     }
 }

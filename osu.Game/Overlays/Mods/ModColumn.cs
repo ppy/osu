@@ -432,7 +432,7 @@ namespace osu.Game.Overlays.Mods
             if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.Repeat)
                 return false;
 
-            return hotkeyHandler.HandleHotkeyPressed(e.Key, availableMods);
+            return hotkeyHandler.HandleHotkeyPressed(e, availableMods);
         }
 
         #endregion
