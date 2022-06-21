@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -70,7 +71,8 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual ModPanel CreateModPanel(ModState mod) => new ModPanel(mod);
 
-        private readonly IModHotkeyHandler hotkeyHandler;
+        private Bindable<ModSelectHotkeyStyle> hotkeyStyle = null!;
+        private IModHotkeyHandler hotkeyHandler = null!;
 
         private readonly TextFlowContainer headerText;
         private readonly Box headerBackground;
@@ -89,7 +91,6 @@ namespace osu.Game.Overlays.Mods
         public ModColumn(ModType modType, bool allowBulkSelection)
         {
             ModType = modType;
-            hotkeyHandler = ModHotkeyHandler.Create(modType);
 
             Width = 320;
             RelativeSizeAxes = Axes.Y;
@@ -231,7 +232,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours, OsuConfigManager configManager)
         {
             headerBackground.Colour = accentColour = colours.ForModType(ModType);
 
@@ -243,6 +244,8 @@ namespace osu.Game.Overlays.Mods
 
             contentContainer.BorderColour = ColourInfo.GradientVertical(colourProvider.Background4, colourProvider.Background3);
             contentBackground.Colour = colourProvider.Background4;
+
+            hotkeyStyle = configManager.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle);
         }
 
         protected override void LoadComplete()
@@ -250,6 +253,7 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             toggleAllCheckbox?.Current.BindValueChanged(_ => updateToggleAllText(), true);
+            hotkeyStyle.BindValueChanged(val => hotkeyHandler = ModHotkeyHandler.Create(ModType, val.NewValue), true);
             asyncLoadPanels();
         }
 

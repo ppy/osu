@@ -13,14 +13,16 @@ namespace osu.Game.Overlays.Mods.Input
         /// <summary>
         /// Creates an appropriate <see cref="IModHotkeyHandler"/> for the given <paramref name="modType"/>.
         /// </summary>
-        public static IModHotkeyHandler Create(ModType modType)
+        public static IModHotkeyHandler Create(ModType modType, ModSelectHotkeyStyle style)
         {
             switch (modType)
             {
                 case ModType.DifficultyReduction:
                 case ModType.DifficultyIncrease:
                 case ModType.Automation:
-                    return SequentialModHotkeyHandler.Create(modType);
+                    return style == ModSelectHotkeyStyle.Sequential
+                        ? (IModHotkeyHandler)SequentialModHotkeyHandler.Create(modType)
+                        : new ClassicModHotkeyHandler();
 
                 default:
                     return new NoopModHotkeyHandler();
