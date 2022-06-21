@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // This loop sucks so much lol.
             // Will be replaced in conjuction with the "objects with current visible" and the "currently visible objects" lists
+            // Also variable names like opacity and note density don't seem accurate anymore :face_with_monocole:...
             for (int i = 0; i < 100; i++)
             {
                 if (currObj.Next(i + 1).IsNull())
