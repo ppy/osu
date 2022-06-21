@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Mods;
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to memorise and hit every object in a map with the Flashlight mod enabled.
     /// </summary>
-    public class Flashlight : OsuStrainSkill
+    public class Flashlight : StrainSkill
     {
         private readonly bool hasHiddenMod;
 
@@ -27,8 +28,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplier => 0.05;
         private double strainDecayBase => 0.15;
-        protected override double DecayWeight => 1.0;
-        protected override int ReducedSectionCount => -1;
 
         private double currentStrain;
 
@@ -42,6 +41,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain += FlashlightEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * skillMultiplier;
 
             return currentStrain;
+        }
+
+        public override double DifficultyValue()
+        {
+            double difficulty = GetCurrentStrainPeaks().Sum();
+
+            // 1.06 comes from the default DifficultyMultiplier field in OsuStrainSkill,
+            // and it's added here to keep values the same after Flashlight was converted from OsuStrainSkill.
+            return difficulty * 1.06;
         }
     }
 }
