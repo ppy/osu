@@ -266,7 +266,6 @@ namespace osu.Game.Screens.Edit.Timing
             if (BeatSyncSource.Clock?.IsRunning != true && isSwinging)
             {
                 swing.ClearTransforms(true);
-                stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
 
                 isSwinging = false;
 
@@ -284,6 +283,7 @@ namespace osu.Game.Screens.Edit.Timing
                 using (swing.BeginDelayedSequence(350))
                 {
                     swing.RotateTo(0, 1000, Easing.OutQuint);
+                    stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
 
                     using (swing.BeginDelayedSequence(250))
                         latchDelegate = Schedule(() => latch?.Play());
