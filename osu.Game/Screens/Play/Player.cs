@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Play
                 },
                 FailOverlay = new FailOverlay
                 {
-                    SaveReplay = saveReplay,
+                    SaveReplay = saveFailedReplay,
                     OnRetry = Restart,
                     OnQuit = () => PerformExit(true),
                 },
@@ -1024,8 +1024,7 @@ namespace osu.Game.Screens.Play
                 if (prepareScoreForDisplayTask == null)
                 {
                     Score.ScoreInfo.Passed = false;
-                    // potentially should be ScoreRank.F instead? this is the best alternative for now.
-                    Score.ScoreInfo.Rank = ScoreRank.D;
+                    Score.ScoreInfo.Rank = ScoreRank.F;
                 }
 
                 // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
@@ -1044,20 +1043,20 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(e);
         }
 
-        private void saveReplay()
+        private async void saveFailedReplay()
         {
+            Score.ScoreInfo.Passed = false;
+            Score.ScoreInfo.Rank = ScoreRank.F;
             var scoreCopy = Score.DeepClone();
 
             try
             {
-                ImportScore(scoreCopy).ConfigureAwait(false);
+                await ImportScore(scoreCopy).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, @"Score import failed!");
             }
-
-            PerformExit(true);
         }
 
         /// <summary>
