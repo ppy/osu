@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mods;
 using osuTK.Input;
 
@@ -41,9 +42,9 @@ namespace osu.Game.Overlays.Mods.Input
             toggleKeys = keys;
         }
 
-        public bool HandleHotkeyPressed(Key hotkey, IEnumerable<ModState> availableMods)
+        public bool HandleHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods)
         {
-            int index = Array.IndexOf(toggleKeys, hotkey);
+            int index = Array.IndexOf(toggleKeys, e.Key);
             if (index < 0)
                 return false;
 

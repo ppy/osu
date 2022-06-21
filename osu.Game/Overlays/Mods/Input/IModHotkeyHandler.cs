@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osuTK.Input;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Mods.Input
 {
@@ -12,11 +12,11 @@ namespace osu.Game.Overlays.Mods.Input
     public interface IModHotkeyHandler
     {
         /// <summary>
-        /// Attempt to handle a press of the supplied <paramref name="hotkey"/> as a selection of one of the mods in <paramref name="availableMods"/>.
+        /// Attempt to handle the supplied <see cref="KeyDownEvent"/> as a selection of one of the mods in <paramref name="availableMods"/>.
         /// </summary>
-        /// <param name="hotkey">The key that was pressed by the user.</param>
+        /// <param name="e">The event representing the user's keypress.</param>
         /// <param name="availableMods">The list of currently available mods.</param>
-        /// <returns>Whether the <paramref name="hotkey"/> was handled as a mod selection/deselection.</returns>
-        bool HandleHotkeyPressed(Key hotkey, IEnumerable<ModState> availableMods);
+        /// <returns>Whether the supplied event was handled as a mod selection/deselection.</returns>
+        bool HandleHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods);
     }
 }
