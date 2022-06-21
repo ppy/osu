@@ -226,6 +226,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("press J", () => InputManager.Key(Key.J));
             AddAssert("no change", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Active.Value).Mod.Acronym == "NC");
+
+            AddStep("filter everything but NC", () => setFilter(mod => mod.Acronym == "NC"));
+
+            AddStep("press A", () => InputManager.Key(Key.A));
+            AddAssert("no change", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Active.Value).Mod.Acronym == "NC");
         }
 
         [Test]
@@ -272,6 +277,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("NC panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NC").Active.Value);
 
             AddStep("press J", () => InputManager.Key(Key.J));
+            AddAssert("no change", () => this.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
+
+            AddStep("filter everything but NC", () => setFilter(mod => mod.Acronym == "NC"));
+
+            AddStep("press A", () => InputManager.Key(Key.A));
             AddAssert("no change", () => this.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
         }
 
