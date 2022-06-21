@@ -44,7 +44,6 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     BackgroundFlow.Add(new RowBackground(group)
                     {
-                        Selected = ReferenceEquals(group, selectedGroup?.Value),
                         Action = () =>
                         {
                             selectedGroup.Value = group;
@@ -55,6 +54,8 @@ namespace osu.Game.Screens.Edit.Timing
 
                 Columns = createHeaders();
                 Content = value.Select(createContent).ToArray().ToRectangular();
+
+                updateSelectedGroup();
             }
         }
 
@@ -65,9 +66,15 @@ namespace osu.Game.Screens.Edit.Timing
             selectedGroup.BindValueChanged(group =>
             {
                 // TODO: This should scroll the selected row into view.
-                foreach (var b in BackgroundFlow)
-                    b.Selected = ReferenceEquals(b.Item, group.NewValue);
+                updateSelectedGroup();
             }, true);
+        }
+
+        private void updateSelectedGroup()
+        {
+            // TODO: This should scroll the selected row into view.
+            foreach (var b in BackgroundFlow)
+                b.Selected = ReferenceEquals(b.Item, selectedGroup?.Value);
         }
 
         private TableColumn[] createHeaders()
