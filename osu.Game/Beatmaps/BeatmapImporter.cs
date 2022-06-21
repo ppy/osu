@@ -177,8 +177,17 @@ namespace osu.Game.Beatmaps
             }
 
             Beatmap beatmap;
+
             using (var stream = new LineBufferedReader(reader.GetStream(mapName)))
+            {
+                if (stream.PeekLine() == null)
+                {
+                    Logger.Log($"No content found in first .osu file of beatmap archive ({reader.Name} / {mapName})", LoggingTarget.Database);
+                    return null;
+                }
+
                 beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
+            }
 
             return new BeatmapSetInfo
             {
