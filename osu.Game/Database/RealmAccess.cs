@@ -387,7 +387,7 @@ namespace osu.Game.Database
         /// <param name="action">The work to run.</param>
         public Task WriteAsync(Action<Realm> action)
         {
-            // Regardless of calling Realm.GetInstance of Realm.GetInstanceAsync, there is a blocking overhead on retrieval.
+            // Regardless of calling Realm.GetInstance or Realm.GetInstanceAsync, there is a blocking overhead on retrieval.
             // Adding a forced Task.Run resolves this.
 
             return Task.Run(async () =>
