@@ -280,12 +280,12 @@ namespace osu.Game.Screens.Edit.Timing
                     return;
                 }
 
-                using (swing.BeginDelayedSequence(350))
+                using (BeginDelayedSequence(350))
                 {
                     swing.RotateTo(0, 1000, Easing.OutQuint);
                     stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
 
-                    using (swing.BeginDelayedSequence(250))
+                    using (BeginDelayedSequence(380))
                         latchDelegate = Schedule(() => latch?.Play());
                 }
             }
