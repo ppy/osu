@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,7 +15,6 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
-using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -41,10 +38,7 @@ namespace osu.Game.Tests.Database
                 using (var importer = new BeatmapImporter(storage, realm))
                 using (new RealmRulesetStore(realm, storage))
                 {
-                    Live<BeatmapSetInfo>? beatmapSet;
-
-                    using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
-                        beatmapSet = await importer.Import(reader);
+                    var beatmapSet = await importer.Import(new ImportTask(TestResources.GetTestBeatmapStream(), "renatus.osz"));
 
                     Assert.NotNull(beatmapSet);
                     Debug.Assert(beatmapSet != null);
@@ -85,10 +79,7 @@ namespace osu.Game.Tests.Database
                 using (var importer = new BeatmapImporter(storage, realm))
                 using (new RealmRulesetStore(realm, storage))
                 {
-                    Live<BeatmapSetInfo>? beatmapSet;
-
-                    using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
-                        beatmapSet = await importer.Import(reader);
+                    var beatmapSet = await importer.Import(new ImportTask(TestResources.GetTestBeatmapStream(), "renatus.osz"));
 
                     Assert.NotNull(beatmapSet);
                     Debug.Assert(beatmapSet != null);
@@ -148,11 +139,8 @@ namespace osu.Game.Tests.Database
                 {
                     Task.Run(async () =>
                     {
-                        Live<BeatmapSetInfo>? beatmapSet;
-
-                        using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
-                            // ReSharper disable once AccessToDisposedClosure
-                            beatmapSet = await importer.Import(reader);
+                        // ReSharper disable once AccessToDisposedClosure
+                        var beatmapSet = await importer.Import(new ImportTask(TestResources.GetTestBeatmapStream(), "renatus.osz"));
 
                         Assert.NotNull(beatmapSet);
                         Debug.Assert(beatmapSet != null);
@@ -175,13 +163,8 @@ namespace osu.Game.Tests.Database
                 using (var importer = new BeatmapImporter(storage, realm))
                 using (new RealmRulesetStore(realm, storage))
                 {
-                    Live<BeatmapSetInfo>? imported;
-
-                    using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
-                    {
-                        imported = await importer.Import(reader);
-                        EnsureLoaded(realm.Realm);
-                    }
+                    var imported = await importer.Import(new ImportTask(TestResources.GetTestBeatmapStream(), "renatus.osz"));
+                    EnsureLoaded(realm.Realm);
 
                     Assert.AreEqual(1, realm.Realm.All<BeatmapSetInfo>().Count());
 
@@ -290,6 +273,42 @@ namespace osu.Game.Tests.Database
 
                 checkBeatmapSetCount(realm.Realm, 1);
                 checkSingleReferencedFileCount(realm.Realm, 18);
+            });
+        }
+
+        [Test]
+        public void TestImportDirectoryWithEmptyOsuFiles()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                using var importer = new BeatmapImporter(storage, realm);
+                using var store = new RealmRulesetStore(realm, storage);
+
+                string? temp = TestResources.GetTestBeatmapForImport();
+
+                string extractedFolder = $"{temp}_extracted";
+                Directory.CreateDirectory(extractedFolder);
+
+                try
+                {
+                    using (var zip = ZipArchive.Open(temp))
+                        zip.WriteToDirectory(extractedFolder);
+
+                    foreach (var file in new DirectoryInfo(extractedFolder).GetFiles("*.osu"))
+                    {
+                        using (file.Open(FileMode.Create))
+                        {
+                            // empty file.
+                        }
+                    }
+
+                    var imported = await importer.Import(new ImportTask(extractedFolder));
+                    Assert.IsNull(imported);
+                }
+                finally
+                {
+                    Directory.Delete(extractedFolder, true);
+                }
             });
         }
 
@@ -762,7 +781,7 @@ namespace osu.Game.Tests.Database
                     }
                 };
 
-                var imported = importer.Import(toImport);
+                var imported = importer.ImportModel(toImport);
 
                 realm.Run(r => r.Refresh());
 
