@@ -165,9 +165,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set filter to NF", () => setFilter(mod => mod.Acronym == "NF"));
 
             AddStep("press W", () => InputManager.Key(Key.W));
+            AddAssert("NF panel not selected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
+
+            AddStep("press Q", () => InputManager.Key(Key.Q));
             AddAssert("NF panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
 
-            AddStep("press W again", () => InputManager.Key(Key.W));
+            AddStep("press Q again", () => InputManager.Key(Key.Q));
             AddAssert("NF panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
 
             AddStep("filter out everything", () => setFilter(_ => false));
