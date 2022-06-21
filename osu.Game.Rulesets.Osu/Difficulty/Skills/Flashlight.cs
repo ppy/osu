@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplier => 0.05;
         private double strainDecayBase => 0.15;
         protected override double DecayWeight => 1.0;
+        protected override int ReducedSectionCount => -1;
 
         private double currentStrain;
 
