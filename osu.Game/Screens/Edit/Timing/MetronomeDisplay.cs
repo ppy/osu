@@ -275,7 +275,7 @@ namespace osu.Game.Screens.Edit.Timing
                 // instantly latch if pendulum arm is close enough to center (to prevent awkward delayed playback of latch sound)
                 if (Precision.AlmostEquals(swing.Rotation, 0, 1))
                 {
-                    swing.RotateTo(0);
+                    swing.RotateTo(0, 60, Easing.OutQuint);
                     sampleLatch?.Play();
                     return;
                 }
