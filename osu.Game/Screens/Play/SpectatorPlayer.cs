@@ -45,6 +45,20 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
+            {
+                if (GameplayClockContainer is MasterGameplayClockContainer master)
+                {
+                    if (master.UserPlaybackRate.Value > 1 && waiting.NewValue)
+                        master.UserPlaybackRate.Value = 1;
+                }
+            }, true);
+        }
+
         protected override void StartGameplay()
         {
             base.StartGameplay();
@@ -81,18 +95,6 @@ namespace osu.Game.Screens.Play
 
             if (isFirstBundle && score.Replay.Frames.Count > 0)
                 SetGameplayStartTime(score.Replay.Frames[0].Time);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.Value > 1
-                && score.Replay.Frames.Count > 0
-                && DrawableRuleset.FrameStableClock.CurrentTime >= score.Replay.Frames[^1].Time)
-            {
-                HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.Value = 1;
-            }
         }
 
         protected override Score CreateScore(IBeatmap beatmap) => score;
