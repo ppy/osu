@@ -8,6 +8,7 @@ using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 
@@ -16,7 +17,7 @@ namespace osu.Game.Graphics.Containers.Markdown
     public class OsuMarkdownLinkText : MarkdownLinkText
     {
         [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
+        private ILinkHandler linkHandler { get; set; }
 
         private readonly string text;
         private readonly string title;
@@ -51,7 +52,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             };
         }
 
-        protected override void OnLinkPressed() => game?.HandleLink(Url);
+        protected override void OnLinkPressed() => linkHandler?.HandleLink(Url);
 
         private class OsuMarkdownLinkCompiler : DrawableLinkCompiler
         {
