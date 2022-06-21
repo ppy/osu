@@ -4,20 +4,54 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    public class SaveFailedScoreButton : DownloadButton
+    public class SaveFailedScoreButton : CompositeDrawable
     {
         public Action? OnSave;
+
+        protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
+
+        private DownloadButton button;
+        private ShakeContainer shakeContainer;
+
+        public SaveFailedScoreButton()
+        {
+            InternalChild = shakeContainer = new ShakeContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = button = new DownloadButton
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
+            };
+            Size = new Vector2(50, 30);
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            button.Action = () =>
+            {
+                switch (State.Value)
+                {
+                    case DownloadState.LocallyAvailable:
+                        shakeContainer.Shake();
+                        break;
+
+                    default:
+                        saveScore();
+                        break;
+                }
+            };
             State.BindValueChanged(updateTooltip, true);
-            Action = saveScore;
         }
 
         private void saveScore()
@@ -26,6 +60,7 @@ namespace osu.Game.Screens.Play
                 OnSave?.Invoke();
 
             State.Value = DownloadState.LocallyAvailable;
+            button.State.Value = DownloadState.LocallyAvailable;
         }
 
         private void updateTooltip(ValueChangedEvent<DownloadState> state)
@@ -33,11 +68,11 @@ namespace osu.Game.Screens.Play
             switch (state.NewValue)
             {
                 case DownloadState.LocallyAvailable:
-                    TooltipText = @"Score saved";
+                    button.TooltipText = @"Score saved";
                     break;
 
                 default:
-                    TooltipText = @"Save score";
+                    button.TooltipText = @"Save score";
                     break;
             }
         }
