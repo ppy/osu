@@ -9,9 +9,11 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Utils;
@@ -24,6 +26,9 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [TestCase(ModType.DifficultyReduction)]
         [TestCase(ModType.DifficultyIncrease)]
@@ -132,8 +137,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestKeyboardSelection()
+        public void TestSequentialKeyboardSelection()
         {
+            AddStep("set sequential hotkey mode", () => configManager.SetValue(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential));
+
             ModColumn column = null!;
             AddStep("create content", () => Child = new Container
             {
