@@ -41,17 +41,12 @@ namespace osu.Game.Screens.Edit
 
             editorBeatmap.BeginChange();
             processHitObjects(result, () => newBeatmap ??= readBeatmap(newState));
-            processTimingPoints(result, () => newBeatmap ??= readBeatmap(newState));
+            processTimingPoints(() => newBeatmap ??= readBeatmap(newState));
             editorBeatmap.EndChange();
         }
 
-        private void processTimingPoints(DiffResult result, Func<IBeatmap> getNewBeatmap)
+        private void processTimingPoints(Func<IBeatmap> getNewBeatmap)
         {
-            findChangedIndices(result, LegacyDecoder<Beatmap>.Section.TimingPoints, out var removedIndices, out var addedIndices);
-
-            if (removedIndices.Count == 0 && addedIndices.Count == 0)
-                return;
-
             ControlPointInfo newControlPoints = EditorBeatmap.ConvertControlPoints(getNewBeatmap().ControlPointInfo);
 
             // Remove all groups from the current beatmap which don't have a corresponding equal group in the new beatmap.
