@@ -47,6 +47,11 @@ namespace osu.Game.Screens.Edit.Timing
 
         public bool EnableClicking { get; set; } = true;
 
+        public MetronomeDisplay()
+        {
+            AllowMistimedEventFiring = false;
+        }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
