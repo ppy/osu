@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("dispose IPC receiver", () => osuSchemeLinkIPCReceiver.Dispose());
             AddStep("dispose IPC sender", () =>
             {
-                osuSchemeLinkIPCReceiver.Dispose();
+                osuSchemeLinkIPCSender.Dispose();
                 ipcSenderHost.Dispose();
             });
             base.TearDownSteps();
