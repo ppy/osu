@@ -256,7 +256,7 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             toggleAllCheckbox?.Current.BindValueChanged(_ => updateToggleAllText(), true);
-            hotkeyStyle.BindValueChanged(val => hotkeyHandler = CreateHotkeyHandler(val.NewValue), true);
+            hotkeyStyle.BindValueChanged(val => hotkeyHandler = createHotkeyHandler(val.NewValue), true);
             asyncLoadPanels();
         }
 
@@ -434,7 +434,7 @@ namespace osu.Game.Overlays.Mods
         /// Creates an appropriate <see cref="IModHotkeyHandler"/> for this column's <see cref="ModType"/> and
         /// the supplied <paramref name="hotkeyStyle"/>.
         /// </summary>
-        protected virtual IModHotkeyHandler CreateHotkeyHandler(ModSelectHotkeyStyle hotkeyStyle)
+        private IModHotkeyHandler createHotkeyHandler(ModSelectHotkeyStyle hotkeyStyle)
         {
             switch (ModType)
             {
