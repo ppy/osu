@@ -52,8 +52,12 @@ namespace osu.Game.Beatmaps.ControlPoints
                && Equals(otherControlPoint);
 
         public virtual bool Equals(ControlPoint? other)
-            => other != null
-               && Time == other.Time;
+        {
+            if (ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(other, this)) return true;
+
+            return Time == other.Time;
+        }
 
         // ReSharper disable once NonReadonlyMemberInGetHashCode
         public override int GetHashCode() => Time.GetHashCode();
