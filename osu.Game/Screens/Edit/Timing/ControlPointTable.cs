@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     BackgroundFlow.Add(new RowBackground(group)
                     {
-                        Selected = group.Equals(selectedGroup?.Value),
+                        Selected = ReferenceEquals(group, selectedGroup?.Value),
                         Action = () =>
                         {
                             selectedGroup.Value = group;
