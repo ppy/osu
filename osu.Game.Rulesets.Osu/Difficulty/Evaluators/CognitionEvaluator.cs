@@ -17,9 +17,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
-            double noteDensity = 1.0;
+            double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
 
-            double difficulty = 0.0;
+            double noteDensity = 1.0;
 
             // This loop sucks so much lol.
             // Will be replaced in conjuction with the "objects with current visible" and the "currently visible objects" lists
@@ -47,18 +47,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 noteDensity += opacity;
             }
 
-            double noteDensityDifficulty = 0;
+            double noteDensityDifficulty = Math.Pow(Math.Max(0, noteDensity - 3), 2.5);
+
+            double hiddenDifficulty = 0;
 
             if (hidden)
-                noteDensityDifficulty = Math.Pow(noteDensity, 2.5) * 1.2;
+            {
+                noteDensityDifficulty *= 3.2;
 
-            difficulty += noteDensityDifficulty;
+                // Really not sure about this, but without this a lot of normal HD plays become underweight.
+                hiddenDifficulty = 11 * currObj.LazyJumpDistance / currObj.StrainTime;
+            }
 
             double preemptDifficulty = 0.0;
             if (currObj.preempt < 400)
-                preemptDifficulty += Math.Pow(400 - currObj.preempt, 1.5) / 7;
+                preemptDifficulty += Math.Pow(400 - currObj.preempt, 1.5) / 14;
 
-            difficulty += preemptDifficulty;
+            // Buff rhythm on high AR.
+            preemptDifficulty *= RhythmEvaluator.EvaluateDifficultyOf(current, 30);
+
+            double difficulty = Math.Max(preemptDifficulty, hiddenDifficulty) + noteDensityDifficulty;
 
             return difficulty;
         }
