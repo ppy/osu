@@ -9,31 +9,25 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Scoring;
-using osu.Game.Skinning;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class GeneralSettings : SettingsSubsection
+    public class BeatmapSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "General";
-
+        protected override LocalisableString Header => "Beatmaps";
         private SettingsButton importBeatmapsButton;
         private SettingsButton importScoresButton;
-        private SettingsButton importSkinsButton;
-        private SettingsButton importCollectionsButton;
         private SettingsButton deleteBeatmapsButton;
+        private SettingsButton deleteBeatmapVideosButton;
         private SettingsButton deleteScoresButton;
-        private SettingsButton deleteSkinsButton;
         private SettingsButton restoreButton;
         private SettingsButton undeleteButton;
-        private SettingsButton deleteBeatmapVideosButton;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] LegacyImportManager legacyImportManager, IDialogOverlay dialogOverlay)
+        private void load(BeatmapManager beatmaps, ScoreManager scores, [CanBeNull] LegacyImportManager legacyImportManager, IDialogOverlay dialogOverlay)
         {
             if (legacyImportManager?.SupportsImportFromStable == true)
             {
@@ -44,6 +38,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         importBeatmapsButton.Enabled.Value = false;
                         legacyImportManager.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
+                    }
+                });
+                Add(importScoresButton = new SettingsButton
+                {
+                    Text = MaintenanceSettingsStrings.ImportScoresFromStable,
+                    Action = () =>
+                    {
+                        importScoresButton.Enabled.Value = false;
+                        legacyImportManager.ImportFromStableAsync(StableContent.Scores).ContinueWith(t => Schedule(() => importScoresButton.Enabled.Value = true));
                     }
                 });
             }
@@ -74,19 +77,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (legacyImportManager?.SupportsImportFromStable == true)
-            {
-                Add(importScoresButton = new SettingsButton
-                {
-                    Text = MaintenanceSettingsStrings.ImportScoresFromStable,
-                    Action = () =>
-                    {
-                        importScoresButton.Enabled.Value = false;
-                        legacyImportManager.ImportFromStableAsync(StableContent.Scores).ContinueWith(t => Schedule(() => importScoresButton.Enabled.Value = true));
-                    }
-                });
-            }
-
             Add(deleteScoresButton = new DangerousSettingsButton
             {
                 Text = MaintenanceSettingsStrings.DeleteAllScores,
@@ -99,58 +89,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     }));
                 }
             });
-
-            if (legacyImportManager?.SupportsImportFromStable == true)
-            {
-                Add(importSkinsButton = new SettingsButton
-                {
-                    Text = MaintenanceSettingsStrings.ImportSkinsFromStable,
-                    Action = () =>
-                    {
-                        importSkinsButton.Enabled.Value = false;
-                        legacyImportManager.ImportFromStableAsync(StableContent.Skins).ContinueWith(t => Schedule(() => importSkinsButton.Enabled.Value = true));
-                    }
-                });
-            }
-
-            Add(deleteSkinsButton = new DangerousSettingsButton
-            {
-                Text = MaintenanceSettingsStrings.DeleteAllSkins,
-                Action = () =>
-                {
-                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
-                    {
-                        deleteSkinsButton.Enabled.Value = false;
-                        Task.Run(() => skins.Delete()).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
-                    }));
-                }
-            });
-
-            if (collectionManager != null)
-            {
-                if (legacyImportManager?.SupportsImportFromStable == true)
-                {
-                    Add(importCollectionsButton = new SettingsButton
-                    {
-                        Text = MaintenanceSettingsStrings.ImportCollectionsFromStable,
-                        Action = () =>
-                        {
-                            importCollectionsButton.Enabled.Value = false;
-                            legacyImportManager.ImportFromStableAsync(StableContent.Collections).ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
-                        }
-                    });
-                }
-
-                Add(new DangerousSettingsButton
-                {
-                    Text = MaintenanceSettingsStrings.DeleteAllCollections,
-                    Action = () =>
-                    {
-                        dialogOverlay?.Push(new MassDeleteConfirmationDialog(collectionManager.DeleteAll));
-                    }
-                });
-            }
-
             AddRange(new Drawable[]
             {
                 restoreButton = new SettingsButton
