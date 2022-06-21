@@ -10,8 +10,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.Osu.Utils
 {
     public static partial class OsuHitObjectGenerationUtils

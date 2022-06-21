@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -784,7 +786,17 @@ namespace osu.Game.Screens.Select
 
             Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
 
-            decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
+            decoupledRuleset.ValueChanged += r =>
+            {
+                bool wasDisabled = Ruleset.Disabled;
+
+                // a sub-screen may have taken a lease on this decoupled ruleset bindable,
+                // which would indirectly propagate to the game-global bindable via the `DisabledChanged` callback below.
+                // to make sure changes sync without crashes, lift the disable for a short while to sync, and then restore the old value.
+                Ruleset.Disabled = false;
+                Ruleset.Value = r.NewValue;
+                Ruleset.Disabled = wasDisabled;
+            };
             decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
             Beatmap.BindValueChanged(workingBeatmapChanged);

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -319,6 +321,12 @@ namespace osu.Game.Skinning.Editor
         protected override bool OnHover(HoverEvent e) => true;
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+        public override void Hide()
+        {
+            base.Hide();
+            SelectedComponents.Clear();
+        }
 
         protected override void PopIn()
         {
