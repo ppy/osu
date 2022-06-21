@@ -37,12 +37,12 @@ namespace osu.Game.Screens.Edit.Timing
 
         private IAdjustableClock metronomeClock;
 
-        private Sample tick;
-        private Sample tickDownbeat;
-        private Sample latch;
+        private Sample sampleTick;
+        private Sample sampleTickDownbeat;
+        private Sample sampleLatch;
 
         [CanBeNull]
-        private ScheduledDelegate clunkDelegate;
+        private ScheduledDelegate tickPlaybackDelegate;
 
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; }
@@ -57,9 +57,9 @@ namespace osu.Game.Screens.Edit.Timing
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            tick = audio.Samples.Get(@"UI/metronome-tick");
-            tickDownbeat = audio.Samples.Get(@"UI/metronome-tick-downbeat");
-            latch = audio.Samples.Get(@"UI/metronome-latch");
+            sampleTick = audio.Samples.Get(@"UI/metronome-tick");
+            sampleTickDownbeat = audio.Samples.Get(@"UI/metronome-tick-downbeat");
+            sampleLatch = audio.Samples.Get(@"UI/metronome-latch");
 
             const float taper = 25;
             const float swing_vertical_offset = -23;
@@ -269,14 +269,14 @@ namespace osu.Game.Screens.Edit.Timing
 
                 isSwinging = false;
 
-                clunkDelegate?.Cancel();
-                clunkDelegate = null;
+                tickPlaybackDelegate?.Cancel();
+                tickPlaybackDelegate = null;
 
                 // instantly latch if pendulum arm is close enough to center (to prevent awkward delayed playback of latch sound)
                 if (Precision.AlmostEquals(swing.Rotation, 0, 1))
                 {
                     swing.RotateTo(0);
-                    latch?.Play();
+                    sampleLatch?.Play();
                     return;
                 }
 
@@ -286,7 +286,7 @@ namespace osu.Game.Screens.Edit.Timing
                     stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
 
                     using (BeginDelayedSequence(380))
-                        latchDelegate = Schedule(() => latch?.Play());
+                        latchDelegate = Schedule(() => sampleLatch?.Play());
                 }
             }
         }
@@ -316,12 +316,12 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     stick.FlashColour(overlayColourProvider.Content1, beatLength, Easing.OutQuint);
 
-                    clunkDelegate = Schedule(() =>
+                    tickPlaybackDelegate = Schedule(() =>
                     {
                         if (!EnableClicking)
                             return;
 
-                        var channel = beatIndex % timingPoint.TimeSignature.Numerator == 0 ? tickDownbeat?.GetChannel() : tick?.GetChannel();
+                        var channel = beatIndex % timingPoint.TimeSignature.Numerator == 0 ? sampleTickDownbeat?.GetChannel() : sampleTick?.GetChannel();
 
                         if (channel == null)
                             return;
