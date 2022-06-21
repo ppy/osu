@@ -21,10 +21,10 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual ModPanel CreateModPanel(ModState mod) => new ModPanel(mod);
 
-        private readonly Key[]? toggleKeys;
+        private readonly IModHotkeyHandler hotkeyHandler;
 
         private readonly TextFlowContainer headerText;
         private readonly Box headerBackground;
@@ -86,10 +86,10 @@ namespace osu.Game.Overlays.Mods
 
         private const float header_height = 42;
 
-        public ModColumn(ModType modType, bool allowBulkSelection, Key[]? toggleKeys = null)
+        public ModColumn(ModType modType, bool allowBulkSelection)
         {
             ModType = modType;
-            this.toggleKeys = toggleKeys;
+            hotkeyHandler = ModHotkeyHandler.Create(modType);
 
             Width = 320;
             RelativeSizeAxes = Axes.Y;
@@ -425,17 +425,10 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed) return false;
-            if (toggleKeys == null) return false;
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.Repeat)
+                return false;
 
-            int index = Array.IndexOf(toggleKeys, e.Key);
-            if (index < 0) return false;
-
-            var modState = availableMods.ElementAtOrDefault(index);
-            if (modState == null || modState.Filtered.Value) return false;
-
-            modState.Active.Toggle();
-            return true;
+            return hotkeyHandler.HandleHotkeyPressed(e.Key, availableMods);
         }
 
         #endregion
