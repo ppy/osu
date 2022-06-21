@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding(30),
-                Child = column = new ModColumn(ModType.DifficultyReduction, true, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P })
+                Child = column = new ModColumn(ModType.DifficultyReduction, true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
