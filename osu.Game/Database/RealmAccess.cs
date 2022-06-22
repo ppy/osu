@@ -822,7 +822,7 @@ namespace osu.Game.Database
                         // Before disposing the update context, clean up all subscriptions.
                         // Note that in the case of realm notification subscriptions, this is not really required (they will be cleaned up by disposal).
                         // In the case of custom subscriptions, we want them to fire before the update realm is disposed in case they do any follow-up work.
-                        foreach (var action in customSubscriptionsResetMap)
+                        foreach (var action in customSubscriptionsResetMap.ToArray())
                         {
                             action.Value?.Dispose();
                             customSubscriptionsResetMap[action.Key] = null;
