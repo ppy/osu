@@ -87,6 +87,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         matchingFilter &= r.FilterTerms.Any(term => term.ToString().Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
                     }
 
+                    matchingFilter &= criteria.Locked || !r.Room.HasPassword.Value;
+
                     r.MatchingFilter = matchingFilter;
                 }
             });
