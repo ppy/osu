@@ -13,10 +13,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <summary>
         /// Applies a speed bonus dependent on the time since the last hit performed using this key.
         /// </summary>
-        /// <param name="notePairDuration">The duration between the current and previous note hit using the same key.</param>
-        private static double speedBonus(double notePairDuration)
+        /// <param name="interval">The interval between the current and previous note hit using the same key.</param>
+        private static double speedBonus(double interval)
         {
-            return Math.Pow(0.4, notePairDuration / 1000);
+            return Math.Pow(0.8, interval / 1000);
         }
 
         /// <summary>
@@ -40,9 +40,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 return 0.0;
             }
 
-            double objectStrain = 0;
-            // Console.WriteLine(speedBonus(taikoCurrent.StartTime - keyPrevious.StartTime));
-            objectStrain += speedBonus(taikoCurrent.StartTime - keyPrevious.StartTime);
+            double objectStrain = 0.85;
+            objectStrain *= speedBonus(taikoCurrent.StartTime - keyPrevious.StartTime);
             return objectStrain;
         }
     }
