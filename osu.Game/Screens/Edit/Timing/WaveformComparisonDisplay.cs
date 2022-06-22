@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Edit.Timing
             double? offsetChange = newStartTime - selectedGroupStartTime;
 
             var nextGroup = editorBeatmap.ControlPointInfo.TimingPoints
-                                         .SkipWhile(g => g != tcp)
+                                         .SkipWhile(g => !ReferenceEquals(g, tcp))
                                          .Skip(1)
                                          .FirstOrDefault();
 
