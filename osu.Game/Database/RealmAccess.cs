@@ -385,11 +385,22 @@ namespace osu.Game.Database
         /// Write changes to realm asynchronously, guaranteeing order of execution.
         /// </summary>
         /// <param name="action">The work to run.</param>
-        public async Task WriteAsync(Action<Realm> action)
+        public Task WriteAsync(Action<Realm> action)
         {
-            total_writes_async.Value++;
-            using (var realm = getRealmInstance())
-                await realm.WriteAsync(() => action(realm));
+            // Regardless of calling Realm.GetInstance or Realm.GetInstanceAsync, there is a blocking overhead on retrieval.
+            // Adding a forced Task.Run resolves this.
+
+            return Task.Run(async () =>
+            {
+                total_writes_async.Value++;
+
+                // Not attempting to use Realm.GetInstanceAsync as there's seemingly no benefit to us (for now) and it adds complexity due to locking
+                // concerns in getRealmInstance(). On a quick check, it looks to be more suited to cases where realm is connecting to an online sync
+                // server, which we don't use. May want to report upstream or revisit in the future.
+                using (var realm = getRealmInstance())
+                    // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
+                    await realm.WriteAsync(() => action(realm));
+            });
         }
 
         /// <summary>
