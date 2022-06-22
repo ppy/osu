@@ -210,10 +210,16 @@ namespace osu.Game.Rulesets.Osu.Utils
             return (timeSinceTimingPoint + 1) % length < 2;
         }
 
+        /// <summary>
+        /// Generates a random number from a normal distribution using the Box-Muller transform.
+        /// </summary>
         public static float RandomGaussian(Random rng, float mean = 0, float stdDev = 1)
         {
+            // Generate 2 random numbers in the interval (0,1].
+            // x1 must not be 0 since log(0) = undefined.
             double x1 = 1 - rng.NextDouble();
             double x2 = 1 - rng.NextDouble();
+
             double stdNormal = Math.Sqrt(-2 * Math.Log(x1)) * Math.Sin(2 * Math.PI * x2);
             return mean + stdDev * (float)stdNormal;
         }
