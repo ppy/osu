@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var group in args.OldItems.OfType<ControlPointGroup>())
                         {
-                            var matching = Children.SingleOrDefault(gv => gv.Group == group);
+                            var matching = Children.SingleOrDefault(gv => ReferenceEquals(gv.Group, group));
 
                             if (matching != null)
                                 matching.Expire();

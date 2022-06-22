@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Edit
                 seekTime = timingPoint.Time + closestBeat * seekAmount;
             }
 
-            if (seekTime < timingPoint.Time && timingPoint != ControlPointInfo.TimingPoints.First())
+            if (seekTime < timingPoint.Time && !ReferenceEquals(timingPoint, ControlPointInfo.TimingPoints.First()))
                 seekTime = timingPoint.Time;
 
             SeekSmoothlyTo(seekTime);

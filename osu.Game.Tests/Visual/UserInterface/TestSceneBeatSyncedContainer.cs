@@ -269,7 +269,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             private TimingControlPoint getNextTimingPoint(TimingControlPoint current)
             {
-                if (timingPoints[^1] == current)
+                if (ReferenceEquals(timingPoints[^1], current))
                     return current;
 
                 int index = timingPoints.IndexOf(current); // -1 means that this is a "default beat"
@@ -281,7 +281,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 if (timingPoints.Count == 0) return 0;
 
-                if (timingPoints[^1] == current)
+                if (ReferenceEquals(timingPoints[^1], current))
                 {
                     Debug.Assert(BeatSyncSource.Clock != null);
 
