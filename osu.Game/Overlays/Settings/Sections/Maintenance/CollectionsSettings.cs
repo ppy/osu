@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Game.Collections;
@@ -15,10 +12,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     public class CollectionsSettings : SettingsSubsection
     {
         protected override LocalisableString Header => "Collections";
-        private SettingsButton importCollectionsButton;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load([CanBeNull] CollectionManager collectionManager, [CanBeNull] LegacyImportManager legacyImportManager, IDialogOverlay dialogOverlay)
+        private SettingsButton importCollectionsButton = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(CollectionManager? collectionManager, LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
         {
             if (collectionManager == null) return;
 

@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -17,14 +14,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     public class BeatmapSettings : SettingsSubsection
     {
         protected override LocalisableString Header => "Beatmaps";
-        private SettingsButton importBeatmapsButton;
-        private SettingsButton deleteBeatmapsButton;
-        private SettingsButton deleteBeatmapVideosButton;
-        private SettingsButton restoreButton;
-        private SettingsButton undeleteButton;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, [CanBeNull] LegacyImportManager legacyImportManager, IDialogOverlay dialogOverlay)
+        private SettingsButton importBeatmapsButton = null!;
+        private SettingsButton deleteBeatmapsButton = null!;
+        private SettingsButton deleteBeatmapVideosButton = null!;
+        private SettingsButton restoreButton = null!;
+        private SettingsButton undeleteButton = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(BeatmapManager beatmaps, LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
         {
             if (legacyImportManager?.SupportsImportFromStable == true)
             {
