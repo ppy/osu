@@ -21,7 +21,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             if (collectionManager == null) return;
 
             if (legacyImportManager?.SupportsImportFromStable == true)
-
             {
                 Add(importCollectionsButton = new SettingsButton
                 {
