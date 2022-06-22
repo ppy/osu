@@ -276,6 +276,7 @@ namespace osu.Game.Screens.Edit.Timing
                 if (Precision.AlmostEquals(swing.Rotation, 0, 1))
                 {
                     swing.RotateTo(0, 60, Easing.OutQuint);
+                    stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
                     sampleLatch?.Play();
                     return;
                 }
