@@ -158,6 +158,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestLockedFiltering()
+        {
+            AddStep("add rooms", () =>
+            {
+                RoomManager.AddRooms(1, withPassword: true);
+                RoomManager.AddRooms(1, withPassword: false);
+            });
+
+            AddUntilStep("both rooms shown", () => container.Rooms.Count(r => r.IsPresent) == 2);
+
+            AddStep("filter locked rooms", () => container.Filter.Value = new FilterCriteria { Locked = false });
+
+            AddUntilStep("locked room hidden", () => container.Rooms.All(r => !r.Room.HasPassword.Value));
+
+            AddStep("unfilter locked rooms", () => container.Filter.SetDefault());
+
+            AddUntilStep("both rooms shown", () => container.Rooms.Count(r => r.IsPresent) == 2);
+        }
+
+        [Test]
         public void TestPasswordProtectedRooms()
         {
             AddStep("add rooms", () => RoomManager.AddRooms(3, withPassword: true));
