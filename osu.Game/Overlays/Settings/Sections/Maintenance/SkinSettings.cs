@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Game.Database;
@@ -16,11 +13,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     public class SkinSettings : SettingsSubsection
     {
         protected override LocalisableString Header => "Skins";
-        private SettingsButton importSkinsButton;
-        private SettingsButton deleteSkinsButton;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(SkinManager skins, [CanBeNull] LegacyImportManager legacyImportManager, IDialogOverlay dialogOverlay)
+        private SettingsButton importSkinsButton = null!;
+        private SettingsButton deleteSkinsButton = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(SkinManager skins, LegacyImportManager? legacyImportManager, IDialogOverlay? dialogOverlay)
         {
             if (legacyImportManager?.SupportsImportFromStable == true)
             {
