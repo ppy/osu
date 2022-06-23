@@ -113,8 +113,9 @@ namespace osu.Game.Screens.Select.Carousel
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        new CalculatingDifficultyIcon(beatmapInfo, shouldShowTooltip: false)
+                        new CalculatingDifficultyIcon(beatmapInfo)
                         {
+                            ShowTooltip = false,
                             Scale = new Vector2(1.8f),
                         },
                         new FillFlowContainer

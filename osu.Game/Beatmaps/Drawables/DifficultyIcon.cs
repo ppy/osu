@@ -30,6 +30,11 @@ namespace osu.Game.Beatmaps.Drawables
             set => iconContainer.Size = value;
         }
 
+        /// <summary>
+        /// Whether to display a tooltip on hover. Only works if a beatmap was provided at construction time.
+        /// </summary>
+        public bool ShowTooltip { get; set; } = true;
+
         private readonly IBeatmapInfo? beatmap;
 
         private readonly IRulesetInfo ruleset;
@@ -54,7 +59,7 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         /// <param name="beatmap">The beatmap to be displayed in the tooltip, and to be used for the initial star rating value.</param>
         /// <param name="ruleset">An optional ruleset to be used for the icon display, in place of the beatmap's ruleset.</param>
-        public DifficultyIcon(IBeatmapInfo beatmap, IRulesetInfo? ruleset)
+        public DifficultyIcon(IBeatmapInfo beatmap, IRulesetInfo? ruleset = null)
             : this(ruleset ?? beatmap.Ruleset)
         {
             this.beatmap = beatmap;
@@ -123,6 +128,6 @@ namespace osu.Game.Beatmaps.Drawables
             GetCustomTooltip() => new DifficultyIconTooltip();
 
         DifficultyIconTooltipContent IHasCustomTooltip<DifficultyIconTooltipContent>.
-            TooltipContent => (beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current) : null)!;
+            TooltipContent => (ShowTooltip && beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current) : null)!;
     }
 }
