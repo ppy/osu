@@ -13,7 +13,6 @@ using osu.Framework.Extensions;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -163,34 +162,6 @@ namespace osu.Game.Beatmaps
                 cancellationToken,
                 TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
                 updateScheduler);
-        }
-
-        /// <summary>
-        /// Retrieves the <see cref="DifficultyRating"/> that describes a star rating.
-        /// </summary>
-        /// <remarks>
-        /// For more information, see: https://osu.ppy.sh/help/wiki/Difficulties
-        /// </remarks>
-        /// <param name="starRating">The star rating.</param>
-        /// <returns>The <see cref="DifficultyRating"/> that best describes <paramref name="starRating"/>.</returns>
-        public static DifficultyRating GetDifficultyRating(double starRating)
-        {
-            if (Precision.AlmostBigger(starRating, 6.5, 0.005))
-                return DifficultyRating.ExpertPlus;
-
-            if (Precision.AlmostBigger(starRating, 5.3, 0.005))
-                return DifficultyRating.Expert;
-
-            if (Precision.AlmostBigger(starRating, 4.0, 0.005))
-                return DifficultyRating.Insane;
-
-            if (Precision.AlmostBigger(starRating, 2.7, 0.005))
-                return DifficultyRating.Hard;
-
-            if (Precision.AlmostBigger(starRating, 2.0, 0.005))
-                return DifficultyRating.Normal;
-
-            return DifficultyRating.Easy;
         }
 
         /// <summary>
