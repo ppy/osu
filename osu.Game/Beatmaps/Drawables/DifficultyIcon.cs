@@ -26,8 +26,6 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public class DifficultyIcon : CompositeDrawable, IHasCustomTooltip<DifficultyIconTooltipContent>
     {
-        private readonly Container iconContainer;
-
         /// <summary>
         /// Size of this difficulty icon.
         /// </summary>
@@ -46,13 +44,18 @@ namespace osu.Game.Beatmaps.Drawables
         [CanBeNull]
         private readonly IReadOnlyList<Mod> mods;
 
+        [Resolved]
+        private IRulesetStore rulesets { get; set; }
+
         private readonly bool shouldShowTooltip;
 
         private readonly bool performBackgroundDifficultyLookup;
 
-        private readonly Bindable<StarDifficulty> difficultyBindable = new Bindable<StarDifficulty>();
-
         private Drawable background;
+
+        private readonly Container iconContainer;
+
+        private readonly Bindable<StarDifficulty> difficultyBindable = new Bindable<StarDifficulty>();
 
         /// <summary>
         /// Creates a new <see cref="DifficultyIcon"/> with a given <see cref="RulesetInfo"/> and <see cref="Mod"/> combination.
@@ -86,9 +89,6 @@ namespace osu.Game.Beatmaps.Drawables
 
             InternalChild = iconContainer = new Container { Size = new Vector2(20f) };
         }
-
-        [Resolved]
-        private IRulesetStore rulesets { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
