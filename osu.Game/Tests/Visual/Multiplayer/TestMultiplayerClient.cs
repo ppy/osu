@@ -272,8 +272,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task ChangeState(MultiplayerUserState newState)
         {
-            Debug.Assert(Room != null);
-
             if (newState == MultiplayerUserState.Idle && LocalUser?.State == MultiplayerUserState.WaitingForLoad)
                 return Task.CompletedTask;
 
