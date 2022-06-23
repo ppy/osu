@@ -12,10 +12,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return Math.Tanh(Math.E * -(val - center) / width);
         }
 
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(TaikoDifficultyHitObjectColour colour)
         {
-            TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
-            TaikoDifficultyHitObjectColour colour = taikoCurrent.Colour;
             if (colour == null) return 0;
 
             double objectStrain = 1.85;
@@ -29,9 +27,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 objectStrain *= sigmoid(colour.DeltaRunLength, 2, 2) * 0.5 + 0.5;
             }
 
-            objectStrain *= -sigmoid(colour.RepetitionInterval, 1, 8); // * 0.5 + 0.5;
-            // Console.WriteLine($"{current.StartTime},{colour.Delta},{colour.RepetitionInterval},{objectStrain}");
+            objectStrain *= -sigmoid(colour.RepetitionInterval, 1, 8);
             return objectStrain;
+        }
+
+        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        {
+            return EvaluateDifficultyOf(((TaikoDifficultyHitObject)current).Colour);
         }
     }
 }

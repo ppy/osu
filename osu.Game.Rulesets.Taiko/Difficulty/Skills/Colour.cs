@@ -6,7 +6,7 @@
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
@@ -25,7 +25,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
-            return ColourEvaluator.EvaluateDifficultyOf(current);
+            TaikoDifficultyHitObjectColour colour = ((TaikoDifficultyHitObject)current).Colour;
+            double difficulty = colour == null ? 0 : colour.EvaluatedDifficulty;
+            // if (current != null && colour != null)
+            // {
+            //     System.Console.WriteLine($"{current.StartTime},{colour.Delta},{colour.RepetitionInterval},{difficulty}");
+            // }
+
+            return difficulty;
         }
     }
 }
