@@ -85,7 +85,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private RoomsContainer roomsContainer;
         private SearchTextBox searchTextBox;
         private Dropdown<RoomStatusFilter> statusDropdown;
-        private Checkbox lockedCheckbox;
+        private Dropdown<RoomPublicityFilter> publicityDropdown;
 
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] IdleTracker idleTracker)
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             SearchString = searchTextBox.Current.Value,
             Ruleset = ruleset.Value,
             Status = statusDropdown.Current.Value,
-            Locked = lockedCheckbox.Current.Value,
+            Publicity = publicityDropdown.Current.Value,
         };
 
         #endregion
@@ -241,16 +241,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             statusDropdown.Current.BindValueChanged(_ => UpdateFilter());
 
-            lockedCheckbox = new OsuTabControlCheckbox
+            publicityDropdown = new SlimEnumDropdown<RoomPublicityFilter>
             {
-                Current = new Bindable<bool>(true),
                 RelativeSizeAxes = Axes.None,
-                Text = @"Show Locked",
+                Width = 160,
             };
 
-            lockedCheckbox.Current.BindValueChanged(_ => UpdateFilter());
+            publicityDropdown.Current.BindValueChanged(_ => UpdateFilter());
 
-            return new Drawable[] { lockedCheckbox, statusDropdown, };
+            return new Drawable[] { publicityDropdown, statusDropdown, };
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
