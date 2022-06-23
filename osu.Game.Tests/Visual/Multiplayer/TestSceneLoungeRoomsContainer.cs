@@ -158,7 +158,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestPublicityFiltering()
+        public void TestAccessTypeFiltering()
         {
             AddStep("add rooms", () =>
             {
