@@ -35,6 +35,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<HitObject> placement;
         private SelectionBlueprint<HitObject> placementBlueprint;
 
+        /// <remarks>
+        /// Positional input must be received outside the container's bounds,
+        /// in order to handle timeline blueprints which are stacked offscreen.
+        /// </remarks>
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => timeline.ReceivePositionalInputAt(screenSpacePos);
+
         public TimelineBlueprintContainer(HitObjectComposer composer)
             : base(composer)
         {
