@@ -85,7 +85,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private RoomsContainer roomsContainer;
         private SearchTextBox searchTextBox;
         private Dropdown<RoomStatusFilter> statusDropdown;
-        private Dropdown<RoomPublicityFilter> publicityDropdown;
 
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] IdleTracker idleTracker)
@@ -225,11 +224,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             SearchString = searchTextBox.Current.Value,
             Ruleset = ruleset.Value,
-            Status = statusDropdown.Current.Value,
-            Publicity = publicityDropdown.Current.Value,
+            Status = statusDropdown.Current.Value
         };
-
-        #endregion
 
         protected virtual IEnumerable<Drawable> CreateFilterControls()
         {
@@ -241,16 +237,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             statusDropdown.Current.BindValueChanged(_ => UpdateFilter());
 
-            publicityDropdown = new SlimEnumDropdown<RoomPublicityFilter>
-            {
-                RelativeSizeAxes = Axes.None,
-                Width = 160,
-            };
-
-            publicityDropdown.Current.BindValueChanged(_ => UpdateFilter());
-
-            return new Drawable[] { publicityDropdown, statusDropdown, };
+            yield return statusDropdown;
         }
+
+        #endregion
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
