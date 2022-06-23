@@ -209,6 +209,10 @@ namespace osu.Game.Database
 
         public void SetMigrationCompletion() => migrationComplete.Set();
 
-        public void WaitForMigrationCompletion() => migrationComplete.Wait(300000);
+        public void WaitForMigrationCompletion()
+        {
+            if (!migrationComplete.Wait(300000))
+                throw new TimeoutException("Migration took too long (likely stuck).");
+        }
     }
 }
