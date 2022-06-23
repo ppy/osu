@@ -209,6 +209,6 @@ namespace osu.Game.Database
 
         public void SetMigrationCompletion() => migrationComplete.Set();
 
-        public void WaitForMigrationCompletion() => migrationComplete.Wait();
+        public void WaitForMigrationCompletion() => migrationComplete.Wait(300000);
     }
 }

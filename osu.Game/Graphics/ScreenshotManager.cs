@@ -103,7 +103,7 @@ namespace osu.Game.Graphics
                             framesWaitedEvent.Set();
                     }, 10, true);
 
-                    framesWaitedEvent.Wait();
+                    framesWaitedEvent.Wait(1000);
                     waitDelegate.Cancel();
                 }
             }

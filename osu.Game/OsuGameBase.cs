@@ -451,7 +451,8 @@ namespace osu.Game
                     readyToRun.Set();
                 }, false);
 
-                readyToRun.Wait();
+                if (!readyToRun.Wait(30000))
+                    throw new TimeoutException("Attempting to block for migration took too long.");
 
                 bool? cleanupSucceded = (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
 
