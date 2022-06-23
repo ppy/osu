@@ -13,6 +13,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         public RoomStatusFilter Status;
         public string Category;
         public RulesetInfo Ruleset;
-        public RoomPublicityFilter Publicity;
+        public RoomAccessType AccessType;
     }
 }

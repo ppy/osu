@@ -170,11 +170,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("both rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 2);
 
-            AddStep("filter public rooms", () => container.Filter.Value = new FilterCriteria { Publicity = RoomPublicityFilter.Public });
+            AddStep("filter public rooms", () => container.Filter.Value = new FilterCriteria { AccessType = RoomAccessType.Public });
 
             AddUntilStep("private room hidden", () => container.Rooms.All(r => !r.Room.HasPassword.Value));
 
-            AddStep("filter private rooms", () => container.Filter.Value = new FilterCriteria { Publicity = RoomPublicityFilter.Private });
+            AddStep("filter private rooms", () => container.Filter.Value = new FilterCriteria { AccessType = RoomAccessType.Private });
 
             AddUntilStep("public room hidden", () => container.Rooms.All(r => r.Room.HasPassword.Value));
         }
