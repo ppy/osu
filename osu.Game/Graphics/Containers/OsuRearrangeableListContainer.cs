@@ -33,8 +33,10 @@ namespace osu.Game.Graphics.Containers
 
         protected abstract OsuRearrangeableListItem<TModel> CreateOsuDrawable(TModel item);
 
-        protected OsuRearrangeableListContainer()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             Items.CollectionChanged += (_, args) =>
             {
                 if (args.Action == NotifyCollectionChangedAction.Move)
