@@ -46,6 +46,9 @@ namespace osu.Game.Graphics.Containers
 
         private void playSwapSample()
         {
+            if (!DragActive.Value)
+                return;
+
             if (Time.Current - sampleLastPlaybackTime <= 35)
                 return;
 
