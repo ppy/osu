@@ -10,7 +10,7 @@ using osu.Game.Beatmaps.Drawables;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class FilterableDifficultyIcon : CalculatingDifficultyIcon
+    public class FilterableDifficultyIcon : DifficultyIcon
     {
         private readonly BindableBool filtered = new BindableBool();
 

@@ -1,13 +1,9 @@
-﻿#nullable enable
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -26,29 +22,15 @@ namespace osu.Game.Beatmaps.Drawables
             set => difficultyIcon.Size = value;
         }
 
-        private readonly IRulesetInfo? ruleset;
-
-        private readonly IReadOnlyList<Mod>? mods;
+        public bool ShowTooltip
+        {
+            get => difficultyIcon.ShowTooltip;
+            set => difficultyIcon.ShowTooltip = value;
+        }
 
         private readonly IBeatmapInfo beatmapInfo;
 
         private readonly DifficultyIcon difficultyIcon;
-
-        /// <summary>
-        /// Creates a new <see cref="CalculatingDifficultyIcon"/> with a given <see cref="RulesetInfo"/> and <see cref="Mod"/> combination.
-        /// </summary>
-        /// <param name="beatmapInfo">The beatmap to show the difficulty of.</param>
-        /// <param name="ruleset">The ruleset to show the difficulty with.</param>
-        /// <param name="mods">The mods to show the difficulty with.</param>
-        /// <param name="shouldShowTooltip">Whether to display a tooltip when hovered.</param>
-        /// <param name="performBackgroundDifficultyLookup">Whether to perform difficulty lookup (including calculation if necessary).</param>
-        public CalculatingDifficultyIcon(IBeatmapInfo beatmapInfo, IRulesetInfo? ruleset, IReadOnlyList<Mod>? mods, bool shouldShowTooltip = true,
-                                         bool performBackgroundDifficultyLookup = true)
-            : this(beatmapInfo, shouldShowTooltip, performBackgroundDifficultyLookup)
-        {
-            this.ruleset = ruleset ?? beatmapInfo.Ruleset;
-            this.mods = mods ?? Array.Empty<Mod>();
-        }
 
         /// <summary>
         /// Creates a new <see cref="CalculatingDifficultyIcon"/> that follows the currently-selected ruleset and mods.
@@ -64,17 +46,11 @@ namespace osu.Game.Beatmaps.Drawables
 
             InternalChildren = new Drawable[]
             {
-                difficultyIcon = new DifficultyIcon(beatmapInfo, beatmapInfo.Ruleset),
+                difficultyIcon = new DifficultyIcon(beatmapInfo),
                 new DelayedLoadUnloadWrapper(createDifficultyRetriever, 0)
             };
         }
 
-        private Drawable createDifficultyRetriever()
-        {
-            if (ruleset != null && mods != null)
-                return new DifficultyRetriever(beatmapInfo, ruleset, mods) { StarDifficulty = { BindTarget = difficultyIcon.Current } };
-
-            return new DifficultyRetriever(beatmapInfo) { StarDifficulty = { BindTarget = difficultyIcon.Current } };
-        }
+        private Drawable createDifficultyRetriever() => new DifficultyRetriever(beatmapInfo) { StarDifficulty = { BindTarget = difficultyIcon.Current } };
     }
 }
