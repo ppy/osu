@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -63,7 +62,8 @@ namespace osu.Game.Beatmaps.Drawables
         /// <param name="mods">The mods to show the difficulty with.</param>
         /// <param name="shouldShowTooltip">Whether to display a tooltip when hovered.</param>
         /// <param name="performBackgroundDifficultyLookup">Whether to perform difficulty lookup (including calculation if necessary).</param>
-        public DifficultyIcon([NotNull] IBeatmapInfo beatmapInfo, [CanBeNull] IRulesetInfo ruleset, [CanBeNull] IReadOnlyList<Mod> mods, bool shouldShowTooltip = true, bool performBackgroundDifficultyLookup = true)
+        public DifficultyIcon([NotNull] IBeatmapInfo beatmapInfo, [CanBeNull] IRulesetInfo ruleset, [CanBeNull] IReadOnlyList<Mod> mods, bool shouldShowTooltip = true,
+                              bool performBackgroundDifficultyLookup = true)
             : this(beatmapInfo, shouldShowTooltip, performBackgroundDifficultyLookup)
         {
             this.ruleset = ruleset ?? beatmapInfo.Ruleset;
@@ -125,11 +125,19 @@ namespace osu.Game.Beatmaps.Drawables
             };
 
             if (performBackgroundDifficultyLookup)
-                iconContainer.Add(new DelayedLoadUnloadWrapper(() => new DifficultyRetriever(beatmapInfo, ruleset, mods) { StarDifficulty = { BindTarget = difficultyBindable } }, 0));
+                iconContainer.Add(new DelayedLoadUnloadWrapper(createDifficultyRetriever, 0));
             else
                 difficultyBindable.Value = new StarDifficulty(beatmapInfo.StarRating, 0);
 
             difficultyBindable.BindValueChanged(difficulty => background.Colour = colours.ForStarDifficulty(difficulty.NewValue.Stars));
+        }
+
+        private Drawable createDifficultyRetriever()
+        {
+            if (ruleset != null && mods != null)
+                return new DifficultyRetriever(beatmapInfo, ruleset, mods) { StarDifficulty = { BindTarget = difficultyBindable } };
+
+            return new DifficultyRetriever(beatmapInfo) { StarDifficulty = { BindTarget = difficultyBindable } };
         }
 
         private Drawable getRulesetIcon()
@@ -142,51 +150,10 @@ namespace osu.Game.Beatmaps.Drawables
             return new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
         }
 
-        ITooltip<DifficultyIconTooltipContent> IHasCustomTooltip<DifficultyIconTooltipContent>.GetCustomTooltip() => new DifficultyIconTooltip();
+        ITooltip<DifficultyIconTooltipContent> IHasCustomTooltip<DifficultyIconTooltipContent>.
+            GetCustomTooltip() => new DifficultyIconTooltip();
 
-        DifficultyIconTooltipContent IHasCustomTooltip<DifficultyIconTooltipContent>.TooltipContent => shouldShowTooltip ? new DifficultyIconTooltipContent(beatmapInfo, difficultyBindable) : null;
-
-        private class DifficultyRetriever : Component
-        {
-            public readonly Bindable<StarDifficulty> StarDifficulty = new Bindable<StarDifficulty>();
-
-            private readonly IBeatmapInfo beatmapInfo;
-            private readonly IRulesetInfo ruleset;
-            private readonly IReadOnlyList<Mod> mods;
-
-            private CancellationTokenSource difficultyCancellation;
-
-            [Resolved]
-            private BeatmapDifficultyCache difficultyCache { get; set; }
-
-            public DifficultyRetriever(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset, IReadOnlyList<Mod> mods)
-            {
-                this.beatmapInfo = beatmapInfo;
-                this.ruleset = ruleset;
-                this.mods = mods;
-            }
-
-            private IBindable<StarDifficulty?> localStarDifficulty;
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                difficultyCancellation = new CancellationTokenSource();
-                localStarDifficulty = ruleset != null
-                    ? difficultyCache.GetBindableDifficulty(beatmapInfo, ruleset, mods, difficultyCancellation.Token)
-                    : difficultyCache.GetBindableDifficulty(beatmapInfo, difficultyCancellation.Token);
-                localStarDifficulty.BindValueChanged(d =>
-                {
-                    if (d.NewValue is StarDifficulty diff)
-                        StarDifficulty.Value = diff;
-                });
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-                difficultyCancellation?.Cancel();
-            }
-        }
+        DifficultyIconTooltipContent IHasCustomTooltip<DifficultyIconTooltipContent>.
+            TooltipContent => shouldShowTooltip ? new DifficultyIconTooltipContent(beatmapInfo, difficultyBindable) : null;
     }
 }
