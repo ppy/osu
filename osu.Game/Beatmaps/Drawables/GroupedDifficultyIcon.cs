@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.Drawables
     /// <remarks>
     /// Used in cases when there are too many difficulty icons to show.
     /// </remarks>
-    public class GroupedDifficultyIcon : DifficultyIcon
+    public class GroupedDifficultyIcon : CalculatingDifficultyIcon
     {
         public GroupedDifficultyIcon(IEnumerable<IBeatmapInfo> beatmaps, IRulesetInfo ruleset, Color4 counterColour)
             : base(beatmaps.OrderBy(b => b.StarRating).Last(), ruleset, null, false)
