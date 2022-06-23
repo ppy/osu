@@ -166,6 +166,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 RoomManager.AddRooms(1, withPassword: false);
             });
 
+            AddStep("apply default filter", () => container.Filter.SetDefault());
+
+            AddUntilStep("both rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 2);
+
             AddStep("filter public rooms", () => container.Filter.Value = new FilterCriteria { Publicity = RoomPublicityFilter.Public });
 
             AddUntilStep("private room hidden", () => container.Rooms.All(r => !r.Room.HasPassword.Value));

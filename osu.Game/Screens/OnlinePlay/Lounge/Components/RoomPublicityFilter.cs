@@ -7,6 +7,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public enum RoomPublicityFilter
     {
+        All,
         Public,
         Private
     }
