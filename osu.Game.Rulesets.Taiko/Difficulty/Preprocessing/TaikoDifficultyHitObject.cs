@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
@@ -29,10 +30,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public readonly TaikoDifficultyHitObjectRhythm Rhythm;
 
         /// <summary>
-        /// Colour data for this hit object. This is used by colour evaluator to calculate colour, but can be used
-        /// differently by other skills in the future.
+        /// Colour data for this hit object. This is used by colour evaluator to calculate colour difficulty, but can be used
+        /// by other skills in the future.
+        /// This need to be writeable by TaikoDifficultyHitObjectColour so that it can assign potentially reused instances
         /// </summary>
-        public readonly TaikoDifficultyHitObjectColour Colour;
+        public TaikoDifficultyHitObjectColour Colour;
 
         /// <summary>
         /// The hit type of this hit object.
@@ -64,8 +66,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 );
             }
 
-            // Find repetition interval for the final TaikoDifficultyHitObjectColour
-            ((TaikoDifficultyHitObject)difficultyHitObject.Last()).Colour?.FindRepetitionInterval();
+            List<TaikoDifficultyHitObjectColour> colours = TaikoDifficultyHitObjectColour.CreateColoursFor(difficultyHitObject);
+
+            // Pre-evaluate colours
+            for (int i = 0; i < colours.Count; i++)
+            {
+                colours[i].EvaluatedDifficulty = ColourEvaluator.EvaluateDifficultyOf(colours[i]);
+            }
+
             return difficultyHitObject;
         }
 
@@ -115,9 +123,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             NoteIndex = noteObjects.Count;
             noteObjects.Add(this);
-
-            // Need to be done after NoteIndex is set.
-            Colour = TaikoDifficultyHitObjectColour.GetInstanceFor(this);
         }
 
         /// <summary>
