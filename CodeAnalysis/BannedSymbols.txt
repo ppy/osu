@@ -16,3 +16,4 @@ M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Linq.IQueryable
 M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Collections.Generic.IList{``0},Realms.NotificationCallbackDelegate{``0});Use osu.Game.Database.RealmObjectExtensions.QueryAsyncWithNotifications(IList<T>,NotificationCallbackDelegate<T>) instead.
 M:System.Threading.Tasks.Task.Wait();Don't use Task.Wait. Use Task.WaitSafely() to ensure we avoid deadlocks.
 P:System.Threading.Tasks.Task`1.Result;Don't use Task.Result. Use Task.GetResultSafely() to ensure we avoid deadlocks.
+M:System.Threading.ManualResetEventSlim.Wait();Specify a timeout to avoid waiting forever.
