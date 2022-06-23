@@ -73,6 +73,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// <summary>
         /// Accuracy used to weight judgements independently from the score's actual accuracy.
         /// </summary>
-        private double customAccuracy => Math.Max((countPerfect * 320 + countGreat * 300 + countGood * 200 + countOk * 100 + countMeh * 50 - countMiss * 100) / (totalHits * 320), 0);
+        private double customAccuracy => (countPerfect * 320 + countGreat * 300 + countGood * 200 + countOk * 100 + countMeh * 50) / (totalHits * 320);
     }
 }
