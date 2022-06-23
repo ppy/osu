@@ -76,7 +76,7 @@ namespace osu.Game.Benchmarks
                 }
             });
 
-            done.Wait();
+            done.Wait(60000);
         }
 
         [Benchmark]
@@ -115,7 +115,7 @@ namespace osu.Game.Benchmarks
                 }
             });
 
-            done.Wait();
+            done.Wait(60000);
         }
 
         [Benchmark]

@@ -79,11 +79,11 @@ namespace osu.Game.Tests.Database
                     {
                         hasThreadedUsage.Set();
 
-                        stopThreadedUsage.Wait();
+                        stopThreadedUsage.Wait(60000);
                     });
                 }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler);
 
-                hasThreadedUsage.Wait();
+                hasThreadedUsage.Wait(60000);
 
                 Assert.Throws<TimeoutException>(() =>
                 {
