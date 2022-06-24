@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,6 +38,15 @@ namespace osu.Game.Database
                 cache[lookup] = computed;
 
             return computed;
+        }
+
+        protected void Invalidate(Func<TLookup, bool> invalidationFunction)
+        {
+            foreach (var kvp in cache)
+            {
+                if (invalidationFunction(kvp.Key))
+                    cache.TryRemove(kvp.Key, out _);
+            }
         }
 
         protected bool CheckExists([NotNull] TLookup lookup, out TValue value) =>
