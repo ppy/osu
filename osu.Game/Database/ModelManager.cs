@@ -201,6 +201,6 @@ namespace osu.Game.Database
 
         public Action<Notification>? PostNotification { get; set; }
 
-        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
+        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLowerInvariant()}";
     }
 }
