@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.UI
             // note: `Slider`'s `ProxiedLayer` is added when its nested `DrawableHitCircle` is loaded.
             switch (drawable)
             {
-                case DrawableSpinner _:
+                case DrawableSpinner:
                     spinnerProxies.Add(drawable.CreateProxy());
                     break;
 

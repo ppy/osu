@@ -465,7 +465,7 @@ namespace osu.Game.Online.Chat
                     default:
                         var req = new JoinChannelRequest(channel);
                         req.Success += () => joinChannel(channel, fetchInitialMessages);
-                        req.Failure += ex => LeaveChannel(channel);
+                        req.Failure += _ => LeaveChannel(channel);
                         api.Queue(req);
                         return channel;
                 }

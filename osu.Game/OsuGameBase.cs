@@ -481,7 +481,7 @@ namespace osu.Game
         {
             switch (handler)
             {
-                case MidiHandler _:
+                case MidiHandler:
                     return new InputSection.HandlerSection(handler);
 
                 // return null for handlers that shouldn't have settings.

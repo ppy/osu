@@ -74,7 +74,7 @@ namespace osu.Game.Skinning
                     switch (target.Target)
                     {
                         case SkinnableTarget.SongSelect:
-                            var songSelectComponents = new SkinnableTargetComponentsContainer(container =>
+                            var songSelectComponents = new SkinnableTargetComponentsContainer(_ =>
                             {
                                 // do stuff when we need to.
                             });

@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit.Timing
             selectedGroup.BindValueChanged(_ => updateTimingGroup(), true);
 
             controlPointGroups.BindTo(editorBeatmap.ControlPointInfo.Groups);
-            controlPointGroups.BindCollectionChanged((_, __) => updateTimingGroup());
+            controlPointGroups.BindCollectionChanged((_, _) => updateTimingGroup());
 
             beatLength.BindValueChanged(_ => regenerateDisplay(true), true);
 

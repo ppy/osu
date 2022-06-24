@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             base.SetUpSteps();
             AddStep("enable storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, true));
             AddStep("set dim level to 0", () => LocalConfig.SetValue<double>(OsuSetting.DimLevel, 0));
-            AddStep("reset fail conditions", () => currentFailConditions = (_, __) => false);
+            AddStep("reset fail conditions", () => currentFailConditions = (_, _) => false);
             AddStep("set storyboard duration to 2s", () => currentStoryboardDuration = 2000);
             AddStep("set ShowResults = true", () => showResults = true);
         }
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             CreateTest(() =>
             {
-                AddStep("fail on first judgement", () => currentFailConditions = (_, __) => true);
+                AddStep("fail on first judgement", () => currentFailConditions = (_, _) => true);
 
                 // Fail occurs at 164ms with the provided beatmap.
                 // Fail animation runs for 2.5s realtime but the gameplay time change is *variable* due to the frequency transform being applied, so we need a bit of lenience.

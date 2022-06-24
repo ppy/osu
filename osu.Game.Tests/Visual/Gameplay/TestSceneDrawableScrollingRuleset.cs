@@ -322,8 +322,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 switch (h)
                 {
-                    case TestPooledHitObject _:
-                    case TestPooledParentHitObject _:
+                    case TestPooledHitObject:
+                    case TestPooledParentHitObject:
                         return null;
 
                     case TestParentHitObject p:

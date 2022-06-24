@@ -31,7 +31,7 @@ namespace osu.Game.Extensions
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            task.ContinueWith(t =>
+            task.ContinueWith(_ =>
             {
                 // the previous task has finished execution or been cancelled, so we can run the provided continuation.
 

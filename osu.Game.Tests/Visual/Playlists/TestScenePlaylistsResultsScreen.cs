@@ -187,8 +187,8 @@ namespace osu.Game.Tests.Visual.Playlists
             // pre-check for requests we should be handling (as they are scheduled below).
             switch (request)
             {
-                case ShowPlaylistUserScoreRequest _:
-                case IndexPlaylistScoresRequest _:
+                case ShowPlaylistUserScoreRequest:
+                case IndexPlaylistScoresRequest:
                     break;
 
                 default:
