@@ -319,14 +319,17 @@ namespace osu.Game.Beatmaps
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
-                Realm.Write(r => setInfo.CopyChangesToRealm(r.Find<BeatmapSetInfo>(setInfo.ID)));
+                Realm.Write(r =>
+                {
+                    var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
+
+                    setInfo.CopyChangesToRealm(liveBeatmapSet);
+
+                    beatmapUpdater?.Process(liveBeatmapSet, r);
+                });
             }
 
-            workingBeatmapCache.Invalidate(beatmapInfo);
-
             Debug.Assert(beatmapInfo.BeatmapSet != null);
-
-            beatmapUpdater?.Queue(Realm.Run(r => r.Find<BeatmapSetInfo>(setInfo.ID).ToLive(Realm)));
 
             static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
             {

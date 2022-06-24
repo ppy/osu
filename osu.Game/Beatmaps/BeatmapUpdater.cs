@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework.Extensions;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects;
+using Realms;
 
 namespace osu.Game.Beatmaps
 {
@@ -40,27 +41,27 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Run all processing on a beatmap immediately.
         /// </summary>
-        public void Process(BeatmapSetInfo beatmapSet)
+        public void Process(BeatmapSetInfo beatmapSet) => beatmapSet.Realm.Write(r => Process(beatmapSet, r));
+
+        public void Process(BeatmapSetInfo beatmapSet, Realm realm)
         {
-            beatmapSet.Realm.Write(() =>
-            {
-                onlineLookupQueue.Update(beatmapSet);
-
-                foreach (var beatmap in beatmapSet.Beatmaps)
-                {
-                    // Because we aren't guaranteed all processing will happen on this thread, it's very hard to use the live realm object.
-                    // This can be fixed by adding a synchronous flow to `BeatmapDifficultyCache`.
-                    var detachedBeatmap = beatmap.Detach();
-
-                    beatmap.StarRating = difficultyCache.GetDifficultyAsync(detachedBeatmap).GetResultSafely()?.Stars ?? 0;
-
-                    var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
-                    beatmap.Length = calculateLength(working.Beatmap);
-                    beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
-                }
-            });
-
+            // Before we use below, we want to invalidate.
             workingBeatmapCache.Invalidate(beatmapSet);
+
+            onlineLookupQueue.Update(beatmapSet);
+
+            foreach (var beatmap in beatmapSet.Beatmaps)
+            {
+                // Because we aren't guaranteed all processing will happen on this thread, it's very hard to use the live realm object.
+                // This can be fixed by adding a synchronous flow to `BeatmapDifficultyCache`.
+                var detachedBeatmap = beatmap.Detach();
+
+                beatmap.StarRating = difficultyCache.GetDifficultyAsync(detachedBeatmap).GetResultSafely()?.Stars ?? 0;
+
+                var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
+                beatmap.Length = calculateLength(working.Beatmap);
+                beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
+            }
         }
 
         private double calculateLength(IBeatmap b)
