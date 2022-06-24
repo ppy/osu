@@ -36,9 +36,7 @@ namespace osu.Game.Beatmaps.Drawables
         /// Creates a new <see cref="CalculatingDifficultyIcon"/> that follows the currently-selected ruleset and mods.
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to show the difficulty of.</param>
-        /// <param name="shouldShowTooltip">Whether to display a tooltip when hovered.</param>
-        /// <param name="performBackgroundDifficultyLookup">Whether to perform difficulty lookup (including calculation if necessary).</param>
-        public CalculatingDifficultyIcon(IBeatmapInfo beatmapInfo, bool shouldShowTooltip = true, bool performBackgroundDifficultyLookup = true)
+        public CalculatingDifficultyIcon(IBeatmapInfo beatmapInfo)
         {
             this.beatmapInfo = beatmapInfo ?? throw new ArgumentNullException(nameof(beatmapInfo));
 
