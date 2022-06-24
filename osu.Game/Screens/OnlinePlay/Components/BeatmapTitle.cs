@@ -27,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            Playlist.CollectionChanged += (_, __) => updateText();
+            Playlist.CollectionChanged += (_, _) => updateText();
 
             updateText();
         }

@@ -38,8 +38,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            volume.BindValueChanged(volume => updateText());
-            bank.BindValueChanged(bank => updateText(), true);
+            volume.BindValueChanged(_ => updateText());
+            bank.BindValueChanged(_ => updateText(), true);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
                 // on commit, ensure that the value is correct by sourcing it from the objects' control points again.
                 // this ensures that committing empty text causes a revert to the previous value.
-                bank.OnCommit += (_, __) => bank.Current.Value = getCommonBank(relevantControlPoints);
+                bank.OnCommit += (_, _) => bank.Current.Value = getCommonBank(relevantControlPoints);
 
                 volume.Current.BindValueChanged(val => updateVolumeFor(relevantObjects, val.NewValue));
             }

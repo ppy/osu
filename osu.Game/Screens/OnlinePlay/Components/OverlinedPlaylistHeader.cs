@@ -18,7 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             base.LoadComplete();
 
-            Playlist.BindCollectionChanged((_, __) => Details.Value = Playlist.GetTotalDuration(), true);
+            Playlist.BindCollectionChanged((_, _) => Details.Value = Playlist.GetTotalDuration(), true);
         }
     }
 }

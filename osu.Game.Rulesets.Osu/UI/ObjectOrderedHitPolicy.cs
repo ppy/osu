@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
                 switch (obj)
                 {
-                    case DrawableSpinner _:
+                    case DrawableSpinner:
                         continue;
 
                     case DrawableSlider slider:

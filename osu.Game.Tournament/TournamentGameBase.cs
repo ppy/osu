@@ -267,7 +267,7 @@ namespace osu.Game.Tournament
             }
             else
             {
-                req.Success += res => { populate(); };
+                req.Success += _ => { populate(); };
                 req.Failure += _ =>
                 {
                     user.OnlineID = 1;

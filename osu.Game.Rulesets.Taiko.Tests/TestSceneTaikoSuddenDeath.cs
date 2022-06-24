@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Setup judgements", () =>
             {
                 judged = false;
-                Player.ScoreProcessor.NewJudgement += b => judged = true;
+                Player.ScoreProcessor.NewJudgement += _ => judged = true;
             });
             AddUntilStep("swell judged", () => judged);
             AddAssert("failed", () => Player.GameplayState.HasFailed);

@@ -81,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             private void load()
             {
                 isConnected.BindTo(client.IsConnected);
-                isConnected.BindValueChanged(c => Scheduler.AddOnce(poll), true);
+                isConnected.BindValueChanged(_ => Scheduler.AddOnce(poll), true);
             }
 
             private void poll()

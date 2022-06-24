@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Database
 
                 realm.RegisterCustomSubscription(r =>
                 {
-                    var subscription = r.All<BeatmapInfo>().QueryAsyncWithNotifications((sender, changes, error) =>
+                    var subscription = r.All<BeatmapInfo>().QueryAsyncWithNotifications((_, _, _) =>
                     {
                         realm.Run(_ =>
                         {
