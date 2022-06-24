@@ -274,8 +274,9 @@ namespace osu.Game.Overlays.BeatmapSet
                             Alpha = 0.5f
                         }
                     },
-                    icon = new DifficultyIcon(beatmapInfo.Ruleset)
+                    icon = new DifficultyIcon(beatmapInfo)
                     {
+                        ShowTooltip = false,
                         Current = { Value = new StarDifficulty(beatmapInfo.StarRating, 0) },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

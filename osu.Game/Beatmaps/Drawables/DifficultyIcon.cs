@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps.Drawables
         private IRulesetStore rulesets { get; set; } = null!;
 
         /// <summary>
-        /// Creates a new <see cref="DifficultyIcon"/> with a tooltip. Will use provided beatmap's <see cref="BeatmapInfo.StarRating"/> for initial value.
+        /// Creates a new <see cref="DifficultyIcon"/>. Will use provided beatmap's <see cref="BeatmapInfo.StarRating"/> for initial value.
         /// </summary>
         /// <param name="beatmap">The beatmap to be displayed in the tooltip, and to be used for the initial star rating value.</param>
         /// <param name="ruleset">An optional ruleset to be used for the icon display, in place of the beatmap's ruleset.</param>
@@ -67,7 +67,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         /// <summary>
-        /// Creates a new <see cref="DifficultyIcon"/> with no tooltip.
+        /// Creates a new <see cref="DifficultyIcon"/> without an associated beatmap.
         /// </summary>
         /// <param name="ruleset">The ruleset to be used for the icon display.</param>
         public DifficultyIcon(IRulesetInfo ruleset)
