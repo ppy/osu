@@ -56,6 +56,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
             taikoBeatmap.HitObjects = hitObjects;
         }
 
+        #region Classic drum roll
+
+        private class TaikoClassicDrumRollJudgement : TaikoDrumRollJudgement
+        {
+            public override HitResult MaxResult => HitResult.IgnoreHit;
+        }
+
         private class ClassicDrumRoll : DrumRoll
         {
             public ClassicDrumRoll(DrumRoll original)
@@ -89,6 +96,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
             }
         }
 
+        private class TaikoClassicDrumRollTickJudgement : TaikoDrumRollTickJudgement
+        {
+            public override HitResult MaxResult => HitResult.SmallBonus;
+        }
+
         private class ClassicDrumRollTick : DrumRollTick
         {
             public override Judgement CreateJudgement() => new TaikoClassicDrumRollTickJudgement();
@@ -100,35 +112,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 FirstTick = original.FirstTick;
                 TickSpacing = original.TickSpacing;
             }
-        }
-
-        private class ClassicSwell : Swell
-        {
-            public ClassicSwell(Swell original)
-            {
-                StartTime = original.StartTime;
-                Samples = original.Samples;
-                EndTime = original.EndTime;
-                Duration = original.Duration;
-                RequiredHits = original.RequiredHits;
-            }
-
-            public override Judgement CreateJudgement() => new TaikoClassicSwellJudgement();
-        }
-
-        private class TaikoClassicDrumRollJudgement : TaikoDrumRollJudgement
-        {
-            public override HitResult MaxResult => HitResult.IgnoreHit;
-        }
-
-        private class TaikoClassicDrumRollTickJudgement : TaikoDrumRollTickJudgement
-        {
-            public override HitResult MaxResult => HitResult.SmallBonus;
-        }
-
-        private class TaikoClassicSwellJudgement : TaikoSwellJudgement
-        {
-            public override HitResult MaxResult => HitResult.LargeBonus;
         }
 
         private class ClassicDrawableDrumRoll : DrawableDrumRoll
@@ -147,12 +130,37 @@ namespace osu.Game.Rulesets.Taiko.Mods
             }
         }
 
+        #endregion
+
+        #region Classic swell
+
+        private class TaikoClassicSwellJudgement : TaikoSwellJudgement
+        {
+            public override HitResult MaxResult => HitResult.LargeBonus;
+        }
+
+        private class ClassicSwell : Swell
+        {
+            public ClassicSwell(Swell original)
+            {
+                StartTime = original.StartTime;
+                Samples = original.Samples;
+                EndTime = original.EndTime;
+                Duration = original.Duration;
+                RequiredHits = original.RequiredHits;
+            }
+
+            public override Judgement CreateJudgement() => new TaikoClassicSwellJudgement();
+        }
+
         private class ClassicDrawableSwell : DrawableSwell
         {
             public override bool DisplayResult => false;
 
             protected override HitResult OkResult => HitResult.SmallBonus;
         }
+
+        #endregion
 
         public void Update(Playfield playfield)
         {
