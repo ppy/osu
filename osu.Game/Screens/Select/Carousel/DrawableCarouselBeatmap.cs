@@ -53,7 +53,9 @@ namespace osu.Game.Screens.Select.Carousel
         private Action<BeatmapInfo> hideRequested;
 
         private Triangles triangles;
+
         private StarCounter starCounter;
+        private DifficultyIcon difficultyIcon;
 
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
@@ -113,7 +115,7 @@ namespace osu.Game.Screens.Select.Carousel
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        new CalculatingDifficultyIcon(beatmapInfo)
+                        difficultyIcon = new DifficultyIcon(beatmapInfo)
                         {
                             ShowTooltip = false,
                             Scale = new Vector2(1.8f),
@@ -217,6 +219,8 @@ namespace osu.Game.Screens.Select.Carousel
                 starDifficultyBindable.BindValueChanged(d =>
                 {
                     starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
+                    if (d.NewValue != null)
+                        difficultyIcon.Current.Value = d.NewValue.Value;
                 }, true);
             }
 
