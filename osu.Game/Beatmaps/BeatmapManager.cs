@@ -418,22 +418,24 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IWorkingBeatmapCache
 
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo? importedBeatmap)
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo? beatmapInfo)
         {
             // Detached sets don't come with files.
             // If we seem to be missing files, now is a good time to re-fetch.
-            if (importedBeatmap?.BeatmapSet?.Files.Count == 0)
+            if (beatmapInfo?.IsManaged == true || beatmapInfo?.BeatmapSet?.Files.Count == 0)
             {
                 Realm.Run(r =>
                 {
-                    var refetch = r.Find<BeatmapInfo>(importedBeatmap.ID)?.Detach();
+                    var refetch = r.Find<BeatmapInfo>(beatmapInfo.ID)?.Detach();
 
                     if (refetch != null)
-                        importedBeatmap = refetch;
+                        beatmapInfo = refetch;
                 });
             }
 
-            return workingBeatmapCache.GetWorkingBeatmap(importedBeatmap);
+            Debug.Assert(beatmapInfo?.IsManaged != true);
+
+            return workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
         }
 
         void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
