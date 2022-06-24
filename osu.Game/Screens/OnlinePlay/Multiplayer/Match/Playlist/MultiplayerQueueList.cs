@@ -64,7 +64,32 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             {
                 base.LoadComplete();
 
-                RequestDeletion = item => multiplayerClient.RemovePlaylistItem(item.ID).FireAndForget();
+                RequestDeletion = item =>
+                {
+                    // If the requested item is the currently selected one, we proceed to a swap because we can't delete the current item
+                    if (IsSelectedItem && multiplayerClient.Room?.Playlist.Count > 1)
+                    {
+                        // We delete the second item which we cache first then we update the first one with the cache
+                        var secondItem = multiplayerClient.Room.Playlist[1];
+                        var replacingItem = new MultiplayerPlaylistItem
+                        {
+                            ID = item.ID,
+                            BeatmapID = secondItem.BeatmapID,
+                            BeatmapChecksum = secondItem.BeatmapChecksum,
+                            RulesetID = secondItem.RulesetID,
+                            RequiredMods = secondItem.RequiredMods,
+                            AllowedMods = secondItem.AllowedMods
+                        };
+
+                        multiplayerClient.RemovePlaylistItem(secondItem.ID).FireAndForget(onSuccess: () =>
+                        {
+                            multiplayerClient.EditPlaylistItem(replacingItem).FireAndForget();
+                        });
+                        return;
+                    }
+                    // Normal case
+                    multiplayerClient.RemovePlaylistItem(item.ID).FireAndForget();
+                };
 
                 multiplayerClient.RoomUpdated += onRoomUpdated;
                 onRoomUpdated();
@@ -79,7 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
                 bool isItemOwner = Item.OwnerID == api.LocalUser.Value.OnlineID || multiplayerClient.IsHost;
 
-                AllowDeletion = isItemOwner && !Item.Expired && Item.ID != multiplayerClient.Room.Settings.PlaylistItemId;
+                AllowDeletion = isItemOwner && !Item.Expired;
                 AllowEditing = isItemOwner && !Item.Expired;
             }
 
