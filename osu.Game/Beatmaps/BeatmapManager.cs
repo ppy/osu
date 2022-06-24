@@ -422,7 +422,7 @@ namespace osu.Game.Beatmaps
         {
             // Detached sets don't come with files.
             // If we seem to be missing files, now is a good time to re-fetch.
-            if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
+            if (beatmapInfo?.IsManaged == true || beatmapInfo?.BeatmapSet?.Files.Count == 0)
             {
                 Realm.Run(r =>
                 {
@@ -432,6 +432,8 @@ namespace osu.Game.Beatmaps
                         beatmapInfo = refetch;
                 });
             }
+
+            Debug.Assert(beatmapInfo?.IsManaged != true);
 
             return workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
         }
