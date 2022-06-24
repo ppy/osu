@@ -64,13 +64,13 @@ namespace osu.Game.Beatmaps
         {
             base.LoadComplete();
 
-            currentRuleset.BindValueChanged(_ => updateTrackedBindables());
+            currentRuleset.BindValueChanged(_ => Scheduler.AddOnce(updateTrackedBindables));
 
             currentMods.BindValueChanged(mods =>
             {
                 modSettingChangeTracker?.Dispose();
 
-                updateTrackedBindables();
+                Scheduler.AddOnce(updateTrackedBindables);
 
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
                 modSettingChangeTracker.SettingChanged += _ =>
