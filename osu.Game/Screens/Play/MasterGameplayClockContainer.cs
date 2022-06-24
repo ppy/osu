@@ -255,7 +255,7 @@ namespace osu.Game.Screens.Play
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => GameplayClock;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : null;
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
         {

@@ -908,6 +908,6 @@ namespace osu.Game.Screens.Edit
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => editorBeatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => clock;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
     }
 }
