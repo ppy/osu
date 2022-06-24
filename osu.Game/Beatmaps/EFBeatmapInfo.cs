@@ -128,7 +128,7 @@ namespace osu.Game.Beatmaps
         public List<EFScoreInfo> Scores { get; set; }
 
         [JsonIgnore]
-        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarRating);
+        public DifficultyRating DifficultyRating => StarDifficulty.GetDifficultyRating(StarRating);
 
         public override string ToString() => this.GetDisplayTitle();
 
