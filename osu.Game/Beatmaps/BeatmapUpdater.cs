@@ -61,6 +61,8 @@ namespace osu.Game.Beatmaps
                 var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
                 beatmap.Length = calculateLength(working.Beatmap);
                 beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
+
+                difficultyCache.Invalidate(beatmap);
             }
         }
 
