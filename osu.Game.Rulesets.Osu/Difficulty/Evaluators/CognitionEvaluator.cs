@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 noteDensity += opacity;
             }
 
-            double noteDensityDifficulty = Math.Pow(Math.Max(0, noteDensity - 3), 2.5);
+            double noteDensityDifficulty = Math.Pow(Math.Max(0, noteDensity - 2), 2);
 
             double hiddenDifficulty = 0;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 noteDensityDifficulty *= 3.2;
 
                 // Really not sure about this, but without this a lot of normal HD plays become underweight.
-                hiddenDifficulty = 11 * currObj.LazyJumpDistance / currObj.StrainTime;
+                hiddenDifficulty = 7 * currObj.LazyJumpDistance / currObj.StrainTime;
             }
 
             double preemptDifficulty = 0.0;
