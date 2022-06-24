@@ -137,6 +137,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private class TaikoClassicSwellJudgement : TaikoSwellJudgement
         {
             public override HitResult MaxResult => HitResult.LargeBonus;
+
+            public override HitResult OkResult => HitResult.SmallBonus;
         }
 
         private class ClassicSwell : Swell
@@ -156,8 +158,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private class ClassicDrawableSwell : DrawableSwell
         {
             public override bool DisplayResult => false;
-
-            protected override HitResult OkResult => HitResult.SmallBonus;
         }
 
         #endregion

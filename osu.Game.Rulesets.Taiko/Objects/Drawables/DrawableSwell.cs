@@ -16,7 +16,7 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double ring_appear_offset = 100;
 
-        protected virtual HitResult OkResult => HitResult.Ok;
         private readonly Container<DrawableSwellTick> ticks;
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
@@ -223,7 +222,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? OkResult : r.Judgement.MinResult);
+                ApplyResult(r =>
+                {
+                    var swellJudgement = (TaikoSwellJudgement)r.Judgement;
+                    r.Type = numHits > HitObject.RequiredHits / 2 ? swellJudgement.OkResult : swellJudgement.MinResult;
+                });
             }
         }
 
