@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
@@ -28,8 +27,6 @@ namespace osu.Game.Beatmaps.Drawables
             set => difficultyIcon.ShowTooltip = value;
         }
 
-        private readonly IBeatmapInfo beatmapInfo;
-
         private readonly DifficultyIcon difficultyIcon;
 
         /// <summary>
@@ -38,17 +35,16 @@ namespace osu.Game.Beatmaps.Drawables
         /// <param name="beatmapInfo">The beatmap to show the difficulty of.</param>
         public CalculatingDifficultyIcon(IBeatmapInfo beatmapInfo)
         {
-            this.beatmapInfo = beatmapInfo ?? throw new ArgumentNullException(nameof(beatmapInfo));
-
             AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
                 difficultyIcon = new DifficultyIcon(beatmapInfo),
-                new DelayedLoadUnloadWrapper(createDifficultyRetriever, 0)
+                new DelayedLoadUnloadWrapper(() => new DifficultyRetriever(beatmapInfo) { StarDifficulty = { BindTarget = difficultyIcon.Current } }, 0)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
             };
         }
-
-        private Drawable createDifficultyRetriever() => new DifficultyRetriever(beatmapInfo) { StarDifficulty = { BindTarget = difficultyIcon.Current } };
     }
 }
