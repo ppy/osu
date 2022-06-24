@@ -26,7 +26,7 @@ namespace osu.Game.Database
         /// <summary>
         /// A user displayable name for the model type associated with this manager.
         /// </summary>
-        string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
+        string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLowerInvariant()}";
 
         /// <summary>
         /// Fired when the user requests to view the resulting import.
