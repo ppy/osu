@@ -80,8 +80,6 @@ namespace osu.Game.Beatmaps
             // If this is ever an issue, we can consider marking as pending delete but not resetting the IDs (but care will be required for
             // beatmaps, which don't have their own `DeletePending` state).
 
-            beatmapUpdater?.Process(beatmapSet, realm);
-
             if (beatmapSet.OnlineID > 0)
             {
                 var existingSetWithSameOnlineID = realm.All<BeatmapSetInfo>().SingleOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
@@ -97,6 +95,13 @@ namespace osu.Game.Beatmaps
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be deleted.");
                 }
             }
+        }
+
+        protected override void PostImport(BeatmapSetInfo model, Realm realm)
+        {
+            base.PostImport(model, realm);
+
+            beatmapUpdater?.Process(model);
         }
 
         private void validateOnlineIds(BeatmapSetInfo beatmapSet, Realm realm)

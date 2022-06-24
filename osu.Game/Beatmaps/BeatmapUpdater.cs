@@ -3,9 +3,9 @@
 
 #nullable enable
 
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using osu.Framework.Extensions;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects;
 using Realms;
@@ -52,17 +52,18 @@ namespace osu.Game.Beatmaps
 
             foreach (var beatmap in beatmapSet.Beatmaps)
             {
-                // Because we aren't guaranteed all processing will happen on this thread, it's very hard to use the live realm object.
-                // This can be fixed by adding a synchronous flow to `BeatmapDifficultyCache`.
-                var detachedBeatmap = beatmap.Detach();
+                difficultyCache.Invalidate(beatmap);
 
-                beatmap.StarRating = difficultyCache.GetDifficultyAsync(detachedBeatmap).GetResultSafely()?.Stars ?? 0;
+                var working = workingBeatmapCache.GetWorkingBeatmap(beatmap.Detach());
+                var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
 
-                var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
+                Debug.Assert(ruleset != null);
+
+                var calculator = ruleset.CreateDifficultyCalculator(working);
+
+                beatmap.StarRating = calculator.Calculate().StarRating;
                 beatmap.Length = calculateLength(working.Beatmap);
                 beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
-
-                difficultyCache.Invalidate(beatmap);
             }
         }
 
