@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// The length (in milliseconds) between ticks of this drumroll.
         /// <para>Half of this value is the hit window of the ticks.</para>
         /// </summary>
-        protected double TickSpacing = 100;
+        private double tickSpacing = 100;
 
         private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
 
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             double scoringDistance = base_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
             Velocity = scoringDistance / timingPoint.BeatLength;
 
-            TickSpacing = timingPoint.BeatLength / TickRate;
+            tickSpacing = timingPoint.BeatLength / TickRate;
             overallDifficulty = difficulty.OverallDifficulty;
         }
 
@@ -91,19 +91,19 @@ namespace osu.Game.Rulesets.Taiko.Objects
         {
             List<TaikoHitObject> ticks = new List<TaikoHitObject>();
 
-            if (TickSpacing == 0)
+            if (tickSpacing == 0)
                 return ticks;
 
             bool first = true;
 
-            for (double t = StartTime; t < EndTime + TickSpacing / 2; t += TickSpacing)
+            for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 ticks.Add(new DrumRollTick
                 {
                     FirstTick = first,
-                    TickSpacing = TickSpacing,
+                    TickSpacing = tickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong
                 });
