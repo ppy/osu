@@ -56,7 +56,7 @@ namespace osu.Game.Storyboards
             {
                 var first = Alpha.Commands.FirstOrDefault();
 
-                return first?.StartValue == 0 ? first.StartTime : (double?)null;
+                return first?.StartValue == 0 ? first.StartTime : null;
             }
         }
 
