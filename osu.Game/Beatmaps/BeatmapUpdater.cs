@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
             {
                 difficultyCache.Invalidate(beatmap);
 
-                var working = workingBeatmapCache.GetWorkingBeatmap(beatmap.Detach());
+                var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
                 var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
 
                 Debug.Assert(ruleset != null);
@@ -65,6 +65,9 @@ namespace osu.Game.Beatmaps
                 beatmap.Length = calculateLength(working.Beatmap);
                 beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
             }
+
+            // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
+            workingBeatmapCache.Invalidate(beatmapSet);
         }
 
         private double calculateLength(IBeatmap b)
