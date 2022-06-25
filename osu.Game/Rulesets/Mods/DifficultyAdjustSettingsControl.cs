@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Mods
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(current => updateCurrentFromSlider());
-            beatmap.BindValueChanged(b => updateCurrentFromSlider(), true);
+            Current.BindValueChanged(_ => updateCurrentFromSlider());
+            beatmap.BindValueChanged(_ => updateCurrentFromSlider(), true);
 
             sliderDisplayCurrent.BindValueChanged(number =>
             {

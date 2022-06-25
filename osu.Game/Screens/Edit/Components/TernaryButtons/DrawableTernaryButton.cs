@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         {
             base.LoadComplete();
 
-            Button.Bindable.BindValueChanged(selected => updateSelectionState(), true);
+            Button.Bindable.BindValueChanged(_ => updateSelectionState(), true);
 
             Action = onAction;
         }

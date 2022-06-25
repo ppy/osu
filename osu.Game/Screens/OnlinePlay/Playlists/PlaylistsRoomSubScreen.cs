@@ -68,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 }
             }, true);
 
-            Room.MaxAttempts.BindValueChanged(attempts => progressSection.Alpha = Room.MaxAttempts.Value != null ? 1 : 0, true);
+            Room.MaxAttempts.BindValueChanged(_ => progressSection.Alpha = Room.MaxAttempts.Value != null ? 1 : 0, true);
         }
 
         protected override Drawable CreateMainContent() => new Container

@@ -156,9 +156,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             {
                 switch (m)
                 {
-                    case ManiaModNoFail _:
-                    case ManiaModEasy _:
-                    case ManiaModHalfTime _:
+                    case ManiaModNoFail:
+                    case ManiaModEasy:
+                    case ManiaModHalfTime:
                         scoreMultiplier *= 0.5;
                         break;
                 }

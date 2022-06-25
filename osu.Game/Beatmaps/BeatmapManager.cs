@@ -101,7 +101,7 @@ namespace osu.Game.Beatmaps
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
                 b.BeatmapSet = beatmapSet;
 
-            var imported = beatmapImporter.Import(beatmapSet);
+            var imported = beatmapImporter.ImportModel(beatmapSet);
 
             if (imported == null)
                 throw new InvalidOperationException("Failed to import new beatmap");
@@ -409,11 +409,8 @@ namespace osu.Game.Beatmaps
         public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) =>
             beatmapImporter.Import(task, batchImport, cancellationToken);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(archive, batchImport, cancellationToken);
-
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(item, archive, false, cancellationToken);
+            beatmapImporter.ImportModel(item, archive, false, cancellationToken);
 
         public IEnumerable<string> HandledExtensions => beatmapImporter.HandledExtensions;
 
@@ -421,22 +418,24 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IWorkingBeatmapCache
 
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo? importedBeatmap)
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo? beatmapInfo)
         {
             // Detached sets don't come with files.
             // If we seem to be missing files, now is a good time to re-fetch.
-            if (importedBeatmap?.BeatmapSet?.Files.Count == 0)
+            if (beatmapInfo?.IsManaged == true || beatmapInfo?.BeatmapSet?.Files.Count == 0)
             {
                 Realm.Run(r =>
                 {
-                    var refetch = r.Find<BeatmapInfo>(importedBeatmap.ID)?.Detach();
+                    var refetch = r.Find<BeatmapInfo>(beatmapInfo.ID)?.Detach();
 
                     if (refetch != null)
-                        importedBeatmap = refetch;
+                        beatmapInfo = refetch;
                 });
             }
 
-            return workingBeatmapCache.GetWorkingBeatmap(importedBeatmap);
+            Debug.Assert(beatmapInfo?.IsManaged != true);
+
+            return workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
         }
 
         void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
@@ -457,9 +456,9 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IPostImports<out BeatmapSetInfo>
 
-        public Action<IEnumerable<Live<BeatmapSetInfo>>>? PostImport
+        public Action<IEnumerable<Live<BeatmapSetInfo>>>? PresentImport
         {
-            set => beatmapImporter.PostImport = value;
+            set => beatmapImporter.PresentImport = value;
         }
 
         #endregion

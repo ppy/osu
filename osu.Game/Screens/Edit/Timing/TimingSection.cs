@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 Label = "BPM";
 
-                OnCommit += (val, isNew) =>
+                OnCommit += (_, isNew) =>
                 {
                     if (!isNew) return;
 

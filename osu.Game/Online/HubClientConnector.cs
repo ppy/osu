@@ -64,7 +64,7 @@ namespace osu.Game.Online
             this.preferMessagePack = preferMessagePack;
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(state => connectIfPossible(), true);
+            apiState.BindValueChanged(_ => connectIfPossible(), true);
         }
 
         public void Reconnect()

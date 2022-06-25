@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            filter.Search.OnCommit += (sender, newText) =>
+            filter.Search.OnCommit += (_, _) =>
             {
                 list.FirstVisibleSet?.PerformRead(set =>
                 {

@@ -251,8 +251,8 @@ namespace osu.Game.Overlays.Comments
                     if (bundle.HasMore)
                     {
                         int loadedTopLevelComments = 0;
-                        pinnedContent.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
-                        content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
+                        pinnedContent.Children.OfType<DrawableComment>().ForEach(_ => loadedTopLevelComments++);
+                        content.Children.OfType<DrawableComment>().ForEach(_ => loadedTopLevelComments++);
 
                         moreButton.Current.Value = bundle.TopLevelCount - loadedTopLevelComments;
                         moreButton.IsLoading = false;
