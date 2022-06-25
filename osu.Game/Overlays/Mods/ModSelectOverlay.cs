@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Mods
         /// </remarks>
         public Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> AvailableMods { get; } = new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>(new Dictionary<ModType, IReadOnlyList<ModState>>());
 
-        private Func<Mod, bool> isValidMod = m => true;
+        private Func<Mod, bool> isValidMod = _ => true;
 
         /// <summary>
         /// A function determining whether each mod in the column should be displayed.
@@ -689,11 +689,11 @@ namespace osu.Game.Overlays.Mods
 
                 switch (e)
                 {
-                    case ClickEvent _:
+                    case ClickEvent:
                         OnClicked?.Invoke();
                         return true;
 
-                    case MouseEvent _:
+                    case MouseEvent:
                         return true;
                 }
 

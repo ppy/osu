@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Timing
                 base.LoadComplete();
 
                 Current.BindValueChanged(_ => updateFromCurrent(), true);
-                numeratorBox.OnCommit += (_, __) => updateFromNumeratorBox();
+                numeratorBox.OnCommit += (_, _) => updateFromNumeratorBox();
             }
 
             private void updateFromCurrent()

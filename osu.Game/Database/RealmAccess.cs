@@ -454,7 +454,7 @@ namespace osu.Game.Database
         public IDisposable SubscribeToPropertyChanged<TModel, TProperty>(Func<Realm, TModel?> modelAccessor, Expression<Func<TModel, TProperty>> propertyLookup, Action<TProperty> onChanged)
             where TModel : RealmObjectBase
         {
-            return RegisterCustomSubscription(r =>
+            return RegisterCustomSubscription(_ =>
             {
                 string propertyName = getMemberName(propertyLookup);
 

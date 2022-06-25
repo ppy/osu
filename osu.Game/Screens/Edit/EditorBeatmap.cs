@@ -105,8 +105,8 @@ namespace osu.Game.Screens.Edit
             {
                 switch (controlPoint)
                 {
-                    case DifficultyControlPoint _:
-                    case SampleControlPoint _:
+                    case DifficultyControlPoint:
+                    case SampleControlPoint:
                         // skip legacy types.
                         continue;
 

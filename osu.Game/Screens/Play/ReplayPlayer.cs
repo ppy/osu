@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play
         protected override bool CheckModsAllowFailure() => false;
 
         public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
-            : this((_, __) => score, configuration)
+            : this((_, _) => score, configuration)
         {
         }
 

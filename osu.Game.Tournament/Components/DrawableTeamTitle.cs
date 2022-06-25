@@ -27,7 +27,7 @@ namespace osu.Game.Tournament.Components
         {
             if (team == null) return;
 
-            (acronym = team.Acronym.GetBoundCopy()).BindValueChanged(acronym => Text.Text = team?.FullName.Value ?? string.Empty, true);
+            (acronym = team.Acronym.GetBoundCopy()).BindValueChanged(_ => Text.Text = team?.FullName.Value ?? string.Empty, true);
         }
     }
 }

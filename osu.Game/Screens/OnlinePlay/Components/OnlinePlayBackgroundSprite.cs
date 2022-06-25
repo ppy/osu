@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             InternalChild = sprite = CreateBackgroundSprite();
 
             CurrentPlaylistItem.BindValueChanged(_ => updateBeatmap());
-            Playlist.CollectionChanged += (_, __) => updateBeatmap();
+            Playlist.CollectionChanged += (_, _) => updateBeatmap();
 
             updateBeatmap();
         }
