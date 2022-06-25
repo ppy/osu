@@ -27,17 +27,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
             TaikoDifficultyHitObjectColour colour = ((TaikoDifficultyHitObject)current).Colour;
             double difficulty = colour == null ? 0 : colour.EvaluatedDifficulty;
-            if (current != null && colour != null)
-            {
-                ColourEncoding[] payload = colour.Encoding.Payload;
-                string payloadDisplay = "";
-                for (int i = 0; i < payload.Length; ++i)
-                {
-                    payloadDisplay += $",({payload[i].MonoRunLength},{payload[i].EncodingRunLength})";
-                }
+            // if (current != null && colour != null)
+            // {
+            //     ColourEncoding[] payload = colour.Encoding.Payload;
+            //     string payloadDisplay = "";
+            //     for (int i = 0; i < payload.Length; ++i)
+            //     {
+            //         payloadDisplay += $",({payload[i].MonoRunLength},{payload[i].EncodingRunLength})";
+            //     }
 
-                System.Console.WriteLine($"{current.StartTime},{colour.RepetitionInterval},{colour.Encoding.RunLength}{payloadDisplay}");
-            }
+            //     System.Console.WriteLine($"{current.StartTime},{colour.RepetitionInterval},{colour.Encoding.RunLength}{payloadDisplay}");
+            // }
 
             return difficulty;
         }
