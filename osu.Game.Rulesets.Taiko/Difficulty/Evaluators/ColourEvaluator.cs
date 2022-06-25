@@ -14,21 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
         public static double EvaluateDifficultyOf(TaikoDifficultyHitObjectColour colour)
         {
-            if (colour == null) return 0;
-
-            double objectStrain = 1.85;
-
-            if (colour.Delta)
-            {
-                objectStrain *= sigmoid(colour.DeltaRunLength, 3, 3) * 0.5 + 0.5;
-            }
-            else
-            {
-                objectStrain *= sigmoid(colour.DeltaRunLength, 2, 2) * 0.5 + 0.5;
-            }
-
-            objectStrain *= -sigmoid(colour.RepetitionInterval, 1, 8);
-            return objectStrain;
+            return 1;
         }
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
