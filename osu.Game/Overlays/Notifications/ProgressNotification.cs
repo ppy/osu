@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Notifications
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
                     NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
-                    this.FadeOut(200).Finally(d => Completed());
+                    this.FadeOut(200).Finally(_ => Completed());
                     break;
             }
         }

@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Edit.Timing
                 }, true);
 
                 controlPointGroups.BindTo(Beatmap.ControlPointInfo.Groups);
-                controlPointGroups.BindCollectionChanged((sender, args) =>
+                controlPointGroups.BindCollectionChanged((_, _) =>
                 {
                     table.ControlGroups = controlPointGroups;
                     changeHandler?.SaveState();

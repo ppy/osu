@@ -216,9 +216,9 @@ namespace osu.Game.Overlays.Mods
             base.OnMouseUp(e);
         }
 
-        protected virtual Colour4 BackgroundColour => Active.Value ? activeColour.Darken(0.3f) : (Colour4)ColourProvider.Background3;
-        protected virtual Colour4 ForegroundColour => Active.Value ? activeColour : (Colour4)ColourProvider.Background2;
-        protected virtual Colour4 TextColour => Active.Value ? (Colour4)ColourProvider.Background6 : Colour4.White;
+        protected virtual Colour4 BackgroundColour => Active.Value ? activeColour.Darken(0.3f) : ColourProvider.Background3;
+        protected virtual Colour4 ForegroundColour => Active.Value ? activeColour : ColourProvider.Background2;
+        protected virtual Colour4 TextColour => Active.Value ? ColourProvider.Background6 : Colour4.White;
 
         protected virtual void UpdateState()
         {

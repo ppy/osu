@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             controlPointGroups.UnbindAll();
             controlPointGroups.BindTo(beatmap.ControlPointInfo.Groups);
-            controlPointGroups.BindCollectionChanged((sender, args) =>
+            controlPointGroups.BindCollectionChanged((_, args) =>
             {
                 switch (args.Action)
                 {

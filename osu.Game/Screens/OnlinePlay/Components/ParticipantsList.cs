@@ -60,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            RecentParticipants.CollectionChanged += (_, __) => updateParticipants();
+            RecentParticipants.CollectionChanged += (_, _) => updateParticipants();
             updateParticipants();
         }
 

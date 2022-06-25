@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 new JuiceStreamPathVertex(20, -5)
             }));
 
-            removeCount = path.RemoveVertices((_, i) => true);
+            removeCount = path.RemoveVertices((_, _) => true);
             Assert.That(removeCount, Is.EqualTo(1));
             Assert.That(path.Vertices, Is.EqualTo(new[]
             {
