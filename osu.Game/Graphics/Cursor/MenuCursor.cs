@@ -51,6 +51,9 @@ namespace osu.Game.Graphics.Cursor
         {
             if (dragRotationState != DragRotationState.NotDragging)
             {
+                if (Vector2.Distance(positionMouseDown, e.MousePosition) > 100)
+                    positionMouseDown = Interpolation.ValueAt(0.001f, positionMouseDown, e.MousePosition, 0, Clock.ElapsedFrameTime);
+
                 var position = e.MousePosition;
                 float distance = Vector2Extensions.Distance(position, positionMouseDown);
 
