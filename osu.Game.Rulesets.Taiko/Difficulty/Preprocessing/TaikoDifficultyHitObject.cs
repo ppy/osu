@@ -52,21 +52,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         public static List<DifficultyHitObject> Create(IBeatmap beatmap, double clockRate)
         {
-            List<DifficultyHitObject> difficultyHitObject = new List<DifficultyHitObject>();
+            List<DifficultyHitObject> difficultyHitObjects = new List<DifficultyHitObject>();
             List<TaikoDifficultyHitObject> centreObjects = new List<TaikoDifficultyHitObject>();
             List<TaikoDifficultyHitObject> rimObjects = new List<TaikoDifficultyHitObject>();
             List<TaikoDifficultyHitObject> noteObjects = new List<TaikoDifficultyHitObject>();
 
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
-                difficultyHitObject.Add(
+                difficultyHitObjects.Add(
                     new TaikoDifficultyHitObject(
-                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, difficultyHitObject,
-                        centreObjects, rimObjects, noteObjects, difficultyHitObject.Count)
+                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, difficultyHitObjects,
+                        centreObjects, rimObjects, noteObjects, difficultyHitObjects.Count)
                 );
             }
 
-            List<TaikoDifficultyHitObjectColour> colours = TaikoDifficultyHitObjectColour.CreateColoursFor(difficultyHitObject);
+            List<TaikoDifficultyHitObjectColour> colours = TaikoDifficultyHitObjectColour.EncodeAndAssign(difficultyHitObjects);
 
             // Pre-evaluate colours
             for (int i = 0; i < colours.Count; i++)
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 colours[i].EvaluatedDifficulty = ColourEvaluator.EvaluateDifficultyOf(colours[i]);
             }
 
-            return difficultyHitObject;
+            return difficultyHitObjects;
         }
 
         /// <summary>

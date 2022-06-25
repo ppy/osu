@@ -1,5 +1,3 @@
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -11,72 +9,51 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     /// </summary>
     public class TaikoDifficultyHitObjectColour
     {
+        public CoupledColourEncoding Encoding { get; private set; }
+
         private const int max_repetition_interval = 16;
-
-        public TaikoDifficultyHitObjectColour Previous { get; private set; }
-
-        /// <summary>
-        /// True if the current colour is different from the previous colour.
-        /// </summary>
-        public bool Delta { get; private set; }
-
-        /// <summary>
-        /// How many notes are Delta repeated
-        /// </summary>
-        public int DeltaRunLength { get; private set; }
 
         /// <summary>
         /// How many notes between the current and previous identical <see cref="TaikoDifficultyHitObjectColour"/>.
         /// Negative number means that there is no repetition in range.
         /// If no repetition is found this will have a value of <see cref="max_repetition_interval"/> + 1.
         /// </summary>
-        public int RepetitionInterval { get; private set; }
+        public int RepetitionInterval { get; private set; } = max_repetition_interval + 1;
 
         /// <summary>
         ///  Evaluated colour difficulty is cached here, as difficulty don't need to be calculated per-note.
         /// </summary>
         /// TODO: Consider having all evaluated difficulty cached in TaikoDifficultyHitObject instead, since we may be
         ///       reusing evaluator results in the future.
-        public double EvaluatedDifficulty;
+        public double EvaluatedDifficulty = 0;
 
-        public TaikoDifficultyHitObjectColour repeatedColour { get; private set; }
+        public TaikoDifficultyHitObjectColour? Previous { get; private set; } = null;
 
-        /// <summary>
-        /// Get the <see cref="TaikoDifficultyHitObjectColour"/> instance for the given hitObject. This is implemented
-        /// as a static function instead of constructor to allow for reusing existing instances.
-        /// </summary>
-        public static List<TaikoDifficultyHitObjectColour> CreateColoursFor(List<DifficultyHitObject> hitObjects)
+        public TaikoDifficultyHitObjectColour? repeatedColour { get; private set; } = null;
+
+        public TaikoDifficultyHitObjectColour(CoupledColourEncoding encoding)
+        {
+            Encoding = encoding;
+        }
+
+        public static List<TaikoDifficultyHitObjectColour> EncodeAndAssign(List<DifficultyHitObject> hitObjects)
         {
             List<TaikoDifficultyHitObjectColour> colours = new List<TaikoDifficultyHitObjectColour>();
-
-            for (int i = 0; i < hitObjects.Count; i++)
+            List<CoupledColourEncoding> encodings = CoupledColourEncoding.Encode(ColourEncoding.Encode(hitObjects));
+            TaikoDifficultyHitObjectColour? lastColour = null;
+            for (int i = 0; i < encodings.Count; i++)
             {
-                TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)hitObjects[i];
-                TaikoDifficultyHitObject lastObject = hitObject.PreviousNote(0);
-                TaikoDifficultyHitObjectColour previous = lastObject?.Colour;
-                bool delta = lastObject == null || hitObject.HitType != lastObject.HitType;
-
-                if (previous != null && delta == previous.Delta)
+                lastColour = new TaikoDifficultyHitObjectColour(encodings[i])
                 {
-                    previous.DeltaRunLength += 1;
-                    hitObject.Colour = previous;
-                    continue;
-                }
-
-                TaikoDifficultyHitObjectColour colour = new TaikoDifficultyHitObjectColour()
-                {
-                    Delta = delta,
-                    DeltaRunLength = 1,
-                    RepetitionInterval = max_repetition_interval + 1,
-                    Previous = previous
+                    Previous = lastColour
                 };
-                hitObject.Colour = colour;
-                colours.Add(colour);
+                colours.Add(lastColour);
             }
 
-            for (int i = 0; i < colours.Count; i++)
+            foreach (TaikoDifficultyHitObjectColour colour in colours)
             {
-                colours[i].FindRepetitionInterval();
+                colour.FindRepetitionInterval();
+                ((TaikoDifficultyHitObject)hitObjects[colour.Encoding.StartIndex]).Colour = colour;
             }
 
             return colours;
@@ -94,20 +71,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 return;
             }
 
-            int interval = Previous.DeltaRunLength;
-            TaikoDifficultyHitObjectColour other = Previous.Previous;
-
-            while (other != null && interval < max_repetition_interval)
+            TaikoDifficultyHitObjectColour? other = Previous.Previous;
+            int interval = this.Encoding.StartIndex - other.Encoding.EndIndex;
+            while (interval < max_repetition_interval)
             {
-                if (other.Delta == Delta && other.DeltaRunLength == DeltaRunLength)
+                if (Encoding.hasIdenticalPayload(other.Encoding))
                 {
                     RepetitionInterval = Math.Min(interval, max_repetition_interval);
                     repeatedColour = other;
                     return;
                 }
 
-                interval += other.DeltaRunLength;
                 other = other.Previous;
+                if (other == null) break;
+                interval = this.Encoding.StartIndex - other.Encoding.EndIndex;
             }
 
             RepetitionInterval = max_repetition_interval + 1;
