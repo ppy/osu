@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Replays
             CurrentTime = Math.Clamp(time, frameStart, frameEnd);
 
             // In an important section, a mid-frame time cannot be used and a null is returned instead.
-            return inImportantSection && frameStart < time && time < frameEnd ? null : (double?)CurrentTime;
+            return inImportantSection && frameStart < time && time < frameEnd ? null : CurrentTime;
         }
 
         private double getFrameTime(int index)

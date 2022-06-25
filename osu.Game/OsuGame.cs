@@ -39,6 +39,7 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -69,7 +70,7 @@ namespace osu.Game
     /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
     /// for initial components that are generally retrieved via DI.
     /// </summary>
-    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager
+    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
@@ -637,6 +638,12 @@ namespace osu.Game
             Add(performFromMainMenuTask = new PerformFromMenuRunner(action, validScreens, () => ScreenStack.CurrentScreen));
         }
 
+        public override void AttemptExit()
+        {
+            // Using PerformFromScreen gives the user a chance to interrupt the exit process if needed.
+            PerformFromScreen(menu => menu.Exit());
+        }
+
         /// <summary>
         /// Wait for the game (and target component) to become loaded and then run an action.
         /// </summary>
@@ -705,13 +712,13 @@ namespace osu.Game
             SkinManager.PostNotification = n => Notifications.Post(n);
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
-            BeatmapManager.PostImport = items => PresentBeatmap(items.First().Value);
+            BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
 
             BeatmapDownloader.PostNotification = n => Notifications.Post(n);
             ScoreDownloader.PostNotification = n => Notifications.Post(n);
 
             ScoreManager.PostNotification = n => Notifications.Post(n);
-            ScoreManager.PostImport = items => PresentScore(items.First().Value);
+            ScoreManager.PresentImport = items => PresentScore(items.First().Value);
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.

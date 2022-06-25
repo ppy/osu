@@ -254,12 +254,12 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             switch (newPoint)
             {
-                case TimingControlPoint _:
+                case TimingControlPoint:
                     // Timing points are a special case and need to be added regardless of fallback availability.
                     existing = BinarySearch(TimingPoints, time);
                     break;
 
-                case EffectControlPoint _:
+                case EffectControlPoint:
                     existing = EffectPointAt(time);
                     break;
             }

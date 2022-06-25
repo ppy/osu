@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                roomPlaylist.BindCollectionChanged((_, __) => InvalidateLayout());
+                roomPlaylist.BindCollectionChanged((_, _) => InvalidateLayout());
             }
 
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.OfType<RearrangeableListItem<PlaylistItem>>().OrderBy(item => item.Model.PlaylistOrder);

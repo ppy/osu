@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania
 
         protected override string RulesetPrefix => ManiaRuleset.SHORT_NAME;
 
-        protected override string ComponentName => Component.ToString().ToLower();
+        protected override string ComponentName => Component.ToString().ToLowerInvariant();
     }
 
     public enum ManiaSkinComponents

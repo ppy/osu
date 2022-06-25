@@ -269,9 +269,9 @@ namespace osu.Game.Skinning
             {
                 switch (lookup)
                 {
-                    case GlobalSkinColours _:
-                    case SkinComboColourLookup _:
-                    case SkinCustomColourLookup _:
+                    case GlobalSkinColours:
+                    case SkinComboColourLookup:
+                    case SkinCustomColourLookup:
                         if (provider.AllowColourLookup)
                             return skin.GetConfig<TLookup, TValue>(lookup);
 

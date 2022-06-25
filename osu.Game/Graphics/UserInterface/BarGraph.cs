@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
 
                 //I'm using ToList() here because Where() returns an Enumerable which can change it's elements afterwards
-                RemoveRange(Children.Where((bar, index) => index >= value.Count()).ToList());
+                RemoveRange(Children.Where((_, index) => index >= value.Count()).ToList());
             }
         }
     }

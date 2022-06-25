@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [TearDownSteps]
-        public void TearDownSteps()
+        public virtual void TearDownSteps()
         {
             if (DebugUtils.IsNUnitRunning && Game != null)
             {

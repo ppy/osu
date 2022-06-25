@@ -798,10 +798,11 @@ namespace osu.Game.Screens.Edit
 
             if (trackPlaying)
             {
-                // generally users are not looking to perform tiny seeks when the track is playing,
-                // so seeks should always be by one full beat, bypassing the beatDivisor.
+                // generally users are not looking to perform tiny seeks when the track is playing.
                 // this multiplication undoes the division that will be applied in the underlying seek operation.
-                amount *= beatDivisor.Value;
+                // scale by BPM to keep the seek amount constant across all BPMs.
+                var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(clock.CurrentTimeAccurate);
+                amount *= beatDivisor.Value * (timingPoint.BPM / 120);
             }
 
             if (direction < 1)
@@ -907,6 +908,6 @@ namespace osu.Game.Screens.Edit
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => editorBeatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => clock;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
     }
 }
