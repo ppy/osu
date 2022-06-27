@@ -396,6 +396,9 @@ namespace osu.Game.Database
         /// <param name="action">The work to run.</param>
         public Task WriteAsync(Action<Realm> action)
         {
+            if (isDisposed)
+                throw new ObjectDisposedException(nameof(RealmAccess));
+
             // Required to ensure the write is tracked and accounted for before disposal.
             // Can potentially be avoided if we have a need to do so in the future.
             if (!ThreadSafety.IsUpdateThread)
