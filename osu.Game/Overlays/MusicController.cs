@@ -107,7 +107,7 @@ namespace osu.Game.Overlays
                 if (beatmap.Disabled)
                     return;
 
-                Logger.Log($"{nameof(MusicController)} skipping to next track to {nameof(EnsurePlayingSomething)}");
+                Logger.Log($"{nameof(MusicController)} skipping next track to {nameof(EnsurePlayingSomething)}");
                 NextTrack();
             }
             else if (!IsPlaying)
