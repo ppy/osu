@@ -549,7 +549,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createPrivateChannel()
         {
-            int id = RNG.Next(0, 10000);
+            int id = RNG.Next(0, DummyAPIAccess.DUMMY_USER_ID - 1);
             return new Channel(new APIUser
             {
                 Id = id,
@@ -559,7 +559,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createAnnounceChannel()
         {
-            int id = RNG.Next(0, 10000);
+            int id = RNG.Next(0, DummyAPIAccess.DUMMY_USER_ID - 1);
             return new Channel
             {
                 Name = $"Announce {id}",
