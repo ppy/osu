@@ -231,7 +231,7 @@ namespace osu.Game
         /// <summary>
         /// Unregisters a blocking <see cref="OverlayContainer"/> that was not created by <see cref="OsuGame"/> itself.
         /// </summary>
-        private void unregisterBlockingOverlay(OverlayContainer overlayContainer)
+        private void unregisterBlockingOverlay(OverlayContainer overlayContainer) => Schedule(() =>
         {
             externalOverlays.Remove(overlayContainer);
 
@@ -239,7 +239,7 @@ namespace osu.Game
                 focusedOverlays.Remove(focusedOverlayContainer);
 
             overlayContainer.Expire();
-        }
+        });
 
         #endregion
 
@@ -249,7 +249,7 @@ namespace osu.Game
         /// <param name="hideToolbar">Whether the toolbar should also be hidden.</param>
         public void CloseAllOverlays(bool hideToolbar = true)
         {
-            foreach (var overlay in focusedOverlays.ToArray())
+            foreach (var overlay in focusedOverlays)
                 overlay.Hide();
 
             if (hideToolbar) Toolbar.Hide();
