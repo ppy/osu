@@ -52,10 +52,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStoryboardSkipOutro()
         {
+            AddStep("set storyboard duration to long", () => currentStoryboardDuration = 200000);
             CreateTest(null);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("skip outro", () => InputManager.Key(osuTK.Input.Key.Space));
-            AddAssert("player is no longer current screen", () => !Player.IsCurrentScreen());
+            AddUntilStep("player is no longer current screen", () => !Player.IsCurrentScreen());
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
 
