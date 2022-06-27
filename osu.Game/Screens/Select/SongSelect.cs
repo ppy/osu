@@ -360,7 +360,10 @@ namespace osu.Game.Screens.Select
         {
             // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
             if (!Carousel.BeatmapSetsLoaded)
+            {
+                Logger.Log($"{nameof(FinaliseSelection)} aborted as carousel beatmaps are not yet loaded");
                 return;
+            }
 
             if (ruleset != null)
                 Ruleset.Value = ruleset;
