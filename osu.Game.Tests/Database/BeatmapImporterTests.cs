@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -607,6 +608,12 @@ namespace osu.Game.Tests.Database
                 using (var outStream = File.Open(brokenTempFilename, FileMode.CreateNew))
                 using (var zip = ZipArchive.Open(brokenOsz))
                 {
+                    foreach (var entry in zip.Entries.ToArray())
+                    {
+                        if (entry.Key.EndsWith(".osu", StringComparison.InvariantCulture))
+                            zip.RemoveEntry(entry);
+                    }
+
                     zip.AddEntry("broken.osu", brokenOsu, false);
                     zip.SaveTo(outStream, CompressionType.Deflate);
                 }
@@ -627,7 +634,7 @@ namespace osu.Game.Tests.Database
 
                 checkSingleReferencedFileCount(realm.Realm, 18);
 
-                Assert.AreEqual(1, loggedExceptionCount);
+                Assert.AreEqual(0, loggedExceptionCount);
 
                 File.Delete(brokenTempFilename);
             });
