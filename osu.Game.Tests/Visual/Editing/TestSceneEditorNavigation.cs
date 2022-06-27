@@ -9,12 +9,10 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
@@ -40,10 +38,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("switch ruleset", () => Game.Ruleset.Value = new ManiaRuleset().RulesetInfo);
 
             AddStep("open editor", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).Edit(beatmapSet.Beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == 0)));
-            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor
-                                                       && editor.IsLoaded
-                                                       && editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
-                                                       && editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true);
+            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
             AddStep("test gameplay", () =>
             {
                 var testGameplayButton = this.ChildrenOfType<TestGameplayButton>().Single();
