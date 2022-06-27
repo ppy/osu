@@ -14,24 +14,49 @@ namespace osu.Game.Beatmaps
         int? MaxCombo { get; }
 
         /// <summary>
+        /// The approach rate.
+        /// </summary>
+        float ApproachRate { get; }
+
+        /// <summary>
+        /// The circle size.
+        /// </summary>
+        float CircleSize { get; }
+
+        /// <summary>
+        /// The drain rate.
+        /// </summary>
+        float DrainRate { get; }
+
+        /// <summary>
+        /// The overall difficulty.
+        /// </summary>
+        float OverallDifficulty { get; }
+
+        /// <summary>
         /// The amount of circles in this beatmap.
         /// </summary>
-        public int CircleCount { get; }
+        int CircleCount { get; }
 
         /// <summary>
         /// The amount of sliders in this beatmap.
         /// </summary>
-        public int SliderCount { get; }
+        int SliderCount { get; }
+
+        /// <summary>
+        /// The amount of spinners in tihs beatmap.
+        /// </summary>
+        int SpinnerCount { get; }
 
         /// <summary>
         /// The amount of plays this beatmap has.
         /// </summary>
-        public int PlayCount { get; }
+        int PlayCount { get; }
 
         /// <summary>
         /// The amount of passes this beatmap has.
         /// </summary>
-        public int PassCount { get; }
+        int PassCount { get; }
 
         APIFailTimes? FailTimes { get; }
     }
