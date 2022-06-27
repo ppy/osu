@@ -249,7 +249,7 @@ namespace osu.Game
         /// <param name="hideToolbar">Whether the toolbar should also be hidden.</param>
         public void CloseAllOverlays(bool hideToolbar = true)
         {
-            foreach (var overlay in focusedOverlays)
+            foreach (var overlay in focusedOverlays.ToArray())
                 overlay.Hide();
 
             if (hideToolbar) Toolbar.Hide();
