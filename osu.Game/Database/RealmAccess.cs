@@ -388,26 +388,43 @@ namespace osu.Game.Database
             }
         }
 
+        private readonly CountdownEvent pendingAsyncWrites = new CountdownEvent(0);
+
         /// <summary>
         /// Write changes to realm asynchronously, guaranteeing order of execution.
         /// </summary>
         /// <param name="action">The work to run.</param>
         public Task WriteAsync(Action<Realm> action)
         {
-            // Regardless of calling Realm.GetInstance or Realm.GetInstanceAsync, there is a blocking overhead on retrieval.
-            // Adding a forced Task.Run resolves this.
+            // Required to ensure the write is tracked and accounted for before disposal.
+            // Can potentially be avoided if we have a need to do so in the future.
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException(@$"{nameof(WriteAsync)} must be called from the update thread.");
 
-            return Task.Run(async () =>
+            lock (realmLock)
             {
-                total_writes_async.Value++;
+                // CountdownEvent will fail if already at zero.
+                if (!pendingAsyncWrites.TryAddCount())
+                    pendingAsyncWrites.Reset(1);
 
-                // Not attempting to use Realm.GetInstanceAsync as there's seemingly no benefit to us (for now) and it adds complexity due to locking
-                // concerns in getRealmInstance(). On a quick check, it looks to be more suited to cases where realm is connecting to an online sync
-                // server, which we don't use. May want to report upstream or revisit in the future.
-                using (var realm = getRealmInstance())
-                    // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
-                    await realm.WriteAsync(() => action(realm));
-            });
+                // Regardless of calling Realm.GetInstance or Realm.GetInstanceAsync, there is a blocking overhead on retrieval.
+                // Adding a forced Task.Run resolves this.
+                var writeTask = Task.Run(async () =>
+                {
+                    total_writes_async.Value++;
+
+                    // Not attempting to use Realm.GetInstanceAsync as there's seemingly no benefit to us (for now) and it adds complexity due to locking
+                    // concerns in getRealmInstance(). On a quick check, it looks to be more suited to cases where realm is connecting to an online sync
+                    // server, which we don't use. May want to report upstream or revisit in the future.
+                    using (var realm = getRealmInstance())
+                        // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
+                        await realm.WriteAsync(() => action(realm));
+
+                    pendingAsyncWrites.Signal();
+                });
+
+                return writeTask;
+            }
         }
 
         /// <summary>
@@ -910,6 +927,9 @@ namespace osu.Game.Database
 
         public void Dispose()
         {
+            if (!pendingAsyncWrites.Wait(10000))
+                Logger.Log("Realm took too long waiting on pending async writes", level: LogLevel.Error);
+
             lock (realmLock)
             {
                 updateRealm?.Dispose();
