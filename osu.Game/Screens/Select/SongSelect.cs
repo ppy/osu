@@ -494,7 +494,7 @@ namespace osu.Game.Screens.Select
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
+                Logger.Log($"Song select updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {
@@ -519,7 +519,7 @@ namespace osu.Game.Screens.Select
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
                 if (!EqualityComparer<BeatmapInfo>.Default.Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
-                    Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
+                    Logger.Log($"Song select changing beatmap from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap?.ToString() ?? "null"}\"");
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
                 }
 
@@ -737,7 +737,10 @@ namespace osu.Game.Screens.Select
             bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
 
             if (!track.IsRunning && (music.UserPauseRequested != true || isNewTrack))
+            {
+                Logger.Log($"Song select decided to {nameof(ensurePlayingSelected)}");
                 music.Play(true);
+            }
 
             lastTrack.SetTarget(track);
         }

@@ -486,6 +486,7 @@ namespace osu.Game
         /// </remarks>
         public void PresentBeatmap(IBeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
+            Logger.Log($"Beginning {nameof(PresentBeatmap)} with beatmap {beatmap}");
             Live<BeatmapSetInfo> databasedSet = null;
 
             if (beatmap.OnlineID > 0)
@@ -522,6 +523,7 @@ namespace osu.Game
                 }
                 else
                 {
+                    Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} ruleset {selection.Ruleset}");
                     Ruleset.Value = selection.Ruleset;
                     Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
                 }
@@ -534,6 +536,8 @@ namespace osu.Game
         /// </summary>
         public void PresentScore(IScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
         {
+            Logger.Log($"Beginning {nameof(PresentScore)} with score {score}");
+
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
             ScoreInfo databasedScoreInfo = null;
@@ -568,6 +572,8 @@ namespace osu.Game
 
             PerformFromScreen(screen =>
             {
+                Logger.Log($"{nameof(PresentScore)} updating beatmap ({databasedBeatmap}) and ruleset ({databasedScore.ScoreInfo.Ruleset} to match score");
+
                 Ruleset.Value = databasedScore.ScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
