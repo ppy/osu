@@ -231,7 +231,7 @@ namespace osu.Game
         /// <summary>
         /// Unregisters a blocking <see cref="OverlayContainer"/> that was not created by <see cref="OsuGame"/> itself.
         /// </summary>
-        private void unregisterBlockingOverlay(OverlayContainer overlayContainer)
+        private void unregisterBlockingOverlay(OverlayContainer overlayContainer) => Schedule(() =>
         {
             externalOverlays.Remove(overlayContainer);
 
@@ -239,7 +239,7 @@ namespace osu.Game
                 focusedOverlays.Remove(focusedOverlayContainer);
 
             overlayContainer.Expire();
-        }
+        });
 
         #endregion
 
