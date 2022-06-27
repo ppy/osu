@@ -111,13 +111,11 @@ namespace osu.Game.Screens.Edit
                 if (!workingBeatmapUpdated)
                     return false;
 
-                var loadedScreen = screenContainer?.Children.SingleOrDefault(s => s.IsLoaded);
-
-                if (loadedScreen == null)
+                if (currentScreen?.IsLoaded != true)
                     return false;
 
-                if (loadedScreen is EditorScreenWithTimeline)
-                    return loadedScreen.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true;
+                if (currentScreen is EditorScreenWithTimeline)
+                    return currentScreen.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true;
 
                 return true;
             }
