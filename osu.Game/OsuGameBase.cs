@@ -490,10 +490,12 @@ namespace osu.Game
             }
         }
 
-        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> valueChangedEvent)
+        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
             if (IsLoaded && !ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException("Global beatmap bindable must be changed from update thread.");
+
+            Logger.Log($"Game-wide working beatmap updated to {beatmap.NewValue}");
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
