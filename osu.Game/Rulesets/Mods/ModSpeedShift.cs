@@ -11,31 +11,31 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModWindDown : ModTimeRamp
+    public class ModSpeedShift : ModTimeRamp
     {
-        public override string Name => "Wind Down";
-        public override string Acronym => "WD";
-        public override string Description => "Sloooow doooown...";
-        public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleDown;
+        public override string Name => "Speed Shift";
+        public override string Acronym => "SS";
+        public override string Description => "Change up the speed a bit!";
+        public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleUp;
         public override double ScoreMultiplier => 1.0;
 
         [SettingSource("Initial rate", "The starting speed of the track")]
         public override BindableNumber<double> InitialRate { get; } = new BindableDouble
         {
-            MinValue = 0.51,
+            MinValue = 0.5,
             MaxValue = 2,
             Default = 1,
             Value = 1,
             Precision = 0.01,
         };
 
-        [SettingSource("Final rate", "The speed increase to ramp towards")]
+        [SettingSource("Final rate", "The speed to shift towards")]
         public override BindableNumber<double> FinalRate { get; } = new BindableDouble
         {
             MinValue = 0.5,
-            MaxValue = 1.99,
-            Default = 0.75,
-            Value = 0.75,
+            MaxValue = 2,
+            Default = 1.5,
+            Value = 1.5,
             Precision = 0.01,
         };
 
@@ -45,22 +45,5 @@ namespace osu.Game.Rulesets.Mods
             Default = true,
             Value = true
         };
-
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModWindUp)).ToArray();
-
-        public ModWindDown()
-        {
-            InitialRate.BindValueChanged(val =>
-            {
-                if (val.NewValue <= FinalRate.Value)
-                    FinalRate.Value = val.NewValue - FinalRate.Precision;
-            });
-
-            FinalRate.BindValueChanged(val =>
-            {
-                if (val.NewValue >= InitialRate.Value)
-                    InitialRate.Value = val.NewValue + InitialRate.Precision;
-            });
-        }
     }
 }

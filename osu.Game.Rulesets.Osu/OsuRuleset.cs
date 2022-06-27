@@ -191,7 +191,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModWiggle(),
                         new OsuModSpinIn(),
                         new MultiMod(new OsuModGrow(), new OsuModDeflate()),
-                        new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new ModSpeedShift(),
                         new OsuModTraceable(),
                         new OsuModBarrelRoll(),
                         new OsuModApproachDifferent(),

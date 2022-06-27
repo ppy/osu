@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Taiko
                 case ModType.Fun:
                     return new Mod[]
                     {
-                        new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new ModSpeedShift(),
                         new TaikoModMuted(),
                         new ModAdaptiveSpeed()
                     };
