@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
@@ -37,9 +38,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             yield return (ATTRIB_ID_SCORE_MULTIPLIER, ScoreMultiplier);
         }
 
-        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
+        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
-            base.FromDatabaseAttributes(values);
+            base.FromDatabaseAttributes(values, onlineInfo);
 
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
             StarRating = values[ATTRIB_ID_DIFFICULTY];

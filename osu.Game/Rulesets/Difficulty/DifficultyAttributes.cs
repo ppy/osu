@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty
@@ -74,7 +75,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// Reads osu-web database attribute mappings into this <see cref="DifficultyAttributes"/> object.
         /// </summary>
         /// <param name="values">The attribute mappings.</param>
-        public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
+        /// <param name="onlineInfo">The <see cref="IBeatmapOnlineInfo"/> where more information about the beatmap may be extracted from (such as AR/CS/OD/etc).</param>
+        public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
         }
     }
