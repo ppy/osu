@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     continue;
                 }
 
-                if (pl.GetSettingEntries()?.Length > 0)
+                if (manager.GetSettingsFor(pl)?.Length > 0)
                     Add(new PluginSettingsSubsection(pl));
             }
         }

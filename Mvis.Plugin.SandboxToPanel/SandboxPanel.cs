@@ -81,9 +81,9 @@ namespace Mvis.Plugin.Sandbox
 
         private SettingsEntry[] entries;
 
-        public override SettingsEntry[] GetSettingEntries()
+        public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {
-            var config = (SandboxConfigManager)PluginManager.GetConfigManager(this);
+            var config = (SandboxConfigManager)pluginConfigManager;
 
             entries ??= new SettingsEntry[]
             {

@@ -43,9 +43,9 @@ namespace osu.Game.Screens.LLin.Plugins.Config
         protected override LocalisableString Header => plugin.Name;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(LLinPluginManager pluginManager)
         {
-            foreach (var se in plugin.GetSettingEntries())
+            foreach (var se in pluginManager.GetSettingsFor(plugin))
             {
                 Add(se.ToSettingsItem());
             }

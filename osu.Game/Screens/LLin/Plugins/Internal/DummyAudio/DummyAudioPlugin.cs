@@ -1,6 +1,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
@@ -21,7 +22,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
         private SettingsEntry[] entries;
         private readonly MConfigManager config;
 
-        public override SettingsEntry[] GetSettingEntries()
+        public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {
             if (entries == null)
             {

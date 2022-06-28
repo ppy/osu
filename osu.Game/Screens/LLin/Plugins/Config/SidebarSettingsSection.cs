@@ -37,12 +37,12 @@ namespace osu.Game.Screens.LLin.Plugins.Config
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(LLinPluginManager pluginManager)
         {
-            foreach (var se in plugin.GetSettingEntries())
+            foreach (var se in pluginManager.GetSettingsFor(plugin))
             {
                 var item = se.ToLLinSettingsItem();
-                if (item != null) Add(se.ToLLinSettingsItem());
+                if (item != null) Add(item);
             }
         }
     }

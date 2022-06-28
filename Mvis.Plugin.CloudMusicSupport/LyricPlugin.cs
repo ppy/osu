@@ -36,9 +36,9 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         private SettingsEntry[] entries;
 
-        public override SettingsEntry[] GetSettingEntries()
+        public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {
-            var config = (LyricConfigManager)PluginManager.GetConfigManager(this);
+            var config = (LyricConfigManager)pluginConfigManager;
 
             entries ??= new SettingsEntry[]
             {

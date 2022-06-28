@@ -93,7 +93,9 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
         {
             return new Overlays.Settings.SettingsSlider<T>
             {
-                Current = (Bindable<T>)Bindable,
+                //todo: 感觉这么做有些dirty，但起码能用
+                //todo: 可以换成"Current = { BindTarget = ... }"这样？
+                Current = (Bindable<T>)Bindable.GetBoundCopy(),
                 LabelText = Name,
                 TooltipText = Description.ToString(),
                 DisplayAsPercentage = this.DisplayAsPercentage,
@@ -107,7 +109,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             {
                 Description = Name,
                 TooltipText = Description,
-                Bindable = (Bindable<T>)this.Bindable,
+                Bindable = (Bindable<T>)Bindable.GetBoundCopy(),
                 Icon = this.Icon,
                 DisplayAsPercentage = this.DisplayAsPercentage
             };
@@ -125,7 +127,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
         {
             return new SettingsCheckbox
             {
-                Current = (Bindable<bool>)Bindable,
+                Current = (Bindable<bool>)Bindable.GetBoundCopy(),
                 LabelText = Name,
                 TooltipText = Description
             };
@@ -137,7 +139,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             {
                 Description = Name,
                 TooltipText = Description,
-                Bindable = (Bindable<bool>)this.Bindable,
+                Bindable = (Bindable<bool>)Bindable.GetBoundCopy(),
                 Icon = this.Icon
             };
         }
@@ -157,7 +159,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             return new SettingsDropdown<T>
             {
                 LabelText = Name,
-                Current = (Bindable<T>)Bindable,
+                Current = (Bindable<T>)Bindable.GetBoundCopy(),
                 Items = Values
             };
         }
@@ -168,7 +170,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             {
                 Description = Name,
                 TooltipText = Description,
-                Bindable = (Bindable<T>)this.Bindable,
+                Bindable = (Bindable<T>)Bindable.GetBoundCopy(),
                 Icon = this.Icon,
                 Values = this.Values.ToList()
             };
@@ -187,7 +189,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
         {
             return new SettingsTextBox
             {
-                Current = (Bindable<string>)Bindable,
+                Current = (Bindable<string>)Bindable.GetBoundCopy(),
                 LabelText = Name,
                 TooltipText = Description.ToString()
             };
@@ -211,7 +213,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
         {
             return new SettingsEnumDropdown<T>
             {
-                Current = (Bindable<T>)Bindable,
+                Current = (Bindable<T>)Bindable.GetBoundCopy(),
                 LabelText = Name,
                 TooltipText = Description.ToString()
             };
@@ -223,7 +225,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
             {
                 Description = Name,
                 TooltipText = Description,
-                Bindable = (Bindable<T>)this.Bindable,
+                Bindable = (Bindable<T>)Bindable.GetBoundCopy(),
                 Icon = this.Icon
             };
         }

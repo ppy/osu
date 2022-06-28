@@ -127,9 +127,9 @@ namespace Mvis.Plugin.StoryboardSupport
 
         private SettingsEntry[] entries;
 
-        public override SettingsEntry[] GetSettingEntries()
+        public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {
-            var config = (SbLoaderConfigManager)PluginManager.GetConfigManager(this);
+            var config = (SbLoaderConfigManager)pluginConfigManager;
 
             entries ??= new SettingsEntry[]
             {

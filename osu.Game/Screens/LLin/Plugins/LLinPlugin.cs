@@ -38,7 +38,10 @@ namespace osu.Game.Screens.LLin.Plugins
         public virtual IPluginConfigManager CreateConfigManager(Storage storage) => null;
 
         [CanBeNull]
-        public virtual SettingsEntry[] GetSettingEntries() => Array.Empty<SettingsEntry>();
+        public virtual SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager) => Array.Empty<SettingsEntry>();
+
+        [Obsolete("请使用带IPluginConfigManager作为参数的新方法")]
+        public virtual SettingsEntry[] GetSettingEntries() => null;
 
         /// <summary>
         /// 内容加载完毕后要执行的步骤

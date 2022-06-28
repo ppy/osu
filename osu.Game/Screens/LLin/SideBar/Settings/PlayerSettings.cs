@@ -44,7 +44,7 @@ namespace osu.Game.Screens.LLin.SideBar.Settings
 
                 if (pluginSidebarSection != null)
                     AddSection(pluginSidebarSection);
-                else if (pl.GetSettingEntries()?.Length > 0)
+                else if (pluginManager.GetSettingsFor(pl)?.Length > 0)
                     AddSection(new NewPluginSettingsSection(pl));
             }
 
