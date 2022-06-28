@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -17,7 +18,9 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
 
         public string ToPath(object target)
         {
-            return target.GetType().Name + "@" + target.GetType().Namespace;
+            var targetType = target is Type ? (Type)target : target.GetType();
+
+            return targetType.Name + "@" + targetType.Namespace;
         }
 
         internal bool RemoveFunctionBarProvider(IFunctionBarProvider functionBarProvider)
@@ -75,15 +78,15 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
             return null;
         }
 
-        private List<IProvideAudioControlPlugin> cachedAudioControlPluginList;
+        private List<Type> cachedAudioControlPluginList;
 
-        internal List<IProvideAudioControlPlugin> GetAllAudioControlPlugin()
+        internal List<Type> GetAllAudioControlPlugin()
         {
-            var list = new List<IProvideAudioControlPlugin>();
+            var list = new List<Type>();
 
             foreach (var keyPair in audioPluginDictionary)
             {
-                list.Add(keyPair.Value);
+                list.Add(keyPair.Value.GetType());
             }
 
             if (cachedAudioControlPluginList == null || cachedAudioControlPluginList != list)
@@ -92,15 +95,15 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
             return list;
         }
 
-        private List<IFunctionBarProvider> cachedFunctionBarPluginList;
+        private List<Type> cachedFunctionBarPluginList;
 
-        internal List<IFunctionBarProvider> GetAllFunctionBarProviders()
+        internal List<Type> GetAllFunctionBarProviders()
         {
-            var list = new List<IFunctionBarProvider>();
+            var list = new List<Type>();
 
             foreach (var keyPair in functionBarDictionary)
             {
-                list.Add(keyPair.Value);
+                list.Add(keyPair.Value.GetType());
             }
 
             if (cachedFunctionBarPluginList == null || cachedFunctionBarPluginList != list)

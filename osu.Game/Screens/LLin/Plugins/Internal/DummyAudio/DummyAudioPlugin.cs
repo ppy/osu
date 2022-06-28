@@ -1,8 +1,8 @@
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Screens.LLin.Plugins.Config;
-using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
 namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
@@ -26,8 +26,8 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
         {
             if (entries == null)
             {
-                ListSettingsEntry<IProvideAudioControlPlugin> audioEntry;
-                var audioPluginBindable = new Bindable<IProvideAudioControlPlugin>();
+                ListSettingsEntry<Type> audioEntry;
+                var audioPluginBindable = new Bindable<Type>();
 
                 entries = new SettingsEntry[]
                 {
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
                         Bindable = config.GetBindable<bool>(MSetting.MvisEnableNightcoreBeat),
                         Description = "动次打次动次打次"
                     },
-                    audioEntry = new ListSettingsEntry<IProvideAudioControlPlugin>
+                    audioEntry = new ListSettingsEntry<Type>
                     {
                         Name = "音乐控制插件",
                         Bindable = audioPluginBindable
@@ -60,17 +60,18 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
 
                 var plugins = PluginManager.GetAllAudioControlPlugin();
 
-                var currentAudioControlPlugin = config.Get<string>(MSetting.MvisCurrentAudioProvider);
-
                 foreach (var pl in plugins)
                 {
-                    if (currentAudioControlPlugin == PluginManager.ToPath(pl))
+                    if (config.Get<string>(MSetting.MvisCurrentAudioProvider) == PluginManager.ToPath(pl))
                     {
                         audioPluginBindable.Value = pl;
+                        break;
                     }
                 }
 
                 audioEntry.Values = plugins;
+                audioPluginBindable.Default = typeof(OsuMusicControllerWrapper);
+
                 audioPluginBindable.BindValueChanged(v =>
                 {
                     if (v.NewValue == null)
@@ -79,7 +80,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
                         return;
                     }
 
-                    var pl = (LLinPlugin)v.NewValue;
+                    var pl = v.NewValue;
 
                     config.SetValue(MSetting.MvisCurrentAudioProvider, PluginManager.ToPath(pl));
                 });

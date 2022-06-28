@@ -77,9 +77,9 @@ namespace osu.Game.Screens.LLin.Plugins
             return entryMap.ContainsKey(pl.GetType()) ? entryMap[pl.GetType()] : null;
         }
 
-        internal List<IFunctionBarProvider> GetAllFunctionBarProviders() => resolver.GetAllFunctionBarProviders();
+        internal List<Type> GetAllFunctionBarProviders() => resolver.GetAllFunctionBarProviders();
 
-        internal List<IProvideAudioControlPlugin> GetAllAudioControlPlugin() => resolver.GetAllAudioControlPlugin();
+        internal List<Type> GetAllAudioControlPlugin() => resolver.GetAllAudioControlPlugin();
 
         internal IProvideAudioControlPlugin GetAudioControlByPath([NotNull] string path) => resolver.GetAudioControlPluginByPath(path);
         internal IFunctionBarProvider GetFunctionBarProviderByPath([NotNull] string path) => resolver.GetFunctionBarProviderByPath(path);
