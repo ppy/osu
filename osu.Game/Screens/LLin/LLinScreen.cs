@@ -91,10 +91,14 @@ namespace osu.Game.Screens.LLin
 
         public Action<double> OnSeek { get; set; }
 
-        public void SeekTo(double position)
+        public bool SeekTo(double position)
         {
-            audioControlPlugin.Seek(position);
-            OnSeek?.Invoke(position);
+            bool success = audioControlPlugin.Seek(position);
+
+            if (success)
+                OnSeek?.Invoke(position);
+
+            return success;
         }
 
         public DrawableTrack CurrentTrack => audioControlPlugin.GetCurrentTrack();
@@ -227,15 +231,15 @@ namespace osu.Game.Screens.LLin
 
         private void initInternalKeyBindings()
         {
-            internalKeyBindings[GlobalAction.MvisMusicPrev] = prevButton.Active;
-            internalKeyBindings[GlobalAction.MvisMusicNext] = nextButton.Active;
-            internalKeyBindings[GlobalAction.MvisOpenInSongSelect] = soloButton.Active;
-            internalKeyBindings[GlobalAction.MvisToggleOverlayLock] = lockButton.Active;
-            internalKeyBindings[GlobalAction.MvisTogglePluginPage] = pluginButton.Active;
-            internalKeyBindings[GlobalAction.MvisTogglePause] = songProgressButton.Active;
-            internalKeyBindings[GlobalAction.MvisToggleTrackLoop] = loopToggleButton.Active;
-            internalKeyBindings[GlobalAction.MvisTogglePlayList] = sidebarToggleButton.Active;
-            internalKeyBindings[GlobalAction.MvisForceLockOverlayChanges] = disableChangesButton.Active;
+            internalKeyBindings[GlobalAction.MvisMusicPrev] = () => prevButton.Active();
+            internalKeyBindings[GlobalAction.MvisMusicNext] = () => nextButton.Active();
+            internalKeyBindings[GlobalAction.MvisOpenInSongSelect] = () => soloButton.Active();
+            internalKeyBindings[GlobalAction.MvisToggleOverlayLock] = () => lockButton.Active();
+            internalKeyBindings[GlobalAction.MvisTogglePluginPage] = () => pluginButton.Active();
+            internalKeyBindings[GlobalAction.MvisTogglePause] = () => songProgressButton.Active();
+            internalKeyBindings[GlobalAction.MvisToggleTrackLoop] = () => loopToggleButton.Active();
+            internalKeyBindings[GlobalAction.MvisTogglePlayList] = () => sidebarToggleButton.Active();
+            internalKeyBindings[GlobalAction.MvisForceLockOverlayChanges] = () => disableChangesButton.Active();
             internalKeyBindings[GlobalAction.Back] = () =>
             {
                 if (sidebar.IsPresent && sidebar.State.Value == Visibility.Visible)
@@ -672,14 +676,22 @@ namespace osu.Game.Screens.LLin
                 new FakeButton
                 {
                     Icon = FontAwesome.Solid.ArrowLeft,
-                    Action = this.Exit,
+                    Action = () =>
+                    {
+                        this.Exit();
+                        return true;
+                    },
                     Description = LLinBaseStrings.Exit,
                     Type = FunctionType.Base
                 },
                 new FakeButton
                 {
                     Icon = FontAwesome.Regular.QuestionCircle,
-                    Action = () => game?.OpenUrlExternally("https://matrix-feather.github.io/mfosu/mfosu_mp_manual/"),
+                    Action = () =>
+                    {
+                        game?.OpenUrlExternally("https://matrix-feather.github.io/mfosu/mfosu_mp_manual/");
+                        return true;
+                    },
                     Description = LLinBaseStrings.Manual,
                     Type = FunctionType.Base
                 },
@@ -698,6 +710,8 @@ namespace osu.Game.Screens.LLin
                     {
                         audioControlPlugin.TogglePause();
                         OnTrackRunningToggle?.Invoke(CurrentTrack.IsRunning);
+
+                        return true;
                     },
                     Type = FunctionType.ProgressDisplay
                 },
@@ -713,7 +727,11 @@ namespace osu.Game.Screens.LLin
                 {
                     Icon = FontAwesome.Solid.Plug,
                     Description = LLinBaseStrings.ViewPlugins,
-                    Action = () => sidebar.ShowComponent(pluginsPage, true),
+                    Action = () =>
+                    {
+                        sidebar.ShowComponent(pluginsPage, true);
+                        return true;
+                    },
                     Type = FunctionType.Misc
                 },
                 disableChangesButton = new FakeButton
@@ -734,6 +752,8 @@ namespace osu.Game.Screens.LLin
                         lockButton.Bindable.Disabled = RuntimeInfo.IsDesktop;
 
                         currentFunctionBar.ShowFunctionControlTemporary();
+
+                        return true;
                     },
                     Description = LLinBaseStrings.HideAndLockInterface,
                     Type = FunctionType.Misc
@@ -748,21 +768,34 @@ namespace osu.Game.Screens.LLin
                 soloButton = new FakeButton
                 {
                     Icon = FontAwesome.Solid.User,
-                    Action = () => game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo),
+                    Action = () =>
+                    {
+                        game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo);
+                        return true;
+                    },
                     Description = LLinBaseStrings.ViewInSongSelect,
                     Type = FunctionType.Misc
                 },
                 sidebarToggleButton = new FakeButton
                 {
                     Icon = FontAwesome.Solid.List,
-                    Action = () => sidebar.ShowComponent(settingsPage, true),
+                    Action = () =>
+                    {
+                        sidebar.ShowComponent(settingsPage, true);
+                        return true;
+                    },
                     Description = LLinBaseStrings.OpenSidebar,
                     Type = FunctionType.Misc
                 },
                 lockButton = new ToggleableFakeButton
                 {
                     Description = LLinBaseStrings.LockInterface,
-                    Action = () => currentFunctionBar.ShowFunctionControlTemporary(),
+                    Action = () =>
+                    {
+                        currentFunctionBar.ShowFunctionControlTemporary();
+
+                        return true;
+                    },
                     Type = FunctionType.Plugin,
                     Icon = FontAwesome.Solid.Lock
                 }
@@ -825,7 +858,11 @@ namespace osu.Game.Screens.LLin
                         //如果插件的侧边栏页面有入口按钮
                         if (btn != null)
                         {
-                            btn.Action = () => sidebar.ShowComponent(pluginSidebarPage, true);
+                            btn.Action = () =>
+                            {
+                                sidebar.ShowComponent(pluginSidebarPage, true);
+                                return true;
+                            };
                             btn.Description += $" ({pluginSidebarPage.ShortcutKey})";
 
                             functionProviders.Add(btn);

@@ -140,17 +140,28 @@ namespace Mvis.Plugin.CollectionSupport
 
         public void Play(WorkingBeatmap b) => changeBeatmap(b);
 
-        public void NextTrack() => changeBeatmap(getBeatmap(beatmapList, b.Value, true));
+        public bool NextTrack()
+        {
+            changeBeatmap(getBeatmap(beatmapList, b.Value, true));
 
-        public void PrevTrack() =>
+            return beatmapList.Count != 0;
+        }
+
+        public bool PrevTrack()
+        {
             changeBeatmap(getBeatmap(beatmapList, b.Value, true, -1));
 
-        public void TogglePause()
+            return beatmapList.Count != 0;
+        }
+
+        public bool TogglePause()
         {
             if (drawableTrack.IsRunning)
                 drawableTrack.Stop();
             else
                 drawableTrack.Start();
+
+            return true;
         }
 
         public override bool Disable()
@@ -184,7 +195,12 @@ namespace Mvis.Plugin.CollectionSupport
             }
         }
 
-        public void Seek(double position) => b.Value.Track.Seek(position);
+        public bool Seek(double position)
+        {
+            b.Value.Track.Seek(position);
+
+            return true;
+        }
 
         private DrawableTrack drawableTrack;
 
@@ -202,7 +218,7 @@ namespace Mvis.Plugin.CollectionSupport
                     drawableTrack = new DrawableTrack(b.Value.Track);
                     drawableTrack.Completed += () =>
                     {
-                        if (IsCurrent) Schedule(NextTrack);
+                        if (IsCurrent) Schedule(() => NextTrack());
                     };
                     trackChangedAfterDisable = false;
                 }
@@ -221,7 +237,7 @@ namespace Mvis.Plugin.CollectionSupport
             drawableTrack = new DrawableTrack(b.Value.Track);
             drawableTrack.Completed += () =>
             {
-                if (IsCurrent) Schedule(NextTrack);
+                if (IsCurrent) Schedule(() => NextTrack());
             };
             controller.Play();
         }

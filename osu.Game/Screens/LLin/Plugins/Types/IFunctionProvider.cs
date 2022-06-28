@@ -16,7 +16,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types
         /// <summary>
         /// 由外部设置的行动，具体是否调用视Active()中是否实现而定。
         /// </summary>
-        public Action Action { get; set; }
+        public Func<bool> Action { get; set; }
 
         /// <summary>
         /// 控制器图标，设置后交由控制条负责处理
@@ -41,7 +41,12 @@ namespace osu.Game.Screens.LLin.Plugins.Types
         /// <summary>
         /// 激活此控制器，用于执行动作
         /// </summary>
-        public void Active();
+        public bool Active();
+
+        /// <summary>
+        /// 激活时的事件
+        /// </summary>
+        public Action<bool> OnActive { get; set; }
 
         public string ToString() => $"{Title} - {Description}";
     }

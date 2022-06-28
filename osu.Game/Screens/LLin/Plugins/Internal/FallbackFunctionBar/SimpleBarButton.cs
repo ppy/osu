@@ -31,7 +31,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
             Colour = Color4.White
         };
 
-        private readonly Box flashBox;
+        private readonly Box hoverBox;
 
         public LocalisableString TooltipText { get; }
 
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
                         spriteText,
                     }
                 },
-                flashBox = new Box
+                hoverBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.White,
@@ -93,16 +93,21 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
             };
         }
 
+        public void DoFlash()
+        {
+            hoverBox.FadeTo(0.2f).Then().FadeTo(IsHovered ? 0.1f : 0f, 300);
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
-            flashBox.FadeTo(0.1f, 300);
+            hoverBox.FadeTo(0.1f, 300);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            flashBox.FadeTo(0f, 300);
+            hoverBox.FadeTo(0f, 300);
         }
 
         protected override bool OnClick(ClickEvent e)

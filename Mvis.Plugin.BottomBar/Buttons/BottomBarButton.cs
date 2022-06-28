@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -89,7 +88,7 @@ namespace Mvis.Plugin.BottomBar.Buttons
         }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
@@ -219,8 +218,10 @@ namespace Mvis.Plugin.BottomBar.Buttons
 
         protected virtual void OnClickAnimation()
         {
-            flashBox.FadeTo(0.2f).Then().FadeTo(IsHovered ? 0.1f : 0f, 300);
+            flashBox?.FadeTo(0.2f).Then().FadeTo(IsHovered ? 0.1f : 0f, 300);
         }
+
+        public void DoFlash() => OnClickAnimation();
 
         private class RippleSprite : Sprite
         {
