@@ -14,7 +14,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// Amount of consecutive encoding with the same <see cref="MonoRunLength" />
         /// </summary>
         public int EncodingRunLength = 1;
-        
+
+        /// <summary>
+        /// How many notes are encoded with this encoding
+        /// </summary>
+        public int NoteLength => MonoRunLength + EncodingRunLength;
+
         /// <summary>
         /// Beginning index in the data that this encodes
         /// </summary>
@@ -27,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
         public static List<ColourEncoding> Encode(List<DifficultyHitObject> data)
         {
-            // Encoding mono lengths
+            // Compute mono lengths
             List<ColourEncoding> firstPass = new List<ColourEncoding>();
             ColourEncoding? lastEncoded = null;
             for (int i = 0; i < data.Count; i++)
@@ -36,7 +41,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 // This ignores all non-note objects, which may or may not be the desired behaviour
                 TaikoDifficultyHitObject previousObject = (TaikoDifficultyHitObject)taikoObject.PreviousNote(0);
 
-                if (previousObject == null || lastEncoded == null || taikoObject.HitType != previousObject.HitType)
+                if (
+                    previousObject == null ||
+                    lastEncoded == null ||
+                    taikoObject.HitType != previousObject.HitType ||
+                    taikoObject.Rhythm.Ratio > 1.9) // Reset colour after a slow down of 2x (set as 1.9x for margin of error)
                 {
                     lastEncoded = new ColourEncoding();
                     lastEncoded.StartIndex = i;
@@ -47,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 lastEncoded.MonoRunLength += 1;
             }
 
-            // Encode encoding lengths
+            // Compute encoding lengths
             List<ColourEncoding> secondPass = new List<ColourEncoding>();
             lastEncoded = null;
             for (int i = 0; i < firstPass.Count; i++)
