@@ -10,6 +10,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
@@ -608,8 +609,12 @@ namespace osu.Game.Screens.LLin
         private readonly BindableBool adjustFreq = new BindableBool();
         private readonly BindableBool nightcoreBeat = new BindableBool();
         private readonly BindableBool allowProxy = new BindableBool();
+        private readonly BindableBool autoVsync = new BindableBool();
         private Bindable<string> currentAudioControlProviderSetting;
         private Bindable<string> currentFunctionbarSetting;
+
+        private FrameSync previousFrameSync;
+        private readonly Bindable<FrameSync> frameSyncMode = new Bindable<FrameSync>();
 
         #endregion
 
@@ -652,7 +657,7 @@ namespace osu.Game.Screens.LLin
         }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config, IdleTracker idleTracker)
+        private void load(MConfigManager config, IdleTracker idleTracker, FrameworkConfigManager fcm)
         {
             inputManager = GetContainingInputManager();
 
@@ -786,8 +791,11 @@ namespace osu.Game.Screens.LLin
             config.BindWith(MSetting.MvisAdjustMusicWithFreq, adjustFreq);
             config.BindWith(MSetting.MvisEnableNightcoreBeat, nightcoreBeat);
             config.BindWith(MSetting.MvisStoryboardProxy, allowProxy);
+            config.BindWith(MSetting.MvisAutoVSync, autoVsync);
             currentAudioControlProviderSetting = config.GetBindable<string>(MSetting.MvisCurrentAudioProvider);
             currentFunctionbarSetting = config.GetBindable<string>(MSetting.MvisCurrentFunctionBar);
+
+            fcm.BindWith(FrameworkSetting.FrameSync, frameSyncMode);
 
             //加载插件
             foreach (var pl in pluginManager.GetAllPlugins(true))
@@ -880,6 +888,17 @@ namespace osu.Game.Screens.LLin
                 }
             }, true);
 
+            //VSync
+            previousFrameSync = frameSyncMode.Value;
+
+            if (autoVsync.Value)
+                frameSyncMode.Value = FrameSync.VSync;
+
+            autoVsync.BindValueChanged(v =>
+            {
+                frameSyncMode.Value = v.NewValue ? FrameSync.VSync : previousFrameSync;
+            });
+
             //设置键位
             initInternalKeyBindings();
 
@@ -964,6 +983,11 @@ namespace osu.Game.Screens.LLin
             pluginManager.OnPluginUnLoad -= onPluginUnLoad;
 
             pluginManager.RemoveDBusMenuEntry(dbusEntry);
+
+            if (autoVsync.Value)
+            {
+                frameSyncMode.Value = previousFrameSync;
+            }
 
             return base.OnExiting(e);
         }

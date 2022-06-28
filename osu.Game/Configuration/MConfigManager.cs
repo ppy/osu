@@ -66,6 +66,7 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.MvisCurrentAudioProvider, "a@b");
             SetDefault(MSetting.MvisCurrentFunctionBar, "LegacyBottomBar@Mvis.Plugin.BottomBar");
             SetDefault(MSetting.MvisTabControlPosition, TabControlPosition.Right);
+            SetDefault(MSetting.MvisAutoVSync, true);
 
             //实验性功能
             SetDefault(MSetting.CustomWindowIconPath, "");
@@ -158,6 +159,7 @@ namespace osu.Game.Configuration
         CoverAccelSource,
         TrackPreviewAccelSource,
         InGameLeaderboardState,
+        MvisAutoVSync
     }
 
     public enum GamemodeActivateCondition

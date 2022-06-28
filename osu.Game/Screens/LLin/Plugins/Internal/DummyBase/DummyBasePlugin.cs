@@ -85,6 +85,12 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
                     {
                         Name = "底栏插件",
                         Bindable = functionBarBindable
+                    },
+                    new BooleanSettingsEntry
+                    {
+                        Name = "自动启用垂直同步",
+                        Bindable = config.GetBindable<bool>(MSetting.MvisAutoVSync),
+                        Description = "启用后，将在进入播放器时自动启用垂直同步，并在退出时恢复帧数限制"
                     }
                 };
 
