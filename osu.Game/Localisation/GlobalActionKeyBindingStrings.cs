@@ -130,14 +130,14 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectNext => new TranslatableString(getKey(@"select_next"), @"选择下一个");
 
         /// <summary>
-        /// "Select previous group"
+        /// "选择上一组"
         /// </summary>
-        public static LocalisableString SelectPreviousGroup => new TranslatableString(getKey(@"select_previous_group"), @"Select previous group");
+        public static LocalisableString SelectPreviousGroup => new TranslatableString(getKey(@"select_previous_group"), @"选择上一组");
 
         /// <summary>
-        /// "Select next group"
+        /// "选择下一组"
         /// </summary>
-        public static LocalisableString SelectNextGroup => new TranslatableString(getKey(@"select_next_group"), @"Select next group");
+        public static LocalisableString SelectNextGroup => new TranslatableString(getKey(@"select_next_group"), @"选择下一组");
 
         /// <summary>
         /// "主页"
@@ -175,9 +175,9 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorTimingMode => new TranslatableString(getKey(@"editor_timing_mode"), @"Timing模式");
 
         /// <summary>
-        /// "Tap for BPM"
+        /// "BPM测定"
         /// </summary>
-        public static LocalisableString EditorTapForBPM => new TranslatableString(getKey(@"editor_tap_for_bpm"), @"Tap for BPM");
+        public static LocalisableString EditorTapForBPM => new TranslatableString(getKey(@"llin_editor_tap_for_bpm"), @"BPM测定");
 
         /// <summary>
         /// "Cycle grid display mode"
@@ -217,7 +217,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "反选所有Mod"
         /// </summary>
-        public static LocalisableString DeselectAllMods => new TranslatableString(getKey(@"deselect_all_mods"), @"反选所有Mod");
+        public static LocalisableString DeselectAllMods => new TranslatableString(getKey(@"llin_deselect_all_mods"), @"反选所有Mod");
 
         /// <summary>
         /// "随机选择"
@@ -260,14 +260,14 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorFlipVertically => new TranslatableString(getKey(@"editor_flip_vertically"), @"Flip selection vertically");
 
         /// <summary>
-        /// "Increase distance spacing"
+        /// "增加距离吸附间隔"
         /// </summary>
-        public static LocalisableString EditorIncreaseDistanceSpacing => new TranslatableString(getKey(@"editor_increase_distance_spacing"), @"Increase distance spacing");
+        public static LocalisableString EditorIncreaseDistanceSpacing => new TranslatableString(getKey(@"editor_increase_distance_spacing"), @"增加距离吸附间隔");
 
         /// <summary>
-        /// "Decrease distance spacing"
+        /// "降低距离吸附间隔"
         /// </summary>
-        public static LocalisableString EditorDecreaseDistanceSpacing => new TranslatableString(getKey(@"editor_decrease_distance_spacing"), @"Decrease distance spacing");
+        public static LocalisableString EditorDecreaseDistanceSpacing => new TranslatableString(getKey(@"editor_decrease_distance_spacing"), @"降低距离吸附间隔");
 
         /// <summary>
         /// "切换皮肤编辑器"

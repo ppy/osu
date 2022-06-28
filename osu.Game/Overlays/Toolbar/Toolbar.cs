@@ -104,12 +104,12 @@ namespace osu.Game.Overlays.Toolbar
                                         AutoSizeAxes = Axes.X,
                                         Children = new Drawable[]
                                         {
-                                            ToolbarMfButton = new ToolbarMfButton(),
                                             new ToolbarSettingsButton(),
                                             new ToolbarHomeButton
                                             {
                                                 Action = () => OnHome?.Invoke()
                                             },
+                                            ToolbarMfButton = new ToolbarMfButton(),
                                         },
                                     },
                                 }
