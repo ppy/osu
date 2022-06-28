@@ -78,6 +78,14 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     switch (req)
                     {
+                        case CreateChannelRequest createRequest:
+                            createRequest.TriggerSuccess(new APIChatChannel
+                            {
+                                ChannelID = ((int)createRequest.Channel.Id),
+                                RecentMessages = new List<Message>()
+                            });
+                            return true;
+
                         case GetUpdatesRequest getUpdates:
                             getUpdates.TriggerFailure(new WebException());
                             return true;
