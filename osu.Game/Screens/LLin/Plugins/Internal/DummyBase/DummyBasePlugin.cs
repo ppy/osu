@@ -1,9 +1,8 @@
-using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Screens.LLin.Misc;
 using osu.Game.Screens.LLin.Plugins.Config;
-using osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 using osu.Game.Screens.LLin.SideBar.Tabs;
 
@@ -25,8 +24,8 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
 
         public override SettingsEntry[] GetSettingEntries(IPluginConfigManager pluginConfigManager)
         {
-            ListSettingsEntry<Type> listEntry;
-            var functionBarBindable = new Bindable<Type>();
+            ListSettingsEntry<TypeWrapper> listEntry;
+            var functionBarBindable = new Bindable<TypeWrapper>();
 
             var entries = new SettingsEntry[]
             {
@@ -80,7 +79,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
                     Bindable = config.GetBindable<bool>(MSetting.MvisEnableBgTriangles),
                     Description = "如果条件允许,播放器将会在背景显示动画"
                 },
-                listEntry = new ListSettingsEntry<Type>
+                listEntry = new ListSettingsEntry<TypeWrapper>
                 {
                     Name = "底栏插件",
                     Bindable = functionBarBindable
@@ -94,7 +93,6 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
             };
 
             var plugins = PluginManager.GetAllFunctionBarProviders();
-            plugins.Insert(0, typeof(FunctionBar));
 
             string currentFunctionBar = config.Get<string>(MSetting.MvisCurrentFunctionBar);
 
@@ -107,7 +105,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
             }
 
             listEntry.Values = plugins;
-            functionBarBindable.Default = typeof(FunctionBar);
+            functionBarBindable.Default = PluginManager.DefaultFunctionBarType;
 
             functionBarBindable.BindValueChanged(v =>
             {

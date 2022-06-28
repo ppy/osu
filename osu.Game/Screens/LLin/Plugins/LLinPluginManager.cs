@@ -15,11 +15,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Screens.LLin.Misc;
 using osu.Game.Screens.LLin.Misc.PluginResolvers;
 using osu.Game.Screens.LLin.Plugins.Config;
-using osu.Game.Screens.LLin.Plugins.Internal;
 using osu.Game.Screens.LLin.Plugins.Internal.DummyAudio;
 using osu.Game.Screens.LLin.Plugins.Internal.DummyBase;
+using osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar;
 using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
@@ -57,7 +58,18 @@ namespace osu.Game.Screens.LLin.Plugins
         private IDBusManagerContainer<IMDBusObject> dBusManagerContainer { get; set; }
 
         public readonly IProvideAudioControlPlugin DefaultAudioController = new OsuMusicControllerWrapper();
-        public readonly IFunctionBarProvider DummyFunctionBar = new DummyFunctionBar();
+
+        public readonly TypeWrapper DefaultFunctionBarType = new TypeWrapper
+        {
+            Type = typeof(FunctionBar),
+            Name = "默认底栏"
+        };
+
+        public readonly TypeWrapper DefaultAudioControllerType = new TypeWrapper
+        {
+            Type = typeof(OsuMusicControllerWrapper),
+            Name = "osu!"
+        };
 
         #endregion
 
@@ -77,12 +89,20 @@ namespace osu.Game.Screens.LLin.Plugins
             return entryMap.ContainsKey(pl.GetType()) ? entryMap[pl.GetType()] : null;
         }
 
-        internal List<Type> GetAllFunctionBarProviders() => resolver.GetAllFunctionBarProviders();
+        internal List<TypeWrapper> GetAllFunctionBarProviders() => resolver.GetAllFunctionBarProviders();
 
-        internal List<Type> GetAllAudioControlPlugin() => resolver.GetAllAudioControlPlugin();
+        internal List<TypeWrapper> GetAllAudioControlPlugin() => resolver.GetAllAudioControlPlugin();
 
-        internal IProvideAudioControlPlugin GetAudioControlByPath([NotNull] string path) => resolver.GetAudioControlPluginByPath(path);
-        internal IFunctionBarProvider GetFunctionBarProviderByPath([NotNull] string path) => resolver.GetFunctionBarProviderByPath(path);
+        internal Type GetAudioControlTypeByPath([NotNull] string path) => resolver.GetAudioControlPluginByPath(path);
+        internal Type GetFunctionBarProviderTypeByPath([NotNull] string path) => resolver.GetFunctionBarProviderByPath(path);
+
+        [CanBeNull]
+        internal IProvideAudioControlPlugin GetAudioControlByPath([NotNull] string path)
+            => (IProvideAudioControlPlugin)avaliablePlugins.FirstOrDefault(pl => pl is IProvideAudioControlPlugin && resolver.ToPath(pl) == path);
+
+        [CanBeNull]
+        internal IFunctionBarProvider GetFunctionBarProviderByPath([NotNull] string path)
+            => (IFunctionBarProvider)avaliablePlugins.FirstOrDefault(pl => pl is IFunctionBarProvider && resolver.ToPath(pl) == path);
 
         private bool platformSupportsDBus => RuntimeInfo.OS == RuntimeInfo.Platform.Linux;
 

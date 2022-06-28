@@ -18,19 +18,23 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
 
         public string ToPath(object target)
         {
-            var targetType = target is Type ? (Type)target : target.GetType();
+            Type targetType;
+
+            if (target is Type) targetType = (Type)target;
+            else if (target is TypeWrapper) targetType = ((TypeWrapper)target).Type;
+            else targetType = target.GetType();
 
             return targetType.Name + "@" + targetType.Namespace;
         }
 
         internal bool RemoveFunctionBarProvider(IFunctionBarProvider functionBarProvider)
-            => functionBarDictionary.Remove(ToPath(functionBarProvider), out functionBarProvider);
+            => functionBarDictionary.Remove(ToPath(functionBarProvider), out _);
 
         internal bool RemoveAudioControlProvider(IProvideAudioControlPlugin provideAudioControlPlugin)
-            => audioPluginDictionary.Remove(ToPath(provideAudioControlPlugin), out provideAudioControlPlugin);
+            => audioPluginDictionary.Remove(ToPath(provideAudioControlPlugin), out _);
 
-        private readonly ConcurrentDictionary<string, IProvideAudioControlPlugin> audioPluginDictionary = new ConcurrentDictionary<string, IProvideAudioControlPlugin>();
-        private readonly ConcurrentDictionary<string, IFunctionBarProvider> functionBarDictionary = new ConcurrentDictionary<string, IFunctionBarProvider>();
+        private readonly ConcurrentDictionary<string, TypeWrapper> audioPluginDictionary = new ConcurrentDictionary<string, TypeWrapper>();
+        private readonly ConcurrentDictionary<string, TypeWrapper> functionBarDictionary = new ConcurrentDictionary<string, TypeWrapper>();
 
         internal void UpdatePluginDictionary(List<LLinPlugin> newPluginList)
         {
@@ -39,54 +43,65 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
 
             foreach (var plugin in newPluginList)
             {
-                var pluginPath =
-                    plugin.GetType().Name
-                    + "@"
-                    + plugin.GetType().Namespace;
+                string pluginPath = ToPath(plugin);
 
                 if (plugin is IFunctionBarProvider functionBarProvider)
-                    functionBarDictionary[pluginPath] = functionBarProvider;
+                {
+                    var typeWrapper = new TypeWrapper
+                    {
+                        Type = functionBarProvider.GetType(),
+                        Name = $"{plugin.Name} ({plugin.Author})"
+                    };
+                    functionBarDictionary[pluginPath] = typeWrapper;
+                }
 
                 if (plugin is IProvideAudioControlPlugin audioControlPlugin)
-                    audioPluginDictionary[pluginPath] = audioControlPlugin;
+                {
+                    var typeWrapper = new TypeWrapper
+                    {
+                        Type = audioControlPlugin.GetType(),
+                        Name = $"{plugin.Name} ({plugin.Author})"
+                    };
+                    audioPluginDictionary[pluginPath] = typeWrapper;
+                }
             }
 
-            var defaultAudioControlPath = pluginManager.DefaultAudioController.GetType().Name
-                                          + "@"
-                                          + pluginManager.DefaultAudioController.GetType().Namespace;
+            var defaultAudio = pluginManager.DefaultAudioControllerType;
+            var defaultFunctionbar = pluginManager.DefaultFunctionBarType;
 
-            audioPluginDictionary[defaultAudioControlPath] = pluginManager.DefaultAudioController;
+            audioPluginDictionary[ToPath(defaultAudio)] = defaultAudio;
+            functionBarDictionary[ToPath(defaultFunctionbar)] = defaultFunctionbar;
         }
 
         [CanBeNull]
-        internal IProvideAudioControlPlugin GetAudioControlPluginByPath(string path)
+        internal Type GetAudioControlPluginByPath(string path)
         {
-            IProvideAudioControlPlugin result;
+            TypeWrapper result;
             if (audioPluginDictionary.TryGetValue(path, out result))
-                return result;
+                return result.Type;
 
             return null;
         }
 
         [CanBeNull]
-        internal IFunctionBarProvider GetFunctionBarProviderByPath(string path)
+        internal Type GetFunctionBarProviderByPath(string path)
         {
-            IFunctionBarProvider result;
+            TypeWrapper result;
             if (functionBarDictionary.TryGetValue(path, out result))
-                return result;
+                return result.Type;
 
             return null;
         }
 
-        private List<Type> cachedAudioControlPluginList;
+        private List<TypeWrapper> cachedAudioControlPluginList;
 
-        internal List<Type> GetAllAudioControlPlugin()
+        internal List<TypeWrapper> GetAllAudioControlPlugin()
         {
-            var list = new List<Type>();
+            var list = new List<TypeWrapper>();
 
             foreach (var keyPair in audioPluginDictionary)
             {
-                list.Add(keyPair.Value.GetType());
+                list.Add(keyPair.Value);
             }
 
             if (cachedAudioControlPluginList == null || cachedAudioControlPluginList != list)
@@ -95,15 +110,15 @@ namespace osu.Game.Screens.LLin.Misc.PluginResolvers
             return list;
         }
 
-        private List<Type> cachedFunctionBarPluginList;
+        private List<TypeWrapper> cachedFunctionBarPluginList;
 
-        internal List<Type> GetAllFunctionBarProviders()
+        internal List<TypeWrapper> GetAllFunctionBarProviders()
         {
-            var list = new List<Type>();
+            var list = new List<TypeWrapper>();
 
             foreach (var keyPair in functionBarDictionary)
             {
-                list.Add(keyPair.Value.GetType());
+                list.Add(keyPair.Value);
             }
 
             if (cachedFunctionBarPluginList == null || cachedFunctionBarPluginList != list)

@@ -1,7 +1,7 @@
-using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Screens.LLin.Misc;
 using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
 
@@ -26,8 +26,8 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
         {
             if (entries == null)
             {
-                ListSettingsEntry<Type> audioEntry;
-                var audioPluginBindable = new Bindable<Type>();
+                ListSettingsEntry<TypeWrapper> audioEntry;
+                var audioPluginBindable = new Bindable<TypeWrapper>();
 
                 entries = new SettingsEntry[]
                 {
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
                         Bindable = config.GetBindable<bool>(MSetting.MvisEnableNightcoreBeat),
                         Description = "动次打次动次打次"
                     },
-                    audioEntry = new ListSettingsEntry<Type>
+                    audioEntry = new ListSettingsEntry<TypeWrapper>
                     {
                         Name = "音乐控制插件",
                         Bindable = audioPluginBindable
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyAudio
                 }
 
                 audioEntry.Values = plugins;
-                audioPluginBindable.Default = typeof(OsuMusicControllerWrapper);
+                audioPluginBindable.Default = PluginManager.DefaultAudioControllerType;
 
                 audioPluginBindable.BindValueChanged(v =>
                 {
