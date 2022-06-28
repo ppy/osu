@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     /// </summary>
     public class TaikoDifficultyHitObject : DifficultyHitObject
     {
-        private readonly IReadOnlyList<TaikoDifficultyHitObject> monoDifficultyHitObjects;
+        private readonly IReadOnlyList<TaikoDifficultyHitObject>? monoDifficultyHitObjects;
         public readonly int MonoIndex;
         private readonly IReadOnlyList<TaikoDifficultyHitObject> noteObjects;
         public readonly int NoteIndex;
@@ -34,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// by other skills in the future.
         /// This need to be writeable by TaikoDifficultyHitObjectColour so that it can assign potentially reused instances
         /// </summary>
-        public TaikoDifficultyHitObjectColour Colour;
+        public TaikoDifficultyHitObjectColour? Colour;
 
         /// <summary>
         /// The hit type of this hit object.
@@ -65,14 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                         centreObjects, rimObjects, noteObjects, difficultyHitObjects.Count)
                 );
             }
-
-            List<TaikoDifficultyHitObjectColour> colours = TaikoDifficultyHitObjectColour.EncodeAndAssign(difficultyHitObjects);
-
-            // Pre-evaluate colours
-            for (int i = 0; i < colours.Count; i++)
-            {
-                colours[i].EvaluatedDifficulty = ColourEvaluator.EvaluateDifficultyOf(colours[i]);
-            }
+            TaikoDifficultyHitObjectColour.EncodeAndAssign(difficultyHitObjects);
 
             return difficultyHitObjects;
         }

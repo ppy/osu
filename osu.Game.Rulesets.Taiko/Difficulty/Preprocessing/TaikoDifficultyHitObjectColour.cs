@@ -5,12 +5,11 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
     /// <summary>
-    /// Stores colour compression information for a <see cref="TaikoDifficultyHitObject"/>.
+    /// Stores colour compression information for a <see cref="TaikoDifficultyHitObject"/>. This is only present for the
+    /// first <see cref="TaikoDifficultyHitObject"/> in a <see cref="CoupledColourEncoding"/> chunk.
     /// </summary>
     public class TaikoDifficultyHitObjectColour
     {
-        public CoupledColourEncoding Encoding { get; private set; }
-
         private const int max_repetition_interval = 16;
 
         /// <summary>
@@ -21,11 +20,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public int RepetitionInterval { get; private set; } = max_repetition_interval + 1;
 
         /// <summary>
-        ///  Evaluated colour difficulty is cached here, as difficulty don't need to be calculated per-note.
+        /// Encoding information of <see cref="TaikoDifficultyHitObjectColour"/>.
         /// </summary>
-        /// TODO: Consider having all evaluated difficulty cached in TaikoDifficultyHitObject instead, since we may be
-        ///       reusing evaluator results in the future.
-        public double EvaluatedDifficulty = 0;
+        public CoupledColourEncoding Encoding { get; private set; }
 
         public TaikoDifficultyHitObjectColour? Previous { get; private set; } = null;
 
@@ -60,8 +57,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Finds the closest previous <see cref="TaikoDifficultyHitObjectColour"/> that has the identical delta value
-        /// and run length with the current instance, and returns the amount of notes between them.
+        /// Finds the closest previous <see cref="TaikoDifficultyHitObjectColour"/> that has the identical <see cref="CoupledColourEncoding.Payload"/>.
+        /// Interval is defined as the amount of <see cref="CoupledColourEncoding"/> chunks between the current and repeated encoding.
         /// </summary>
         public void FindRepetitionInterval()
         {
@@ -72,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             }
 
             TaikoDifficultyHitObjectColour? other = Previous.Previous;
-            int interval = this.Encoding.StartIndex - other.Encoding.EndIndex;
+            int interval = 2;
             while (interval < max_repetition_interval)
             {
                 if (Encoding.hasIdenticalPayload(other.Encoding))
@@ -84,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
                 other = other.Previous;
                 if (other == null) break;
-                interval = this.Encoding.StartIndex - other.Encoding.EndIndex;
+                ++interval;
             }
 
             RepetitionInterval = max_repetition_interval + 1;
