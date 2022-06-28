@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestStoryboardSkipOutro()
         {
             AddStep("set storyboard duration to long", () => currentStoryboardDuration = 200000);
-            CreateTest(null);
+            CreateTest();
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("skip outro", () => InputManager.Key(osuTK.Input.Key.Space));
             AddUntilStep("player is no longer current screen", () => !Player.IsCurrentScreen());
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStoryboardNoSkipOutro()
         {
-            CreateTest(null);
+            CreateTest();
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStoryboardExitDuringOutroStillExits()
         {
-            CreateTest(null);
+            CreateTest();
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("exit via pause", () => Player.ExitViaPause());
             AddAssert("player exited", () => !Player.IsCurrentScreen() && Player.GetChildScreen() == null);
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(true)]
         public void TestStoryboardToggle(bool enabledAtBeginning)
         {
-            CreateTest(null);
+            CreateTest();
             AddStep($"{(enabledAtBeginning ? "enable" : "disable")} storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, enabledAtBeginning));
             AddStep("toggle storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, !enabledAtBeginning));
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             SkipOverlay.FadeContainer fadeContainer() => Player.ChildrenOfType<SkipOverlay.FadeContainer>().First();
 
-            CreateTest(null);
+            CreateTest();
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddUntilStep("skip overlay content becomes visible", () => fadeContainer().State == Visibility.Visible);
 
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestPerformExitNoOutro()
         {
-            CreateTest(null);
+            CreateTest();
             AddStep("disable storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, false));
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("exit via pause", () => Player.ExitViaPause());
