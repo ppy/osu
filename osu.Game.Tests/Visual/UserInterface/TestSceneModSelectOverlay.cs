@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             createScreen();
             AddStep("select diff adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
 
-            AddStep("set setting", () => modSelectOverlay.ChildrenOfType<SettingsSlider<float>>().First().Current.Value = 8);
+            AddStep("set setting", () => modSelectOverlay.ChildrenOfType<OsuSliderBar<float>>().First().Current.Value = 8);
 
             AddAssert("ensure setting is propagated", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 8);
 
