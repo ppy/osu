@@ -472,8 +472,8 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
-
             waitForChannel1Visible();
+
             AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
             waitForChannel2Visible();
 
