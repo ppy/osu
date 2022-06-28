@@ -17,7 +17,8 @@ namespace osu.Game.Screens.LLin.SideBar.Settings
     {
         private readonly FillFlowContainer<Section> fillFlow = new FillFlowContainer<Section>
         {
-            AutoSizeAxes = Axes.Both,
+            AutoSizeAxes = Axes.Y,
+            RelativeSizeAxes = Axes.X,
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
             Spacing = new Vector2(5),

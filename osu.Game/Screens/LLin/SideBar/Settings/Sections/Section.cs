@@ -13,8 +13,6 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Sections
 {
     public abstract class Section : CompositeDrawable, ISidebarContent
     {
-        public virtual int Columns => 3;
-
         public string Title
         {
             get => title.Text.ToString();
@@ -28,11 +26,10 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Sections
             Font = OsuFont.GetFont(size: 30)
         };
 
-        protected virtual float PieceWidth => 150;
-
         protected Section()
         {
-            AutoSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
             Anchor = Origin = Anchor.TopRight;
             Padding = new MarginPadding(10);
 
@@ -42,7 +39,8 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Sections
                 FillFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
-                    Width = (PieceWidth * Columns) + (5 * (Columns - 1)),
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.6f,
                     Spacing = new Vector2(5),
                     Margin = new MarginPadding { Top = 40 }
                 }
@@ -70,16 +68,19 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Sections
                 case TabControlPosition.Left:
                     title.Anchor = title.Origin = Anchor.TopLeft;
                     Anchor = Origin = Anchor.TopLeft;
+                    FillFlow.Anchor = FillFlow.Origin = Anchor.TopLeft;
                     break;
 
                 case TabControlPosition.Right:
                     title.Anchor = title.Origin = Anchor.TopRight;
                     Anchor = Origin = Anchor.TopRight;
+                    FillFlow.Anchor = FillFlow.Origin = Anchor.TopRight;
                     break;
 
                 case TabControlPosition.Top:
                     title.Anchor = title.Origin = Anchor.TopCentre;
                     Anchor = Origin = Anchor.TopCentre;
+                    FillFlow.Anchor = FillFlow.Origin = Anchor.TopCentre;
                     break;
             }
         }
