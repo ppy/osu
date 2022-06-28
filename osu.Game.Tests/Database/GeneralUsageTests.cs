@@ -50,6 +50,27 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestAsyncWriteWhileBlocking()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                Task writeTask;
+
+                using (realm.BlockAllOperations())
+                {
+                    writeTask = realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
+                    Thread.Sleep(100);
+                    Assert.That(writeTask.IsCompleted, Is.False);
+                }
+
+                writeTask.WaitSafely();
+
+                realm.Run(r => r.Refresh());
+                Assert.That(realm.Run(r => r.All<BeatmapSetInfo>().Count()), Is.EqualTo(1));
+            });
+        }
+
+        [Test]
         public void TestAsyncWrite()
         {
             RunTestWithRealm((realm, _) =>
