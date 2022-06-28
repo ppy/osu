@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Handlers;
@@ -41,6 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections
             Children = new Drawable[]
             {
                 new BindingSettings(keyConfig),
+                new FrameworkActionManagerSetings()
             };
 
             foreach (var handler in host.AvailableInputHandlers)
@@ -106,6 +108,24 @@ namespace osu.Game.Overlays.Settings.Sections
             }
 
             protected override LocalisableString Header => handler.Description;
+        }
+    }
+
+    internal class FrameworkActionManagerSetings : SettingsSubsection
+    {
+        protected override LocalisableString Header => "框架";
+
+        [BackgroundDependencyLoader]
+        private void load(FrameworkConfigManager fcm)
+        {
+            Children = new[]
+            {
+                new SettingsCheckbox
+                {
+                    LabelText = "忽略框架KeyBind",
+                    Current = fcm.GetBindable<bool>(FrameworkSetting.ActionContainerIgnoreKeyBind)
+                }
+            };
         }
     }
 }
