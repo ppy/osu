@@ -11,8 +11,6 @@ namespace osu.Game.Scoring
 {
     public enum ScoreRank
     {
-        // TODO: reconsider changing later on
-        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.RankD))]
         [Description(@"F")]
         F = -1,
 
