@@ -24,6 +24,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -686,27 +687,29 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
+            var languages = Enum.GetValues(typeof(Language)).OfType<Language>();
+
+            var mappings = languages.Select(language =>
             {
 #if DEBUG
                 if (language == Language.debug)
-                {
-                    Localisation.AddLanguage(Language.debug.ToString(), new DebugLocalisationStore());
-                    continue;
-                }
+                    return new LocaleMapping("debug", new DebugLocalisationStore());
 #endif
 
                 string cultureCode = language.ToCultureCode();
 
                 try
                 {
-                    Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+                    return new LocaleMapping(new ResourceManagerLocalisationStore(cultureCode));
                 }
                 catch (Exception ex)
                 {
                     Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                    return null;
                 }
-            }
+            }).Where(m => m != null);
+
+            Localisation.AddLocaleMappings(mappings);
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
