@@ -102,6 +102,12 @@ namespace osu.Game.Database
 
         private Realm? updateRealm;
 
+        /// <summary>
+        /// Tracks whether a realm was ever fetched from this instance.
+        /// After a fetch occurs, blocking operations will be guaranteed to restore any subscriptions.
+        /// </summary>
+        private bool hasInitialisedOnce;
+
         private bool isSendingNotificationResetEvents;
 
         public Realm Realm => ensureUpdateRealm();
@@ -121,11 +127,12 @@ namespace osu.Game.Database
                 if (updateRealm == null)
                 {
                     updateRealm = getRealmInstance();
+                    hasInitialisedOnce = true;
 
                     Logger.Log(@$"Opened realm ""{updateRealm.Config.DatabasePath}"" at version {updateRealm.Config.SchemaVersion}");
 
                     // Resubscribe any subscriptions
-                    foreach (var action in customSubscriptionsResetMap.Keys)
+                    foreach (var action in customSubscriptionsResetMap.Keys.ToArray())
                         registerSubscription(action);
                 }
 
@@ -385,11 +392,22 @@ namespace osu.Game.Database
         /// Write changes to realm asynchronously, guaranteeing order of execution.
         /// </summary>
         /// <param name="action">The work to run.</param>
-        public async Task WriteAsync(Action<Realm> action)
+        public Task WriteAsync(Action<Realm> action)
         {
-            total_writes_async.Value++;
-            using (var realm = getRealmInstance())
-                await realm.WriteAsync(() => action(realm));
+            // Regardless of calling Realm.GetInstance or Realm.GetInstanceAsync, there is a blocking overhead on retrieval.
+            // Adding a forced Task.Run resolves this.
+
+            return Task.Run(async () =>
+            {
+                total_writes_async.Value++;
+
+                // Not attempting to use Realm.GetInstanceAsync as there's seemingly no benefit to us (for now) and it adds complexity due to locking
+                // concerns in getRealmInstance(). On a quick check, it looks to be more suited to cases where realm is connecting to an online sync
+                // server, which we don't use. May want to report upstream or revisit in the future.
+                using (var realm = getRealmInstance())
+                    // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
+                    await realm.WriteAsync(() => action(realm));
+            });
         }
 
         /// <summary>
@@ -443,7 +461,7 @@ namespace osu.Game.Database
         public IDisposable SubscribeToPropertyChanged<TModel, TProperty>(Func<Realm, TModel?> modelAccessor, Expression<Func<TModel, TProperty>> propertyLookup, Action<TProperty> onChanged)
             where TModel : RealmObjectBase
         {
-            return RegisterCustomSubscription(r =>
+            return RegisterCustomSubscription(_ =>
             {
                 string propertyName = getMemberName(propertyLookup);
 
@@ -795,13 +813,7 @@ namespace osu.Game.Database
 
                 lock (realmLock)
                 {
-                    if (updateRealm == null)
-                    {
-                        // null realm means the update thread has not yet retrieved its instance.
-                        // we don't need to worry about reviving the update instance in this case, so don't bother with the SynchronizationContext.
-                        Debug.Assert(!ThreadSafety.IsUpdateThread);
-                    }
-                    else
+                    if (hasInitialisedOnce)
                     {
                         if (!ThreadSafety.IsUpdateThread)
                             throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
@@ -811,17 +823,17 @@ namespace osu.Game.Database
                         // Before disposing the update context, clean up all subscriptions.
                         // Note that in the case of realm notification subscriptions, this is not really required (they will be cleaned up by disposal).
                         // In the case of custom subscriptions, we want them to fire before the update realm is disposed in case they do any follow-up work.
-                        foreach (var action in customSubscriptionsResetMap)
+                        foreach (var action in customSubscriptionsResetMap.ToArray())
                         {
                             action.Value?.Dispose();
                             customSubscriptionsResetMap[action.Key] = null;
                         }
+
+                        updateRealm?.Dispose();
+                        updateRealm = null;
                     }
 
                     Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
-
-                    updateRealm?.Dispose();
-                    updateRealm = null;
                 }
 
                 const int sleep_length = 200;

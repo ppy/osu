@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Objects
         }
 
         public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
-            : this(controlPoints.Select((c, i) => new PathControlPoint(c, i == 0 ? (PathType?)type : null)).ToArray(), expectedDistance)
+            : this(controlPoints.Select((c, i) => new PathControlPoint(c, i == 0 ? type : null)).ToArray(), expectedDistance)
         {
         }
 

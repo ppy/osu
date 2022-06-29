@@ -37,10 +37,12 @@ namespace osu.Game.Screens.Edit.Timing
 
         private IAdjustableClock metronomeClock;
 
-        private Sample clunk;
+        private Sample sampleTick;
+        private Sample sampleTickDownbeat;
+        private Sample sampleLatch;
 
         [CanBeNull]
-        private ScheduledDelegate clunkDelegate;
+        private ScheduledDelegate tickPlaybackDelegate;
 
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; }
@@ -55,7 +57,9 @@ namespace osu.Game.Screens.Edit.Timing
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            clunk = audio.Samples.Get(@"Multiplayer/countdown-tick");
+            sampleTick = audio.Samples.Get(@"UI/metronome-tick");
+            sampleTickDownbeat = audio.Samples.Get(@"UI/metronome-tick-downbeat");
+            sampleLatch = audio.Samples.Get(@"UI/metronome-latch");
 
             const float taper = 25;
             const float swing_vertical_offset = -23;
@@ -227,6 +231,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         private readonly BindableInt interpolatedBpm = new BindableInt();
 
+        private ScheduledDelegate latchDelegate;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -261,16 +267,28 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 swing.ClearTransforms(true);
 
-                using (swing.BeginDelayedSequence(350))
+                isSwinging = false;
+
+                tickPlaybackDelegate?.Cancel();
+                tickPlaybackDelegate = null;
+
+                // instantly latch if pendulum arm is close enough to center (to prevent awkward delayed playback of latch sound)
+                if (Precision.AlmostEquals(swing.Rotation, 0, 1))
+                {
+                    swing.RotateTo(0, 60, Easing.OutQuint);
+                    stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
+                    sampleLatch?.Play();
+                    return;
+                }
+
+                using (BeginDelayedSequence(350))
                 {
                     swing.RotateTo(0, 1000, Easing.OutQuint);
                     stick.FadeColour(overlayColourProvider.Colour2, 1000, Easing.OutQuint);
+
+                    using (BeginDelayedSequence(380))
+                        latchDelegate = Schedule(() => sampleLatch?.Play());
                 }
-
-                isSwinging = false;
-
-                clunkDelegate?.Cancel();
-                clunkDelegate = null;
             }
         }
 
@@ -285,6 +303,9 @@ namespace osu.Game.Screens.Edit.Timing
 
             isSwinging = true;
 
+            latchDelegate?.Cancel();
+            latchDelegate = null;
+
             float currentAngle = swing.Rotation;
             float targetAngle = currentAngle > 0 ? -angle : angle;
 
@@ -296,18 +317,18 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     stick.FlashColour(overlayColourProvider.Content1, beatLength, Easing.OutQuint);
 
-                    clunkDelegate = Schedule(() =>
+                    tickPlaybackDelegate = Schedule(() =>
                     {
                         if (!EnableClicking)
                             return;
 
-                        var channel = clunk?.GetChannel();
+                        var channel = beatIndex % timingPoint.TimeSignature.Numerator == 0 ? sampleTickDownbeat?.GetChannel() : sampleTick?.GetChannel();
 
-                        if (channel != null)
-                        {
-                            channel.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
-                            channel.Play();
-                        }
+                        if (channel == null)
+                            return;
+
+                        channel.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
+                        channel.Play();
                     });
                 }
             }

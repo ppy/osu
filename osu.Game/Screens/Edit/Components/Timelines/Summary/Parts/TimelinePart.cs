@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             AddInternal(this.content = content ?? new Container<T> { RelativeSizeAxes = Axes.Both });
 
-            beatmap.ValueChanged += b =>
+            beatmap.ValueChanged += _ =>
             {
                 updateRelativeChildSize();
             };

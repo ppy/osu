@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     updateRepeats(repeats);
             }
 
-            if (difficultyControlPoint != Item.DifficultyControlPoint)
+            if (!ReferenceEquals(difficultyControlPoint, Item.DifficultyControlPoint))
             {
                 difficultyControlPoint = Item.DifficultyControlPoint;
                 difficultyOverrideDisplay?.Expire();
@@ -220,7 +220,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             }
 
-            if (sampleControlPoint != Item.SampleControlPoint)
+            if (!ReferenceEquals(sampleControlPoint, Item.SampleControlPoint))
             {
                 sampleControlPoint = Item.SampleControlPoint;
                 sampleOverrideDisplay?.Expire();
@@ -393,7 +393,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                                 if (e.CurrentState.Keyboard.ShiftPressed)
                                 {
-                                    if (hitObject.DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                                    if (ReferenceEquals(hitObject.DifficultyControlPoint, DifficultyControlPoint.DEFAULT))
                                         hitObject.DifficultyControlPoint = new DifficultyControlPoint();
 
                                     double newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);

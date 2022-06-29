@@ -14,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -106,10 +107,12 @@ namespace osu.Game.Overlays
                 if (beatmap.Disabled)
                     return;
 
+                Logger.Log($"{nameof(MusicController)} skipping next track to {nameof(EnsurePlayingSomething)}");
                 NextTrack();
             }
             else if (!IsPlaying)
             {
+                Logger.Log($"{nameof(MusicController)} starting playback to {nameof(EnsurePlayingSomething)}");
                 Play();
             }
         }

@@ -217,7 +217,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             scope.BindValueChanged(_ => getScores());
             ruleset.BindValueChanged(_ => getScores());
 
-            modSelector.SelectedMods.CollectionChanged += (_, __) => getScores();
+            modSelector.SelectedMods.CollectionChanged += (_, _) => getScores();
 
             Beatmap.BindValueChanged(onBeatmapChanged);
             user.BindValueChanged(onUserChanged, true);

@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             InternalChild = SelectionBox = CreateSelectionBox();
 
-            SelectedItems.CollectionChanged += (sender, args) =>
+            SelectedItems.CollectionChanged += (_, _) =>
             {
                 Scheduler.AddOnce(updateVisibility);
             };

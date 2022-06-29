@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            SelectedItems.CollectionChanged += (selectedObjects, args) =>
+            SelectedItems.CollectionChanged += (_, args) =>
             {
                 switch (args.Action)
                 {
