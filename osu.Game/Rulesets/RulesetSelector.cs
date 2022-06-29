@@ -5,6 +5,7 @@
 
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Allocation;
+using osu.Framework.Logging;
 
 namespace osu.Game.Rulesets
 {
@@ -19,7 +20,16 @@ namespace osu.Game.Rulesets
         private void load()
         {
             foreach (var r in Rulesets.AvailableRulesets)
-                AddItem(r);
+            {
+                try
+                {
+                    AddItem(r);
+                }
+                catch
+                {
+                    Logger.Log($"Could not create ruleset icon for {r.Name}. Please check for an update.", level: LogLevel.Error);
+                }
+            }
         }
     }
 }
