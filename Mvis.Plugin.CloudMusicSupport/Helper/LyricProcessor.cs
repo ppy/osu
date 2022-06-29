@@ -83,7 +83,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 Logger.Error(e, message);
                 onFail?.Invoke(e.ToString());
             };
-            req.PerformAsync(cancellationTokenSource.Token);
+            req.PerformAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
             currentSearchRequest = req;
         }

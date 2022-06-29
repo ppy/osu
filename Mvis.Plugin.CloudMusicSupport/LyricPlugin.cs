@@ -21,6 +21,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
+using Sentry;
 
 namespace Mvis.Plugin.CloudMusicSupport
 {
@@ -104,6 +105,18 @@ namespace Mvis.Plugin.CloudMusicSupport
                     Name = CloudMusicStrings.PositionY,
                     Bindable = config.GetBindable<float>(LyricSettings.LyricPositionY),
                     DisplayAsPercentage = true
+                },
+                new BooleanSettingsEntry
+                {
+                    Name = "启用用户定义",
+                    Bindable = config.GetBindable<bool>(LyricSettings.EnableUserDefinitions),
+                    Description = "启用用户定义后，将通过设置的URL获取相关设置来优先匹配本地谱面ID以提供更准确的歌词查询"
+                },
+                new StringSettingsEntry
+                {
+                    Name = "用户定义文件URL",
+                    Bindable = config.GetBindable<string>(LyricSettings.UserDefinitionURL),
+                    Description = "将通过此URL拉取用户定义配置"
                 }
             };
 
@@ -197,6 +210,9 @@ namespace Mvis.Plugin.CloudMusicSupport
             Enabled = false
         };
 
+        [Cached]
+        public UserDefinitionHelper UserDefinitionHelper { get; private set; } = new UserDefinitionHelper();
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -206,6 +222,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             autoSave = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish);
 
             AddInternal(processor);
+            AddInternal(UserDefinitionHelper);
 
             PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
 
@@ -247,7 +264,11 @@ namespace Mvis.Plugin.CloudMusicSupport
             Lyrics.Clear();
             currentResponseRoot = null;
             CurrentLine = null;
-            processor.StartFetchByBeatmap(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
+
+            if (UserDefinitionHelper.HaveDefinition(currentWorkingBeatmap.BeatmapSetInfo.OnlineID, out int neid))
+                GetLyricFor(neid);
+            else
+                processor.StartFetchByBeatmap(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
         }
 
         private double targetTime => track.CurrentTime + Offset.Value;

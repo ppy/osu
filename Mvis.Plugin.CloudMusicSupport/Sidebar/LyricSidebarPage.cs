@@ -1,4 +1,3 @@
-using System;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Screens;
 using osu.Framework.Allocation;
@@ -32,7 +31,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
         private LyricPlugin plugin => (LyricPlugin)Plugin;
 
-        public Guid BeatmapSetId;
+        public int BeatmapSetId;
 
         private ScreenStack screenStack;
 
@@ -105,7 +104,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
         private void refreshBeatmap(WorkingBeatmap working)
         {
-            BeatmapSetId = working.BeatmapSetInfo.ID;
+            BeatmapSetId = working.BeatmapSetInfo.OnlineID;
             toolbox.IdText = $"ID: {BeatmapSetId}";
         }
     }

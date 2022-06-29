@@ -180,8 +180,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
         }
     }
 
-    public class StringSettingsEntry<T> : SettingsEntry
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
+    public class StringSettingsEntry : SettingsEntry
     {
         public StringSettingsEntry()
         {

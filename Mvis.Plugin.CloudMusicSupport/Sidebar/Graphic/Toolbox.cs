@@ -1,6 +1,7 @@
 using System;
 using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
+using Mvis.Plugin.CloudMusicSupport.Helper;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -33,6 +34,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
         [Resolved]
         private LyricPlugin plugin { get; set; }
+
+        private UserDefinitionHelper udh;
 
         public Toolbox()
         {
@@ -104,6 +107,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         [BackgroundDependencyLoader]
         private void load(LyricConfigManager config)
         {
+            udh ??= plugin.UserDefinitionHelper;
+
             contentFillFlow.AddRange(new Drawable[]
             {
                 new SettingsSlider<double>
@@ -121,6 +126,17 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.X,
                     PlaceholderText = "按网易云ID搜索歌词"
+                },
+                new IconButton
+                {
+                    Size = new Vector2(30),
+                    TooltipText = "更新定义",
+                    Action = () =>
+                    {
+                        udh.UpdateDefinition();
+                        udh.Debug();
+                    },
+                    Icon = FontAwesome.Solid.Cloud
                 }
             });
 
