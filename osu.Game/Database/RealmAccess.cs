@@ -128,7 +128,7 @@ namespace osu.Game.Database
                 Logger.Log(@$"Opened realm ""{updateRealm.Config.DatabasePath}"" at version {updateRealm.Config.SchemaVersion}");
 
                 // Resubscribe any subscriptions
-                foreach (var action in customSubscriptionsResetMap.Keys)
+                foreach (var action in customSubscriptionsResetMap.Keys.ToArray())
                     registerSubscription(action);
             }
 
