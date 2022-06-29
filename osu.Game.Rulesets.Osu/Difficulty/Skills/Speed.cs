@@ -56,6 +56,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public double RelevantNoteCount()
         {
+            if (objectStrains.Count == 0)
+                return 0;
+
             double maxStrain = objectStrains.Max();
             return objectStrains.Aggregate((total, next) => total + (1.0 / (1.0 + Math.Exp(-(next / maxStrain * 12.0 - 6.0)))));
         }
