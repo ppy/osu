@@ -4,6 +4,8 @@
 #nullable disable
 
 using System;
+using System.Threading.Tasks;
+using osu.Game.Scoring;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -18,7 +20,7 @@ namespace osu.Game.Screens.Play
 {
     public class FailOverlay : GameplayMenuOverlay
     {
-        public Action SaveReplay;
+        public Func<Task<ScoreInfo>> SaveReplay;
         public override string Header => "failed";
         public override string Description => "you're dead, try again?";
 
@@ -52,10 +54,8 @@ namespace osu.Game.Screens.Play
                         Direction = FillDirection.Horizontal,
                         Children = new Drawable[]
                         {
-                            new SaveFailedScoreButton()
+                            new SaveFailedScoreButton(SaveReplay)
                             {
-                                OnSave = SaveReplay,
-                                RelativeSizeAxes = Axes.Y,
                                 Width = 300
                             },
                         }

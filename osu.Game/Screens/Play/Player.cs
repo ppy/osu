@@ -1043,7 +1043,7 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(e);
         }
 
-        private async void saveFailedReplay()
+        private async Task<ScoreInfo> saveFailedReplay()
         {
             Score.ScoreInfo.Passed = false;
             Score.ScoreInfo.Rank = ScoreRank.F;
@@ -1051,12 +1051,15 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                await ImportScore(scoreCopy).ConfigureAwait(false);
+                await ImportScore(scoreCopy);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, @"Score import failed!");
+                return null;
             }
+
+            return scoreCopy.ScoreInfo;
         }
 
         /// <summary>
