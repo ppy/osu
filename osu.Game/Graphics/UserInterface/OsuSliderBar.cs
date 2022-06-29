@@ -165,6 +165,8 @@ namespace osu.Game.Graphics.UserInterface
             base.OnHoverLost(e);
         }
 
+        protected override bool HandleAsRelativeMovement(MouseDownEvent e) => Nub.ReceivePositionalInputAt(e.ScreenSpaceMouseDownPosition);
+
         protected override void OnDragEnd(DragEndEvent e)
         {
             updateGlow();
