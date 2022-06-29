@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double DifficultyMultiplier => 1.04;
         private readonly double greatWindow;
 
-        private List<double> objectStrains = new List<double>();
+        private readonly List<double> objectStrains = new List<double>();
 
         public Speed(Mod[] mods, double hitWindowGreat)
             : base(mods)
