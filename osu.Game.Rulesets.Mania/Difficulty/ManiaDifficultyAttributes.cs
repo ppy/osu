@@ -19,12 +19,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         [JsonProperty("great_hit_window")]
         public double GreatHitWindow { get; set; }
 
-        /// <summary>
-        /// The score multiplier applied via score-reducing mods.
-        /// </summary>
-        [JsonProperty("score_multiplier")]
-        public double ScoreMultiplier { get; set; }
-
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             foreach (var v in base.ToDatabaseAttributes())
@@ -33,7 +27,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
             yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
-            yield return (ATTRIB_ID_SCORE_MULTIPLIER, ScoreMultiplier);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -43,7 +36,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
             StarRating = values[ATTRIB_ID_DIFFICULTY];
             GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
-            ScoreMultiplier = values[ATTRIB_ID_SCORE_MULTIPLIER];
         }
     }
 }
