@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public StarDifficulty([NotNull] DifficultyAttributes attributes)
         {
-            Stars = attributes.StarRating;
+            Stars = double.IsFinite(attributes.StarRating) ? attributes.StarRating : 0;
             MaxCombo = attributes.MaxCombo;
             Attributes = attributes;
             // Todo: Add more members (BeatmapInfo.DifficultyRating? Attributes? Etc...)
@@ -46,7 +46,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public StarDifficulty(double starDifficulty, int maxCombo)
         {
-            Stars = starDifficulty;
+            Stars = double.IsFinite(starDifficulty) ? starDifficulty : 0;
             MaxCombo = maxCombo;
             Attributes = null;
         }
