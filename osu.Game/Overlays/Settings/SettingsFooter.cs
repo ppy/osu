@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
@@ -29,7 +28,33 @@ namespace osu.Game.Overlays.Settings
             Direction = FillDirection.Vertical;
             Padding = new MarginPadding { Top = 20, Bottom = 30, Horizontal = SettingsPanel.CONTENT_MARGINS };
 
-            var modes = new List<Drawable>();
+            FillFlowContainer modes;
+
+            Children = new Drawable[]
+            {
+                modes = new FillFlowContainer
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Direction = FillDirection.Full,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(5),
+                    Padding = new MarginPadding { Bottom = 10 },
+                },
+                new OsuSpriteText
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Text = game.Name,
+                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
+                },
+                new BuildDisplay(game.Version, DebugUtils.IsDebugBuild)
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                }
+            };
 
             foreach (var ruleset in rulesets.AvailableRulesets)
             {
@@ -51,33 +76,6 @@ namespace osu.Game.Overlays.Settings
                     Logger.Log($"Could not create ruleset icon for {ruleset.Name}. Please check for an update from the developer.", level: LogLevel.Error);
                 }
             }
-
-            Children = new Drawable[]
-            {
-                new FillFlowContainer
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Direction = FillDirection.Full,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = modes,
-                    Spacing = new Vector2(5),
-                    Padding = new MarginPadding { Bottom = 10 },
-                },
-                new OsuSpriteText
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Text = game.Name,
-                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
-                },
-                new BuildDisplay(game.Version, DebugUtils.IsDebugBuild)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                }
-            };
         }
 
         private class BuildDisplay : OsuAnimatedButton
