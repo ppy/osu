@@ -67,6 +67,7 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.MvisCurrentFunctionBar, "LegacyBottomBar@Mvis.Plugin.BottomBar");
             SetDefault(MSetting.MvisTabControlPosition, TabControlPosition.Right);
             SetDefault(MSetting.MvisAutoVSync, true);
+            SetDefault(MSetting.MvisPlayerSettingsMaxWidth, 0.6f, 0.2f, 1f);
 
             //实验性功能
             SetDefault(MSetting.CustomWindowIconPath, "");
@@ -159,7 +160,8 @@ namespace osu.Game.Configuration
         CoverAccelSource,
         TrackPreviewAccelSource,
         InGameLeaderboardState,
-        MvisAutoVSync
+        MvisAutoVSync,
+        MvisPlayerSettingsMaxWidth
     }
 
     public enum GamemodeActivateCondition

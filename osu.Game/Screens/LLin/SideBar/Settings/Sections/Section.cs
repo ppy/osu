@@ -1,3 +1,4 @@
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -40,28 +41,38 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Sections
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Width = 0.6f,
                     Spacing = new Vector2(5),
                     Margin = new MarginPadding { Top = 40 }
                 }
             };
         }
 
-        private Bindable<TabControlPosition> currentTabPosition;
+        [Cached]
+        private Bindable<TabControlPosition> currentTabPosition { get; set; } = new Bindable<TabControlPosition>();
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
-            currentTabPosition = config.GetBindable<TabControlPosition>(MSetting.MvisTabControlPosition);
+            config.BindWith(MSetting.MvisTabControlPosition, currentTabPosition);
         }
 
         protected override void LoadComplete()
         {
-            currentTabPosition.BindValueChanged(onTabPositionChanged, true);
+            currentTabPosition.BindValueChanged(OnTabPositionChanged, true);
+
             base.LoadComplete();
         }
 
-        private void onTabPositionChanged(ValueChangedEvent<TabControlPosition> v)
+        protected void FadeoutThen(double fadeOutDuration, Action action)
+        {
+            this.FadeTo(0.01f, fadeOutDuration, Easing.OutQuint)
+                .Then()
+                .Schedule(action.Invoke)
+                .Then()
+                .FadeIn(200, Easing.OutQuint);
+        }
+
+        protected virtual void OnTabPositionChanged(ValueChangedEvent<TabControlPosition> v)
         {
             switch (v.NewValue)
             {

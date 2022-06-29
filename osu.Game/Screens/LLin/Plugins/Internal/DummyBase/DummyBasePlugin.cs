@@ -89,7 +89,15 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.DummyBase
                     Name = "自动启用垂直同步",
                     Bindable = config.GetBindable<bool>(MSetting.MvisAutoVSync),
                     Description = "启用后，将在进入播放器时自动启用垂直同步，并在退出时恢复帧数限制"
-                }
+                },
+                new NumberSettingsEntry<float>
+                {
+                    Name = "播放器设置最大宽度",
+                    Bindable = config.GetBindable<float>(MSetting.MvisPlayerSettingsMaxWidth),
+                    DisplayAsPercentage = true,
+                    KeyboardStep = 0.01f,
+                    CommitOnMouseRelease = true
+                },
             };
 
             var plugins = PluginManager.GetAllFunctionBarProviders();

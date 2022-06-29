@@ -1,6 +1,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -10,6 +11,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.LLin.SideBar.Tabs;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -67,6 +69,9 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
 
         private Sample sampleOnClick;
 
+        [Resolved]
+        private Bindable<TabControlPosition> tabpos { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
@@ -116,6 +121,30 @@ namespace osu.Game.Screens.LLin.SideBar.Settings.Items
             if (!haveIconSet) spriteIcon.Icon = DefaultIcon;
 
             sampleOnClick = audio.Samples.Get("UI/default-select");
+        }
+
+        protected override void LoadComplete()
+        {
+            tabpos.BindValueChanged(onTabPositionChanged, true);
+            base.LoadComplete();
+        }
+
+        private void onTabPositionChanged(ValueChangedEvent<TabControlPosition> v)
+        {
+            switch (v.NewValue)
+            {
+                case TabControlPosition.Left:
+                    Anchor = Origin = Anchor.TopLeft;
+                    break;
+
+                case TabControlPosition.Right:
+                    Anchor = Origin = Anchor.TopRight;
+                    break;
+
+                case TabControlPosition.Top:
+                    Anchor = Origin = Anchor.TopCentre;
+                    break;
+            }
         }
 
         protected virtual void OnColorChanged()

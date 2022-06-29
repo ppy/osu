@@ -761,7 +761,12 @@ namespace osu.Game.Screens.LLin
                 loopToggleButton = new ToggleableFakeButton
                 {
                     Icon = FontAwesome.Solid.Undo,
-                    Action = () => CurrentTrack.Looping = loopToggleButton.Bindable.Value,
+                    Action = () =>
+                    {
+                        CurrentTrack.Looping = loopToggleButton.Bindable.Value;
+
+                        return true;
+                    },
                     Description = LLinBaseStrings.ToggleLoop,
                     Type = FunctionType.Misc
                 },

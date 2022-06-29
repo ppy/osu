@@ -83,6 +83,7 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
     {
         public bool DisplayAsPercentage = false;
         public float KeyboardStep = 0.1f;
+        public bool CommitOnMouseRelease = false;
 
         public NumberSettingsEntry()
         {
@@ -99,7 +100,8 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
                 LabelText = Name,
                 TooltipText = Description.ToString(),
                 DisplayAsPercentage = this.DisplayAsPercentage,
-                KeyboardStep = this.KeyboardStep
+                KeyboardStep = this.KeyboardStep,
+                TransferValueOnCommit = CommitOnMouseRelease
             };
         }
 
@@ -111,7 +113,8 @@ namespace osu.Game.Screens.LLin.Plugins.Types.SettingsItems
                 TooltipText = Description,
                 Bindable = (Bindable<T>)Bindable.GetBoundCopy(),
                 Icon = this.Icon,
-                DisplayAsPercentage = this.DisplayAsPercentage
+                DisplayAsPercentage = this.DisplayAsPercentage,
+                TransferValueOnCommit = CommitOnMouseRelease
             };
         }
     }
