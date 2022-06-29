@@ -19,15 +19,15 @@ namespace osu.Game.Rulesets
         [BackgroundDependencyLoader]
         private void load()
         {
-            foreach (var r in Rulesets.AvailableRulesets)
+            foreach (var ruleset in Rulesets.AvailableRulesets)
             {
                 try
                 {
-                    AddItem(r);
+                    AddItem(ruleset);
                 }
                 catch
                 {
-                    Logger.Log($"Could not create ruleset icon for {r.Name}. Please check for an update.", level: LogLevel.Error);
+                    Logger.Log($"Could not create ruleset icon for {ruleset.Name}. Please check for an update from the developer.", level: LogLevel.Error);
                 }
             }
         }
