@@ -60,6 +60,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             double maxStrain = objectStrains.Max();
+
+            if (maxStrain == 0)
+                return 0;
+
             return objectStrains.Aggregate((total, next) => total + (1.0 / (1.0 + Math.Exp(-(next / maxStrain * 12.0 - 6.0)))));
         }
     }
