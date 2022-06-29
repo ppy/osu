@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Database
                     });
 
                     // Can't be used, even from within a valid context.
-                    realm.Run(threadContext =>
+                    realm.Run(_ =>
                     {
                         Assert.Throws<InvalidOperationException>(() =>
                         {

@@ -161,13 +161,13 @@ namespace osu.Game.Overlays.BeatmapListing
                 queueUpdateSearch(true);
             });
 
-            searchControl.General.CollectionChanged += (_, __) => queueUpdateSearch();
+            searchControl.General.CollectionChanged += (_, _) => queueUpdateSearch();
             searchControl.Ruleset.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Category.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Genre.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Language.BindValueChanged(_ => queueUpdateSearch());
-            searchControl.Extra.CollectionChanged += (_, __) => queueUpdateSearch();
-            searchControl.Ranks.CollectionChanged += (_, __) => queueUpdateSearch();
+            searchControl.Extra.CollectionChanged += (_, _) => queueUpdateSearch();
+            searchControl.Ranks.CollectionChanged += (_, _) => queueUpdateSearch();
             searchControl.Played.BindValueChanged(_ => queueUpdateSearch());
             searchControl.ExplicitContent.BindValueChanged(_ => queueUpdateSearch());
 

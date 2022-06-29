@@ -57,7 +57,7 @@ namespace osu.Desktop
             client.OnReady += onReady;
 
             // safety measure for now, until we performance test / improve backoff for failed connections.
-            client.OnConnectionFailed += (_, __) => client.Deinitialize();
+            client.OnConnectionFailed += (_, _) => client.Deinitialize();
 
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network);
 

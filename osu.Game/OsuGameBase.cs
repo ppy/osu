@@ -21,6 +21,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.Input.Handlers;
+using osu.Framework.Input.Handlers.Midi;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -42,6 +44,8 @@ using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -85,7 +89,7 @@ namespace osu.Game
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
         internal EndpointConfiguration CreateEndpoints() =>
-            UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -240,7 +244,7 @@ namespace osu.Game
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
-            largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
+            largeStore.AddTextureSource(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(this);
@@ -264,14 +268,16 @@ namespace osu.Game
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
+            dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
+
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, () => difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
 
-            dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
+            // Add after all the above cache operations as it depends on them.
             AddInternal(difficultyCache);
 
             dependencies.Cache(userCache = new UserLookupCache());
@@ -417,14 +423,15 @@ namespace osu.Game
 
         /// <summary>
         /// Use to programatically exit the game as if the user was triggering via alt-f4.
-        /// Will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// By default, will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// May be interrupted (see <see cref="OsuGame"/>'s override).
         /// </summary>
-        public void GracefullyExit()
+        public virtual void AttemptExit()
         {
             if (!OnExiting())
                 Exit();
             else
-                Scheduler.AddDelayed(GracefullyExit, 2000);
+                Scheduler.AddDelayed(AttemptExit, 2000);
         }
 
         public bool Migrate(string path)
@@ -444,7 +451,8 @@ namespace osu.Game
                     readyToRun.Set();
                 }, false);
 
-                readyToRun.Wait();
+                if (!readyToRun.Wait(30000))
+                    throw new TimeoutException("Attempting to block for migration took too long.");
 
                 bool? cleanupSucceded = (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
 
@@ -465,10 +473,29 @@ namespace osu.Game
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
-        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> valueChangedEvent)
+        /// <summary>
+        /// Creates an input settings subsection for an <see cref="InputHandler"/>.
+        /// </summary>
+        /// <remarks>Should be overriden per-platform to provide settings for platform-specific handlers.</remarks>
+        public virtual SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
+        {
+            switch (handler)
+            {
+                case MidiHandler:
+                    return new InputSection.HandlerSection(handler);
+
+                // return null for handlers that shouldn't have settings.
+                default:
+                    return null;
+            }
+        }
+
+        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
             if (IsLoaded && !ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException("Global beatmap bindable must be changed from update thread.");
+
+            Logger.Log($"Game-wide working beatmap updated to {beatmap.NewValue}");
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
@@ -558,6 +585,6 @@ namespace osu.Game
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.Beatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track : (IClock)null;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
     }
 }

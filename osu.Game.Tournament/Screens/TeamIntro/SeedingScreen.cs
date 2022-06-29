@@ -198,7 +198,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     {
                         row.Add(new Sprite
                         {
-                            Texture = textures.Get($"Mods/{mods.ToLower()}"),
+                            Texture = textures.Get($"Mods/{mods.ToLowerInvariant()}"),
                             Scale = new Vector2(0.5f)
                         });
                     }
@@ -257,7 +257,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 };
 
                 foreach (var p in team.Players)
-                    fill.Add(new RowDisplay(p.Username, p.Statistics?.GlobalRank?.ToString("\\##,0") ?? "-"));
+                    fill.Add(new RowDisplay(p.Username, p.Rank?.ToString("\\##,0") ?? "-"));
             }
 
             internal class RowDisplay : CompositeDrawable

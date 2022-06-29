@@ -69,6 +69,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"count_sliders")]
         public int SliderCount { get; set; }
 
+        [JsonProperty(@"count_spinners")]
+        public int SpinnerCount { get; set; }
+
         [JsonProperty(@"version")]
         public string DifficultyName { get; set; } = string.Empty;
 

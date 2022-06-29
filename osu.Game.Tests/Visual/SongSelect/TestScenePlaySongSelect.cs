@@ -872,10 +872,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return set != null;
             });
 
-            FilterableGroupedDifficultyIcon groupIcon = null;
+            GroupedDifficultyIcon groupIcon = null;
             AddUntilStep("Find group icon for different ruleset", () =>
             {
-                return (groupIcon = set.ChildrenOfType<FilterableGroupedDifficultyIcon>()
+                return (groupIcon = set.ChildrenOfType<GroupedDifficultyIcon>()
                                        .FirstOrDefault(icon => icon.Items.First().BeatmapInfo.Ruleset.OnlineID == 3)) != null;
             });
 

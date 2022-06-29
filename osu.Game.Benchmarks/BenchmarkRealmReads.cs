@@ -31,7 +31,7 @@ namespace osu.Game.Benchmarks
 
             realm = new RealmAccess(storage, OsuGameBase.CLIENT_DATABASE_FILENAME);
 
-            realm.Run(r =>
+            realm.Run(_ =>
             {
                 realm.Write(c => c.Add(TestResources.CreateTestBeatmapSetInfo(rulesets: new[] { new OsuRuleset().RulesetInfo })));
             });
@@ -76,7 +76,7 @@ namespace osu.Game.Benchmarks
                 }
             });
 
-            done.Wait();
+            done.Wait(60000);
         }
 
         [Benchmark]
@@ -115,7 +115,7 @@ namespace osu.Game.Benchmarks
                 }
             });
 
-            done.Wait();
+            done.Wait(60000);
         }
 
         [Benchmark]
