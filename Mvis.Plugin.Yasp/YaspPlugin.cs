@@ -55,7 +55,7 @@ namespace Mvis.Plugin.Yasp
             };
         }
 
-        public override int Version => 9;
+        public override int Version => 10;
 
         public YaspPlugin()
         {

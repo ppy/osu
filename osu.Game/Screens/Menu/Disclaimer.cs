@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -47,11 +46,10 @@ namespace osu.Game.Screens.Menu
 
         private readonly List<ITextPart> expendableText = new List<ITextPart>();
 
-        [CanBeNull]
         private Texture avatarTexture;
 
         private bool showDisclaimer;
-        private Color4 backgroundColor;
+        private readonly Color4 backgroundColor;
 
         public Disclaimer(OsuScreen nextScreen = null, bool showDisclaimer = true, Color4 backgroundColor = new Color4())
         {
@@ -70,7 +68,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, LargeTextureStore largeTextureStore, MConfigManager mConfig)
         {
-            var enableAvatarSprite = mConfig.Get<bool>(MSetting.UseCustomGreetingPicture);
+            bool enableAvatarSprite = mConfig.Get<bool>(MSetting.UseCustomGreetingPicture);
 
             showDisclaimer = !mConfig.Get<bool>(MSetting.DoNotShowDisclaimer) && showDisclaimer;
 
@@ -120,7 +118,10 @@ namespace osu.Game.Screens.Menu
 
             if (enableAvatarSprite)
             {
-                avatarTexture = largeTextureStore.Get("avatarlogo");
+                avatarTexture = largeTextureStore.Get("startup");
+
+                if (!avatarTexture.Available)
+                    avatarTexture = largeTextureStore.Get("avatarlogo");
 
                 AddInternal(new Sprite
                 {
@@ -237,8 +238,7 @@ namespace osu.Game.Screens.Menu
             if (showDisclaimer)
             {
                 //显示Disclaimer
-
-                using (BeginDelayedSequence(3000, true))
+                using (BeginDelayedSequence(3000))
                 {
                     icon.FadeColour(iconColour, 200, Easing.OutQuint);
                     icon.MoveToY(icon_y * 1.3f, 500, Easing.OutCirc)
@@ -279,8 +279,7 @@ namespace osu.Game.Screens.Menu
             else
             {
                 //不显示Disclaimer
-
-                var instantPush = avatarTexture == null;
+                bool instantPush = avatarTexture == null;
 
                 icon.FadeOut();
                 textFlow.FadeOut();
