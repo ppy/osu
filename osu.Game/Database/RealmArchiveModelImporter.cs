@@ -56,7 +56,7 @@ namespace osu.Game.Database
         /// </summary>
         private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
-        public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
+        public abstract IEnumerable<string> HandledExtensions { get; }
 
         protected readonly RealmFileStore Files;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<Live<TModel>>>? PostImport { get; set; }
+        public Action<IEnumerable<Live<TModel>>>? PresentImport { get; set; }
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -158,12 +158,12 @@ namespace osu.Game.Database
                     ? $"Imported {imported.First().GetDisplayString()}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
-                if (imported.Count > 0 && PostImport != null)
+                if (imported.Count > 0 && PresentImport != null)
                 {
                     notification.CompletionText += " Click to view.";
                     notification.CompletionClickAction = () =>
                     {
-                        PostImport?.Invoke(imported);
+                        PresentImport?.Invoke(imported);
                         return true;
                     };
                 }
@@ -188,7 +188,7 @@ namespace osu.Game.Database
 
             Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
-                import = await Import(reader, batchImport, cancellationToken).ConfigureAwait(false);
+                import = await importFromArchive(reader, batchImport, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -208,12 +208,15 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Silently import an item from an <see cref="ArchiveReader"/>.
+        /// Create and import a model based off the provided <see cref="ArchiveReader"/>.
         /// </summary>
+        /// <remarks>
+        /// This method also handled queueing the import task on a relevant import thread pool.
+        /// </remarks>
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="batchImport">Whether this import is part of a larger batch.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<Live<TModel>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
+        private async Task<Live<TModel>?> importFromArchive(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -236,7 +239,7 @@ namespace osu.Game.Database
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, batchImport, cancellationToken),
+            var scheduledImport = Task.Factory.StartNew(() => ImportModel(model, archive, batchImport, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler,
                 batchImport ? import_scheduler_batch : import_scheduler);
@@ -251,7 +254,7 @@ namespace osu.Game.Database
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="batchImport">If <c>true</c>, imports will be skipped before they begin, given an existing model matches on hash and filenames. Should generally only be used for large batch imports, as it may defy user expectations when updating an existing model.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
+        public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, bool batchImport = false, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -293,7 +296,8 @@ namespace osu.Game.Database
 
             try
             {
-                LogForModel(item, @"Beginning import...");
+                // Log output here will be missing a valid hash in non-batch imports.
+                LogForModel(item, $@"Beginning import from {archive?.Name ?? "unknown"}...");
 
                 // TODO: do we want to make the transaction this local? not 100% sure, will need further investigation.
                 using (var transaction = realm.BeginWrite())
@@ -334,6 +338,8 @@ namespace osu.Game.Database
 
                     transaction.Commit();
                 }
+
+                PostImport(item, realm);
 
                 LogForModel(item, @"Import successfully completed!");
             }
@@ -471,6 +477,15 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Perform any final actions after the import has been committed to the database.
+        /// </summary>
+        /// <param name="model">The model prepared for import.</param>
+        /// <param name="realm">The current realm context.</param>
+        protected virtual void PostImport(TModel model, Realm realm)
+        {
+        }
+
+        /// <summary>
         /// Check whether an existing model already exists for a new import item.
         /// </summary>
         /// <param name="model">The new model proposed for import.</param>
@@ -535,6 +550,6 @@ namespace osu.Game.Database
                 yield return f.Filename;
         }
 
-        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
+        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLowerInvariant()}";
     }
 }

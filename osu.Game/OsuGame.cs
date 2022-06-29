@@ -24,6 +24,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -39,6 +40,7 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -69,7 +71,7 @@ namespace osu.Game
     /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
     /// for initial components that are generally retrieved via DI.
     /// </summary>
-    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager
+    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
@@ -230,7 +232,7 @@ namespace osu.Game
         /// <summary>
         /// Unregisters a blocking <see cref="OverlayContainer"/> that was not created by <see cref="OsuGame"/> itself.
         /// </summary>
-        private void unregisterBlockingOverlay(OverlayContainer overlayContainer)
+        private void unregisterBlockingOverlay(OverlayContainer overlayContainer) => Schedule(() =>
         {
             externalOverlays.Remove(overlayContainer);
 
@@ -238,7 +240,7 @@ namespace osu.Game
                 focusedOverlays.Remove(focusedOverlayContainer);
 
             overlayContainer.Expire();
-        }
+        });
 
         #endregion
 
@@ -485,6 +487,7 @@ namespace osu.Game
         /// </remarks>
         public void PresentBeatmap(IBeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
+            Logger.Log($"Beginning {nameof(PresentBeatmap)} with beatmap {beatmap}");
             Live<BeatmapSetInfo> databasedSet = null;
 
             if (beatmap.OnlineID > 0)
@@ -521,6 +524,7 @@ namespace osu.Game
                 }
                 else
                 {
+                    Logger.Log($"Completing {nameof(PresentBeatmap)} with beatmap {beatmap} ruleset {selection.Ruleset}");
                     Ruleset.Value = selection.Ruleset;
                     Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
                 }
@@ -533,6 +537,8 @@ namespace osu.Game
         /// </summary>
         public void PresentScore(IScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
         {
+            Logger.Log($"Beginning {nameof(PresentScore)} with score {score}");
+
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
             ScoreInfo databasedScoreInfo = null;
@@ -567,6 +573,8 @@ namespace osu.Game
 
             PerformFromScreen(screen =>
             {
+                Logger.Log($"{nameof(PresentScore)} updating beatmap ({databasedBeatmap}) and ruleset ({databasedScore.ScoreInfo.Ruleset} to match score");
+
                 Ruleset.Value = databasedScore.ScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
@@ -611,7 +619,6 @@ namespace osu.Game
         {
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
-            Logger.Log($"Game-wide working beatmap updated to {beatmap.NewValue}");
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -635,6 +642,12 @@ namespace osu.Game
         {
             performFromMainMenuTask?.Cancel();
             Add(performFromMainMenuTask = new PerformFromMenuRunner(action, validScreens, () => ScreenStack.CurrentScreen));
+        }
+
+        public override void AttemptExit()
+        {
+            // Using PerformFromScreen gives the user a chance to interrupt the exit process if needed.
+            PerformFromScreen(menu => menu.Exit());
         }
 
         /// <summary>
@@ -674,27 +687,29 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
+            var languages = Enum.GetValues(typeof(Language)).OfType<Language>();
+
+            var mappings = languages.Select(language =>
             {
 #if DEBUG
                 if (language == Language.debug)
-                {
-                    Localisation.AddLanguage(Language.debug.ToString(), new DebugLocalisationStore());
-                    continue;
-                }
+                    return new LocaleMapping("debug", new DebugLocalisationStore());
 #endif
 
                 string cultureCode = language.ToCultureCode();
 
                 try
                 {
-                    Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+                    return new LocaleMapping(new ResourceManagerLocalisationStore(cultureCode));
                 }
                 catch (Exception ex)
                 {
                     Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                    return null;
                 }
-            }
+            }).Where(m => m != null);
+
+            Localisation.AddLocaleMappings(mappings);
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
@@ -705,13 +720,13 @@ namespace osu.Game
             SkinManager.PostNotification = n => Notifications.Post(n);
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
-            BeatmapManager.PostImport = items => PresentBeatmap(items.First().Value);
+            BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
 
             BeatmapDownloader.PostNotification = n => Notifications.Post(n);
             ScoreDownloader.PostNotification = n => Notifications.Post(n);
 
             ScoreManager.PostNotification = n => Notifications.Post(n);
-            ScoreManager.PostImport = items => PresentScore(items.First().Value);
+            ScoreManager.PresentImport = items => PresentScore(items.First().Value);
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.

@@ -44,7 +44,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
             AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));
 
-            LadderInfo.Matches.CollectionChanged += (_, __) => updateMessage();
+            LadderInfo.Matches.CollectionChanged += (_, _) => updateMessage();
             updateMessage();
         }
 

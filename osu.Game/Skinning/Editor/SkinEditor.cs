@@ -190,13 +190,13 @@ namespace osu.Game.Skinning.Editor
             // schedule ensures this only happens when the skin editor is visible.
             // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
             // probably something which will be factored out in a future database refactor so not too concerning for now.
-            currentSkin.BindValueChanged(skin =>
+            currentSkin.BindValueChanged(_ =>
             {
                 hasBegunMutating = false;
                 Scheduler.AddOnce(skinChanged);
             }, true);
 
-            SelectedComponents.BindCollectionChanged((_, __) => Scheduler.AddOnce(populateSettings), true);
+            SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
         }
 
         public void UpdateTargetScreen(Drawable targetScreen)
@@ -321,6 +321,12 @@ namespace osu.Game.Skinning.Editor
         protected override bool OnHover(HoverEvent e) => true;
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+        public override void Hide()
+        {
+            base.Hide();
+            SelectedComponents.Clear();
+        }
 
         protected override void PopIn()
         {

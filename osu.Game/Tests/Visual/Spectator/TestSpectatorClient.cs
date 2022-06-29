@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.Spectator
             FrameSendAttempts++;
 
             if (ShouldFailSendingFrames)
-                return Task.FromException(new InvalidOperationException());
+                return Task.FromException(new InvalidOperationException($"Intentional fail via {nameof(ShouldFailSendingFrames)}"));
 
             return ((ISpectatorClient)this).UserSentFrames(api.LocalUser.Value.Id, bundle);
         }

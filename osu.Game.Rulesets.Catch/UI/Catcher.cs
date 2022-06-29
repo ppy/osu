@@ -389,13 +389,13 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             switch (source)
             {
-                case Fruit _:
+                case Fruit:
                     return caughtFruitPool.Get();
 
-                case Banana _:
+                case Banana:
                     return caughtBananaPool.Get();
 
-                case Droplet _:
+                case Droplet:
                     return caughtDropletPool.Get();
 
                 default:

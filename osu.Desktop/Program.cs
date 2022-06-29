@@ -11,6 +11,7 @@ using osu.Framework;
 using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Tournament;
 using Squirrel;
@@ -65,19 +66,8 @@ namespace osu.Desktop
             {
                 if (!host.IsPrimaryInstance)
                 {
-                    if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
-                    {
-                        var importer = new ArchiveImportIPCChannel(host);
-
-                        foreach (string file in args)
-                        {
-                            Console.WriteLine(@"Importing {0}", file);
-                            if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
-                                throw new TimeoutException(@"IPC took too long to send");
-                        }
-
+                    if (trySendIPCMessage(host, cwd, args))
                         return;
-                    }
 
                     // we want to allow multiple instances to be started when in debug.
                     if (!DebugUtils.IsDebugBuild)
@@ -108,21 +98,49 @@ namespace osu.Desktop
             }
         }
 
+        private static bool trySendIPCMessage(IIpcHost host, string cwd, string[] args)
+        {
+            if (args.Length == 1 && args[0].StartsWith(OsuGameBase.OSU_PROTOCOL, StringComparison.Ordinal))
+            {
+                var osuSchemeLinkHandler = new OsuSchemeLinkIPCChannel(host);
+                if (!osuSchemeLinkHandler.HandleLinkAsync(args[0]).Wait(3000))
+                    throw new IPCTimeoutException(osuSchemeLinkHandler.GetType());
+
+                return true;
+            }
+
+            if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
+            {
+                var importer = new ArchiveImportIPCChannel(host);
+
+                foreach (string file in args)
+                {
+                    Console.WriteLine(@"Importing {0}", file);
+                    if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
+                        throw new IPCTimeoutException(importer.GetType());
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         [SupportedOSPlatform("windows")]
         private static void setupSquirrel()
         {
-            SquirrelAwareApp.HandleEvents(onInitialInstall: (version, tools) =>
+            SquirrelAwareApp.HandleEvents(onInitialInstall: (_, tools) =>
             {
                 tools.CreateShortcutForThisExe();
                 tools.CreateUninstallerRegistryEntry();
-            }, onAppUpdate: (version, tools) =>
+            }, onAppUpdate: (_, tools) =>
             {
                 tools.CreateUninstallerRegistryEntry();
-            }, onAppUninstall: (version, tools) =>
+            }, onAppUninstall: (_, tools) =>
             {
                 tools.RemoveShortcutForThisExe();
                 tools.RemoveUninstallerRegistryEntry();
-            }, onEveryRun: (version, tools, firstRun) =>
+            }, onEveryRun: (_, _, _) =>
             {
                 // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
                 // causes the right-click context menu to function incorrectly.

@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -29,7 +28,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddToggleStep("toggle enabled", toggle =>
             {
                 for (int i = 0; i < 6; i++)
-                    button.Action = toggle ? () => { } : (Action)null;
+                    button.Action = toggle ? () => { } : null;
             });
         }
 

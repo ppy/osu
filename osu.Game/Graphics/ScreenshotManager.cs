@@ -103,7 +103,9 @@ namespace osu.Game.Graphics
                             framesWaitedEvent.Set();
                     }, 10, true);
 
-                    framesWaitedEvent.Wait();
+                    if (!framesWaitedEvent.Wait(1000))
+                        throw new TimeoutException("Screenshot data did not arrive in a timely fashion");
+
                     waitDelegate.Cancel();
                 }
             }

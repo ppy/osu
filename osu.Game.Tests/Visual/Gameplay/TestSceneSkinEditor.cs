@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestToggleEditor()
         {
-            AddToggleStep("toggle editor visibility", visible => skinEditor.ToggleVisibility());
+            AddToggleStep("toggle editor visibility", _ => skinEditor.ToggleVisibility());
         }
 
         [Test]

@@ -36,7 +36,7 @@ namespace osu.Game.Collections
 
         public BeatmapCollection()
         {
-            BeatmapHashes.CollectionChanged += (_, __) => onChange();
+            BeatmapHashes.CollectionChanged += (_, _) => onChange();
             Name.ValueChanged += _ => onChange();
         }
 
