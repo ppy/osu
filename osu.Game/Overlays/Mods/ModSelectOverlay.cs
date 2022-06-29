@@ -21,7 +21,6 @@ using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -41,7 +40,7 @@ namespace osu.Game.Overlays.Mods
         /// </remarks>
         public Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> AvailableMods { get; } = new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>(new Dictionary<ModType, IReadOnlyList<ModState>>());
 
-        private Func<Mod, bool> isValidMod = m => true;
+        private Func<Mod, bool> isValidMod = _ => true;
 
         /// <summary>
         /// A function determining whether each mod in the column should be displayed.
@@ -68,7 +67,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected virtual bool AllowCustomisation => true;
 
-        protected virtual ModColumn CreateModColumn(ModType modType, Key[]? toggleKeys = null) => new ModColumn(modType, false, toggleKeys);
+        protected virtual ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, false);
 
         protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
 
@@ -160,9 +159,9 @@ namespace osu.Game.Overlays.Mods
                                 Padding = new MarginPadding { Bottom = 10 },
                                 Children = new[]
                                 {
-                                    createModColumnContent(ModType.DifficultyReduction, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P }),
-                                    createModColumnContent(ModType.DifficultyIncrease, new[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L }),
-                                    createModColumnContent(ModType.Automation, new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M }),
+                                    createModColumnContent(ModType.DifficultyReduction),
+                                    createModColumnContent(ModType.DifficultyIncrease),
+                                    createModColumnContent(ModType.Automation),
                                     createModColumnContent(ModType.Conversion),
                                     createModColumnContent(ModType.Fun)
                                 }
@@ -264,9 +263,9 @@ namespace osu.Game.Overlays.Mods
                 column.DeselectAll();
         }
 
-        private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
+        private ColumnDimContainer createModColumnContent(ModType modType)
         {
-            var column = CreateModColumn(modType, toggleKeys).With(column =>
+            var column = CreateModColumn(modType).With(column =>
             {
                 // spacing applied here rather than via `columnFlow.Spacing` to avoid uneven gaps when some of the columns are hidden.
                 column.Margin = new MarginPadding { Right = 10 };
@@ -690,11 +689,11 @@ namespace osu.Game.Overlays.Mods
 
                 switch (e)
                 {
-                    case ClickEvent _:
+                    case ClickEvent:
                         OnClicked?.Invoke();
                         return true;
 
-                    case MouseEvent _:
+                    case MouseEvent:
                         return true;
                 }
 

@@ -80,11 +80,11 @@ namespace osu.Game.Input
 
             switch (e)
             {
-                case KeyDownEvent _:
-                case KeyUpEvent _:
-                case MouseDownEvent _:
-                case MouseUpEvent _:
-                case MouseMoveEvent _:
+                case KeyDownEvent:
+                case KeyUpEvent:
+                case MouseDownEvent:
+                case MouseUpEvent:
+                case MouseMoveEvent:
                     return updateLastInteractionTime();
 
                 default:

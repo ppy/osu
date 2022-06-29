@@ -45,7 +45,7 @@ namespace osu.Game.Tournament.Components
                 FillMode = FillMode.Fill
             };
 
-            (flag = team.FlagName.GetBoundCopy()).BindValueChanged(acronym => flagSprite.Texture = textures.Get($@"Flags/{team.FlagName}"), true);
+            (flag = team.FlagName.GetBoundCopy()).BindValueChanged(_ => flagSprite.Texture = textures.Get($@"Flags/{team.FlagName}"), true);
         }
     }
 }

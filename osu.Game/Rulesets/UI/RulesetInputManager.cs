@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.UI
         {
             switch (e)
             {
-                case MouseDownEvent _:
+                case MouseDownEvent:
                     if (mouseDisabled.Value)
                         return true; // importantly, block upwards propagation so global bindings also don't fire.
 

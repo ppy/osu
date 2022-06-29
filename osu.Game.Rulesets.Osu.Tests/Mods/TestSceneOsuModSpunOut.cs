@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                         lastResult = null;
 
                         spinner = nextSpinner;
-                        spinner.OnNewResult += (o, result) => lastResult = result;
+                        spinner.OnNewResult += (_, result) => lastResult = result;
                     }
 
                     return lastResult?.Type == HitResult.Great;
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                             return false;
 
                         spinner = nextSpinner;
-                        spinner.OnNewResult += (o, result) => results.Add(result);
+                        spinner.OnNewResult += (_, result) => results.Add(result);
 
                         results.Clear();
                     }

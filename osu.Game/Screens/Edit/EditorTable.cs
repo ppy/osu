@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Edit
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colours)
             {
-                hoveredBackground.Colour = colourHover = colours.Background1;
+                colourHover = colours.Background1;
                 colourSelected = colours.Colour3;
             }
 
@@ -105,8 +105,7 @@ namespace osu.Game.Screens.Edit
             {
                 base.LoadComplete();
 
-                // Reduce flicker of rows when offset is being changed rapidly.
-                // Probably need to reconsider this.
+                updateState();
                 FinishTransforms(true);
             }
 
