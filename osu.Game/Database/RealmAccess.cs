@@ -880,8 +880,11 @@ namespace osu.Game.Database
 
                     try
                     {
-                        foreach (var action in notificationsResetMap.Values)
-                            action();
+                        lock (notificationsResetMap)
+                        {
+                            foreach (var action in notificationsResetMap.Values)
+                                action();
+                        }
                     }
                     finally
                     {
