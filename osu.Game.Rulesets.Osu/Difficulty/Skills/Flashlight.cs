@@ -43,13 +43,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return currentStrain;
         }
 
-        public override double DifficultyValue()
-        {
-            double difficulty = GetCurrentStrainPeaks().Sum();
-
-            // 1.06 comes from the default DifficultyMultiplier field in OsuStrainSkill,
-            // and it's added here to keep values the same after Flashlight was converted from OsuStrainSkill.
-            return difficulty * 1.06;
-        }
+        public override double DifficultyValue() => GetCurrentStrainPeaks().Sum() * OsuStrainSkill.DEFAULT_DIFFICULTY_MULTIPLIER;
     }
 }
