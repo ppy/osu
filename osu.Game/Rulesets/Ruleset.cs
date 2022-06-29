@@ -126,55 +126,55 @@ namespace osu.Game.Rulesets
             {
                 switch (mod)
                 {
-                    case ModNoFail _:
+                    case ModNoFail:
                         value |= LegacyMods.NoFail;
                         break;
 
-                    case ModEasy _:
+                    case ModEasy:
                         value |= LegacyMods.Easy;
                         break;
 
-                    case ModHidden _:
+                    case ModHidden:
                         value |= LegacyMods.Hidden;
                         break;
 
-                    case ModHardRock _:
+                    case ModHardRock:
                         value |= LegacyMods.HardRock;
                         break;
 
-                    case ModPerfect _:
+                    case ModPerfect:
                         value |= LegacyMods.Perfect;
                         break;
 
-                    case ModSuddenDeath _:
+                    case ModSuddenDeath:
                         value |= LegacyMods.SuddenDeath;
                         break;
 
-                    case ModNightcore _:
+                    case ModNightcore:
                         value |= LegacyMods.Nightcore;
                         break;
 
-                    case ModDoubleTime _:
+                    case ModDoubleTime:
                         value |= LegacyMods.DoubleTime;
                         break;
 
-                    case ModRelax _:
+                    case ModRelax:
                         value |= LegacyMods.Relax;
                         break;
 
-                    case ModHalfTime _:
+                    case ModHalfTime:
                         value |= LegacyMods.HalfTime;
                         break;
 
-                    case ModFlashlight _:
+                    case ModFlashlight:
                         value |= LegacyMods.Flashlight;
                         break;
 
-                    case ModCinema _:
+                    case ModCinema:
                         value |= LegacyMods.Cinema;
                         break;
 
-                    case ModAutoplay _:
+                    case ModAutoplay:
                         value |= LegacyMods.Autoplay;
                         break;
                 }

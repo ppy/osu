@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
@@ -55,8 +56,8 @@ namespace osu.Game.Rulesets.Mods
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(current => updateCurrentFromSlider());
-            beatmap.BindValueChanged(b => updateCurrentFromSlider(), true);
+            Current.BindValueChanged(_ => updateCurrentFromSlider());
+            beatmap.BindValueChanged(_ => updateCurrentFromSlider(), true);
 
             sliderDisplayCurrent.BindValueChanged(number =>
             {
@@ -103,9 +104,9 @@ namespace osu.Game.Rulesets.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    new SettingsSlider<float>
+                    new OsuSliderBar<float>
                     {
-                        ShowsDefaultIndicator = false,
+                        RelativeSizeAxes = Axes.X,
                         Current = currentNumber,
                         KeyboardStep = 0.1f,
                     }

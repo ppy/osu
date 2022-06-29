@@ -17,7 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         public LoungeBackgroundScreen()
         {
             SelectedRoom.BindValueChanged(onSelectedRoomChanged);
-            playlist.BindCollectionChanged((_, __) => PlaylistItem = playlist.GetCurrentItem());
+            playlist.BindCollectionChanged((_, _) => PlaylistItem = playlist.GetCurrentItem());
         }
 
         private void onSelectedRoomChanged(ValueChangedEvent<Room> room)

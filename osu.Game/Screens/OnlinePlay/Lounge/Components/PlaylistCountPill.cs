@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             base.LoadComplete();
 
             PlaylistItemStats.BindValueChanged(_ => updateCount());
-            Playlist.BindCollectionChanged((_, __) => updateCount(), true);
+            Playlist.BindCollectionChanged((_, _) => updateCount(), true);
         }
 
         private void updateCount()

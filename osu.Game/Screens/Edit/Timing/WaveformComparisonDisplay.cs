@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit.Timing
             selectedGroup.BindValueChanged(_ => updateTimingGroup(), true);
 
             controlPointGroups.BindTo(editorBeatmap.ControlPointInfo.Groups);
-            controlPointGroups.BindCollectionChanged((_, __) => updateTimingGroup());
+            controlPointGroups.BindCollectionChanged((_, _) => updateTimingGroup());
 
             beatLength.BindValueChanged(_ => regenerateDisplay(true), true);
 
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Edit.Timing
             double? offsetChange = newStartTime - selectedGroupStartTime;
 
             var nextGroup = editorBeatmap.ControlPointInfo.TimingPoints
-                                         .SkipWhile(g => g != tcp)
+                                         .SkipWhile(g => !ReferenceEquals(g, tcp))
                                          .Skip(1)
                                          .FirstOrDefault();
 

@@ -27,16 +27,16 @@ namespace osu.Game.Scoring
     public class ScoreManager : ModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
         private readonly Scheduler scheduler;
-        private readonly Func<BeatmapDifficultyCache> difficulties;
+        private readonly BeatmapDifficultyCache difficultyCache;
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler,
-                            Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
+                            BeatmapDifficultyCache difficultyCache = null, OsuConfigManager configManager = null)
             : base(storage, realm)
         {
             this.scheduler = scheduler;
-            this.difficulties = difficulties;
+            this.difficultyCache = difficultyCache;
             this.configManager = configManager;
 
             scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm)
@@ -65,8 +65,6 @@ namespace osu.Game.Scoring
         /// <returns>The given <paramref name="scores"/> ordered by decreasing total score.</returns>
         public async Task<ScoreInfo[]> OrderByTotalScoreAsync(ScoreInfo[] scores, CancellationToken cancellationToken = default)
         {
-            var difficultyCache = difficulties?.Invoke();
-
             if (difficultyCache != null)
             {
                 // Compute difficulties asynchronously first to prevent blocking via the GetTotalScore() call below.
@@ -168,11 +166,11 @@ namespace osu.Game.Scoring
                     return score.BeatmapInfo.MaxCombo.Value;
 #pragma warning restore CS0618
 
-                if (difficulties == null)
+                if (difficultyCache == null)
                     return null;
 
                 // We can compute the max combo locally after the async beatmap difficulty computation.
-                var difficulty = await difficulties().GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
+                var difficulty = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
                 return difficulty?.MaxCombo;
             }
 
@@ -265,13 +263,13 @@ namespace osu.Game.Scoring
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreImporter.Import(notification, tasks);
 
         public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            scoreImporter.Import(item, archive, batchImport, cancellationToken);
+            scoreImporter.ImportModel(item, archive, batchImport, cancellationToken);
 
         #region Implementation of IPresentImports<ScoreInfo>
 
-        public Action<IEnumerable<Live<ScoreInfo>>> PostImport
+        public Action<IEnumerable<Live<ScoreInfo>>> PresentImport
         {
-            set => scoreImporter.PostImport = value;
+            set => scoreImporter.PresentImport = value;
         }
 
         #endregion

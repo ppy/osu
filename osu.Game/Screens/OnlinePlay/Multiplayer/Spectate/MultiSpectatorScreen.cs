@@ -133,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(users)
             {
                 Expanded = { Value = true },
-            }, l =>
+            }, _ =>
             {
                 foreach (var instance in instances)
                     leaderboard.AddClock(instance.UserId, instance.GameplayClock);

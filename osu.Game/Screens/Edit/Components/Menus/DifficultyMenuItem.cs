@@ -24,6 +24,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 Action.Value = () => difficultyChangeFunc.Invoke(beatmapInfo);
         }
 
-        public override IconUsage? GetIconForState(bool state) => state ? (IconUsage?)FontAwesome.Solid.Check : null;
+        public override IconUsage? GetIconForState(bool state) => state ? FontAwesome.Solid.Check : null;
     }
 }

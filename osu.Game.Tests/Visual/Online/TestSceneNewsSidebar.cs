@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 base.LoadComplete();
 
-                Metadata.BindValueChanged(metadata =>
+                Metadata.BindValueChanged(_ =>
                 {
                     foreach (var b in this.ChildrenOfType<YearButton>())
                         b.Action = () => YearChanged?.Invoke(b.Year);

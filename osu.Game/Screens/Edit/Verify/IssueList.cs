@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Edit.Verify
             base.LoadComplete();
 
             verify.InterpretedDifficulty.BindValueChanged(_ => refresh());
-            verify.HiddenIssueTypes.BindCollectionChanged((_, __) => refresh());
+            verify.HiddenIssueTypes.BindCollectionChanged((_, _) => refresh());
 
             refresh();
         }

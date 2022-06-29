@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Menu
                 .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
-                .Finally(d =>
+                .Finally(_ =>
                 {
                     if (nextScreen != null)
                         this.Push(nextScreen);

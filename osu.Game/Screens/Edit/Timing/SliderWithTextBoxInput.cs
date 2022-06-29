@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Edit.Timing
                 Current.TriggerChange();
             };
 
-            Current.BindValueChanged(val =>
+            Current.BindValueChanged(_ =>
             {
                 decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
                 textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");

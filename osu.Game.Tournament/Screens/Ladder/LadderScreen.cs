@@ -75,7 +75,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             foreach (var match in LadderInfo.Matches)
                 addMatch(match);
 
-            LadderInfo.Rounds.CollectionChanged += (_, __) => layout.Invalidate();
+            LadderInfo.Rounds.CollectionChanged += (_, _) => layout.Invalidate();
             LadderInfo.Matches.CollectionChanged += (_, args) =>
             {
                 switch (args.Action)

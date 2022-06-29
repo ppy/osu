@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 notificationOverlay.Reset();
 
                 performer.Setup(g => g.PerformFromScreen(It.IsAny<Action<IScreen>>(), It.IsAny<IEnumerable<Type>>()))
-                         .Callback((Action<IScreen> action, IEnumerable<Type> types) => action(null));
+                         .Callback((Action<IScreen> action, IEnumerable<Type> _) => action(null));
 
                 notificationOverlay.Setup(n => n.Post(It.IsAny<Notification>()))
                                    .Callback((Notification n) => lastNotification = n);
