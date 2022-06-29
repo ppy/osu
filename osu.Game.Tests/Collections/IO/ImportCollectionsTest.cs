@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Collections.IO
         public async Task TestImportMalformedDatabase()
         {
             bool exceptionThrown = false;
-            UnhandledExceptionEventHandler setException = (_, __) => exceptionThrown = true;
+            UnhandledExceptionEventHandler setException = (_, _) => exceptionThrown = true;
 
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {

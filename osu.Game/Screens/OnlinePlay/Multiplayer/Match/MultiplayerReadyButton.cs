@@ -61,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             switch (room?.Countdown)
             {
-                case MatchStartCountdown _:
+                case MatchStartCountdown:
                     newCountdown = room.Countdown;
                     break;
 

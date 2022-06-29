@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            drawable.ApplyCustomUpdateState += (drawableObject, state) =>
+            drawable.ApplyCustomUpdateState += (drawableObject, _) =>
             {
                 if (!(drawableObject is DrawableHitCircle drawableHitCircle)) return;
 

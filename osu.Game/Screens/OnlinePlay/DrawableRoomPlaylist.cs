@@ -181,7 +181,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             // schedules added as the properties may change value while the drawable items haven't been created yet.
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(scrollToSelection));
-            Items.BindCollectionChanged((_, __) => Scheduler.AddOnce(scrollToSelection), true);
+            Items.BindCollectionChanged((_, _) => Scheduler.AddOnce(scrollToSelection), true);
         }
 
         private void scrollToSelection()

@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Edit.Compose
             if (composer == null)
                 return;
 
-            EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) => updateClipboardActionAvailability());
+            EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateClipboardActionAvailability());
             clipboard.BindValueChanged(_ => updateClipboardActionAvailability());
             composer.OnLoadComplete += _ => updateClipboardActionAvailability();
             updateClipboardActionAvailability();

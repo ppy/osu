@@ -39,10 +39,10 @@ namespace osu.Game.Tests.Visual
             base.SetUpSteps();
 
             if (!HasCustomSteps)
-                CreateTest(null);
+                CreateTest();
         }
 
-        protected void CreateTest(Action action)
+        protected void CreateTest([CanBeNull] Action action = null)
         {
             if (action != null && !HasCustomSteps)
                 throw new InvalidOperationException($"Cannot add custom test steps without {nameof(HasCustomSteps)} being set.");

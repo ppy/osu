@@ -9,6 +9,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
@@ -35,10 +36,12 @@ namespace osu.Game.Tests.Visual.Editing
                 () => Game.Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet)
                       && Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect
                       && songSelect.IsLoaded);
+            AddUntilStep("wait for completion notification", () => Game.Notifications.ChildrenOfType<ProgressCompletionNotification>().Count() == 1);
+            AddStep("dismiss notifications", () => Game.Notifications.Hide());
             AddStep("switch ruleset", () => Game.Ruleset.Value = new ManiaRuleset().RulesetInfo);
 
             AddStep("open editor", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).Edit(beatmapSet.Beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == 0)));
-            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.IsLoaded);
+            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
             AddStep("test gameplay", () =>
             {
                 var testGameplayButton = this.ChildrenOfType<TestGameplayButton>().Single();
