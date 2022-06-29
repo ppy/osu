@@ -41,7 +41,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                     Child = LyricScroll = new OsuScrollContainer<T>
                     {
                         RelativeSizeAxes = Axes.Both,
-                        ScrollContent = { AutoSizeAxes = Axes.None },
+                        ScrollContent = { AutoSizeAxes = Axes.None, Padding = new MarginPadding { Right = 20 } },
                         Padding = new MarginPadding(5)
                     }
                 }

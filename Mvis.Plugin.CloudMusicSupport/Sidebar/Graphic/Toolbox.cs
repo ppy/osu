@@ -4,13 +4,11 @@ using Mvis.Plugin.CloudMusicSupport.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
-using osu.Game.Screens.LLin;
 using osuTK;
 using osuTK.Graphics;
 
@@ -18,7 +16,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
     public class Toolbox : CompositeDrawable
     {
-        private readonly Box bgBox;
         private readonly FillFlowContainer buttonFillFlow;
         private readonly OsuSpriteText idText;
 
@@ -50,10 +47,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
             InternalChildren = new Drawable[]
             {
-                bgBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
                 contentFillFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -65,8 +58,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                         idText = new OsuSpriteText
                         {
                             Margin = new MarginPadding { Horizontal = 15, Top = 15 },
-                            Font = OsuFont.GetFont(size: 20),
-                            Colour = Color4.Black
+                            Font = OsuFont.GetFont(size: 20)
                         },
                         new TrackTimeIndicator(),
                         buttonFillFlow = new FillFlowContainer
@@ -97,7 +89,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
             foreach (var btn in range)
             {
-                btn.IconColour = Color4.Black;
                 btn.Anchor = btn.Origin = Anchor.Centre;
 
                 buttonFillFlow.Add(btn);
@@ -110,17 +101,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             }
         }
 
-        [Resolved]
-        private CustomColourProvider colourProvider { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(LyricConfigManager config)
         {
-            colourProvider.HueColour.BindValueChanged(_ =>
-            {
-                bgBox.Colour = colourProvider.ActiveColor;
-            }, true);
-
             contentFillFlow.AddRange(new Drawable[]
             {
                 new SettingsSlider<double>
@@ -130,8 +113,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                     Current = plugin.Offset,
                     LabelText = CloudMusicStrings.LocalOffset,
                     RelativeSizeAxes = Axes.X,
-                    Padding = new MarginPadding { Right = 10 },
-                    Colour = Color4.Black
+                    Padding = new MarginPadding { Right = 10 }
                 },
                 textBox = new OsuTextBox
                 {
