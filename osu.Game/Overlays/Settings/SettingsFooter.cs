@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -32,16 +33,23 @@ namespace osu.Game.Overlays.Settings
 
             foreach (var ruleset in rulesets.AvailableRulesets)
             {
-                var icon = new ConstrainedIconContainer
+                try
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Icon = ruleset.CreateInstance().CreateIcon(),
-                    Colour = Color4.Gray,
-                    Size = new Vector2(20),
-                };
+                    var icon = new ConstrainedIconContainer
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Icon = ruleset.CreateInstance().CreateIcon(),
+                        Colour = Color4.Gray,
+                        Size = new Vector2(20),
+                    };
 
-                modes.Add(icon);
+                    modes.Add(icon);
+                }
+                catch
+                {
+                    Logger.Log($"Could not create ruleset icon for {ruleset.Name}. Please check for an update from the developer.", level: LogLevel.Error);
+                }
             }
 
             Children = new Drawable[]
