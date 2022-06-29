@@ -446,8 +446,12 @@ namespace osu.Game.Database
         {
             Func<Realm, IDisposable?> action = realm => query(realm).QueryAsyncWithNotifications(callback);
 
-            // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
-            notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
+            lock (notificationsResetMap)
+            {
+                // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
+                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
+            }
+
             return RegisterCustomSubscription(action);
         }
 
@@ -543,7 +547,12 @@ namespace osu.Game.Database
                     {
                         unsubscriptionAction?.Dispose();
                         customSubscriptionsResetMap.Remove(action);
-                        notificationsResetMap.Remove(action);
+
+                        lock (notificationsResetMap)
+                        {
+                            notificationsResetMap.Remove(action);
+                        }
+
                         total_subscriptions.Value--;
                     }
                 }
@@ -805,6 +814,9 @@ namespace osu.Game.Database
         /// <returns>An <see cref="IDisposable"/> which should be disposed to end the blocking section.</returns>
         public IDisposable BlockAllOperations()
         {
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
+
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmAccess));
 
@@ -816,9 +828,6 @@ namespace osu.Game.Database
 
                 if (hasInitialisedOnce)
                 {
-                    if (!ThreadSafety.IsUpdateThread)
-                        throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
-
                     syncContext = SynchronizationContext.Current;
 
                     // Before disposing the update context, clean up all subscriptions.
