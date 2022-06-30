@@ -66,7 +66,6 @@ namespace osu.Game.Screens.Play
                         break;
                 }
             };
-            State.BindValueChanged(updateTooltip, true);
             State.BindValueChanged(state =>
             {
                 switch (state.NewValue)
@@ -84,6 +83,7 @@ namespace osu.Game.Screens.Play
                         break;
                 }
             }, true);
+            State.BindValueChanged(updateTooltip, true);
         }
 
         private void saveScore()
@@ -120,7 +120,6 @@ namespace osu.Game.Screens.Play
                     break;
 
                 case ImportState.Failed:
-                    button.State.Value = DownloadState.NotDownloaded;
                     button.TooltipText = @"Import failed, click button to re-import";
                     break;
 
