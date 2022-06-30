@@ -92,6 +92,25 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestTransactionRolledBackOnException()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
+
+                realm.Run(r => r.Write(_ => r.Add(beatmap)));
+
+                var liveBeatmap = beatmap.ToLive(realm);
+
+                Assert.Throws<InvalidOperationException>(() => liveBeatmap.PerformWrite(l => throw new InvalidOperationException()));
+                Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+
+                liveBeatmap.PerformWrite(l => l.Hidden = true);
+                Assert.IsTrue(liveBeatmap.PerformRead(l => l.Hidden));
+            });
+        }
+
+        [Test]
         public void TestScopedReadWithoutContext()
         {
             RunTestWithRealm((realm, _) =>
