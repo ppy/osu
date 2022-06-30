@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets
                         break;
 
                     case ModPerfect:
-                        value |= LegacyMods.Perfect;
+                        value |= LegacyMods.Perfect | LegacyMods.SuddenDeath;
                         break;
 
                     case ModSuddenDeath:
@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets
                         break;
 
                     case ModNightcore:
-                        value |= LegacyMods.Nightcore;
+                        value |= LegacyMods.Nightcore | LegacyMods.DoubleTime;
                         break;
 
                     case ModDoubleTime:
@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets
                         break;
 
                     case ModCinema:
-                        value |= LegacyMods.Cinema;
+                        value |= LegacyMods.Cinema | LegacyMods.Autoplay;
                         break;
 
                     case ModAutoplay:
