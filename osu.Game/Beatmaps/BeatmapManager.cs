@@ -41,7 +41,6 @@ namespace osu.Game.Beatmaps
         private readonly BeatmapImporter beatmapImporter;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
-        private readonly BeatmapOnlineLookupQueue? onlineBeatmapLookupQueue;
         private readonly BeatmapUpdater? beatmapUpdater;
 
         public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
@@ -56,8 +55,7 @@ namespace osu.Game.Beatmaps
                 if (difficultyCache == null)
                     throw new ArgumentNullException(nameof(difficultyCache), "Difficulty cache must be provided if online lookups are required.");
 
-                onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
-                beatmapUpdater = new BeatmapUpdater(this, onlineBeatmapLookupQueue, difficultyCache);
+                beatmapUpdater = new BeatmapUpdater(this, difficultyCache, api, storage);
             }
 
             var userResources = new RealmFileStore(realm, storage).Store;
@@ -474,7 +472,7 @@ namespace osu.Game.Beatmaps
 
         public void Dispose()
         {
-            onlineBeatmapLookupQueue?.Dispose();
+            beatmapUpdater?.Dispose();
         }
 
         #endregion

@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Rulesets.Objects;
 using Realms;
 
@@ -13,17 +17,18 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles all processing required to ensure a local beatmap is in a consistent state with any changes.
     /// </summary>
-    public class BeatmapUpdater
+    public class BeatmapUpdater : IDisposable
     {
         private readonly IWorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
         private readonly BeatmapDifficultyCache difficultyCache;
 
-        public BeatmapUpdater(IWorkingBeatmapCache workingBeatmapCache, BeatmapOnlineLookupQueue onlineLookupQueue, BeatmapDifficultyCache difficultyCache)
+        public BeatmapUpdater(IWorkingBeatmapCache workingBeatmapCache, BeatmapDifficultyCache difficultyCache, IAPIProvider api, Storage storage)
         {
             this.workingBeatmapCache = workingBeatmapCache;
-            this.onlineLookupQueue = onlineLookupQueue;
             this.difficultyCache = difficultyCache;
+
+            onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
         }
 
         /// <summary>
@@ -81,5 +86,15 @@ namespace osu.Game.Beatmaps
 
             return endTime - startTime;
         }
+
+        #region Implementation of IDisposable
+
+        public void Dispose()
+        {
+            if (onlineLookupQueue.IsNotNull())
+                onlineLookupQueue.Dispose();
+        }
+
+        #endregion
     }
 }
