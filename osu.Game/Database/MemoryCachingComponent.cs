@@ -40,11 +40,15 @@ namespace osu.Game.Database
             return computed;
         }
 
-        protected void Invalidate(Func<TLookup, bool> invalidationFunction)
+        /// <summary>
+        /// Invalidate all entries matching a provided predicate.
+        /// </summary>
+        /// <param name="matchKeyPredicate">The predicate to decide which keys should be invalidated.</param>
+        protected void Invalidate(Func<TLookup, bool> matchKeyPredicate)
         {
             foreach (var kvp in cache)
             {
-                if (invalidationFunction(kvp.Key))
+                if (matchKeyPredicate(kvp.Key))
                     cache.TryRemove(kvp.Key, out _);
             }
         }
