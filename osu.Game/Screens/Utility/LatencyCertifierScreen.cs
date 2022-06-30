@@ -448,14 +448,14 @@ namespace osu.Game.Screens.Utility
 
             mainArea.AddRange(new[]
             {
-                new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : (int?)null)
+                new LatencyArea(Key.Number1, betterSide == 1 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : null)
                 {
                     Width = 0.5f,
                     VisualMode = { BindTarget = VisualMode },
                     IsActiveArea = { Value = true },
                     ReportUserBest = () => recordResult(betterSide == 0),
                 },
-                new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : (int?)null)
+                new LatencyArea(Key.Number2, betterSide == 0 ? mapDifficultyToTargetFrameRate(DifficultyLevel) : null)
                 {
                     Width = 0.5f,
                     VisualMode = { BindTarget = VisualMode },

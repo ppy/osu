@@ -34,13 +34,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             set => ball.Colour = value;
         }
 
-        /// <summary>
-        /// Whether to track accurately to the visual size of this <see cref="SliderBall"/>.
-        /// If <c>false</c>, tracking will be performed at the final scale at all times.
-        /// </summary>
-        public bool InputTracksVisualSize = true;
-
         private readonly Drawable followCircle;
+        private readonly Drawable fullSizeFollowCircle;
         private readonly DrawableSlider drawableSlider;
         private readonly Drawable ball;
 
@@ -61,6 +56,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
                     Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle()),
+                },
+                fullSizeFollowCircle = new CircularContainer
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true
                 },
                 ball = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall())
                 {
@@ -104,14 +106,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
                 tracking = value;
 
-                if (InputTracksVisualSize)
-                    followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
-                else
-                {
-                    // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
-                    followCircle.ScaleTo(tracking ? 2.4f : 1f);
-                }
+                fullSizeFollowCircle.Scale = new Vector2(tracking ? 2.4f : 1f);
 
+                followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
                 followCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
@@ -170,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 // in valid time range
                 Time.Current >= drawableSlider.HitObject.StartTime && Time.Current < drawableSlider.HitObject.EndTime &&
                 // in valid position range
-                lastScreenSpaceMousePosition.HasValue && followCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                lastScreenSpaceMousePosition.HasValue && fullSizeFollowCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
 

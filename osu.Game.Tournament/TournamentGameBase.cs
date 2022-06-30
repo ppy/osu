@@ -62,7 +62,7 @@ namespace osu.Game.Tournament
 
             dependencies.Cache(new TournamentVideoResourceStore(storage));
 
-            Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
+            Textures.AddTextureSource(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
             dependencies.CacheAs(new StableInfo(storage));
         }
@@ -267,7 +267,7 @@ namespace osu.Game.Tournament
             }
             else
             {
-                req.Success += res => { populate(); };
+                req.Success += _ => { populate(); };
                 req.Failure += _ =>
                 {
                     user.OnlineID = 1;

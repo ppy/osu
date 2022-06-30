@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Select
         {
             switch (tab)
             {
-                case BeatmapDetailAreaDetailTabItem _:
+                case BeatmapDetailAreaDetailTabItem:
                     Details.Show();
                     break;
 

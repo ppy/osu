@@ -296,7 +296,8 @@ namespace osu.Game.Database
 
             try
             {
-                LogForModel(item, @"Beginning import...");
+                // Log output here will be missing a valid hash in non-batch imports.
+                LogForModel(item, $@"Beginning import from {archive?.Name ?? "unknown"}...");
 
                 // TODO: do we want to make the transaction this local? not 100% sure, will need further investigation.
                 using (var transaction = realm.BeginWrite())
