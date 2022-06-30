@@ -158,6 +158,11 @@ namespace osu.Game.Screens.Select
                                 Height = 20,
                                 Children = new Drawable[]
                                 {
+                                    new DifficultyRangeFilterControl
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Width = 0.5f,
+                                    },
                                     collectionDropdown = new CollectionFilterDropdown
                                     {
                                         Anchor = Anchor.TopRight,

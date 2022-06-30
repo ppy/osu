@@ -38,8 +38,8 @@ namespace osu.Game.Graphics.UserInterface
         private T lastSampleValue;
 
         protected readonly Nub Nub;
-        private readonly Box leftBox;
-        private readonly Box rightBox;
+        protected readonly Box LeftBox;
+        protected readonly Box RightBox;
         private readonly Container nubContainer;
 
         public virtual LocalisableString TooltipText { get; private set; }
@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                leftBox.Colour = value;
+                LeftBox.Colour = value;
             }
         }
 
@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 backgroundColour = value;
-                rightBox.Colour = value;
+                RightBox.Colour = value;
             }
         }
 
@@ -96,7 +96,7 @@ namespace osu.Game.Graphics.UserInterface
                         CornerRadius = 5f,
                         Children = new Drawable[]
                         {
-                            leftBox = new Box
+                            LeftBox = new Box
                             {
                                 Height = 5,
                                 EdgeSmoothness = new Vector2(0, 0.5f),
@@ -104,7 +104,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                             },
-                            rightBox = new Box
+                            RightBox = new Box
                             {
                                 Height = 5,
                                 EdgeSmoothness = new Vector2(0, 0.5f),
@@ -225,9 +225,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            leftBox.Scale = new Vector2(Math.Clamp(
+            LeftBox.Scale = new Vector2(Math.Clamp(
                 RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
-            rightBox.Scale = new Vector2(Math.Clamp(
+            RightBox.Scale = new Vector2(Math.Clamp(
                 DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2, 0, DrawWidth), 1);
         }
 
