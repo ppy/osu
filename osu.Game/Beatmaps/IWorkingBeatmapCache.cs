@@ -28,6 +28,9 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap info to invalidate any cached entries for.</param>
         void Invalidate(BeatmapInfo beatmapInfo);
 
+        /// <summary>
+        /// Fired whenever a <see cref="WorkingBeatmap"/> is invalidated.
+        /// </summary>
         event Action<WorkingBeatmap> OnInvalidated;
     }
 }
