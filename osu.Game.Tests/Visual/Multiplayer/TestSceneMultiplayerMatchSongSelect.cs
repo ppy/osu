@@ -110,6 +110,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
             AddStep("set mods", () => SelectedMods.Value = new[] { new TaikoModDoubleTime() });
 
+            AddUntilStep("wait for ongoing operation to complete", () => !OnlinePlayDependencies.OngoingOperationTracker.InProgress.Value);
             AddStep("confirm selection", () => songSelect.FinaliseSelection());
 
             AddUntilStep("song select exited", () => !songSelect.IsCurrentScreen());

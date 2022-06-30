@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.Play;
@@ -146,6 +147,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (mods != null)
                 AddStep($"set mods to {string.Join(",", mods.Select(m => m.Acronym))}", () => songSelect.AsNonNull().Mods.Value = mods);
 
+            AddUntilStep("wait for ongoing operation to complete", () => !(CurrentScreen as OnlinePlayScreen).ChildrenOfType<OngoingOperationTracker>().Single().InProgress.Value);
             AddStep("select other beatmap", () => songSelect.AsNonNull().FinaliseSelection(beatmap()));
             AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
         }
