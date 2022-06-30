@@ -107,10 +107,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("change ruleset", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
             AddStep("select beatmap",
                 () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == new TaikoRuleset().LegacyID)));
+
             AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
+            AddUntilStep("wait for ongoing operation to complete", () => !OnlinePlayDependencies.OngoingOperationTracker.InProgress.Value);
+
             AddStep("set mods", () => SelectedMods.Value = new[] { new TaikoModDoubleTime() });
 
-            AddUntilStep("wait for ongoing operation to complete", () => !OnlinePlayDependencies.OngoingOperationTracker.InProgress.Value);
             AddStep("confirm selection", () => songSelect.FinaliseSelection());
 
             AddUntilStep("song select exited", () => !songSelect.IsCurrentScreen());
