@@ -436,19 +436,22 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap to lookup.</param>
         /// <param name="refetch">Whether to force a refetch from the database to ensure <see cref="BeatmapInfo"/> is up-to-date.</param>
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, bool refetch = false)
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo? beatmapInfo, bool refetch = false)
         {
-            // Detached sets don't come with files.
-            // If we seem to be missing files, now is a good time to re-fetch.
-            if (refetch || beatmapInfo.IsManaged || beatmapInfo.BeatmapSet?.Files.Count == 0)
+            if (beatmapInfo != null)
             {
-                workingBeatmapCache.Invalidate(beatmapInfo);
+                // Detached sets don't come with files.
+                // If we seem to be missing files, now is a good time to re-fetch.
+                if (refetch || beatmapInfo.IsManaged || beatmapInfo.BeatmapSet?.Files.Count == 0)
+                {
+                    workingBeatmapCache.Invalidate(beatmapInfo);
 
-                Guid id = beatmapInfo.ID;
-                beatmapInfo = Realm.Run(r => r.Find<BeatmapInfo>(id)?.Detach()) ?? beatmapInfo;
+                    Guid id = beatmapInfo.ID;
+                    beatmapInfo = Realm.Run(r => r.Find<BeatmapInfo>(id)?.Detach()) ?? beatmapInfo;
+                }
+
+                Debug.Assert(beatmapInfo.IsManaged != true);
             }
-
-            Debug.Assert(beatmapInfo.IsManaged != true);
 
             return workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
         }
