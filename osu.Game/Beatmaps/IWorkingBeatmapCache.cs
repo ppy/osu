@@ -1,10 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
-
 namespace osu.Game.Beatmaps
 {
     public interface IWorkingBeatmapCache
@@ -27,10 +23,5 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapInfo">The beatmap info to invalidate any cached entries for.</param>
         void Invalidate(BeatmapInfo beatmapInfo);
-
-        /// <summary>
-        /// Fired whenever a <see cref="WorkingBeatmap"/> is invalidated.
-        /// </summary>
-        event Action<WorkingBeatmap> OnInvalidated;
     }
 }
