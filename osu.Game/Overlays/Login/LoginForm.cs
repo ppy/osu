@@ -109,7 +109,7 @@ namespace osu.Game.Overlays.Login
                 }
             };
 
-            password.OnCommit += (sender, newText) => performLogin();
+            password.OnCommit += (_, _) => performLogin();
 
             if (api?.LastLoginError?.Message is string error)
                 errorText.AddErrors(new[] { error });

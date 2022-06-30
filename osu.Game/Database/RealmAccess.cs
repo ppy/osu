@@ -102,6 +102,12 @@ namespace osu.Game.Database
 
         private Realm? updateRealm;
 
+        /// <summary>
+        /// Tracks whether a realm was ever fetched from this instance.
+        /// After a fetch occurs, blocking operations will be guaranteed to restore any subscriptions.
+        /// </summary>
+        private bool hasInitialisedOnce;
+
         private bool isSendingNotificationResetEvents;
 
         public Realm Realm => ensureUpdateRealm();
@@ -121,11 +127,12 @@ namespace osu.Game.Database
                 if (updateRealm == null)
                 {
                     updateRealm = getRealmInstance();
+                    hasInitialisedOnce = true;
 
                     Logger.Log(@$"Opened realm ""{updateRealm.Config.DatabasePath}"" at version {updateRealm.Config.SchemaVersion}");
 
                     // Resubscribe any subscriptions
-                    foreach (var action in customSubscriptionsResetMap.Keys)
+                    foreach (var action in customSubscriptionsResetMap.Keys.ToArray())
                         registerSubscription(action);
                 }
 
@@ -454,7 +461,7 @@ namespace osu.Game.Database
         public IDisposable SubscribeToPropertyChanged<TModel, TProperty>(Func<Realm, TModel?> modelAccessor, Expression<Func<TModel, TProperty>> propertyLookup, Action<TProperty> onChanged)
             where TModel : RealmObjectBase
         {
-            return RegisterCustomSubscription(r =>
+            return RegisterCustomSubscription(_ =>
             {
                 string propertyName = getMemberName(propertyLookup);
 
@@ -806,13 +813,7 @@ namespace osu.Game.Database
 
                 lock (realmLock)
                 {
-                    if (updateRealm == null)
-                    {
-                        // null realm means the update thread has not yet retrieved its instance.
-                        // we don't need to worry about reviving the update instance in this case, so don't bother with the SynchronizationContext.
-                        Debug.Assert(!ThreadSafety.IsUpdateThread);
-                    }
-                    else
+                    if (hasInitialisedOnce)
                     {
                         if (!ThreadSafety.IsUpdateThread)
                             throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
@@ -827,12 +828,12 @@ namespace osu.Game.Database
                             action.Value?.Dispose();
                             customSubscriptionsResetMap[action.Key] = null;
                         }
+
+                        updateRealm?.Dispose();
+                        updateRealm = null;
                     }
 
                     Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
-
-                    updateRealm?.Dispose();
-                    updateRealm = null;
                 }
 
                 const int sleep_length = 200;

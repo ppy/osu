@@ -217,7 +217,7 @@ namespace osu.Game.Screens.Select
                 });
             };
 
-            lookup.Failure += e =>
+            lookup.Failure += _ =>
             {
                 Schedule(() =>
                 {

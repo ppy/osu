@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Set time before zero", () =>
             {
-                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                beatContainer.NewBeat = (i, timingControlPoint, _, _) =>
                 {
                     lastActuationTime = gameplayClockContainer.CurrentTime;
                     lastTimingPoint = timingControlPoint;
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Set time before zero", () =>
             {
-                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                beatContainer.NewBeat = (i, timingControlPoint, _, _) =>
                 {
                     lastBeatIndex = i;
                     lastBpm = timingControlPoint.BPM;
@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("bind event", () =>
             {
-                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) => lastBpm = timingControlPoint.BPM;
+                beatContainer.NewBeat = (_, timingControlPoint, _, _) => lastBpm = timingControlPoint.BPM;
             });
 
             AddUntilStep("wait for trigger", () => lastBpm != null);
@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 actualEffectPoint = null;
                 beatContainer.AllowMistimedEventFiring = false;
 
-                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                beatContainer.NewBeat = (_, _, effectControlPoint, _) =>
                 {
                     if (Precision.AlmostEquals(gameplayClockContainer.CurrentTime + earlyActivationMilliseconds, expectedEffectPoint.Time, BeatSyncedContainer.MISTIMED_ALLOWANCE))
                         actualEffectPoint = effectControlPoint;

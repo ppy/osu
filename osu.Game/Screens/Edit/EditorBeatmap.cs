@@ -105,8 +105,8 @@ namespace osu.Game.Screens.Edit
             {
                 switch (controlPoint)
                 {
-                    case DifficultyControlPoint _:
-                    case SampleControlPoint _:
+                    case DifficultyControlPoint:
+                    case SampleControlPoint:
                         // skip legacy types.
                         continue;
 
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Edit
         public BeatmapInfo BeatmapInfo
         {
             get => beatmapInfo;
-            set => throw new InvalidOperationException();
+            set => throw new InvalidOperationException($"Can't set {nameof(BeatmapInfo)} on {nameof(EditorBeatmap)}");
         }
 
         public BeatmapMetadata Metadata => beatmapInfo.Metadata;

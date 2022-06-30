@@ -129,18 +129,18 @@ namespace osu.Desktop
         [SupportedOSPlatform("windows")]
         private static void setupSquirrel()
         {
-            SquirrelAwareApp.HandleEvents(onInitialInstall: (version, tools) =>
+            SquirrelAwareApp.HandleEvents(onInitialInstall: (_, tools) =>
             {
                 tools.CreateShortcutForThisExe();
                 tools.CreateUninstallerRegistryEntry();
-            }, onAppUpdate: (version, tools) =>
+            }, onAppUpdate: (_, tools) =>
             {
                 tools.CreateUninstallerRegistryEntry();
-            }, onAppUninstall: (version, tools) =>
+            }, onAppUninstall: (_, tools) =>
             {
                 tools.RemoveShortcutForThisExe();
                 tools.RemoveUninstallerRegistryEntry();
-            }, onEveryRun: (version, tools, firstRun) =>
+            }, onEveryRun: (_, _, _) =>
             {
                 // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
                 // causes the right-click context menu to function incorrectly.

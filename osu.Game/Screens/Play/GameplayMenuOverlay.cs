@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            State.ValueChanged += s => InternalButtons.Deselect();
+            State.ValueChanged += _ => InternalButtons.Deselect();
 
             updateRetryCount();
         }
@@ -267,7 +267,7 @@ namespace osu.Game.Screens.Play
         {
             switch (e)
             {
-                case ScrollEvent _:
+                case ScrollEvent:
                     if (ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
                         return globalAction.TriggerEvent(e);
 
