@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -166,15 +167,22 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             var beatmapSet = TestResources.CreateTestBeatmapSetInfo(rulesets.Length, rulesets);
 
-            for (int i = 0; i < rulesets.Length; i++)
+            var importedBeatmapSet = Game.BeatmapManager.Import(beatmapSet);
+
+            Debug.Assert(importedBeatmapSet != null);
+
+            importedBeatmapSet.PerformWrite(s =>
             {
-                var beatmap = beatmapSet.Beatmaps[i];
+                for (int i = 0; i < rulesets.Length; i++)
+                {
+                    var beatmap = s.Beatmaps[i];
 
-                beatmap.StarRating = i + 1;
-                beatmap.DifficultyName = $"SR{i + 1}";
-            }
+                    beatmap.StarRating = i + 1;
+                    beatmap.DifficultyName = $"SR{i + 1}";
+                }
+            });
 
-            return Game.BeatmapManager.Import(beatmapSet)?.Value;
+            return importedBeatmapSet.Value;
         }
 
         private bool ensureAllBeatmapSetsImported(IEnumerable<BeatmapSetInfo> beatmapSets) => beatmapSets.All(set => set != null);
