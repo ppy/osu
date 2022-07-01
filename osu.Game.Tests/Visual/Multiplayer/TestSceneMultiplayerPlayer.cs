@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Stack.Push(player = new MultiplayerPlayer(MultiplayerClient.ClientAPIRoom, new PlaylistItem(Beatmap.Value.BeatmapInfo)
                 {
                     RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
-                }, MultiplayerClient.Room?.Users.ToArray()));
+                }, MultiplayerClient.ServerRoom?.Users.ToArray()));
             });
 
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen() && player.IsLoaded);

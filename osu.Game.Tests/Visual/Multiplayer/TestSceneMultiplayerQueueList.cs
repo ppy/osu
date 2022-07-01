@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertDeleteButtonVisibility(1, true);
 
             AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
-            AddUntilStep("wait for next item to be selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == 2);
+            AddUntilStep("wait for next item to be selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == 2);
             AddUntilStep("wait for two items in playlist", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().Count() == 2);
 
             assertDeleteButtonVisibility(0, false);
