@@ -86,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public readonly Room Room;
         private readonly bool allowEdit;
 
-        public ModSelectOverlay UserModsSelectOverlay { get; private set; }
+        internal ModSelectOverlay UserModsSelectOverlay { get; private set; }
 
         [CanBeNull]
         private IDisposable userModsSelectOverlayRegistration;

@@ -218,7 +218,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
 
-            // AddWaitStep("wait some", 3);
+            AddWaitStep("wait some", 3);
             AddAssert("mod select not shown", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Hidden);
         }
 
