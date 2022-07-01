@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFirstItemSelectedByDefault()
         {
-            AddAssert("first item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[0].ID);
+            AddAssert("first item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             selectNewItem(() => InitialBeatmap);
 
-            AddAssert("playlist item still selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[0].ID);
+            AddAssert("playlist item still selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             selectNewItem(() => OtherBeatmap);
 
-            AddAssert("playlist item still selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[0].ID);
+            AddAssert("playlist item still selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -48,10 +48,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             RunGameplay();
 
-            AddAssert("playlist contains two items", () => MultiplayerClient.APIRoom?.Playlist.Count == 2);
-            AddAssert("first playlist item expired", () => MultiplayerClient.APIRoom?.Playlist[0].Expired == true);
-            AddAssert("second playlist item not expired", () => MultiplayerClient.APIRoom?.Playlist[1].Expired == false);
-            AddAssert("second playlist item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.APIRoom?.Playlist[1].ID);
+            AddAssert("playlist contains two items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 2);
+            AddAssert("first playlist item expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
+            AddAssert("second playlist item not expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Expired == false);
+            AddAssert("second playlist item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[1].ID);
         }
 
         [Test]
@@ -60,12 +60,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             RunGameplay();
 
             IBeatmapInfo firstBeatmap = null;
-            AddStep("get first playlist item beatmap", () => firstBeatmap = MultiplayerClient.APIRoom?.Playlist[0].Beatmap);
+            AddStep("get first playlist item beatmap", () => firstBeatmap = MultiplayerClient.ClientAPIRoom?.Playlist[0].Beatmap);
 
             selectNewItem(() => OtherBeatmap);
 
-            AddAssert("first playlist item hasn't changed", () => MultiplayerClient.APIRoom?.Playlist[0].Beatmap == firstBeatmap);
-            AddAssert("second playlist item changed", () => MultiplayerClient.APIRoom?.Playlist[1].Beatmap != firstBeatmap);
+            AddAssert("first playlist item hasn't changed", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Beatmap == firstBeatmap);
+            AddAssert("second playlist item changed", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Beatmap != firstBeatmap);
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 QueueMode = QueueMode.AllPlayers
             }).WaitSafely());
 
-            AddUntilStep("api room updated", () => MultiplayerClient.APIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+            AddUntilStep("api room updated", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             addItem(() => OtherBeatmap);
 
-            AddAssert("playlist contains two items", () => MultiplayerClient.APIRoom?.Playlist.Count == 2);
+            AddAssert("playlist contains two items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 2);
         }
 
         private void selectNewItem(Func<BeatmapInfo> beatmap)
