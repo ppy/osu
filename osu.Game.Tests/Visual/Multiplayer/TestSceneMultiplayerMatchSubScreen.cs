@@ -176,8 +176,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("mod select contents loaded",
                 () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
             AddUntilStep("mod select contains only double time mod",
-                () => this.ChildrenOfType<UserModSelectOverlay>()
-                          .SingleOrDefault()?
+                () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay
                           .ChildrenOfType<ModPanel>()
                           .SingleOrDefault(panel => !panel.Filtered.Value)?.Mod is OsuModDoubleTime);
         }
@@ -200,7 +199,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
 
-            AddUntilStep("mod select shown", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
+            AddUntilStep("mod select shown", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Visible);
         }
 
         [Test]
@@ -220,7 +219,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
 
             AddWaitStep("wait some", 3);
-            AddAssert("mod select not shown", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Hidden);
+            AddAssert("mod select not shown", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Hidden);
         }
 
         [Test]
