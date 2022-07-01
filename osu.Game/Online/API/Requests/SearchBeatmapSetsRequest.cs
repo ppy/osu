@@ -112,7 +112,8 @@ namespace osu.Game.Online.API.Requests
 
             req.AddParameter("nsfw", ExplicitContent == SearchExplicit.Show ? "true" : "false");
 
-            req.AddCursor(cursor);
+            if (cursor != null)
+                req.AddCursor(cursor);
 
             return req;
         }
