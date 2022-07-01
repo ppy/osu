@@ -35,22 +35,31 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             double difficulty = ColourEvaluator.EvaluateDifficultyOf(current);
-            // difficulty *= speedBonus(current.DeltaTime);
-            // TaikoDifficultyHitObject? taikoCurrent = (TaikoDifficultyHitObject)current;
-            // TaikoDifficultyHitObjectColour? colour = taikoCurrent?.Colour;
-            // if (taikoCurrent != null && colour != null)
-            // {
-            //     ColourEncoding[] payload = colour.Encoding.Payload;
-            //     string payloadDisplay = "";
-            //     for (int i = 0; i < payload.Length; ++i)
-            //     {
-            //         payloadDisplay += $",({payload[i].MonoRunLength}|{payload[i].EncodingRunLength})";
-            //     }
-
-            //     System.Console.WriteLine($"{current.StartTime},{difficulty},{colour.RepetitionInterval},{colour.Encoding.RunLength}{payloadDisplay}");
-            // }
-
             return difficulty;
+        }
+
+        // TODO: Remove befor pr
+        public string GetDebugString(DifficultyHitObject current)
+        {
+            double difficulty = ColourEvaluator.EvaluateDifficultyOf(current);
+            difficulty *= speedBonus(current.DeltaTime);
+            TaikoDifficultyHitObject? taikoCurrent = (TaikoDifficultyHitObject)current;
+            TaikoDifficultyHitObjectColour? colour = taikoCurrent?.Colour;
+            if (taikoCurrent != null && colour != null)
+            {
+                ColourEncoding[] payload = colour.Encoding.Payload;
+                string payloadDisplay = "";
+                for (int i = 0; i < payload.Length; ++i)
+                {
+                    payloadDisplay += $"({payload[i].MonoRunLength}|{payload[i].EncodingRunLength})";
+                }
+
+                return $"{current.StartTime},{difficulty},{CurrentStrain},{colour.RepetitionInterval},{colour.Encoding.RunLength},{payloadDisplay}";
+            }
+            else
+            {
+                return $"{current.StartTime},{difficulty},{CurrentStrain},0,0,0";
+            }
         }
     }
 }
