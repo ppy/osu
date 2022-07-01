@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest]
+        [FlakyTest] // See above
         public void TestTaikoOnlyMod()
         {
             AddStep("add playlist item", () =>
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest]
+        [FlakyTest] // See above
         public void TestSettingValidity()
         {
             AddAssert("create button not enabled", () => !this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest]
+        [FlakyTest] // See above
         public void TestStartMatchWhileSpectating()
         {
             AddStep("set playlist", () =>
@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest]
+        [FlakyTest] // See above
         public void TestFreeModSelectionHasAllowedMods()
         {
             AddStep("add playlist item with allowed mod", () =>
@@ -206,7 +206,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest]
+        [FlakyTest] // See above
         public void TestModSelectKeyWithAllowedMods()
         {
             AddStep("add playlist item with allowed mod", () =>
@@ -228,19 +228,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest]
-        /*
-         * Fail rate around 0.3%
-         *
-         * Somehow there are two mod select overlays?
-         *
-         * TearDown : System.InvalidOperationException : Sequence contains more than one element
-         *  --TearDown
-         *     at System.Linq.ThrowHelper.ThrowMoreThanOneElementException()
-         *     at System.Linq.Enumerable.TryGetSingle[TSource](IEnumerable`1 source, Boolean& found)
-         *     at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source)
-         *     at osu.Game.Tests.Visual.Multiplayer.TestSceneMultiplayerMatchSubScreen.<TestModSelectKeyWithNoAllowedMods>b__14_3() in /opt/buildagent/work/ecd860037212ac52/osu.Game.Tests/Visual/Multiplayer/TestSceneMultiplayerMatchSubScreen.cs:line 223
-         */
+        [FlakyTest] // See above
         public void TestModSelectKeyWithNoAllowedMods()
         {
             AddStep("add playlist item with no allowed mods", () =>
@@ -261,7 +249,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest]
+        [FlakyTest] // See above
         public void TestNextPlaylistItemSelectedAfterCompletion()
         {
             AddStep("add two playlist items", () =>
