@@ -35,7 +35,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             AddStep("add user", () => MultiplayerClient.AddUser(user));
             AddUntilStep("room has 2 users", () => MultiplayerClient.ClientRoom?.Users.Count == 2);
 
-            AddRepeatStep("remove user multiple times", () => MultiplayerClient.RemoveUser(user), 3);
+            AddStep("remove user", () => MultiplayerClient.RemoveUser(user));
             AddUntilStep("room has 1 user", () => MultiplayerClient.ClientRoom?.Users.Count == 1);
         }
 
