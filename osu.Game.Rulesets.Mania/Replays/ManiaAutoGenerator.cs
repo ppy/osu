@@ -57,11 +57,11 @@ namespace osu.Game.Rulesets.Mania.Replays
                 {
                     switch (point)
                     {
-                        case HitPoint _:
+                        case HitPoint:
                             actions.Add(columnActions[point.Column]);
                             break;
 
-                        case ReleasePoint _:
+                        case ReleasePoint:
                             actions.Remove(columnActions[point.Column]);
                             break;
                     }

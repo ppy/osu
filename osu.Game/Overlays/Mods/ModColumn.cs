@@ -442,7 +442,7 @@ namespace osu.Game.Overlays.Mods
                 case ModType.DifficultyIncrease:
                 case ModType.Automation:
                     return hotkeyStyle == ModSelectHotkeyStyle.Sequential
-                        ? (IModHotkeyHandler)SequentialModHotkeyHandler.Create(ModType)
+                        ? SequentialModHotkeyHandler.Create(ModType)
                         : new ClassicModHotkeyHandler(allowIncompatibleSelection);
 
                 default:

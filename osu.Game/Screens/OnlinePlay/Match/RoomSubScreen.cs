@@ -86,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public readonly Room Room;
         private readonly bool allowEdit;
 
-        private ModSelectOverlay userModsSelectOverlay;
+        internal ModSelectOverlay UserModsSelectOverlay { get; private set; }
 
         [CanBeNull]
         private IDisposable userModsSelectOverlayRegistration;
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 }
             };
 
-            LoadComponent(userModsSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Plum)
+            LoadComponent(UserModsSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Plum)
             {
                 SelectedMods = { BindTarget = UserMods },
                 IsValidMod = _ => false
@@ -269,7 +269,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateWorkingBeatmap());
 
-            userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);
+            userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(UserModsSelectOverlay);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -289,9 +289,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 return base.OnBackButton();
             }
 
-            if (userModsSelectOverlay.State.Value == Visibility.Visible)
+            if (UserModsSelectOverlay.State.Value == Visibility.Visible)
             {
-                userModsSelectOverlay.Hide();
+                UserModsSelectOverlay.Hide();
                 return true;
             }
 
@@ -304,7 +304,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             return base.OnBackButton();
         }
 
-        protected void ShowUserModSelect() => userModsSelectOverlay.Show();
+        protected void ShowUserModSelect() => UserModsSelectOverlay.Show();
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
@@ -385,13 +385,13 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (!selected.AllowedMods.Any())
             {
                 UserModsSection?.Hide();
-                userModsSelectOverlay.Hide();
-                userModsSelectOverlay.IsValidMod = _ => false;
+                UserModsSelectOverlay.Hide();
+                UserModsSelectOverlay.IsValidMod = _ => false;
             }
             else
             {
                 UserModsSection?.Show();
-                userModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
+                UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
             }
         }
 
@@ -430,7 +430,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private void onLeaving()
         {
-            userModsSelectOverlay.Hide();
+            UserModsSelectOverlay.Hide();
             endHandlingTrack();
         }
 

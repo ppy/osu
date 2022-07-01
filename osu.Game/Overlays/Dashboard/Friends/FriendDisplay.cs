@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             controlBackground.Colour = colourProvider.Background5;
 
             apiFriends.BindTo(api.Friends);
-            apiFriends.BindCollectionChanged((_, __) => Schedule(() => Users = apiFriends.ToList()), true);
+            apiFriends.BindCollectionChanged((_, _) => Schedule(() => Users = apiFriends.ToList()), true);
         }
 
         protected override void LoadComplete()

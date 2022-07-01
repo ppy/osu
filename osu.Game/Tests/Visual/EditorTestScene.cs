@@ -17,9 +17,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
 
@@ -58,15 +56,13 @@ namespace osu.Game.Tests.Visual
                 Dependencies.CacheAs<BeatmapManager>(testBeatmapManager = new TestBeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
         }
 
-        protected virtual bool EditorComponentsReady => Editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
-                                                        && Editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true;
-
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             AddStep("load editor", LoadEditor);
-            AddUntilStep("wait for editor to load", () => EditorComponentsReady);
+            AddUntilStep("wait for editor to load", () => Editor?.ReadyForUse == true);
+            AddUntilStep("wait for beatmap updated", () => !Beatmap.IsDefault);
         }
 
         protected virtual void LoadEditor()

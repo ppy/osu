@@ -30,9 +30,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Apply classic note lock", "Applies note lock to the full hit window.")]
         public Bindable<bool> ClassicNoteLock { get; } = new BindableBool(true);
 
-        [SettingSource("Use fixed slider follow circle hit area", "Makes the slider follow circle track its final size at all times.")]
-        public Bindable<bool> FixedFollowCircleHitArea { get; } = new BindableBool(true);
-
         [SettingSource("Always play a slider's tail sample", "Always plays a slider's tail sample regardless of whether it was hit or not.")]
         public Bindable<bool> AlwaysPlayTailSample { get; } = new BindableBool(true);
 
@@ -62,10 +59,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             switch (obj)
             {
-                case DrawableSlider slider:
-                    slider.Ball.InputTracksVisualSize = !FixedFollowCircleHitArea.Value;
-                    break;
-
                 case DrawableSliderHead head:
                     head.TrackFollowCircle = !NoSliderHeadMovement.Value;
                     break;

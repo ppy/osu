@@ -959,7 +959,7 @@ namespace osu.Game.Screens.Select
             {
                 // root should always remain selected. if not, PerformSelection will not be called.
                 State.Value = CarouselItemState.Selected;
-                State.ValueChanged += state => State.Value = CarouselItemState.Selected;
+                State.ValueChanged += _ => State.Value = CarouselItemState.Selected;
 
                 this.carousel = carousel;
             }

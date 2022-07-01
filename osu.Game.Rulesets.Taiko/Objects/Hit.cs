@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 DisplayColour.Value = Type == HitType.Centre ? COLOUR_CENTRE : COLOUR_RIM;
             });
 
-            SamplesBindable.BindCollectionChanged((_, __) => updateTypeFromSamples());
+            SamplesBindable.BindCollectionChanged((_, _) => updateTypeFromSamples());
         }
 
         private void updateTypeFromSamples()

@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.Play;
@@ -139,6 +140,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for song select", () => (songSelect = CurrentSubScreen as Screens.Select.SongSelect) != null);
             AddUntilStep("wait for loaded", () => songSelect.AsNonNull().BeatmapSetsLoaded);
+            AddUntilStep("wait for ongoing operation to complete", () => !(CurrentScreen as OnlinePlayScreen).ChildrenOfType<OngoingOperationTracker>().Single().InProgress.Value);
 
             if (ruleset != null)
                 AddStep($"set {ruleset.Name} ruleset", () => songSelect.AsNonNull().Ruleset.Value = ruleset);

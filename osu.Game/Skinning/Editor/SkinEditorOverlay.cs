@@ -70,7 +70,7 @@ namespace osu.Game.Skinning.Editor
 
             var editor = new SkinEditor();
 
-            editor.State.BindValueChanged(visibility => updateComponentVisibility());
+            editor.State.BindValueChanged(_ => updateComponentVisibility());
 
             skinEditor = editor;
 

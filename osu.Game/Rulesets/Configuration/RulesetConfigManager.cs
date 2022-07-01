@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Configuration
                 databasedSettings.Add(setting);
             }
 
-            bindable.ValueChanged += b =>
+            bindable.ValueChanged += _ =>
             {
                 lock (pendingWrites)
                     pendingWrites.Add(lookup);

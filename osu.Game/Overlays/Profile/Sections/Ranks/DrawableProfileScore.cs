@@ -136,7 +136,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Spacing = new Vector2(2),
                                         Children = Score.Mods.Select(mod =>
                                         {
-                                            var ruleset = rulesets.GetRuleset(Score.RulesetID) ?? throw new InvalidOperationException();
+                                            var ruleset = rulesets.GetRuleset(Score.RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {Score.RulesetID} not found locally");
 
                                             return new ModIcon(ruleset.CreateInstance().CreateModFromAcronym(mod.Acronym))
                                             {
