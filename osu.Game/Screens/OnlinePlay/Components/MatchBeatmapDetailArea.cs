@@ -86,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             switch (tab)
             {
-                case BeatmapDetailAreaPlaylistTabItem _:
+                case BeatmapDetailAreaPlaylistTabItem:
                     playlistArea.Show();
                     break;
 

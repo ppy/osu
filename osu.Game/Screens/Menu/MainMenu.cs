@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -302,6 +303,8 @@ namespace osu.Game.Screens.Menu
 
         public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
         {
+            Logger.Log($"{nameof(MainMenu)} completing {nameof(PresentBeatmap)} with beatmap {beatmap} ruleset {ruleset}");
+
             Beatmap.Value = beatmap;
             Ruleset.Value = ruleset;
 

@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             EnableCountdown.Current.BindValueChanged(_ => updateBeatmap());
             CountdownSpeed.Current.BindValueChanged(_ => updateBeatmap());
-            CountdownOffset.OnCommit += (_, __) => onOffsetCommitted();
+            CountdownOffset.OnCommit += (_, _) => onOffsetCommitted();
 
             widescreenSupport.Current.BindValueChanged(_ => updateBeatmap());
             epilepsyWarning.Current.BindValueChanged(_ => updateBeatmap());

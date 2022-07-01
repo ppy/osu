@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             var clickOperation = ongoingOperationTracker.BeginOperation();
 
-            Client.ToggleSpectate().ContinueWith(t => endOperation());
+            Client.ToggleSpectate().ContinueWith(_ => endOperation());
 
             void endOperation() => clickOperation?.Dispose();
         }

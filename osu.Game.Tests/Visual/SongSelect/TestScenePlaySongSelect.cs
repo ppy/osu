@@ -100,11 +100,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestPlaceholderConvertSetting()
         {
-            changeRuleset(2);
             addRulesetImportStep(0);
             AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
 
             createSongSelect();
+
+            changeRuleset(2);
 
             AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
 
@@ -872,10 +873,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return set != null;
             });
 
-            FilterableGroupedDifficultyIcon groupIcon = null;
+            GroupedDifficultyIcon groupIcon = null;
             AddUntilStep("Find group icon for different ruleset", () =>
             {
-                return (groupIcon = set.ChildrenOfType<FilterableGroupedDifficultyIcon>()
+                return (groupIcon = set.ChildrenOfType<GroupedDifficultyIcon>()
                                        .FirstOrDefault(icon => icon.Items.First().BeatmapInfo.Ruleset.OnlineID == 3)) != null;
             });
 

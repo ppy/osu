@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Play
 
             PrepareReplay();
 
-            ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(Score.ScoreInfo);
+            ScoreProcessor.NewJudgement += _ => ScoreProcessor.PopulateScore(Score.ScoreInfo);
             ScoreProcessor.OnResetFromReplayFrame += () => ScoreProcessor.PopulateScore(Score.ScoreInfo);
 
             gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Play
                     GameplayClockContainer.Start();
             });
 
-            DrawableRuleset.IsPaused.BindValueChanged(paused =>
+            DrawableRuleset.IsPaused.BindValueChanged(_ =>
             {
                 updateGameplayState();
                 updateSampleDisabledState();

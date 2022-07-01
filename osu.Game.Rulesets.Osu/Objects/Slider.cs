@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.CollectionChanged += (_, __) => UpdateNestedSamples();
+            SamplesBindable.CollectionChanged += (_, _) => UpdateNestedSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 

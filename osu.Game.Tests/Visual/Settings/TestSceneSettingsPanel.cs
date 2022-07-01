@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Settings
         public void ToggleVisibility()
         {
             AddWaitStep("wait some", 5);
-            AddToggleStep("toggle visibility", visible => settings.ToggleVisibility());
+            AddToggleStep("toggle visibility", _ => settings.ToggleVisibility());
         }
 
         [Test]

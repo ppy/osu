@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Database
 {
@@ -33,6 +36,85 @@ namespace osu.Game.Tests.Database
             });
         }
 
+        [Test]
+        public void TestAsyncWriteAsync()
+        {
+            RunTestWithRealmAsync(async (realm, _) =>
+            {
+                await realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
+
+                realm.Run(r => r.Refresh());
+
+                Assert.That(realm.Run(r => r.All<BeatmapSetInfo>().Count()), Is.EqualTo(1));
+            });
+        }
+
+        [Test]
+        public void TestAsyncWriteWhileBlocking()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                Task writeTask;
+
+                using (realm.BlockAllOperations())
+                {
+                    writeTask = realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
+                    Thread.Sleep(100);
+                    Assert.That(writeTask.IsCompleted, Is.False);
+                }
+
+                writeTask.WaitSafely();
+
+                realm.Run(r => r.Refresh());
+                Assert.That(realm.Run(r => r.All<BeatmapSetInfo>().Count()), Is.EqualTo(1));
+            });
+        }
+
+        [Test]
+        public void TestAsyncWrite()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo())).WaitSafely();
+
+                realm.Run(r => r.Refresh());
+
+                Assert.That(realm.Run(r => r.All<BeatmapSetInfo>().Count()), Is.EqualTo(1));
+            });
+        }
+
+        [Test]
+        public void TestAsyncWriteAfterDisposal()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                realm.Dispose();
+                Assert.ThrowsAsync<ObjectDisposedException>(() => realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo())));
+            });
+        }
+
+        [Test]
+        public void TestAsyncWriteBeforeDisposal()
+        {
+            ManualResetEventSlim resetEvent = new ManualResetEventSlim();
+
+            RunTestWithRealm((realm, _) =>
+            {
+                var writeTask = realm.WriteAsync(r =>
+                {
+                    // ensure that disposal blocks for our execution
+                    Assert.That(resetEvent.Wait(100), Is.False);
+
+                    r.Add(TestResources.CreateTestBeatmapSetInfo());
+                });
+
+                realm.Dispose();
+                resetEvent.Set();
+
+                writeTask.WaitSafely();
+            });
+        }
+
         /// <summary>
         /// Test to ensure that a `CreateContext` call nested inside a subscription doesn't cause any deadlocks
         /// due to context fetching semaphores.
@@ -46,7 +128,7 @@ namespace osu.Game.Tests.Database
 
                 realm.RegisterCustomSubscription(r =>
                 {
-                    var subscription = r.All<BeatmapInfo>().QueryAsyncWithNotifications((sender, changes, error) =>
+                    var subscription = r.All<BeatmapInfo>().QueryAsyncWithNotifications((_, _, _) =>
                     {
                         realm.Run(_ =>
                         {
@@ -79,11 +161,11 @@ namespace osu.Game.Tests.Database
                     {
                         hasThreadedUsage.Set();
 
-                        stopThreadedUsage.Wait();
+                        stopThreadedUsage.Wait(60000);
                     });
                 }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler);
 
-                hasThreadedUsage.Wait();
+                hasThreadedUsage.Wait(60000);
 
                 Assert.Throws<TimeoutException>(() =>
                 {

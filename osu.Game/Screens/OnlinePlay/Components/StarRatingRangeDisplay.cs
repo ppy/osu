@@ -77,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             base.LoadComplete();
 
             DifficultyRange.BindValueChanged(_ => updateRange());
-            Playlist.BindCollectionChanged((_, __) => updateRange(), true);
+            Playlist.BindCollectionChanged((_, _) => updateRange(), true);
         }
 
         private void updateRange()

@@ -34,10 +34,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             switch (drawable)
             {
-                case DrawableSliderHead _:
-                case DrawableSliderTail _:
-                case DrawableSliderTick _:
-                case DrawableSliderRepeat _:
+                case DrawableSliderHead:
+                case DrawableSliderTail:
+                case DrawableSliderTick:
+                case DrawableSliderRepeat:
                     return;
 
                 default:

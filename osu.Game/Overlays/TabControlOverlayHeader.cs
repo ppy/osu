@@ -110,25 +110,18 @@ namespace osu.Game.Overlays
                 public OverlayHeaderTabItem(T value)
                     : base(value)
                 {
-                    switch (Value)
+                    if (!(Value is Enum enumValue))
+                        Text.Text = Value.ToString().ToLowerInvariant();
+                    else
                     {
                         case LocalisableString localisableString:
                             Text.Text = localisableString.ToLower();
                             break;
 
-                        case Enum enumValue:
-                            var localisableDescription = enumValue.GetLocalisableDescription();
-                            string nonLocalisableDescription = enumValue.GetDescription();
-
-                            // If localisable == non-localisable, then we must have a basic string, so .ToLower() is used.
-                            Text.Text = localisableDescription.Equals(nonLocalisableDescription)
-                                ? nonLocalisableDescription.ToLower()
-                                : localisableDescription;
-                            break;
-
-                        default:
-                            Text.Text = Value.ToString().ToLower();
-                            break;
+                        // If localisable == non-localisable, then we must have a basic string, so .ToLowerInvariant() is used.
+                        Text.Text = localisableDescription.Equals(nonLocalisableDescription)
+                            ? nonLocalisableDescription.ToLowerInvariant()
+                            : localisableDescription;
                     }
 
                     Text.Font = OsuFont.GetFont(size: 14);

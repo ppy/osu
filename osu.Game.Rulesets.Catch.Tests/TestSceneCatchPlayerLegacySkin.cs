@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 AddStep("change component scale", () => Player.ChildrenOfType<LegacyScoreCounter>().First().Scale = new Vector2(2f));
                 AddStep("update target", () => Player.ChildrenOfType<SkinnableTargetContainer>().ForEach(LegacySkin.UpdateDrawableTarget));
                 AddStep("exit player", () => Player.Exit());
-                CreateTest(null);
+                CreateTest();
             }
 
             AddAssert("legacy HUD combo counter hidden", () =>

@@ -104,6 +104,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for song select", () => CurrentSubScreen is Screens.Select.SongSelect select && select.BeatmapSetsLoaded);
 
             BeatmapInfo otherBeatmap = null;
+            AddUntilStep("wait for ongoing operation to complete", () => !(CurrentScreen as OnlinePlayScreen).ChildrenOfType<OngoingOperationTracker>().Single().InProgress.Value);
             AddStep("select other beatmap", () => ((Screens.Select.SongSelect)CurrentSubScreen).FinaliseSelection(otherBeatmap = beatmap()));
 
             AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
@@ -119,6 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for song select", () => CurrentSubScreen is Screens.Select.SongSelect select && select.BeatmapSetsLoaded);
+            AddUntilStep("wait for ongoing operation to complete", () => !(CurrentScreen as OnlinePlayScreen).ChildrenOfType<OngoingOperationTracker>().Single().InProgress.Value);
             AddStep("select other beatmap", () => ((Screens.Select.SongSelect)CurrentSubScreen).FinaliseSelection(beatmap()));
             AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
         }
