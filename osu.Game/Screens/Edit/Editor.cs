@@ -657,9 +657,7 @@ namespace osu.Game.Screens.Edit
             // To update the game-wide beatmap with any changes, perform a re-fetch on exit/suspend.
             // This is required as the editor makes its local changes via EditorBeatmap
             // (which are not propagated outwards to a potentially cached WorkingBeatmap).
-            ((IWorkingBeatmapCache)beatmapManager).Invalidate(Beatmap.Value.BeatmapInfo);
-            var refetchedBeatmapInfo = beatmapManager.QueryBeatmap(b => b.ID == Beatmap.Value.BeatmapInfo.ID);
-            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(refetchedBeatmapInfo);
+            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
 
             if (!(refetchedBeatmap is DummyWorkingBeatmap))
             {

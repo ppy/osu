@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -128,6 +129,54 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("Placed object still has non-default control points", () =>
                 !ReferenceEquals(EditorBeatmap.HitObjects[0].SampleControlPoint, SampleControlPoint.DEFAULT) &&
                 !ReferenceEquals(EditorBeatmap.HitObjects[0].DifficultyControlPoint, DifficultyControlPoint.DEFAULT));
+        }
+
+        [Test]
+        public void TestLengthAndStarRatingUpdated()
+        {
+            WorkingBeatmap working = null;
+            double lastStarRating = 0;
+            double lastLength = 0;
+
+            AddStep("Add timing point", () => EditorBeatmap.ControlPointInfo.Add(500, new TimingControlPoint()));
+            AddStep("Change to placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
+            AddStep("Place single hitcircle", () => InputManager.Click(MouseButton.Left));
+            AddAssert("One hitobject placed", () => EditorBeatmap.HitObjects.Count == 1);
+
+            SaveEditor();
+            AddStep("Get working beatmap", () => working = Game.BeatmapManager.GetWorkingBeatmap(EditorBeatmap.BeatmapInfo, true));
+
+            AddAssert("Beatmap length is zero", () => working.BeatmapInfo.Length == 0);
+            checkDifficultyIncreased();
+
+            AddStep("Move forward", () => InputManager.Key(Key.Right));
+            AddStep("Place another hitcircle", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Two hitobjects placed", () => EditorBeatmap.HitObjects.Count == 2);
+
+            SaveEditor();
+            AddStep("Get working beatmap", () => working = Game.BeatmapManager.GetWorkingBeatmap(EditorBeatmap.BeatmapInfo, true));
+
+            checkDifficultyIncreased();
+            checkLengthIncreased();
+
+            void checkLengthIncreased()
+            {
+                AddStep("Beatmap length increased", () =>
+                {
+                    Assert.That(working.BeatmapInfo.Length, Is.GreaterThan(lastLength));
+                    lastLength = working.BeatmapInfo.Length;
+                });
+            }
+
+            void checkDifficultyIncreased()
+            {
+                AddStep("Beatmap difficulty increased", () =>
+                {
+                    Assert.That(working.BeatmapInfo.StarRating, Is.GreaterThan(lastStarRating));
+                    lastStarRating = working.BeatmapInfo.StarRating;
+                });
+            }
         }
 
         [Test]

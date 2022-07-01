@@ -76,9 +76,12 @@ namespace osu.Game.Beatmaps
                 {
                     Logger.Log($"Invalidating working beatmap cache for {info}");
                     workingCache.Remove(working);
+                    OnInvalidated?.Invoke(working);
                 }
             }
         }
+
+        public event Action<WorkingBeatmap> OnInvalidated;
 
         public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {

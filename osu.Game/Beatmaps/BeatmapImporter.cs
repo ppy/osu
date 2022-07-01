@@ -6,10 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -19,8 +17,6 @@ using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Skinning;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -29,18 +25,18 @@ namespace osu.Game.Beatmaps
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>, IDisposable
+    public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
+        private readonly BeatmapUpdater? beatmapUpdater;
 
-        public BeatmapImporter(Storage storage, RealmAccess realm, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+        public BeatmapImporter(Storage storage, RealmAccess realm, BeatmapUpdater? beatmapUpdater = null)
             : base(storage, realm)
         {
-            this.onlineLookupQueue = onlineLookupQueue;
+            this.beatmapUpdater = beatmapUpdater;
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == ".osz";
@@ -64,8 +60,7 @@ namespace osu.Game.Beatmaps
 
             bool hadOnlineIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
 
-            onlineLookupQueue?.Update(beatmapSet);
-
+            // TODO: this may no longer be valid as we aren't doing an online population at this point.
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
             {
@@ -99,6 +94,13 @@ namespace osu.Game.Beatmaps
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be deleted.");
                 }
             }
+        }
+
+        protected override void PostImport(BeatmapSetInfo model, Realm realm)
+        {
+            base.PostImport(model, realm);
+
+            beatmapUpdater?.Process(model);
         }
 
         private void validateOnlineIds(BeatmapSetInfo beatmapSet, Realm realm)
@@ -286,64 +288,11 @@ namespace osu.Game.Beatmaps
                         MD5Hash = memoryStream.ComputeMD5Hash(),
                     };
 
-                    updateBeatmapStatistics(beatmap, decoded);
-
                     beatmaps.Add(beatmap);
                 }
             }
 
             return beatmaps;
-        }
-
-        private void updateBeatmapStatistics(BeatmapInfo beatmap, IBeatmap decoded)
-        {
-            var rulesetInstance = ((IRulesetInfo)beatmap.Ruleset).CreateInstance();
-
-            decoded.BeatmapInfo.Ruleset = rulesetInstance.RulesetInfo;
-
-            // TODO: this should be done in a better place once we actually need to dynamically update it.
-            beatmap.StarRating = rulesetInstance.CreateDifficultyCalculator(new DummyConversionBeatmap(decoded)).Calculate().StarRating;
-            beatmap.Length = calculateLength(decoded);
-            beatmap.BPM = 60000 / decoded.GetMostCommonBeatLength();
-        }
-
-        private double calculateLength(IBeatmap b)
-        {
-            if (!b.HitObjects.Any())
-                return 0;
-
-            var lastObject = b.HitObjects.Last();
-
-            //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-            double endTime = lastObject.GetEndTime();
-            double startTime = b.HitObjects.First().StartTime;
-
-            return endTime - startTime;
-        }
-
-        public void Dispose()
-        {
-            onlineLookupQueue?.Dispose();
-        }
-
-        /// <summary>
-        /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.
-        /// </summary>
-        private class DummyConversionBeatmap : WorkingBeatmap
-        {
-            private readonly IBeatmap beatmap;
-
-            public DummyConversionBeatmap(IBeatmap beatmap)
-                : base(beatmap.BeatmapInfo, null)
-            {
-                this.beatmap = beatmap;
-            }
-
-            protected override IBeatmap GetBeatmap() => beatmap;
-            protected override Texture? GetBackground() => null;
-            protected override Track? GetBeatmapTrack() => null;
-            protected internal override ISkin? GetSkin() => null;
-            public override Stream? GetStream(string storagePath) => null;
         }
     }
 }
