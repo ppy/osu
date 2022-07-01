@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public enum RoomAccessType
+    public enum RoomPermissionsFilter
     {
         All,
         Public,

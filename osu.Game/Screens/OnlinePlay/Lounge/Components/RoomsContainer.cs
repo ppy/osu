@@ -87,27 +87,27 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         matchingFilter &= r.FilterTerms.Any(term => term.ToString().Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
                     }
 
-                    matchingFilter &= matchesAccessType(r, criteria.AccessType);
+                    matchingFilter &= matchPermissions(r, criteria.Permissions);
 
                     r.MatchingFilter = matchingFilter;
                 }
             });
 
-            static bool matchesAccessType(DrawableLoungeRoom room, RoomAccessType accessType)
+            static bool matchPermissions(DrawableLoungeRoom room, RoomPermissionsFilter accessType)
             {
                 switch (accessType)
                 {
-                    case RoomAccessType.All:
+                    case RoomPermissionsFilter.All:
                         return true;
 
-                    case RoomAccessType.Public:
+                    case RoomPermissionsFilter.Public:
                         return !room.Room.HasPassword.Value;
 
-                    case RoomAccessType.Private:
+                    case RoomPermissionsFilter.Private:
                         return room.Room.HasPassword.Value;
 
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(accessType), accessType, $"Unsupported {nameof(RoomAccessType)} in filter");
+                        throw new ArgumentOutOfRangeException(nameof(accessType), accessType, $"Unsupported {nameof(RoomPermissionsFilter)} in filter");
                 }
             }
         }
