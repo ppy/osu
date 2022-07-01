@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -15,13 +14,14 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
     internal class DifficultyRangeFilterControl : CompositeDrawable
     {
-        private Bindable<double> minStars;
-        private Bindable<double> maxStars;
+        private Bindable<double> lowerStars;
+        private Bindable<double> upperStars;
 
         private StarsSlider lowerSlider;
         private MaximumStarsSlider upperSlider;
@@ -45,46 +45,75 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.X,
                     Y = vertical_offset,
                 },
-                lowerSlider = new StarsSlider
+                lowerSlider = new MinimumStarsSlider
                 {
                     Current = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                     KeyboardStep = 0.1f,
                     RelativeSizeAxes = Axes.X,
                     Y = vertical_offset,
                 },
-                lowerSlider.Nub.CreateProxy(),
                 upperSlider.Nub.CreateProxy(),
+                lowerSlider.Nub.CreateProxy(),
             };
 
-            lowerSlider.LeftBox.Height = 6;
-
-            minStars = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum);
-            maxStars = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
-
-            lowerSlider.AccentColour = lowerSlider.BackgroundColour;
+            lowerStars = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum);
+            upperStars = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            minStars.ValueChanged += min => maxStars.Value = Math.Max(min.NewValue, maxStars.Value);
-            maxStars.ValueChanged += max => minStars.Value = Math.Min(max.NewValue, minStars.Value);
+            lowerStars.ValueChanged += min => upperStars.Value = Math.Max(min.NewValue + 0.1, upperStars.Value);
+            upperStars.ValueChanged += max => lowerStars.Value = Math.Min(max.NewValue - 0.1, lowerStars.Value);
+        }
+
+        private class MinimumStarsSlider : StarsSlider
+        {
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                LeftBox.Height = 6; // hide any colour bleeding from overlap
+
+                AccentColour = BackgroundColour;
+                BackgroundColour = Color4.Transparent;
+            }
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+                base.ReceivePositionalInputAt(screenSpacePos)
+                && screenSpacePos.X <= Nub.ScreenSpaceDrawQuad.TopRight.X;
+
+            public override LocalisableString TooltipText => Current.IsDefault ? UserInterfaceStrings.NoLimit : base.TooltipText;
         }
 
         private class MaximumStarsSlider : StarsSlider
         {
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                RightBox.Height = 6; // just to match the left bar height really
+            }
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+                base.ReceivePositionalInputAt(screenSpacePos)
+                && screenSpacePos.X >= Nub.ScreenSpaceDrawQuad.TopLeft.X;
             public override LocalisableString TooltipText => Current.IsDefault ? UserInterfaceStrings.NoLimit : base.TooltipText;
         }
 
         private class StarsSlider : OsuSliderBar<double>
         {
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Nub.ReceivePositionalInputAt(screenSpacePos);
-
             public override LocalisableString TooltipText => Current.Value.ToString(@"0.## stars");
 
             public new Nub Nub => base.Nub;
-            public new Box LeftBox => base.LeftBox;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Nub.Width = Nub.HEIGHT;
+                RangePadding = Nub.Width / 2;
+            }
         }
     }
 }
