@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFirstItemSelectedByDefault()
         {
-            AddAssert("first item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+            AddUntilStep("first item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             selectNewItem(() => InitialBeatmap);
 
-            AddAssert("playlist item still selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             selectNewItem(() => OtherBeatmap);
 
-            AddAssert("playlist item still selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+            AddUntilStep("playlist item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("playlist contains two items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 2);
             AddAssert("first playlist item expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
             AddAssert("second playlist item not expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Expired == false);
-            AddAssert("second playlist item selected", () => MultiplayerClient.Room?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[1].ID);
+            AddUntilStep("second playlist item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[1].ID);
         }
 
         [Test]
