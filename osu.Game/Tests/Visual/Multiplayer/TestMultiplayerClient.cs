@@ -201,13 +201,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(ServerRoom != null);
 
             var user = ServerRoom.Users.Single(u => u.UserID == userId);
-            user.BeatmapAvailability = clone(newBeatmapAvailability);
+            user.BeatmapAvailability = newBeatmapAvailability;
 
             ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged(clone(userId), clone(user.BeatmapAvailability));
         }
 
         protected override async Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
         {
+            roomId = clone(roomId);
+            password = clone(password);
+
             ServerAPIRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == roomId);
 
             if (password != ServerAPIRoom.Password.Value)
@@ -262,6 +265,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task TransferHost(int userId)
         {
+            userId = clone(userId);
+
             Debug.Assert(ServerRoom != null);
 
             ServerRoom.Host = ServerRoom.Users.Single(u => u.UserID == userId);
@@ -271,10 +276,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task KickUser(int userId)
         {
+            userId = clone(userId);
+
             Debug.Assert(ServerRoom != null);
 
             var user = ServerRoom.Users.Single(u => u.UserID == userId);
-
             ServerRoom.Users.Remove(user);
 
             return ((IMultiplayerClient)this).UserKicked(clone(user));
@@ -282,10 +288,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
         {
+            settings = clone(settings);
+
             Debug.Assert(ServerRoom != null);
             Debug.Assert(currentItem != null);
-
-            settings = clone(settings);
 
             // Server is authoritative for the time being.
             settings.PlaylistItemId = ServerRoom.Settings.PlaylistItemId;
@@ -304,40 +310,44 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task ChangeState(MultiplayerUserState newState)
         {
+            newState = clone(newState);
+
             if (newState == MultiplayerUserState.Idle && LocalUser?.State == MultiplayerUserState.WaitingForLoad)
                 return Task.CompletedTask;
 
-            ChangeUserState(api.LocalUser.Value.Id, newState);
+            ChangeUserState(api.LocalUser.Value.Id, clone(newState));
             return Task.CompletedTask;
         }
 
         public override Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability)
         {
-            ChangeUserBeatmapAvailability(api.LocalUser.Value.Id, newBeatmapAvailability);
+            ChangeUserBeatmapAvailability(api.LocalUser.Value.Id, clone(newBeatmapAvailability));
             return Task.CompletedTask;
         }
 
         public void ChangeUserMods(int userId, IEnumerable<Mod> newMods)
-            => ChangeUserMods(userId, newMods.Select(m => new APIMod(m)).ToList());
+            => ChangeUserMods(userId, newMods.Select(m => new APIMod(m)));
 
         public void ChangeUserMods(int userId, IEnumerable<APIMod> newMods)
         {
             Debug.Assert(ServerRoom != null);
 
             var user = ServerRoom.Users.Single(u => u.UserID == userId);
-            user.Mods = clone(newMods).ToArray();
+            user.Mods = newMods.ToArray();
 
             ((IMultiplayerClient)this).UserModsChanged(clone(userId), clone(user.Mods));
         }
 
         public override Task ChangeUserMods(IEnumerable<APIMod> newMods)
         {
-            ChangeUserMods(api.LocalUser.Value.Id, newMods);
+            ChangeUserMods(api.LocalUser.Value.Id, clone(newMods));
             return Task.CompletedTask;
         }
 
         public override async Task SendMatchRequest(MatchUserRequest request)
         {
+            request = clone(request);
+
             Debug.Assert(ServerRoom != null);
             Debug.Assert(LocalUser != null);
 
@@ -455,7 +465,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             updateRoomStateIfRequired();
         }
 
-        public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, playlistItemId);
+        public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, clone(playlistItemId));
 
         private async Task changeMatchType(MatchType type)
         {
