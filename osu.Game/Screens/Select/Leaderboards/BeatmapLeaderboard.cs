@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -111,7 +112,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                subscribeToLocalScores(cancellationToken);
+                subscribeToLocalScores(fetchBeatmapInfo, cancellationToken);
                 return null;
             }
 
@@ -174,13 +175,12 @@ namespace osu.Game.Screens.Select.Leaderboards
             Action = () => ScoreSelected?.Invoke(model)
         };
 
-        private void subscribeToLocalScores(CancellationToken cancellationToken)
+        private void subscribeToLocalScores(BeatmapInfo beatmapInfo, CancellationToken cancellationToken)
         {
+            Debug.Assert(beatmapInfo != null);
+
             scoreSubscription?.Dispose();
             scoreSubscription = null;
-
-            if (beatmapInfo == null)
-                return;
 
             scoreSubscription = realm.RegisterForNotifications(r =>
                 r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
