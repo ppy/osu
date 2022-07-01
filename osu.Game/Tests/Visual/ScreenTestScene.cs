@@ -49,8 +49,8 @@ namespace osu.Game.Tests.Visual
                 }
             });
 
-            Stack.ScreenPushed += (lastScreen, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");
-            Stack.ScreenExited += (lastScreen, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed ← {newScreen}");
+            Stack.ScreenPushed += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");
+            Stack.ScreenExited += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed ← {newScreen}");
         }
 
         protected void LoadScreen(OsuScreen screen) => Stack.Push(screen);

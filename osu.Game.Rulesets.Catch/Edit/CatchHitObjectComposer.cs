@@ -135,15 +135,15 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             switch (BlueprintContainer.CurrentTool)
             {
-                case SelectTool _:
+                case SelectTool:
                     if (EditorBeatmap.SelectedHitObjects.Count == 0)
                         return null;
 
                     double minTime = EditorBeatmap.SelectedHitObjects.Min(hitObject => hitObject.StartTime);
                     return getLastSnappableHitObject(minTime);
 
-                case FruitCompositionTool _:
-                case JuiceStreamCompositionTool _:
+                case FruitCompositionTool:
+                case JuiceStreamCompositionTool:
                     if (!CursorInPlacementArea)
                         return null;
 

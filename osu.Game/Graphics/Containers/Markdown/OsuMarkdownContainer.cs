@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         {
             switch (markdownObject)
             {
-                case YamlFrontMatterBlock _:
+                case YamlFrontMatterBlock:
                     // Don't parse YAML Frontmatter
                     break;
 

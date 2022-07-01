@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             switch (hitObject)
             {
-                case BananaShower _:
+                case BananaShower:
                     return false;
 
                 case JuiceStream juiceStream:

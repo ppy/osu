@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Comments
                 }
             });
 
-            textBox.OnCommit += (u, v) =>
+            textBox.OnCommit += (_, _) =>
             {
                 if (commitButton.IsBlocked.Value)
                     return;

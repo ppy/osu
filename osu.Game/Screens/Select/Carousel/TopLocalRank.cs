@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select.Carousel
                                  + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
                                  + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName)
                          .OrderByDescending(s => s.TotalScore),
-                    (items, changes, ___) =>
+                    (items, _, _) =>
                     {
                         Rank = items.FirstOrDefault()?.Rank;
                         // Required since presence is changed via IsPresent override
