@@ -37,10 +37,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestItemAddedToTheEndOfQueue()
         {
             addItem(() => OtherBeatmap);
-            AddAssert("playlist has 2 items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 2);
+            AddUntilStep("playlist has 2 items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 2);
 
             addItem(() => InitialBeatmap);
-            AddAssert("playlist has 3 items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 3);
+            AddUntilStep("playlist has 3 items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 3);
 
             AddUntilStep("first item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
@@ -50,8 +50,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             RunGameplay();
 
-            AddAssert("playlist has only one item", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 1);
-            AddAssert("playlist item is expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
+            AddUntilStep("playlist has only one item", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 1);
+            AddUntilStep("playlist item is expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
             AddUntilStep("last item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
@@ -63,12 +63,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             RunGameplay();
 
-            AddAssert("first item expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
+            AddUntilStep("first item expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
             AddUntilStep("next item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[1].ID);
 
             RunGameplay();
 
-            AddAssert("second item expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Expired == true);
+            AddUntilStep("second item expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Expired == true);
             AddUntilStep("next item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[2].ID);
         }
 
@@ -82,8 +82,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             RunGameplay();
 
             AddStep("change queue mode", () => MultiplayerClient.ChangeSettings(queueMode: QueueMode.HostOnly));
-            AddAssert("playlist has 3 items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 3);
-            AddAssert("item 2 is not expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Expired == false);
+            AddUntilStep("playlist has 3 items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 3);
+            AddUntilStep("item 2 is not expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[1].Expired == false);
             AddUntilStep("current item is the other beatmap", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == 2);
         }
 
