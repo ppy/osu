@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Storyboards;
+using osu.Game.Tests;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -71,6 +72,16 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(2)]
+        [FlakyTest]
+        /*
+         * Fail rate around 0.15%
+         *
+         * TearDown : System.TimeoutException : "wait for seek to finish" timed out
+         *   --TearDown
+         *      at osu.Framework.Testing.Drawables.Steps.UntilStepButton.<>c__DisplayClass11_0.<.ctor>b__0()
+         *      at osu.Framework.Testing.Drawables.Steps.StepButton.PerformStep(Boolean userTriggered)
+         *      at osu.Framework.Testing.TestScene.runNextStep(Action onCompletion, Action`1 onError, Func`2 stopCondition)
+         */
         public void TestSnakingEnabled(int sliderIndex)
         {
             AddStep("enable autoplay", () => autoplay = true);
@@ -95,6 +106,16 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(2)]
+        [FlakyTest]
+        /*
+         * Fail rate around 0.15%
+         *
+         * TearDown : System.TimeoutException : "wait for seek to finish" timed out
+         *   --TearDown
+         *      at osu.Framework.Testing.Drawables.Steps.UntilStepButton.<>c__DisplayClass11_0.<.ctor>b__0()
+         *      at osu.Framework.Testing.Drawables.Steps.StepButton.PerformStep(Boolean userTriggered)
+         *      at osu.Framework.Testing.TestScene.runNextStep(Action onCompletion, Action`1 onError, Func`2 stopCondition)
+         */
         public void TestSnakingDisabled(int sliderIndex)
         {
             AddStep("have autoplay", () => autoplay = true);

@@ -74,6 +74,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
+        /*
+         * Fail rate around 1.5%
+         *
+         * TearDown : System.AggregateException : One or more errors occurred. (Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index'))
+  ----> System.ArgumentOutOfRangeException : Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+         * --TearDown
+         *    at System.Threading.Tasks.Task.ThrowIfExceptional(Boolean includeTaskCanceledExceptions)
+         *   at System.Threading.Tasks.Task.Wait(Int32 millisecondsTimeout, CancellationToken cancellationToken)
+         *   at osu.Framework.Extensions.TaskExtensions.WaitSafely(Task task)
+         *   at osu.Framework.Testing.TestScene.checkForErrors()
+         *   at osu.Framework.Testing.TestScene.RunTestsFromNUnit()
+         *--ArgumentOutOfRangeException
+         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
+         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
+         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
+         *   at osu.Game.Online.Multiplayer.MultiplayerClient.<>c__DisplayClass106_0.<PlaylistItemChanged>b__0() in C:\BuildAgent\work\ecd860037212ac52\osu.Game\Online\Multiplayer\MultiplayerClient     .cs:line 702
+         *   at osu.Framework.Threading.ScheduledDelegate.RunTaskInternal()
+         */
         public void TestCreatedRoom()
         {
             AddStep("add playlist item", () =>
@@ -90,6 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
         public void TestTaikoOnlyMod()
         {
             AddStep("add playlist item", () =>
@@ -110,6 +130,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
         public void TestSettingValidity()
         {
             AddAssert("create button not enabled", () => !this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
@@ -126,6 +147,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
         public void TestStartMatchWhileSpectating()
         {
             AddStep("set playlist", () =>
@@ -156,6 +178,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
         public void TestFreeModSelectionHasAllowedMods()
         {
             AddStep("add playlist item with allowed mod", () =>
@@ -183,6 +206,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
         public void TestModSelectKeyWithAllowedMods()
         {
             AddStep("add playlist item with allowed mod", () =>
@@ -204,6 +228,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
+        /*
+         * Fail rate around 0.3%
+         *
+         * Somehow there are two mod select overlays?
+         *
+         * TearDown : System.InvalidOperationException : Sequence contains more than one element
+         *  --TearDown
+         *     at System.Linq.ThrowHelper.ThrowMoreThanOneElementException()
+         *     at System.Linq.Enumerable.TryGetSingle[TSource](IEnumerable`1 source, Boolean& found)
+         *     at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source)
+         *     at osu.Game.Tests.Visual.Multiplayer.TestSceneMultiplayerMatchSubScreen.<TestModSelectKeyWithNoAllowedMods>b__14_3() in /opt/buildagent/work/ecd860037212ac52/osu.Game.Tests/Visual/Multiplayer/TestSceneMultiplayerMatchSubScreen.cs:line 223
+         */
         public void TestModSelectKeyWithNoAllowedMods()
         {
             AddStep("add playlist item with no allowed mods", () =>
@@ -224,6 +261,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
         public void TestNextPlaylistItemSelectedAfterCompletion()
         {
             AddStep("add two playlist items", () =>
