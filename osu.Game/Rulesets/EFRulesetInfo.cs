@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets
         public int OnlineID
         {
             get => ID ?? -1;
-            set => ID = value >= 0 ? value : (int?)null;
+            set => ID = value >= 0 ? value : null;
         }
 
         #endregion

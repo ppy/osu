@@ -89,7 +89,7 @@ namespace osu.Game
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
         internal EndpointConfiguration CreateEndpoints() =>
-            UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -244,7 +244,7 @@ namespace osu.Game
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
-            largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
+            largeStore.AddTextureSource(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(this);
@@ -451,7 +451,8 @@ namespace osu.Game
                     readyToRun.Set();
                 }, false);
 
-                readyToRun.Wait();
+                if (!readyToRun.Wait(30000))
+                    throw new TimeoutException("Attempting to block for migration took too long.");
 
                 bool? cleanupSucceded = (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
 
@@ -480,7 +481,7 @@ namespace osu.Game
         {
             switch (handler)
             {
-                case MidiHandler _:
+                case MidiHandler:
                     return new InputSection.HandlerSection(handler);
 
                 // return null for handlers that shouldn't have settings.
@@ -489,10 +490,12 @@ namespace osu.Game
             }
         }
 
-        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> valueChangedEvent)
+        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
             if (IsLoaded && !ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException("Global beatmap bindable must be changed from update thread.");
+
+            Logger.Log($"Game-wide working beatmap updated to {beatmap.NewValue}");
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
@@ -582,6 +585,6 @@ namespace osu.Game
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.Beatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track : (IClock)null;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
     }
 }

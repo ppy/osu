@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     Width = 500,
                     AutoSizeAxes = Axes.Y,
-                    Child = component = padded ? (LabelledDrawable<Drawable>)new PaddedLabelledDrawable() : new NonPaddedLabelledDrawable(),
+                    Child = component = padded ? new PaddedLabelledDrawable() : new NonPaddedLabelledDrawable(),
                 };
 
                 component.Label = "a sample component";

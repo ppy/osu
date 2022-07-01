@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                          setRoomCountdown(countdownStart.Duration);
                                          break;
 
-                                     case StopCountdownRequest _:
+                                     case StopCountdownRequest:
                                          multiplayerRoom.Countdown = null;
                                          raiseRoomUpdated();
                                          break;
