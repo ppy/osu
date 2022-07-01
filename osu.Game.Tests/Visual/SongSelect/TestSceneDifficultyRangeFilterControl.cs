@@ -14,13 +14,16 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestBasic()
         {
-            Child = new DifficultyRangeFilterControl
+            AddStep("create control", () =>
             {
-                Width = 200,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scale = new Vector2(3),
-            };
+                Child = new DifficultyRangeFilterControl
+                {
+                    Width = 200,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(3),
+                };
+            });
         }
     }
 }
