@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             return new Skill[]
             {
-                new Peaks(mods)
+                new Peaks(mods, beatmap)
             };
         }
 

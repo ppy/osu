@@ -1,17 +1,19 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Peaks : Skill
     {
         private const double rhythm_skill_multiplier = 0.3 * final_multiplier;
-        private const double colour_skill_multiplier = 0.39 * final_multiplier;
-        private const double stamina_skill_multiplier = 0.33 * final_multiplier;
+        private const double colour_skill_multiplier = 0.375 * final_multiplier;
+        private const double stamina_skill_multiplier = 0.375 * final_multiplier;
 
         private const double final_multiplier = 0.06;
 
@@ -23,12 +25,25 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         public double RhythmDifficultyValue => rhythm.DifficultyValue() * rhythm_skill_multiplier;
         public double StaminaDifficultyValue => stamina.DifficultyValue() * stamina_skill_multiplier;
 
-        public Peaks(Mod[] mods)
+        // TODO: remove before pr
+        private StreamWriter? colourDebugOutput;
+        bool debugColour = false;
+
+        public Peaks(Mod[] mods, IBeatmap beatmap)
             : base(mods)
         {
             rhythm = new Rhythm(mods);
             colour = new Colour(mods);
             stamina = new Stamina(mods);
+
+            if (debugColour)
+            {
+                String filename = $"{beatmap.BeatmapInfo.Metadata.Title}[{beatmap.BeatmapInfo.DifficultyName}].csv";
+                filename = filename.Replace('/', '_');
+                colourDebugOutput = new StreamWriter(File.OpenWrite($"/run/mount/secondary/workspace/osu/output/colour-debug/{filename}"));
+                colourDebugOutput.WriteLine("StartTime,Raw,Decayed,RepetitionInterval,EncodingRunLength,Payload");
+            }
+
         }
 
         /// <summary>
@@ -43,6 +58,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             rhythm.Process(current);
             colour.Process(current);
             stamina.Process(current);
+
+            if (debugColour && colourDebugOutput != null)
+            {
+                colourDebugOutput.WriteLine(colour.GetDebugString(current));
+                colourDebugOutput.Flush();
+            }
         }
 
         /// <summary>
