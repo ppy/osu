@@ -31,7 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
-        private Dropdown<RoomAccessType> roomAccessTypeDropdown;
+        private Dropdown<RoomPermissionsFilter> roomAccessTypeDropdown;
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override IEnumerable<Drawable> CreateFilterControls()
         {
-            roomAccessTypeDropdown = new SlimEnumDropdown<RoomAccessType>
+            roomAccessTypeDropdown = new SlimEnumDropdown<RoomPermissionsFilter>
             {
                 RelativeSizeAxes = Axes.None,
                 Width = 160,
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             var criteria = base.CreateFilterCriteria();
             criteria.Category = @"realtime";
-            criteria.AccessType = roomAccessTypeDropdown.Current.Value;
+            criteria.Permissions = roomAccessTypeDropdown.Current.Value;
             return criteria;
         }
 
