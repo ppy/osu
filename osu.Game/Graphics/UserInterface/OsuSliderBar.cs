@@ -111,7 +111,6 @@ namespace osu.Game.Graphics.UserInterface
                                 RelativeSizeAxes = Axes.None,
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
-                                Alpha = 0.5f,
                             },
                         },
                     },
@@ -137,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             sample = audio.Samples.Get(@"UI/notch-tick");
             AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
-            BackgroundColour = colourProvider?.Background5 ?? colours.Pink.Opacity(0.5f);
+            BackgroundColour = colourProvider?.Background5 ?? colours.PinkDarker.Darken(1);
         }
 
         protected override void Update()
