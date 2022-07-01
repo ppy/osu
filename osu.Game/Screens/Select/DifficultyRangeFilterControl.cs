@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            const float vertical_offset = 15;
+            const float vertical_offset = 13;
 
             InternalChildren = new[]
             {
