@@ -98,6 +98,22 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestPlaceholderStarDifficulty()
+        {
+            addRulesetImportStep(0);
+            AddStep("change star filter", () => config.SetValue(OsuSetting.DisplayStarsMinimum, 10.0));
+
+            createSongSelect();
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            AddStep("click link in placeholder", () => getPlaceholder().ChildrenOfType<DrawableLinkCompiler>().First().TriggerClick());
+
+            AddUntilStep("star filter reset", () => config.Get<double>(OsuSetting.DisplayStarsMinimum) == 0.0);
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
         public void TestPlaceholderConvertSetting()
         {
             addRulesetImportStep(0);
