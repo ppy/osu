@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         protected TaikoStrongableHitObject()
         {
             IsStrongBindable.BindValueChanged(_ => updateSamplesFromType());
-            SamplesBindable.BindCollectionChanged((_, __) => updateTypeFromSamples());
+            SamplesBindable.BindCollectionChanged((_, _) => updateTypeFromSamples());
         }
 
         private void updateTypeFromSamples()

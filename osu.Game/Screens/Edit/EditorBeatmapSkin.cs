@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit
             ComboColours = new BindableList<Colour4>();
             if (Skin.Configuration.ComboColours != null)
                 ComboColours.AddRange(Skin.Configuration.ComboColours.Select(c => (Colour4)c));
-            ComboColours.BindCollectionChanged((_, __) => updateColours());
+            ComboColours.BindCollectionChanged((_, _) => updateColours());
         }
 
         private void invokeSkinChanged() => BeatmapSkinChanged?.Invoke();

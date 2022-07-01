@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Select
         {
             switch (item)
             {
-                case BeatmapDetailAreaDetailTabItem _:
+                case BeatmapDetailAreaDetailTabItem:
                     return TabType.Details;
 
                 case BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope> leaderboardTab:

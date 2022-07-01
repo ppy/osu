@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.OSD
                     if (val) selectedOption = 0;
                     break;
 
-                case Enum _:
+                case Enum:
                     var values = Enum.GetValues(description.RawValue.GetType());
                     optionCount = values.Length;
                     selectedOption = Convert.ToInt32(description.RawValue);

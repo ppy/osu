@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Select
         {
             foreach (Match match in query_syntax_regex.Matches(query))
             {
-                string key = match.Groups["key"].Value.ToLower();
+                string key = match.Groups["key"].Value.ToLowerInvariant();
                 var op = parseOperator(match.Groups["op"].Value);
                 string value = match.Groups["value"].Value;
 

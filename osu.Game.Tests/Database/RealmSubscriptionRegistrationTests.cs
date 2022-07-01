@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -84,11 +83,7 @@ namespace osu.Game.Tests.Database
 
                 realm.Run(r => r.Refresh());
 
-                // Without forcing the write onto its own thread, realm will internally run the operation synchronously, which can cause a deadlock with `WaitSafely`.
-                Task.Run(async () =>
-                {
-                    await realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
-                }).WaitSafely();
+                realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo())).WaitSafely();
 
                 realm.Run(r => r.Refresh());
 
