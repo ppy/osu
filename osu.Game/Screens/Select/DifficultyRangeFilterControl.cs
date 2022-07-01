@@ -83,8 +83,6 @@ namespace osu.Game.Screens.Select
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
                 base.ReceivePositionalInputAt(screenSpacePos)
                 && screenSpacePos.X <= Nub.ScreenSpaceDrawQuad.TopRight.X;
-
-            public override LocalisableString TooltipText => Current.IsDefault ? UserInterfaceStrings.NoLimit : base.TooltipText;
         }
 
         private class MaximumStarsSlider : StarsSlider
@@ -99,12 +97,15 @@ namespace osu.Game.Screens.Select
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
                 base.ReceivePositionalInputAt(screenSpacePos)
                 && screenSpacePos.X >= Nub.ScreenSpaceDrawQuad.TopLeft.X;
-            public override LocalisableString TooltipText => Current.IsDefault ? UserInterfaceStrings.NoLimit : base.TooltipText;
         }
 
         private class StarsSlider : OsuSliderBar<double>
         {
-            public override LocalisableString TooltipText => Current.Value.ToString(@"0.## stars");
+            private OsuSpriteText currentDisplay;
+
+            public override LocalisableString TooltipText => Current.IsDefault
+                ? UserInterfaceStrings.NoLimit
+                : Current.Value.ToString(@"0.## stars");
 
             public new Nub Nub => base.Nub;
 
@@ -113,6 +114,20 @@ namespace osu.Game.Screens.Select
                 base.LoadComplete();
                 Nub.Width = Nub.HEIGHT;
                 RangePadding = Nub.Width / 2;
+
+                Nub.Add(currentDisplay = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Y = -0.5f,
+                    Colour = Color4.White,
+                    Font = OsuFont.Torus.With(size: 10),
+                });
+
+                Current.BindValueChanged(current =>
+                {
+                    currentDisplay.Text = current.NewValue != Current.Default ? current.NewValue.ToString("N1") : "∞";
+                }, true);
             }
         }
     }
