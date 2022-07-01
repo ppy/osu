@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
@@ -78,7 +79,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override bool SelectItem(PlaylistItem item)
         {
             if (operationInProgress.Value)
+            {
+                Logger.Log($"{nameof(SelectedItem)} aborted due to {nameof(operationInProgress)}");
                 return false;
+            }
 
             // If the client is already in a room, update via the client.
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.

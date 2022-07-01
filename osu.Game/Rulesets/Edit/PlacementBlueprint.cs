@@ -129,10 +129,10 @@ namespace osu.Game.Rulesets.Edit
 
             switch (e)
             {
-                case ScrollEvent _:
+                case ScrollEvent:
                     return false;
 
-                case DoubleClickEvent _:
+                case DoubleClickEvent:
                     return false;
 
                 case MouseButtonEvent mouse:

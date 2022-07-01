@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
             // Run in constructor so IsRedundant calls can work correctly.
             controlPoints.BindTo(Group.ControlPoints);
-            controlPoints.BindCollectionChanged((_, __) =>
+            controlPoints.BindCollectionChanged((_, _) =>
             {
                 ClearInternal();
 
@@ -40,15 +40,15 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 {
                     switch (point)
                     {
-                        case TimingControlPoint _:
+                        case TimingControlPoint:
                             AddInternal(new ControlPointVisualisation(point) { Y = 0, });
                             break;
 
-                        case DifficultyControlPoint _:
+                        case DifficultyControlPoint:
                             AddInternal(new ControlPointVisualisation(point) { Y = 0.25f, });
                             break;
 
-                        case SampleControlPoint _:
+                        case SampleControlPoint:
                             AddInternal(new ControlPointVisualisation(point) { Y = 0.5f, });
                             break;
 

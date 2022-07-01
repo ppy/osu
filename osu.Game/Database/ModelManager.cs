@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
@@ -46,6 +47,7 @@ namespace osu.Game.Database
                 Realm.Realm.Write(realm =>
                 {
                     var managed = realm.Find<TModel>(item.ID);
+                    Debug.Assert(managed != null);
                     operation(managed);
 
                     item.Files.Clear();
@@ -201,6 +203,6 @@ namespace osu.Game.Database
 
         public Action<Notification>? PostNotification { get; set; }
 
-        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
+        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLowerInvariant()}";
     }
 }

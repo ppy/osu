@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             Spacing = new Vector2(10, 0),
             Children = new[]
             {
-                base.CreateContent().With(d =>
+                base.CreateContent().With(_ =>
                 {
                     Anchor = Anchor.CentreLeft;
                     Origin = Anchor.CentreLeft;
