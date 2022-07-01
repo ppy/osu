@@ -41,10 +41,10 @@ namespace osu.Game.Beatmaps
         private readonly BeatmapImporter beatmapImporter;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
-        private readonly BeatmapOnlineLookupQueue? onlineBeatmapLookupQueue;
+        private readonly BeatmapUpdater? beatmapUpdater;
 
         public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
-                              WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
+                              WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
             : base(storage, realm)
         {
             if (performOnlineLookups)
@@ -52,14 +52,17 @@ namespace osu.Game.Beatmaps
                 if (api == null)
                     throw new ArgumentNullException(nameof(api), "API must be provided if online lookups are required.");
 
-                onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+                if (difficultyCache == null)
+                    throw new ArgumentNullException(nameof(difficultyCache), "Difficulty cache must be provided if online lookups are required.");
+
+                beatmapUpdater = new BeatmapUpdater(this, difficultyCache, api, storage);
             }
 
             var userResources = new RealmFileStore(realm, storage).Store;
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            beatmapImporter = CreateBeatmapImporter(storage, realm, rulesets, onlineBeatmapLookupQueue);
+            beatmapImporter = CreateBeatmapImporter(storage, realm, rulesets, beatmapUpdater);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -71,8 +74,8 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
-            new BeatmapImporter(storage, realm, onlineLookupQueue);
+        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapUpdater? beatmapUpdater) =>
+            new BeatmapImporter(storage, realm, beatmapUpdater);
 
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,
@@ -314,10 +317,17 @@ namespace osu.Game.Beatmaps
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
-                Realm.Write(r => setInfo.CopyChangesToRealm(r.Find<BeatmapSetInfo>(setInfo.ID)));
+                Realm.Write(r =>
+                {
+                    var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
+
+                    setInfo.CopyChangesToRealm(liveBeatmapSet);
+
+                    beatmapUpdater?.Process(liveBeatmapSet, r);
+                });
             }
 
-            workingBeatmapCache.Invalidate(beatmapInfo);
+            Debug.Assert(beatmapInfo.BeatmapSet != null);
 
             static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
             {
@@ -418,28 +428,41 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IWorkingBeatmapCache
 
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo? beatmapInfo)
+        /// <summary>
+        /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
+        /// </summary>
+        /// <param name="beatmapInfo">The beatmap to lookup.</param>
+        /// <param name="refetch">Whether to force a refetch from the database to ensure <see cref="BeatmapInfo"/> is up-to-date.</param>
+        /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo? beatmapInfo, bool refetch = false)
         {
-            // Detached sets don't come with files.
-            // If we seem to be missing files, now is a good time to re-fetch.
-            if (beatmapInfo?.IsManaged == true || beatmapInfo?.BeatmapSet?.Files.Count == 0)
+            if (beatmapInfo != null)
             {
-                Realm.Run(r =>
+                // Detached sets don't come with files.
+                // If we seem to be missing files, now is a good time to re-fetch.
+                if (refetch || beatmapInfo.IsManaged || beatmapInfo.BeatmapSet?.Files.Count == 0)
                 {
-                    var refetch = r.Find<BeatmapInfo>(beatmapInfo.ID)?.Detach();
+                    workingBeatmapCache.Invalidate(beatmapInfo);
 
-                    if (refetch != null)
-                        beatmapInfo = refetch;
-                });
+                    Guid id = beatmapInfo.ID;
+                    beatmapInfo = Realm.Run(r => r.Find<BeatmapInfo>(id)?.Detach()) ?? beatmapInfo;
+                }
+
+                Debug.Assert(beatmapInfo.IsManaged != true);
             }
-
-            Debug.Assert(beatmapInfo?.IsManaged != true);
 
             return workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
         }
 
+        WorkingBeatmap IWorkingBeatmapCache.GetWorkingBeatmap(BeatmapInfo beatmapInfo) => GetWorkingBeatmap(beatmapInfo);
         void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
         void IWorkingBeatmapCache.Invalidate(BeatmapInfo beatmapInfo) => workingBeatmapCache.Invalidate(beatmapInfo);
+
+        public event Action<WorkingBeatmap>? OnInvalidated
+        {
+            add => workingBeatmapCache.OnInvalidated += value;
+            remove => workingBeatmapCache.OnInvalidated -= value;
+        }
 
         public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID));
 
@@ -449,7 +472,7 @@ namespace osu.Game.Beatmaps
 
         public void Dispose()
         {
-            onlineBeatmapLookupQueue?.Dispose();
+            beatmapUpdater?.Dispose();
         }
 
         #endregion
