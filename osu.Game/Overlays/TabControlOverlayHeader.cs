@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -110,20 +108,7 @@ namespace osu.Game.Overlays
                 public OverlayHeaderTabItem(T value)
                     : base(value)
                 {
-                    if (!(Value is Enum enumValue))
-                        Text.Text = Value.ToString().ToLowerInvariant();
-                    else
-                    {
-                        case LocalisableString localisableString:
-                            Text.Text = localisableString.ToLower();
-                            break;
-
-                        // If localisable == non-localisable, then we must have a basic string, so .ToLowerInvariant() is used.
-                        Text.Text = localisableDescription.Equals(nonLocalisableDescription)
-                            ? nonLocalisableDescription.ToLowerInvariant()
-                            : localisableDescription;
-                    }
-
+                    Text.Text = value.GetLocalisableDescription().ToLower();
                     Text.Font = OsuFont.GetFont(size: 14);
                     Text.Margin = new MarginPadding { Vertical = 16.5f }; // 15px padding + 1.5px line-height difference compensation
                     Bar.Margin = new MarginPadding { Bottom = bar_height };
