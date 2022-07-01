@@ -126,12 +126,6 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      # macOS agents recently have empty NuGet config files, resulting in restore failures,
-      # see https://github.com/actions/virtual-environments/issues/5768
-      # Add the global nuget package source manually for now.
-      - name: Setup NuGet.Config
-        run: echo '<configuration><packageSources><add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" /></packageSources></configuration>' > ~/.config/NuGet/NuGet.Config
-
       # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
       # cannot accept .sln(f) files as arguments.
       # Build just the main game for now.
