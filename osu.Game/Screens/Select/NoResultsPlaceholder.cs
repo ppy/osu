@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select
             Masking = true;
             CornerRadius = 10;
 
-            Width = 300;
+            Width = 400;
             AutoSizeAxes = Axes.Y;
 
             Anchor = Anchor.Centre;
@@ -118,22 +118,35 @@ namespace osu.Game.Screens.Select
                 textFlow.AddParagraph("No beatmaps match your filter criteria!");
                 textFlow.AddParagraph(string.Empty);
 
-                if (string.IsNullOrEmpty(filter?.SearchText))
+                if (filter?.UserStarDifficulty.HasFilter == true)
                 {
-                    // TODO: Add realm queries to hint at which ruleset results are available in (and allow clicking to switch).
-                    // TODO: Make this message more certain by ensuring the osu! beatmaps exist before suggesting.
-                    if (filter?.Ruleset.OnlineID > 0 && !filter.AllowConvertedBeatmaps)
+                    textFlow.AddParagraph("- Try ");
+                    textFlow.AddLink("removing", () =>
                     {
-                        textFlow.AddParagraph("Beatmaps may be available by ");
-                        textFlow.AddLink("enabling automatic conversion", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
-                        textFlow.AddText("!");
-                    }
+                        config.SetValue(OsuSetting.DisplayStarsMinimum, 0.0);
+                        config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1);
+                    });
+
+                    string lowerStar = filter.UserStarDifficulty.Min == null ? "∞" : $"{filter.UserStarDifficulty.Min:N1}";
+                    string upperStar = filter.UserStarDifficulty.Max == null ? "∞" : $"{filter.UserStarDifficulty.Max:N1}";
+
+                    textFlow.AddText($" the {lowerStar}-{upperStar} star difficulty filter.");
                 }
-                else
+
+                // TODO: Add realm queries to hint at which ruleset results are available in (and allow clicking to switch).
+                // TODO: Make this message more certain by ensuring the osu! beatmaps exist before suggesting.
+                if (filter?.Ruleset?.OnlineID > 0 && !filter.AllowConvertedBeatmaps)
                 {
-                    textFlow.AddParagraph("You can try ");
+                    textFlow.AddParagraph("- Try");
+                    textFlow.AddLink(" enabling ", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
+                    textFlow.AddText("automatic conversion!");
+                }
+
+                if (!string.IsNullOrEmpty(filter?.SearchText))
+                {
+                    textFlow.AddParagraph("- Try ");
                     textFlow.AddLink("searching online", LinkAction.SearchBeatmapSet, filter.SearchText);
-                    textFlow.AddText(" for this query.");
+                    textFlow.AddText($" for \"{filter.SearchText}\".");
                 }
             }
 
