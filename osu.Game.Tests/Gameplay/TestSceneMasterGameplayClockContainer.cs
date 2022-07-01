@@ -78,6 +78,16 @@ namespace osu.Game.Tests.Gameplay
         }
 
         [Test]
+        [FlakyTest]
+        /*
+         * Fail rate around 0.15%
+         *
+         * TearDown : osu.Framework.Testing.Drawables.Steps.AssertButton+TracedException : gameplay clock time = 2500
+         * --TearDown
+         *    at osu.Framework.Threading.ScheduledDelegate.RunTaskInternal()
+         *    at osu.Framework.Threading.Scheduler.Update()
+         *    at osu.Framework.Graphics.Drawable.UpdateSubTree()
+         */
         public void TestSeekPerformsInGameplayTime(
             [Values(1.0, 0.5, 2.0)] double clockRate,
             [Values(0.0, 200.0, -200.0)] double userOffset,
