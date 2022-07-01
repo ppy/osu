@@ -133,14 +133,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddUntilStep("match type head to head", () => multiplayerClient.APIRoom?.Type.Value == MatchType.HeadToHead);
+            AddUntilStep("match type head to head", () => multiplayerClient.ClientAPIRoom?.Type.Value == MatchType.HeadToHead);
 
             AddStep("change match type", () => multiplayerClient.ChangeSettings(new MultiplayerRoomSettings
             {
                 MatchType = MatchType.TeamVersus
             }).WaitSafely());
 
-            AddUntilStep("api room updated to team versus", () => multiplayerClient.APIRoom?.Type.Value == MatchType.TeamVersus);
+            AddUntilStep("api room updated to team versus", () => multiplayerClient.ClientAPIRoom?.Type.Value == MatchType.TeamVersus);
         }
 
         [Test]

@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         /// <summary>
         /// The local client's <see cref="Room"/>. This is not always equivalent to the server-side room.
         /// </summary>
-        public new Room? APIRoom => base.APIRoom;
+        public Room? ClientAPIRoom => APIRoom;
 
         public Action<MultiplayerRoom>? RoomSetupAction;
 
@@ -126,8 +126,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void updateRoomStateIfRequired()
         {
-            Debug.Assert(APIRoom != null);
-
             Schedule(() =>
             {
                 Debug.Assert(Room != null);
@@ -223,7 +221,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected override void OnRoomJoined()
         {
-            Debug.Assert(APIRoom != null);
             Debug.Assert(Room != null);
 
             // emulate the server sending this after the join room. scheduler required to make sure the join room event is fired first (in Join).
@@ -250,7 +247,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
         {
             Debug.Assert(Room != null);
-            Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
             // Server is authoritative for the time being.
@@ -344,7 +340,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public async Task AddUserPlaylistItem(int userId, MultiplayerPlaylistItem item)
         {
             Debug.Assert(Room != null);
-            Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
             if (Room.Settings.QueueMode == QueueMode.HostOnly && Room.Host?.UserID != LocalUser?.UserID)
@@ -392,7 +387,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public async Task RemoveUserPlaylistItem(int userId, long playlistItemId)
         {
             Debug.Assert(Room != null);
-            Debug.Assert(APIRoom != null);
             Debug.Assert(serverSideAPIRoom != null);
 
             var item = serverSidePlaylist.Find(i => i.ID == playlistItemId);
@@ -444,7 +438,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private async Task changeQueueMode(QueueMode newMode)
         {
             Debug.Assert(Room != null);
-            Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
             // When changing to host-only mode, ensure that at least one non-expired playlist item exists by duplicating the current item.
@@ -458,7 +451,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public async Task FinishCurrentItem()
         {
             Debug.Assert(Room != null);
-            Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
             // Expire the current playlist item.
