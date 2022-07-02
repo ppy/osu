@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,6 +29,9 @@ namespace osu.Game.Overlays.Mods
     public abstract class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler
     {
         public const int BUTTON_WIDTH = 200;
+
+        protected override string PopInSampleName => "";
+        protected override string PopOutSampleName => @"SongSelect/mod-select-overlay-pop-out";
 
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -101,16 +106,20 @@ namespace osu.Game.Overlays.Mods
 
         private ShearedToggleButton? customisationButton;
 
+        private Sample? columnAppearSample;
+
         protected ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuColour colours)
+        private void load(OsuGameBase game, OsuColour colours, AudioManager audio)
         {
             Header.Title = ModSelectOverlayStrings.ModSelectTitle;
             Header.Description = ModSelectOverlayStrings.ModSelectDescription;
+
+            columnAppearSample = audio.Samples.Get(@"SongSelect/mod-column-pop-in");
 
             AddRange(new Drawable[]
             {
@@ -453,8 +462,31 @@ namespace osu.Game.Overlays.Mods
                       .MoveToY(0, duration, Easing.OutQuint)
                       .FadeIn(duration, Easing.OutQuint);
 
-                if (!allFiltered)
-                    nonFilteredColumnCount += 1;
+                if (allFiltered)
+                    continue;
+
+                int columnNumber = nonFilteredColumnCount;
+                Scheduler.AddDelayed(() =>
+                {
+                    var channel = columnAppearSample?.GetChannel();
+                    if (channel == null) return;
+
+                    // Still play sound effects for off-screen columns up to a certain point.
+                    if (columnNumber > 5 && !column.Active.Value) return;
+
+                    // use X position of the column on screen as a basis for panning the sample
+                    float balance = column.Parent.BoundingBox.Centre.X / RelativeToAbsoluteFactor.X;
+
+                    // dip frequency and ramp volume of sample over the first 5 displayed columns
+                    float progress = Math.Min(1, columnNumber / 5f);
+
+                    channel.Frequency.Value = 1.3 - (progress * 0.3) + RNG.NextDouble(0.1);
+                    channel.Volume.Value = Math.Max(progress, 0.2);
+                    channel.Balance.Value = -1 + balance * 2;
+                    channel.Play();
+                }, delay);
+
+                nonFilteredColumnCount += 1;
             }
         }
 

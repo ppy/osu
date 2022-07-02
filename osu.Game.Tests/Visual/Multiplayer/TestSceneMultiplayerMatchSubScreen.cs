@@ -152,7 +152,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
-            AddUntilStep("match started", () => MultiplayerClient.Room?.State == MultiplayerRoomState.WaitingForLoad);
+            AddUntilStep("match started", () => MultiplayerClient.ClientRoom?.State == MultiplayerRoomState.WaitingForLoad);
         }
 
         [Test]
@@ -253,7 +253,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("last playlist item selected", () =>
             {
-                var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.APIRoom?.Playlist.Last().ID);
+                var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.ServerAPIRoom?.Playlist.Last().ID);
                 return lastItem.IsSelectedItem;
             });
         }
