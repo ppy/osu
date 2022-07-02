@@ -23,37 +23,32 @@ namespace osu.Game.Screens.Select
         private Bindable<double> lowerStars;
         private Bindable<double> upperStars;
 
-        private StarsSlider lowerSlider;
-        private MaximumStarsSlider upperSlider;
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             const float vertical_offset = 13;
 
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
                 new OsuSpriteText
                 {
                     Text = "Difficulty range",
                     Font = OsuFont.GetFont(size: 14),
                 },
-                upperSlider = new MaximumStarsSlider
+                new MaximumStarsSlider
                 {
                     Current = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                     KeyboardStep = 0.1f,
                     RelativeSizeAxes = Axes.X,
                     Y = vertical_offset,
                 },
-                lowerSlider = new MinimumStarsSlider
+                new MinimumStarsSlider
                 {
                     Current = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                     KeyboardStep = 0.1f,
                     RelativeSizeAxes = Axes.X,
                     Y = vertical_offset,
-                },
-                upperSlider.Nub.CreateProxy(),
-                lowerSlider.Nub.CreateProxy(),
+                }
             };
 
             lowerStars = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum);
@@ -106,8 +101,6 @@ namespace osu.Game.Screens.Select
             public override LocalisableString TooltipText => Current.IsDefault
                 ? UserInterfaceStrings.NoLimit
                 : Current.Value.ToString(@"0.## stars");
-
-            public new Nub Nub => base.Nub;
 
             protected override void LoadComplete()
             {
