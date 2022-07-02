@@ -126,7 +126,7 @@ namespace osu.Game.Database
             string backupSuffix = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
             // required for initial backup.
-            var realmBlockOperations = realm.BlockAllOperations();
+            var realmBlockOperations = realm.BlockAllOperations("EF migration");
 
             Task.Factory.StartNew(() =>
             {

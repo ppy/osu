@@ -576,12 +576,13 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createAnnounceChannel()
         {
-            int id = RNG.Next(0, DummyAPIAccess.DUMMY_USER_ID - 1);
+            const int announce_channel_id = 133337;
+
             return new Channel
             {
-                Name = $"Announce {id}",
+                Name = $"Announce {announce_channel_id}",
                 Type = ChannelType.Announce,
-                Id = id,
+                Id = announce_channel_id,
             };
         }
 
