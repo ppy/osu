@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             bool canDelayKeyUpFully = nextObject == null ||
                                       nextObject.StartTime > endTime + RELEASE_DELAY;
 
-            return endTime + (canDelayKeyUpFully ? RELEASE_DELAY : (nextObject.StartTime - endTime) * 0.9);
+            return endTime + (canDelayKeyUpFully ? RELEASE_DELAY : (nextObject!.StartTime - endTime) * 0.9);
         }
 
         protected override HitObject? GetNextObject(int currentIndex)
