@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -92,10 +92,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (obj is not DrawableSlider)
                 return;
 
-            using (BeginAbsoluteSequence(drawableObject.AsNonNull().StateUpdateTime))
+            Debug.Assert(drawableObject != null);
+
+            using (BeginAbsoluteSequence(drawableObject.StateUpdateTime))
                 this.FadeIn();
 
-            using (BeginAbsoluteSequence(drawableObject.AsNonNull().HitStateUpdateTime))
+            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
                 this.FadeOut();
         }
 
