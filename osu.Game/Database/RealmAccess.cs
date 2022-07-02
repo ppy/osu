@@ -860,7 +860,7 @@ namespace osu.Game.Database
                         timeout -= sleep_length;
 
                         if (timeout < 0)
-                            throw new TimeoutException(@"Took too long to acquire lock");
+                            throw new TimeoutException($@"Realm compact failed after {timeout / sleep_length} attempts over {timeout / 1000} seconds");
                     }
                 }
                 catch (RealmException e)
