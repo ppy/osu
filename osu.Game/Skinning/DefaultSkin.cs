@@ -113,12 +113,12 @@ namespace osu.Game.Skinning
                                         accuracy.Position = new Vector2(-accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 - horizontal_padding, vertical_offset + 5);
                                         accuracy.Origin = Anchor.TopRight;
                                         accuracy.Anchor = Anchor.TopCentre;
-                                    }
 
-                                    if (combo != null)
-                                    {
-                                        combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
-                                        combo.Anchor = Anchor.TopCentre;
+                                        if (combo != null)
+                                        {
+                                            combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
+                                            combo.Anchor = Anchor.TopCentre;
+                                        }
                                     }
 
                                     var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();

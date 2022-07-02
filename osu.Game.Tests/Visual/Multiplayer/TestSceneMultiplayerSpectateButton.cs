@@ -99,10 +99,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestToggleWhenIdle(MultiplayerUserState initialState)
         {
             ClickButtonWhenEnabled<MultiplayerSpectateButton>();
-            AddUntilStep("user is spectating", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Spectating);
+            AddUntilStep("user is spectating", () => MultiplayerClient.ClientRoom?.Users[0].State == MultiplayerUserState.Spectating);
 
             ClickButtonWhenEnabled<MultiplayerSpectateButton>();
-            AddUntilStep("user is idle", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Idle);
+            AddUntilStep("user is idle", () => MultiplayerClient.ClientRoom?.Users[0].State == MultiplayerUserState.Idle);
         }
 
         [TestCase(MultiplayerRoomState.Closed)]
