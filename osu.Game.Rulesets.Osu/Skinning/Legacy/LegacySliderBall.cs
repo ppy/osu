@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private readonly ISkin skin;
 
         [Resolved(canBeNull: true)]
-        private DrawableHitObject? drawableObject { get; set; }
+        private DrawableHitObject? parentObject { get; set; }
 
         private Sprite layerNd = null!;
         private Sprite layerSpec = null!;
@@ -66,10 +65,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.LoadComplete();
 
-            if (drawableObject != null)
+            if (parentObject != null)
             {
-                drawableObject.ApplyCustomUpdateState += updateStateTransforms;
-                updateStateTransforms(drawableObject, drawableObject.State.Value);
+                parentObject.ApplyCustomUpdateState += updateStateTransforms;
+                updateStateTransforms(parentObject, parentObject.State.Value);
             }
         }
 
@@ -84,15 +83,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             layerSpec.Rotation = -appliedRotation;
         }
 
-        private void updateStateTransforms(DrawableHitObject obj, ArmedState _)
+        private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState _)
         {
             // Gets called by slider ticks, tails, etc., leading to duplicated
             // animations which in this case have no visual impact (due to
             // instant fade) but may negatively affect performance
-            if (obj is not DrawableSlider)
+            if (drawableObject is not DrawableSlider)
                 return;
-
-            Debug.Assert(drawableObject != null);
 
             using (BeginAbsoluteSequence(drawableObject.StateUpdateTime))
                 this.FadeIn();
@@ -105,8 +102,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.Dispose(isDisposing);
 
-            if (drawableObject != null)
-                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
+            if (parentObject != null)
+                parentObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
