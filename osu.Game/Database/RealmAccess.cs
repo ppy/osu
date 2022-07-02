@@ -780,7 +780,7 @@ namespace osu.Game.Database
 
         public void CreateBackup(string backupFilename, IDisposable? blockAllOperations = null)
         {
-            using (blockAllOperations ?? BlockAllOperations())
+            using (blockAllOperations ?? BlockAllOperations("creating backup"))
             {
                 Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
 
@@ -811,9 +811,12 @@ namespace osu.Game.Database
         /// This should be used in places we need to ensure no ongoing reads/writes are occurring with realm.
         /// ie. to move the realm backing file to a new location.
         /// </remarks>
+        /// <param name="reason">The reason for blocking. Used for logging purposes.</param>
         /// <returns>An <see cref="IDisposable"/> which should be disposed to end the blocking section.</returns>
-        public IDisposable BlockAllOperations()
+        public IDisposable BlockAllOperations(string reason)
         {
+            Logger.Log($@"Attempting to block all realm operations for {reason}.", LoggingTarget.Database);
+
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
@@ -843,10 +846,10 @@ namespace osu.Game.Database
                     updateRealm = null;
                 }
 
-                Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
+                Logger.Log(@"Lock acquired for blocking operations", LoggingTarget.Database);
 
                 const int sleep_length = 200;
-                int timeout = 5000;
+                int timeSpent = 0;
 
                 try
                 {
@@ -854,10 +857,10 @@ namespace osu.Game.Database
                     while (!Compact())
                     {
                         Thread.Sleep(sleep_length);
-                        timeout -= sleep_length;
+                        timeSpent += sleep_length;
 
-                        if (timeout < 0)
-                            throw new TimeoutException(@"Took too long to acquire lock");
+                        if (timeSpent > 5000)
+                            throw new TimeoutException($@"Realm compact failed after {timeSpent / sleep_length} attempts over {timeSpent / 1000} seconds");
                     }
                 }
                 catch (RealmException e)
@@ -866,6 +869,8 @@ namespace osu.Game.Database
                     // We still want to continue with the blocking operation, though.
                     Logger.Log($"Realm compact failed with error {e}", LoggingTarget.Database);
                 }
+
+                Logger.Log(@"Realm usage isolated via compact", LoggingTarget.Database);
 
                 // In order to ensure events arrive in the correct order, these *must* be fired post disposal of the update realm,
                 // and must be posted to the synchronization context.
