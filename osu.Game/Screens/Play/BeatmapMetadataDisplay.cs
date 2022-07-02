@@ -197,21 +197,19 @@ namespace osu.Game.Screens.Play
                 starRatingDisplay.Show();
             }
             else
-            {
                 starRatingDisplay.Hide();
 
-                starDifficulty.ValueChanged += d =>
-                {
-                    Debug.Assert(d.NewValue != null);
+            starDifficulty.ValueChanged += d =>
+            {
+                Debug.Assert(d.NewValue != null);
 
-                    starRatingDisplay.Current.Value = d.NewValue.Value;
+                starRatingDisplay.Current.Value = d.NewValue.Value;
 
-                    versionFlow.AutoSizeDuration = 300;
-                    versionFlow.AutoSizeEasing = Easing.OutQuint;
+                versionFlow.AutoSizeDuration = 300;
+                versionFlow.AutoSizeEasing = Easing.OutQuint;
 
-                    starRatingDisplay.FadeIn(300, Easing.InQuint);
-                };
-            }
+                starRatingDisplay.FadeIn(300, Easing.InQuint);
+            };
         }
 
         private class MetadataLineLabel : OsuSpriteText
