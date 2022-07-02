@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Select
         private readonly Box light;
 
         public FooterButton()
-            : base(HoverSampleSet.Toolbar)
+            : base(HoverSampleSet.Default)
         {
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
