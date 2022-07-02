@@ -471,12 +471,11 @@ namespace osu.Game.Overlays.Mods
                     var channel = columnAppearSample?.GetChannel();
                     if (channel == null) return;
 
-                    // don't play sample if column isn't visible, but try to play it at least 5 times (assuming there's at least 5 visible columns in `columnFlow`)
+                    // Still play sound effects for off-screen columns up to a certain point.
                     if (columnNumber > 5 && !column.Active.Value) return;
 
                     // use X position of the column on screen as a basis for panning the sample
-                    var bounds = column.Parent.BoundingBox;
-                    float balance = (bounds.TopLeft.X + bounds.Width / 2) / RelativeToAbsoluteFactor.X;
+                    float balance = column.Parent.BoundingBox.Centre.X / RelativeToAbsoluteFactor.X;
 
                     // dip frequency and ramp volume of sample over the first 5 displayed columns
                     float progress = Math.Min(1, columnNumber / 5f);
