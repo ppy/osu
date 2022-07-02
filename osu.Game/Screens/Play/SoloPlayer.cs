@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Play
             if (!Ruleset.Value.IsLegacyRuleset())
                 return null;
 
-            return new CreateSoloScoreRequest(beatmapId, rulesetId, Game.VersionHash);
+            return new CreateSoloScoreRequest(Beatmap.Value.BeatmapInfo, rulesetId, Game.VersionHash);
         }
 
         protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
