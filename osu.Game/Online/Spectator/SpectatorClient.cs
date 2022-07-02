@@ -188,7 +188,7 @@ namespace osu.Game.Online.Spectator
             }
 
             if (frame is IConvertibleReplayFrame convertible)
-                pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+                pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap!));
 
             if (pendingFrames.Count > max_pending_frames)
                 purgePendingFrames();

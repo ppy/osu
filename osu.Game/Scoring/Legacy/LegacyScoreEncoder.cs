@@ -143,7 +143,7 @@ namespace osu.Game.Scoring.Legacy
                     return legacyFrame;
 
                 case IConvertibleReplayFrame convertibleFrame:
-                    return convertibleFrame.ToLegacy(beatmap);
+                    return convertibleFrame.ToLegacy(beatmap!);
 
                 default:
                     throw new ArgumentException(@"Frame could not be converted to legacy frames", nameof(replayFrame));
