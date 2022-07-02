@@ -849,7 +849,7 @@ namespace osu.Game.Database
                 Logger.Log(@"Lock acquired for blocking operations", LoggingTarget.Database);
 
                 const int sleep_length = 200;
-                int timeout = 5000;
+                int timeSpent = 0;
 
                 try
                 {
@@ -857,10 +857,10 @@ namespace osu.Game.Database
                     while (!Compact())
                     {
                         Thread.Sleep(sleep_length);
-                        timeout -= sleep_length;
+                        timeSpent += sleep_length;
 
-                        if (timeout < 0)
-                            throw new TimeoutException($@"Realm compact failed after {timeout / sleep_length} attempts over {timeout / 1000} seconds");
+                        if (timeSpent > 5000)
+                            throw new TimeoutException($@"Realm compact failed after {timeSpent / sleep_length} attempts over {timeSpent / 1000} seconds");
                     }
                 }
                 catch (RealmException e)
