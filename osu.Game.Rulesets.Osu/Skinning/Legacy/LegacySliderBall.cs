@@ -7,6 +7,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -17,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private readonly Drawable animationContent;
 
         private readonly ISkin skin;
+
+        private DrawableSlider slider;
 
         private Sprite layerNd;
         private Sprite layerSpec;
@@ -30,8 +34,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(DrawableHitObject dho)
         {
+            slider = (DrawableSlider)dho;
+
             var ballColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
 
             InternalChildren = new[]
@@ -56,6 +62,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Blending = BlendingParameters.Additive,
                 },
             };
+
+            slider.ApplyCustomUpdateState += updateStateTransforms;
         }
 
         protected override void UpdateAfterChildren()
@@ -67,6 +75,26 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             layerNd.Rotation = -appliedRotation;
             layerSpec.Rotation = -appliedRotation;
+        }
+
+        private void updateStateTransforms(DrawableHitObject obj, ArmedState _)
+        {
+            if (obj is not DrawableSlider)
+                return;
+
+            using (BeginAbsoluteSequence(slider.StateUpdateTime))
+                this.FadeIn();
+
+            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
+                this.FadeOut();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (slider != null)
+                slider.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
