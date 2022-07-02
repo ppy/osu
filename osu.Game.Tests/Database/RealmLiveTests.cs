@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Database
                 {
                     migratedStorage.DeleteDirectory(string.Empty);
 
-                    using (realm.BlockAllOperations())
+                    using (realm.BlockAllOperations("testing"))
                     {
                         storage.Migrate(migratedStorage);
                     }
