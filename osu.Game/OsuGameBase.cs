@@ -446,7 +446,7 @@ namespace osu.Game
 
                 Scheduler.Add(() =>
                 {
-                    realmBlocker = realm.BlockAllOperations();
+                    realmBlocker = realm.BlockAllOperations("migration");
 
                     readyToRun.Set();
                 }, false);
