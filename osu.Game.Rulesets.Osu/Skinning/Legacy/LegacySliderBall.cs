@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -85,6 +86,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void updateStateTransforms(DrawableHitObject obj, ArmedState _)
         {
+            // Gets called by slider ticks, tails, etc., leading to duplicated
+            // animations which in this case have no visual impact (due to
+            // instant fade) but may negatively affect performance
+            if (obj is not DrawableSlider)
+                return;
+
             using (BeginAbsoluteSequence(drawableObject.AsNonNull().StateUpdateTime))
                 this.FadeIn();
 
