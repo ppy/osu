@@ -1,14 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -20,10 +18,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private readonly ISkin skin;
 
-        private DrawableSlider slider;
+        [Resolved(canBeNull: true)]
+        private DrawableHitObject? drawableObject { get; set; }
 
-        private Sprite layerNd;
-        private Sprite layerSpec;
+        private Sprite layerNd = null!;
+        private Sprite layerSpec = null!;
 
         public LegacySliderBall(Drawable animationContent, ISkin skin)
         {
@@ -36,8 +35,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject dho)
         {
-            slider = (DrawableSlider)dho;
-
             var ballColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
 
             InternalChildren = new[]
@@ -62,8 +59,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Blending = BlendingParameters.Additive,
                 },
             };
+        }
 
-            slider.ApplyCustomUpdateState += updateStateTransforms;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (drawableObject != null)
+            {
+                drawableObject.ApplyCustomUpdateState += updateStateTransforms;
+                updateStateTransforms(drawableObject, drawableObject.State.Value);
+            }
         }
 
         protected override void UpdateAfterChildren()
@@ -79,13 +85,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void updateStateTransforms(DrawableHitObject obj, ArmedState _)
         {
-            if (obj is not DrawableSlider)
-                return;
-
-            using (BeginAbsoluteSequence(slider.StateUpdateTime))
+            using (BeginAbsoluteSequence(drawableObject.AsNonNull().StateUpdateTime))
                 this.FadeIn();
 
-            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
+            using (BeginAbsoluteSequence(drawableObject.AsNonNull().HitStateUpdateTime))
                 this.FadeOut();
         }
 
@@ -93,8 +96,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.Dispose(isDisposing);
 
-            if (slider != null)
-                slider.ApplyCustomUpdateState -= updateStateTransforms;
+            if (drawableObject != null)
+                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
