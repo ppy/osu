@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -101,6 +102,12 @@ namespace osu.Game.Screens.Select
             public override LocalisableString TooltipText => Current.IsDefault
                 ? UserInterfaceStrings.NoLimit
                 : Current.Value.ToString(@"0.## stars");
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                base.OnHover(e);
+                return true; // Make sure only one nub shows hover effect at once.
+            }
 
             protected override void LoadComplete()
             {
