@@ -19,7 +19,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class Nub : CompositeDrawable, IHasCurrentValue<bool>, IHasAccentColour
+    public class Nub : Container, IHasCurrentValue<bool>, IHasAccentColour
     {
         public const float HEIGHT = 15;
 
