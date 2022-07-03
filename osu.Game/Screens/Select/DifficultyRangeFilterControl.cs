@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -21,8 +20,8 @@ namespace osu.Game.Screens.Select
 {
     internal class DifficultyRangeFilterControl : CompositeDrawable
     {
-        private Bindable<double> lowerStars;
-        private Bindable<double> upperStars;
+        private Bindable<double> lowerStars = null!;
+        private Bindable<double> upperStars = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -97,8 +96,6 @@ namespace osu.Game.Screens.Select
 
         private class StarsSlider : OsuSliderBar<double>
         {
-            private OsuSpriteText currentDisplay;
-
             public override LocalisableString TooltipText => Current.IsDefault
                 ? UserInterfaceStrings.NoLimit
                 : Current.Value.ToString(@"0.## stars");
@@ -114,6 +111,8 @@ namespace osu.Game.Screens.Select
                 base.LoadComplete();
                 Nub.Width = Nub.HEIGHT;
                 RangePadding = Nub.Width / 2;
+
+                OsuSpriteText currentDisplay;
 
                 Nub.Add(currentDisplay = new OsuSpriteText
                 {
