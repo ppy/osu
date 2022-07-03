@@ -53,13 +53,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Margin = new MarginPadding { Top = 20 }
             });
 
-            AddStep("show", () =>
-            {
-                infoWedge.Show();
-                infoWedge.Beatmap = Beatmap.Value;
-            });
+            AddStep("show", () => infoWedge.Show());
 
-            // select part is redundant, but wait for load isn't
             selectBeatmap(Beatmap.Value.Beatmap);
 
             AddWaitStep("wait for select", 3);
