@@ -82,6 +82,25 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        [FlakyTest]
+        /*
+         * Fail rate around 1.2%.
+         *
+         * Failing with realm refetch occasionally being null.
+         * My only guess is that the WorkingBeatmap at SetupScreen is dummy instead of the true one.
+         * If it's something else, we have larger issues with realm, but I don't think that's the case.
+         *
+         * at osu.Framework.Logging.ThrowingTraceListener.Fail(String message1, String message2)
+         * at System.Diagnostics.TraceInternal.Fail(String message, String detailMessage)
+         * at System.Diagnostics.TraceInternal.TraceProvider.Fail(String message, String detailMessage)
+         * at System.Diagnostics.Debug.Fail(String message, String detailMessage)
+         * at osu.Game.Database.ModelManager`1.<>c__DisplayClass8_0.<performFileOperation>b__0(Realm realm) ModelManager.cs:line 50
+         * at osu.Game.Database.RealmExtensions.Write(Realm realm, Action`1 function) RealmExtensions.cs:line 14
+         * at osu.Game.Database.ModelManager`1.performFileOperation(TModel item, Action`1 operation) ModelManager.cs:line 47
+         * at osu.Game.Database.ModelManager`1.AddFile(TModel item, Stream contents, String filename) ModelManager.cs:line 37
+         * at osu.Game.Screens.Edit.Setup.ResourcesSection.ChangeAudioTrack(FileInfo source) ResourcesSection.cs:line 115
+         * at osu.Game.Tests.Visual.Editing.TestSceneEditorBeatmapCreation.<TestAddAudioTrack>b__11_0() TestSceneEditorBeatmapCreation.cs:line 101
+         */
         public void TestAddAudioTrack()
         {
             AddAssert("switch track to real track", () =>
