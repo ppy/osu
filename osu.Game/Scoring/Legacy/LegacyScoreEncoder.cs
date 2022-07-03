@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
@@ -144,7 +144,8 @@ namespace osu.Game.Scoring.Legacy
                     return legacyFrame;
 
                 case IConvertibleReplayFrame convertibleFrame:
-                    return convertibleFrame.ToLegacy(beatmap.AsNonNull());
+                    Debug.Assert(beatmap != null);
+                    return convertibleFrame.ToLegacy(beatmap);
 
                 default:
                     throw new ArgumentException(@"Frame could not be converted to legacy frames", nameof(replayFrame));
