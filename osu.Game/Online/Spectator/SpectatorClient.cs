@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -189,7 +188,10 @@ namespace osu.Game.Online.Spectator
             }
 
             if (frame is IConvertibleReplayFrame convertible)
-                pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap.AsNonNull()));
+            {
+                Debug.Assert(currentBeatmap != null);
+                pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+            }
 
             if (pendingFrames.Count > max_pending_frames)
                 purgePendingFrames();
