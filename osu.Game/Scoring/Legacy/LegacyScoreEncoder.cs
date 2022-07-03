@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -143,6 +144,7 @@ namespace osu.Game.Scoring.Legacy
                     return legacyFrame;
 
                 case IConvertibleReplayFrame convertibleFrame:
+                    Debug.Assert(beatmap != null);
                     return convertibleFrame.ToLegacy(beatmap);
 
                 default:
