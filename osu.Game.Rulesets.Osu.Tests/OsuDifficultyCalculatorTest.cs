@@ -17,18 +17,18 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
-        [TestCase(6.6972307565739273d, 206, "diffcalc-test")]
-        [TestCase(1.4484754139145539d, 45, "zero-length-sliders")]
+        [TestCase(6.8043847243906566d, 206, "diffcalc-test")]
+        [TestCase(1.449091582269485d, 45, "zero-length-sliders")]
         public void Test(double expectedStarRating, int expectedMaxCombo, string name)
             => base.Test(expectedStarRating, expectedMaxCombo, name);
 
-        [TestCase(8.9382559208689809d, 206, "diffcalc-test")]
-        [TestCase(1.7548875851757628d, 45, "zero-length-sliders")]
+        [TestCase(9.0768518847360937d, 206, "diffcalc-test")]
+        [TestCase(1.7555890739194639d, 45, "zero-length-sliders")]
         public void TestClockRateAdjusted(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new OsuModDoubleTime());
 
-        [TestCase(6.6972307218715166d, 239, "diffcalc-test")]
-        [TestCase(1.4484754139145537d, 54, "zero-length-sliders")]
+        [TestCase(6.8043847243906566d, 239, "diffcalc-test")]
+        [TestCase(1.449091582269485d, 54, "zero-length-sliders")]
         public void TestClassicMod(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new OsuModClassic());
 
