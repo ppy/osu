@@ -205,6 +205,28 @@ namespace osu.Game.Screens.Menu
             return base.OnKeyDown(e);
         }
 
+        protected override bool OnJoystickPress(JoystickPressEvent e)
+        {
+            if (State == ButtonSystemState.Initial)
+            {
+                logo?.TriggerClick();
+                return true;
+            }
+
+            return base.OnJoystickPress(e);
+        }
+
+        protected override bool OnMidiDown(MidiDownEvent e)
+        {
+            if (State == ButtonSystemState.Initial)
+            {
+                logo?.TriggerClick();
+                return true;
+            }
+
+            return base.OnMidiDown(e);
+        }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
