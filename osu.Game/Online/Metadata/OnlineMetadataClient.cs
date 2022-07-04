@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 
 namespace osu.Game.Online.Metadata
 {
     public class OnlineMetadataClient : MetadataClient
     {
+        private readonly BeatmapUpdater beatmapUpdater;
         private readonly string endpoint;
 
         private IHubClientConnector? connector;
@@ -21,8 +23,9 @@ namespace osu.Game.Online.Metadata
 
         private HubConnection? connection => connector?.CurrentConnection;
 
-        public OnlineMetadataClient(EndpointConfiguration endpoints)
+        public OnlineMetadataClient(EndpointConfiguration endpoints, BeatmapUpdater beatmapUpdater)
         {
+            this.beatmapUpdater = beatmapUpdater;
             endpoint = endpoints.MetadataEndpointUrl;
         }
 
@@ -99,7 +102,11 @@ namespace osu.Game.Online.Metadata
         protected Task ProcessChanges(int[] beatmapSetIDs)
         {
             foreach (int id in beatmapSetIDs)
+            {
                 Logger.Log($"Processing {id}...");
+                beatmapUpdater.Queue(id);
+            }
+
             return Task.CompletedTask;
         }
 
