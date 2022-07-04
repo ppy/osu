@@ -44,7 +44,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             if (mods.Any(h => h is OsuModRelax))
+            {
                 speedRating = 0.0;
+                flashlightRating *= 0.75;
+            }
 
             double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
             double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating / 0.0675) - 4, 3) / 100000;
