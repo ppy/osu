@@ -66,7 +66,10 @@ namespace osu.Game.Database
         /// </summary>
         private readonly SemaphoreSlim realmRetrievalLock = new SemaphoreSlim(1);
 
-        private readonly ThreadLocal<bool> currentThreadCanCreateRealmInstances = new ThreadLocal<bool>();
+        /// <summary>
+        /// <c>true</c> when the current thread has already entered the <see cref="realmRetrievalLock"/>.
+        /// </summary>
+        private readonly ThreadLocal<bool> currentThreadHasRealmRetrievalLock = new ThreadLocal<bool>();
 
         /// <summary>
         /// Holds a map of functions registered via <see cref="RegisterCustomSubscription"/> and <see cref="RegisterForNotifications{T}"/> and a coinciding action which when triggered,
@@ -584,10 +587,11 @@ namespace osu.Game.Database
 
             try
             {
-                if (!currentThreadCanCreateRealmInstances.Value)
+                // Ensure that the thread that currently has the `realmRetrievalLock` can retrieve nested contexts and not deadlock on itself.
+                if (!currentThreadHasRealmRetrievalLock.Value)
                 {
                     realmRetrievalLock.Wait();
-                    currentThreadCanCreateRealmInstances.Value = true;
+                    currentThreadHasRealmRetrievalLock.Value = true;
                     tookSemaphoreLock = true;
                 }
                 else
@@ -611,7 +615,7 @@ namespace osu.Game.Database
                 if (tookSemaphoreLock)
                 {
                     realmRetrievalLock.Release();
-                    currentThreadCanCreateRealmInstances.Value = false;
+                    currentThreadHasRealmRetrievalLock.Value = false;
                 }
             }
         }
