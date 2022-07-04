@@ -184,14 +184,14 @@ namespace osu.Game.Database
 
                     // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
                     if (!storage.Exists(newerVersionFilename))
-                        CreateBackup(newerVersionFilename);
+                        createBackup(newerVersionFilename);
 
                     storage.Delete(Filename);
                 }
                 else
                 {
                     Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
-                    CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
+                    createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
                     storage.Delete(Filename);
                 }
 
@@ -236,7 +236,7 @@ namespace osu.Game.Database
             }
 
             // For extra safety, also store the temporarily-used database which we are about to replace.
-            CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_newer_version_before_recovery{realm_extension}");
+            createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_newer_version_before_recovery{realm_extension}");
 
             storage.Delete(Filename);
 
@@ -778,28 +778,37 @@ namespace osu.Game.Database
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
-        public void CreateBackup(string backupFilename, IDisposable? blockAllOperations = null)
+        /// <summary>
+        /// Create a full realm backup.
+        /// </summary>
+        /// <param name="backupFilename">The filename for the backup.</param>
+        public void CreateBackup(string backupFilename)
         {
-            using (blockAllOperations ?? BlockAllOperations("creating backup"))
+            if (realmRetrievalLock.CurrentCount != 0)
+                throw new InvalidOperationException($"Call {nameof(BlockAllOperations)} before creating a backup.");
+
+            createBackup(backupFilename);
+        }
+
+        private void createBackup(string backupFilename)
+        {
+            Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
+
+            int attempts = 10;
+
+            while (attempts-- > 0)
             {
-                Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
-
-                int attempts = 10;
-
-                while (attempts-- > 0)
+                try
                 {
-                    try
-                    {
-                        using (var source = storage.GetStream(Filename, mode: FileMode.Open))
-                        using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
-                            source.CopyTo(destination);
-                        return;
-                    }
-                    catch (IOException)
-                    {
-                        // file may be locked during use.
-                        Thread.Sleep(500);
-                    }
+                    using (var source = storage.GetStream(Filename, mode: FileMode.Open))
+                    using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                        source.CopyTo(destination);
+                    return;
+                }
+                catch (IOException)
+                {
+                    // file may be locked during use.
+                    Thread.Sleep(500);
                 }
             }
         }
