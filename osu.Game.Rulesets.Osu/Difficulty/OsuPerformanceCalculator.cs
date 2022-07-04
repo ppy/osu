@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(h => h is OsuModRelax))
             {
-                // https://www.desmos.com/calculator/adhhgjtuyp
+                // https://www.desmos.com/calculator/bc9eybdthb
                 double okMultiplier = Math.Max(0.0, osuAttributes.OverallDifficulty > 0.0 ? 1 - Math.Pow(osuAttributes.OverallDifficulty / 13.33, 1.8) : 1.0);
                 double mehMultiplier = Math.Max(0.0, osuAttributes.OverallDifficulty > 0.0 ? 1 - Math.Pow(osuAttributes.OverallDifficulty / 13.33, 5) : 1.0);
 
