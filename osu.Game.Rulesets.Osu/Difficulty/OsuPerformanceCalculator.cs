@@ -52,9 +52,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax))
             {
                 // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
-                effectiveMissCount = Math.Min(effectiveMissCount + countOk + countMeh, totalHits);
+                effectiveMissCount = Math.Min(effectiveMissCount + countOk * 0.33 + countMeh * 0.66, totalHits);
 
-                multiplier *= 0.6;
+                multiplier *= 0.7;
             }
 
             double aimValue = computeAimValue(score, osuAttributes);
@@ -105,6 +105,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (attributes.ApproachRate < 8.0)
                 approachRateFactor = 0.1 * (8.0 - attributes.ApproachRate);
 
+            if (score.Mods.Any(h => h is OsuModRelax))
+                approachRateFactor = 0.0;
+
             aimValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
             if (score.Mods.Any(m => m is OsuModBlinds))
@@ -134,6 +137,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
+            if (score.Mods.Any(h => h is OsuModRelax))
+                return 0.0;
+
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
