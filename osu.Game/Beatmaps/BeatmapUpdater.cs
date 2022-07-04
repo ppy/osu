@@ -34,6 +34,14 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Queue a beatmap for background processing.
         /// </summary>
+        public void Queue(int beatmapSetId)
+        {
+            // TODO: implement
+        }
+
+        /// <summary>
+        /// Queue a beatmap for background processing.
+        /// </summary>
         public void Queue(Live<BeatmapSetInfo> beatmap)
         {
             // For now, just fire off a task.
@@ -44,7 +52,13 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Run all processing on a beatmap immediately.
         /// </summary>
-        public void Process(BeatmapSetInfo beatmapSet) => beatmapSet.Realm.Write(r => Process(beatmapSet, r));
+        public void Process(BeatmapSetInfo beatmapSet)
+        {
+            if (beatmapSet.Realm.IsInTransaction)
+                Process(beatmapSet, beatmapSet.Realm);
+            else
+                beatmapSet.Realm.Write(r => Process(beatmapSet, r));
+        }
 
         public void Process(BeatmapSetInfo beatmapSet, Realm realm)
         {
