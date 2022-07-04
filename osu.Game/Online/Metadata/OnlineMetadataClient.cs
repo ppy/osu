@@ -1,10 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 
@@ -15,6 +16,8 @@ namespace osu.Game.Online.Metadata
         private readonly string endpoint;
 
         private IHubClientConnector? connector;
+
+        private uint? lastQueueId;
 
         private HubConnection? connection => connector?.CurrentConnection;
 
@@ -38,18 +41,78 @@ namespace osu.Game.Online.Metadata
                     // https://github.com/dotnet/aspnetcore/issues/15198
                     connection.On<BeatmapUpdates>(nameof(IMetadataClient.BeatmapSetsUpdated), ((IMetadataClient)this).BeatmapSetsUpdated);
                 };
+
+                connector.IsConnected.BindValueChanged(isConnectedChanged, true);
             }
         }
 
-        public override Task BeatmapSetsUpdated(BeatmapUpdates updates)
+        private bool catchingUp;
+
+        private void isConnectedChanged(ValueChangedEvent<bool> connected)
+        {
+            if (!connected.NewValue)
+                return;
+
+            if (lastQueueId != null)
+            {
+                catchingUp = true;
+
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        while (true)
+                        {
+                            Logger.Log($"Requesting catch-up from {lastQueueId.Value}");
+                            var catchUpChanges = await GetChangesSince(lastQueueId.Value);
+
+                            lastQueueId = catchUpChanges.LastProcessedQueueID;
+
+                            if (catchUpChanges.BeatmapSetIDs.Length == 0)
+                            {
+                                Logger.Log($"Catch-up complete at {lastQueueId.Value}");
+                                break;
+                            }
+
+                            await ProcessChanges(catchUpChanges.BeatmapSetIDs);
+                        }
+                    }
+                    finally
+                    {
+                        catchingUp = false;
+                    }
+                });
+            }
+        }
+
+        public override async Task BeatmapSetsUpdated(BeatmapUpdates updates)
         {
             Logger.Log($"Received beatmap updates {updates.BeatmapSetIDs.Length} updates with last id {updates.LastProcessedQueueID}");
+
+            // If we're still catching up, avoid updating the last ID as it will interfere with catch-up efforts.
+            if (!catchingUp)
+                lastQueueId = updates.LastProcessedQueueID;
+
+            await ProcessChanges(updates.BeatmapSetIDs);
+        }
+
+        protected Task ProcessChanges(int[] beatmapSetIDs)
+        {
+            foreach (int id in beatmapSetIDs)
+                Logger.Log($"Processing {id}...");
             return Task.CompletedTask;
         }
 
         public override Task<BeatmapUpdates> GetChangesSince(uint queueId)
         {
-            throw new NotImplementedException();
+            if (connector?.IsConnected.Value != true)
+                return Task.FromCanceled<BeatmapUpdates>(default);
+
+            Logger.Log($"Requesting any changes since last known queue id {queueId}");
+
+            Debug.Assert(connection != null);
+
+            return connection.InvokeAsync<BeatmapUpdates>(nameof(IMetadataServer.GetChangesSince), queueId);
         }
 
         protected override void Dispose(bool isDisposing)
