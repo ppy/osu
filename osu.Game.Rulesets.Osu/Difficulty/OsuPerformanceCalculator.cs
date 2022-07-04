@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
-            double multiplier = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+            double multiplier = 1.11; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
