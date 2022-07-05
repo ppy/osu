@@ -49,6 +49,7 @@ namespace osu.Game.Overlays.Login
             RelativeSizeAxes = Axes.X;
 
             ErrorTextFlowContainer errorText;
+            LinkFlowContainer forgottenPaswordLink;
 
             Children = new Drawable[]
             {
@@ -80,6 +81,12 @@ namespace osu.Game.Overlays.Login
                     LabelText = "Stay signed in",
                     Current = config.GetBindable<bool>(OsuSetting.SavePassword),
                 },
+                forgottenPaswordLink = new LinkFlowContainer
+                {
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -108,6 +115,8 @@ namespace osu.Game.Overlays.Login
                     }
                 }
             };
+
+            forgottenPaswordLink.AddLink(LayoutStrings.PopupLoginLoginForgot, "https://osu.ppy.sh/home/password-reset");
 
             password.OnCommit += (_, _) => performLogin();
 
