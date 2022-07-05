@@ -16,6 +16,6 @@ namespace osu.Game.Online.Metadata
         /// </summary>
         /// <param name="queueId">The last processed queue ID.</param>
         /// <returns></returns>
-        Task<BeatmapUpdates> GetChangesSince(uint queueId);
+        Task<BeatmapUpdates> GetChangesSince(int queueId);
     }
 }
