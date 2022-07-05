@@ -920,6 +920,8 @@ namespace osu.Game.Database
 
             void restoreOperation()
             {
+                // Release of lock needs to happen here rather than on the update thread, as there may be another
+                // operation already blocking the update thread waiting for the blocking operation to complete.
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
                 realmRetrievalLock.Release();
 
