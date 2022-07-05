@@ -9,7 +9,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
 
         public bool isIdenticalTo(ColourEncoding other)
         {
-            return other.Payload[0].RunLength == Payload[0].RunLength &&
+            return hasIdenticalMonoLength(other) &&
+                other.Payload.Count == Payload.Count &&
                 other.Payload[0].EncodedData[0].HitType == Payload[0].EncodedData[0].HitType;
         }
 

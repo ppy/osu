@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// </summary>
     public class Colour : StrainDecaySkill
     {
-        protected override double SkillMultiplier => 0.7;
-        protected override double StrainDecayBase => 0.4;
+        protected override double SkillMultiplier => 0.2;
+        protected override double StrainDecayBase => 0.8;
 
         /// <summary>
         /// Applies a speed bonus dependent on the time since the last hit.
