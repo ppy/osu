@@ -137,6 +137,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 this.ScaleTo(initial_scale);
                 this.RotateTo(0);
 
+                updateComplete(false, 0);
+
                 using (BeginDelayedSequence(spinner.TimePreempt / 2))
                 {
                     // constant ambient rotation to give the spinner "spinning" character.
@@ -177,9 +179,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 }
             }
 
-            // transforms we have from completing the spinner will be rolled back, so reapply immediately.
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
-                updateComplete(state == ArmedState.Hit, 0);
+            if (drawableSpinner.Result?.TimeCompleted is double completionTime)
+            {
+                using (BeginAbsoluteSequence(completionTime))
+                    updateComplete(true, 200);
+            }
         }
 
         private void updateComplete(bool complete, double duration)
