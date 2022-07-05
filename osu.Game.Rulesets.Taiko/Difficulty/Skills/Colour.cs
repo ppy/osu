@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
@@ -15,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// </summary>
     public class Colour : StrainDecaySkill
     {
-        protected override double SkillMultiplier => 1;
+        protected override double SkillMultiplier => 0.7;
         protected override double StrainDecayBase => 0.4;
 
         /// <summary>
@@ -38,6 +40,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return difficulty;
         }
 
+        public static String GetDebugHeaderLabels()
+        {
+            return "StartTime,Raw,Decayed,CoupledRunLength,RepetitionInterval,EncodingRunLength,Payload(MonoRunLength|MonoCount)";
+        }
+
         // TODO: Remove befor pr
         public string GetDebugString(DifficultyHitObject current)
         {
@@ -47,18 +54,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             TaikoDifficultyHitObjectColour? colour = taikoCurrent?.Colour;
             if (taikoCurrent != null && colour != null)
             {
-                ColourEncoding[] payload = colour.Encoding.Payload;
+                List<ColourEncoding> payload = colour.Encoding.Payload;
                 string payloadDisplay = "";
-                for (int i = 0; i < payload.Length; ++i)
+                for (int i = 0; i < payload.Count; ++i)
                 {
-                    payloadDisplay += $"({payload[i].MonoRunLength}|{payload[i].EncodingRunLength})";
+                    payloadDisplay += $"({payload[i].Payload[0].RunLength}|{payload[i].Payload.Count})";
                 }
 
-                return $"{current.StartTime},{difficulty},{CurrentStrain},{colour.RepetitionInterval},{colour.Encoding.RunLength},{payloadDisplay}";
+                return $"{current.StartTime},{difficulty},{CurrentStrain},{colour.Encoding.Payload[0].Payload.Count},{colour.Encoding.RepetitionInterval},{colour.Encoding.Payload.Count},{payloadDisplay}";
             }
             else
             {
-                return $"{current.StartTime},{difficulty},{CurrentStrain},0,0,0";
+                return $"{current.StartTime},{difficulty},{CurrentStrain},0,0,0,0,0";
             }
         }
     }

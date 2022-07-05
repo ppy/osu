@@ -38,10 +38,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             if (debugColour)
             {
-                String filename = $"{beatmap.BeatmapInfo.Metadata.Title}[{beatmap.BeatmapInfo.DifficultyName}].csv";
+                String filename = $"{beatmap.BeatmapInfo.OnlineID} - {beatmap.BeatmapInfo.Metadata.Title}[{beatmap.BeatmapInfo.DifficultyName}].csv";
                 filename = filename.Replace('/', '_');
                 colourDebugOutput = new StreamWriter(File.OpenWrite($"/run/mount/secondary/workspace/osu/output/colour-debug/{filename}"));
-                colourDebugOutput.WriteLine("StartTime,Raw,Decayed,RepetitionInterval,EncodingRunLength,Payload");
+                colourDebugOutput.WriteLine(Colour.GetDebugHeaderLabels());
             }
 
         }

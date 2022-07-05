@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
@@ -63,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                         centreObjects, rimObjects, noteObjects, difficultyHitObjects.Count)
                 );
             }
-            TaikoDifficultyHitObjectColour.EncodeAndAssign(difficultyHitObjects);
+            var encoded = TaikoDifficultyHitObjectColour.EncodeAndAssign(difficultyHitObjects);
 
             return difficultyHitObjects;
         }
