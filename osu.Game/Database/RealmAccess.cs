@@ -66,7 +66,10 @@ namespace osu.Game.Database
         /// </summary>
         private readonly SemaphoreSlim realmRetrievalLock = new SemaphoreSlim(1);
 
-        private readonly ThreadLocal<bool> currentThreadCanCreateRealmInstances = new ThreadLocal<bool>();
+        /// <summary>
+        /// <c>true</c> when the current thread has already entered the <see cref="realmRetrievalLock"/>.
+        /// </summary>
+        private readonly ThreadLocal<bool> currentThreadHasRealmRetrievalLock = new ThreadLocal<bool>();
 
         /// <summary>
         /// Holds a map of functions registered via <see cref="RegisterCustomSubscription"/> and <see cref="RegisterForNotifications{T}"/> and a coinciding action which when triggered,
@@ -584,10 +587,11 @@ namespace osu.Game.Database
 
             try
             {
-                if (!currentThreadCanCreateRealmInstances.Value)
+                // Ensure that the thread that currently has the `realmRetrievalLock` can retrieve nested contexts and not deadlock on itself.
+                if (!currentThreadHasRealmRetrievalLock.Value)
                 {
                     realmRetrievalLock.Wait();
-                    currentThreadCanCreateRealmInstances.Value = true;
+                    currentThreadHasRealmRetrievalLock.Value = true;
                     tookSemaphoreLock = true;
                 }
                 else
@@ -611,7 +615,7 @@ namespace osu.Game.Database
                 if (tookSemaphoreLock)
                 {
                     realmRetrievalLock.Release();
-                    currentThreadCanCreateRealmInstances.Value = false;
+                    currentThreadHasRealmRetrievalLock.Value = false;
                 }
             }
         }
@@ -916,16 +920,39 @@ namespace osu.Game.Database
 
             void restoreOperation()
             {
+                // Release of lock needs to happen here rather than on the update thread, as there may be another
+                // operation already blocking the update thread waiting for the blocking operation to complete.
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
                 realmRetrievalLock.Release();
+
+                if (syncContext == null) return;
+
+                ManualResetEventSlim updateRealmReestablished = new ManualResetEventSlim();
 
                 // Post back to the update thread to revive any subscriptions.
                 // In the case we are on the update thread, let's also require this to run synchronously.
                 // This requirement is mostly due to test coverage, but shouldn't cause any harm.
                 if (ThreadSafety.IsUpdateThread)
-                    syncContext?.Send(_ => ensureUpdateRealm(), null);
+                {
+                    syncContext.Send(_ =>
+                    {
+                        ensureUpdateRealm();
+                        updateRealmReestablished.Set();
+                    }, null);
+                }
                 else
-                    syncContext?.Post(_ => ensureUpdateRealm(), null);
+                {
+                    syncContext.Post(_ =>
+                    {
+                        ensureUpdateRealm();
+                        updateRealmReestablished.Set();
+                    }, null);
+                }
+
+                // Wait for the post to complete to ensure a second `Migrate` operation doesn't start in the mean time.
+                // This is important to ensure `ensureUpdateRealm` is run before another blocking migration operation starts.
+                if (!updateRealmReestablished.Wait(10000))
+                    throw new TimeoutException(@"Reestablishing update realm after block took too long");
             }
         }
 
