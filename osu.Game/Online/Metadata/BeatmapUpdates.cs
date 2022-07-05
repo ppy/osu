@@ -17,9 +17,9 @@ namespace osu.Game.Online.Metadata
         public int[] BeatmapSetIDs { get; set; }
 
         [Key(1)]
-        public uint LastProcessedQueueID { get; set; }
+        public int LastProcessedQueueID { get; set; }
 
-        public BeatmapUpdates(int[] beatmapSetIDs, uint lastProcessedQueueID)
+        public BeatmapUpdates(int[] beatmapSetIDs, int lastProcessedQueueID)
         {
             BeatmapSetIDs = beatmapSetIDs;
             LastProcessedQueueID = lastProcessedQueueID;

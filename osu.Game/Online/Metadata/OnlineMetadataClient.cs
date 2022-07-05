@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 
 namespace osu.Game.Online.Metadata
@@ -19,7 +20,7 @@ namespace osu.Game.Online.Metadata
 
         private IHubClientConnector? connector;
 
-        private uint? lastQueueId;
+        private Bindable<int> lastQueueId = null!;
 
         private HubConnection? connection => connector?.CurrentConnection;
 
@@ -30,7 +31,7 @@ namespace osu.Game.Online.Metadata
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        private void load(IAPIProvider api, OsuConfigManager config)
         {
             // Importantly, we are intentionally not using MessagePack here to correctly support derived class serialization.
             // More information on the limitations / reasoning can be found in osu-server-spectator's initialisation code.
@@ -47,6 +48,8 @@ namespace osu.Game.Online.Metadata
 
                 connector.IsConnected.BindValueChanged(isConnectedChanged, true);
             }
+
+            lastQueueId = config.GetBindable<int>(OsuSetting.LastProcessedMetadataId);
         }
 
         private bool catchingUp;
@@ -56,7 +59,7 @@ namespace osu.Game.Online.Metadata
             if (!connected.NewValue)
                 return;
 
-            if (lastQueueId != null)
+            if (lastQueueId.Value >= 0)
             {
                 catchingUp = true;
 
@@ -69,7 +72,7 @@ namespace osu.Game.Online.Metadata
                             Logger.Log($"Requesting catch-up from {lastQueueId.Value}");
                             var catchUpChanges = await GetChangesSince(lastQueueId.Value);
 
-                            lastQueueId = catchUpChanges.LastProcessedQueueID;
+                            lastQueueId.Value = catchUpChanges.LastProcessedQueueID;
 
                             if (catchUpChanges.BeatmapSetIDs.Length == 0)
                             {
@@ -94,7 +97,7 @@ namespace osu.Game.Online.Metadata
 
             // If we're still catching up, avoid updating the last ID as it will interfere with catch-up efforts.
             if (!catchingUp)
-                lastQueueId = updates.LastProcessedQueueID;
+                lastQueueId.Value = updates.LastProcessedQueueID;
 
             await ProcessChanges(updates.BeatmapSetIDs);
         }
@@ -110,7 +113,7 @@ namespace osu.Game.Online.Metadata
             return Task.CompletedTask;
         }
 
-        public override Task<BeatmapUpdates> GetChangesSince(uint queueId)
+        public override Task<BeatmapUpdates> GetChangesSince(int queueId)
         {
             if (connector?.IsConnected.Value != true)
                 return Task.FromCanceled<BeatmapUpdates>(default);

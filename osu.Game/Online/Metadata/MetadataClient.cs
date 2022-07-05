@@ -10,6 +10,6 @@ namespace osu.Game.Online.Metadata
     {
         public abstract Task BeatmapSetsUpdated(BeatmapUpdates updates);
 
-        public abstract Task<BeatmapUpdates> GetChangesSince(uint queueId);
+        public abstract Task<BeatmapUpdates> GetChangesSince(int queueId);
     }
 }
