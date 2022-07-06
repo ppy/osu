@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -11,7 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Overlays.Settings;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osuTK;
@@ -244,7 +246,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep($"Set {name} slider to {value}", () =>
                 this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText == name)
-                    .ChildrenOfType<SettingsSlider<float>>().First().Current.Value = value);
+                    .ChildrenOfType<OsuSliderBar<float>>().First().Current.Value = value);
         }
 
         private void checkBindableAtValue(string name, float? expectedValue)
@@ -258,7 +260,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddAssert($"Slider {name} at {expectedValue}", () =>
                 this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText == name)
-                    .ChildrenOfType<SettingsSlider<float>>().First().Current.Value == expectedValue);
+                    .ChildrenOfType<OsuSliderBar<float>>().First().Current.Value == expectedValue);
         }
 
         private void setBeatmapWithDifficultyParameters(float value)

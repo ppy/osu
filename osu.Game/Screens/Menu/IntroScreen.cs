@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -17,7 +19,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -62,6 +63,8 @@ namespace osu.Game.Screens.Menu
         private ISample seeya;
 
         protected virtual string SeeyaSampleName => "Intro/seeya";
+
+        protected override bool PlayExitSound => false;
 
         private LeasedBindable<WorkingBeatmap> beatmap;
 
@@ -137,7 +140,7 @@ namespace osu.Game.Screens.Menu
                 {
                     // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
                     // this could happen if a user has nuked their files store. for now, reimport to repair this.
-                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
+                    var import = beatmaps.Import(new ImportTask(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
 
                     import?.PerformWrite(b => b.Protected = true);
 

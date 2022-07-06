@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +54,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 notificationOverlay.Reset();
 
                 performer.Setup(g => g.PerformFromScreen(It.IsAny<Action<IScreen>>(), It.IsAny<IEnumerable<Type>>()))
-                         .Callback((Action<IScreen> action, IEnumerable<Type> types) => action(null));
+                         .Callback((Action<IScreen> action, IEnumerable<Type> _) => action(null));
 
                 notificationOverlay.Setup(n => n.Post(It.IsAny<Notification>()))
                                    .Callback((Notification n) => lastNotification = n);

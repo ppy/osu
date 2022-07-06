@@ -5,8 +5,6 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Resources.Localisation.Web;
 
-#nullable enable
-
 namespace osu.Game.Overlays.BeatmapSet
 {
     public class SpotlightBeatmapBadge : BeatmapBadge
@@ -15,7 +13,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OsuColour colours)
         {
             BadgeText = BeatmapsetsStrings.SpotlightBadgeLabel;
-            BadgeColour = colours.Pink1;
+            BadgeColour = colours.SpotlightColour;
             // todo: add linking support to allow redirecting spotlight badge to https://osu.ppy.sh/wiki/en/Beatmap_Spotlights.
         }
     }

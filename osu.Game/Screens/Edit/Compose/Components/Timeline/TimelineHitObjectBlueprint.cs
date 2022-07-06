@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -203,7 +205,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     updateRepeats(repeats);
             }
 
-            if (difficultyControlPoint != Item.DifficultyControlPoint)
+            if (!ReferenceEquals(difficultyControlPoint, Item.DifficultyControlPoint))
             {
                 difficultyControlPoint = Item.DifficultyControlPoint;
                 difficultyOverrideDisplay?.Expire();
@@ -218,7 +220,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             }
 
-            if (sampleControlPoint != Item.SampleControlPoint)
+            if (!ReferenceEquals(sampleControlPoint, Item.SampleControlPoint))
             {
                 sampleControlPoint = Item.SampleControlPoint;
                 sampleOverrideDisplay?.Expire();
@@ -391,7 +393,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                                 if (e.CurrentState.Keyboard.ShiftPressed)
                                 {
-                                    if (hitObject.DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                                    if (ReferenceEquals(hitObject.DifficultyControlPoint, DifficultyControlPoint.DEFAULT))
                                         hitObject.DifficultyControlPoint = new DifficultyControlPoint();
 
                                     double newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);

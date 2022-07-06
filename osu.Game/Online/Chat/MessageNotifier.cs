@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -77,7 +79,7 @@ namespace osu.Game.Online.Chat
             if (!messages.Any())
                 return;
 
-            var channel = channelManager.JoinedChannels.SingleOrDefault(c => c.Id == messages.First().ChannelId);
+            var channel = channelManager.JoinedChannels.SingleOrDefault(c => c.Id > 0 && c.Id == messages.First().ChannelId);
 
             if (channel == null)
                 return;

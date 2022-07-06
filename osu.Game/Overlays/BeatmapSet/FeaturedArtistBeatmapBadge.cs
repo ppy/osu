@@ -5,8 +5,6 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Resources.Localisation.Web;
 
-#nullable enable
-
 namespace osu.Game.Overlays.BeatmapSet
 {
     public class FeaturedArtistBeatmapBadge : BeatmapBadge
@@ -15,7 +13,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OsuColour colours)
         {
             BadgeText = BeatmapsetsStrings.FeaturedArtistBadgeLabel;
-            BadgeColour = colours.Blue1;
+            BadgeColour = colours.FeaturedArtistColour;
             // todo: add linking support to allow redirecting featured artist badge to corresponding track.
         }
     }

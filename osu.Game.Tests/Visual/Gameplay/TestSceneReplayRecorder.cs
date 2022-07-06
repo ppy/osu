@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -14,16 +15,15 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Graphics;
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestReplayRecorder recorder;
 
         [Cached]
-        private GameplayState gameplayState = new GameplayState(new Beatmap(), new OsuRuleset(), Array.Empty<Mod>());
+        private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
         [SetUpSteps]
         public void SetUpSteps()

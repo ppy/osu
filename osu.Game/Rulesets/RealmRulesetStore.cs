@@ -9,8 +9,6 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
 
-#nullable enable
-
 namespace osu.Game.Rulesets
 {
     public class RealmRulesetStore : RulesetStore

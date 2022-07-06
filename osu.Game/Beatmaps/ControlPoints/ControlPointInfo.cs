@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -252,12 +254,12 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             switch (newPoint)
             {
-                case TimingControlPoint _:
+                case TimingControlPoint:
                     // Timing points are a special case and need to be added regardless of fallback availability.
                     existing = BinarySearch(TimingPoints, time);
                     break;
 
-                case EffectControlPoint _:
+                case EffectControlPoint:
                     existing = EffectPointAt(time);
                     break;
             }

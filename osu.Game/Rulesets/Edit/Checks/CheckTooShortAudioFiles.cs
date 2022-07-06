@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -63,7 +65,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        private bool hasAudioExtension(string filename) => audioExtensions.Any(filename.ToLower().EndsWith);
+        private bool hasAudioExtension(string filename) => audioExtensions.Any(filename.ToLowerInvariant().EndsWith);
         private bool probablyHasAudioData(Stream data) => data.Length > min_bytes_threshold;
 
         public class IssueTemplateTooShort : IssueTemplate

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,13 +18,15 @@ namespace osu.Game.Screens.Edit.Components
     /// </summary>
     internal class EditorSidebar : Container<EditorSidebarSection>
     {
+        public const float WIDTH = 250;
+
         private readonly Box background;
 
         protected override Container<EditorSidebarSection> Content { get; }
 
         public EditorSidebar()
         {
-            Width = 250;
+            Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]

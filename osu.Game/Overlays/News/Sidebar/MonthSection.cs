@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -18,7 +20,6 @@ using System.Diagnostics;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Platform;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
@@ -129,7 +130,6 @@ namespace osu.Game.Overlays.News.Sidebar
             private readonly APINewsPost post;
 
             public PostButton(APINewsPost post)
-                : base(HoverSampleSet.Submit)
             {
                 this.post = post;
 

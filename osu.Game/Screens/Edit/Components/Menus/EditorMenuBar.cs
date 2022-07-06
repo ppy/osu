@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -110,8 +112,28 @@ namespace osu.Game.Screens.Edit.Components.Menus
                     case EditorMenuItemSpacer spacer:
                         return new DrawableSpacer(spacer);
 
+                    case StatefulMenuItem stateful:
+                        return new EditorStatefulMenuItem(stateful);
+
                     default:
                         return new EditorMenuItem(item);
+                }
+            }
+
+            private class EditorStatefulMenuItem : DrawableStatefulMenuItem
+            {
+                public EditorStatefulMenuItem(StatefulMenuItem item)
+                    : base(item)
+                {
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    BackgroundColour = colourProvider.Background2;
+                    BackgroundColourHover = colourProvider.Background1;
+
+                    Foreground.Padding = new MarginPadding { Vertical = 2 };
                 }
             }
 

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -154,12 +152,15 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             var downloadTracker = tutorialDownloader.DownloadTrackers.First();
 
+            downloadTracker.State.BindValueChanged(state =>
+            {
+                if (state.NewValue == DownloadState.LocallyAvailable)
+                    downloadTutorialButton.Complete();
+            }, true);
+
             downloadTracker.Progress.BindValueChanged(progress =>
             {
                 downloadTutorialButton.SetProgress(progress.NewValue, false);
-
-                if (progress.NewValue == 1)
-                    downloadTutorialButton.Complete();
             }, true);
         }
 

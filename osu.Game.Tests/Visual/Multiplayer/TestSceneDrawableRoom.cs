@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -124,13 +126,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Status = { Value = new RoomStatusOpen() },
                             Category = { Value = RoomCategory.Spotlight },
                         }),
+                        createLoungeRoom(new Room
+                        {
+                            Name = { Value = "Featured artist room" },
+                            Status = { Value = new RoomStatusOpen() },
+                            Category = { Value = RoomCategory.FeaturedArtist },
+                        }),
                     }
                 };
             });
 
-            AddUntilStep("wait for panel load", () => rooms.Count == 5);
+            AddUntilStep("wait for panel load", () => rooms.Count == 6);
             AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Currently playing", StringComparison.Ordinal)) == 2);
-            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)) == 3);
+            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)) == 4);
         }
 
         [Test]

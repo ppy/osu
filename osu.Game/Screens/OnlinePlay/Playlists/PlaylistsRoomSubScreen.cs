@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -66,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 }
             }, true);
 
-            Room.MaxAttempts.BindValueChanged(attempts => progressSection.Alpha = Room.MaxAttempts.Value != null ? 1 : 0, true);
+            Room.MaxAttempts.BindValueChanged(_ => progressSection.Alpha = Room.MaxAttempts.Value != null ? 1 : 0, true);
         }
 
         protected override Drawable CreateMainContent() => new Container

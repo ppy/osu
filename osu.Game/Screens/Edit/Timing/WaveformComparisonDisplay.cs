@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -14,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
@@ -25,6 +24,8 @@ namespace osu.Game.Screens.Edit.Timing
     internal class WaveformComparisonDisplay : CompositeDrawable
     {
         private const int total_waveforms = 8;
+
+        private const float corner_radius = LabelledDrawable<Drawable>.CORNER_RADIUS;
 
         private readonly BindableNumber<double> beatLength = new BindableDouble();
 
@@ -42,18 +43,22 @@ namespace osu.Game.Screens.Edit.Timing
 
         private TimingControlPoint timingPoint = TimingControlPoint.DEFAULT;
 
-        private int lastDisplayedBeatIndex;
+        private double displayedTime;
 
         private double selectedGroupStartTime;
         private double selectedGroupEndTime;
 
         private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
+        private readonly BindableBool displayLocked = new BindableBool();
+
+        private LockedOverlay lockedOverlay = null!;
+
         public WaveformComparisonDisplay()
         {
             RelativeSizeAxes = Axes.Both;
 
-            CornerRadius = LabelledDrawable<Drawable>.CORNER_RADIUS;
+            CornerRadius = corner_radius;
             Masking = true;
         }
 
@@ -63,7 +68,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             for (int i = 0; i < total_waveforms; i++)
             {
-                AddInternal(new WaveformRow
+                AddInternal(new WaveformRow(i == total_waveforms / 2)
                 {
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
@@ -81,71 +86,111 @@ namespace osu.Game.Screens.Edit.Timing
                 Width = 3,
             });
 
+            AddInternal(lockedOverlay = new LockedOverlay());
+
             selectedGroup.BindValueChanged(_ => updateTimingGroup(), true);
 
             controlPointGroups.BindTo(editorBeatmap.ControlPointInfo.Groups);
-            controlPointGroups.BindCollectionChanged((_, __) => updateTimingGroup());
+            controlPointGroups.BindCollectionChanged((_, _) => updateTimingGroup());
 
-            beatLength.BindValueChanged(_ => showFrom(lastDisplayedBeatIndex), true);
+            beatLength.BindValueChanged(_ => regenerateDisplay(true), true);
+
+            displayLocked.BindValueChanged(locked =>
+            {
+                if (locked.NewValue)
+                    lockedOverlay.Show();
+                else
+                    lockedOverlay.Hide();
+            }, true);
         }
 
         private void updateTimingGroup()
         {
             beatLength.UnbindBindings();
 
-            selectedGroupStartTime = 0;
-            selectedGroupEndTime = beatmap.Value.Track.Length;
-
             var tcp = selectedGroup.Value?.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
             if (tcp == null)
             {
                 timingPoint = new TimingControlPoint();
+                // During movement of a control point's offset, this clause can be hit momentarily,
+                // as moving a control point is implemented by removing it and inserting it at the new time.
+                // We don't want to reset the `selectedGroupStartTime` here as we rely on having the
+                // last value to update the waveform display below.
+                selectedGroupEndTime = beatmap.Value.Track.Length;
                 return;
             }
 
             timingPoint = tcp;
             beatLength.BindTo(timingPoint.BeatLengthBindable);
 
-            selectedGroupStartTime = selectedGroup.Value?.Time ?? 0;
+            double? newStartTime = selectedGroup.Value?.Time;
+            double? offsetChange = newStartTime - selectedGroupStartTime;
 
             var nextGroup = editorBeatmap.ControlPointInfo.TimingPoints
-                                         .SkipWhile(g => g != tcp)
+                                         .SkipWhile(g => !ReferenceEquals(g, tcp))
                                          .Skip(1)
                                          .FirstOrDefault();
 
-            if (nextGroup != null)
-                selectedGroupEndTime = nextGroup.Time;
+            selectedGroupStartTime = newStartTime ?? 0;
+            selectedGroupEndTime = nextGroup?.Time ?? beatmap.Value.Track.Length;
+
+            if (newStartTime.HasValue && offsetChange.HasValue)
+            {
+                // The offset of the selected point may have changed.
+                // This handles the case the user has locked the view and expects the display to update with this change.
+                showFromTime(displayedTime + offsetChange.Value, true);
+            }
         }
 
         protected override bool OnHover(HoverEvent e) => true;
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            float trackLength = (float)beatmap.Value.Track.Length;
-            int totalBeatsAvailable = (int)(trackLength / timingPoint.BeatLength);
+            if (!displayLocked.Value)
+            {
+                float trackLength = (float)beatmap.Value.Track.Length;
+                int totalBeatsAvailable = (int)(trackLength / timingPoint.BeatLength);
 
-            Scheduler.AddOnce(showFrom, (int)(e.MousePosition.X / DrawWidth * totalBeatsAvailable));
+                Scheduler.AddOnce(showFromBeat, (int)(e.MousePosition.X / DrawWidth * totalBeatsAvailable));
+            }
 
             return base.OnMouseMove(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            displayLocked.Toggle();
+            return true;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (!IsHovered)
+            if (!IsHovered && !displayLocked.Value)
             {
                 int currentBeat = (int)Math.Floor((editorClock.CurrentTimeAccurate - selectedGroupStartTime) / timingPoint.BeatLength);
 
-                showFrom(currentBeat);
+                showFromBeat(currentBeat);
             }
         }
 
-        private void showFrom(int beatIndex)
+        private void showFromBeat(int beatIndex) =>
+            showFromTime(selectedGroupStartTime + beatIndex * timingPoint.BeatLength, false);
+
+        private void showFromTime(double time, bool animated)
         {
-            if (lastDisplayedBeatIndex == beatIndex)
+            if (displayedTime == time)
                 return;
+
+            displayedTime = time;
+            regenerateDisplay(animated);
+        }
+
+        private void regenerateDisplay(bool animated)
+        {
+            double index = (displayedTime - selectedGroupStartTime) / timingPoint.BeatLength;
 
             // Chosen as a pretty usable number across all BPMs.
             // Optimally we'd want this to scale with the BPM in question, but performing
@@ -156,38 +201,115 @@ namespace osu.Game.Screens.Edit.Timing
             float trackLength = (float)beatmap.Value.Track.Length;
             float scale = trackLength / visible_width;
 
+            const int start_offset = total_waveforms / 2;
+
             // Start displaying from before the current beat
-            beatIndex -= total_waveforms / 2;
+            index -= start_offset;
 
             foreach (var row in InternalChildren.OfType<WaveformRow>())
             {
                 // offset to the required beat index.
-                double time = selectedGroupStartTime + beatIndex * timingPoint.BeatLength;
+                double time = selectedGroupStartTime + index * timingPoint.BeatLength;
 
                 float offset = (float)(time - visible_width / 2) / trackLength * scale;
 
                 row.Alpha = time < selectedGroupStartTime || time > selectedGroupEndTime ? 0.2f : 1;
-                row.WaveformOffset = -offset;
+                row.WaveformOffsetTo(-offset, animated);
                 row.WaveformScale = new Vector2(scale, 1);
-                row.BeatIndex = beatIndex++;
+                row.BeatIndex = (int)Math.Floor(index);
+
+                index++;
+            }
+        }
+
+        internal class LockedOverlay : CompositeDrawable
+        {
+            private OsuSpriteText text = null!;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                RelativeSizeAxes = Axes.Both;
+                Masking = true;
+                CornerRadius = corner_radius;
+                BorderColour = colours.Red;
+                BorderThickness = 3;
+                Alpha = 0;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        AlwaysPresent = true,
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                    },
+                    new Container
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                Colour = colours.Red,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            text = new OsuSpriteText
+                            {
+                                Colour = colours.GrayF,
+                                Text = "Locked",
+                                Margin = new MarginPadding(5),
+                                Shadow = false,
+                                Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
+                            }
+                        }
+                    },
+                };
             }
 
-            lastDisplayedBeatIndex = beatIndex;
+            public override void Show()
+            {
+                this.FadeIn(100, Easing.OutQuint);
+
+                text
+                    .FadeIn().Then().Delay(600)
+                    .FadeOut().Then().Delay(600)
+                    .Loop();
+            }
+
+            public override void Hide()
+            {
+                this.FadeOut(100, Easing.OutQuint);
+            }
         }
 
         internal class WaveformRow : CompositeDrawable
         {
+            private readonly bool isMainRow;
             private OsuSpriteText beatIndexText = null!;
             private WaveformGraph waveformGraph = null!;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
+            public WaveformRow(bool isMainRow)
+            {
+                this.isMainRow = isMainRow;
+            }
+
             [BackgroundDependencyLoader]
             private void load(IBindable<WorkingBeatmap> beatmap)
             {
                 InternalChildren = new Drawable[]
                 {
+                    new Box
+                    {
+                        Colour = colourProvider.Background3,
+                        Alpha = isMainRow ? 1 : 0,
+                        RelativeSizeAxes = Axes.Both,
+                    },
                     waveformGraph = new WaveformGraph
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -212,7 +334,15 @@ namespace osu.Game.Screens.Edit.Timing
 
             public int BeatIndex { set => beatIndexText.Text = value.ToString(); }
             public Vector2 WaveformScale { set => waveformGraph.Scale = value; }
-            public float WaveformOffset { set => waveformGraph.X = value; }
+
+            public void WaveformOffsetTo(float value, bool animated) =>
+                this.TransformTo(nameof(waveformOffset), value, animated ? 300 : 0, Easing.OutQuint);
+
+            private float waveformOffset
+            {
+                get => waveformGraph.X;
+                set => waveformGraph.X = value;
+            }
         }
     }
 }

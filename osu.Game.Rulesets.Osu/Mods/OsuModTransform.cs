@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -32,10 +34,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             switch (drawable)
             {
-                case DrawableSliderHead _:
-                case DrawableSliderTail _:
-                case DrawableSliderTick _:
-                case DrawableSliderRepeat _:
+                case DrawableSliderHead:
+                case DrawableSliderTail:
+                case DrawableSliderTick:
+                case DrawableSliderRepeat:
                     return;
 
                 default:

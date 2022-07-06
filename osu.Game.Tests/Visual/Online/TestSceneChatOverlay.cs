@@ -1,19 +1,24 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -21,408 +26,248 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
-using osu.Game.Overlays.Chat.Selection;
-using osu.Game.Overlays.Chat.Tabs;
+using osu.Game.Overlays.Chat.Listing;
+using osu.Game.Overlays.Chat.ChannelList;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
+    [TestFixture]
     public class TestSceneChatOverlay : OsuManualInputManagerTestScene
     {
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
 
-        private IEnumerable<Channel> visibleChannels => chatOverlay.ChannelTabControl.VisibleItems.Where(channel => channel.Name != "+");
-        private IEnumerable<Channel> joinedChannels => chatOverlay.ChannelTabControl.Items.Where(channel => channel.Name != "+");
-        private readonly List<Channel> channels;
+        private readonly APIUser testUser = new APIUser { Username = "test user", Id = 5071479 };
 
-        private Channel currentChannel => channelManager.CurrentChannel.Value;
-        private Channel nextChannel => joinedChannels.ElementAt(joinedChannels.ToList().IndexOf(currentChannel) + 1);
-        private Channel previousChannel => joinedChannels.ElementAt(joinedChannels.ToList().IndexOf(currentChannel) - 1);
-        private Channel channel1 => channels[0];
-        private Channel channel2 => channels[1];
-        private Channel channel3 => channels[2];
+        private Channel[] testChannels;
 
-        [CanBeNull]
-        private Func<Channel, List<Message>> onGetMessages;
+        private Channel testChannel1 => testChannels[0];
+        private Channel testChannel2 => testChannels[1];
 
-        public TestSceneChatOverlay()
-        {
-            channels = Enumerable.Range(1, 10)
-                                 .Select(index => new Channel(new APIUser())
-                                 {
-                                     Name = $"Channel no. {index}",
-                                     Topic = index == 3 ? null : $"We talk about the number {index} here",
-                                     Type = index % 2 == 0 ? ChannelType.PM : ChannelType.Temporary,
-                                     Id = index
-                                 })
-                                 .ToList();
-        }
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         [SetUp]
-        public void Setup()
+        public void SetUp() => Schedule(() =>
         {
-            Schedule(() =>
+            testChannels = Enumerable.Range(1, 10).Select(createPublicChannel).ToArray();
+
+            Child = new DependencyProvidingContainer
             {
-                ChannelManagerContainer container;
-
-                Child = container = new ChannelManagerContainer(channels)
+                RelativeSizeAxes = Axes.Both,
+                CachedDependencies = new (Type, object)[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                };
-
-                chatOverlay = container.ChatOverlay;
-                channelManager = container.ChannelManager;
-            });
-        }
+                    (typeof(ChannelManager), channelManager = new ChannelManager(API)),
+                },
+                Children = new Drawable[]
+                {
+                    channelManager,
+                    chatOverlay = new TestChatOverlay(),
+                },
+            };
+        });
 
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("register request handling", () =>
+            AddStep("Setup request handler", () =>
             {
-                onGetMessages = null;
-
                 ((DummyAPIAccess)API).HandleRequest = req =>
                 {
                     switch (req)
                     {
+                        case CreateChannelRequest createRequest:
+                            createRequest.TriggerSuccess(new APIChatChannel
+                            {
+                                ChannelID = ((int)createRequest.Channel.Id),
+                                RecentMessages = new List<Message>()
+                            });
+                            return true;
+
+                        case GetUpdatesRequest getUpdates:
+                            getUpdates.TriggerFailure(new WebException());
+                            return true;
+
                         case JoinChannelRequest joinChannel:
                             joinChannel.TriggerSuccess();
                             return true;
 
-                        case GetUserRequest getUser:
-                            if (getUser.Lookup.Equals("some body", StringComparison.OrdinalIgnoreCase))
-                            {
-                                getUser.TriggerSuccess(new APIUser
-                                {
-                                    Username = "some body",
-                                    Id = 1,
-                                });
-                            }
-                            else
-                            {
-                                getUser.TriggerFailure(new WebException());
-                            }
-
+                        case LeaveChannelRequest leaveChannel:
+                            leaveChannel.TriggerSuccess();
                             return true;
 
                         case GetMessagesRequest getMessages:
-                            var messages = onGetMessages?.Invoke(getMessages.Channel);
-                            if (messages != null)
-                                getMessages.TriggerSuccess(messages);
+                            getMessages.TriggerSuccess(createChannelMessages(getMessages.Channel));
                             return true;
-                    }
 
-                    return false;
+                        case GetUserRequest getUser:
+                            if (getUser.Lookup == testUser.Username)
+                                getUser.TriggerSuccess(testUser);
+                            else
+                                getUser.TriggerFailure(new WebException());
+                            return true;
+
+                        case PostMessageRequest postMessage:
+                            postMessage.TriggerSuccess(new Message(RNG.Next(0, 10000000))
+                            {
+                                Content = postMessage.Message.Content,
+                                ChannelId = postMessage.Message.ChannelId,
+                                Sender = postMessage.Message.Sender,
+                                Timestamp = new DateTimeOffset(DateTime.Now),
+                            });
+                            return true;
+
+                        default:
+                            Logger.Log($"Unhandled Request Type: {req.GetType()}");
+                            return false;
+                    }
                 };
+            });
+
+            AddStep("Add test channels", () =>
+            {
+                (channelManager.AvailableChannels as BindableList<Channel>)?.AddRange(testChannels);
             });
         }
 
         [Test]
-        public void TestHideOverlay()
+        public void TestBasic()
         {
-            AddStep("Open chat overlay", () => chatOverlay.Show());
+            AddStep("Show overlay with channel", () =>
+            {
+                chatOverlay.Show();
+                Channel joinedChannel = channelManager.JoinChannel(testChannel1);
+                channelManager.CurrentChannel.Value = joinedChannel;
+            });
+            AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
+            waitForChannel1Visible();
+        }
 
-            AddAssert("Chat overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
-            AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+        [Test]
+        public void TestShowHide()
+        {
+            AddStep("Show overlay", () => chatOverlay.Show());
+            AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
+            AddStep("Hide overlay", () => chatOverlay.Hide());
+            AddAssert("Overlay is hidden", () => chatOverlay.State.Value == Visibility.Hidden);
+        }
 
-            AddStep("Close chat overlay", () => chatOverlay.Hide());
+        [Test]
+        public void TestChatHeight()
+        {
+            BindableFloat configChatHeight = new BindableFloat();
 
-            AddAssert("Chat overlay was hidden", () => chatOverlay.State.Value == Visibility.Hidden);
-            AddAssert("Channel selection overlay was hidden", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
+            float newHeight = 0;
+
+            AddStep("Reset config chat height", () =>
+            {
+                config.BindWith(OsuSetting.ChatDisplayHeight, configChatHeight);
+                configChatHeight.SetDefault();
+            });
+            AddStep("Show overlay", () => chatOverlay.Show());
+            AddAssert("Overlay uses config height", () => chatOverlay.Height == configChatHeight.Default);
+            AddStep("Click top bar", () =>
+            {
+                InputManager.MoveMouseTo(chatOverlayTopBar);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep("Drag overlay to new height", () => InputManager.MoveMouseTo(chatOverlayTopBar, new Vector2(0, -300)));
+            AddStep("Stop dragging", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddStep("Store new height", () => newHeight = chatOverlay.Height);
+            AddAssert("Config height changed", () => !configChatHeight.IsDefault && configChatHeight.Value == newHeight);
+            AddStep("Hide overlay", () => chatOverlay.Hide());
+            AddStep("Show overlay", () => chatOverlay.Show());
+            AddAssert("Overlay uses new height", () => chatOverlay.Height == newHeight);
         }
 
         [Test]
         public void TestChannelSelection()
         {
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
-            AddStep("Setup get message response", () => onGetMessages = channel =>
-            {
-                if (channel == channel1)
-                {
-                    return new List<Message>
-                    {
-                        new Message(1)
-                        {
-                            ChannelId = channel1.Id,
-                            Content = "hello from channel 1!",
-                            Sender = new APIUser
-                            {
-                                Id = 2,
-                                Username = "test_user"
-                            }
-                        }
-                    };
-                }
-
-                return null;
-            });
-
-            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-            AddStep("Switch to channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
-
-            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
-            AddUntilStep("Loading spinner hidden", () => chatOverlay.ChildrenOfType<LoadingSpinner>().All(spinner => !spinner.IsPresent));
-            AddAssert("Channel message shown", () => chatOverlay.ChildrenOfType<ChatLine>().Count() == 1);
-            AddAssert("Channel selector was closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
+            AddStep("Show overlay", () => chatOverlay.Show());
+            AddAssert("Listing is visible", () => listingIsVisible);
+            joinTestChannel(0);
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
+            waitForChannel1Visible();
         }
 
         [Test]
-        public void TestSearchInSelector()
+        public void TestSearchInListing()
         {
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddStep("Search for 'no. 2'", () => chatOverlay.ChildrenOfType<SearchTextBox>().First().Text = "no. 2");
+            AddStep("Show overlay", () => chatOverlay.Show());
+            AddAssert("Listing is visible", () => listingIsVisible);
+            AddStep("Search for 'number 2'", () => chatOverlayTextBox.Text = "number 2");
             AddUntilStep("Only channel 2 visible", () =>
             {
-                var listItems = chatOverlay.ChildrenOfType<ChannelListItem>().Where(c => c.IsPresent);
-                return listItems.Count() == 1 && listItems.Single().Channel == channel2;
+                IEnumerable<ChannelListingItem> listingItems = chatOverlay.ChildrenOfType<ChannelListingItem>()
+                                                                          .Where(item => item.IsPresent);
+                return listingItems.Count() == 1 && listingItems.Single().Channel == testChannel2;
             });
-        }
-
-        [Test]
-        public void TestChannelShortcutKeys()
-        {
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddStep("Join channels", () => channels.ForEach(channel => channelManager.JoinChannel(channel)));
-            AddStep("Close channel selector", () => InputManager.Key(Key.Escape));
-            AddUntilStep("Wait for close", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
-
-            for (int zeroBasedIndex = 0; zeroBasedIndex < 10; ++zeroBasedIndex)
-            {
-                int oneBasedIndex = zeroBasedIndex + 1;
-                int targetNumberKey = oneBasedIndex % 10;
-                var targetChannel = channels[zeroBasedIndex];
-                AddStep($"Press Alt+{targetNumberKey}", () => pressChannelHotkey(targetNumberKey));
-                AddAssert($"Channel #{oneBasedIndex} is selected", () => currentChannel == targetChannel);
-            }
-        }
-
-        private Channel expectedChannel;
-
-        [Test]
-        public void TestCloseChannelBehaviour()
-        {
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddUntilStep("Join until dropdown has channels", () =>
-            {
-                if (visibleChannels.Count() < joinedChannels.Count())
-                    return true;
-
-                // Using temporary channels because they don't hide their names when not active
-                channelManager.JoinChannel(new Channel
-                {
-                    Name = $"Channel no. {joinedChannels.Count() + 11}",
-                    Type = ChannelType.Temporary
-                });
-
-                return false;
-            });
-
-            AddStep("Switch to last tab", () => clickDrawable(chatOverlay.TabMap[visibleChannels.Last()]));
-            AddAssert("Last visible selected", () => currentChannel == visibleChannels.Last());
-
-            // Closing the last channel before dropdown
-            AddStep("Close current channel", () =>
-            {
-                expectedChannel = nextChannel;
-                chatOverlay.ChannelTabControl.RemoveChannel(currentChannel);
-            });
-            AddAssert("Next channel selected", () => currentChannel == expectedChannel);
-            AddAssert("Selector remained closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
-
-            // Depending on the window size, one more channel might need to be closed for the selectorTab to appear
-            AddUntilStep("Close channels until selector visible", () =>
-            {
-                if (chatOverlay.ChannelTabControl.VisibleItems.Last().Name == "+")
-                    return true;
-
-                chatOverlay.ChannelTabControl.RemoveChannel(visibleChannels.Last());
-                return false;
-            });
-            AddAssert("Last visible selected", () => currentChannel == visibleChannels.Last());
-
-            // Closing the last channel with dropdown no longer present
-            AddStep("Close last when selector next", () =>
-            {
-                expectedChannel = previousChannel;
-                chatOverlay.ChannelTabControl.RemoveChannel(currentChannel);
-            });
-            AddAssert("Previous channel selected", () => currentChannel == expectedChannel);
-
-            // Standard channel closing
-            AddStep("Switch to previous channel", () => chatOverlay.ChannelTabControl.SwitchTab(-1));
-            AddStep("Close current channel", () =>
-            {
-                expectedChannel = nextChannel;
-                chatOverlay.ChannelTabControl.RemoveChannel(currentChannel);
-            });
-            AddAssert("Next channel selected", () => currentChannel == expectedChannel);
-
-            // Selector reappearing after all channels closed
-            AddUntilStep("Close all channels", () =>
-            {
-                if (!joinedChannels.Any())
-                    return true;
-
-                chatOverlay.ChannelTabControl.RemoveChannel(joinedChannels.Last());
-                return false;
-            });
-            AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
 
         [Test]
         public void TestChannelCloseButton()
         {
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddStep("Join 2 channels", () =>
+            var testPMChannel = new Channel(testUser);
+
+            AddStep("Show overlay", () => chatOverlay.Show());
+            joinTestChannel(0);
+            joinChannel(testPMChannel);
+            AddStep("Select PM channel", () => clickDrawable(getChannelListItem(testPMChannel)));
+            AddStep("Click close button", () =>
             {
-                channelManager.JoinChannel(channel1);
-                channelManager.JoinChannel(channel2);
+                ChannelListItemCloseButton closeButton = getChannelListItem(testPMChannel).ChildrenOfType<ChannelListItemCloseButton>().Single();
+                clickDrawable(closeButton);
             });
-
-            // PM channel close button only appears when active
-            AddStep("Select PM channel", () => clickDrawable(chatOverlay.TabMap[channel2]));
-            AddStep("Click PM close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
-            AddAssert("PM channel closed", () => !channelManager.JoinedChannels.Contains(channel2));
-
-            // Non-PM chat channel close button only appears when hovered
-            AddStep("Hover normal channel tab", () => InputManager.MoveMouseTo(chatOverlay.TabMap[channel1]));
-            AddStep("Click normal close button", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
-            AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
-        }
-
-        [Test]
-        public void TestCloseTabShortcut()
-        {
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddStep("Join 2 channels", () =>
+            AddAssert("PM channel closed", () => !channelManager.JoinedChannels.Contains(testPMChannel));
+            AddStep("Select normal channel", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddStep("Click close button", () =>
             {
-                channelManager.JoinChannel(channel1);
-                channelManager.JoinChannel(channel2);
+                ChannelListItemCloseButton closeButton = getChannelListItem(testChannel1).ChildrenOfType<ChannelListItemCloseButton>().Single();
+                clickDrawable(closeButton);
             });
-
-            // Want to close channel 2
-            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
-            AddStep("Close tab via shortcut", pressCloseDocumentKeys);
-
-            // Channel 2 should be closed
-            AddAssert("Channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
-            AddAssert("Channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
-
-            // Want to close channel 1
-            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
-
-            AddStep("Close tab via shortcut", pressCloseDocumentKeys);
-            // Channel 1 and channel 2 should be closed
-            AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
-        }
-
-        [Test]
-        public void TestNewTabShortcut()
-        {
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddStep("Join 2 channels", () =>
-            {
-                channelManager.JoinChannel(channel1);
-                channelManager.JoinChannel(channel2);
-            });
-
-            // Want to join another channel
-            AddStep("Press new tab shortcut", pressNewTabKeys);
-
-            // Selector should be visible
-            AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
-        }
-
-        [Test]
-        public void TestRestoreTabShortcut()
-        {
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddStep("Join 3 channels", () =>
-            {
-                channelManager.JoinChannel(channel1);
-                channelManager.JoinChannel(channel2);
-                channelManager.JoinChannel(channel3);
-            });
-
-            // Should do nothing
-            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
-            AddAssert("All channels still open", () => channelManager.JoinedChannels.Count == 3);
-
-            // Close channel 1
-            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
-            AddStep("Click normal close button", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
-            AddAssert("Channel 1 closed", () => !channelManager.JoinedChannels.Contains(channel1));
-            AddAssert("Other channels still open", () => channelManager.JoinedChannels.Count == 2);
-
-            // Reopen channel 1
-            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
-            AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
-            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
-
-            // Close two channels
-            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
-            AddStep("Close channel 1", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
-            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
-            AddStep("Close channel 2", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
-            AddAssert("Only one channel open", () => channelManager.JoinedChannels.Count == 1);
-            AddAssert("Current channel is channel 3", () => currentChannel == channel3);
-
-            // Should first re-open channel 2
-            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
-            AddAssert("Channel 1 still closed", () => !channelManager.JoinedChannels.Contains(channel1));
-            AddAssert("Channel 2 now open", () => channelManager.JoinedChannels.Contains(channel2));
-            AddAssert("Current channel is channel 2", () => currentChannel == channel2);
-
-            // Should then re-open channel 1
-            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
-            AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
-            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
+            AddAssert("Normal channel closed", () => !channelManager.JoinedChannels.Contains(testChannel1));
         }
 
         [Test]
         public void TestChatCommand()
         {
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
-
-            AddStep("Open chat with user", () => channelManager.PostCommand("chat some body"));
+            AddStep("Show overlay", () => chatOverlay.Show());
+            joinTestChannel(0);
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddStep("Open chat with user", () => channelManager.PostCommand($"chat {testUser.Username}"));
             AddAssert("PM channel is selected", () =>
-                channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single().Username == "some body");
-
-            AddStep("Open chat with non-existent user", () => channelManager.PostCommand("chat nobody"));
+                channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single() == testUser);
+            AddStep("Open chat with non-existent user", () => channelManager.PostCommand("chat user_doesnt_exist"));
             AddAssert("Last message is error", () => channelManager.CurrentChannel.Value.Messages.Last() is ErrorMessage);
 
             // Make sure no unnecessary requests are made when the PM channel is already open.
-            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddStep("Unregister request handling", () => ((DummyAPIAccess)API).HandleRequest = null);
-            AddStep("Open chat with user", () => channelManager.PostCommand("chat some body"));
+            AddStep("Open chat with user", () => channelManager.PostCommand($"chat {testUser.Username}"));
             AddAssert("PM channel is selected", () =>
-                channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single().Username == "some body");
+                channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single() == testUser);
         }
 
         [Test]
         public void TestMultiplayerChannelIsNotShown()
         {
-            Channel multiplayerChannel = null;
+            Channel multiplayerChannel;
 
-            AddStep("open chat overlay", () => chatOverlay.Show());
+            AddStep("Show overlay", () => chatOverlay.Show());
 
-            AddStep("join multiplayer channel", () => channelManager.JoinChannel(multiplayerChannel = new Channel(new APIUser())
+            joinChannel(multiplayerChannel = new Channel(new APIUser())
             {
                 Name = "#mp_1",
                 Type = ChannelType.Multiplayer,
-            }));
+            });
 
-            AddAssert("channel joined", () => channelManager.JoinedChannels.Contains(multiplayerChannel));
-            AddAssert("channel not present in overlay", () => !chatOverlay.TabMap.ContainsKey(multiplayerChannel));
-            AddAssert("multiplayer channel is not current", () => channelManager.CurrentChannel.Value != multiplayerChannel);
-
-            AddStep("leave channel", () => channelManager.LeaveChannel(multiplayerChannel));
-            AddAssert("channel left", () => !channelManager.JoinedChannels.Contains(multiplayerChannel));
+            AddAssert("Channel is joined", () => channelManager.JoinedChannels.Contains(multiplayerChannel));
+            AddUntilStep("Channel not present in listing", () => !chatOverlay.ChildrenOfType<ChannelListingItem>()
+                                                                             .Where(item => item.IsPresent)
+                                                                             .Select(item => item.Channel)
+                                                                             .Contains(multiplayerChannel));
         }
 
         [Test]
@@ -430,26 +275,21 @@ namespace osu.Game.Tests.Visual.Online
         {
             Message message = null;
 
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
-
+            AddStep("Show overlay", () => chatOverlay.Show());
+            joinTestChannel(0);
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddStep("Send message in channel 1", () =>
             {
-                channel1.AddNewMessages(message = new Message
+                testChannel1.AddNewMessages(message = new Message
                 {
-                    ChannelId = channel1.Id,
+                    ChannelId = testChannel1.Id,
                     Content = "Message to highlight!",
                     Timestamp = DateTimeOffset.Now,
-                    Sender = new APIUser
-                    {
-                        Id = 2,
-                        Username = "Someone",
-                    }
+                    Sender = testUser,
                 });
             });
-
-            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel1));
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel1));
+            waitForChannel1Visible();
         }
 
         [Test]
@@ -457,28 +297,22 @@ namespace osu.Game.Tests.Visual.Online
         {
             Message message = null;
 
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
-
-            AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
+            AddStep("Show overlay", () => chatOverlay.Show());
+            joinTestChannel(0);
+            joinTestChannel(1);
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddStep("Send message in channel 2", () =>
             {
-                channel2.AddNewMessages(message = new Message
+                testChannel2.AddNewMessages(message = new Message
                 {
-                    ChannelId = channel2.Id,
+                    ChannelId = testChannel2.Id,
                     Content = "Message to highlight!",
                     Timestamp = DateTimeOffset.Now,
-                    Sender = new APIUser
-                    {
-                        Id = 2,
-                        Username = "Someone",
-                    }
+                    Sender = testUser,
                 });
             });
-
-            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel2));
-            AddAssert("Switched to channel 2", () => channelManager.CurrentChannel.Value == channel2);
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel2));
+            waitForChannel2Visible();
         }
 
         [Test]
@@ -486,30 +320,23 @@ namespace osu.Game.Tests.Visual.Online
         {
             Message message = null;
 
-            AddStep("Open chat overlay", () => chatOverlay.Show());
-
-            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
-
-            AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
+            AddStep("Show overlay", () => chatOverlay.Show());
+            joinTestChannel(0);
+            joinTestChannel(1);
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddStep("Send message in channel 2", () =>
             {
-                channel2.AddNewMessages(message = new Message
+                testChannel2.AddNewMessages(message = new Message
                 {
-                    ChannelId = channel2.Id,
+                    ChannelId = testChannel2.Id,
                     Content = "Message to highlight!",
                     Timestamp = DateTimeOffset.Now,
-                    Sender = new APIUser
-                    {
-                        Id = 2,
-                        Username = "Someone",
-                    }
+                    Sender = testUser,
                 });
             });
-            AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
-
-            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel2));
-            AddAssert("Switched to channel 2", () => channelManager.CurrentChannel.Value == channel2);
+            AddStep("Leave channel 2", () => channelManager.LeaveChannel(testChannel2));
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel2));
+            waitForChannel2Visible();
         }
 
         [Test]
@@ -517,24 +344,19 @@ namespace osu.Game.Tests.Visual.Online
         {
             Message message = null;
 
-            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-
+            joinTestChannel(0);
             AddStep("Send message in channel 1", () =>
             {
-                channel1.AddNewMessages(message = new Message
+                testChannel1.AddNewMessages(message = new Message
                 {
-                    ChannelId = channel1.Id,
+                    ChannelId = testChannel1.Id,
                     Content = "Message to highlight!",
                     Timestamp = DateTimeOffset.Now,
-                    Sender = new APIUser
-                    {
-                        Id = 2,
-                        Username = "Someone",
-                    }
+                    Sender = testUser,
                 });
             });
-
-            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel1));
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel1));
+            waitForChannel1Visible();
         }
 
         [Test]
@@ -542,40 +364,179 @@ namespace osu.Game.Tests.Visual.Online
         {
             Message message = null;
 
-            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-
+            joinTestChannel(0);
             AddStep("Send message in channel 1", () =>
             {
-                channel1.AddNewMessages(message = new Message
+                testChannel1.AddNewMessages(message = new Message
                 {
-                    ChannelId = channel1.Id,
+                    ChannelId = testChannel1.Id,
                     Content = "Message to highlight!",
                     Timestamp = DateTimeOffset.Now,
-                    Sender = new APIUser
-                    {
-                        Id = 2,
-                        Username = "Someone",
-                    }
+                    Sender = testUser,
                 });
             });
-
             AddStep("Set null channel", () => channelManager.CurrentChannel.Value = null);
-            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel1));
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, testChannel1));
+            waitForChannel1Visible();
         }
 
-        private void pressChannelHotkey(int number)
+        [Test]
+        public void TestTextBoxRetainsFocus()
         {
-            var channelKey = Key.Number0 + number;
-            InputManager.PressKey(Key.AltLeft);
-            InputManager.Key(channelKey);
-            InputManager.ReleaseKey(Key.AltLeft);
+            AddStep("Show overlay", () => chatOverlay.Show());
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            joinTestChannel(0);
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
+            waitForChannel1Visible();
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click drawable channel", () => clickDrawable(currentDrawableChannel));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click selector", () => clickDrawable(channelSelectorButton));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click listing", () => clickDrawable(chatOverlay.ChildrenOfType<ChannelListing>().Single()));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click channel list", () => clickDrawable(chatOverlay.ChildrenOfType<ChannelList>().Single()));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Click top bar", () => clickDrawable(chatOverlay.ChildrenOfType<ChatOverlayTopBar>().Single()));
+            AddAssert("TextBox is focused", () => InputManager.FocusedDrawable == chatOverlayTextBox);
+            AddStep("Hide overlay", () => chatOverlay.Hide());
+            AddAssert("TextBox is not focused", () => InputManager.FocusedDrawable == null);
         }
 
-        private void pressCloseDocumentKeys() => InputManager.Keys(PlatformAction.DocumentClose);
+        [Test]
+        public void TestSlowLoadingChannel()
+        {
+            AddStep("Show overlay (slow-loading)", () =>
+            {
+                chatOverlay.Show();
+                chatOverlay.SlowLoading = true;
+            });
+            joinTestChannel(0);
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddUntilStep("Channel 1 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel1).LoadState == LoadState.Loading);
 
-        private void pressNewTabKeys() => InputManager.Keys(PlatformAction.TabNew);
+            joinTestChannel(1);
+            AddStep("Select channel 2", () => clickDrawable(getChannelListItem(testChannel2)));
+            AddUntilStep("Channel 2 loading", () => !channelIsVisible && chatOverlay.GetSlowLoadingChannel(testChannel2).LoadState == LoadState.Loading);
 
-        private void pressRestoreTabKeys() => InputManager.Keys(PlatformAction.TabRestore);
+            AddStep("Finish channel 1 load", () => chatOverlay.GetSlowLoadingChannel(testChannel1).LoadEvent.Set());
+            AddUntilStep("Channel 1 ready", () => chatOverlay.GetSlowLoadingChannel(testChannel1).LoadState == LoadState.Ready);
+            AddAssert("Channel 1 not displayed", () => !channelIsVisible);
+
+            AddStep("Finish channel 2 load", () => chatOverlay.GetSlowLoadingChannel(testChannel2).LoadEvent.Set());
+            AddUntilStep("Channel 2 loaded", () => chatOverlay.GetSlowLoadingChannel(testChannel2).IsLoaded);
+            waitForChannel2Visible();
+
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
+            AddUntilStep("Channel 1 loaded", () => chatOverlay.GetSlowLoadingChannel(testChannel1).IsLoaded);
+            waitForChannel1Visible();
+        }
+
+        [Test]
+        public void TestKeyboardCloseAndRestoreChannel()
+        {
+            AddStep("Show overlay with channel 1", () =>
+            {
+                channelManager.JoinChannel(testChannel1);
+                chatOverlay.Show();
+            });
+            waitForChannel1Visible();
+            AddStep("Press document close keys", () => InputManager.Keys(PlatformAction.DocumentClose));
+            AddAssert("Listing is visible", () => listingIsVisible);
+
+            AddStep("Press tab restore keys", () => InputManager.Keys(PlatformAction.TabRestore));
+            waitForChannel1Visible();
+        }
+
+        [Test]
+        public void TestKeyboardNewChannel()
+        {
+            AddStep("Show overlay with channel 1", () =>
+            {
+                channelManager.JoinChannel(testChannel1);
+                chatOverlay.Show();
+            });
+            waitForChannel1Visible();
+            AddStep("Press tab new keys", () => InputManager.Keys(PlatformAction.TabNew));
+            AddAssert("Listing is visible", () => listingIsVisible);
+        }
+
+        [Test]
+        public void TestKeyboardNextChannel()
+        {
+            Channel announceChannel = createAnnounceChannel();
+            Channel pmChannel1 = createPrivateChannel();
+            Channel pmChannel2 = createPrivateChannel();
+
+            joinTestChannel(0);
+            joinTestChannel(1);
+            joinChannel(pmChannel1);
+            joinChannel(pmChannel2);
+            joinChannel(announceChannel);
+
+            AddStep("Show overlay", () => chatOverlay.Show());
+
+            AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
+            waitForChannel1Visible();
+
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            waitForChannel2Visible();
+
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            AddUntilStep("PM Channel 1 displayed", () => channelIsVisible && currentDrawableChannel?.Channel == pmChannel1);
+
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            AddUntilStep("PM Channel 2 displayed", () => channelIsVisible && currentDrawableChannel?.Channel == pmChannel2);
+
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            AddUntilStep("Announce channel displayed", () => channelIsVisible && currentDrawableChannel?.Channel == announceChannel);
+
+            AddStep("Press document next keys", () => InputManager.Keys(PlatformAction.DocumentNext));
+            waitForChannel1Visible();
+        }
+
+        private void joinTestChannel(int i)
+        {
+            AddStep($"Join test channel {i}", () => channelManager.JoinChannel(testChannels[i]));
+            AddUntilStep("wait for join completed", () => testChannels[i].Joined.Value);
+        }
+
+        private void joinChannel(Channel channel)
+        {
+            AddStep($"Join channel {channel}", () => channelManager.JoinChannel(channel));
+            AddUntilStep("wait for join completed", () => channel.Joined.Value);
+        }
+
+        private void waitForChannel1Visible() =>
+            AddUntilStep("Channel 1 is visible", () => channelIsVisible && currentDrawableChannel?.Channel == testChannel1);
+
+        private void waitForChannel2Visible() =>
+            AddUntilStep("Channel 2 is visible", () => channelIsVisible && currentDrawableChannel?.Channel == testChannel2);
+
+        private bool listingIsVisible =>
+            chatOverlay.ChildrenOfType<ChannelListing>().Single().State.Value == Visibility.Visible;
+
+        private bool loadingIsVisible =>
+            chatOverlay.ChildrenOfType<LoadingLayer>().Single().State.Value == Visibility.Visible;
+
+        private bool channelIsVisible =>
+            !listingIsVisible && !loadingIsVisible;
+
+        [CanBeNull]
+        private DrawableChannel currentDrawableChannel =>
+            chatOverlay.ChildrenOfType<DrawableChannel>().SingleOrDefault();
+
+        private ChannelListItem getChannelListItem(Channel channel) =>
+            chatOverlay.ChildrenOfType<ChannelListItem>().Single(item => item.Channel == channel);
+
+        private ChatTextBox chatOverlayTextBox =>
+            chatOverlay.ChildrenOfType<ChatTextBox>().Single();
+
+        private ChatOverlayTopBar chatOverlayTopBar =>
+            chatOverlay.ChildrenOfType<ChatOverlayTopBar>().Single();
+
+        private ChannelListItem channelSelectorButton =>
+            chatOverlay.ChildrenOfType<ChannelListItem>().Single(item => item.Channel is ChannelListing.ChannelListingChannel);
 
         private void clickDrawable(Drawable d)
         {
@@ -583,81 +544,76 @@ namespace osu.Game.Tests.Visual.Online
             InputManager.Click(MouseButton.Left);
         }
 
-        private class ChannelManagerContainer : Container
+        private List<Message> createChannelMessages(Channel channel)
         {
-            public TestChatOverlay ChatOverlay { get; private set; }
-
-            [Cached]
-            public ChannelManager ChannelManager { get; } = new ChannelManager();
-
-            private readonly List<Channel> channels;
-
-            public ChannelManagerContainer(List<Channel> channels)
+            var message = new Message
             {
-                this.channels = channels;
+                ChannelId = channel.Id,
+                Content = $"Hello, this is a message in {channel.Name}",
+                Sender = testUser,
+                Timestamp = new DateTimeOffset(DateTime.Now),
+            };
+            return new List<Message> { message };
+        }
+
+        private Channel createPublicChannel(int id) => new Channel
+        {
+            Id = id,
+            Name = $"#channel-{id}",
+            Topic = $"We talk about the number {id} here",
+            Type = ChannelType.Public,
+        };
+
+        private Channel createPrivateChannel()
+        {
+            int id = RNG.Next(0, DummyAPIAccess.DUMMY_USER_ID - 1);
+            return new Channel(new APIUser
+            {
+                Id = id,
+                Username = $"test user {id}",
+            });
+        }
+
+        private Channel createAnnounceChannel()
+        {
+            const int announce_channel_id = 133337;
+
+            return new Channel
+            {
+                Name = $"Announce {announce_channel_id}",
+                Type = ChannelType.Announce,
+                Id = announce_channel_id,
+            };
+        }
+
+        private class TestChatOverlay : ChatOverlay
+        {
+            public bool SlowLoading { get; set; }
+
+            public SlowLoadingDrawableChannel GetSlowLoadingChannel(Channel channel) => DrawableChannels.OfType<SlowLoadingDrawableChannel>().Single(c => c.Channel == channel);
+
+            protected override DrawableChannel CreateDrawableChannel(Channel newChannel)
+            {
+                return SlowLoading
+                    ? new SlowLoadingDrawableChannel(newChannel)
+                    : new DrawableChannel(newChannel);
+            }
+        }
+
+        private class SlowLoadingDrawableChannel : DrawableChannel
+        {
+            public readonly ManualResetEventSlim LoadEvent = new ManualResetEventSlim();
+
+            public SlowLoadingDrawableChannel([NotNull] Channel channel)
+                : base(channel)
+            {
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                ((BindableList<Channel>)ChannelManager.AvailableChannels).AddRange(channels);
-
-                InternalChildren = new Drawable[]
-                {
-                    ChannelManager,
-                    ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, },
-                };
+                LoadEvent.Wait(10000);
             }
-        }
-
-        private class TestChatOverlay : ChatOverlay
-        {
-            public Visibility SelectionOverlayState => ChannelSelectionOverlay.State.Value;
-
-            public new ChannelTabControl ChannelTabControl => base.ChannelTabControl;
-
-            public new ChannelSelectionOverlay ChannelSelectionOverlay => base.ChannelSelectionOverlay;
-
-            protected override ChannelTabControl CreateChannelTabControl() => new TestTabControl();
-
-            public IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => ((TestTabControl)ChannelTabControl).TabMap;
-        }
-
-        private class TestTabControl : ChannelTabControl
-        {
-            protected override TabItem<Channel> CreateTabItem(Channel value)
-            {
-                switch (value.Type)
-                {
-                    case ChannelType.PM:
-                        return new TestPrivateChannelTabItem(value);
-
-                    default:
-                        return new TestChannelTabItem(value);
-                }
-            }
-
-            public new IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => base.TabMap;
-        }
-
-        private class TestChannelTabItem : ChannelTabItem
-        {
-            public TestChannelTabItem(Channel channel)
-                : base(channel)
-            {
-            }
-
-            public new ClickableContainer CloseButton => base.CloseButton;
-        }
-
-        private class TestPrivateChannelTabItem : PrivateChannelTabItem
-        {
-            public TestPrivateChannelTabItem(Channel channel)
-                : base(channel)
-            {
-            }
-
-            public new ClickableContainer CloseButton => base.CloseButton;
         }
     }
 }

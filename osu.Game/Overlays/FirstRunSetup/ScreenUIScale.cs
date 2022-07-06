@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -126,6 +128,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         private class SampleScreenContainer : CompositeDrawable
         {
             private readonly OsuScreen screen;
+
             // Minimal isolation from main game.
 
             [Cached]
@@ -150,6 +153,9 @@ namespace osu.Game.Overlays.FirstRunSetup
                 this.screen = screen;
                 RelativeSizeAxes = Axes.Both;
             }
+
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+                new DependencyContainer(new DependencyIsolationContainer(base.CreateChildDependencies(parent)));
 
             [BackgroundDependencyLoader]
             private void load(AudioManager audio, TextureStore textures, RulesetStore rulesets)
@@ -195,6 +201,42 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                 // intentionally load synchronously so it is included in the initial load of the first run screen.
                 stack.PushSynchronously(screen);
+            }
+        }
+
+        private class DependencyIsolationContainer : IReadOnlyDependencyContainer
+        {
+            private readonly IReadOnlyDependencyContainer parentDependencies;
+
+            private readonly Type[] isolatedTypes =
+            {
+                typeof(OsuGame)
+            };
+
+            public DependencyIsolationContainer(IReadOnlyDependencyContainer parentDependencies)
+            {
+                this.parentDependencies = parentDependencies;
+            }
+
+            public object Get(Type type)
+            {
+                if (isolatedTypes.Contains(type))
+                    return null;
+
+                return parentDependencies.Get(type);
+            }
+
+            public object Get(Type type, CacheInfo info)
+            {
+                if (isolatedTypes.Contains(type))
+                    return null;
+
+                return parentDependencies.Get(type, info);
+            }
+
+            public void Inject<T>(T instance) where T : class
+            {
+                parentDependencies.Inject(instance);
             }
         }
     }

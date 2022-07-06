@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             double endTime = prev.GetEndTime();
 
-            HitWindows hitWindows = null;
+            HitWindows? hitWindows = null;
 
             switch (h)
             {
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     hitWindows = slider.TailCircle.HitWindows;
                     break;
 
-                case Spinner _:
+                case Spinner:
                     hitWindows = defaultHitWindows;
                     break;
             }
@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
 
             double timeDifference = ApplyModsToTimeDelta(lastFrame.Time, h.StartTime);
-            OsuReplayFrame lastLastFrame = Frames.Count >= 2 ? (OsuReplayFrame)Frames[^2] : null;
+            OsuReplayFrame? lastLastFrame = Frames.Count >= 2 ? (OsuReplayFrame)Frames[^2] : null;
 
             if (timeDifference > 0)
             {

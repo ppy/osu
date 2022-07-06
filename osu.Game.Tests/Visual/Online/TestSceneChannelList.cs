@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -87,7 +89,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     leaveText.Text = $"OnRequestLeave: {channel.Name}";
                     leaveText.FadeOutFromOne(1000, Easing.InQuint);
-                    selected.Value = null;
+                    selected.Value = channelList.ChannelListingChannel;
                     channelList.RemoveChannel(channel);
                 };
 
@@ -111,6 +113,12 @@ namespace osu.Game.Tests.Visual.Online
             {
                 for (int i = 0; i < 10; i++)
                     channelList.AddChannel(createRandomPrivateChannel());
+            });
+
+            AddStep("Add Announce Channels", () =>
+            {
+                for (int i = 0; i < 2; i++)
+                    channelList.AddChannel(createRandomAnnounceChannel());
             });
         }
 
@@ -169,6 +177,17 @@ namespace osu.Game.Tests.Visual.Online
                 Id = id,
                 Username = $"test user {id}",
             });
+        }
+
+        private Channel createRandomAnnounceChannel()
+        {
+            int id = RNG.Next(0, 10000);
+            return new Channel
+            {
+                Name = $"Announce {id}",
+                Type = ChannelType.Announce,
+                Id = id,
+            };
         }
     }
 }

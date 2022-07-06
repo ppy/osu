@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -101,7 +103,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Child = new SkinProvidingContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"))
+                        Child = consumer = new SkinConsumer("test", _ => new NamedBox("Default Implementation"))
                     }
                 };
             });
@@ -130,7 +132,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
             });
 
-            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"))));
+            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", _ => new NamedBox("Default Implementation"))));
             AddAssert("consumer using override source", () => consumer.Drawable is SecondarySourceBox);
             AddAssert("skinchanged only called once", () => consumer.SkinChangedCount == 1);
         }
@@ -153,7 +155,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
             });
 
-            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"))));
+            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", _ => new NamedBox("Default Implementation"))));
             AddAssert("consumer using override source", () => consumer.Drawable is SecondarySourceBox);
             AddStep("disable", () => target.Disable());
             AddAssert("consumer using base source", () => consumer.Drawable is BaseSourceBox);
