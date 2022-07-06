@@ -1,13 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.Logging;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -23,7 +27,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             animationContent.Anchor = Anchor.Centre;
             animationContent.Origin = Anchor.Centre;
 
-            Alpha = 0f;
             RelativeSizeAxes = Axes.Both;
             InternalChild = animationContent;
         }
@@ -44,6 +47,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             if (parentObject != null)
             {
+                parentObject.HitObjectApplied += onHitObjectApplied;
+                onHitObjectApplied(parentObject);
+
                 parentObject.ApplyCustomUpdateState += updateStateTransforms;
                 updateStateTransforms(parentObject, parentObject.State.Value);
             }
@@ -69,18 +75,38 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 .FadeTo(tracking.NewValue ? 1f : 0f, realFadeDuration, Easing.OutQuad);
         }
 
+        private void onHitObjectApplied(DrawableHitObject drawableObject)
+        {
+            this.ScaleTo(1f)
+                .FadeOut();
+        }
+
         private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
         {
+            // see comment in LegacySliderBall.updateStateTransforms
             if (drawableObject is not DrawableSlider)
                 return;
 
             const float shrink_duration = 200f;
-            const float fade_duration = 240f;
+            const float fade_delay = 175f;
+            const float fade_duration = 35f;
 
             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
-                this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 0.8f, shrink_duration, Easing.OutQuint)
-                    .FadeOut(fade_duration, Easing.InQuint);
+                this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 0.75f, shrink_duration, Easing.OutQuad)
+                    .Delay(fade_delay)
+                    .FadeOut(fade_duration);
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (parentObject != null)
+            {
+                parentObject.HitObjectApplied -= onHitObjectApplied;
+                parentObject.ApplyCustomUpdateState -= updateStateTransforms;
             }
         }
     }

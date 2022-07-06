@@ -73,26 +73,27 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
         {
+            // see comment in LegacySliderBall.updateStateTransforms
             if (drawableObject is not DrawableSlider)
                 return;
 
-            const float fade_out_time = 450f;
+            const float fade_duration = 450f;
 
             using (BeginAbsoluteSequence(drawableObject.StateUpdateTime))
             {
-                this.ScaleTo(1f)
-                    .FadeIn();
+                this.FadeIn()
+                    .ScaleTo(1f);
             }
 
             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
                 // intentionally pile on an extra FadeOut to make it happen much faster
-                this.FadeOut(fade_out_time / 4, Easing.Out);
+                this.FadeOut(fade_duration / 4, Easing.Out);
 
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        this.ScaleTo(1.4f, fade_out_time, Easing.Out);
+                        this.ScaleTo(1.4f, fade_duration, Easing.Out);
                         break;
                 }
             }
