@@ -108,19 +108,13 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadToEndAfterReadsAndPeeks()
         {
-            const string contents = "this line is gone\rthis one shouldn't be\r\nthese ones\ndefinitely not";
+            const string contents = "first line\r\nsecond line";
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
             {
-                Assert.AreEqual("this line is gone", bufferedReader.ReadLine());
-                Assert.AreEqual("this one shouldn't be", bufferedReader.PeekLine());
-
-                string[] endingLines = bufferedReader.ReadToEnd().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                Assert.AreEqual(3, endingLines.Length);
-                Assert.AreEqual("this one shouldn't be", endingLines[0]);
-                Assert.AreEqual("these ones", endingLines[1]);
-                Assert.AreEqual("definitely not", endingLines[2]);
+                bufferedReader.PeekLine();
+                Assert.Throws<InvalidOperationException>(() => bufferedReader.ReadToEnd());
             }
         }
     }
