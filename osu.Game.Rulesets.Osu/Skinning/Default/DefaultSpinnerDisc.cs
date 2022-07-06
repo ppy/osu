@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.LoadComplete();
 
-            complete.BindValueChanged(complete => updateComplete(complete.NewValue, 200));
+            complete.BindValueChanged(complete => updateDiscColour(complete.NewValue, 200));
             drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
 
             updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 this.ScaleTo(initial_scale);
                 this.RotateTo(0);
 
-                updateComplete(false, 0);
+                updateDiscColour(false);
 
                 using (BeginDelayedSequence(spinner.TimePreempt / 2))
                 {
@@ -182,11 +182,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             if (drawableSpinner.Result?.TimeCompleted is double completionTime)
             {
                 using (BeginAbsoluteSequence(completionTime))
-                    updateComplete(true, 200);
+                    updateDiscColour(true, 200);
             }
         }
 
-        private void updateComplete(bool complete, double duration)
+        private void updateDiscColour(bool complete, double duration = 0)
         {
             var colour = complete ? completeColour : normalColour;
 
