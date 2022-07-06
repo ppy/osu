@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void easeTo(DrawableHitObject hitObject, Vector2 destination)
         {
-            double dampLength = Interpolation.Lerp(3000, 40, 0.8 * RepulsionStrength.Value);
+            double dampLength = Vector2.Distance(hitObject.Position, destination) / (0.04 * RepulsionStrength.Value + 0.04);
 
             float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, gameplayClock.ElapsedFrameTime);
             float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, gameplayClock.ElapsedFrameTime);
