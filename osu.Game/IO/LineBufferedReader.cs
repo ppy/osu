@@ -34,14 +34,10 @@ namespace osu.Game.IO
         /// </summary>
         public string? ReadLine()
         {
-            try
-            {
-                return peekedLine ?? streamReader.ReadLine();
-            }
-            finally
-            {
-                peekedLine = null;
-            }
+            string? line = peekedLine ?? streamReader.ReadLine();
+
+            peekedLine = null;
+            return line;
         }
 
         /// <summary>
