@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private IFrameStableClock gameplayClock;
 
         [SettingSource("Repulsion strength", "How strong the repulsion is.", 0)]
-        public BindableFloat RepulsionStrength { get; } = new BindableFloat(0.6f)
+        public BindableFloat RepulsionStrength { get; } = new BindableFloat(0.5f)
         {
             Precision = 0.05f,
             MinValue = 0.05f,
