@@ -46,14 +46,21 @@ namespace osu.Game.IO
 
         /// <summary>
         /// Reads the stream to its end and returns the text read.
-        /// Not compatible with calls to <see cref="PeekLine"/>.
+        /// This includes any peeked but unconsumed lines.
         /// </summary>
         public string ReadToEnd()
         {
-            if (peekedLine != null)
-                throw new InvalidOperationException($"Do not use {nameof(ReadToEnd)} when also peeking for lines.");
+            string remainingText = streamReader.ReadToEnd();
+            if (peekedLine == null)
+                return remainingText;
 
-            return streamReader.ReadToEnd();
+            var builder = new StringBuilder();
+
+            // this might not be completely correct due to varying platform line endings
+            builder.AppendLine(peekedLine);
+            builder.Append(remainingText);
+
+            return builder.ToString();
         }
 
         public void Dispose()
