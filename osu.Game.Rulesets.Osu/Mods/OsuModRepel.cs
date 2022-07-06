@@ -51,23 +51,18 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
-                float x = Math.Clamp(2 * drawable.X - cursorPos.X, 0, OsuPlayfield.BASE_SIZE.X);
-                float y = Math.Clamp(2 * drawable.Y - cursorPos.Y, 0, OsuPlayfield.BASE_SIZE.Y);
+                var destination = Vector2.Clamp(2 * drawable.Position - cursorPos, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
                 if (drawable.HitObject is Slider thisSlider)
                 {
                     var possibleMovementBounds = OsuHitObjectGenerationUtils.CalculatePossibleMovementBounds(thisSlider);
 
-                    x = possibleMovementBounds.Width < 0
-                        ? x
-                        : Math.Clamp(x, possibleMovementBounds.Left, possibleMovementBounds.Right);
-
-                    y = possibleMovementBounds.Height < 0
-                        ? y
-                        : Math.Clamp(y, possibleMovementBounds.Top, possibleMovementBounds.Bottom);
+                    destination = Vector2.Clamp(
+                        destination,
+                        new Vector2(possibleMovementBounds.Left, possibleMovementBounds.Top),
+                        new Vector2(possibleMovementBounds.Right, possibleMovementBounds.Bottom)
+                    );
                 }
-
-                var destination = new Vector2(x, y);
 
                 switch (drawable)
                 {
