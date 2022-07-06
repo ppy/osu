@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -13,7 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -200,14 +201,14 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 public void CreateNew()
                 {
-                    var user = new APIUser();
-                    team.Players.Add(user);
-                    flow.Add(new PlayerRow(team, user));
+                    var player = new TournamentUser();
+                    team.Players.Add(player);
+                    flow.Add(new PlayerRow(team, player));
                 }
 
                 public class PlayerRow : CompositeDrawable
                 {
-                    private readonly APIUser user;
+                    private readonly TournamentUser user;
 
                     [Resolved]
                     protected IAPIProvider API { get; private set; }
@@ -215,11 +216,11 @@ namespace osu.Game.Tournament.Screens.Editors
                     [Resolved]
                     private TournamentGameBase game { get; set; }
 
-                    private readonly Bindable<int?> userId = new Bindable<int?>();
+                    private readonly Bindable<int?> playerId = new Bindable<int?>();
 
                     private readonly Container drawableContainer;
 
-                    public PlayerRow(TournamentTeam team, APIUser user)
+                    public PlayerRow(TournamentTeam team, TournamentUser user)
                     {
                         this.user = user;
 
@@ -252,7 +253,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "User ID",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Current = userId,
+                                        Current = playerId,
                                     },
                                     drawableContainer = new Container
                                     {
@@ -279,10 +280,10 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load()
                     {
-                        userId.Value = user.Id;
-                        userId.BindValueChanged(id =>
+                        playerId.Value = user.OnlineID;
+                        playerId.BindValueChanged(id =>
                         {
-                            user.Id = id.NewValue ?? 0;
+                            user.OnlineID = id.NewValue ?? 0;
 
                             if (id.NewValue != id.OldValue)
                                 user.Username = string.Empty;
@@ -293,13 +294,13 @@ namespace osu.Game.Tournament.Screens.Editors
                                 return;
                             }
 
-                            game.PopulateUser(user, updatePanel, updatePanel);
+                            game.PopulatePlayer(user, updatePanel, updatePanel);
                         }, true);
                     }
 
                     private void updatePanel()
                     {
-                        drawableContainer.Child = new UserGridPanel(user) { Width = 300 };
+                        drawableContainer.Child = new UserGridPanel(user.ToAPIUser()) { Width = 300 };
                     }
                 }
             }

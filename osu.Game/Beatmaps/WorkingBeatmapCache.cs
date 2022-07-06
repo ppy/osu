@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -74,9 +76,12 @@ namespace osu.Game.Beatmaps
                 {
                     Logger.Log($"Invalidating working beatmap cache for {info}");
                     workingCache.Remove(working);
+                    OnInvalidated?.Invoke(working);
                 }
             }
         }
+
+        public event Action<WorkingBeatmap> OnInvalidated;
 
         public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {

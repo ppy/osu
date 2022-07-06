@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -202,12 +204,12 @@ namespace osu.Game.Tournament
 
             switch (currentScreen)
             {
-                case MapPoolScreen _:
+                case MapPoolScreen:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     chatContainer.ResizeWidthTo(1, 500, Easing.OutQuint);
                     break;
 
-                case GameplayScreen _:
+                case GameplayScreen:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     chatContainer.ResizeWidthTo(0.5f, 500, Easing.OutQuint);
                     break;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -135,7 +137,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                         Vector2 size = Vector2.One;
 
-                        if (indexInBar != 1)
+                        if (indexInBar != 0)
                             size = BindableBeatDivisor.GetSize(divisor);
 
                         var line = getNextUsableLine();

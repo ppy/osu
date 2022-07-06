@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -71,31 +73,7 @@ namespace osu.Game.Screens.Edit
         public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
         {
             PlayableBeatmap = playableBeatmap;
-
-            // ensure we are not working with legacy control points.
-            // if we leave the legacy points around they will be applied over any local changes on
-            // ApplyDefaults calls. this should eventually be removed once the default logic is moved to the decoder/converter.
-            if (PlayableBeatmap.ControlPointInfo is LegacyControlPointInfo)
-            {
-                var newControlPoints = new ControlPointInfo();
-
-                foreach (var controlPoint in PlayableBeatmap.ControlPointInfo.AllControlPoints)
-                {
-                    switch (controlPoint)
-                    {
-                        case DifficultyControlPoint _:
-                        case SampleControlPoint _:
-                            // skip legacy types.
-                            continue;
-
-                        default:
-                            newControlPoints.Add(controlPoint.Time, controlPoint);
-                            break;
-                    }
-                }
-
-                playableBeatmap.ControlPointInfo = newControlPoints;
-            }
+            PlayableBeatmap.ControlPointInfo = ConvertControlPoints(PlayableBeatmap.ControlPointInfo);
 
             this.beatmapInfo = beatmapInfo ?? playableBeatmap.BeatmapInfo;
 
@@ -108,10 +86,43 @@ namespace osu.Game.Screens.Edit
                 trackStartTime(obj);
         }
 
+        /// <summary>
+        /// Converts a <see cref="ControlPointInfo"/> such that the resultant <see cref="ControlPointInfo"/> is non-legacy.
+        /// </summary>
+        /// <param name="incoming">The <see cref="ControlPointInfo"/> to convert.</param>
+        /// <returns>The non-legacy <see cref="ControlPointInfo"/>. <paramref name="incoming"/> is returned if already non-legacy.</returns>
+        public static ControlPointInfo ConvertControlPoints(ControlPointInfo incoming)
+        {
+            // ensure we are not working with legacy control points.
+            // if we leave the legacy points around they will be applied over any local changes on
+            // ApplyDefaults calls. this should eventually be removed once the default logic is moved to the decoder/converter.
+            if (!(incoming is LegacyControlPointInfo))
+                return incoming;
+
+            var newControlPoints = new ControlPointInfo();
+
+            foreach (var controlPoint in incoming.AllControlPoints)
+            {
+                switch (controlPoint)
+                {
+                    case DifficultyControlPoint:
+                    case SampleControlPoint:
+                        // skip legacy types.
+                        continue;
+
+                    default:
+                        newControlPoints.Add(controlPoint.Time, controlPoint);
+                        break;
+                }
+            }
+
+            return newControlPoints;
+        }
+
         public BeatmapInfo BeatmapInfo
         {
             get => beatmapInfo;
-            set => throw new InvalidOperationException();
+            set => throw new InvalidOperationException($"Can't set {nameof(BeatmapInfo)} on {nameof(EditorBeatmap)}");
         }
 
         public BeatmapMetadata Metadata => beatmapInfo.Metadata;

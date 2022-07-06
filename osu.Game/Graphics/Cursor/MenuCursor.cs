@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -49,12 +51,16 @@ namespace osu.Game.Graphics.Cursor
         {
             if (dragRotationState != DragRotationState.NotDragging)
             {
+                // make the rotation centre point floating.
+                if (Vector2.Distance(positionMouseDown, e.MousePosition) > 60)
+                    positionMouseDown = Interpolation.ValueAt(0.005f, positionMouseDown, e.MousePosition, 0, Clock.ElapsedFrameTime);
+
                 var position = e.MousePosition;
                 float distance = Vector2Extensions.Distance(position, positionMouseDown);
 
                 // don't start rotating until we're moved a minimum distance away from the mouse down location,
                 // else it can have an annoying effect.
-                if (dragRotationState == DragRotationState.DragStarted && distance > 30)
+                if (dragRotationState == DragRotationState.DragStarted && distance > 80)
                     dragRotationState = DragRotationState.Rotating;
 
                 // don't rotate when distance is zero to avoid NaN
@@ -69,7 +75,7 @@ namespace osu.Game.Graphics.Cursor
                     if (diff > 180) diff -= 360;
                     degrees = activeCursor.Rotation + diff;
 
-                    activeCursor.RotateTo(degrees, 600, Easing.OutQuint);
+                    activeCursor.RotateTo(degrees, 120, Easing.OutQuint);
                 }
             }
 
@@ -109,7 +115,7 @@ namespace osu.Game.Graphics.Cursor
 
                 if (dragRotationState != DragRotationState.NotDragging)
                 {
-                    activeCursor.RotateTo(0, 600 * (1 + Math.Abs(activeCursor.Rotation / 720)), Easing.OutElasticHalf);
+                    activeCursor.RotateTo(0, 400 * (0.5f + Math.Abs(activeCursor.Rotation / 960)), Easing.OutElasticQuarter);
                     dragRotationState = DragRotationState.NotDragging;
                 }
 

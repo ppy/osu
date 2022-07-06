@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -25,12 +23,7 @@ namespace osu.Game.Online.Multiplayer
 
                     Debug.Assert(exception != null);
 
-                    string message = exception is HubException
-                        // HubExceptions arrive with additional message context added, but we want to display the human readable message:
-                        // "An unexpected error occurred invoking 'AddPlaylistItem' on the server.InvalidStateException: Can't enqueue more than 3 items at once."
-                        // We generally use the message field for a user-parseable error (eventually to be replaced), so drop the first part for now.
-                        ? exception.Message.Substring(exception.Message.IndexOf(':') + 1).Trim()
-                        : exception.Message;
+                    string message = exception.GetHubExceptionMessage() ?? exception.Message;
 
                     Logger.Log(message, level: LogLevel.Important);
                     onError?.Invoke(exception);
@@ -40,5 +33,16 @@ namespace osu.Game.Online.Multiplayer
                     onSuccess?.Invoke();
                 }
             });
+
+        public static string? GetHubExceptionMessage(this Exception exception)
+        {
+            if (exception is HubException hubException)
+                // HubExceptions arrive with additional message context added, but we want to display the human readable message:
+                // "An unexpected error occurred invoking 'AddPlaylistItem' on the server.InvalidStateException: Can't enqueue more than 3 items at once."
+                // We generally use the message field for a user-parseable error (eventually to be replaced), so drop the first part for now.
+                return hubException.Message.Substring(exception.Message.IndexOf(':') + 1).Trim();
+
+            return null;
+        }
     }
 }

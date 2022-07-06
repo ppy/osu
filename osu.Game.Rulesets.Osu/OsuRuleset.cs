@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -118,19 +120,19 @@ namespace osu.Game.Rulesets.Osu
             {
                 switch (mod)
                 {
-                    case OsuModAutopilot _:
+                    case OsuModAutopilot:
                         value |= LegacyMods.Autopilot;
                         break;
 
-                    case OsuModSpunOut _:
+                    case OsuModSpunOut:
                         value |= LegacyMods.SpunOut;
                         break;
 
-                    case OsuModTarget _:
+                    case OsuModTarget:
                         value |= LegacyMods.Target;
                         break;
 
-                    case OsuModTouchDevice _:
+                    case OsuModTouchDevice:
                         value |= LegacyMods.TouchDevice;
                         break;
                 }

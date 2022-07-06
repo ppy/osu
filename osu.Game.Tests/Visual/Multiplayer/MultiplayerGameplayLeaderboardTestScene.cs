@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -18,7 +20,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
-using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
@@ -27,7 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public abstract class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
     {
-        private const int total_users = 16;
+        protected const int TOTAL_USERS = 16;
 
         protected readonly BindableList<MultiplayerRoomUser> MultiplayerUsers = new BindableList<MultiplayerRoomUser>();
 
@@ -35,9 +36,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected virtual MultiplayerRoomUser CreateUser(int userId) => new MultiplayerRoomUser(userId);
 
-        protected abstract MultiplayerGameplayLeaderboard CreateLeaderboard(OsuScoreProcessor scoreProcessor);
+        protected abstract MultiplayerGameplayLeaderboard CreateLeaderboard();
 
         private readonly BindableList<int> multiplayerUserIds = new BindableList<int>();
+        private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
 
         private OsuConfigManager config;
 
@@ -55,7 +57,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // To emulate `MultiplayerClient.CurrentMatchPlayingUserIds` we need a bindable list of *only IDs*.
             // This tracks the list of users 1:1.
-            MultiplayerUsers.BindCollectionChanged((c, e) =>
+            MultiplayerUsers.BindCollectionChanged((_, e) =>
             {
                 switch (e.Action)
                 {
@@ -81,6 +83,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             multiplayerClient.SetupGet(c => c.CurrentMatchPlayingUserIds)
                              .Returns(() => multiplayerUserIds);
+
+            spectatorClient.SetupGet(c => c.WatchedUserStates)
+                           .Returns(() => watchedUserStates);
         }
 
         [SetUpSteps]
@@ -100,8 +105,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("populate users", () =>
             {
                 MultiplayerUsers.Clear();
-                for (int i = 0; i < total_users; i++)
-                    MultiplayerUsers.Add(CreateUser(i));
+
+                for (int i = 0; i < TOTAL_USERS; i++)
+                {
+                    var user = CreateUser(i);
+
+                    MultiplayerUsers.Add(user);
+
+                    watchedUserStates[i] = new SpectatorState
+                    {
+                        BeatmapID = 0,
+                        RulesetID = 0,
+                        Mods = user.Mods,
+                        MaximumScoringValues = new ScoringValues
+                        {
+                            BaseScore = 10000,
+                            MaxCombo = 1000,
+                            CountBasicHitObjects = 1000
+                        }
+                    };
+                }
             });
 
             AddStep("create leaderboard", () =>
@@ -109,13 +132,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Leaderboard?.Expire();
 
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
-                var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
-                OsuScoreProcessor scoreProcessor = new OsuScoreProcessor();
-                scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-                Child = scoreProcessor;
-
-                LoadComponentAsync(Leaderboard = CreateLeaderboard(scoreProcessor), Add);
+                LoadComponentAsync(Leaderboard = CreateLeaderboard(), Add);
             });
 
             AddUntilStep("wait for load", () => Leaderboard.IsLoaded);

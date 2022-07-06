@@ -6,8 +6,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
 using osuTK.Graphics;
 
-#nullable enable
-
 namespace osu.Game.Rulesets.Catch.UI
 {
     public class HitExplosionEntry : LifetimeEntry

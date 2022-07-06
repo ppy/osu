@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +43,7 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText labelText;
 
-        private OsuTextFlowContainer warningText;
+        private OsuTextFlowContainer noticeText;
 
         public bool ShowsDefaultIndicator = true;
         private readonly Container defaultValueIndicatorContainer;
@@ -70,27 +72,32 @@ namespace osu.Game.Overlays.Settings
         }
 
         /// <summary>
-        /// Text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
-        /// Generally used to recommend the user change their setting as the current one is considered sub-optimal.
+        /// Clear any warning text.
         /// </summary>
-        public LocalisableString? WarningText
+        public void ClearNoticeText()
         {
-            set
+            noticeText?.Expire();
+            noticeText = null;
+        }
+
+        /// <summary>
+        /// Set the text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
+        /// Generally used to provide feedback to a user about a sub-optimal setting.
+        /// </summary>
+        /// <param name="text">The text to display.</param>
+        /// <param name="isWarning">Whether the text is in a warning state. Will decide how this is visually represented.</param>
+        public void SetNoticeText(LocalisableString text, bool isWarning = false)
+        {
+            ClearNoticeText();
+
+            // construct lazily for cases where the label is not needed (may be provided by the Control).
+            FlowContent.Add(noticeText = new LinkFlowContainer(cp => cp.Colour = isWarning ? colours.Yellow : colours.Green)
             {
-                bool hasValue = value != default;
-
-                if (warningText == null)
-                {
-                    if (!hasValue)
-                        return;
-
-                    // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    FlowContent.Add(warningText = new SettingsNoticeText(colours) { Margin = new MarginPadding { Bottom = 5 } });
-                }
-
-                warningText.Alpha = hasValue ? 1 : 0;
-                warningText.Text = value ?? default;
-            }
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Margin = new MarginPadding { Bottom = 5 },
+                Text = text,
+            });
         }
 
         public virtual Bindable<T> Current

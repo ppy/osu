@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -84,9 +86,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             return individualStrain + overallStrain - CurrentStrain;
         }
 
-        protected override double CalculateInitialStrain(double offset)
-            => applyDecay(individualStrain, offset - Previous[0].StartTime, individual_decay_base)
-               + applyDecay(overallStrain, offset - Previous[0].StartTime, overall_decay_base);
+        protected override double CalculateInitialStrain(double offset, DifficultyHitObject current)
+            => applyDecay(individualStrain, offset - current.Previous(0).StartTime, individual_decay_base)
+               + applyDecay(overallStrain, offset - current.Previous(0).StartTime, overall_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);

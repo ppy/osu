@@ -1,8 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
@@ -338,24 +340,28 @@ namespace osu.Game.Screens.Menu
                 [BackgroundDependencyLoader]
                 private void load(RulesetStore rulesets)
                 {
-                    var modes = new List<Drawable>();
-
-                    foreach (var ruleset in rulesets.AvailableRulesets)
-                    {
-                        var icon = new ConstrainedIconContainer
-                        {
-                            Icon = ruleset.CreateInstance().CreateIcon(),
-                            Size = new Vector2(30),
-                        };
-
-                        modes.Add(icon);
-                    }
-
                     AutoSizeAxes = Axes.Both;
-                    Children = modes;
 
                     Anchor = Anchor.Centre;
                     Origin = Anchor.Centre;
+
+                    foreach (var ruleset in rulesets.AvailableRulesets)
+                    {
+                        try
+                        {
+                            var icon = new ConstrainedIconContainer
+                            {
+                                Icon = ruleset.CreateInstance().CreateIcon(),
+                                Size = new Vector2(30),
+                            };
+
+                            Add(icon);
+                        }
+                        catch
+                        {
+                            Logger.Log($"Could not create ruleset icon for {ruleset.Name}. Please check for an update from the developer.", level: LogLevel.Error);
+                        }
+                    }
                 }
             }
 

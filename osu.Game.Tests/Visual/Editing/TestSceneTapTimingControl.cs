@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -11,7 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
@@ -78,28 +80,6 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestTapThenReset()
-        {
-            AddStep("click tap button", () =>
-            {
-                control.ChildrenOfType<RoundedButton>()
-                       .Last()
-                       .TriggerClick();
-            });
-
-            AddUntilStep("wait for track playing", () => Clock.IsRunning);
-
-            AddStep("click reset button", () =>
-            {
-                control.ChildrenOfType<RoundedButton>()
-                       .First()
-                       .TriggerClick();
-            });
-
-            AddUntilStep("wait for track stopped", () => !Clock.IsRunning);
-        }
-
-        [Test]
         public void TestBasic()
         {
             AddStep("set low bpm", () =>
@@ -109,7 +89,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("click tap button", () =>
             {
-                control.ChildrenOfType<RoundedButton>()
+                control.ChildrenOfType<OsuButton>()
                        .Last()
                        .TriggerClick();
             });
@@ -121,6 +101,28 @@ namespace osu.Game.Tests.Visual.Editing
 
                 editorBeatmap.ControlPointInfo.TimingPoints.First().BeatLength = 60000f / bpm;
             });
+        }
+
+        [Test]
+        public void TestTapThenReset()
+        {
+            AddStep("click tap button", () =>
+            {
+                control.ChildrenOfType<OsuButton>()
+                       .Last()
+                       .TriggerClick();
+            });
+
+            AddUntilStep("wait for track playing", () => Clock.IsRunning);
+
+            AddStep("click reset button", () =>
+            {
+                control.ChildrenOfType<OsuButton>()
+                       .First()
+                       .TriggerClick();
+            });
+
+            AddUntilStep("wait for track stopped", () => !Clock.IsRunning);
         }
 
         protected override void Dispose(bool isDisposing)

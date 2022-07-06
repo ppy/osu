@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,7 +88,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// <returns></returns>
         public ScoreInfo CreateScoreInfo(RulesetStore rulesets, BeatmapInfo beatmap = null)
         {
-            var ruleset = rulesets.GetRuleset(RulesetID) ?? throw new InvalidOperationException();
+            var ruleset = rulesets.GetRuleset(RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {RulesetID} not found locally");
 
             var rulesetInstance = ruleset.CreateInstance();
 

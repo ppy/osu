@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -37,7 +39,7 @@ namespace osu.Game.Screens.Edit.Timing
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Padding = new MarginPadding(10);
+            Padding = new MarginPadding(10) { Bottom = 0 };
 
             InternalChildren = new Drawable[]
             {

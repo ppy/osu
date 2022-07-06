@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,6 +30,8 @@ namespace osu.Game.Skinning.Editor
     public class SkinEditor : VisibilityContainer, ICanAcceptFiles
     {
         public const double TRANSITION_DURATION = 500;
+
+        public const float MENU_HEIGHT = 40;
 
         public readonly BindableList<ISkinnableDrawable> SelectedComponents = new BindableList<ISkinnableDrawable>();
 
@@ -78,8 +82,6 @@ namespace osu.Game.Skinning.Editor
         {
             RelativeSizeAxes = Axes.Both;
 
-            const float menu_height = 40;
-
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -102,7 +104,7 @@ namespace osu.Game.Skinning.Editor
                                 Name = "Menu container",
                                 RelativeSizeAxes = Axes.X,
                                 Depth = float.MinValue,
-                                Height = menu_height,
+                                Height = MENU_HEIGHT,
                                 Children = new Drawable[]
                                 {
                                     new EditorMenuBar
@@ -188,13 +190,13 @@ namespace osu.Game.Skinning.Editor
             // schedule ensures this only happens when the skin editor is visible.
             // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
             // probably something which will be factored out in a future database refactor so not too concerning for now.
-            currentSkin.BindValueChanged(skin =>
+            currentSkin.BindValueChanged(_ =>
             {
                 hasBegunMutating = false;
                 Scheduler.AddOnce(skinChanged);
             }, true);
 
-            SelectedComponents.BindCollectionChanged((_, __) => Scheduler.AddOnce(populateSettings), true);
+            SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
         }
 
         public void UpdateTargetScreen(Drawable targetScreen)
@@ -320,9 +322,18 @@ namespace osu.Game.Skinning.Editor
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
 
+        public override void Hide()
+        {
+            base.Hide();
+            SelectedComponents.Clear();
+        }
+
         protected override void PopIn()
         {
-            this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+            this
+                // align animation to happen after the majority of the ScalingContainer animation completes.
+                .Delay(ScalingContainer.TRANSITION_DURATION * 0.3f)
+                .FadeIn(TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()

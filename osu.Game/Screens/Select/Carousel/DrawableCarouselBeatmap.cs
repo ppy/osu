@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -50,7 +53,9 @@ namespace osu.Game.Screens.Select.Carousel
         private Action<BeatmapInfo> hideRequested;
 
         private Triangles triangles;
+
         private StarCounter starCounter;
+        private DifficultyIcon difficultyIcon;
 
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
@@ -110,8 +115,9 @@ namespace osu.Game.Screens.Select.Carousel
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        new DifficultyIcon(beatmapInfo, shouldShowTooltip: false)
+                        difficultyIcon = new DifficultyIcon(beatmapInfo)
                         {
+                            ShowTooltip = false,
                             Scale = new Vector2(1.8f),
                         },
                         new FillFlowContainer
@@ -213,6 +219,8 @@ namespace osu.Game.Screens.Select.Carousel
                 starDifficultyBindable.BindValueChanged(d =>
                 {
                     starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
+                    if (d.NewValue != null)
+                        difficultyIcon.Current.Value = d.NewValue.Value;
                 }, true);
             }
 
@@ -244,7 +252,7 @@ namespace osu.Game.Screens.Select.Carousel
                 }
 
                 if (hideRequested != null)
-                    items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
+                    items.Add(new OsuMenuItem(CommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
 
                 return items.ToArray();
             }
@@ -255,12 +263,12 @@ namespace osu.Game.Screens.Select.Carousel
             return new ToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
             {
                 if (s)
-                    collection.Beatmaps.Add(beatmapInfo);
+                    collection.BeatmapHashes.Add(beatmapInfo.MD5Hash);
                 else
-                    collection.Beatmaps.Remove(beatmapInfo);
+                    collection.BeatmapHashes.Remove(beatmapInfo.MD5Hash);
             })
             {
-                State = { Value = collection.Beatmaps.Contains(beatmapInfo) }
+                State = { Value = collection.BeatmapHashes.Contains(beatmapInfo.MD5Hash) }
             };
         }
 

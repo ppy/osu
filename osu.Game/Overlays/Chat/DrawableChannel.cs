@@ -1,20 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osuTK.Graphics;
 
@@ -40,9 +37,6 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         public DrawableChannel(Channel channel)
         {
             Channel = channel;
@@ -67,7 +61,7 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Bottom = 5 },
                     Child = ChatLineFlow = new FillFlowContainer
                     {
-                        Padding = new MarginPadding { Left = 20, Right = 20 },
+                        Padding = new MarginPadding { Horizontal = 10 },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
@@ -121,11 +115,7 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual ChatLine CreateChatLine(Message m) => new ChatLine(m);
 
-        protected virtual Drawable CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
-        {
-            Colour = colours.ChatBlue.Lighten(0.7f),
-            Margin = new MarginPadding { Vertical = 10 },
-        };
+        protected virtual DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time);
 
         private void newMessagesArrived(IEnumerable<Message> newMessages) => Schedule(() =>
         {
@@ -203,69 +193,5 @@ namespace osu.Game.Overlays.Chat
         });
 
         private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();
-
-        public class DaySeparator : Container
-        {
-            public float TextSize
-            {
-                get => text.Font.Size;
-                set => text.Font = text.Font.With(size: value);
-            }
-
-            private float lineHeight = 2;
-
-            public float LineHeight
-            {
-                get => lineHeight;
-                set => lineHeight = leftBox.Height = rightBox.Height = value;
-            }
-
-            private readonly SpriteText text;
-            private readonly Box leftBox;
-            private readonly Box rightBox;
-
-            public DaySeparator(DateTimeOffset time)
-            {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                Child = new GridContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    ColumnDimensions = new[]
-                    {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(),
-                    },
-                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize), },
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            leftBox = new Box
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                RelativeSizeAxes = Axes.X,
-                                Height = lineHeight,
-                            },
-                            text = new OsuSpriteText
-                            {
-                                Margin = new MarginPadding { Horizontal = 10 },
-                                Text = time.ToLocalTime().ToString("dd MMM yyyy"),
-                            },
-                            rightBox = new Box
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                RelativeSizeAxes = Axes.X,
-                                Height = lineHeight,
-                            },
-                        }
-                    }
-                };
-            }
-        }
     }
 }
