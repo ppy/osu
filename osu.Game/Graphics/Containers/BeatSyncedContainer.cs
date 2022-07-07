@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.Containers
             TimingControlPoint timingPoint;
             EffectControlPoint effectPoint;
 
-            IsBeatSyncedWithTrack = BeatSyncSource.Clock?.IsRunning == true;
+            IsBeatSyncedWithTrack = BeatSyncSource.Clock?.IsRunning == true && BeatSyncSource.ControlPoints != null;
 
             double currentTrackTime;
 
