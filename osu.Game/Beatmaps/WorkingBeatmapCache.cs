@@ -248,37 +248,37 @@ namespace osu.Game.Beatmaps
                 try
                 {
                     string fileStorePath = BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path);
-                    var stream = GetStream(fileStorePath);
+                    var beatmapFileStream = GetStream(fileStorePath);
 
-                    if (stream == null)
+                    if (beatmapFileStream == null)
                     {
                         Logger.Log($"Beatmap failed to load (file {BeatmapInfo.Path} not found on disk at expected location {fileStorePath})", level: LogLevel.Error);
                         return null;
                     }
 
-                    using (var reader = new LineBufferedReader(stream))
+                    using (var reader = new LineBufferedReader(beatmapFileStream))
                     {
                         var decoder = Decoder.GetDecoder<Storyboard>(reader);
 
-                        string storyboardFilename = BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
+                        Stream storyboardFileStream = null;
 
-                        // todo: support loading from both set-wide storyboard *and* beatmap specific.
-                        if (string.IsNullOrEmpty(storyboardFilename))
-                            storyboard = decoder.Decode(reader);
-                        else
+                        if (BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename is string storyboardFilename)
                         {
-                            string storyboardFileStorePath = BeatmapSetInfo.GetPathForFile(storyboardFilename);
-                            var secondaryStream = GetStream(storyboardFileStorePath);
+                            string storyboardFileStorePath = BeatmapSetInfo?.GetPathForFile(storyboardFilename);
+                            storyboardFileStream = GetStream(storyboardFileStorePath);
 
-                            if (secondaryStream == null)
-                            {
-                                Logger.Log($"Storyboard failed to load (file {storyboardFilename} not found on disk at expected location {fileStorePath})", level: LogLevel.Error);
-                                return null;
-                            }
+                            if (storyboardFileStream == null)
+                                Logger.Log($"Storyboard failed to load (file {storyboardFilename} not found on disk at expected location {storyboardFileStorePath})", level: LogLevel.Error);
+                        }
 
-                            using (var secondaryReader = new LineBufferedReader(secondaryStream))
+                        if (storyboardFileStream != null)
+                        {
+                            // Stand-alone storyboard was found, so parse in addition to the beatmap's local storyboard.
+                            using (var secondaryReader = new LineBufferedReader(storyboardFileStream))
                                 storyboard = decoder.Decode(reader, secondaryReader);
                         }
+                        else
+                            storyboard = decoder.Decode(reader);
                     }
                 }
                 catch (Exception e)
