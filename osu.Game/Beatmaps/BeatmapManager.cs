@@ -316,6 +316,8 @@ namespace osu.Game.Beatmaps
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
+                setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
+
                 Realm.Write(r =>
                 {
                     var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
