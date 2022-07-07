@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
     {
         public List<MonoEncoding> Payload { get; private set; } = new List<MonoEncoding>();
 
-        public bool isIdenticalTo(ColourEncoding other)
+        public bool isRepetitionOf(ColourEncoding other)
         {
             return hasIdenticalMonoLength(other) &&
                 other.Payload.Count == Payload.Count &&

@@ -2,12 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
@@ -17,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// </summary>
     public class Colour : StrainDecaySkill
     {
-        protected override double SkillMultiplier => 0.2;
+        protected override double SkillMultiplier => 0.12;
         protected override double StrainDecayBase => 0.8;
 
         /// <summary>
@@ -40,33 +37,34 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return difficulty;
         }
 
-        public static String GetDebugHeaderLabels()
-        {
-            return "StartTime,Raw,Decayed,CoupledRunLength,RepetitionInterval,EncodingRunLength,Payload(MonoRunLength|MonoCount)";
-        }
+        // TODO: Remove before pr
+        // public static String GetDebugHeaderLabels()
+        // {
+        //     return "StartTime,Raw,Decayed,CoupledRunLength,RepetitionInterval,EncodingRunLength,Payload(MonoRunLength|MonoCount)";
+        // }
 
-        // TODO: Remove befor pr
-        public string GetDebugString(DifficultyHitObject current)
-        {
-            double difficulty = ColourEvaluator.EvaluateDifficultyOf(current);
-            difficulty *= speedBonus(current.DeltaTime);
-            TaikoDifficultyHitObject? taikoCurrent = (TaikoDifficultyHitObject)current;
-            TaikoDifficultyHitObjectColour? colour = taikoCurrent?.Colour;
-            if (taikoCurrent != null && colour != null)
-            {
-                List<ColourEncoding> payload = colour.Encoding.Payload;
-                string payloadDisplay = "";
-                for (int i = 0; i < payload.Count; ++i)
-                {
-                    payloadDisplay += $"({payload[i].Payload[0].RunLength}|{payload[i].Payload.Count})";
-                }
+        // // TODO: Remove before pr
+        // public string GetDebugString(DifficultyHitObject current)
+        // {
+        //     double difficulty = ColourEvaluator.EvaluateDifficultyOf(current);
+        //     difficulty *= speedBonus(current.DeltaTime);
+        //     TaikoDifficultyHitObject? taikoCurrent = (TaikoDifficultyHitObject)current;
+        //     TaikoDifficultyHitObjectColour? colour = taikoCurrent?.Colour;
+        //     if (taikoCurrent != null && colour != null)
+        //     {
+        //         List<ColourEncoding> payload = colour.Encoding.Payload;
+        //         string payloadDisplay = "";
+        //         for (int i = 0; i < payload.Count; ++i)
+        //         {
+        //             payloadDisplay += $"({payload[i].Payload[0].RunLength}|{payload[i].Payload.Count})";
+        //         }
 
-                return $"{current.StartTime},{difficulty},{CurrentStrain},{colour.Encoding.Payload[0].Payload.Count},{colour.Encoding.RepetitionInterval},{colour.Encoding.Payload.Count},{payloadDisplay}";
-            }
-            else
-            {
-                return $"{current.StartTime},{difficulty},{CurrentStrain},0,0,0,0,0";
-            }
-        }
+        //         return $"{current.StartTime},{difficulty},{CurrentStrain},{colour.Encoding.Payload[0].Payload.Count},{colour.Encoding.RepetitionInterval},{colour.Encoding.Payload.Count},{payloadDisplay}";
+        //     }
+        //     else
+        //     {
+        //         return $"{current.StartTime},{difficulty},{CurrentStrain},0,0,0,0,0";
+        //     }
+        // }
     }
 }

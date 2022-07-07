@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                     Previous = lastEncoded
                 };
 
-                bool isCoupled = i < data.Count - 2 && data[i].isIdenticalTo(data[i + 2]);
+                bool isCoupled = i < data.Count - 2 && data[i].isRepetitionOf(data[i + 2]);
                 if (!isCoupled)
                 {
                     lastEncoded.Payload.Add(data[i]);
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                         lastEncoded.Payload.Add(data[i]);
                         i++;
 
-                        isCoupled = i < data.Count - 2 && data[i].isIdenticalTo(data[i + 2]);
+                        isCoupled = i < data.Count - 2 && data[i].isRepetitionOf(data[i + 2]);
                     }
 
                     // Skip over peeked data and add the rest to the payload

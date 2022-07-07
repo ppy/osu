@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static void PreEvaluateDifficulties(CoupledColourEncoding encoding)
         {
-            double coupledEncodingDifficulty = EvaluateDifficultyOf(encoding);
+            double coupledEncodingDifficulty = 2 * EvaluateDifficultyOf(encoding);
             encoding.Payload[0].Payload[0].EncodedData[0].Colour!.EvaluatedDifficulty += coupledEncodingDifficulty;
             for (int i = 0; i < encoding.Payload.Count; i++)
             {
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 for (int j = 0; j < colourEncoding.Payload.Count; j++)
                 {
                     MonoEncoding monoEncoding = colourEncoding.Payload[j];
-                    monoEncoding.EncodedData[0].Colour!.EvaluatedDifficulty += EvaluateDifficultyOf(monoEncoding, j) * colourEncodingDifficulty;
+                    monoEncoding.EncodedData[0].Colour!.EvaluatedDifficulty += EvaluateDifficultyOf(monoEncoding, j) * colourEncodingDifficulty * 0.5;
                 }
             }
         }

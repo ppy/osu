@@ -11,11 +11,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Peaks : Skill
     {
-        private const double rhythm_skill_multiplier = 0.3 * final_multiplier;
-        private const double colour_skill_multiplier = 0.4 * final_multiplier;
-        private const double stamina_skill_multiplier = 0.35 * final_multiplier;
+        private const double rhythm_skill_multiplier = 0.2 * final_multiplier;
+        private const double colour_skill_multiplier = 0.375 * final_multiplier;
+        private const double stamina_skill_multiplier = 0.375 * final_multiplier;
 
-        private const double final_multiplier = 0.06;
+        private const double final_multiplier = 0.0625;
 
         private readonly Rhythm rhythm;
         private readonly Colour colour;
@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         public double StaminaDifficultyValue => stamina.DifficultyValue() * stamina_skill_multiplier;
 
         // TODO: remove before pr
-        private StreamWriter? colourDebugOutput;
-        bool debugColour = false;
+        // private StreamWriter? colourDebugOutput;
+        // bool debugColour = false;
 
         public Peaks(Mod[] mods, IBeatmap beatmap)
             : base(mods)
@@ -36,13 +36,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             colour = new Colour(mods);
             stamina = new Stamina(mods);
 
-            if (debugColour)
-            {
-                String filename = $"{beatmap.BeatmapInfo.OnlineID} - {beatmap.BeatmapInfo.Metadata.Title}[{beatmap.BeatmapInfo.DifficultyName}].csv";
-                filename = filename.Replace('/', '_');
-                colourDebugOutput = new StreamWriter(File.OpenWrite($"/run/mount/secondary/workspace/osu/output/colour-debug/{filename}"));
-                colourDebugOutput.WriteLine(Colour.GetDebugHeaderLabels());
-            }
+            // if (debugColour)
+            // {
+            //     String filename = $"{beatmap.BeatmapInfo.OnlineID} - {beatmap.BeatmapInfo.Metadata.Title}[{beatmap.BeatmapInfo.DifficultyName}].csv";
+            //     filename = filename.Replace('/', '_');
+            //     colourDebugOutput = new StreamWriter(File.OpenWrite($"/run/mount/secondary/workspace/osu/output/colour-debug/{filename}"));
+            //     colourDebugOutput.WriteLine(Colour.GetDebugHeaderLabels());
+            // }
 
         }
 
@@ -59,11 +59,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             colour.Process(current);
             stamina.Process(current);
 
-            if (debugColour && colourDebugOutput != null)
-            {
-                colourDebugOutput.WriteLine(colour.GetDebugString(current));
-                colourDebugOutput.Flush();
-            }
+            // if (debugColour && colourDebugOutput != null)
+            // {
+            //     colourDebugOutput.WriteLine(colour.GetDebugString(current));
+            //     colourDebugOutput.Flush();
+            // }
         }
 
         /// <summary>
