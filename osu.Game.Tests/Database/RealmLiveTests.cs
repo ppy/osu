@@ -78,6 +78,27 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestFailedNestedWritePerformsRollback()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                Assert.Throws<InvalidOperationException>(() =>
+                {
+                    realm.Write(r =>
+                    {
+                        realm.Write(_ =>
+                        {
+                            r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata()));
+                            throw new InvalidOperationException();
+                        });
+                    });
+                });
+
+                Assert.That(realm.Run(r => r.All<BeatmapInfo>()), Is.Empty);
+            });
+        }
+
+        [Test]
         public void TestNestedWriteCalls()
         {
             RunTestWithRealm((realm, _) =>
