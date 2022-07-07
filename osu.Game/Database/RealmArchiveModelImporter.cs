@@ -386,7 +386,7 @@ namespace osu.Game.Database
         /// <remarks>
         ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
         /// </remarks>
-        protected string ComputeHash(TModel item)
+        public string ComputeHash(TModel item)
         {
             // for now, concatenate all hashable files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
