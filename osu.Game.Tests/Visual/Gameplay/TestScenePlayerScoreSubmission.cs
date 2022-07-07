@@ -363,9 +363,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 await AllowImportCompletion.WaitAsync().ConfigureAwait(false);
 
-                await base.ImportScore(score);
-
                 ImportedScore = score;
+
+                // Calling base.ImportScore is omitted as it will fail for the test method which uses a custom ruleset.
+                // This can be resolved by doing something similar to what TestScenePlayerLocalScoreImport is doing,
+                // but requires a bit of restructuring.
             }
         }
     }
