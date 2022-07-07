@@ -363,23 +363,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 await AllowImportCompletion.WaitAsync().ConfigureAwait(false);
 
-                ImportedScore = score;
+                await base.ImportScore(score);
 
-                // It was discovered that Score members could sometimes be half-populated.
-                // In particular, the RulesetID property could be set to 0 even on non-osu! maps.
-                // We want to test that the state of that property is consistent in this test.
-                // EF makes this impossible.
-                //
-                // First off, because of the EF navigational property-explicit foreign key field duality,
-                // it can happen that - for example - the Ruleset navigational property is correctly initialised to mania,
-                // but the RulesetID foreign key property is not initialised and remains 0.
-                // EF silently bypasses this by prioritising the Ruleset navigational property over the RulesetID foreign key one.
-                //
-                // Additionally, adding an entity to an EF DbSet CAUSES SIDE EFFECTS with regard to the foreign key property.
-                // In the above instance, if a ScoreInfo with Ruleset = {mania} and RulesetID = 0 is attached to an EF context,
-                // RulesetID WILL BE SILENTLY SET TO THE CORRECT VALUE of 3.
-                //
-                // For the above reasons, actual importing is disabled in this test.
+                ImportedScore = score;
             }
         }
     }
