@@ -252,10 +252,10 @@ namespace osu.Game.Screens.Menu
 
         private bool backgroundFaded;
 
-        protected void FadeInBackground(float fadeInTime)
+        protected void FadeInBackground(float duration = 0)
         {
+            ApplyToBackground(b => b.FadeColour(Color4.White, duration));
             backgroundFaded = true;
-            ApplyToBackground(b => b.FadeColour(Color4.White, fadeInTime));
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)

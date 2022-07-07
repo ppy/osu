@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Menu
                 if (UsingThemedIntro)
                     decoupledClock.ChangeSource(Track);
 
-                LoadComponentAsync(intro = new TrianglesIntroSequence(logo, () => FadeInBackground(0))
+                LoadComponentAsync(intro = new TrianglesIntroSequence(logo, () => FadeInBackground())
                 {
                     RelativeSizeAxes = Axes.Both,
                     Clock = decoupledClock,
