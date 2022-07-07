@@ -18,7 +18,7 @@ namespace osu.Game.Tests
         }
 
         public FlakyTestAttribute(int tryCount)
-            : base(Environment.GetEnvironmentVariable("OSU_TESTS_FAIL_FLAKY") == "1" ? 0 : tryCount)
+            : base(Environment.GetEnvironmentVariable("OSU_TESTS_FAIL_FLAKY") == "1" ? 1 : tryCount)
         {
         }
     }
