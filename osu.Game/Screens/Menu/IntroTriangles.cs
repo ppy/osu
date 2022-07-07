@@ -8,19 +8,18 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
-using osu.Framework.Utils;
+using osu.Framework.Screens;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
 
@@ -32,15 +31,8 @@ namespace osu.Game.Screens.Menu
 
         protected override string BeatmapFile => "triangles.osz";
 
-        protected override BackgroundScreen CreateBackground() => background = new BackgroundScreenDefault(false)
-        {
-            Alpha = 0,
-        };
-
         [Resolved]
         private AudioManager audio { get; set; }
-
-        private BackgroundScreenDefault background;
 
         private Sample welcome;
 
@@ -75,7 +67,7 @@ namespace osu.Game.Screens.Menu
                 if (UsingThemedIntro)
                     decoupledClock.ChangeSource(Track);
 
-                LoadComponentAsync(intro = new TrianglesIntroSequence(logo, background)
+                LoadComponentAsync(intro = new TrianglesIntroSequence(logo, () => FadeInBackground(0))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Clock = decoupledClock,
@@ -95,17 +87,8 @@ namespace osu.Game.Screens.Menu
         {
             base.OnSuspending(e);
 
-            // ensure the background is shown, even if the TriangleIntroSequence failed to do so.
-            background.ApplyToBackground(b => b.Show());
-
             // important as there is a clock attached to a track which will likely be disposed before returning to this screen.
             intro.Expire();
-        }
-
-        public override void OnResuming(ScreenTransitionEvent e)
-        {
-            base.OnResuming(e);
-            background.FadeOut(100);
         }
 
         protected override void StartTrack()
@@ -116,7 +99,7 @@ namespace osu.Game.Screens.Menu
         private class TrianglesIntroSequence : CompositeDrawable
         {
             private readonly OsuLogo logo;
-            private readonly BackgroundScreenDefault background;
+            private readonly Action showBackgroundAction;
             private OsuSpriteText welcomeText;
 
             private RulesetFlow rulesets;
@@ -128,10 +111,10 @@ namespace osu.Game.Screens.Menu
 
             public Action LoadMenu;
 
-            public TrianglesIntroSequence(OsuLogo logo, BackgroundScreenDefault background)
+            public TrianglesIntroSequence(OsuLogo logo, Action showBackgroundAction)
             {
                 this.logo = logo;
-                this.background = background;
+                this.showBackgroundAction = showBackgroundAction;
             }
 
             [Resolved]
@@ -205,7 +188,6 @@ namespace osu.Game.Screens.Menu
 
                 rulesets.Hide();
                 lazerLogo.Hide();
-                background.ApplyToBackground(b => b.Hide());
 
                 using (BeginAbsoluteSequence(0))
                 {
@@ -267,7 +249,7 @@ namespace osu.Game.Screens.Menu
 
                             logo.FadeIn();
 
-                            background.ApplyToBackground(b => b.Show());
+                            showBackgroundAction();
 
                             game.Add(new GameWideFlash());
 
