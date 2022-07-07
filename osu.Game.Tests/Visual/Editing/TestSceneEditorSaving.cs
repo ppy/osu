@@ -40,6 +40,8 @@ namespace osu.Game.Tests.Visual.Editing
 
             SaveEditor();
 
+            AddAssert("Hash updated", () => !string.IsNullOrEmpty(EditorBeatmap.BeatmapInfo.BeatmapSet?.Hash));
+
             AddAssert("Beatmap has correct metadata", () => EditorBeatmap.BeatmapInfo.Metadata.Artist == "artist" && EditorBeatmap.BeatmapInfo.Metadata.Title == "title");
             AddAssert("Beatmap has correct author", () => EditorBeatmap.BeatmapInfo.Metadata.Author.Username == "author");
             AddAssert("Beatmap has correct difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName == "difficulty");
