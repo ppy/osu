@@ -52,15 +52,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Run all processing on a beatmap immediately.
         /// </summary>
-        public void Process(BeatmapSetInfo beatmapSet)
-        {
-            if (beatmapSet.Realm.IsInTransaction)
-                Process(beatmapSet, beatmapSet.Realm);
-            else
-                beatmapSet.Realm.Write(r => Process(beatmapSet, r));
-        }
-
-        public void Process(BeatmapSetInfo beatmapSet, Realm realm)
+        public void Process(BeatmapSetInfo beatmapSet) => beatmapSet.Realm.Write(r =>
         {
             // Before we use below, we want to invalidate.
             workingBeatmapCache.Invalidate(beatmapSet);
@@ -85,7 +77,7 @@ namespace osu.Game.Beatmaps
 
             // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
             workingBeatmapCache.Invalidate(beatmapSet);
-        }
+        });
 
         private double calculateLength(IBeatmap b)
         {
