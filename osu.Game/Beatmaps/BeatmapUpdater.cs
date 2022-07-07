@@ -10,7 +10,6 @@ using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Objects;
-using Realms;
 
 namespace osu.Game.Beatmaps
 {
