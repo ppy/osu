@@ -20,12 +20,19 @@ namespace osu.Game.Database
         {
             Transaction? transaction = null;
 
-            if (!realm.IsInTransaction)
-                transaction = realm.BeginWrite();
+            try
+            {
+                if (!realm.IsInTransaction)
+                    transaction = realm.BeginWrite();
 
-            function(realm);
+                function(realm);
 
-            transaction?.Commit();
+                transaction?.Commit();
+            }
+            finally
+            {
+                transaction?.Dispose();
+            }
         }
 
         /// <summary>
@@ -40,14 +47,21 @@ namespace osu.Game.Database
         {
             Transaction? transaction = null;
 
-            if (!realm.IsInTransaction)
-                transaction = realm.BeginWrite();
+            try
+            {
+                if (!realm.IsInTransaction)
+                    transaction = realm.BeginWrite();
 
-            var result = function(realm);
+                var result = function(realm);
 
-            transaction?.Commit();
+                transaction?.Commit();
 
-            return result;
+                return result;
+            }
+            finally
+            {
+                transaction?.Dispose();
+            }
         }
 
         /// <summary>
