@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -51,17 +49,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayer : ScreenTestScene
     {
-        private BeatmapManager beatmaps;
-        private RulesetStore rulesets;
-        private BeatmapSetInfo importedSet;
+        private BeatmapManager beatmaps = null!;
+        private RulesetStore rulesets = null!;
+        private BeatmapSetInfo importedSet = null!;
 
-        private TestMultiplayerComponents multiplayerComponents;
+        private TestMultiplayerComponents multiplayerComponents = null!;
 
         private TestMultiplayerClient multiplayerClient => multiplayerComponents.MultiplayerClient;
         private TestMultiplayerRoomManager roomManager => multiplayerComponents.RoomManager;
 
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -146,7 +144,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void removeLastUser()
         {
-            APIUser lastUser = multiplayerClient.ServerRoom?.Users.Last().User;
+            APIUser? lastUser = multiplayerClient.ServerRoom?.Users.Last().User;
 
             if (lastUser == null || lastUser == multiplayerClient.LocalUser?.User)
                 return;
@@ -156,7 +154,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void kickLastUser()
         {
-            APIUser lastUser = multiplayerClient.ServerRoom?.Users.Last().User;
+            APIUser? lastUser = multiplayerClient.ServerRoom?.Users.Last().User;
 
             if (lastUser == null || lastUser == multiplayerClient.LocalUser?.User)
                 return;
@@ -351,7 +349,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("join room", () => InputManager.Key(Key.Enter));
 
-            DrawableLoungeRoom.PasswordEntryPopover passwordEntryPopover = null;
+            DrawableLoungeRoom.PasswordEntryPopover? passwordEntryPopover = null;
             AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
             AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
             AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().TriggerClick());
@@ -678,7 +676,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestGameplayExitFlow()
         {
-            Bindable<double> holdDelay = null;
+            Bindable<double>? holdDelay = null;
 
             AddStep("Set hold delay to zero", () =>
             {
@@ -709,7 +707,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for lounge", () => multiplayerComponents.CurrentScreen is Screens.OnlinePlay.Multiplayer.Multiplayer);
 
             AddStep("stop holding", () => InputManager.ReleaseKey(Key.Escape));
-            AddStep("set hold delay to default", () => holdDelay.SetDefault());
+            AddStep("set hold delay to default", () => holdDelay?.SetDefault());
         }
 
         [Test]
@@ -992,7 +990,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for ready button to be enabled", () => readyButton.Enabled.Value);
 
             MultiplayerUserState lastState = MultiplayerUserState.Idle;
-            MultiplayerRoomUser user = null;
+            MultiplayerRoomUser? user = null;
 
             AddStep("click ready button", () =>
             {
