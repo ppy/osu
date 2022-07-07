@@ -597,7 +597,7 @@ namespace osu.Game
                 Host.ExceptionThrown -= onExceptionThrown;
         }
 
-        ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.Beatmap.ControlPointInfo;
+        ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.BeatmapLoaded ? Beatmap.Value.Beatmap.ControlPointInfo : null;
         IClock IBeatSyncProvider.Clock => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track : (IClock)null;
         ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
     }

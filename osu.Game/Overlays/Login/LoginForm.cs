@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -23,19 +21,19 @@ namespace osu.Game.Overlays.Login
 {
     public class LoginForm : FillFlowContainer
     {
-        private TextBox username;
-        private TextBox password;
-        private ShakeContainer shakeSignIn;
+        private TextBox username = null!;
+        private TextBox password = null!;
+        private ShakeContainer shakeSignIn = null!;
 
-        [Resolved(CanBeNull = true)]
-        private IAPIProvider api { get; set; }
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
-        public Action RequestHide;
+        public Action? RequestHide;
 
         private void performLogin()
         {
             if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
-                api?.Login(username.Text, password.Text);
+                api.Login(username.Text, password.Text);
             else
                 shakeSignIn.Shake();
         }
@@ -49,6 +47,7 @@ namespace osu.Game.Overlays.Login
             RelativeSizeAxes = Axes.X;
 
             ErrorTextFlowContainer errorText;
+            LinkFlowContainer forgottenPaswordLink;
 
             Children = new Drawable[]
             {
@@ -56,7 +55,7 @@ namespace osu.Game.Overlays.Login
                 {
                     PlaceholderText = UsersStrings.LoginUsername.ToLower(),
                     RelativeSizeAxes = Axes.X,
-                    Text = api?.ProvidedUsername ?? string.Empty,
+                    Text = api.ProvidedUsername,
                     TabbableContentContainer = this
                 },
                 password = new OsuPasswordTextBox
@@ -79,6 +78,12 @@ namespace osu.Game.Overlays.Login
                 {
                     LabelText = "Stay signed in",
                     Current = config.GetBindable<bool>(OsuSetting.SavePassword),
+                },
+                forgottenPaswordLink = new LinkFlowContainer
+                {
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                 },
                 new Container
                 {
@@ -103,15 +108,17 @@ namespace osu.Game.Overlays.Login
                     Text = "Register",
                     Action = () =>
                     {
-                        RequestHide();
+                        RequestHide?.Invoke();
                         accountCreation.Show();
                     }
                 }
             };
 
+            forgottenPaswordLink.AddLink(LayoutStrings.PopupLoginLoginForgot, $"{api.WebsiteRootUrl}/home/password-reset");
+
             password.OnCommit += (_, _) => performLogin();
 
-            if (api?.LastLoginError?.Message is string error)
+            if (api.LastLoginError?.Message is string error)
                 errorText.AddErrors(new[] { error });
         }
 
