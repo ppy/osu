@@ -60,6 +60,25 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestNestedWriteCalls()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
+
+                var liveBeatmap = beatmap.ToLive(realm);
+
+                realm.Run(r =>
+                    r.Write(_ =>
+                        r.Write(_ =>
+                            r.Add(beatmap)))
+                );
+
+                Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+            });
+        }
+
+        [Test]
         public void TestAccessAfterAttach()
         {
             RunTestWithRealm((realm, _) =>
