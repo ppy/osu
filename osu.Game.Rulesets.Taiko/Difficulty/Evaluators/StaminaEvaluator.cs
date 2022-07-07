@@ -16,8 +16,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <param name="interval">The interval between the current and previous note hit using the same key.</param>
         private static double speedBonus(double interval)
         {
-            // return 10 / Math.Pow(interval, 0.6);
-            return Math.Pow(0.1, interval / 1000);
+            // return 15 / Math.Pow(interval, 0.6);
+            return Math.Pow(0.2, interval / 1000);
         }
 
         /// <summary>
