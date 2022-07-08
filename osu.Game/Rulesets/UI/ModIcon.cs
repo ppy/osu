@@ -123,40 +123,12 @@ namespace osu.Game.Rulesets.UI
                 modAcronym.FadeOut();
             }
 
-            switch (value.Type)
-            {
-                default:
-                case ModType.DifficultyIncrease:
-                    backgroundColour = colours.Red1;
-                    highlightedColour = colours.Red0;
-                    break;
+            Color4 typeColour = colours.ForModType(value.Type);
+            backgroundColour = typeColour;
+            highlightedColour = ((Colour4)typeColour).Lighten(.2f);
 
-                case ModType.DifficultyReduction:
-                    backgroundColour = colours.Lime1;
-                    highlightedColour = colours.Lime0;
-                    break;
-
-                case ModType.Automation:
-                    backgroundColour = colours.Blue1;
-                    highlightedColour = colours.Blue0;
-                    break;
-
-                case ModType.Conversion:
-                    backgroundColour = colours.Purple1;
-                    highlightedColour = colours.Purple0;
-                    break;
-
-                case ModType.Fun:
-                    backgroundColour = colours.Pink1;
-                    highlightedColour = colours.Pink0;
-                    break;
-
-                case ModType.System:
-                    backgroundColour = colours.Gray7;
-                    highlightedColour = colours.Gray8;
-                    modIcon.Colour = colours.Yellow;
-                    break;
-            }
+            if (value.Type == ModType.System)
+                modIcon.Colour = colours.Yellow;
 
             updateColour();
         }
