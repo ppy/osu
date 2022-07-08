@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -82,6 +83,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set custom ruleset", () => customRuleset = createCustomRuleset());
 
             CreateTest();
+
+            AddAssert("score has custom ruleset", () => Player.Score.ScoreInfo.Ruleset.Equals(customRuleset.AsNonNull().RulesetInfo));
 
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
 
