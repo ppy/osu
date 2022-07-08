@@ -34,6 +34,6 @@ namespace osu.Game.Graphics.UserInterface
         {
         }
 
-        public override IconUsage? GetIconForState(bool state) => state ? (IconUsage?)FontAwesome.Solid.Check : null;
+        public override IconUsage? GetIconForState(bool state) => state ? FontAwesome.Solid.Check : null;
     }
 }

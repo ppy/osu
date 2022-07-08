@@ -1,11 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects;
@@ -34,7 +31,7 @@ namespace osu.Game.Rulesets.Replays
         /// </summary>
         public abstract Replay Generate();
 
-        protected virtual HitObject GetNextObject(int currentIndex)
+        protected virtual HitObject? GetNextObject(int currentIndex)
         {
             if (currentIndex >= Beatmap.HitObjects.Count - 1)
                 return null;
@@ -51,8 +48,7 @@ namespace osu.Game.Rulesets.Replays
         /// </summary>
         protected readonly List<TFrame> Frames = new List<TFrame>();
 
-        [CanBeNull]
-        protected TFrame LastFrame => Frames.Count == 0 ? null : Frames[^1];
+        protected TFrame? LastFrame => Frames.Count == 0 ? null : Frames[^1];
 
         protected AutoGenerator(IBeatmap beatmap)
             : base(beatmap)

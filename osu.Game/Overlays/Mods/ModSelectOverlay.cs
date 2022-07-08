@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,13 +23,15 @@ using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
     public abstract class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler
     {
         public const int BUTTON_WIDTH = 200;
+
+        protected override string PopInSampleName => "";
+        protected override string PopOutSampleName => @"SongSelect/mod-select-overlay-pop-out";
 
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -41,7 +45,7 @@ namespace osu.Game.Overlays.Mods
         /// </remarks>
         public Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> AvailableMods { get; } = new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>(new Dictionary<ModType, IReadOnlyList<ModState>>());
 
-        private Func<Mod, bool> isValidMod = m => true;
+        private Func<Mod, bool> isValidMod = _ => true;
 
         /// <summary>
         /// A function determining whether each mod in the column should be displayed.
@@ -68,7 +72,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected virtual bool AllowCustomisation => true;
 
-        protected virtual ModColumn CreateModColumn(ModType modType, Key[]? toggleKeys = null) => new ModColumn(modType, false, toggleKeys);
+        protected virtual ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, false);
 
         protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
 
@@ -102,16 +106,20 @@ namespace osu.Game.Overlays.Mods
 
         private ShearedToggleButton? customisationButton;
 
+        private Sample? columnAppearSample;
+
         protected ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuColour colours)
+        private void load(OsuGameBase game, OsuColour colours, AudioManager audio)
         {
             Header.Title = ModSelectOverlayStrings.ModSelectTitle;
             Header.Description = ModSelectOverlayStrings.ModSelectDescription;
+
+            columnAppearSample = audio.Samples.Get(@"SongSelect/mod-column-pop-in");
 
             AddRange(new Drawable[]
             {
@@ -160,9 +168,9 @@ namespace osu.Game.Overlays.Mods
                                 Padding = new MarginPadding { Bottom = 10 },
                                 Children = new[]
                                 {
-                                    createModColumnContent(ModType.DifficultyReduction, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P }),
-                                    createModColumnContent(ModType.DifficultyIncrease, new[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L }),
-                                    createModColumnContent(ModType.Automation, new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M }),
+                                    createModColumnContent(ModType.DifficultyReduction),
+                                    createModColumnContent(ModType.DifficultyIncrease),
+                                    createModColumnContent(ModType.Automation),
                                     createModColumnContent(ModType.Conversion),
                                     createModColumnContent(ModType.Fun)
                                 }
@@ -264,9 +272,9 @@ namespace osu.Game.Overlays.Mods
                 column.DeselectAll();
         }
 
-        private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
+        private ColumnDimContainer createModColumnContent(ModType modType)
         {
-            var column = CreateModColumn(modType, toggleKeys).With(column =>
+            var column = CreateModColumn(modType).With(column =>
             {
                 // spacing applied here rather than via `columnFlow.Spacing` to avoid uneven gaps when some of the columns are hidden.
                 column.Margin = new MarginPadding { Right = 10 };
@@ -454,8 +462,31 @@ namespace osu.Game.Overlays.Mods
                       .MoveToY(0, duration, Easing.OutQuint)
                       .FadeIn(duration, Easing.OutQuint);
 
-                if (!allFiltered)
-                    nonFilteredColumnCount += 1;
+                if (allFiltered)
+                    continue;
+
+                int columnNumber = nonFilteredColumnCount;
+                Scheduler.AddDelayed(() =>
+                {
+                    var channel = columnAppearSample?.GetChannel();
+                    if (channel == null) return;
+
+                    // Still play sound effects for off-screen columns up to a certain point.
+                    if (columnNumber > 5 && !column.Active.Value) return;
+
+                    // use X position of the column on screen as a basis for panning the sample
+                    float balance = column.Parent.BoundingBox.Centre.X / RelativeToAbsoluteFactor.X;
+
+                    // dip frequency and ramp volume of sample over the first 5 displayed columns
+                    float progress = Math.Min(1, columnNumber / 5f);
+
+                    channel.Frequency.Value = 1.3 - (progress * 0.3) + RNG.NextDouble(0.1);
+                    channel.Volume.Value = Math.Max(progress, 0.2);
+                    channel.Balance.Value = -1 + balance * 2;
+                    channel.Play();
+                }, delay);
+
+                nonFilteredColumnCount += 1;
             }
         }
 
@@ -690,11 +721,11 @@ namespace osu.Game.Overlays.Mods
 
                 switch (e)
                 {
-                    case ClickEvent _:
+                    case ClickEvent:
                         OnClicked?.Invoke();
                         return true;
 
-                    case MouseEvent _:
+                    case MouseEvent:
                         return true;
                 }
 

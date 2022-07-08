@@ -48,8 +48,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             switch (hitObject)
             {
-                case DrawableDrumRollTick _:
-                case DrawableHit _:
+                case DrawableDrumRollTick:
+                case DrawableHit:
                     double preempt = drawableRuleset.TimeRange.Value / drawableRuleset.ControlPointAt(hitObject.HitObject.StartTime).Multiplier;
                     double start = hitObject.HitObject.StartTime - preempt * fade_out_start_time;
                     double duration = preempt * fade_out_duration;

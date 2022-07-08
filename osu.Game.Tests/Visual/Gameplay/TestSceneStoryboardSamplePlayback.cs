@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void createPlayerTest()
         {
-            CreateTest(null);
+            CreateTest();
 
             AddAssert("storyboard loaded", () => Player.Beatmap.Value.Storyboard != null);
             waitUntilStoryboardSamplesPlay();

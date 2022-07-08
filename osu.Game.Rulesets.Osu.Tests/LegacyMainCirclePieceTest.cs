@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 skin.Setup(s => s.GetTexture(It.IsAny<string>())).CallBase();
 
                 skin.Setup(s => s.GetTexture(It.IsIn(textureFilenames), It.IsAny<WrapMode>(), It.IsAny<WrapMode>()))
-                    .Returns((string componentName, WrapMode _, WrapMode __) => new Texture(1, 1) { AssetName = componentName });
+                    .Returns((string componentName, WrapMode _, WrapMode _) => new Texture(1, 1) { AssetName = componentName });
 
                 Child = new DependencyProvidingContainer
                 {

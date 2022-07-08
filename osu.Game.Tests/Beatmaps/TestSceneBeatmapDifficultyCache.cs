@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Beatmaps
         [TestCase(8.3, DifficultyRating.ExpertPlus)]
         public void TestDifficultyRatingMapping(double starRating, DifficultyRating expectedBracket)
         {
-            var actualBracket = BeatmapDifficultyCache.GetDifficultyRating(starRating);
+            var actualBracket = StarDifficulty.GetDifficultyRating(starRating);
 
             Assert.AreEqual(expectedBracket, actualBracket);
         }

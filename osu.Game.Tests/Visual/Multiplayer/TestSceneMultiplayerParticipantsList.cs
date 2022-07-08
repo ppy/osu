@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -53,20 +51,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 1);
 
             AddStep("add non-resolvable user", () => MultiplayerClient.TestAddUnresolvedUser());
-            AddAssert("null user added", () => MultiplayerClient.Room.AsNonNull().Users.Count(u => u.User == null) == 1);
+            AddUntilStep("null user added", () => MultiplayerClient.ClientRoom.AsNonNull().Users.Count(u => u.User == null) == 1);
 
             AddUntilStep("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
 
             AddStep("kick null user", () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.User.User == null)
                                                 .ChildrenOfType<ParticipantPanel.KickButton>().Single().TriggerClick());
 
-            AddAssert("null user kicked", () => MultiplayerClient.Room.AsNonNull().Users.Count == 1);
+            AddUntilStep("null user kicked", () => MultiplayerClient.ClientRoom.AsNonNull().Users.Count == 1);
         }
 
         [Test]
         public void TestRemoveUser()
         {
-            APIUser secondUser = null;
+            APIUser? secondUser = null;
 
             AddStep("add a user", () =>
             {
@@ -80,7 +78,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("remove host", () => MultiplayerClient.RemoveUser(API.LocalUser.Value));
 
-            AddAssert("single panel is for second user", () => this.ChildrenOfType<ParticipantPanel>().Single().User.User == secondUser);
+            AddAssert("single panel is for second user", () => this.ChildrenOfType<ParticipantPanel>().Single().User.UserID == secondUser?.Id);
         }
 
         [Test]
@@ -217,7 +215,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("kick second user", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Single(d => d.IsPresent).TriggerClick());
 
-            AddAssert("second user kicked", () => MultiplayerClient.Room?.Users.Single().UserID == API.LocalUser.Value.Id);
+            AddUntilStep("second user kicked", () => MultiplayerClient.ClientRoom?.Users.Single().UserID == API.LocalUser.Value.Id);
         }
 
         [Test]
@@ -368,7 +366,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createNewParticipantsList()
         {
-            ParticipantsList participantsList = null;
+            ParticipantsList? participantsList = null;
 
             AddStep("create new list", () => Child = participantsList = new ParticipantsList
             {
@@ -378,7 +376,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Size = new Vector2(380, 0.7f)
             });
 
-            AddUntilStep("wait for list to load", () => participantsList.IsLoaded);
+            AddUntilStep("wait for list to load", () => participantsList?.IsLoaded == true);
         }
 
         private void checkProgressBarVisibility(bool visible) =>

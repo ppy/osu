@@ -120,16 +120,16 @@ namespace osu.Game.Skinning
                             currentConfig.MinimumColumnWidth = minWidth;
                         break;
 
-                    case string _ when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
                         HandleColours(currentConfig, line);
                         break;
 
                     // Custom sprite paths
-                    case string _ when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
-                    case string _ when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }

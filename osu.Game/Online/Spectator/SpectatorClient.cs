@@ -188,7 +188,10 @@ namespace osu.Game.Online.Spectator
             }
 
             if (frame is IConvertibleReplayFrame convertible)
+            {
+                Debug.Assert(currentBeatmap != null);
                 pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+            }
 
             if (pendingFrames.Count > max_pending_frames)
                 purgePendingFrames();
@@ -294,17 +297,21 @@ namespace osu.Game.Online.Spectator
 
             lastSend = tcs.Task;
 
-            SendFramesInternal(bundle).ContinueWith(t => Schedule(() =>
+            SendFramesInternal(bundle).ContinueWith(t =>
             {
+                // Handle exception outside of `Schedule` to ensure it doesn't go unovserved.
                 bool wasSuccessful = t.Exception == null;
 
-                // If the last bundle send wasn't successful, try again without dequeuing.
-                if (wasSuccessful)
-                    pendingFrameBundles.Dequeue();
+                return Schedule(() =>
+                {
+                    // If the last bundle send wasn't successful, try again without dequeuing.
+                    if (wasSuccessful)
+                        pendingFrameBundles.Dequeue();
 
-                tcs.SetResult(wasSuccessful);
-                sendNextBundleIfRequired();
-            }));
+                    tcs.SetResult(wasSuccessful);
+                    sendNextBundleIfRequired();
+                });
+            });
         }
     }
 }
