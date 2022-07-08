@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                     RotateSlider(slider, workingObject.RotationOriginal + MathF.PI - getSliderRotation(slider));
                 }
 
-                possibleMovementBounds = calculatePossibleMovementBounds(slider);
+                possibleMovementBounds = CalculatePossibleMovementBounds(slider);
             }
 
             var previousPosition = workingObject.PositionModified;
