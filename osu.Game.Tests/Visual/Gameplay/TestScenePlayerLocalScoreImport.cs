@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override string Description => "custom";
             public override string ShortName => "custom";
 
-            public new int LegacyID => -1;
+            int ILegacyRuleset.LegacyID => -1;
 
             public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(this);
         }
