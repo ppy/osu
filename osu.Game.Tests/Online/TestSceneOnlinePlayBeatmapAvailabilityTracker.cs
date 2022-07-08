@@ -212,17 +212,17 @@ namespace osu.Game.Tests.Online
             {
             }
 
-            protected override BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapUpdater beatmapUpdater)
+            protected override BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm)
             {
-                return new TestBeatmapImporter(this, storage, realm, beatmapUpdater);
+                return new TestBeatmapImporter(this, storage, realm);
             }
 
             internal class TestBeatmapImporter : BeatmapImporter
             {
                 private readonly TestBeatmapManager testBeatmapManager;
 
-                public TestBeatmapImporter(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapUpdater beatmapUpdater)
-                    : base(storage, databaseAccess, beatmapUpdater)
+                public TestBeatmapImporter(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess)
+                    : base(storage, databaseAccess)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }

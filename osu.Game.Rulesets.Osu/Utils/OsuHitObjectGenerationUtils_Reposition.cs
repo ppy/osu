@@ -196,6 +196,27 @@ namespace osu.Game.Rulesets.Osu.Utils
             var slider = (Slider)workingObject.HitObject;
             var possibleMovementBounds = CalculatePossibleMovementBounds(slider);
 
+            // The slider rotation applied in computeModifiedPosition might make it impossible to fit the slider into the playfield
+            // For example, a long horizontal slider will be off-screen when rotated by 90 degrees
+            // In this case, limit the rotation to either 0 or 180 degrees
+            if (possibleMovementBounds.Width < 0 || possibleMovementBounds.Height < 0)
+            {
+                float currentRotation = getSliderRotation(slider);
+                float diff1 = getAngleDifference(workingObject.RotationOriginal, currentRotation);
+                float diff2 = getAngleDifference(workingObject.RotationOriginal + MathF.PI, currentRotation);
+
+                if (diff1 < diff2)
+                {
+                    RotateSlider(slider, workingObject.RotationOriginal - getSliderRotation(slider));
+                }
+                else
+                {
+                    RotateSlider(slider, workingObject.RotationOriginal + MathF.PI - getSliderRotation(slider));
+                }
+
+                possibleMovementBounds = calculatePossibleMovementBounds(slider);
+            }
+
             var previousPosition = workingObject.PositionModified;
 
             // Clamp slider position to the placement area
@@ -355,6 +376,18 @@ namespace osu.Game.Rulesets.Osu.Utils
             return MathF.Atan2(endPositionVector.Y, endPositionVector.X);
         }
 
+        /// <summary>
+        /// Get the absolute difference between 2 angles measured in Radians.
+        /// </summary>
+        /// <param name="angle1">The first angle</param>
+        /// <param name="angle2">The second angle</param>
+        /// <returns>The absolute difference with interval <c>[0, MathF.PI)</c></returns>
+        private static float getAngleDifference(float angle1, float angle2)
+        {
+            float diff = MathF.Abs(angle1 - angle2) % (MathF.PI * 2);
+            return MathF.Min(diff, MathF.PI * 2 - diff);
+        }
+
         public class ObjectPositionInfo
         {
             /// <summary>
@@ -397,6 +430,7 @@ namespace osu.Game.Rulesets.Osu.Utils
 
         private class WorkingObject
         {
+            public float RotationOriginal { get; }
             public Vector2 PositionOriginal { get; }
             public Vector2 PositionModified { get; set; }
             public Vector2 EndPositionModified { get; set; }
@@ -407,6 +441,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             public WorkingObject(ObjectPositionInfo positionInfo)
             {
                 PositionInfo = positionInfo;
+                RotationOriginal = HitObject is Slider slider ? getSliderRotation(slider) : 0;
                 PositionModified = PositionOriginal = HitObject.Position;
                 EndPositionModified = HitObject.EndPosition;
             }
