@@ -3,22 +3,51 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Extensions;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
-using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [HeadlessTest] // Importing rulesets doesn't work in interactive flows.
     public class TestScenePlayerLocalScoreImport : PlayerTestScene
     {
-        private Ruleset? customRuleset;
+        private BeatmapManager beatmaps = null!;
+        private RulesetStore rulesets = null!;
 
-        protected override bool ImportBeatmapToDatabase => true;
+        private BeatmapSetInfo? importedSet;
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host, AudioManager audio)
+        {
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new ScoreManager(rulesets, () => beatmaps, LocalStorage, Realm, Scheduler));
+            Dependencies.Cache(Realm);
+        }
+
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("import beatmap", () =>
+            {
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+            });
+        }
+
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => beatmaps.GetWorkingBeatmap(importedSet?.Beatmaps.First()).Beatmap;
+
+        private Ruleset? customRuleset;
 
         protected override Ruleset CreatePlayerRuleset() => customRuleset ?? new OsuRuleset();
 
@@ -66,7 +95,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
-            AddUntilStep("score in database", () => Realm.Run(r => r.All<ScoreInfo>().Count() == 1));
+            AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
         }
     }
 }
