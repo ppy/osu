@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -26,8 +27,12 @@ namespace osu.Game.Tests.Visual
         protected virtual bool HasCustomSteps => false;
 
         /// <summary>
-        /// WARNING: ONLY WORKS IF RUN HEADLESS because reasons.
+        /// Import the beatmap to the database before starting gameplay. Handy for testing local score storage and the likes.
         /// </summary>
+        /// <remarks>
+        /// Only works under headless operation currently due to realm isolation difficulties.
+        /// If this is ever needed to change, consideration needs to be given to the fact that BeatmapManager is attached to the global realm.
+        /// </remarks>
         protected virtual bool ImportBeatmapToDatabase => false;
 
         protected TestPlayer Player;
@@ -77,6 +82,8 @@ namespace osu.Game.Tests.Visual
 
             if (ImportBeatmapToDatabase)
             {
+                Debug.Assert(DebugUtils.IsNUnitRunning, $@"Importing beatmaps in {nameof(PlayerTestScene)} requires headless environment.");
+
                 Debug.Assert(beatmap.BeatmapInfo.BeatmapSet != null);
 
                 var imported = beatmaps.Import(beatmap.BeatmapInfo.BeatmapSet);
