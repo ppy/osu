@@ -9,6 +9,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -21,7 +22,7 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public class TestSceneComposeScreen : EditorClockTestScene
     {
-        private EditorBeatmap editorBeatmap;
+        private EditorBeatmap editorBeatmap = null!;
 
         [Cached]
         private EditorClipboard clipboard = new EditorClipboard();
@@ -47,6 +48,7 @@ namespace osu.Game.Tests.Visual.Editing
                     {
                         (typeof(EditorBeatmap), editorBeatmap),
                         (typeof(IBeatSnapProvider), editorBeatmap),
+                        (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Green)),
                     },
                     Child = new ComposeScreen { State = { Value = Visibility.Visible } },
                 };

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,7 @@ using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.Chat.Tabs;
+using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
 {
@@ -61,8 +63,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        private readonly IAPIProvider api;
 
         [Resolved]
         private UserLookupCache users { get; set; }
@@ -71,8 +72,9 @@ namespace osu.Game.Online.Chat
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
-        public ChannelManager()
+        public ChannelManager(IAPIProvider api)
         {
+            this.api = api;
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
 
@@ -131,10 +133,14 @@ namespace osu.Game.Online.Chat
                                    ?? JoinChannel(new Channel(user));
         }
 
-        private void currentChannelChanged(ValueChangedEvent<Channel> e)
+        private void currentChannelChanged(ValueChangedEvent<Channel> channel)
         {
-            if (!(e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel))
-                JoinChannel(e.NewValue);
+            bool isSelectorChannel = channel.NewValue is ChannelListing.ChannelListingChannel;
+
+            if (!isSelectorChannel)
+                JoinChannel(channel.NewValue);
+
+            Logger.Log($"Current channel changed to {channel.NewValue}");
         }
 
         /// <summary>
@@ -420,11 +426,10 @@ namespace osu.Game.Online.Chat
         /// Joins a channel if it has not already been joined. Must be called from the update thread.
         /// </summary>
         /// <param name="channel">The channel to join.</param>
-        /// <param name="setCurrent">Set the channel to join as the current channel if the current channel is null.</param>
         /// <returns>The joined channel. Note that this may not match the parameter channel as it is a backed object.</returns>
-        public Channel JoinChannel(Channel channel, bool setCurrent = true) => joinChannel(channel, true, setCurrent);
+        public Channel JoinChannel(Channel channel) => joinChannel(channel, true);
 
-        private Channel joinChannel(Channel channel, bool fetchInitialMessages = false, bool setCurrent = true)
+        private Channel joinChannel(Channel channel, bool fetchInitialMessages = false)
         {
             if (channel == null) return null;
 
@@ -440,13 +445,21 @@ namespace osu.Game.Online.Chat
                     case ChannelType.Multiplayer:
                         // join is implicit. happens when you join a multiplayer game.
                         // this will probably change in the future.
-                        joinChannel(channel, fetchInitialMessages, setCurrent);
+                        joinChannel(channel, fetchInitialMessages);
                         return channel;
 
                     case ChannelType.PM:
+                        Logger.Log($"Attempting to join PM channel {channel}");
+
                         var createRequest = new CreateChannelRequest(channel);
+                        createRequest.Failure += e =>
+                        {
+                            Logger.Log($"Failed to join PM channel {channel} ({e.Message})");
+                        };
                         createRequest.Success += resChannel =>
                         {
+                            Logger.Log($"Joined PM channel {channel} ({resChannel.ChannelID})");
+
                             if (resChannel.ChannelID.HasValue)
                             {
                                 channel.Id = resChannel.ChannelID.Value;
@@ -460,9 +473,19 @@ namespace osu.Game.Online.Chat
                         break;
 
                     default:
+                        Logger.Log($"Attempting to join public channel {channel}");
+
                         var req = new JoinChannelRequest(channel);
-                        req.Success += () => joinChannel(channel, fetchInitialMessages, setCurrent);
-                        req.Failure += ex => LeaveChannel(channel);
+                        req.Success += () =>
+                        {
+                            Logger.Log($"Joined public channel {channel}");
+                            joinChannel(channel, fetchInitialMessages);
+                        };
+                        req.Failure += e =>
+                        {
+                            Logger.Log($"Failed to join public channel {channel} ({e.Message})");
+                            LeaveChannel(channel);
+                        };
                         api.Queue(req);
                         return channel;
                 }
@@ -473,8 +496,7 @@ namespace osu.Game.Online.Chat
                     this.fetchInitialMessages(channel);
             }
 
-            if (setCurrent)
-                CurrentChannel.Value ??= channel;
+            CurrentChannel.Value ??= channel;
 
             return channel;
         }

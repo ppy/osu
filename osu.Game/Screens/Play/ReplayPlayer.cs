@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +26,7 @@ namespace osu.Game.Screens.Play
         protected override bool CheckModsAllowFailure() => false;
 
         public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
-            : this((_, __) => score, configuration)
+            : this((_, _) => score, configuration)
         {
         }
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,7 +24,7 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyBeatmapEncoder
     {
-        public const int LATEST_VERSION = 128;
+        public const int FIRST_LAZER_VERSION = 128;
 
         /// <summary>
         /// osu! is generally slower than taiko, so a factor is added to increase
@@ -55,7 +57,7 @@ namespace osu.Game.Beatmaps.Formats
 
         public void Encode(TextWriter writer)
         {
-            writer.WriteLine($"osu file format v{LATEST_VERSION}");
+            writer.WriteLine($"osu file format v{FIRST_LAZER_VERSION}");
 
             writer.WriteLine();
             handleGeneral(writer);
@@ -371,11 +373,11 @@ namespace osu.Game.Beatmaps.Formats
 
             switch (hitObject)
             {
-                case IHasPath _:
+                case IHasPath:
                     type |= LegacyHitObjectType.Slider;
                     break;
 
-                case IHasDuration _:
+                case IHasDuration:
                     if (onlineRulesetID == 3)
                         type |= LegacyHitObjectType.Hold;
                     else

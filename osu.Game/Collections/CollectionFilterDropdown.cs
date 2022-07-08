@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -38,7 +40,7 @@ namespace osu.Game.Collections
         }
 
         private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
-        private readonly IBindableList<BeatmapInfo> beatmaps = new BindableList<BeatmapInfo>();
+        private readonly IBindableList<string> beatmaps = new BindableList<string>();
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
         [Resolved(CanBeNull = true)]
@@ -65,7 +67,7 @@ namespace osu.Game.Collections
             // An extra bindable is enough to subvert this behaviour.
             base.Current = Current;
 
-            collections.BindCollectionChanged((_, __) => collectionsChanged(), true);
+            collections.BindCollectionChanged((_, _) => collectionsChanged(), true);
             Current.BindValueChanged(filterChanged, true);
         }
 
@@ -95,10 +97,10 @@ namespace osu.Game.Collections
             beatmaps.CollectionChanged -= filterBeatmapsChanged;
 
             if (filter.OldValue?.Collection != null)
-                beatmaps.UnbindFrom(filter.OldValue.Collection.Beatmaps);
+                beatmaps.UnbindFrom(filter.OldValue.Collection.BeatmapHashes);
 
             if (filter.NewValue?.Collection != null)
-                beatmaps.BindTo(filter.NewValue.Collection.Beatmaps);
+                beatmaps.BindTo(filter.NewValue.Collection.BeatmapHashes);
 
             beatmaps.CollectionChanged += filterBeatmapsChanged;
 
@@ -196,7 +198,7 @@ namespace osu.Game.Collections
             private IBindable<WorkingBeatmap> beatmap { get; set; }
 
             [CanBeNull]
-            private readonly BindableList<BeatmapInfo> collectionBeatmaps;
+            private readonly BindableList<string> collectionBeatmaps;
 
             [NotNull]
             private readonly Bindable<string> collectionName;
@@ -208,7 +210,7 @@ namespace osu.Game.Collections
             public CollectionDropdownMenuItem(MenuItem item)
                 : base(item)
             {
-                collectionBeatmaps = Item.Collection?.Beatmaps.GetBoundCopy();
+                collectionBeatmaps = Item.Collection?.BeatmapHashes.GetBoundCopy();
                 collectionName = Item.CollectionName.GetBoundCopy();
             }
 
@@ -231,7 +233,7 @@ namespace osu.Game.Collections
 
                 if (collectionBeatmaps != null)
                 {
-                    collectionBeatmaps.CollectionChanged += (_, __) => collectionChanged();
+                    collectionBeatmaps.CollectionChanged += (_, _) => collectionChanged();
                     beatmap.BindValueChanged(_ => collectionChanged(), true);
                 }
 
@@ -258,7 +260,7 @@ namespace osu.Game.Collections
             {
                 Debug.Assert(collectionBeatmaps != null);
 
-                beatmapInCollection = collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo);
+                beatmapInCollection = collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo.MD5Hash);
 
                 addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
                 addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
@@ -285,8 +287,8 @@ namespace osu.Game.Collections
             {
                 Debug.Assert(collectionBeatmaps != null);
 
-                if (!collectionBeatmaps.Remove(beatmap.Value.BeatmapInfo))
-                    collectionBeatmaps.Add(beatmap.Value.BeatmapInfo);
+                if (!collectionBeatmaps.Remove(beatmap.Value.BeatmapInfo.MD5Hash))
+                    collectionBeatmaps.Add(beatmap.Value.BeatmapInfo.MD5Hash);
             }
 
             protected override Drawable CreateContent() => content = (Content)base.CreateContent();

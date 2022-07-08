@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay
         private Container difficultyIconContainer;
         private LinkFlowContainer beatmapText;
         private LinkFlowContainer authorText;
-        private ExplicitContentBeatmapPill explicitContentPill;
+        private ExplicitContentBeatmapBadge explicitContent;
         private ModDisplay modDisplay;
         private FillFlowContainer buttonsFlow;
         private UpdateableAvatar ownerAvatar;
@@ -264,7 +266,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
 
             if (beatmap != null)
-                difficultyIconContainer.Child = new DifficultyIcon(beatmap, ruleset, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(icon_height) };
+                difficultyIconContainer.Child = new DifficultyIcon(beatmap, ruleset) { Size = new Vector2(icon_height) };
             else
                 difficultyIconContainer.Clear();
 
@@ -293,7 +295,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
 
             bool hasExplicitContent = (beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
-            explicitContentPill.Alpha = hasExplicitContent ? 1 : 0;
+            explicitContent.Alpha = hasExplicitContent ? 1 : 0;
 
             modDisplay.Current.Value = requiredMods.ToArray();
 
@@ -380,7 +382,7 @@ namespace osu.Game.Screens.OnlinePlay
                                                     Children = new Drawable[]
                                                     {
                                                         authorText = new LinkFlowContainer(fontParameters) { AutoSizeAxes = Axes.Both },
-                                                        explicitContentPill = new ExplicitContentBeatmapPill
+                                                        explicitContent = new ExplicitContentBeatmapBadge
                                                         {
                                                             Alpha = 0f,
                                                             Anchor = Anchor.CentreLeft,

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -70,7 +68,7 @@ namespace osu.Game.Overlays.Mods
             Content.Masking = true;
             Content.CornerRadius = CORNER_RADIUS;
             Content.BorderThickness = 2;
-            Content.Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
+            Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
 
             Children = new Drawable[]
             {
@@ -218,9 +216,9 @@ namespace osu.Game.Overlays.Mods
             base.OnMouseUp(e);
         }
 
-        protected virtual Colour4 BackgroundColour => Active.Value ? activeColour.Darken(0.3f) : (Colour4)ColourProvider.Background3;
-        protected virtual Colour4 ForegroundColour => Active.Value ? activeColour : (Colour4)ColourProvider.Background2;
-        protected virtual Colour4 TextColour => Active.Value ? (Colour4)ColourProvider.Background6 : Colour4.White;
+        protected virtual Colour4 BackgroundColour => Active.Value ? activeColour.Darken(0.3f) : ColourProvider.Background3;
+        protected virtual Colour4 ForegroundColour => Active.Value ? activeColour : ColourProvider.Background2;
+        protected virtual Colour4 TextColour => Active.Value ? ColourProvider.Background6 : Colour4.White;
 
         protected virtual void UpdateState()
         {

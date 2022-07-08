@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
@@ -55,9 +56,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
         }
 
-        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
+        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
-            base.FromDatabaseAttributes(values);
+            base.FromDatabaseAttributes(values, onlineInfo);
 
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
             StarRating = values[ATTRIB_ID_DIFFICULTY];

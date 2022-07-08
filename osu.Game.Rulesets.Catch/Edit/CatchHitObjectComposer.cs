@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -89,15 +92,19 @@ namespace osu.Game.Rulesets.Catch.Edit
             new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
         });
 
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
-            var result = base.FindSnappedPositionAndTime(screenSpacePosition);
+            var result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
+
             result.ScreenSpacePosition.X = screenSpacePosition.X;
 
-            if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
-                Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
+            if (snapType.HasFlagFast(SnapType.Grids))
             {
-                result = snapResult;
+                if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
+                    Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
+                {
+                    result = snapResult;
+                }
             }
 
             return result;
@@ -128,15 +135,15 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             switch (BlueprintContainer.CurrentTool)
             {
-                case SelectTool _:
+                case SelectTool:
                     if (EditorBeatmap.SelectedHitObjects.Count == 0)
                         return null;
 
                     double minTime = EditorBeatmap.SelectedHitObjects.Min(hitObject => hitObject.StartTime);
                     return getLastSnappableHitObject(minTime);
 
-                case FruitCompositionTool _:
-                case JuiceStreamCompositionTool _:
+                case FruitCompositionTool:
+                case JuiceStreamCompositionTool:
                     if (!CursorInPlacementArea)
                         return null;
 

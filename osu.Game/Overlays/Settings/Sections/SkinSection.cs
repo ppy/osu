@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 using Realms;
@@ -59,7 +62,8 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 skinDropdown = new SkinSettingsDropdown
                 {
-                    LabelText = SkinSettingsStrings.CurrentSkin
+                    LabelText = SkinSettingsStrings.CurrentSkin,
+                    Keywords = new[] { @"skins" }
                 },
                 new SettingsButton
                 {
@@ -67,6 +71,7 @@ namespace osu.Game.Overlays.Settings.Sections
                     Action = () => skinEditor?.ToggleVisibility(),
                 },
                 new ExportSkinButton(),
+                new DeleteSkinButton(),
             };
 
             config.BindWith(OsuSetting.Skin, configBindable);
@@ -78,12 +83,12 @@ namespace osu.Game.Overlays.Settings.Sections
 
             skinDropdown.Current = dropdownBindable;
 
-            realmSubscription = realm.RegisterForNotifications(r => realm.Realm.All<SkinInfo>()
+            realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
                                                                          .Where(s => !s.DeletePending)
                                                                          .OrderByDescending(s => s.Protected) // protected skins should be at the top.
                                                                          .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase), skinsChanged);
 
-            configBindable.BindValueChanged(id => Scheduler.AddOnce(updateSelectedSkinFromConfig));
+            configBindable.BindValueChanged(_ => Scheduler.AddOnce(updateSelectedSkinFromConfig));
 
             dropdownBindable.BindValueChanged(dropdownSelectionChanged);
         }
@@ -127,9 +132,12 @@ namespace osu.Game.Overlays.Settings.Sections
                 dropdownItems.Add(skin.ToLive(realm));
             dropdownItems.Insert(protectedCount, random_skin_info);
 
-            skinDropdown.Items = dropdownItems;
+            Schedule(() =>
+            {
+                skinDropdown.Items = dropdownItems;
 
-            updateSelectedSkinFromConfig();
+                updateSelectedSkinFromConfig();
+            });
         }
 
         private void updateSelectedSkinFromConfig()
@@ -197,6 +205,37 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     Logger.Log($"Could not export current skin: {e.Message}", level: LogLevel.Error);
                 }
+            }
+        }
+
+        public class DeleteSkinButton : DangerousSettingsButton
+        {
+            [Resolved]
+            private SkinManager skins { get; set; }
+
+            [Resolved(CanBeNull = true)]
+            private IDialogOverlay dialogOverlay { get; set; }
+
+            private Bindable<Skin> currentSkin;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Text = SkinSettingsStrings.DeleteSkinButton;
+                Action = delete;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                currentSkin = skins.CurrentSkin.GetBoundCopy();
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
+            }
+
+            private void delete()
+            {
+                dialogOverlay?.Push(new SkinDeleteDialog(currentSkin.Value));
             }
         }
     }

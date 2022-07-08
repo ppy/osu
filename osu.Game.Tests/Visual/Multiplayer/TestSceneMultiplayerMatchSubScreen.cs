@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -28,6 +31,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -70,6 +74,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
+        /*
+         * Fail rate around 1.5%
+         *
+         * TearDown : System.AggregateException : One or more errors occurred. (Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index'))
+  ----> System.ArgumentOutOfRangeException : Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+         * --TearDown
+         *    at System.Threading.Tasks.Task.ThrowIfExceptional(Boolean includeTaskCanceledExceptions)
+         *   at System.Threading.Tasks.Task.Wait(Int32 millisecondsTimeout, CancellationToken cancellationToken)
+         *   at osu.Framework.Extensions.TaskExtensions.WaitSafely(Task task)
+         *   at osu.Framework.Testing.TestScene.checkForErrors()
+         *   at osu.Framework.Testing.TestScene.RunTestsFromNUnit()
+         *--ArgumentOutOfRangeException
+         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
+         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
+         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
+         *   at osu.Game.Online.Multiplayer.MultiplayerClient.<>c__DisplayClass106_0.<PlaylistItemChanged>b__0() in C:\BuildAgent\work\ecd860037212ac52\osu.Game\Online\Multiplayer\MultiplayerClient     .cs:line 702
+         *   at osu.Framework.Threading.ScheduledDelegate.RunTaskInternal()
+         */
         public void TestCreatedRoom()
         {
             AddStep("add playlist item", () =>
@@ -86,6 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestTaikoOnlyMod()
         {
             AddStep("add playlist item", () =>
@@ -106,6 +130,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestSettingValidity()
         {
             AddAssert("create button not enabled", () => !this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
@@ -122,6 +147,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestStartMatchWhileSpectating()
         {
             AddStep("set playlist", () =>
@@ -148,10 +174,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
-            AddUntilStep("match started", () => MultiplayerClient.Room?.State == MultiplayerRoomState.WaitingForLoad);
+            AddUntilStep("match started", () => MultiplayerClient.ClientRoom?.State == MultiplayerRoomState.WaitingForLoad);
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestFreeModSelectionHasAllowedMods()
         {
             AddStep("add playlist item with allowed mod", () =>
@@ -172,13 +199,56 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("mod select contents loaded",
                 () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
             AddUntilStep("mod select contains only double time mod",
-                () => this.ChildrenOfType<UserModSelectOverlay>()
-                          .SingleOrDefault()?
+                () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay
                           .ChildrenOfType<ModPanel>()
                           .SingleOrDefault(panel => !panel.Filtered.Value)?.Mod is OsuModDoubleTime);
         }
 
         [Test]
+        [FlakyTest] // See above
+        public void TestModSelectKeyWithAllowedMods()
+        {
+            AddStep("add playlist item with allowed mod", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
+                });
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
+
+            AddUntilStep("mod select shown", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Visible);
+        }
+
+        [Test]
+        [FlakyTest] // See above
+        public void TestModSelectKeyWithNoAllowedMods()
+        {
+            AddStep("add playlist item with no allowed mods", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                });
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
+
+            AddWaitStep("wait some", 3);
+            AddAssert("mod select not shown", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        [FlakyTest] // See above
         public void TestNextPlaylistItemSelectedAfterCompletion()
         {
             AddStep("add two playlist items", () =>
@@ -209,7 +279,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("last playlist item selected", () =>
             {
-                var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.APIRoom?.Playlist.Last().ID);
+                var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.ServerAPIRoom?.Playlist.Last().ID);
                 return lastItem.IsSelectedItem;
             });
         }

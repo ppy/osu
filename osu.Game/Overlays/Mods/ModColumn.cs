@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,14 +17,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -72,7 +71,7 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual ModPanel CreateModPanel(ModState mod) => new ModPanel(mod);
 
-        private readonly Key[]? toggleKeys;
+        private readonly bool allowIncompatibleSelection;
 
         private readonly TextFlowContainer headerText;
         private readonly Box headerBackground;
@@ -83,15 +82,18 @@ namespace osu.Game.Overlays.Mods
 
         private Colour4 accentColour;
 
+        private Bindable<ModSelectHotkeyStyle> hotkeyStyle = null!;
+        private IModHotkeyHandler hotkeyHandler = null!;
+
         private Task? latestLoadTask;
         internal bool ItemsLoaded => latestLoadTask == null;
 
         private const float header_height = 42;
 
-        public ModColumn(ModType modType, bool allowBulkSelection, Key[]? toggleKeys = null)
+        public ModColumn(ModType modType, bool allowIncompatibleSelection)
         {
             ModType = modType;
-            this.toggleKeys = toggleKeys;
+            this.allowIncompatibleSelection = allowIncompatibleSelection;
 
             Width = 320;
             RelativeSizeAxes = Axes.Y;
@@ -199,7 +201,7 @@ namespace osu.Game.Overlays.Mods
 
             createHeaderText();
 
-            if (allowBulkSelection)
+            if (allowIncompatibleSelection)
             {
                 controlContainer.Height = 35;
                 controlContainer.Add(toggleAllCheckbox = new ToggleAllCheckbox(this)
@@ -233,7 +235,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours, OsuConfigManager configManager)
         {
             headerBackground.Colour = accentColour = colours.ForModType(ModType);
 
@@ -245,6 +247,8 @@ namespace osu.Game.Overlays.Mods
 
             contentContainer.BorderColour = ColourInfo.GradientVertical(colourProvider.Background4, colourProvider.Background3);
             contentBackground.Colour = colourProvider.Background4;
+
+            hotkeyStyle = configManager.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle);
         }
 
         protected override void LoadComplete()
@@ -252,6 +256,7 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             toggleAllCheckbox?.Current.BindValueChanged(_ => updateToggleAllText(), true);
+            hotkeyStyle.BindValueChanged(val => hotkeyHandler = createHotkeyHandler(val.NewValue), true);
             asyncLoadPanels();
         }
 
@@ -267,7 +272,7 @@ namespace osu.Game.Overlays.Mods
         {
             cancellationTokenSource?.Cancel();
 
-            var panels = availableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)));
+            var panels = availableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = Vector2.Zero));
 
             Task? loadTask;
 
@@ -425,19 +430,32 @@ namespace osu.Game.Overlays.Mods
 
         #region Keyboard selection support
 
+        /// <summary>
+        /// Creates an appropriate <see cref="IModHotkeyHandler"/> for this column's <see cref="ModType"/> and
+        /// the supplied <paramref name="hotkeyStyle"/>.
+        /// </summary>
+        private IModHotkeyHandler createHotkeyHandler(ModSelectHotkeyStyle hotkeyStyle)
+        {
+            switch (ModType)
+            {
+                case ModType.DifficultyReduction:
+                case ModType.DifficultyIncrease:
+                case ModType.Automation:
+                    return hotkeyStyle == ModSelectHotkeyStyle.Sequential
+                        ? SequentialModHotkeyHandler.Create(ModType)
+                        : new ClassicModHotkeyHandler(allowIncompatibleSelection);
+
+                default:
+                    return new NoopModHotkeyHandler();
+            }
+        }
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed) return false;
-            if (toggleKeys == null) return false;
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.Repeat)
+                return false;
 
-            int index = Array.IndexOf(toggleKeys, e.Key);
-            if (index < 0) return false;
-
-            var modState = availableMods.ElementAtOrDefault(index);
-            if (modState == null || modState.Filtered.Value) return false;
-
-            modState.Active.Toggle();
-            return true;
+            return hotkeyHandler.HandleHotkeyPressed(e, availableMods);
         }
 
         #endregion

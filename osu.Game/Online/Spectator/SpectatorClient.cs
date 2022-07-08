@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -39,7 +37,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// The states of all users currently being watched.
         /// </summary>
-        public IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
+        public virtual IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
 
         /// <summary>
         /// A global list of all players currently playing.
@@ -172,6 +170,7 @@ namespace osu.Game.Online.Spectator
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
                 currentState.State = SpectatedUserState.Playing;
+                currentState.MaximumScoringValues = state.ScoreProcessor.MaximumScoringValues;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
@@ -189,7 +188,10 @@ namespace osu.Game.Online.Spectator
             }
 
             if (frame is IConvertibleReplayFrame convertible)
+            {
+                Debug.Assert(currentBeatmap != null);
                 pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+            }
 
             if (pendingFrames.Count > max_pending_frames)
                 purgePendingFrames();
@@ -295,17 +297,21 @@ namespace osu.Game.Online.Spectator
 
             lastSend = tcs.Task;
 
-            SendFramesInternal(bundle).ContinueWith(t => Schedule(() =>
+            SendFramesInternal(bundle).ContinueWith(t =>
             {
+                // Handle exception outside of `Schedule` to ensure it doesn't go unovserved.
                 bool wasSuccessful = t.Exception == null;
 
-                // If the last bundle send wasn't successful, try again without dequeuing.
-                if (wasSuccessful)
-                    pendingFrameBundles.Dequeue();
+                return Schedule(() =>
+                {
+                    // If the last bundle send wasn't successful, try again without dequeuing.
+                    if (wasSuccessful)
+                        pendingFrameBundles.Dequeue();
 
-                tcs.SetResult(wasSuccessful);
-                sendNextBundleIfRequired();
-            }));
+                    tcs.SetResult(wasSuccessful);
+                    sendNextBundleIfRequired();
+                });
+            });
         }
     }
 }

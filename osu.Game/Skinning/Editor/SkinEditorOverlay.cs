@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -12,6 +14,8 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit.Components;
+using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -32,6 +36,8 @@ namespace osu.Game.Skinning.Editor
         private OsuGame game { get; set; }
 
         private OsuScreen lastTargetScreen;
+
+        private Vector2 lastDrawSize;
 
         public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
@@ -64,7 +70,7 @@ namespace osu.Game.Skinning.Editor
 
             var editor = new SkinEditor();
 
-            editor.State.BindValueChanged(visibility => updateComponentVisibility());
+            editor.State.BindValueChanged(_ => updateComponentVisibility());
 
             skinEditor = editor;
 
@@ -81,15 +87,42 @@ namespace osu.Game.Skinning.Editor
 
         protected override void PopOut() => skinEditor?.Hide();
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (game.DrawSize != lastDrawSize)
+            {
+                lastDrawSize = game.DrawSize;
+                updateScreenSizing();
+            }
+        }
+
+        private void updateScreenSizing()
+        {
+            if (skinEditor?.State.Value != Visibility.Visible) return;
+
+            const float padding = 10;
+
+            float relativeSidebarWidth = (EditorSidebar.WIDTH + padding) / DrawWidth;
+            float relativeToolbarHeight = (SkinEditorSceneLibrary.HEIGHT + SkinEditor.MENU_HEIGHT + padding) / DrawHeight;
+
+            var rect = new RectangleF(
+                relativeSidebarWidth,
+                relativeToolbarHeight,
+                1 - relativeSidebarWidth * 2,
+                1f - relativeToolbarHeight - padding / DrawHeight);
+
+            scalingContainer.SetCustomRect(rect, true);
+        }
+
         private void updateComponentVisibility()
         {
             Debug.Assert(skinEditor != null);
 
-            const float toolbar_padding_requirement = 0.18f;
-
             if (skinEditor.State.Value == Visibility.Visible)
             {
-                scalingContainer.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.2f, 0.8f - toolbar_padding_requirement, 0.7f), true);
+                Scheduler.AddOnce(updateScreenSizing);
 
                 game?.Toolbar.Hide();
                 game?.CloseAllOverlays();
@@ -127,6 +160,9 @@ namespace osu.Game.Skinning.Editor
 
         private void setTarget(OsuScreen target)
         {
+            if (target == null)
+                return;
+
             Debug.Assert(skinEditor != null);
 
             if (!target.IsLoaded)

@@ -1,14 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
@@ -67,7 +70,21 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             // To get around this, the BeatmapManager is looked up from the dependencies provided to the children of the test scene instead.
             var beatmapManager = dependencies.Get<BeatmapManager>();
 
-            ((DummyAPIAccess)API).HandleRequest = request => handler.HandleRequest(request, API.LocalUser.Value, beatmapManager);
+            ((DummyAPIAccess)API).HandleRequest = request =>
+            {
+                try
+                {
+                    return handler.HandleRequest(request, API.LocalUser.Value, beatmapManager);
+                }
+                catch (ObjectDisposedException)
+                {
+                    // These requests can be fired asynchronously, but potentially arrive after game components
+                    // have been disposed (ie. realm in BeatmapManager).
+                    // This only happens in tests and it's easiest to ignore them for now.
+                    Logger.Log($"Handled {nameof(ObjectDisposedException)} in test request handling");
+                    return true;
+                }
+            };
         });
 
         /// <summary>

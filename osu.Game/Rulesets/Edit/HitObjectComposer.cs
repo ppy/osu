@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -113,9 +116,9 @@ namespace osu.Game.Rulesets.Edit
                                               .WithChild(BlueprintContainer = CreateBlueprintContainer())
                     }
                 },
-                new ExpandingToolboxContainer(80, 200)
+                new ExpandingToolboxContainer(90, 200)
                 {
-                    Padding = new MarginPadding { Left = 10 },
+                    Padding = new MarginPadding(10),
                     Children = new Drawable[]
                     {
                         new EditorToolboxGroup("toolbox (1-9)")
@@ -361,20 +364,23 @@ namespace osu.Game.Rulesets.Edit
         /// <returns>The most relevant <see cref="Playfield"/>.</returns>
         protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
 
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             double? targetTime = null;
 
-            if (playfield is ScrollingPlayfield scrollingPlayfield)
+            if (snapType.HasFlagFast(SnapType.Grids))
             {
-                targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
+                if (playfield is ScrollingPlayfield scrollingPlayfield)
+                {
+                    targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
 
-                // apply beat snapping
-                targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
+                    // apply beat snapping
+                    targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
 
-                // convert back to screen space
-                screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+                    // convert back to screen space
+                    screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+                }
             }
 
             return new SnapResult(screenSpacePosition, targetTime, playfield);
@@ -414,10 +420,7 @@ namespace osu.Game.Rulesets.Edit
 
         #region IPositionSnapProvider
 
-        public abstract SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition);
-
-        public virtual SnapResult FindSnappedPosition(Vector2 screenSpacePosition) =>
-            new SnapResult(screenSpacePosition, null);
+        public abstract SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All);
 
         #endregion
     }

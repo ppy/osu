@@ -1,13 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
@@ -18,6 +17,7 @@ using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using Sentry;
 using Sentry.Protocol;
@@ -41,14 +41,13 @@ namespace osu.Game.Utils
             sentrySession = SentrySdk.Init(options =>
             {
                 // Not setting the dsn will completely disable sentry.
-                if (game.IsDeployedBuild)
+                if (game.IsDeployedBuild && game.CreateEndpoints().WebsiteRootUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
                     options.Dsn = "https://ad9f78529cef40ac874afb95a9aca04e@sentry.ppy.sh/2";
 
                 options.AutoSessionTracking = true;
                 options.IsEnvironmentUser = false;
-                // The reported release needs to match release tags on github in order for sentry
-                // to automatically associate and track against releases.
-                options.Release = game.Version.Replace($@"-{OsuGameBase.BUILD_SUFFIX}", string.Empty);
+                // The reported release needs to match version as reported to Sentry in .github/workflows/sentry-release.yml
+                options.Release = $"osu@{game.Version.Replace($@"-{OsuGameBase.BUILD_SUFFIX}", string.Empty)}";
             });
 
             Logger.NewEntry += processLogEntry;
@@ -109,6 +108,7 @@ namespace osu.Game.Utils
                 }, scope =>
                 {
                     var beatmap = game.Dependencies.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo;
+                    var ruleset = game.Dependencies.Get<IBindable<RulesetInfo>>().Value;
 
                     scope.Contexts[@"config"] = new
                     {
@@ -125,6 +125,8 @@ namespace osu.Game.Utils
                                 BeatmapSets = realm.All<BeatmapSetInfo>().Count(),
                                 Beatmaps = realm.All<BeatmapInfo>().Count(),
                                 Files = realm.All<RealmFile>().Count(),
+                                Rulesets = realm.All<RulesetInfo>().Count(),
+                                RulesetsAvailable = realm.All<RulesetInfo>().Count(r => r.Available),
                                 Skins = realm.All<SkinInfo>().Count(),
                             }
                         };
@@ -137,7 +139,16 @@ namespace osu.Game.Utils
                     scope.Contexts[@"beatmap"] = new
                     {
                         Name = beatmap.ToString(),
+                        Ruleset = beatmap.Ruleset.InstantiationInfo,
                         beatmap.OnlineID,
+                    };
+
+                    scope.Contexts[@"ruleset"] = new
+                    {
+                        ruleset.ShortName,
+                        ruleset.Name,
+                        ruleset.InstantiationInfo,
+                        ruleset.OnlineID
                     };
 
                     scope.Contexts[@"clocks"] = new
@@ -145,6 +156,11 @@ namespace osu.Game.Utils
                         Audio = game.Dependencies.Get<MusicController>().CurrentTrack.CurrentTime,
                         Game = game.Clock.CurrentTime,
                     };
+
+                    scope.SetTag(@"beatmap", $"{beatmap.OnlineID}");
+                    scope.SetTag(@"ruleset", ruleset.ShortName);
+                    scope.SetTag(@"os", $"{RuntimeInfo.OS} ({Environment.OSVersion})");
+                    scope.SetTag(@"processor count", Environment.ProcessorCount.ToString());
                 });
             }
             else

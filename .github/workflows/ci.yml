@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ github.workspace }}/inspectcode
-          key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', '.editorconfig', '.globalconfig') }}
+          key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', 'osu*.slnf', '.editorconfig', '.globalconfig', 'CodeAnalysis/*', '**/*.csproj', '**/*.props') }}
 
       - name: Dotnet code style
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf -p:EnforceCodeStyleInBuild=true
@@ -78,23 +78,11 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      - name: Install .NET workloads
-        run: dotnet workload install android
-
-      # FIXME: libavformat is not included in Ubuntu. Let's fix that.
-      # https://github.com/ppy/osu-framework/issues/4349
-      # Remove this once https://github.com/actions/virtual-environments/issues/3306 has been resolved.
-      - name: Install libavformat-dev
-        if: ${{matrix.os.fullname == 'ubuntu-latest'}}
-        run: |
-         sudo apt-get update && \
-         sudo apt-get -y install libavformat-dev
-
       - name: Compile
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
 
       - name: Test
-        run: dotnet test $pwd/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
+        run: dotnet test $pwd/**/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
         shell: pwsh
 
       # Attempt to upload results even if test fails.
@@ -108,7 +96,7 @@ jobs:
 
   build-only-android:
     name: Build only (Android)
-    runs-on: macos-latest
+    runs-on: windows-latest
     timeout-minutes: 60
     steps:
       - name: Checkout

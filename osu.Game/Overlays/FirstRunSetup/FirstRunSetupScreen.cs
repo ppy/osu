@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -20,6 +22,8 @@ namespace osu.Game.Overlays.FirstRunSetup
         protected FillFlowContainer Content { get; private set; }
 
         protected const float CONTENT_FONT_SIZE = 16;
+
+        protected const float CONTENT_PADDING = 30;
 
         protected const float HEADER_FONT_SIZE = 24;
 
@@ -41,7 +45,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding { Horizontal = 30 },
+                        Padding = new MarginPadding { Horizontal = CONTENT_PADDING },
                         Children = new Drawable[]
                         {
                             new OsuSpriteText

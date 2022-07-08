@@ -1,11 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Online;
@@ -83,18 +87,22 @@ namespace osu.Game.Beatmaps.Drawables
                 downloadTrackers.Add(beatmapDownloadTracker);
                 AddInternal(beatmapDownloadTracker);
 
+                // Note that this is downloading the beatmaps even if they are already downloaded.
+                // We could rely more on `BeatmapDownloadTracker`'s exposed state to avoid this.
                 beatmapDownloader.Download(beatmapSet);
             }
         }
 
         private void queueDownloads(string[] sourceFilenames, int? limit = null)
         {
+            Debug.Assert(LoadState == LoadState.NotLoaded);
+
             try
             {
                 // Matches osu-stable, in order to provide new users with roughly the same randomised selection of bundled beatmaps.
                 var random = new LegacyRandom(DateTime.UtcNow.Year * 1000 + (DateTime.UtcNow.DayOfYear / 7));
 
-                downloadableFilenames.AddRange(sourceFilenames.OrderBy(x => random.NextDouble()).Take(limit ?? int.MaxValue));
+                downloadableFilenames.AddRange(sourceFilenames.OrderBy(_ => random.NextDouble()).Take(limit ?? int.MaxValue));
             }
             catch { }
         }

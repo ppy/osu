@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -67,7 +70,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private Bindable<bool> isDefault { get; } = new BindableBool(true);
 
-        public IEnumerable<string> FilterTerms => bindings.Select(b => keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text.ToString());
+        public IEnumerable<LocalisableString> FilterTerms => bindings.Select(b => (LocalisableString)keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text);
 
         public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
         {

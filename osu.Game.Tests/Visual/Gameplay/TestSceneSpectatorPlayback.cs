@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,13 +22,13 @@ using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Mods;
 using osu.Game.Tests.Visual.Spectator;
 using osuTK;
@@ -65,7 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     CachedDependencies = new[]
                     {
                         (typeof(SpectatorClient), (object)(spectatorClient = new TestSpectatorClient())),
-                        (typeof(GameplayState), new GameplayState(new Beatmap(), new OsuRuleset(), Array.Empty<Mod>()))
+                        (typeof(GameplayState), TestGameplayState.Create(new OsuRuleset()))
                     },
                     Children = new Drawable[]
                     {
@@ -165,11 +167,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("start failing sends", () =>
             {
                 spectatorClient.ShouldFailSendingFrames = true;
-                framesReceivedSoFar = replay.Frames.Count;
                 frameSendAttemptsSoFar = spectatorClient.FrameSendAttempts;
             });
 
-            AddUntilStep("wait for send attempts", () => spectatorClient.FrameSendAttempts > frameSendAttemptsSoFar + 5);
+            AddUntilStep("wait for next send attempt", () =>
+            {
+                framesReceivedSoFar = replay.Frames.Count;
+                return spectatorClient.FrameSendAttempts > frameSendAttemptsSoFar + 1;
+            });
+
+            AddUntilStep("wait for more send attempts", () => spectatorClient.FrameSendAttempts > frameSendAttemptsSoFar + 10);
             AddAssert("frames did not increase", () => framesReceivedSoFar == replay.Frames.Count);
 
             AddStep("stop failing sends", () => spectatorClient.ShouldFailSendingFrames = false);
