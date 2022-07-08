@@ -14,6 +14,7 @@ namespace osu.Game.Online
             APIClientID = "5";
             SpectatorEndpointUrl = "https://spectator.ppy.sh/spectator";
             MultiplayerEndpointUrl = "https://spectator.ppy.sh/multiplayer";
+            MetadataEndpointUrl = "https://spectator.ppy.sh/metadata";
         }
     }
 }
