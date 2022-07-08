@@ -4,16 +4,12 @@
 #nullable disable
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Development;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
@@ -25,15 +21,6 @@ namespace osu.Game.Tests.Visual
         /// Whether custom test steps are provided. Custom tests should invoke <see cref="CreateTest"/> to create the test steps.
         /// </summary>
         protected virtual bool HasCustomSteps => false;
-
-        /// <summary>
-        /// Import the beatmap to the database before starting gameplay. Handy for testing local score storage and the likes.
-        /// </summary>
-        /// <remarks>
-        /// Only works under headless operation currently due to realm isolation difficulties.
-        /// If this is ever needed to change, consideration needs to be given to the fact that BeatmapManager is attached to the global realm.
-        /// </remarks>
-        protected virtual bool ImportBeatmapToDatabase => false;
 
         protected TestPlayer Player;
 
@@ -70,31 +57,12 @@ namespace osu.Game.Tests.Visual
 
         protected virtual bool Autoplay => false;
 
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
-
         protected void LoadPlayer()
         {
             var ruleset = CreatePlayerRuleset();
             Ruleset.Value = ruleset.RulesetInfo;
 
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
-
-            if (ImportBeatmapToDatabase)
-            {
-                Debug.Assert(DebugUtils.IsNUnitRunning, $@"Importing beatmaps in {nameof(PlayerTestScene)} requires headless environment.");
-
-                Debug.Assert(beatmap.BeatmapInfo.BeatmapSet != null);
-
-                var imported = beatmaps.Import(beatmap.BeatmapInfo.BeatmapSet);
-
-                Debug.Assert(imported != null);
-
-                beatmap.BeatmapInfo = null;
-                beatmap.Difficulty = null;
-
-                beatmap.BeatmapInfo = imported.Value.Detach().Beatmaps.First();
-            }
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
             SelectedMods.Value = Array.Empty<Mod>();
