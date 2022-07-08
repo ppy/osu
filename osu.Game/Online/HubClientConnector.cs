@@ -64,7 +64,7 @@ namespace osu.Game.Online
             this.preferMessagePack = preferMessagePack;
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(state => connectIfPossible(), true);
+            apiState.BindValueChanged(_ => connectIfPossible(), true);
         }
 
         public void Reconnect()
@@ -144,7 +144,7 @@ namespace osu.Game.Online
         /// </summary>
         private async Task handleErrorAndDelay(Exception exception, CancellationToken cancellationToken)
         {
-            Logger.Log($"{clientName} connection error: {exception}", LoggingTarget.Network);
+            Logger.Log($"{clientName} connect attempt failed: {exception.Message}", LoggingTarget.Network);
             await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
         }
 

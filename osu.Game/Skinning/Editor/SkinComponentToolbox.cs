@@ -88,7 +88,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private class ToolboxComponentButton : OsuButton
+        public class ToolboxComponentButton : OsuButton
         {
             protected override bool ShouldBeConsideredForInput(Drawable child) => false;
 

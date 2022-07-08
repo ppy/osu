@@ -21,6 +21,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -39,6 +40,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.Design;
 using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Edit.Setup;
@@ -96,6 +98,30 @@ namespace osu.Game.Screens.Edit
         public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
         public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
+
+        /// <summary>
+        /// Ensure all asynchronously loading pieces of the editor are in a good state.
+        /// This exists here for convenience for tests, not for actual use.
+        /// Eventually we'd probably want a better way to signal this.
+        /// </summary>
+        public bool ReadyForUse
+        {
+            get
+            {
+                if (!workingBeatmapUpdated)
+                    return false;
+
+                if (currentScreen?.IsLoaded != true)
+                    return false;
+
+                if (currentScreen is EditorScreenWithTimeline)
+                    return currentScreen.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true;
+
+                return true;
+            }
+        }
+
+        private bool workingBeatmapUpdated;
 
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
@@ -219,6 +245,7 @@ namespace osu.Game.Screens.Edit
                 // this assumes that nothing during the rest of this load() method is accessing Beatmap.Value (loadableBeatmap should be preferred).
                 // generally this is quite safe, as the actual load of editor content comes after menuBar.Mode.ValueChanged is fired in its own LoadComplete.
                 Beatmap.Value = loadableBeatmap;
+                workingBeatmapUpdated = true;
             });
 
             OsuMenuItem undoMenuItem;
@@ -630,9 +657,7 @@ namespace osu.Game.Screens.Edit
             // To update the game-wide beatmap with any changes, perform a re-fetch on exit/suspend.
             // This is required as the editor makes its local changes via EditorBeatmap
             // (which are not propagated outwards to a potentially cached WorkingBeatmap).
-            ((IWorkingBeatmapCache)beatmapManager).Invalidate(Beatmap.Value.BeatmapInfo);
-            var refetchedBeatmapInfo = beatmapManager.QueryBeatmap(b => b.ID == Beatmap.Value.BeatmapInfo.ID);
-            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(refetchedBeatmapInfo);
+            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
 
             if (!(refetchedBeatmap is DummyWorkingBeatmap))
             {
@@ -798,10 +823,11 @@ namespace osu.Game.Screens.Edit
 
             if (trackPlaying)
             {
-                // generally users are not looking to perform tiny seeks when the track is playing,
-                // so seeks should always be by one full beat, bypassing the beatDivisor.
+                // generally users are not looking to perform tiny seeks when the track is playing.
                 // this multiplication undoes the division that will be applied in the underlying seek operation.
-                amount *= beatDivisor.Value;
+                // scale by BPM to keep the seek amount constant across all BPMs.
+                var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(clock.CurrentTimeAccurate);
+                amount *= beatDivisor.Value * (timingPoint.BPM / 120);
             }
 
             if (direction < 1)
@@ -907,6 +933,6 @@ namespace osu.Game.Screens.Edit
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => editorBeatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => clock;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
     }
 }

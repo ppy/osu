@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     break;
 
-                case DrawableSpinnerBonusTick _:
+                case DrawableSpinnerBonusTick:
                     if (state == ArmedState.Hit)
                         glow.FlashColour(Color4.White, 200);
 

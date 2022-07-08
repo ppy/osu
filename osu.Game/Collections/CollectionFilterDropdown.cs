@@ -67,7 +67,7 @@ namespace osu.Game.Collections
             // An extra bindable is enough to subvert this behaviour.
             base.Current = Current;
 
-            collections.BindCollectionChanged((_, __) => collectionsChanged(), true);
+            collections.BindCollectionChanged((_, _) => collectionsChanged(), true);
             Current.BindValueChanged(filterChanged, true);
         }
 
@@ -233,7 +233,7 @@ namespace osu.Game.Collections
 
                 if (collectionBeatmaps != null)
                 {
-                    collectionBeatmaps.CollectionChanged += (_, __) => collectionChanged();
+                    collectionBeatmaps.CollectionChanged += (_, _) => collectionChanged();
                     beatmap.BindValueChanged(_ => collectionChanged(), true);
                 }
 

@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             Task.Run(() =>
             {
                 playableBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo).GetPlayableBeatmap(newScore.Ruleset, newScore.Mods);
-            }, loadCancellation.Token).ContinueWith(t => Schedule(() =>
+            }, loadCancellation.Token).ContinueWith(_ => Schedule(() =>
             {
                 bool hitEventsAvailable = newScore.HitEvents.Count != 0;
                 Container<Drawable> container;

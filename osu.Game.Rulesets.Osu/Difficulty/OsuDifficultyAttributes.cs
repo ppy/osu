@@ -1,12 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 
@@ -25,6 +24,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         [JsonProperty("speed_difficulty")]
         public double SpeedDifficulty { get; set; }
+
+        /// <summary>
+        /// The number of clickable objects weighted by difficulty.
+        /// Related to <see cref="SpeedDifficulty"/>
+        /// </summary>
+        [JsonProperty("speed_note_count")]
+        public double SpeedNoteCount { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the flashlight skill.
@@ -94,11 +100,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 yield return (ATTRIB_ID_FLASHLIGHT, FlashlightDifficulty);
 
             yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
+            yield return (ATTRIB_ID_SPEED_NOTE_COUNT, SpeedNoteCount);
         }
 
-        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
+        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
-            base.FromDatabaseAttributes(values);
+            base.FromDatabaseAttributes(values, onlineInfo);
 
             AimDifficulty = values[ATTRIB_ID_AIM];
             SpeedDifficulty = values[ATTRIB_ID_SPEED];
@@ -108,6 +115,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             StarRating = values[ATTRIB_ID_DIFFICULTY];
             FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
+            SpeedNoteCount = values[ATTRIB_ID_SPEED_NOTE_COUNT];
+
+            DrainRate = onlineInfo.DrainRate;
+            HitCircleCount = onlineInfo.CircleCount;
+            SliderCount = onlineInfo.SliderCount;
+            SpinnerCount = onlineInfo.SpinnerCount;
         }
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods

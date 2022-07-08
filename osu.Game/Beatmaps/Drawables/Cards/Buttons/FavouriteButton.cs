@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             };
             favouriteRequest.Failure += e =>
             {
-                Logger.Error(e, $"Failed to {actionType.ToString().ToLower()} beatmap: {e.Message}");
+                Logger.Error(e, $"Failed to {actionType.ToString().ToLowerInvariant()} beatmap: {e.Message}");
                 Enabled.Value = true;
             };
 

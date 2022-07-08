@@ -125,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             client.GameplayStarted += onGameplayStarted;
             client.ResultsReady += onResultsReady;
 
-            ScoreProcessor.HasCompleted.BindValueChanged(completed =>
+            ScoreProcessor.HasCompleted.BindValueChanged(_ =>
             {
                 // wait for server to tell us that results are ready (see SubmitScore implementation)
                 loadingDisplay.Show();

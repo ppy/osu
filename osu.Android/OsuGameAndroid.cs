@@ -7,7 +7,11 @@ using System;
 using Android.App;
 using Android.OS;
 using osu.Framework.Allocation;
+using osu.Framework.Android.Input;
+using osu.Framework.Input.Handlers;
+using osu.Framework.Platform;
 using osu.Game;
+using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using Xamarin.Essentials;
@@ -75,9 +79,27 @@ namespace osu.Android
             LoadComponentAsync(new GameplayScreenRotationLocker(), Add);
         }
 
+        public override void SetHost(GameHost host)
+        {
+            base.SetHost(host);
+            host.Window.CursorState |= CursorState.Hidden;
+        }
+
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
 
         protected override BatteryInfo CreateBatteryInfo() => new AndroidBatteryInfo();
+
+        public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
+        {
+            switch (handler)
+            {
+                case AndroidMouseHandler mh:
+                    return new AndroidMouseSettings(mh);
+
+                default:
+                    return base.CreateSettingsSubsectionFor(handler);
+            }
+        }
 
         private class AndroidBatteryInfo : BatteryInfo
         {

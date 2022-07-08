@@ -98,13 +98,30 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestPlaceholderStarDifficulty()
+        {
+            addRulesetImportStep(0);
+            AddStep("change star filter", () => config.SetValue(OsuSetting.DisplayStarsMinimum, 10.0));
+
+            createSongSelect();
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            AddStep("click link in placeholder", () => getPlaceholder().ChildrenOfType<DrawableLinkCompiler>().First().TriggerClick());
+
+            AddUntilStep("star filter reset", () => config.Get<double>(OsuSetting.DisplayStarsMinimum) == 0.0);
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
         public void TestPlaceholderConvertSetting()
         {
-            changeRuleset(2);
             addRulesetImportStep(0);
             AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
 
             createSongSelect();
+
+            changeRuleset(2);
 
             AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
 
@@ -872,10 +889,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return set != null;
             });
 
-            FilterableGroupedDifficultyIcon groupIcon = null;
+            GroupedDifficultyIcon groupIcon = null;
             AddUntilStep("Find group icon for different ruleset", () =>
             {
-                return (groupIcon = set.ChildrenOfType<FilterableGroupedDifficultyIcon>()
+                return (groupIcon = set.ChildrenOfType<GroupedDifficultyIcon>()
                                        .FirstOrDefault(icon => icon.Items.First().BeatmapInfo.Ruleset.OnlineID == 3)) != null;
             });
 

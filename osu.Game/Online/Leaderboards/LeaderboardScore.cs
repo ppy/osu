@@ -426,10 +426,10 @@ namespace osu.Game.Online.Leaderboards
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
 
                 if (Score.Files.Count > 0)
+                {
                     items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
-
-                if (!isOnlineScope)
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                }
 
                 return items.ToArray();
             }

@@ -360,7 +360,10 @@ namespace osu.Game.Screens.Select
         {
             // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
             if (!Carousel.BeatmapSetsLoaded)
+            {
+                Logger.Log($"{nameof(FinaliseSelection)} aborted as carousel beatmaps are not yet loaded");
                 return;
+            }
 
             if (ruleset != null)
                 Ruleset.Value = ruleset;
@@ -494,7 +497,7 @@ namespace osu.Game.Screens.Select
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
+                Logger.Log($"Song select updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {
@@ -519,7 +522,7 @@ namespace osu.Game.Screens.Select
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
                 if (!EqualityComparer<BeatmapInfo>.Default.Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
-                    Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
+                    Logger.Log($"Song select changing beatmap from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap?.ToString() ?? "null"}\"");
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
                 }
 
@@ -737,7 +740,10 @@ namespace osu.Game.Screens.Select
             bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
 
             if (!track.IsRunning && (music.UserPauseRequested != true || isNewTrack))
+            {
+                Logger.Log($"Song select decided to {nameof(ensurePlayingSelected)}");
                 music.Play(true);
+            }
 
             lastTrack.SetTarget(track);
         }
@@ -786,7 +792,17 @@ namespace osu.Game.Screens.Select
 
             Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
 
-            decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
+            decoupledRuleset.ValueChanged += r =>
+            {
+                bool wasDisabled = Ruleset.Disabled;
+
+                // a sub-screen may have taken a lease on this decoupled ruleset bindable,
+                // which would indirectly propagate to the game-global bindable via the `DisabledChanged` callback below.
+                // to make sure changes sync without crashes, lift the disable for a short while to sync, and then restore the old value.
+                Ruleset.Disabled = false;
+                Ruleset.Value = r.NewValue;
+                Ruleset.Disabled = wasDisabled;
+            };
             decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
             Beatmap.BindValueChanged(workingBeatmapChanged);
