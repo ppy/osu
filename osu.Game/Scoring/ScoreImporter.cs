@@ -8,11 +8,15 @@ using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Models;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using Realms;
 
 namespace osu.Game.Scoring
@@ -26,11 +30,14 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreImporter(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
+        private readonly IAPIProvider api;
+
+        public ScoreImporter(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, IAPIProvider api)
             : base(storage, realm)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
+            this.api = api;
         }
 
         protected override ScoreInfo? CreateModel(ArchiveReader archive)
@@ -67,6 +74,25 @@ namespace osu.Game.Scoring
 
             if (string.IsNullOrEmpty(model.StatisticsJson))
                 model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
+        }
+
+        protected override void PostImport(ScoreInfo model, Realm realm)
+        {
+            base.PostImport(model, realm);
+
+            var userRequest = new GetUserRequest(model.User.Username);
+            api.Perform(userRequest);
+            APIUser userReq = userRequest.Response;
+
+            if (!(userReq is null)) {
+                Logger.Log($"Assignning UserID to RealmUser");
+                var user = new RealmUser
+                {
+                    OnlineID = userReq.Id,
+                    Username = model.User.Username
+                };
+                model.RealmUser = user;
+            }
         }
     }
 }
