@@ -1,17 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.Logging;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -67,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             double maxScaleDuration = parentObject.HitStateUpdateTime - Time.Current;
             double realScaleDuration = scale_duration;
-            if (tracking.NewValue && maxScaleDuration < realScaleDuration)
+            if (tracking.NewValue && maxScaleDuration < realScaleDuration && maxScaleDuration >= 0)
                 realScaleDuration = maxScaleDuration;
             double realFadeDuration = fade_duration * realScaleDuration / fade_duration;
 
@@ -77,6 +73,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void onHitObjectApplied(DrawableHitObject drawableObject)
         {
+            ClearTransformsAfter(double.MinValue);
+
             this.ScaleTo(1f)
                 .FadeOut();
         }
