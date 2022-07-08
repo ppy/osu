@@ -127,33 +127,33 @@ namespace osu.Game.Rulesets.UI
             {
                 default:
                 case ModType.DifficultyIncrease:
-                    backgroundColour = colours.Yellow;
-                    highlightedColour = colours.YellowLight;
+                    backgroundColour = colours.Red1;
+                    highlightedColour = colours.Red0;
                     break;
 
                 case ModType.DifficultyReduction:
-                    backgroundColour = colours.Green;
-                    highlightedColour = colours.GreenLight;
+                    backgroundColour = colours.Lime1;
+                    highlightedColour = colours.Lime0;
                     break;
 
                 case ModType.Automation:
-                    backgroundColour = colours.Blue;
-                    highlightedColour = colours.BlueLight;
+                    backgroundColour = colours.Blue1;
+                    highlightedColour = colours.Blue0;
                     break;
 
                 case ModType.Conversion:
-                    backgroundColour = colours.Purple;
-                    highlightedColour = colours.PurpleLight;
+                    backgroundColour = colours.Purple1;
+                    highlightedColour = colours.Purple0;
                     break;
 
                 case ModType.Fun:
-                    backgroundColour = colours.Pink;
-                    highlightedColour = colours.PinkLight;
+                    backgroundColour = colours.Pink1;
+                    highlightedColour = colours.Pink0;
                     break;
 
                 case ModType.System:
-                    backgroundColour = colours.Gray6;
-                    highlightedColour = colours.Gray7;
+                    backgroundColour = colours.Gray7;
+                    highlightedColour = colours.Gray8;
                     modIcon.Colour = colours.Yellow;
                     break;
             }
