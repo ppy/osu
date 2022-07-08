@@ -20,8 +20,8 @@ namespace osu.Game.Screens.Play
 {
     public class SaveFailedScoreButton : CompositeDrawable
     {
-        public Func<Task<ScoreInfo>> SaveReplay;
-        private Task<ScoreInfo> saveReplayAsync;
+        public Func<Task<ScoreInfo>> ImportFailedScore;
+        private Task<ScoreInfo> saveFailedScoreTask;
         private ScoreInfo score;
 
         private ScheduledDelegate saveScoreDelegate;
@@ -31,10 +31,10 @@ namespace osu.Game.Screens.Play
         private DownloadButton button;
         private ShakeContainer shakeContainer;
 
-        public SaveFailedScoreButton(Func<Task<ScoreInfo>> sr)
+        public SaveFailedScoreButton(Func<Task<ScoreInfo>> requestImportFailedScore)
         {
             Size = new Vector2(50, 30);
-            SaveReplay = sr;
+            ImportFailedScore = requestImportFailedScore;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -89,17 +89,18 @@ namespace osu.Game.Screens.Play
         private void saveScore()
         {
             State.Value = ImportState.Importing;
-            saveReplayAsync = Task.Run(SaveReplay);
+
+            saveFailedScoreTask = Task.Run(ImportFailedScore);
 
             saveScoreDelegate = new ScheduledDelegate(() =>
             {
-                if (saveReplayAsync?.IsCompleted != true)
+                if (saveFailedScoreTask?.IsCompleted != true)
                     // If the asynchronous preparation has not completed, keep repeating this delegate.
                     return;
 
                 saveScoreDelegate?.Cancel();
 
-                score = saveReplayAsync.GetAwaiter().GetResult();
+                score = saveFailedScoreTask.GetAwaiter().GetResult();
 
                 State.Value = score != null ? ImportState.Imported : ImportState.Failed;
             }, Time.Current, 50);
