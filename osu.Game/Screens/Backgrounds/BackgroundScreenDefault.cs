@@ -51,25 +51,24 @@ namespace osu.Game.Screens.Backgrounds
 
             AddInternal(seasonalBackgroundLoader);
 
-            user.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
-            skin.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
-            source.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
-            beatmap.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
-            introSequence.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
-            seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Scheduler.AddOnce(loadNextIfRequired);
-
+            // Load first background asynchronously as part of BDL load.
             currentDisplay = RNG.Next(0, background_count);
-
             Next();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            user.ValueChanged += _ => Scheduler.AddOnce(next);
+            skin.ValueChanged += _ => Scheduler.AddOnce(next);
+            source.ValueChanged += _ => Scheduler.AddOnce(next);
+            beatmap.ValueChanged += _ => Scheduler.AddOnce(next);
+            introSequence.ValueChanged += _ => Scheduler.AddOnce(next);
+            seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Scheduler.AddOnce(next);
 
             // helper function required for AddOnce usage.
-            void loadNextIfRequired()
-            {
-                if (!IsLoaded)
-                    return;
-
-                Next();
-            }
+            void next() => Next();
         }
 
         private ScheduledDelegate nextTask;
