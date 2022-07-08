@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
@@ -75,15 +76,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestScoreStoredLocallyCustomRuleset()
         {
-            Ruleset createCustomRuleset() => new OsuRuleset
-            {
-                RulesetInfo =
-                {
-                    Name = "custom",
-                    ShortName = "custom",
-                    OnlineID = -1
-                }
-            };
+            Ruleset createCustomRuleset() => new CustomRuleset();
 
             AddStep("import custom ruleset", () => Realm.Write(r => r.Add(createCustomRuleset().RulesetInfo)));
             AddStep("set custom ruleset", () => customRuleset = createCustomRuleset());
@@ -96,6 +89,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
+        }
+
+        private class CustomRuleset : OsuRuleset, ILegacyRuleset
+        {
+            public override string Description => "custom";
+            public override string ShortName => "custom";
+
+            public new int LegacyID => -1;
+
+            public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(this);
         }
     }
 }
