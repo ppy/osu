@@ -206,7 +206,7 @@ namespace osu.Game.Screens.Menu
         {
             this.FadeIn(300);
 
-            ApplyToBackground(b => b.FadeColour(Color4.Black));
+            ApplyToBackground(b => b.FadeColour(Color4.Black, 100));
 
             double fadeOutTime = exit_delay;
 
