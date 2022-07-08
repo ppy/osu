@@ -34,14 +34,15 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : ModelManager<BeatmapSetInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
+    public class BeatmapManager : ModelManager<BeatmapSetInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache
     {
         public ITrackStore BeatmapTrackStore { get; }
 
         private readonly BeatmapImporter beatmapImporter;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
-        private readonly BeatmapUpdater? beatmapUpdater;
+
+        public Action<BeatmapSetInfo>? ProcessBeatmap { private get; set; }
 
         public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
@@ -54,15 +55,14 @@ namespace osu.Game.Beatmaps
 
                 if (difficultyCache == null)
                     throw new ArgumentNullException(nameof(difficultyCache), "Difficulty cache must be provided if online lookups are required.");
-
-                beatmapUpdater = new BeatmapUpdater(this, difficultyCache, api, storage);
             }
 
             var userResources = new RealmFileStore(realm, storage).Store;
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            beatmapImporter = CreateBeatmapImporter(storage, realm, rulesets, beatmapUpdater);
+            beatmapImporter = CreateBeatmapImporter(storage, realm);
+            beatmapImporter.ProcessBeatmap = obj => ProcessBeatmap?.Invoke(obj);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -74,8 +74,7 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapUpdater? beatmapUpdater) =>
-            new BeatmapImporter(storage, realm, beatmapUpdater);
+        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm) => new BeatmapImporter(storage, realm);
 
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,
@@ -317,13 +316,15 @@ namespace osu.Game.Beatmaps
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
+                setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
+
                 Realm.Write(r =>
                 {
                     var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
 
-                    beatmapUpdater?.Process(liveBeatmapSet, r);
+                    ProcessBeatmap?.Invoke(liveBeatmapSet);
                 });
             }
 
@@ -465,15 +466,6 @@ namespace osu.Game.Beatmaps
         }
 
         public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID));
-
-        #endregion
-
-        #region Implementation of IDisposable
-
-        public void Dispose()
-        {
-            beatmapUpdater?.Dispose();
-        }
 
         #endregion
 
