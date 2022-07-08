@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Play
                         break;
                 }
             }, true);
-            State.BindValueChanged(updateTooltip, true);
+            State.BindValueChanged(updateState, true);
         }
 
         private void saveScore()
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Play
             }));
         }
 
-        private void updateTooltip(ValueChangedEvent<ImportState> state)
+        private void updateState(ValueChangedEvent<ImportState> state)
         {
             switch (state.NewValue)
             {
