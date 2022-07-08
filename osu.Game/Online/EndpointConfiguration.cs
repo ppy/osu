@@ -39,5 +39,10 @@ namespace osu.Game.Online
         /// The endpoint for the SignalR multiplayer server.
         /// </summary>
         public string MultiplayerEndpointUrl { get; set; }
+
+        /// <summary>
+        /// The endpoint for the SignalR metadata server.
+        /// </summary>
+        public string MetadataEndpointUrl { get; set; }
     }
 }
