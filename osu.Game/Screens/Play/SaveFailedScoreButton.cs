@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Threading;
 using osu.Game.Scoring;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -23,8 +22,6 @@ namespace osu.Game.Screens.Play
         public Func<Task<ScoreInfo>> ImportFailedScore;
         private Task<ScoreInfo> saveFailedScoreTask;
         private ScoreInfo score;
-
-        private ScheduledDelegate saveScoreDelegate;
 
         protected readonly Bindable<ImportState> State = new Bindable<ImportState>();
 
@@ -88,24 +85,19 @@ namespace osu.Game.Screens.Play
 
         private void saveScore()
         {
+            if (saveFailedScoreTask != null)
+            {
+                return;
+            }
+
             State.Value = ImportState.Importing;
 
             saveFailedScoreTask = Task.Run(ImportFailedScore);
-
-            saveScoreDelegate = new ScheduledDelegate(() =>
+            saveFailedScoreTask.ContinueWith(s => Schedule(() =>
             {
-                if (saveFailedScoreTask?.IsCompleted != true)
-                    // If the asynchronous preparation has not completed, keep repeating this delegate.
-                    return;
-
-                saveScoreDelegate?.Cancel();
-
-                score = saveFailedScoreTask.GetAwaiter().GetResult();
-
+                score = s.GetAwaiter().GetResult();
                 State.Value = score != null ? ImportState.Imported : ImportState.Failed;
-            }, Time.Current, 50);
-
-            Scheduler.Add(saveScoreDelegate);
+            }));
         }
 
         private void updateTooltip(ValueChangedEvent<ImportState> state)
