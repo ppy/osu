@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Scoring;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osuTK;
@@ -26,7 +25,6 @@ namespace osu.Game.Screens.Play
         protected readonly Bindable<ImportState> State = new Bindable<ImportState>();
 
         private DownloadButton button;
-        private ShakeContainer shakeContainer;
 
         public SaveFailedScoreButton(Func<Task<ScoreInfo>> requestImportFailedScore)
         {
@@ -37,13 +35,9 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game)
         {
-            InternalChild = shakeContainer = new ShakeContainer
+            InternalChild = button = new DownloadButton
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = button = new DownloadButton
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
             };
 
             button.Action = () =>
@@ -55,7 +49,6 @@ namespace osu.Game.Screens.Play
                         break;
 
                     case ImportState.Importing:
-                        shakeContainer.Shake();
                         break;
 
                     default:
@@ -106,18 +99,22 @@ namespace osu.Game.Screens.Play
             {
                 case ImportState.Imported:
                     button.TooltipText = @"Watch replay";
+                    button.Enabled.Value = true;
                     break;
 
                 case ImportState.Importing:
                     button.TooltipText = @"Importing score";
+                    button.Enabled.Value = false;
                     break;
 
                 case ImportState.Failed:
                     button.TooltipText = @"Import failed, click button to re-import";
+                    button.Enabled.Value = true;
                     break;
 
                 default:
                     button.TooltipText = @"Save score";
+                    button.Enabled.Value = true;
                     break;
             }
         }
