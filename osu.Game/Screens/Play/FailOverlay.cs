@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Play
     public class FailOverlay : GameplayMenuOverlay
     {
         public Func<Task<ScoreInfo>> SaveReplay;
+
         public override string Header => "failed";
         public override string Description => "you're dead, try again?";
 
