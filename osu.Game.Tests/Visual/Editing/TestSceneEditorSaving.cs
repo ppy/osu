@@ -24,6 +24,7 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestCantExitWithoutSaving()
         {
             AddRepeatStep("Exit", () => InputManager.Key(Key.Escape), 10);
+            AddAssert("Sample playback disabled", () => Editor.SamplePlaybackDisabled.Value);
             AddAssert("Editor is still active screen", () => Game.ScreenStack.CurrentScreen is Editor);
         }
 
