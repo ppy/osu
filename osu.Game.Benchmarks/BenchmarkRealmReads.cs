@@ -133,9 +133,9 @@ namespace osu.Game.Benchmarks
         [GlobalCleanup]
         public void Cleanup()
         {
-            realm?.Dispose();
-            storage?.Dispose();
-            updateThread?.Exit();
+            realm.Dispose();
+            storage.Dispose();
+            updateThread.Exit();
         }
     }
 }
