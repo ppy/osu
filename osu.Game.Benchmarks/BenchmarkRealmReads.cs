@@ -15,9 +15,9 @@ namespace osu.Game.Benchmarks
 {
     public class BenchmarkRealmReads : BenchmarkTest
     {
-        private TemporaryNativeStorage storage;
-        private RealmAccess realm;
-        private UpdateThread updateThread;
+        private TemporaryNativeStorage storage = null!;
+        private RealmAccess realm = null!;
+        private UpdateThread updateThread = null!;
 
         [Params(1, 100, 1000)]
         public int ReadsPerFetch { get; set; }
