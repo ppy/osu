@@ -282,7 +282,7 @@ namespace osu.Game.Scoring.Legacy
 
         private ReplayFrame convertFrame(LegacyReplayFrame currentFrame, ReplayFrame lastFrame)
         {
-            var convertible = currentRuleset.CreateConvertibleReplayFrame();
+            var convertible = (currentRuleset as ILegacyRuleset)?.CreateConvertibleReplayFrame();
             if (convertible == null)
                 throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
 
