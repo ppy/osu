@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<double> mainVolumeAdjust = new BindableDouble(0.5);
         private readonly BindableNumber<double> metronomeVolumeAdjust = new BindableDouble(0.5);
 
-        private BindableNumber<int> currentCombo;
+        private readonly BindableNumber<int> currentCombo = new BindableInt();
 
         [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
         public BindableBool EnableMetronome { get; } = new BindableBool
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            currentCombo = scoreProcessor.Combo.GetBoundCopy();
+            currentCombo.BindTo(scoreProcessor.Combo);
             currentCombo.BindValueChanged(combo =>
             {
                 double dimFactor = MuteComboCount.Value == 0 ? 1 : (double)combo.NewValue / MuteComboCount.Value;
