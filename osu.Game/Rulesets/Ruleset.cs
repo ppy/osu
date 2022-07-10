@@ -23,7 +23,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Users;
-using JetBrains.Annotations;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
@@ -101,7 +100,6 @@ namespace osu.Game.Rulesets
         /// then the proper behaviour is to return an empty enumerable.
         /// <see langword="null"/> mods should not be present in the returned enumerable.
         /// </remarks>
-        [ItemNotNull]
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         /// <summary>
@@ -183,7 +181,7 @@ namespace osu.Game.Rulesets
 
         public ModAutoplay? GetAutoplayMod() => CreateMod<ModAutoplay>();
 
-        public virtual ISkin? CreateLegacySkinProvider([NotNull] ISkin skin, IBeatmap beatmap) => null;
+        public virtual ISkin? CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => null;
 
         protected Ruleset()
         {
