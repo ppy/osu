@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public int LegacyID => 1;
 
-        public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
+        public IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
 
         protected override IEnumerable<HitResult> GetValidHitResults()
         {
