@@ -16,6 +16,11 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc.Mapping
         /// </summary>
         public int[] Beatmaps { get; set; }
 
+        /// <summary>
+        /// 偏移
+        /// </summary>
+        public int Offset { get; set; }
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);

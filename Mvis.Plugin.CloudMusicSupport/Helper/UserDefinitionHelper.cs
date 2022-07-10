@@ -47,12 +47,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 var deserializedObject = JsonConvert.DeserializeObject<APIMappingRoot>(File.ReadAllText(storage.GetFullPath(filePath)));
 
                 //检查日期
-                if (deserializedObject != null)
+                //如果日期那里是-1，那么直接跳过时间检查
+                if (deserializedObject != null && deserializedObject.LastUpdate != -1)
                 {
                     int lastUpdate = TimeSpan.FromMilliseconds(deserializedObject.LastUpdate).Days;
                     int now = TimeSpan.FromMilliseconds(DateTime.Now.Millisecond).Days;
 
-                    //如果在一周内更新或者LastUpdate是-1(调试模式)，那么跳过
+                    //如果在一周内更新或者LastUpdate是-2(调试模式)，那么跳过
                     if (now - lastUpdate < 7 || deserializedObject.LastUpdate == -1)
                     {
                         mappingRoot = deserializedObject;
@@ -74,6 +75,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 if (currentRequest == req) currentRequest = null;
 
                 mappingRoot = req.ResponseObject;
+
+                File.WriteAllText(storage.GetFullPath(filePath), req.GetResponseString());
 
                 onComplete?.Invoke();
             };

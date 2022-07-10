@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using Markdig.Helpers;
 using Newtonsoft.Json;
 
@@ -10,24 +9,22 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc
     public class APILyricResponseRoot : IDisposable
     {
         [JsonProperty("lrc")]
-        public LyricInfo LyricInfo;
+        public LyricInfo? LyricInfo;
 
         /// <summary>
         /// 网易云中歌词和翻译歌词是分开的，存储和下载歌词是用TLyricInfo获取翻译
         /// </summary>
         [JsonProperty("tlyric")]
-        public LyricInfo TLyricInfo;
+        public LyricInfo? TLyricInfo;
 
         [JsonProperty("localOffset")]
         public double LocalOffset;
 
-        [CanBeNull]
         [JsonIgnore]
-        public List<string> Lyrics => LyricInfo?.RawLyric?.Split("\n", StringSplitOptions.RemoveEmptyEntries).ToList();
+        public List<string>? Lyrics => LyricInfo?.RawLyric?.Split("\n", StringSplitOptions.RemoveEmptyEntries).ToList();
 
-        [CanBeNull]
         [JsonIgnore]
-        public List<string> Tlyrics => TLyricInfo?.RawLyric?.Split("\n", StringSplitOptions.RemoveEmptyEntries).ToList();
+        public List<string>? Tlyrics => TLyricInfo?.RawLyric?.Split("\n", StringSplitOptions.RemoveEmptyEntries).ToList();
 
         public List<Lyric> ToLyricList()
         {
@@ -152,8 +149,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc
                         }
 
                         //如果是属性，那么添加字符到propertyName，反之则是lyricContent
-                        if (propertyDetected) propertyName = propertyName + c;
-                        else lyricContent = lyricContent + c;
+                        if (propertyDetected) propertyName += c;
+                        else lyricContent += c;
                     }
 
                     foreach (int time in times)

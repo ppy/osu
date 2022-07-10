@@ -111,12 +111,18 @@ namespace Mvis.Plugin.CloudMusicSupport
                     Bindable = config.GetBindable<bool>(LyricSettings.EnableUserDefinitions),
                     Description = "启用用户定义后，将通过设置的URL获取相关设置来优先匹配本地谱面ID以提供更准确的歌词查询"
                 },
+                new BooleanSettingsEntry
+                {
+                    Name = "输出定义到日志",
+                    Bindable = config.GetBindable<bool>(LyricSettings.OutputDefinitionInLogs),
+                    Description = "更新定义时输出内容到日志中，可以在某些情况下帮助查找相关信息"
+                },
                 new StringSettingsEntry
                 {
                     Name = "用户定义文件URL",
                     Bindable = config.GetBindable<string>(LyricSettings.UserDefinitionURL),
                     Description = "将通过此URL拉取用户定义配置"
-                }
+                },
             };
 
             return entries;
@@ -229,7 +235,8 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             Offset.BindValueChanged(v =>
             {
-                currentResponseRoot.LocalOffset = v.NewValue;
+                if (currentResponseRoot != null)
+                    currentResponseRoot.LocalOffset = v.NewValue;
             });
         }
 

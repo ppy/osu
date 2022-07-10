@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osu.Game.Screens.LLin.Plugins;
 using osuTK;
 using osuTK.Graphics;
 
@@ -106,7 +107,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         }
 
         [BackgroundDependencyLoader]
-        private void load(LyricConfigManager config)
+        private void load(LyricConfigManager config, LyricConfigManager lcm)
         {
             udh ??= plugin.UserDefinitionHelper;
 
@@ -128,43 +129,53 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                     RelativeSizeAxes = Axes.X,
                     PlaceholderText = "按网易云ID搜索歌词"
                 },
-                new IconButton
+                new FillFlowContainer
                 {
-                    Size = new Vector2(30),
-                    TooltipText = "更新定义",
-                    Action = () =>
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        udh.UpdateDefinition();
-                        udh.Debug();
-                    },
-                    Icon = FontAwesome.Solid.Cloud
-                },
-                new IconButton
-                {
-                    Size = new Vector2(30),
-                    TooltipText = "复制信息",
-                    Action = () =>
-                    {
-                        SDL2.SDL.SDL_SetClipboardText(resolveBeatmapVerboseString(plugin.CurrentWorkingBeatmap));
-                    },
-                    Icon = FontAwesome.Solid.Clipboard
-                },
-                new IconButton
-                {
-                    Size = new Vector2(30),
-                    TooltipText = "复制模板",
-                    Action = () =>
-                    {
-                        string targetString = "\n{\n"
-                                              + "  \"Target\": 把这条中文替换成你得到的网易云ID,\n"
-                                              + "  \"Beatmaps\":\n"
-                                              + "  [\n"
-                                              + $"    {resolveBeatmapVerboseString(plugin.CurrentWorkingBeatmap)}\n"
-                                              + "  ]\n"
-                                              + "},";
-                        SDL2.SDL.SDL_SetClipboardText(targetString);
-                    },
-                    Icon = FontAwesome.Solid.Pen
+                        new IconButton
+                        {
+                            Size = new Vector2(30),
+                            TooltipText = "更新定义",
+                            Action = () =>
+                            {
+                                udh.UpdateDefinition();
+
+                                if (lcm.Get<bool>(LyricSettings.OutputDefinitionInLogs))
+                                    udh.Debug();
+                            },
+                            Icon = FontAwesome.Solid.Cloud
+                        },
+                        new IconButton
+                        {
+                            Size = new Vector2(30),
+                            TooltipText = "复制单条信息",
+                            Action = () =>
+                            {
+                                SDL2.SDL.SDL_SetClipboardText(resolveBeatmapVerboseString(plugin.CurrentWorkingBeatmap));
+                            },
+                            Icon = FontAwesome.Solid.Clipboard
+                        },
+                        new IconButton
+                        {
+                            Size = new Vector2(30),
+                            TooltipText = "复制模板",
+                            Action = () =>
+                            {
+                                string targetString = "\n{\n"
+                                                      + "  \"Target\": 把这条中文替换成你得到的网易云ID,\n"
+                                                      + "  \"Beatmaps\":\n"
+                                                      + "  [\n"
+                                                      + $"    {resolveBeatmapVerboseString(plugin.CurrentWorkingBeatmap)}\n"
+                                                      + "  ]\n"
+                                                      + "},";
+                                SDL2.SDL.SDL_SetClipboardText(targetString);
+                            },
+                            Icon = FontAwesome.Solid.Pen
+                        }
+                    }
                 }
             });
 
