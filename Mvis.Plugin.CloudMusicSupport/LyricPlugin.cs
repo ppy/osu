@@ -21,7 +21,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.LLin.Plugins.Types.SettingsItems;
-using Sentry;
 
 namespace Mvis.Plugin.CloudMusicSupport
 {
@@ -128,7 +127,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         public override int Version => 10;
 
-        private WorkingBeatmap currentWorkingBeatmap;
+        internal WorkingBeatmap CurrentWorkingBeatmap;
         private LyricLineHandler lrcLine;
 
         /// <summary>
@@ -247,7 +246,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         public void WriteLyricToDisk(WorkingBeatmap currentBeatmap = null)
         {
-            currentBeatmap ??= currentWorkingBeatmap;
+            currentBeatmap ??= CurrentWorkingBeatmap;
             processor.WriteLrcToFile(currentResponseRoot, currentBeatmap);
         }
 
@@ -265,10 +264,10 @@ namespace Mvis.Plugin.CloudMusicSupport
             currentResponseRoot = null;
             CurrentLine = null;
 
-            if (UserDefinitionHelper.HaveDefinition(currentWorkingBeatmap.BeatmapSetInfo.OnlineID, out int neid))
+            if (UserDefinitionHelper.HaveDefinition(CurrentWorkingBeatmap.BeatmapSetInfo.OnlineID, out int neid))
                 GetLyricFor(neid);
             else
-                processor.StartFetchByBeatmap(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
+                processor.StartFetchByBeatmap(CurrentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
         }
 
         private double targetTime => track.CurrentTime + Offset.Value;
@@ -277,9 +276,9 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             if (Disabled.Value) return;
 
-            if (currentWorkingBeatmap != null) WriteLyricToDisk(currentWorkingBeatmap);
+            if (CurrentWorkingBeatmap != null) WriteLyricToDisk(CurrentWorkingBeatmap);
 
-            currentWorkingBeatmap = working;
+            CurrentWorkingBeatmap = working;
             track = working.Track;
 
             CurrentStatus.Value = Status.Working;

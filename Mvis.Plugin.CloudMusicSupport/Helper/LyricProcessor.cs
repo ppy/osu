@@ -125,7 +125,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             var req = new OsuJsonWebRequest<APILyricResponseRoot>(target);
             req.Finished += () => onFinish?.Invoke(req.ResponseObject);
             req.Failed += e => Logger.Error(e, "获取歌词失败");
-            req.PerformAsync(cancellationTokenSource.Token);
+            req.PerformAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
             currentLyricRequest = req;
         }
