@@ -40,7 +40,6 @@ using System.Diagnostics;
 using osu.Game.Screens.Backgrounds;
 using JetBrains.Annotations;
 using osu.Game.Screens.Play;
-using osu.Game.Database;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 

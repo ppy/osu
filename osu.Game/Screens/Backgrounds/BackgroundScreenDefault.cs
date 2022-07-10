@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Backgrounds
         private Bindable<IntroSequence> introSequence;
         private readonly SeasonalBackgroundLoader seasonalBackgroundLoader = new SeasonalBackgroundLoader();
 
+        private Bindable<BackgroundSource> mode;
+
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
 
@@ -50,6 +52,8 @@ namespace osu.Game.Screens.Backgrounds
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
 
             AddInternal(seasonalBackgroundLoader);
+
+            mode = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
 
             //workaround: intro -> MainMenu后背景看上去短暂变黑
             if (mode.Value == BackgroundSource.LoaderBackground)

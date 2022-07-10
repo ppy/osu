@@ -274,8 +274,6 @@ namespace osu.Game.Screens.Menu
                 foreach (var c in textFlow.Children)
                     c.FadeTo(0.001f).Delay(delay += 20).FadeIn(500);
 
-                animateHeart();
-
                 this
                     .FadeInFromZero(500)
                     .Then(5500)
@@ -297,11 +295,7 @@ namespace osu.Game.Screens.Menu
                 supportFlow.FadeOut();
 
                 if (!instantPush)
-                {
                     supportFlow.FadeIn(500);
-
-                    animateHeart();
-                }
 
                 this
                     .FadeInFromZero(instantPush ? 0 : 500)
@@ -340,7 +334,6 @@ namespace osu.Game.Screens.Menu
                 "使用linux游玩以获得更好的体验 ——翎",
                 "原来，你也玩osu",
                 "选择ppy，选择成功！",
-                "I use Arch btw.",
                 "owo"
             };
 

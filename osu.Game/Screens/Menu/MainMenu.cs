@@ -163,9 +163,6 @@ namespace osu.Game.Screens.Menu
             Buttons.OnSettings = () => settings?.ToggleVisibility();
             Buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
 
-            LoadComponentAsync(background = new BackgroundScreenDefault(config.Get<BackgroundSource>(OsuSetting.MenuBackgroundSource) != BackgroundSource.LoaderBackground
-                                                                        || config.Get<Configuration.IntroSequence>(OsuSetting.IntroSequence) != Configuration.IntroSequence.SkippedIntro));
-
             preloadSongSelect();
         }
 
@@ -294,7 +291,7 @@ namespace osu.Game.Screens.Menu
             ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());
 
             // we may have consumed our preloaded instance, so let's make another.
-            preloadScreens();
+            preloadSongSelect();
 
             musicController.EnsurePlayingSomething();
         }

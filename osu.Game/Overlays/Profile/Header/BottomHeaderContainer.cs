@@ -4,8 +4,6 @@
 #nullable disable
 
 using System;
-using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;

@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using Humanizer;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 

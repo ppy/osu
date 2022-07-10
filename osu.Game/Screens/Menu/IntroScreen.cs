@@ -226,8 +226,6 @@ namespace osu.Game.Screens.Menu
 
             ApplyToBackground(b => b.FadeColour(Color4.Black, 100));
 
-            double fadeOutTime = exit_delay;
-
             var track = musicController.CurrentTrack;
 
             // ensure the track doesn't change or loop as we are exiting.

@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using Humanizer;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;

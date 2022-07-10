@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-<<<<<<< HEAD
-using osu.Framework.Extensions;
-=======
 #nullable disable
 
->>>>>>> upstream/master
+using osu.Framework.Extensions;
 using osu.Game.Tournament.Models;
 using osuTK;
 

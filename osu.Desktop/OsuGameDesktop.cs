@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -261,17 +260,15 @@ namespace osu.Desktop
             }
         }
 
-<<<<<<< HEAD
         public void TransformWindowOpacity(float final, double duration = 0, Easing easing = Easing.None) =>
             this.TransformBindableTo(windowOpacity, final, duration, easing);
 
         public void SetWindowOpacity(float value) => ((SDL2DesktopWindow)Window).Opacity = value;
-=======
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
             osuSchemeLinkIPCChannel?.Dispose();
         }
->>>>>>> upstream/master
     }
 }

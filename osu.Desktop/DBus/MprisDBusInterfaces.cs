@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using M.DBus;
 using Tmds.DBus;
 
+#nullable disable
+
 namespace osu.Desktop.DBus
 {
     [DBusInterface("org.mpris.MediaPlayer2")]

@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;

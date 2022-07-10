@@ -136,10 +136,11 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             foreach (string hash in c.BeatmapHashes)
             {
                 var item = hashResolver.ResolveHash(hash);
-                if (item == null) continue;
 
                 //获取当前BeatmapSet
                 var currentSet = item.BeatmapSet;
+
+                if (currentSet == null) continue;
 
                 //进行比对，如果beatmapList中不存在，则添加。
                 if (!beatmapSets.Contains(currentSet))

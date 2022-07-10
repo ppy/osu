@@ -232,10 +232,10 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             {
                 var item = hashResolver.ResolveHash(hash);
 
-                if (item == null) continue;
-
                 //获取当前BeatmapSet
                 var currentSet = item.BeatmapSet;
+
+                if (currentSet == null) continue;
 
                 //进行比对，如果beatmapList中不存在，则添加。
                 if (!beatmapSets.Contains(currentSet))
@@ -267,7 +267,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             //如果已经被选中了，则触发双击
             if (State.Value == ActiveState.Selected)
             {
-                doubleClick?.Invoke();
+                doubleClick.Invoke();
                 State.Value = ActiveState.Active;
 
                 return base.OnClick(e);
@@ -295,7 +295,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             }
         }
 
-        private class BeatmapThumbnailFlow : FillFlowContainer
+        private class BeatmapThumbnailFlow : FillFlowContainer<TooltipContainer>
         {
             [Resolved]
             private BeatmapManager beatmaps { get; set; }

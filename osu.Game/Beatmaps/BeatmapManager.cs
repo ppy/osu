@@ -440,7 +440,7 @@ namespace osu.Game.Beatmaps
 
         public void UndeleteAll()
         {
-            realm.Run(r =>
+            Realm.Run(r =>
             {
                 //Llin custom
                 var items = r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList();

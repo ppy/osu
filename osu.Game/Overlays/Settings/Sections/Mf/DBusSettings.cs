@@ -54,12 +54,12 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
             intergrationCheckbox.Current.BindValueChanged(v =>
             {
-                intergrationCheckbox.SetNoticeText(v.NewValue ? default : "需要重启", true);
+                intergrationCheckbox.SetNoticeText(v.NewValue ? "" : "需要重启", true);
             });
 
             dbusWaitOnlineSlider.Current.BindValueChanged(v =>
             {
-                dbusWaitOnlineSlider.SetNoticeText(v.NewValue == 3000d ? "真得有桌面需要拉这么高的值吗 O.O" : default);
+                dbusWaitOnlineSlider.SetNoticeText(v.NewValue == 3000d ? "真得有桌面需要拉这么高的值吗 O.O" : "");
             }, true);
         }
     }

@@ -270,7 +270,7 @@ namespace osu.Game
 
             //CustomStore在字体后初始化，避免覆盖原有字体
             var customStore = new CustomFontStore(Storage, this);
-            largeStore.AddStore(new TextureLoaderStore(customStore));
+            largeStore.AddTextureSource(new TextureLoaderStore(customStore));
             dependencies.Cache(customStore);
 
             //初始化加速地址扩展处理器Store

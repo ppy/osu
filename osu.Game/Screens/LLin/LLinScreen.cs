@@ -1022,6 +1022,7 @@ namespace osu.Game.Screens.LLin
             this.FadeOut(500, Easing.OutQuint);
 
             Exiting?.Invoke();
+
             pluginManager.OnPluginUnLoad -= onPluginUnLoad;
 
             pluginManager.RemoveDBusMenuEntry(dbusEntry);

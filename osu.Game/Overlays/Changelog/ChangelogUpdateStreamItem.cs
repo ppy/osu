@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using Humanizer;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;

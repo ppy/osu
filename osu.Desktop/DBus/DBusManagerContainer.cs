@@ -114,9 +114,9 @@ namespace osu.Desktop.DBus
         public void Add(IMDBusObject obj)
         {
             if (!string.IsNullOrEmpty(obj.CustomRegisterName))
-                DBusManager.RegisterNewObject(obj, obj.CustomRegisterName);
+                DBusManager.RegisterNewObject(obj, obj.CustomRegisterName).ConfigureAwait(false);
             else
-                DBusManager.RegisterNewObject(obj);
+                DBusManager.RegisterNewObject(obj).ConfigureAwait(false);
         }
 
         public void AddRange(IMDBusObject[] objects)
@@ -331,7 +331,7 @@ namespace osu.Desktop.DBus
             });
         }
 
-        private void exitGame() => Schedule(game.GracefullyExit);
+        private void exitGame() => Schedule(game.Exit);
 
         private void onMessageRevicedFromDBus(string message)
         {
