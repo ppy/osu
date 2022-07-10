@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -445,10 +447,10 @@ namespace osu.Game.Online.Leaderboards
                     items.Add(new OsuMenuItem("使用这些mod游玩", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
 
                 if (Score.Files.Count > 0)
+                {
                     items.Add(new OsuMenuItem("导出", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
-
-                if (!isOnlineScope)
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                }
 
                 return items.ToArray();
             }

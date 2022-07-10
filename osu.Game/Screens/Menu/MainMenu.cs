@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -8,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -64,9 +67,7 @@ namespace osu.Game.Screens.Menu
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
-        private BackgroundScreenDefault background;
-
-        protected override BackgroundScreen CreateBackground() => background;
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         protected override bool PlayExitSound => false;
 
@@ -162,9 +163,7 @@ namespace osu.Game.Screens.Menu
             Buttons.OnSettings = () => settings?.ToggleVisibility();
             Buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
 
-            LoadComponentAsync(background = new BackgroundScreenDefault(config.Get<BackgroundSource>(OsuSetting.MenuBackgroundSource) != BackgroundSource.LoaderBackground
-                                                                        || config.Get<Configuration.IntroSequence>(OsuSetting.IntroSequence) != Configuration.IntroSequence.SkippedIntro));
-            preloadScreens();
+            preloadSongSelect();
         }
 
         [Resolved(canBeNull: true)]
@@ -180,7 +179,7 @@ namespace osu.Game.Screens.Menu
             performer?.PerformFromScreen(menu => menu.Exit());
         }
 
-        private void preloadScreens()
+        private void preloadSongSelect()
         {
             if (songSelect == null)
                 LoadComponentAsync(songSelect = new PlaySongSelect());
@@ -292,7 +291,7 @@ namespace osu.Game.Screens.Menu
             ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());
 
             // we may have consumed our preloaded instance, so let's make another.
-            preloadScreens();
+            preloadSongSelect();
 
             musicController.EnsurePlayingSomething();
         }
@@ -320,6 +319,8 @@ namespace osu.Game.Screens.Menu
 
         public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
         {
+            Logger.Log($"{nameof(MainMenu)} completing {nameof(PresentBeatmap)} with beatmap {beatmap} ruleset {ruleset}");
+
             Beatmap.Value = beatmap;
             Ruleset.Value = ruleset;
 

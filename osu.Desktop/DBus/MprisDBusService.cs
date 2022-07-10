@@ -9,6 +9,8 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using Tmds.DBus;
 
+#nullable disable
+
 namespace osu.Desktop.DBus
 {
     public class MprisPlayerService : IMDBusObject, IPlayer, IMediaPlayer2

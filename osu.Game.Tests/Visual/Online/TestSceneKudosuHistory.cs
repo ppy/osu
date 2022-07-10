@@ -1,6 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+<<<<<<< HEAD
+=======
+#nullable disable
+
+using osu.Game.Overlays.Profile.Sections.Kudosu;
+using System.Collections.Generic;
+>>>>>>> upstream/master
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;

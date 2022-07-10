@@ -1,9 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -49,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void LoadComplete()
         {
-            Active.BindDisabledChanged(disabled => Action = disabled ? (Action?)null : Active.Toggle, true);
+            Active.BindDisabledChanged(disabled => Action = disabled ? null : Active.Toggle, true);
             Active.BindValueChanged(_ =>
             {
                 updateActiveState();

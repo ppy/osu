@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -215,7 +217,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             scope.BindValueChanged(_ => getScores());
             ruleset.BindValueChanged(_ => getScores());
 
-            modSelector.SelectedMods.CollectionChanged += (_, __) => getScores();
+            modSelector.SelectedMods.CollectionChanged += (_, _) => getScores();
 
             Beatmap.BindValueChanged(onBeatmapChanged);
             user.BindValueChanged(onUserChanged, true);

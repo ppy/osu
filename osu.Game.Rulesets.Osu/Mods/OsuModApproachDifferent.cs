@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
+#nullable disable
+
 using System;
+using System.ComponentModel;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -36,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            drawable.ApplyCustomUpdateState += (drawableObject, state) =>
+            drawable.ApplyCustomUpdateState += (drawableObject, _) =>
             {
                 if (!(drawableObject is DrawableHitCircle drawableHitCircle)) return;
 

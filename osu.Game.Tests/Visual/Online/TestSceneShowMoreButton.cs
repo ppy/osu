@@ -1,7 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+<<<<<<< HEAD
 using osu.Framework.Allocation;
+=======
+#nullable disable
+
+>>>>>>> upstream/master
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;

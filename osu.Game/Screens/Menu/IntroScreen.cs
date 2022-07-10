@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -17,7 +19,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -96,6 +97,11 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         protected bool UsingThemedIntro { get; private set; }
 
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault(false)
+        {
+            Colour = Color4.Black
+        };
+
         protected IntroScreen([CanBeNull] Func<MainMenu> createNextScreen = null)
         {
             this.createNextScreen = createNextScreen;
@@ -145,7 +151,7 @@ namespace osu.Game.Screens.Menu
                 {
                     // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
                     // this could happen if a user has nuked their files store. for now, reimport to repair this.
-                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
+                    var import = beatmaps.Import(new ImportTask(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
 
                     import?.PerformWrite(b => b.Protected = true);
 
@@ -218,6 +224,8 @@ namespace osu.Game.Screens.Menu
         {
             this.FadeIn(300);
 
+            ApplyToBackground(b => b.FadeColour(Color4.Black, 100));
+
             var track = musicController.CurrentTrack;
 
             // ensure the track doesn't change or loop as we are exiting.
@@ -256,13 +264,22 @@ namespace osu.Game.Screens.Menu
             base.OnResuming(e);
         }
 
+        private bool backgroundFaded;
+
+        protected void FadeInBackground(float duration = 0)
+        {
+            ApplyToBackground(b => b.FadeColour(Color4.White, duration));
+            backgroundFaded = true;
+        }
+
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             base.OnSuspending(e);
             initialBeatmap = null;
-        }
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
+            if (!backgroundFaded)
+                FadeInBackground(200);
+        }
 
         protected virtual void StartTrack()
         {

@@ -40,7 +40,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             var config = (LyricConfigManager)pluginConfigManager;
 
-            entries ??= new SettingsEntry[]
+            entries = new SettingsEntry[]
             {
                 new BooleanSettingsEntry
                 {
@@ -225,13 +225,11 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
 
-            if (LLin != null)
-                LLin.Exiting += onMvisExiting;
+            LLin.Exiting += onMvisExiting;
 
             Offset.BindValueChanged(v =>
             {
-                if (currentResponseRoot != null)
-                    currentResponseRoot.LocalOffset = v.NewValue;
+                currentResponseRoot.LocalOffset = v.NewValue;
             });
         }
 

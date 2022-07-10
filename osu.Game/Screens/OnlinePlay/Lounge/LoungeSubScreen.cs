@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -302,7 +304,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            RoomManager?.JoinRoom(room, password, r =>
+            RoomManager?.JoinRoom(room, password, _ =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();

@@ -70,7 +70,7 @@ namespace osu.Game.Configuration.AccelUtils
 
                     //替换值的时候使用
                     string propertyNameInput = propertyInfo.name;
-                    propertyInfo.name = propertyInfo.name.ToUpper();
+                    propertyInfo.name = propertyInfo.name.ToUpperInvariant();
 
                     if (!vaild_properties.Contains(propertyInfo.name) && !noSuggestion)
                     {
@@ -101,7 +101,7 @@ namespace osu.Game.Configuration.AccelUtils
                         bool vaildExtension = ExtensionHandlers.TryGetValue(propertyInfo.extensionName, out handler);
 
                         //如果没查到，则转换到大写再试一次
-                        if (!vaildExtension) vaildExtension = ExtensionHandlers.TryGetValue(propertyInfo.extensionName.ToUpper(), out handler);
+                        if (!vaildExtension) vaildExtension = ExtensionHandlers.TryGetValue(propertyInfo.extensionName.ToUpperInvariant(), out handler);
 
                         //如果还是没有
                         if (!vaildExtension && !noSuggestion)

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -200,16 +202,17 @@ namespace osu.Game.Screens.Menu
                     supportFlow.AddText("来支持游戏的开发", formatSemiBold);
                 }
 
-                heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
+                supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
+                    heart = t;
+
                     t.Padding = new MarginPadding { Left = 5, Top = 3 };
                     t.Font = t.Font.With(size: 20);
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
-                }).Drawables.First();
 
-                if (IsLoaded)
-                    animateHeart();
+                    Schedule(() => heart?.FlashColour(Color4.White, 750, Easing.OutQuint).Loop());
+                });
 
                 if (supportFlow.IsPresent)
                     supportFlow.FadeInFromZero(500);
@@ -223,6 +226,14 @@ namespace osu.Game.Screens.Menu
                 LoadComponentAsync(nextScreen);
 
             ((IBindable<APIUser>)currentUser).BindTo(api.LocalUser);
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            base.OnSuspending(e);
+
+            // Once this screen has finished being displayed, we don't want to unnecessarily handle user change events.
+            currentUser.UnbindAll();
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -263,8 +274,6 @@ namespace osu.Game.Screens.Menu
                 foreach (var c in textFlow.Children)
                     c.FadeTo(0.001f).Delay(delay += 20).FadeIn(500);
 
-                animateHeart();
-
                 this
                     .FadeInFromZero(500)
                     .Then(5500)
@@ -286,11 +295,7 @@ namespace osu.Game.Screens.Menu
                 supportFlow.FadeOut();
 
                 if (!instantPush)
-                {
                     supportFlow.FadeIn(500);
-
-                    animateHeart();
-                }
 
                 this
                     .FadeInFromZero(instantPush ? 0 : 500)
@@ -329,16 +334,10 @@ namespace osu.Game.Screens.Menu
                 "使用linux游玩以获得更好的体验 ——翎",
                 "原来，你也玩osu",
                 "选择ppy，选择成功！",
-                "I use Arch btw.",
                 "owo"
             };
 
             return tips[RNG.Next(0, tips.Length)];
-        }
-
-        private void animateHeart()
-        {
-            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
     }
 }

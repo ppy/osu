@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Play
@@ -99,6 +102,8 @@ namespace osu.Game.Screens.Play
         /// <param name="time">The destination time to seek to.</param>
         public virtual void Seek(double time)
         {
+            Logger.Log($"{nameof(GameplayClockContainer)} seeking to {time}");
+
             AdjustableSource.Seek(time);
 
             // Manually process to make sure the gameplay clock is correctly updated after a seek.

@@ -33,13 +33,15 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        private FlowContainer<NotificationSection> sections;
+        private FlowContainer<NotificationSection> sections = null!;
 
         [Resolved]
-        private AudioManager audio { get; set; }
+        private AudioManager audio { get; set; } = null!;
+
+        private readonly IBindable<Visibility> firstRunSetupVisibility = new Bindable<Visibility>();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(FirstRunSetupOverlay? firstRunSetup)
         {
             X = WIDTH;
             Width = WIDTH;
@@ -78,13 +80,16 @@ namespace osu.Game.Overlays
                     }
                 }
             };
+
+            if (firstRunSetup != null)
+                firstRunSetupVisibility.BindTo(firstRunSetup.State);
         }
 
-        private ScheduledDelegate notificationsEnabler;
+        private ScheduledDelegate? notificationsEnabler;
 
         private void updateProcessingMode()
         {
-            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State.Value == Visibility.Visible;
+            bool enabled = (OverlayActivationMode.Value == OverlayActivation.All && firstRunSetupVisibility.Value != Visibility.Visible) || State.Value == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
@@ -99,7 +104,8 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            State.ValueChanged += _ => updateProcessingMode();
+            State.BindValueChanged(_ => updateProcessingMode());
+            firstRunSetupVisibility.BindValueChanged(_ => updateProcessingMode());
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 

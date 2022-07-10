@@ -9,6 +9,8 @@ using M.DBus.Utils.Canonical.DBusMenuFlags;
 using osu.Framework.Logging;
 using Tmds.DBus;
 
+#nullable disable
+
 namespace osu.Desktop.DBus.Tray
 {
     /// <summary>

@@ -105,6 +105,11 @@ namespace osu.Game.Localisation
         public static LocalisableString RandomSelectionAlgorithm => new TranslatableString(getKey(@"random_selection_algorithm"), @"Random selection algorithm");
 
         /// <summary>
+        /// "Mod select hotkey style"
+        /// </summary>
+        public static LocalisableString ModSelectHotkeyStyle => new TranslatableString(getKey(@"mod_select_hotkey_style"), @"Mod select hotkey style");
+
+        /// <summary>
         /// "no limit"
         /// </summary>
         public static LocalisableString NoLimit => new TranslatableString(getKey(@"no_limit"), @"no limit");

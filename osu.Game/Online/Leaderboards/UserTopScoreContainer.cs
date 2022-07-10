@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using osu.Framework.Bindables;
@@ -46,8 +48,8 @@ namespace osu.Game.Online.Leaderboards
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = @"个人最佳成绩".ToUpper(),
-                            Font = OsuFont.GetFont(size: 25, weight: FontWeight.Bold),//第一次翻译时修改
+                            Text = @"个人最佳成绩".ToUpperInvariant(),
+                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
                         },
                         scoreContainer = new Container
                         {

@@ -14,7 +14,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
@@ -89,9 +88,6 @@ namespace Mvis.Plugin.CollectionSupport
 
         private bool trackChangedAfterDisable = true;
 
-        [Resolved]
-        private OsuGame game { get; set; }
-
         private CollectionDBusObject dBusObject;
 
         private readonly SimpleEntry trayEntry = new SimpleEntry
@@ -113,11 +109,8 @@ namespace Mvis.Plugin.CollectionSupport
 
             PluginManager.RegisterDBusObject(dBusObject = new CollectionDBusObject());
 
-            if (LLin != null)
-            {
-                LLin.Resuming += UpdateBeatmaps;
-                LLin.Exiting += onMvisExiting;
-            }
+            LLin.Resuming += UpdateBeatmaps;
+            LLin.Exiting += onMvisExiting;
         }
 
         protected override void LoadComplete()
@@ -204,7 +197,7 @@ namespace Mvis.Plugin.CollectionSupport
 
         private DrawableTrack drawableTrack;
 
-        public DrawableTrack GetCurrentTrack() => drawableTrack ??= new DrawableTrack(b.Value.Track);
+        public DrawableTrack GetCurrentTrack() => drawableTrack;
 
         private bool isCurrent;
 
@@ -290,20 +283,21 @@ namespace Mvis.Plugin.CollectionSupport
             beatmapList.Clear();
             trayEntry.Children.Clear();
 
-            if (collection == null) return;
+            if (collection?.BeatmapHashes == null) return;
 
             foreach (string hash in collection.BeatmapHashes)
             {
                 var item = hashResolver.ResolveHash(hash);
 
-                if (item == null)
+                //获取当前BeatmapSet
+                var currentSet = item.BeatmapSet;
+
+                if (currentSet == null)
                 {
                     Logger.Log($"{hash}解析到的谱面是null，将不会继续处理此Hash");
                     continue;
                 }
 
-                //获取当前BeatmapSet
-                var currentSet = item.BeatmapSet;
                 //进行比对，如果beatmapList中不存在，则添加。
                 if (!beatmapList.Contains(currentSet))
                     beatmapList.Add(currentSet);
@@ -331,7 +325,7 @@ namespace Mvis.Plugin.CollectionSupport
             trayEntry.Label = $"收藏夹（{collection.Name}）";
         }
 
-        private SimpleEntry currentSubEntry;
+        private SimpleEntry? currentSubEntry;
 
         private void updateCurrentPosition(bool triggerDBusSubmenu = false)
         {
@@ -367,10 +361,9 @@ namespace Mvis.Plugin.CollectionSupport
 
         protected override void Dispose(bool isDisposing)
         {
-            if (collectionManager != null)
-                collectionManager.Collections.CollectionChanged -= triggerRefresh;
+            collectionManager.Collections.CollectionChanged -= triggerRefresh;
 
-            if (LLin != null) LLin.Resuming -= UpdateBeatmaps;
+            LLin.Resuming -= UpdateBeatmaps;
 
             base.Dispose(isDisposing);
         }
