@@ -214,8 +214,8 @@ namespace osu.Game.Rulesets.Mods
 
             public bool Equals(IBindable x, IBindable y)
             {
-                object xValue = x?.GetUnderlyingSettingValue();
-                object yValue = y?.GetUnderlyingSettingValue();
+                object xValue = x.GetUnderlyingSettingValue();
+                object yValue = y.GetUnderlyingSettingValue();
 
                 return EqualityComparer<object>.Default.Equals(xValue, yValue);
             }
