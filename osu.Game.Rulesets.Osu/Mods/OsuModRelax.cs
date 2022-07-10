@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private OsuInputManager osuInputManager;
 
-        private ReplayState<OsuAction> state;
+        private ReplayState<OsuAction>? state;
         private double lastStateChangeTime;
 
         private bool hasReplay;

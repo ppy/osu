@@ -53,9 +53,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// <summary>
             /// Black background boxes behind blind panel textures.
             /// </summary>
-            private Box blackBoxLeft, blackBoxRight;
+            private Box blackBoxLeft = null!, blackBoxRight = null!;
 
-            private Drawable panelLeft, panelRight, bgPanelLeft, bgPanelRight;
+            private Drawable panelLeft = null!, panelRight = null!, bgPanelLeft = null!, bgPanelRight = null!;
 
             private readonly Beatmap<OsuHitObject> beatmap;
 

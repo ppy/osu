@@ -403,7 +403,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="hitObjects">The list of hit objects in a beatmap, ordered by StartTime</param>
         /// <param name="time">The point in time to get samples for</param>
         /// <returns>Hit samples</returns>
-        private IList<HitSampleInfo> getSamplesAtTime(IEnumerable<OsuHitObject> hitObjects, double time)
+        private IList<HitSampleInfo>? getSamplesAtTime(IEnumerable<OsuHitObject> hitObjects, double time)
         {
             // Get a hit object that
             //   either has StartTime equal to the target time
