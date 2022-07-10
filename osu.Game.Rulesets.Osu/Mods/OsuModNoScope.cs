@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -19,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Description => "Where's the cursor?";
 
-        private PeriodTracker spinnerPeriods;
+        private PeriodTracker? spinnerPeriods;
 
         [SettingSource(
             "Hidden at combo",
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            bool shouldAlwaysShowCursor = IsBreakTime.Value || spinnerPeriods.IsInAny(playfield.Clock.CurrentTime);
+            bool shouldAlwaysShowCursor = IsBreakTime.Value || spinnerPeriods.AsNonNull().IsInAny(playfield.Clock.CurrentTime);
             float targetAlpha = shouldAlwaysShowCursor ? 1 : ComboBasedAlpha;
             playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetAlpha, Math.Clamp(playfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
         }
