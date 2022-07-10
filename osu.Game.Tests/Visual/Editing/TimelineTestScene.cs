@@ -39,7 +39,13 @@ namespace osu.Game.Tests.Visual.Editing
             Dependencies.Cache(EditorBeatmap);
             Dependencies.CacheAs<IBeatSnapProvider>(EditorBeatmap);
 
-            Composer = playable.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer().With(d => d.Alpha = 0);
+            Composer = playable.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer().With(d =>
+            {
+                if (d == null)
+                    return;
+
+                d.Alpha = 0;
+            });
 
             Add(new OsuContextMenuContainer
             {

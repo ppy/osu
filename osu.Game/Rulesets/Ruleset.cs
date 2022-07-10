@@ -236,7 +236,7 @@ namespace osu.Game.Rulesets
         /// <returns>A performance calculator instance for the provided score.</returns>
         public virtual PerformanceCalculator? CreatePerformanceCalculator() => null;
 
-        public virtual HitObjectComposer CreateHitObjectComposer() => null;
+        public virtual HitObjectComposer? CreateHitObjectComposer() => null;
 
         public virtual IBeatmapVerifier? CreateBeatmapVerifier() => null;
 
