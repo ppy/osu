@@ -239,7 +239,7 @@ namespace osu.Game.Rulesets
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
-        public virtual IBeatmapVerifier CreateBeatmapVerifier() => null;
+        public virtual IBeatmapVerifier? CreateBeatmapVerifier() => null;
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 
