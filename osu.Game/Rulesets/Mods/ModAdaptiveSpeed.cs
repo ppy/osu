@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -163,7 +165,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            drawable.OnNewResult += (o, result) =>
+            drawable.OnNewResult += (_, result) =>
             {
                 if (ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;
@@ -175,7 +177,7 @@ namespace osu.Game.Rulesets.Mods
 
                 updateTargetRate();
             };
-            drawable.OnRevertResult += (o, result) =>
+            drawable.OnRevertResult += (_, result) =>
             {
                 if (!ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;

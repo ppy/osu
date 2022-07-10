@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -20,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.ChannelList;
@@ -102,23 +101,10 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.X,
                     Height = top_bar_height,
                 },
-                channelList = new ChannelList
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = side_bar_width,
-                    Padding = new MarginPadding { Top = top_bar_height },
-                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Padding = new MarginPadding
-                    {
-                        Top = top_bar_height,
-                        Left = side_bar_width,
-                        Bottom = chat_bar_height,
-                    },
+                    Padding = new MarginPadding { Top = top_bar_height },
                     Children = new Drawable[]
                     {
                         new Box
@@ -126,24 +112,50 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.Both,
                             Colour = colourProvider.Background4,
                         },
-                        currentChannelContainer = new Container<DrawableChannel>
+                        new OnlineViewContainer("Sign in to chat")
                         {
                             RelativeSizeAxes = Axes.Both,
-                        },
-                        loading = new LoadingLayer(true),
-                        channelListing = new ChannelListing
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                    },
-                },
-                textBar = new ChatTextBar
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Padding = new MarginPadding { Left = side_bar_width },
-                },
+                            Children = new Drawable[]
+                            {
+                                channelList = new ChannelList
+                                {
+                                    RelativeSizeAxes = Axes.Y,
+                                    Width = side_bar_width,
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Padding = new MarginPadding
+                                    {
+                                        Left = side_bar_width,
+                                        Bottom = chat_bar_height,
+                                    },
+                                    Children = new Drawable[]
+                                    {
+                                        currentChannelContainer = new Container<DrawableChannel>
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        loading = new LoadingLayer(true),
+                                        channelListing = new ChannelListing
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                    },
+                                },
+                                textBar = new ChatTextBar
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.BottomRight,
+                                    Padding = new MarginPadding { Left = side_bar_width },
+                                },
+                            }
+                        }
+                    }
+                }
             };
         }
 

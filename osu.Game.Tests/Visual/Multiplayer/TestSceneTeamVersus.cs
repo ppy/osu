@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -74,8 +76,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddUntilStep("room type is team vs", () => multiplayerClient.Room?.Settings.MatchType == MatchType.TeamVersus);
-            AddAssert("user state arrived", () => multiplayerClient.Room?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState);
+            AddUntilStep("room type is team vs", () => multiplayerClient.ClientRoom?.Settings.MatchType == MatchType.TeamVersus);
+            AddUntilStep("user state arrived", () => multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState);
         }
 
         [Test]
@@ -94,7 +96,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddAssert("user on team 0", () => (multiplayerClient.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddUntilStep("user on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
             AddStep("add another user", () => multiplayerClient.AddUser(new APIUser { Username = "otheruser", Id = 44 }));
 
             AddStep("press own button", () =>
@@ -102,17 +104,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.MoveMouseTo(multiplayerComponents.ChildrenOfType<TeamDisplay>().First());
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("user on team 1", () => (multiplayerClient.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 1);
+            AddUntilStep("user on team 1", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 1);
 
             AddStep("press own button again", () => InputManager.Click(MouseButton.Left));
-            AddAssert("user on team 0", () => (multiplayerClient.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddUntilStep("user on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
 
             AddStep("press other user's button", () =>
             {
                 InputManager.MoveMouseTo(multiplayerComponents.ChildrenOfType<TeamDisplay>().ElementAt(1));
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("user still on team 0", () => (multiplayerClient.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddUntilStep("user still on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
         }
 
         [Test]
@@ -131,14 +133,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddUntilStep("match type head to head", () => multiplayerClient.APIRoom?.Type.Value == MatchType.HeadToHead);
+            AddUntilStep("match type head to head", () => multiplayerClient.ClientAPIRoom?.Type.Value == MatchType.HeadToHead);
 
             AddStep("change match type", () => multiplayerClient.ChangeSettings(new MultiplayerRoomSettings
             {
                 MatchType = MatchType.TeamVersus
             }).WaitSafely());
 
-            AddUntilStep("api room updated to team versus", () => multiplayerClient.APIRoom?.Type.Value == MatchType.TeamVersus);
+            AddUntilStep("api room updated to team versus", () => multiplayerClient.ClientAPIRoom?.Type.Value == MatchType.TeamVersus);
         }
 
         [Test]
@@ -156,13 +158,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddUntilStep("room type is head to head", () => multiplayerClient.Room?.Settings.MatchType == MatchType.HeadToHead);
+            AddUntilStep("room type is head to head", () => multiplayerClient.ClientRoom?.Settings.MatchType == MatchType.HeadToHead);
 
             AddUntilStep("team displays are not displaying teams", () => multiplayerComponents.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam == null));
 
             AddStep("change to team vs", () => multiplayerClient.ChangeSettings(matchType: MatchType.TeamVersus));
 
-            AddUntilStep("room type is team vs", () => multiplayerClient.Room?.Settings.MatchType == MatchType.TeamVersus);
+            AddUntilStep("room type is team vs", () => multiplayerClient.ClientRoom?.Settings.MatchType == MatchType.TeamVersus);
 
             AddUntilStep("team displays are displaying teams", () => multiplayerComponents.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam != null));
         }

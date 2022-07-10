@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -20,6 +22,7 @@ using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
@@ -171,7 +174,7 @@ namespace osu.Game.Screens.Play
 
             PrepareReplay();
 
-            ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(Score.ScoreInfo);
+            ScoreProcessor.NewJudgement += _ => ScoreProcessor.PopulateScore(Score.ScoreInfo);
             ScoreProcessor.OnResetFromReplayFrame += () => ScoreProcessor.PopulateScore(Score.ScoreInfo);
 
             gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
@@ -313,7 +316,7 @@ namespace osu.Game.Screens.Play
                     GameplayClockContainer.Start();
             });
 
-            DrawableRuleset.IsPaused.BindValueChanged(paused =>
+            DrawableRuleset.IsPaused.BindValueChanged(_ =>
             {
                 updateGameplayState();
                 updateSampleDisabledState();
@@ -1064,12 +1067,15 @@ namespace osu.Game.Screens.Play
             if (DrawableRuleset.ReplayScore != null && !haveDanceMod)
                 return Task.CompletedTask;
 
-            LegacyByteArrayReader replayReader;
+            LegacyByteArrayReader replayReader = null;
 
-            using (var stream = new MemoryStream())
+            if (score.ScoreInfo.Ruleset.IsLegacyRuleset())
             {
-                new LegacyScoreEncoder(score, GameplayState.Beatmap).Encode(stream);
-                replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                using (var stream = new MemoryStream())
+                {
+                    new LegacyScoreEncoder(score, GameplayState.Beatmap).Encode(stream);
+                    replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                }
             }
 
             // the import process will re-attach managed beatmap/rulesets to this score. we don't want this for now, so create a temporary copy to import.
