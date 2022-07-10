@@ -69,24 +69,24 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:
-                        easeTo(circle, destination);
+                        easeTo(circle, destination, cursorPos);
                         break;
 
                     case DrawableSlider slider:
 
                         if (!slider.HeadCircle.Result.HasResult)
-                            easeTo(slider, destination);
+                            easeTo(slider, destination, cursorPos);
                         else
-                            easeTo(slider, destination - slider.Ball.DrawPosition);
+                            easeTo(slider, destination - slider.Ball.DrawPosition, cursorPos);
 
                         break;
                 }
             }
         }
 
-        private void easeTo(DrawableHitObject hitObject, Vector2 destination)
+        private void easeTo(DrawableHitObject hitObject, Vector2 destination, Vector2 cursorPos)
         {
-            double dampLength = Vector2.Distance(hitObject.Position, destination) / (0.04 * RepulsionStrength.Value + 0.04);
+            double dampLength = Vector2.Distance(hitObject.Position, cursorPos) / (0.04 * RepulsionStrength.Value + 0.04);
 
             float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, gameplayClock.ElapsedFrameTime);
             float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, gameplayClock.ElapsedFrameTime);
