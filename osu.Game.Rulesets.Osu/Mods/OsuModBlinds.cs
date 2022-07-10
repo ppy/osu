@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight) };
 
-        private DrawableOsuBlinds blinds;
+        private DrawableOsuBlinds? blinds;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -40,6 +41,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
+            Debug.Assert(blinds != null);
+
             healthProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
         }
 

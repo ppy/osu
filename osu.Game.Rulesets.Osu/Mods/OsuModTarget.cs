@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
@@ -94,11 +96,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         #region Private Fields
 
-        private ControlPointInfo controlPointInfo;
+        private ControlPointInfo? controlPointInfo;
 
-        private List<OsuHitObject> originalHitObjects;
+        private List<OsuHitObject>? originalHitObjects;
 
-        private Random rng;
+        private Random? rng;
 
         #endregion
 
@@ -158,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 circle.ApproachCircle.Hide();
             }
 
-            using (circle.BeginAbsoluteSequence(startTime - controlPointInfo.TimingPointAt(startTime).BeatLength - undim_duration))
+            using (circle.BeginAbsoluteSequence(startTime - controlPointInfo.AsNonNull().TimingPointAt(startTime).BeatLength - undim_duration))
                 circle.FadeColour(Color4.White, undim_duration);
         }
 
@@ -200,6 +202,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private IEnumerable<double> generateBeats(IBeatmap beatmap)
         {
+            Debug.Assert(originalHitObjects != null);
+
             double startTime = originalHitObjects.First().StartTime;
             double endTime = originalHitObjects.Last().GetEndTime();
 
@@ -228,6 +232,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void addHitSamples(IEnumerable<OsuHitObject> hitObjects)
         {
+            Debug.Assert(originalHitObjects != null);
+
             foreach (var obj in hitObjects)
             {
                 var samples = getSamplesAtTime(originalHitObjects, obj.StartTime);
@@ -240,6 +246,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void fixComboInfo(List<OsuHitObject> hitObjects)
         {
+            Debug.Assert(originalHitObjects != null);
+
             // Copy combo indices from an original object at the same time or from the closest preceding object
             // (Objects lying between two combos are assumed to belong to the preceding combo)
             hitObjects.ForEach(newObj =>
@@ -276,7 +284,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (hitObjects.Count == 0) return;
 
-            float nextSingle(float max = 1f) => (float)(rng.NextDouble() * max);
+            float nextSingle(float max = 1f) => (float)(rng.AsNonNull().NextDouble() * max);
 
             const float two_pi = MathF.PI * 2;
 
@@ -357,6 +365,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="time">The time to be checked.</param>=
         private bool isInsideBreakPeriod(IEnumerable<BreakPeriod> breaks, double time)
         {
+            Debug.Assert(originalHitObjects != null);
+
             return breaks.Any(breakPeriod =>
             {
                 var firstObjAfterBreak = originalHitObjects.First(obj => almostBigger(obj.StartTime, breakPeriod.EndTime));
@@ -371,6 +381,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             var beats = new List<double>();
             int i = 0;
             double currentTime = timingPoint.Time;
+
+            Debug.Assert(controlPointInfo != null);
 
             while (!definitelyBigger(currentTime, mapEndTime) && ReferenceEquals(controlPointInfo.TimingPointAt(currentTime), timingPoint))
             {

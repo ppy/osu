@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private bool isDownState;
         private bool wasLeft;
 
-        private OsuInputManager osuInputManager;
+        private OsuInputManager? osuInputManager;
 
         private ReplayState<OsuAction>? state;
         private double lastStateChangeTime;
@@ -44,6 +44,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToPlayer(Player player)
         {
+            Debug.Assert(osuInputManager != null);
+
             if (osuInputManager.ReplayInputHandler != null)
             {
                 hasReplay = true;
@@ -131,6 +133,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
                     wasLeft = !wasLeft;
                 }
+
+                Debug.Assert(osuInputManager != null);
 
                 state?.Apply(osuInputManager.CurrentState, osuInputManager);
             }
