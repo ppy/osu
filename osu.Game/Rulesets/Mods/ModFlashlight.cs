@@ -94,13 +94,13 @@ namespace osu.Game.Rulesets.Mods
         {
             public readonly BindableInt Combo = new BindableInt();
 
-            private IShader shader;
+            private IShader shader = null!;
 
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode(this);
 
             public override bool RemoveCompletedTransforms => false;
 
-            public List<BreakPeriod> Breaks;
+            public List<BreakPeriod> Breaks = new List<BreakPeriod>();
 
             private readonly float defaultFlashlightSize;
             private readonly float sizeMultiplier;
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 protected new Flashlight Source => (Flashlight)base.Source;
 
-                private IShader shader;
+                private IShader shader = null!;
                 private Quad screenSpaceDrawQuad;
                 private Vector2 flashlightPosition;
                 private Vector2 flashlightSize;
@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.Mods
                 protected override void Dispose(bool isDisposing)
                 {
                     base.Dispose(isDisposing);
-                    quadBatch?.Dispose();
+                    quadBatch.Dispose();
                 }
             }
         }
