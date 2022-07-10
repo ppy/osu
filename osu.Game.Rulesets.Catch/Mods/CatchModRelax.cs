@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override string Description => @"Use the mouse to control the catcher.";
 
-        private DrawableRuleset<CatchHitObject> drawableRuleset;
+        private DrawableRuleset<CatchHitObject> drawableRuleset = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {

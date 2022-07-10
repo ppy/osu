@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         protected override Flashlight CreateFlashlight() => new CatchFlashlight(this, playfield);
 
-        private CatchPlayfield playfield;
+        private CatchPlayfield playfield = null!;
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
