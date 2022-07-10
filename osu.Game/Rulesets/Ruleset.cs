@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets
         /// Creates the <see cref="IRulesetConfigManager"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <param name="settings">The <see cref="SettingsStore"/> to store the settings.</param>
-        public virtual IRulesetConfigManager CreateConfig(SettingsStore settings) => null;
+        public virtual IRulesetConfigManager? CreateConfig(SettingsStore? settings) => null;
 
         /// <summary>
         /// A unique short name to reference this ruleset in online requests.
