@@ -12,8 +12,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
@@ -26,7 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings
 {
-    public class DrawingsScreen : TournamentScreen
+    public class DrawingsScreen : TournamentScreen, IProvideVideo
     {
         private const string results_filename = "drawings_results.txt";
 
@@ -45,7 +43,7 @@ namespace osu.Game.Tournament.Screens.Drawings
         public ITeamList TeamList;
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, Storage storage)
+        private void load(Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -91,12 +89,6 @@ namespace osu.Game.Tournament.Screens.Drawings
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new Sprite
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Fill,
-                            Texture = textures.Get(@"Backgrounds/Drawings/background.png")
-                        },
                         new TourneyVideo("drawings")
                         {
                             Loop = true,
