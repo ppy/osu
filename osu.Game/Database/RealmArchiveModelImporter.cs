@@ -479,7 +479,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Perform any final actions after the import has been committed to the database.
+        /// Perform any final actions before the import has been committed to the database.
         /// </summary>
         /// <param name="model">The model prepared for import.</param>
         /// <param name="realm">The current realm context.</param>
