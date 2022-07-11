@@ -97,6 +97,11 @@ namespace osu.Game.Tournament.Screens.Drawings
                             FillMode = FillMode.Fill,
                             Texture = textures.Get(@"Backgrounds/Drawings/background.png")
                         },
+                        new TourneyVideo("drawings")
+                        {
+                            Loop = true,
+                            RelativeSizeAxes = Axes.Both,
+                        },
                         // Visualiser
                         new VisualiserContainer
                         {
