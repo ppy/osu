@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModMagnetised) };
 
-        private IFrameStableClock gameplayClock;
+        private IFrameStableClock? gameplayClock;
 
         [SettingSource("Repulsion strength", "How strong the repulsion is.", 0)]
         public BindableFloat RepulsionStrength { get; } = new BindableFloat(0.5f)
@@ -86,6 +85,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void easeTo(DrawableHitObject hitObject, Vector2 destination, Vector2 cursorPos)
         {
+            Debug.Assert(gameplayClock != null);
+
             double dampLength = Vector2.Distance(hitObject.Position, cursorPos) / (0.04 * RepulsionStrength.Value + 0.04);
 
             float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, gameplayClock.ElapsedFrameTime);
