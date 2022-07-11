@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -22,9 +23,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Origin = Anchor.CentreLeft;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
         {
+            if (overlayColourProvider != null)
+                return;
+
             Nub.AccentColour = colours.GreySeaFoamLighter;
             Nub.GlowingAccentColour = Color4.White;
             Nub.GlowColour = Color4.White;
