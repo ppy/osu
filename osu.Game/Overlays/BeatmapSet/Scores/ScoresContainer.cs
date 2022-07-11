@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 scoreTable.Show();
 
                                 var userScore = value.UserScore;
-                                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets, beatmapInfo);
+                                var userScoreInfo = userScore?.Score.ToScoreInfo(rulesets, beatmapInfo);
 
                                 topScoresContainer.Add(new DrawableTopScore(topScore));
 
