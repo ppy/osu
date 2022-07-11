@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -108,7 +109,7 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = CreateHeader(),
                 SelectedSection = { BindTarget = CurrentSection },
-                FixedHeader = new Container
+                FixedHeader = new InputBlockingContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
