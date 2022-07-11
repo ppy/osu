@@ -19,6 +19,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Size = new Vector2(100, 50);
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.CentreLeft;
+            LabelTextFlowContainer.Anchor = Anchor.CentreLeft;
+            LabelTextFlowContainer.Origin = Anchor.CentreLeft;
             LabelText = @"Show hidden";
         }
 
