@@ -3,18 +3,17 @@
 
 #nullable disable
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Tests.Visual.UserInterface;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public class TestSceneDirectorySelector : OsuTestScene
+    public class TestSceneDirectorySelector : ThemeComparisonTestScene
     {
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override Drawable CreateContent() => new OsuDirectorySelector
         {
-            Add(new OsuDirectorySelector { RelativeSizeAxes = Axes.Both });
-        }
+            RelativeSizeAxes = Axes.Both
+        };
     }
 }
