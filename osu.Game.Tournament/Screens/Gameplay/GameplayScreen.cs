@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
 {
-    public class GameplayScreen : BeatmapInfoScreen, IProvideVideo
+    public class GameplayScreen : BeatmapInfoScreen
     {
         private readonly BindableBool warmup = new BindableBool();
 
