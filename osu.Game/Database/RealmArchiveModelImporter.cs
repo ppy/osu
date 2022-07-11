@@ -338,10 +338,10 @@ namespace osu.Game.Database
                     // import to store
                     realm.Add(item);
 
+                    PostImport(item, realm);
+
                     transaction.Commit();
                 }
-
-                PostImport(item, realm);
 
                 LogForModel(item, @"Import successfully completed!");
             }
