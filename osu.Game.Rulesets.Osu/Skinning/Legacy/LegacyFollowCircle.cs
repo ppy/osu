@@ -73,8 +73,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void onHitObjectApplied(DrawableHitObject drawableObject)
         {
-            ClearTransformsAfter(double.MinValue);
-
             this.ScaleTo(1f)
                 .FadeOut();
         }
