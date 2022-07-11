@@ -8,7 +8,6 @@ using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Models;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
@@ -80,19 +79,12 @@ namespace osu.Game.Scoring
         {
             base.PostImport(model, realm);
 
-            var userRequest = new GetUserRequest(model.User.Username);
-            api.Perform(userRequest);
-            APIUser userReq = userRequest.Response;
+            var userRequest = new GetUserRequest(model.RealmUser.Username);
 
-            if (!(userReq is null)) {
-                Logger.Log($"Assignning UserID to RealmUser");
-                var user = new RealmUser
-                {
-                    OnlineID = userReq.Id,
-                    Username = model.User.Username
-                };
-                model.RealmUser = user;
-            }
+            api.Perform(userRequest);
+
+            if (userRequest.Response is APIUser user)
+                model.RealmUser.OnlineID = user.Id;
         }
     }
 }
