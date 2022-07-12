@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -80,8 +81,8 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            if (GameplayState.Ruleset is not ILegacyRuleset legacyRuleset)
-                return;
+            var legacyRuleset = GameplayState.Ruleset as ILegacyRuleset;
+            Debug.Assert(legacyRuleset != null);
 
             bool isFirstBundle = score.Replay.Frames.Count == 0;
 
