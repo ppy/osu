@@ -89,40 +89,33 @@ namespace osu.Game.Online.API.Requests.Responses
         /// <param name="rulesets">A ruleset store, used to populate a ruleset instance in the returned score.</param>
         /// <param name="beatmap">An optional beatmap, copied into the returned score (for cases where the API does not populate the beatmap).</param>
         /// <returns></returns>
-        public ScoreInfo CreateScoreInfo(RulesetStore rulesets, BeatmapInfo? beatmap = null)
+        public ScoreInfo ToScoreInfo(RulesetStore rulesets, BeatmapInfo? beatmap = null)
         {
             var ruleset = rulesets.GetRuleset(RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {RulesetID} not found locally");
 
             var rulesetInstance = ruleset.CreateInstance();
 
-            var modInstances = Mods.Select(apiMod => rulesetInstance.CreateModFromAcronym(apiMod.Acronym)).Where(m => m != null).ToArray();
+            var mods = Mods.Select(apiMod => rulesetInstance.CreateModFromAcronym(apiMod.Acronym)).Where(m => m != null).ToArray();
 
             // all API scores provided by this class are considered to be legacy.
-            modInstances = modInstances.Append(rulesetInstance.CreateMod<ModClassic>()).ToArray();
+            mods = mods.Append(rulesetInstance.CreateMod<ModClassic>()).ToArray();
 
-            var scoreInfo = new ScoreInfo
-            {
-                OnlineID = OnlineID,
-                User = User ?? new APIUser { Id = UserID },
-                BeatmapInfo = beatmap ?? new BeatmapInfo { OnlineID = BeatmapID },
-                Ruleset = ruleset,
-                Passed = Passed,
-                TotalScore = TotalScore,
-                Accuracy = Accuracy,
-                MaxCombo = MaxCombo,
-                Rank = Rank,
-                Statistics = Statistics,
-                Date = EndedAt ?? DateTimeOffset.Now,
-                Hash = "online", // TODO: temporary?
-                Mods = modInstances,
-            };
+            var scoreInfo = ToScoreInfo(mods);
+
+            scoreInfo.Ruleset = ruleset;
+            if (beatmap != null) scoreInfo.BeatmapInfo = beatmap;
 
             return scoreInfo;
         }
 
+        /// <summary>
+        /// Create a <see cref="ScoreInfo"/> from an API score instance.
+        /// </summary>
+        /// <param name="mods">The mod instances, resolved from a ruleset.</param>
+        /// <returns></returns>
         public ScoreInfo ToScoreInfo(Mod[] mods) => new ScoreInfo
         {
-            OnlineID = ID,
+            OnlineID = OnlineID,
             User = new APIUser { Id = UserID },
             BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
             Ruleset = new RulesetInfo { OnlineID = RulesetID },
