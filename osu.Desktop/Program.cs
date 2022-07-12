@@ -39,7 +39,7 @@ namespace osu.Desktop
                 {
                     SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
                         "Your operating system is too old to run osu!",
-                        "This version of osu! requires at least Windows 8 to run.\nPlease upgrade your operating system or consider using an older version of osu!.", IntPtr.Zero);
+                        "This version of osu! requires at least Windows 8.1 to run.\nPlease upgrade your operating system or consider using an older version of osu!.", IntPtr.Zero);
                     return;
                 }
 
