@@ -21,6 +21,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Online.API;
 
 namespace osu.Game.Scoring
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Scoring
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler,
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler, IAPIProvider api,
                             BeatmapDifficultyCache difficultyCache = null, OsuConfigManager configManager = null)
             : base(storage, realm)
         {
@@ -39,7 +40,7 @@ namespace osu.Game.Scoring
             this.difficultyCache = difficultyCache;
             this.configManager = configManager;
 
-            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm)
+            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
