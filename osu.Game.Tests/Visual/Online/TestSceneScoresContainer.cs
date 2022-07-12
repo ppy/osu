@@ -279,7 +279,7 @@ namespace osu.Game.Tests.Visual.Online
                 s.Statistics = new Dictionary<HitResult, int>
                 {
                     { HitResult.Great, RNG.Next(2000) },
-                    { HitResult.Good, RNG.Next(2000) },
+                    { HitResult.Ok, RNG.Next(2000) },
                     { HitResult.Meh, RNG.Next(2000) },
                     { HitResult.Miss, RNG.Next(2000) }
                 };
