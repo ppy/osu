@@ -14,6 +14,7 @@ namespace osu.Game.Online
             APIClientID = "5";
             SpectatorEndpointUrl = $"{APIEndpointUrl}/spectator";
             MultiplayerEndpointUrl = $"{APIEndpointUrl}/multiplayer";
+            MetadataEndpointUrl = $"{APIEndpointUrl}/metadata";
         }
     }
 }
