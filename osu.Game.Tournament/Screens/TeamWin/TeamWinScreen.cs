@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamWin
 {
-    public class TeamWinScreen : TournamentMatchScreen, IProvideVideo
+    public class TeamWinScreen : TournamentMatchScreen
     {
         private Container mainContainer;
 
