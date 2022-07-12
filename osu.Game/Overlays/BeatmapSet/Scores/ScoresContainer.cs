@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     MD5Hash = apiBeatmap.MD5Hash
                 };
 
-                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
                             .ContinueWith(task => Schedule(() =>
                             {
                                 if (loadCancellationSource.IsCancellationRequested)
