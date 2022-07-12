@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         private static Vector2 clampSliderToPlayfield(WorkingObject workingObject)
         {
             var slider = (Slider)workingObject.HitObject;
-            var possibleMovementBounds = calculatePossibleMovementBounds(slider);
+            var possibleMovementBounds = CalculatePossibleMovementBounds(slider);
 
             // The slider rotation applied in computeModifiedPosition might make it impossible to fit the slider into the playfield
             // For example, a long horizontal slider will be off-screen when rotated by 90 degrees
@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                     RotateSlider(slider, workingObject.RotationOriginal + MathF.PI - getSliderRotation(slider));
                 }
 
-                possibleMovementBounds = calculatePossibleMovementBounds(slider);
+                possibleMovementBounds = CalculatePossibleMovementBounds(slider);
             }
 
             var previousPosition = workingObject.PositionModified;
@@ -260,10 +260,12 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Calculates a <see cref="RectangleF"/> which contains all of the possible movements of the slider (in relative X/Y coordinates)
         /// such that the entire slider is inside the playfield.
         /// </summary>
+        /// <param name="slider">The <see cref="Slider"/> for which to calculate a movement bounding box.</param>
+        /// <returns>A <see cref="RectangleF"/> which contains all of the possible movements of the slider such that the entire slider is inside the playfield.</returns>
         /// <remarks>
         /// If the slider is larger than the playfield, the returned <see cref="RectangleF"/> may have negative width/height.
         /// </remarks>
-        private static RectangleF calculatePossibleMovementBounds(Slider slider)
+        public static RectangleF CalculatePossibleMovementBounds(Slider slider)
         {
             var pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
