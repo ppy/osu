@@ -430,9 +430,17 @@ namespace osu.Game.Tests.Visual
                     return accumulated == seek;
                 }
 
+                public override Task<bool> SeekAsync(double seek) => Task.FromResult(Seek(seek));
+
                 public override void Start()
                 {
                     running = true;
+                }
+
+                public override Task StartAsync()
+                {
+                    Start();
+                    return Task.CompletedTask;
                 }
 
                 public override void Reset()
@@ -448,6 +456,12 @@ namespace osu.Game.Tests.Visual
                         running = false;
                         lastReferenceTime = null;
                     }
+                }
+
+                public override Task StopAsync()
+                {
+                    Stop();
+                    return Task.CompletedTask;
                 }
 
                 public override bool IsRunning => running;

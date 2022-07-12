@@ -62,7 +62,8 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 skinDropdown = new SkinSettingsDropdown
                 {
-                    LabelText = SkinSettingsStrings.CurrentSkin
+                    LabelText = SkinSettingsStrings.CurrentSkin,
+                    Keywords = new[] { @"skins" }
                 },
                 new SettingsButton
                 {

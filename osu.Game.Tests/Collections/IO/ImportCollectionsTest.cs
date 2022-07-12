@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Collections.IO
         {
             string firstRunName;
 
-            using (var host = new CleanRunHeadlessGameHost(bypassCleanup: true))
+            using (var host = new CleanRunHeadlessGameHost(bypassCleanupOnDispose: true))
             {
                 firstRunName = host.Name;
 
