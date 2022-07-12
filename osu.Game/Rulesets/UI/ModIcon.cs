@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.UI
@@ -53,7 +54,6 @@ namespace osu.Game.Rulesets.UI
         private OsuColour colours { get; set; }
 
         private Color4 backgroundColour;
-        private Color4 highlightedColour;
 
         /// <summary>
         /// Construct a new instance.
@@ -123,47 +123,13 @@ namespace osu.Game.Rulesets.UI
                 modAcronym.FadeOut();
             }
 
-            switch (value.Type)
-            {
-                default:
-                case ModType.DifficultyIncrease:
-                    backgroundColour = colours.Yellow;
-                    highlightedColour = colours.YellowLight;
-                    break;
-
-                case ModType.DifficultyReduction:
-                    backgroundColour = colours.Green;
-                    highlightedColour = colours.GreenLight;
-                    break;
-
-                case ModType.Automation:
-                    backgroundColour = colours.Blue;
-                    highlightedColour = colours.BlueLight;
-                    break;
-
-                case ModType.Conversion:
-                    backgroundColour = colours.Purple;
-                    highlightedColour = colours.PurpleLight;
-                    break;
-
-                case ModType.Fun:
-                    backgroundColour = colours.Pink;
-                    highlightedColour = colours.PinkLight;
-                    break;
-
-                case ModType.System:
-                    backgroundColour = colours.Gray6;
-                    highlightedColour = colours.Gray7;
-                    modIcon.Colour = colours.Yellow;
-                    break;
-            }
-
+            backgroundColour = colours.ForModType(value.Type);
             updateColour();
         }
 
         private void updateColour()
         {
-            background.Colour = Selected.Value ? highlightedColour : backgroundColour;
+            background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
         }
     }
 }

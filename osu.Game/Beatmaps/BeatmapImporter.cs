@@ -31,12 +31,11 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        private readonly BeatmapUpdater? beatmapUpdater;
+        public Action<BeatmapSetInfo>? ProcessBeatmap { private get; set; }
 
-        public BeatmapImporter(Storage storage, RealmAccess realm, BeatmapUpdater? beatmapUpdater = null)
+        public BeatmapImporter(Storage storage, RealmAccess realm)
             : base(storage, realm)
         {
-            this.beatmapUpdater = beatmapUpdater;
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == ".osz";
@@ -100,7 +99,7 @@ namespace osu.Game.Beatmaps
         {
             base.PostImport(model, realm);
 
-            beatmapUpdater?.Process(model);
+            ProcessBeatmap?.Invoke(model);
         }
 
         private void validateOnlineIds(BeatmapSetInfo beatmapSet, Realm realm)

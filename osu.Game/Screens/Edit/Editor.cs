@@ -921,7 +921,7 @@ namespace osu.Game.Screens.Edit
 
         private void cancelExit()
         {
-            samplePlaybackDisabled.Value = false;
+            updateSampleDisabledState();
             loader?.CancelPendingDifficultySwitch();
         }
 
