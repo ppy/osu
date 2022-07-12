@@ -57,7 +57,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset? EndedAt { get; set; }
 
         [JsonProperty("mods")]
-        public List<APIMod> Mods { get; set; } = new List<APIMod>();
+        public APIMod[] Mods { get; set; } = Array.Empty<APIMod>();
 
         [JsonIgnore]
         [JsonProperty("created_at")]
