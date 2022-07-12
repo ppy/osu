@@ -18,9 +18,8 @@ namespace osu.Game.Online.API.Requests.Responses
     [Serializable]
     public class SoloScoreInfo : IHasOnlineID<long>
     {
-        [JsonIgnore]
-        [JsonProperty(" ")]
-        public long ID { get; set; }
+        [JsonProperty("replay")]
+        public bool HasReplay { get; set; }
 
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
@@ -42,12 +41,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("user_id")]
         public int UserID { get; set; }
-
-        /// <summary>
-        /// User may be provided via an osu-web response, but will not be present from raw database json.
-        /// </summary>
-        [JsonProperty("user")]
-        public APIUser? User { get; set; }
 
         // TODO: probably want to update this column to match user stats (short)?
         [JsonProperty("max_combo")]
@@ -80,6 +73,19 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics { get; set; } = new Dictionary<HitResult, int>();
+
+        #region osu-web API additions (not stored to database).
+
+        [JsonProperty("id")]
+        public long? ID { get; set; }
+
+        [JsonProperty("user")]
+        public APIUser? User { get; set; }
+
+        [JsonProperty("pp")]
+        public double? PP { get; set; }
+
+        #endregion
 
         public override string ToString() => $"score_id: {ID} user_id: {UserID}";
 
@@ -116,7 +122,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public ScoreInfo ToScoreInfo(Mod[] mods) => new ScoreInfo
         {
             OnlineID = OnlineID,
-            User = new APIUser { Id = UserID },
+            User = User ?? new APIUser { Id = UserID },
             BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
             Ruleset = new RulesetInfo { OnlineID = RulesetID },
             Passed = Passed,
@@ -127,9 +133,11 @@ namespace osu.Game.Online.API.Requests.Responses
             Statistics = Statistics,
             Date = EndedAt ?? DateTimeOffset.Now,
             Hash = "online", // TODO: temporary?
+            HasReplay = HasReplay,
             Mods = mods,
+            PP = PP,
         };
 
-        public long OnlineID => ID;
+        public long OnlineID => ID ?? -1;
     }
 }
