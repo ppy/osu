@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Play
 
             request.Failure += e =>
             {
-                Logger.Error(e, "Failed to submit score");
+                Logger.Error(e, $"Failed to submit score ({e.Message})");
                 scoreSubmissionSource.SetResult(false);
             };
 

@@ -88,6 +88,11 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         protected bool UsingThemedIntro { get; private set; }
 
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault(false)
+        {
+            Colour = Color4.Black
+        };
+
         protected IntroScreen([CanBeNull] Func<MainMenu> createNextScreen = null)
         {
             this.createNextScreen = createNextScreen;
@@ -201,6 +206,8 @@ namespace osu.Game.Screens.Menu
         {
             this.FadeIn(300);
 
+            ApplyToBackground(b => b.FadeColour(Color4.Black, 100));
+
             double fadeOutTime = exit_delay;
 
             var track = musicController.CurrentTrack;
@@ -243,13 +250,22 @@ namespace osu.Game.Screens.Menu
             base.OnResuming(e);
         }
 
+        private bool backgroundFaded;
+
+        protected void FadeInBackground(float duration = 0)
+        {
+            ApplyToBackground(b => b.FadeColour(Color4.White, duration));
+            backgroundFaded = true;
+        }
+
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             base.OnSuspending(e);
             initialBeatmap = null;
-        }
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
+            if (!backgroundFaded)
+                FadeInBackground(200);
+        }
 
         protected virtual void StartTrack()
         {
