@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.UI
@@ -53,7 +54,6 @@ namespace osu.Game.Rulesets.UI
         private OsuColour colours { get; set; }
 
         private Color4 backgroundColour;
-        private Color4 highlightedColour;
 
         /// <summary>
         /// Construct a new instance.
@@ -123,19 +123,13 @@ namespace osu.Game.Rulesets.UI
                 modAcronym.FadeOut();
             }
 
-            Color4 typeColour = colours.ForModType(value.Type);
-            backgroundColour = typeColour;
-            highlightedColour = ((Colour4)typeColour).Lighten(.2f);
-
-            if (value.Type == ModType.System)
-                modIcon.Colour = colours.Yellow;
-
+            backgroundColour = colours.ForModType(value.Type);
             updateColour();
         }
 
         private void updateColour()
         {
-            background.Colour = Selected.Value ? highlightedColour : backgroundColour;
+            background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
         }
     }
 }
