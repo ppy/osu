@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private DrawableRuleset<OsuHitObject> ruleset = null!;
 
-        protected OsuAction? LastActionPressed;
+        protected OsuAction? LastActionPressed { get; private set; }
 
         /// <summary>
         /// A tracker for periods where alternate should not be forced (i.e. non-gameplay periods).
