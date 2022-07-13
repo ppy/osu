@@ -91,8 +91,9 @@ namespace osu.Desktop.Updater
                                 //TODO use proper paths / filenames
                                 appimageupdatetool.StartInfo = new ProcessStartInfo{
                                     FileName = "appimageupdatetool-x86_64.AppImage",
-                                    Arguments = $"{RuntimeInfo.StartupDirectory}/osu.AppImage",
+                                    Arguments = $"\"{RuntimeInfo.StartupDirectory}/osu.AppImage\"",
                                     UseShellExecute = false,
+                                    RedirectStandardError = true,
                                     RedirectStandardOutput = true,
                                 };
 
@@ -109,8 +110,8 @@ namespace osu.Desktop.Updater
                                     if(e.Data != null){
                                         var match = Regex.Match(e.Data, @"^(?:(\d*(?:\.\d+)?)% done)(?:\s\((\d*(?:\.\d+)?) of (\d*(?:\.\d+)?))", RegexOptions.IgnoreCase);
 
-                                        if(match.Success){
-
+                                        if(match.Success)
+                                        {
                                             float progress = float.Parse(match.Groups[1].ToString()) / 100;
                                             float downloadedSize = float.Parse(match.Groups[2].ToString());
                                             float downloadSize = float.Parse(match.Groups[3].ToString());
@@ -136,7 +137,8 @@ namespace osu.Desktop.Updater
                                 notification.Text = @"Downloading update...";
                                 notification.State = ProgressNotificationState.Active;
 
-                            }catch(System.ComponentModel.Win32Exception){
+                            }catch(System.ComponentModel.Win32Exception)
+                            {
                                 // appimageupdatetool-x86_64.AppImage is not installed
                             }
                             
