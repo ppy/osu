@@ -11,6 +11,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
@@ -117,6 +119,23 @@ namespace osu.Game.Screens.Play
             await submitScore(score).ConfigureAwait(false);
         }
 
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        protected override void StartGameplay()
+        {
+            base.StartGameplay();
+
+            // User expectation is that last played should be updated when entering the gameplay loop
+            // from multiplayer / playlists / solo.
+            realm.WriteAsync(r =>
+            {
+                var realmBeatmap = r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID);
+                if (realmBeatmap != null)
+                    realmBeatmap.LastPlayed = DateTimeOffset.Now;
+            });
+        }
+
         public override bool OnExiting(ScreenExitEvent e)
         {
             bool exiting = base.OnExiting(e);
@@ -168,7 +187,7 @@ namespace osu.Game.Screens.Play
 
             request.Failure += e =>
             {
-                Logger.Error(e, "Failed to submit score");
+                Logger.Error(e, $"Failed to submit score ({e.Message})");
                 scoreSubmissionSource.SetResult(false);
             };
 

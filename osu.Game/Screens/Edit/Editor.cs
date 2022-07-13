@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Edit
                 loadableBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
 
                 // required so we can get the track length in EditorClock.
-                // this is safe as nothing has yet got a reference to this new beatmap.
+                // this is ONLY safe because the track being provided is a `TrackVirtual` which we don't really care about disposing.
                 loadableBeatmap.LoadTrack();
 
                 // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
@@ -921,7 +921,7 @@ namespace osu.Game.Screens.Edit
 
         private void cancelExit()
         {
-            samplePlaybackDisabled.Value = false;
+            updateSampleDisabledState();
             loader?.CancelPendingDifficultySwitch();
         }
 

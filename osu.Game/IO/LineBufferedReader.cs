@@ -19,7 +19,7 @@ namespace osu.Game.IO
 
         public LineBufferedReader(Stream stream, bool leaveOpen = false)
         {
-            streamReader = new StreamReader(stream, Encoding.UTF8, true, -1, leaveOpen);
+            streamReader = new StreamReader(stream, Encoding.UTF8, true, 1024, leaveOpen);
         }
 
         /// <summary>

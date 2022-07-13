@@ -6,11 +6,13 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Select;
@@ -23,7 +25,9 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestCantExitWithoutSaving()
         {
+            AddUntilStep("Wait for dialog overlay load", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
             AddRepeatStep("Exit", () => InputManager.Key(Key.Escape), 10);
+            AddAssert("Sample playback disabled", () => Editor.SamplePlaybackDisabled.Value);
             AddAssert("Editor is still active screen", () => Game.ScreenStack.CurrentScreen is Editor);
         }
 
@@ -39,6 +43,8 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = "difficulty");
 
             SaveEditor();
+
+            AddAssert("Hash updated", () => !string.IsNullOrEmpty(EditorBeatmap.BeatmapInfo.BeatmapSet?.Hash));
 
             AddAssert("Beatmap has correct metadata", () => EditorBeatmap.BeatmapInfo.Metadata.Artist == "artist" && EditorBeatmap.BeatmapInfo.Metadata.Title == "title");
             AddAssert("Beatmap has correct author", () => EditorBeatmap.BeatmapInfo.Metadata.Author.Username == "author");

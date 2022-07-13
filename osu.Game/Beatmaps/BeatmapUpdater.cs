@@ -10,7 +10,6 @@ using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Objects;
-using Realms;
 
 namespace osu.Game.Beatmaps
 {
@@ -34,6 +33,14 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Queue a beatmap for background processing.
         /// </summary>
+        public void Queue(int beatmapSetId)
+        {
+            // TODO: implement
+        }
+
+        /// <summary>
+        /// Queue a beatmap for background processing.
+        /// </summary>
         public void Queue(Live<BeatmapSetInfo> beatmap)
         {
             // For now, just fire off a task.
@@ -44,9 +51,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Run all processing on a beatmap immediately.
         /// </summary>
-        public void Process(BeatmapSetInfo beatmapSet) => beatmapSet.Realm.Write(r => Process(beatmapSet, r));
-
-        public void Process(BeatmapSetInfo beatmapSet, Realm realm)
+        public void Process(BeatmapSetInfo beatmapSet) => beatmapSet.Realm.Write(r =>
         {
             // Before we use below, we want to invalidate.
             workingBeatmapCache.Invalidate(beatmapSet);
@@ -71,7 +76,7 @@ namespace osu.Game.Beatmaps
 
             // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
             workingBeatmapCache.Invalidate(beatmapSet);
-        }
+        });
 
         private double calculateLength(IBeatmap b)
         {
