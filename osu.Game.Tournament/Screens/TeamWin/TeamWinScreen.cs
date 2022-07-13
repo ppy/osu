@@ -66,7 +66,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
 
         private bool firstDisplay = true;
 
-        private void update() => Schedule(() =>
+        private void update() => Scheduler.AddOnce(() =>
         {
             var match = CurrentMatch.Value;
 
