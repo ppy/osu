@@ -15,6 +15,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModSingleTap) }).ToArray();
 
-        protected override bool CheckValidNewAction(OsuAction action) => LastActionPressed != action;
+        protected override bool CheckValidNewAction(OsuAction action) => LastAcceptedAction != action;
     }
 }
