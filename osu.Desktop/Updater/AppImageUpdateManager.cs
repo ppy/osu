@@ -136,12 +136,11 @@ namespace osu.Desktop.Updater
                                 notification.Progress = 0;
                                 notification.Text = @"Downloading update...";
                                 notification.State = ProgressNotificationState.Active;
-
-                            }catch(System.ComponentModel.Win32Exception)
+                            }
+                            catch(System.ComponentModel.Win32Exception)
                             {
                                 // appimageupdatetool-x86_64.AppImage is not installed
                             }
-                            
                             return true;
                         }
                     });
