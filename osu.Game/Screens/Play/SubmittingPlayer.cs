@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Play
             base.StartGameplay();
 
             // User expectation is that last played should be updated when entering the gameplay loop
-            // from multiplayer / playlists / solo, even when using autoplay mod.
+            // from multiplayer / playlists / solo.
             realm.WriteAsync(r =>
             {
                 var realmBeatmap = r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID);
