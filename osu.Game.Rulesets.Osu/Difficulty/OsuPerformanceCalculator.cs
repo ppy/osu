@@ -59,8 +59,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
-
-                multiplier *= 0.7;
             }
 
             double aimValue = computeAimValue(score, osuAttributes);
