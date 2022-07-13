@@ -24,9 +24,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(OsuModCinema) };
         public override ModType Type => ModType.Conversion;
 
-        protected const double FLASH_DURATION = 1000;
+        private const double flash_duration = 1000;
 
-        protected DrawableRuleset<OsuHitObject> Ruleset = null!;
+        private DrawableRuleset<OsuHitObject> ruleset = null!;
 
         protected OsuAction? LastActionPressed;
 
@@ -42,17 +42,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            Ruleset = drawableRuleset;
+            ruleset = drawableRuleset;
             drawableRuleset.KeyBindingInputManager.Add(new InputInterceptor(this));
 
             var periods = new List<Period>();
 
             if (drawableRuleset.Objects.Any())
             {
-                periods.Add(new Period(int.MinValue, getValidJudgementTime(Ruleset.Objects.First()) - 1));
+                periods.Add(new Period(int.MinValue, getValidJudgementTime(ruleset.Objects.First()) - 1));
 
                 foreach (BreakPeriod b in drawableRuleset.Beatmap.Breaks)
-                    periods.Add(new Period(b.StartTime, getValidJudgementTime(Ruleset.Objects.First(h => h.StartTime >= b.EndTime)) - 1));
+                    periods.Add(new Period(b.StartTime, getValidJudgementTime(ruleset.Objects.First(h => h.StartTime >= b.EndTime)) - 1));
 
                 static double getValidJudgementTime(HitObject hitObject) => hitObject.StartTime - hitObject.HitWindows.WindowFor(HitResult.Meh);
             }
