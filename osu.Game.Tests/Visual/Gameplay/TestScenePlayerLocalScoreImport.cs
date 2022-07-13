@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -58,6 +59,20 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override bool HasCustomSteps => true;
 
         protected override bool AllowFail => false;
+
+        [Test]
+        public void TestLastPlayedUpdated()
+        {
+            DateTimeOffset? getLastPlayed() => Realm.Run(r => r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID)?.LastPlayed);
+
+            AddStep("set no custom ruleset", () => customRuleset = null);
+            AddAssert("last played is null", () => getLastPlayed() == null);
+
+            CreateTest();
+
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
+            AddUntilStep("wait for last played to update", () => getLastPlayed() != null);
+        }
 
         [Test]
         public void TestScoreStoredLocally()
