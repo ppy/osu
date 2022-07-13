@@ -29,11 +29,27 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             Content.Children = new Drawable[]
             {
-                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
+                new GridContainer
                 {
-                    Text = FirstRunSetupOverlayStrings.WelcomeDescription,
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y
+                    AutoSizeAxes = Axes.Y,
+                    RowDimensions = new[]
+                    {
+                        // Avoid height changes when changing language.
+                        new Dimension(GridSizeMode.AutoSize, minSize: 100),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
+                            {
+                                Text = FirstRunSetupOverlayStrings.WelcomeDescription,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y
+                            },
+                        },
+                    }
                 },
                 new LanguageSelectionFlow
                 {
