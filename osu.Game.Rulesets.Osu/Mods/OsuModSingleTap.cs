@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System;
+using System.Linq;
 using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -12,6 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => @"Single Tap";
         public override string Acronym => @"ST";
         public override string Description => @"You must only use one key!";
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAlternate) }).ToArray();
 
         protected override bool CheckCorrectAction(OsuAction action)
         {
