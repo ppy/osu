@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -16,20 +15,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModSingleTap) }).ToArray();
 
-        protected override bool CheckCorrectAction(OsuAction action)
-        {
-            if (base.CheckCorrectAction(action))
-                return true;
-
-            if (LastActionPressed != action)
-            {
-                // User alternated correctly.
-                LastActionPressed = action;
-                return true;
-            }
-
-            Ruleset.Cursor.FlashColour(Colour4.Red, FLASH_DURATION, Easing.OutQuint);
-            return false;
-        }
+        protected override bool CheckValidNewAction(OsuAction action) => LastActionPressed != action;
     }
 }
