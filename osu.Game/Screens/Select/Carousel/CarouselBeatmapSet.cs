@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Select.Carousel
                     return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
 
                 case SortMode.LastPlayed:
-                    return compare(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    return -compare(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
 
                 case SortMode.BPM:
                     return compare(otherSet, b => b.BPM);
