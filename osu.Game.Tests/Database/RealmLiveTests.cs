@@ -60,6 +60,64 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestFailedWritePerformsRollback()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                Assert.Throws<InvalidOperationException>(() =>
+                {
+                    realm.Write(r =>
+                    {
+                        r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata()));
+                        throw new InvalidOperationException();
+                    });
+                });
+
+                Assert.That(realm.Run(r => r.All<BeatmapInfo>()), Is.Empty);
+            });
+        }
+
+        [Test]
+        public void TestFailedNestedWritePerformsRollback()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                Assert.Throws<InvalidOperationException>(() =>
+                {
+                    realm.Write(r =>
+                    {
+                        realm.Write(_ =>
+                        {
+                            r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata()));
+                            throw new InvalidOperationException();
+                        });
+                    });
+                });
+
+                Assert.That(realm.Run(r => r.All<BeatmapInfo>()), Is.Empty);
+            });
+        }
+
+        [Test]
+        public void TestNestedWriteCalls()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
+
+                var liveBeatmap = beatmap.ToLive(realm);
+
+                realm.Run(r =>
+                    r.Write(_ =>
+                        r.Write(_ =>
+                            r.Add(beatmap)))
+                );
+
+                Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+            });
+        }
+
+        [Test]
         public void TestAccessAfterAttach()
         {
             RunTestWithRealm((realm, _) =>

@@ -58,15 +58,19 @@ namespace osu.Game.Database
         /// 12   2021-11-24    Add Status to RealmBeatmapSet.
         /// 13   2022-01-13    Final migration of beatmaps and scores to realm (multiple new storage fields).
         /// 14   2022-03-01    Added BeatmapUserSettings to BeatmapInfo.
+        /// 15   2022-07-13    Added LastPlayed to BeatmapInfo.
         /// </summary>
-        private const int schema_version = 14;
+        private const int schema_version = 15;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
         /// </summary>
         private readonly SemaphoreSlim realmRetrievalLock = new SemaphoreSlim(1);
 
-        private readonly ThreadLocal<bool> currentThreadCanCreateRealmInstances = new ThreadLocal<bool>();
+        /// <summary>
+        /// <c>true</c> when the current thread has already entered the <see cref="realmRetrievalLock"/>.
+        /// </summary>
+        private readonly ThreadLocal<bool> currentThreadHasRealmRetrievalLock = new ThreadLocal<bool>();
 
         /// <summary>
         /// Holds a map of functions registered via <see cref="RegisterCustomSubscription"/> and <see cref="RegisterForNotifications{T}"/> and a coinciding action which when triggered,
@@ -184,14 +188,14 @@ namespace osu.Game.Database
 
                     // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
                     if (!storage.Exists(newerVersionFilename))
-                        CreateBackup(newerVersionFilename);
+                        createBackup(newerVersionFilename);
 
                     storage.Delete(Filename);
                 }
                 else
                 {
                     Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
-                    CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
+                    createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
                     storage.Delete(Filename);
                 }
 
@@ -236,7 +240,7 @@ namespace osu.Game.Database
             }
 
             // For extra safety, also store the temporarily-used database which we are about to replace.
-            CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_newer_version_before_recovery{realm_extension}");
+            createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_newer_version_before_recovery{realm_extension}");
 
             storage.Delete(Filename);
 
@@ -584,10 +588,11 @@ namespace osu.Game.Database
 
             try
             {
-                if (!currentThreadCanCreateRealmInstances.Value)
+                // Ensure that the thread that currently has the `realmRetrievalLock` can retrieve nested contexts and not deadlock on itself.
+                if (!currentThreadHasRealmRetrievalLock.Value)
                 {
                     realmRetrievalLock.Wait();
-                    currentThreadCanCreateRealmInstances.Value = true;
+                    currentThreadHasRealmRetrievalLock.Value = true;
                     tookSemaphoreLock = true;
                 }
                 else
@@ -611,7 +616,7 @@ namespace osu.Game.Database
                 if (tookSemaphoreLock)
                 {
                     realmRetrievalLock.Release();
-                    currentThreadCanCreateRealmInstances.Value = false;
+                    currentThreadHasRealmRetrievalLock.Value = false;
                 }
             }
         }
@@ -778,28 +783,37 @@ namespace osu.Game.Database
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
-        public void CreateBackup(string backupFilename, IDisposable? blockAllOperations = null)
+        /// <summary>
+        /// Create a full realm backup.
+        /// </summary>
+        /// <param name="backupFilename">The filename for the backup.</param>
+        public void CreateBackup(string backupFilename)
         {
-            using (blockAllOperations ?? BlockAllOperations("creating backup"))
+            if (realmRetrievalLock.CurrentCount != 0)
+                throw new InvalidOperationException($"Call {nameof(BlockAllOperations)} before creating a backup.");
+
+            createBackup(backupFilename);
+        }
+
+        private void createBackup(string backupFilename)
+        {
+            Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
+
+            int attempts = 10;
+
+            while (attempts-- > 0)
             {
-                Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
-
-                int attempts = 10;
-
-                while (attempts-- > 0)
+                try
                 {
-                    try
-                    {
-                        using (var source = storage.GetStream(Filename, mode: FileMode.Open))
-                        using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
-                            source.CopyTo(destination);
-                        return;
-                    }
-                    catch (IOException)
-                    {
-                        // file may be locked during use.
-                        Thread.Sleep(500);
-                    }
+                    using (var source = storage.GetStream(Filename, mode: FileMode.Open))
+                    using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                        source.CopyTo(destination);
+                    return;
+                }
+                catch (IOException)
+                {
+                    // file may be locked during use.
+                    Thread.Sleep(500);
                 }
             }
         }
@@ -907,16 +921,39 @@ namespace osu.Game.Database
 
             void restoreOperation()
             {
+                // Release of lock needs to happen here rather than on the update thread, as there may be another
+                // operation already blocking the update thread waiting for the blocking operation to complete.
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
                 realmRetrievalLock.Release();
+
+                if (syncContext == null) return;
+
+                ManualResetEventSlim updateRealmReestablished = new ManualResetEventSlim();
 
                 // Post back to the update thread to revive any subscriptions.
                 // In the case we are on the update thread, let's also require this to run synchronously.
                 // This requirement is mostly due to test coverage, but shouldn't cause any harm.
                 if (ThreadSafety.IsUpdateThread)
-                    syncContext?.Send(_ => ensureUpdateRealm(), null);
+                {
+                    syncContext.Send(_ =>
+                    {
+                        ensureUpdateRealm();
+                        updateRealmReestablished.Set();
+                    }, null);
+                }
                 else
-                    syncContext?.Post(_ => ensureUpdateRealm(), null);
+                {
+                    syncContext.Post(_ =>
+                    {
+                        ensureUpdateRealm();
+                        updateRealmReestablished.Set();
+                    }, null);
+                }
+
+                // Wait for the post to complete to ensure a second `Migrate` operation doesn't start in the mean time.
+                // This is important to ensure `ensureUpdateRealm` is run before another blocking migration operation starts.
+                if (!updateRealmReestablished.Wait(10000))
+                    throw new TimeoutException(@"Reestablishing update realm after block took too long");
             }
         }
 

@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             Section section = Section.General;
 
-            string line;
+            string? line;
 
             while ((line = stream.ReadLine()) != null)
             {

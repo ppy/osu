@@ -314,6 +314,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            // Should be a noop in most cases, but let's ensure beyond doubt that the beatmap is in a correct state.
+            updateWorkingBeatmap();
+
             onLeaving();
             base.OnSuspending(e);
         }

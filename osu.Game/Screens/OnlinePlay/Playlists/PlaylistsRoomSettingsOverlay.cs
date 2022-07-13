@@ -140,9 +140,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                         },
                                                         new Section("Duration")
                                                         {
-                                                            Child = DurationField = new DurationDropdown
+                                                            Child = new Container
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
+                                                                Height = 40,
+                                                                Child = DurationField = new DurationDropdown
+                                                                {
+                                                                    RelativeSizeAxes = Axes.X
+                                                                }
                                                             }
                                                         },
                                                         new Section("Allowed attempts (across all playlist items)")
