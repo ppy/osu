@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -14,26 +13,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"You must only use one key!";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAlternate) }).ToArray();
 
-        protected override bool CheckCorrectAction(OsuAction action)
-        {
-            if (base.CheckCorrectAction(action))
-                return true;
-
-            if (LastActionPressed == null)
-            {
-                // First keypress, store the expected action.
-                LastActionPressed = action;
-                return true;
-            }
-
-            if (LastActionPressed == action)
-            {
-                // User singletapped correctly.
-                return true;
-            }
-
-            Ruleset.Cursor.FlashColour(Colour4.Red, FLASH_DURATION, Easing.OutQuint);
-            return false;
-        }
+        protected override bool CheckValidNewAction(OsuAction action) => LastActionPressed == null || LastActionPressed == action;
     }
 }

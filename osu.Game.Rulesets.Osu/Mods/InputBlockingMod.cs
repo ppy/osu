@@ -62,7 +62,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             gameplayClock = drawableRuleset.FrameStableClock;
         }
 
-        protected virtual bool CheckCorrectAction(OsuAction action)
+        protected abstract bool CheckValidNewAction(OsuAction action);
+
+        private bool checkCorrectAction(OsuAction action)
         {
             if (nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
             {
@@ -81,6 +83,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return true;
             }
 
+            if (CheckValidNewAction(action))
+            {
+                LastActionPressed = action;
+                return true;
+            }
+
+            ruleset.Cursor.FlashColour(Colour4.Red, flash_duration, Easing.OutQuint);
             return false;
         }
 
@@ -95,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
                 // if the pressed action is incorrect, block it from reaching gameplay.
-                => !mod.CheckCorrectAction(e.Action);
+                => !mod.checkCorrectAction(e.Action);
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
