@@ -111,6 +111,11 @@ namespace osu.Game.Beatmaps
         public bool SamplesMatchPlaybackRate { get; set; } = true;
 
         /// <summary>
+        /// The time at which this beatmap was last played by the local user.
+        /// </summary>
+        public DateTimeOffset? LastPlayed { get; set; }
+
+        /// <summary>
         /// The ratio of distance travelled per time unit.
         /// Generally used to decouple the spacing between hit objects from the enforced "velocity" of the beatmap (see <see cref="DifficultyControlPoint.SliderVelocity"/>).
         /// </summary>
