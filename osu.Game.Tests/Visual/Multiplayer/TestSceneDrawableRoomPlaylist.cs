@@ -245,40 +245,35 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestExpiredItems()
         {
-            AddStep("create playlist", () =>
+            createPlaylist(p =>
             {
-                Child = playlist = new TestPlaylist
+                p.Items.Clear();
+                p.Items.AddRange(new[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(500, 300),
-                    Items =
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
-                        new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                        ID = 0,
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        Expired = true,
+                        RequiredMods = new[]
                         {
-                            ID = 0,
-                            RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                            Expired = true,
-                            RequiredMods = new[]
-                            {
-                                new APIMod(new OsuModHardRock()),
-                                new APIMod(new OsuModDoubleTime()),
-                                new APIMod(new OsuModAutoplay())
-                            }
-                        },
-                        new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                            new APIMod(new OsuModHardRock()),
+                            new APIMod(new OsuModDoubleTime()),
+                            new APIMod(new OsuModAutoplay())
+                        }
+                    },
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        ID = 1,
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        RequiredMods = new[]
                         {
-                            ID = 1,
-                            RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                            RequiredMods = new[]
-                            {
-                                new APIMod(new OsuModHardRock()),
-                                new APIMod(new OsuModDoubleTime()),
-                                new APIMod(new OsuModAutoplay())
-                            }
+                            new APIMod(new OsuModHardRock()),
+                            new APIMod(new OsuModDoubleTime()),
+                            new APIMod(new OsuModAutoplay())
                         }
                     }
-                };
+                });
             });
 
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
@@ -321,6 +316,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible",
                 () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
 
+        private void createPlaylistWithBeatmaps(Func<IEnumerable<IBeatmapInfo>> beatmaps) => createPlaylist(p =>
+        {
+            int index = 0;
+
+            p.Items.Clear();
+
+            foreach (var b in beatmaps())
+            {
+                p.Items.Add(new PlaylistItem(b)
+                {
+                    ID = index++,
+                    OwnerID = 2,
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    RequiredMods = new[]
+                    {
+                        new APIMod(new OsuModHardRock()),
+                        new APIMod(new OsuModDoubleTime()),
+                        new APIMod(new OsuModAutoplay())
+                    }
+                });
+            }
+        });
+
         private void createPlaylist(Action<TestPlaylist> setupPlaylist = null)
         {
             AddStep("create playlist", () =>
@@ -331,8 +349,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Origin = Anchor.Centre,
                     Size = new Vector2(500, 300)
                 };
-
-                setupPlaylist?.Invoke(playlist);
 
                 for (int i = 0; i < 20; i++)
                 {
@@ -360,39 +376,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }
                     });
                 }
-            });
 
-            AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
-        }
-
-        private void createPlaylistWithBeatmaps(Func<IEnumerable<IBeatmapInfo>> beatmaps)
-        {
-            AddStep("create playlist", () =>
-            {
-                Child = playlist = new TestPlaylist
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(500, 300)
-                };
-
-                int index = 0;
-
-                foreach (var b in beatmaps())
-                {
-                    playlist.Items.Add(new PlaylistItem(b)
-                    {
-                        ID = index++,
-                        OwnerID = 2,
-                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                        RequiredMods = new[]
-                        {
-                            new APIMod(new OsuModHardRock()),
-                            new APIMod(new OsuModDoubleTime()),
-                            new APIMod(new OsuModAutoplay())
-                        }
-                    });
-                }
+                setupPlaylist?.Invoke(playlist);
             });
 
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
