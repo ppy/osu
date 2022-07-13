@@ -35,7 +35,13 @@ namespace osu.Game.Screens.Edit.GameplayTest
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
                 if (completed.NewValue)
-                    Scheduler.AddDelayed(this.Exit, RESULTS_DISPLAY_DELAY);
+                {
+                    Scheduler.AddDelayed(() =>
+                    {
+                        if (this.IsCurrentScreen())
+                            this.Exit();
+                    }, RESULTS_DISPLAY_DELAY);
+                }
             });
         }
 

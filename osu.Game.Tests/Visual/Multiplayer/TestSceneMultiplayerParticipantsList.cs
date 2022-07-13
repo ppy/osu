@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -67,7 +65,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestRemoveUser()
         {
-            APIUser secondUser = null;
+            APIUser? secondUser = null;
 
             AddStep("add a user", () =>
             {
@@ -81,7 +79,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("remove host", () => MultiplayerClient.RemoveUser(API.LocalUser.Value));
 
-            AddAssert("single panel is for second user", () => this.ChildrenOfType<ParticipantPanel>().Single().User.UserID == secondUser.Id);
+            AddAssert("single panel is for second user", () => this.ChildrenOfType<ParticipantPanel>().Single().User.UserID == secondUser?.Id);
         }
 
         [Test]
@@ -369,7 +367,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createNewParticipantsList()
         {
-            ParticipantsList participantsList = null;
+            ParticipantsList? participantsList = null;
 
             AddStep("create new list", () => Child = new OsuContextMenuContainer
             {
@@ -383,7 +381,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddUntilStep("wait for list to load", () => participantsList.IsLoaded);
+            AddUntilStep("wait for list to load", () => participantsList?.IsLoaded == true);
         }
 
         private void checkProgressBarVisibility(bool visible) =>

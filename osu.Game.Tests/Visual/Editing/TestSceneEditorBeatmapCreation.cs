@@ -1,13 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -39,7 +38,9 @@ namespace osu.Game.Tests.Visual.Editing
         protected override bool IsolateSavingFromDatabase => false;
 
         [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
+        private Guid currentBeatmapSetID => EditorBeatmap.BeatmapInfo.BeatmapSet?.ID ?? Guid.Empty;
 
         public override void SetUpSteps()
         {
@@ -50,19 +51,19 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("make new beatmap unique", () => EditorBeatmap.Metadata.Title = Guid.NewGuid().ToString());
         }
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) => new DummyWorkingBeatmap(Audio, null);
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard = null) => new DummyWorkingBeatmap(Audio, null);
 
         [Test]
         public void TestCreateNewBeatmap()
         {
             AddStep("save beatmap", () => Editor.Save());
-            AddAssert("new beatmap in database", () => beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID)?.Value.DeletePending == false);
+            AddAssert("new beatmap in database", () => beatmapManager.QueryBeatmapSet(s => s.ID == currentBeatmapSetID)?.Value.DeletePending == false);
         }
 
         [Test]
         public void TestExitWithoutSave()
         {
-            EditorBeatmap editorBeatmap = null;
+            EditorBeatmap editorBeatmap = null!;
 
             AddStep("store editor beatmap", () => editorBeatmap = EditorBeatmap);
 
@@ -78,7 +79,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("wait for exit", () => !Editor.IsCurrentScreen());
             AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == editorBeatmap.BeatmapInfo.BeatmapSet.ID)?.Value.DeletePending == true);
+            AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == editorBeatmap.BeatmapInfo.BeatmapSet.AsNonNull().ID)?.Value.DeletePending == true);
         }
 
         [Test]
@@ -103,6 +104,8 @@ namespace osu.Game.Tests.Visual.Editing
          */
         public void TestAddAudioTrack()
         {
+            AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
+
             AddAssert("switch track to real track", () =>
             {
                 var setup = Editor.ChildrenOfType<SetupScreen>().First();
@@ -131,6 +134,7 @@ namespace osu.Game.Tests.Visual.Editing
                 }
             });
 
+            AddAssert("track is not virtual", () => Beatmap.Value.Track is not TrackVirtual);
             AddAssert("track length changed", () => Beatmap.Value.Track.Length > 60000);
         }
 
@@ -160,7 +164,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("new beatmap persisted", () =>
             {
                 var beatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == firstDifficultyName);
-                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == currentBeatmapSetID);
 
                 return beatmap != null
                        && beatmap.DifficultyName == firstDifficultyName
@@ -179,7 +183,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("wait for created", () =>
             {
-                string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName != firstDifficultyName;
             });
 
@@ -195,7 +199,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("new beatmap persisted", () =>
             {
                 var beatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == secondDifficultyName);
-                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == currentBeatmapSetID);
 
                 return beatmap != null
                        && beatmap.DifficultyName == secondDifficultyName
@@ -246,7 +250,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("new beatmap persisted", () =>
             {
                 var beatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == originalDifficultyName);
-                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == currentBeatmapSetID);
 
                 return beatmap != null
                        && beatmap.DifficultyName == originalDifficultyName
@@ -262,7 +266,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("wait for created", () =>
             {
-                string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName != originalDifficultyName;
             });
 
@@ -281,13 +285,13 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("save beatmap", () => Editor.Save());
 
-            BeatmapInfo refetchedBeatmap = null;
-            Live<BeatmapSetInfo> refetchedBeatmapSet = null;
+            BeatmapInfo? refetchedBeatmap = null;
+            Live<BeatmapSetInfo>? refetchedBeatmapSet = null;
 
             AddStep("refetch from database", () =>
             {
                 refetchedBeatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == copyDifficultyName);
-                refetchedBeatmapSet = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+                refetchedBeatmapSet = beatmapManager.QueryBeatmapSet(s => s.ID == currentBeatmapSetID);
             });
 
             AddAssert("new beatmap persisted", () =>
@@ -323,7 +327,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("wait for created", () =>
             {
-                string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName != "New Difficulty";
             });
             AddAssert("new difficulty has correct name", () => EditorBeatmap.BeatmapInfo.DifficultyName == "New Difficulty (1)");
@@ -359,7 +363,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("wait for created", () =>
             {
-                string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName != duplicate_difficulty_name;
             });
 

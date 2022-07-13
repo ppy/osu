@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -41,6 +40,7 @@ using osu.Game.IO;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
@@ -52,6 +52,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
+using File = System.IO.File;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
@@ -170,6 +171,7 @@ namespace osu.Game
         public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>(new Dictionary<ModType, IReadOnlyList<Mod>>());
 
         private BeatmapDifficultyCache difficultyCache;
+        private BeatmapUpdater beatmapUpdater;
 
         private UserLookupCache userCache;
         private BeatmapLookupCache beatmapCache;
@@ -179,6 +181,8 @@ namespace osu.Game
         private SpectatorClient spectatorClient;
 
         private MultiplayerClient multiplayerClient;
+
+        private MetadataClient metadataClient;
 
         private RealmAccess realm;
 
@@ -263,15 +267,13 @@ namespace osu.Game
 
             dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
 
-            dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
-            dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
-
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, API, difficultyCache, LocalConfig));
+
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
@@ -279,6 +281,15 @@ namespace osu.Game
 
             // Add after all the above cache operations as it depends on them.
             AddInternal(difficultyCache);
+
+            // TODO: OsuGame or OsuGameBase?
+            beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage);
+
+            dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
+            dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
+            dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints, beatmapUpdater));
+
+            BeatmapManager.ProcessBeatmap = set => beatmapUpdater.Process(set);
 
             dependencies.Cache(userCache = new UserLookupCache());
             AddInternal(userCache);
@@ -316,8 +327,10 @@ namespace osu.Game
             // add api components to hierarchy.
             if (API is APIAccess apiAccess)
                 AddInternal(apiAccess);
+
             AddInternal(spectatorClient);
             AddInternal(multiplayerClient);
+            AddInternal(metadataClient);
 
             AddInternal(rulesetConfigCache);
 
@@ -574,8 +587,9 @@ namespace osu.Game
             base.Dispose(isDisposing);
 
             RulesetStore?.Dispose();
-            BeatmapManager?.Dispose();
             LocalConfig?.Dispose();
+
+            beatmapUpdater?.Dispose();
 
             realm?.Dispose();
 
