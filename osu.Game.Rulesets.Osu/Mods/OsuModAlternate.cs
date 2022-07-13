@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 
@@ -14,6 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => @"AL";
         public override string Description => @"Don't use the same key twice in a row!";
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModSingleTap) }).ToArray();
 
         protected override bool CheckCorrectAction(OsuAction action)
         {
