@@ -29,13 +29,17 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
-        public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
+        public List<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>().ToList();
+
+        public BeatmapInfo OrderBy;
+
+        public CarouselBeatmap OrderByCarouselItem => Beatmaps.First(b => ReferenceEquals(b.BeatmapInfo, OrderBy));
 
         public BeatmapSetInfo BeatmapSet;
 
         public Func<IEnumerable<BeatmapInfo>, BeatmapInfo> GetRecommendedBeatmap;
 
-        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet)
+        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet, BeatmapInfo orderBy)
         {
             BeatmapSet = beatmapSet ?? throw new ArgumentNullException(nameof(beatmapSet));
 
@@ -45,6 +49,7 @@ namespace osu.Game.Screens.Select.Carousel
                       .ThenBy(b => b.StarRating)
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
+            OrderBy = orderBy;
         }
 
         protected override CarouselItem GetNextToSelect()
@@ -82,34 +87,31 @@ namespace osu.Game.Screens.Select.Carousel
                     return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
 
                 case SortMode.LastPlayed:
-                    return -compareUsingAggregateMax(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    return compare(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
 
                 case SortMode.BPM:
-                    return compareUsingAggregateMax(otherSet, b => b.BPM);
+                    return compare(otherSet, b => b.BPM);
 
                 case SortMode.Length:
-                    return compareUsingAggregateMax(otherSet, b => b.Length);
+                    return compare(otherSet, b => b.Length);
 
                 case SortMode.Difficulty:
-                    return compareUsingAggregateMax(otherSet, b => b.StarRating);
+                    return compare(otherSet, b => b.StarRating);
             }
         }
 
-        /// <summary>
-        /// All beatmaps which are not filtered and valid for display.
-        /// </summary>
-        protected IEnumerable<BeatmapInfo> ValidBeatmaps => Beatmaps.Where(b => !b.Filtered.Value || b.State.Value == CarouselItemState.Selected).Select(b => b.BeatmapInfo);
-
-        private int compareUsingAggregateMax(CarouselBeatmapSet other, Func<BeatmapInfo, double> func)
+        private int compare(CarouselBeatmapSet other, Func<BeatmapInfo, double> func)
         {
-            bool ourBeatmaps = ValidBeatmaps.Any();
-            bool otherBeatmaps = other.ValidBeatmaps.Any();
+            var bmLeft  = OrderByCarouselItem;
+            var bmRight = other.OrderByCarouselItem;
 
-            if (!ourBeatmaps && !otherBeatmaps) return 0;
-            if (!ourBeatmaps) return -1;
-            if (!otherBeatmaps) return 1;
+            if (!valid(bmLeft) && !valid(bmRight)) return 0;
+            if (!valid(bmLeft)) return -1;
+            if (!valid(bmRight)) return 1;
 
-            return ValidBeatmaps.Max(func).CompareTo(other.ValidBeatmaps.Max(func));
+            return func(bmLeft.BeatmapInfo).CompareTo(func(bmRight.BeatmapInfo));
+
+            bool valid(CarouselItem beatmap) => !beatmap.Filtered.Value || beatmap.State.Value == CarouselItemState.Selected;
         }
 
         public override void Filter(FilterCriteria criteria)
