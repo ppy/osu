@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,12 +32,13 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <remarks>
         /// This is different from <see cref="Player.IsBreakTime"/> in that the periods here end strictly at the first object after the break, rather than the break's end time.
         /// </remarks>
-        protected PeriodTracker NonGameplayPeriods;
+        protected PeriodTracker NonGameplayPeriods = null!;
+
+        protected DrawableRuleset<OsuHitObject> Ruleset = null!;
+
+        protected IFrameStableClock GameplayClock = null!;
 
         protected OsuAction? LastActionPressed;
-        protected DrawableRuleset<OsuHitObject> Ruleset;
-
-        protected IFrameStableClock GameplayClock;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
