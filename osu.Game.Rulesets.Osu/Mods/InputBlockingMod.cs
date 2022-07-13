@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private DrawableRuleset<OsuHitObject> ruleset = null!;
 
-        protected OsuAction? LastActionPressed { get; private set; }
+        protected OsuAction? LastAcceptedAction { get; private set; }
 
         /// <summary>
         /// A tracker for periods where alternate should not be forced (i.e. non-gameplay periods).
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
             {
-                LastActionPressed = null;
+                LastAcceptedAction = null;
                 return true;
             }
 
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (CheckValidNewAction(action))
             {
-                LastActionPressed = action;
+                LastAcceptedAction = action;
                 return true;
             }
 

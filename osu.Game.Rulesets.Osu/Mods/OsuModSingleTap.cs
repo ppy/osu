@@ -13,6 +13,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"You must only use one key!";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAlternate) }).ToArray();
 
-        protected override bool CheckValidNewAction(OsuAction action) => LastActionPressed == null || LastActionPressed == action;
+        protected override bool CheckValidNewAction(OsuAction action) => LastAcceptedAction == null || LastAcceptedAction == action;
     }
 }
