@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -135,6 +136,8 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             {
                 public BeatmapScoreRow(SeedingBeatmap beatmap)
                 {
+                    Debug.Assert(beatmap.Beatmap != null);
+
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
 
