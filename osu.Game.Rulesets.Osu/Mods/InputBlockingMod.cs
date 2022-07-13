@@ -26,19 +26,19 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected const double FLASH_DURATION = 1000;
 
+        protected DrawableRuleset<OsuHitObject> Ruleset = null!;
+
+        protected OsuAction? LastActionPressed;
+
         /// <summary>
         /// A tracker for periods where alternate should not be forced (i.e. non-gameplay periods).
         /// </summary>
         /// <remarks>
         /// This is different from <see cref="Player.IsBreakTime"/> in that the periods here end strictly at the first object after the break, rather than the break's end time.
         /// </remarks>
-        protected PeriodTracker NonGameplayPeriods = null!;
+        private PeriodTracker nonGameplayPeriods = null!;
 
-        protected DrawableRuleset<OsuHitObject> Ruleset = null!;
-
-        protected IFrameStableClock GameplayClock = null!;
-
-        protected OsuAction? LastActionPressed;
+        private IFrameStableClock gameplayClock = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -57,14 +57,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                 static double getValidJudgementTime(HitObject hitObject) => hitObject.StartTime - hitObject.HitWindows.WindowFor(HitResult.Meh);
             }
 
-            NonGameplayPeriods = new PeriodTracker(periods);
+            nonGameplayPeriods = new PeriodTracker(periods);
 
-            GameplayClock = drawableRuleset.FrameStableClock;
+            gameplayClock = drawableRuleset.FrameStableClock;
         }
 
         protected virtual bool CheckCorrectAction(OsuAction action)
         {
-            if (NonGameplayPeriods.IsInAny(GameplayClock.CurrentTime))
+            if (nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
             {
                 LastActionPressed = null;
                 return true;
