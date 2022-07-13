@@ -12,15 +12,19 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -299,6 +303,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
+        [Test]
+        public void TestContextMenuDetails()
+        {
+            OsuContextMenu contextMenu = null;
+
+            createPlaylist();
+
+            moveToItem(0);
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+            AddAssert("context menu open", () => (contextMenu = this.ChildrenOfType<OsuContextMenu>().SingleOrDefault())?.State == MenuState.Open);
+
+            AddStep("click details", () =>
+            {
+                InputManager.MoveMouseTo(contextMenu.ChildrenOfType<DrawableOsuMenuItem>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("beatmap overlay visible", () => this.ChildrenOfType<BeatmapSetOverlay>().Single().State.Value == Visibility.Visible);
+        }
+
         private void moveToItem(int index, Vector2? offset = null)
             => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DrawableRoomPlaylistItem>().ElementAt(index), offset));
 
@@ -343,11 +366,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create playlist", () =>
             {
-                Child = playlist = new TestPlaylist
+                BeatmapSetOverlay beatmapOverlay;
+
+                Child = new DependencyProvidingContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(500, 300)
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = new (Type, object)[]
+                    {
+                        (typeof(BeatmapSetOverlay), beatmapOverlay = new BeatmapSetOverlay()),
+                    },
+                    Children = new Drawable[]
+                    {
+                        new OsuContextMenuContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = playlist = new TestPlaylist
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(500, 300),
+                            },
+                        },
+                        beatmapOverlay,
+                    },
                 };
 
                 for (int i = 0; i < 20; i++)
