@@ -8,7 +8,9 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Statistics;
 
 namespace osu.Game.Database
 {
@@ -20,7 +22,15 @@ namespace osu.Game.Database
     {
         private readonly ConcurrentDictionary<TLookup, TValue> cache = new ConcurrentDictionary<TLookup, TValue>();
 
+        private readonly GlobalStatistic<MemoryCachingStatistics> statistics;
+
         protected virtual bool CacheNullValues => true;
+
+        protected MemoryCachingComponent()
+        {
+            statistics = GlobalStatistics.Get<MemoryCachingStatistics>(nameof(MemoryCachingComponent<TLookup, TValue>), GetType().ReadableName());
+            statistics.Value = new MemoryCachingStatistics();
+        }
 
         /// <summary>
         /// Retrieve the cached value for the given lookup.
@@ -30,12 +40,20 @@ namespace osu.Game.Database
         protected async Task<TValue> GetAsync([NotNull] TLookup lookup, CancellationToken token = default)
         {
             if (CheckExists(lookup, out TValue performance))
+            {
+                statistics.Value.HitCount++;
                 return performance;
+            }
 
             var computed = await ComputeValueAsync(lookup, token).ConfigureAwait(false);
 
+            statistics.Value.MissCount++;
+
             if (computed != null || CacheNullValues)
+            {
                 cache[lookup] = computed;
+                statistics.Value.Usage = cache.Count;
+            }
 
             return computed;
         }
@@ -51,6 +69,8 @@ namespace osu.Game.Database
                 if (matchKeyPredicate(kvp.Key))
                     cache.TryRemove(kvp.Key, out _);
             }
+
+            statistics.Value.Usage = cache.Count;
         }
 
         protected bool CheckExists([NotNull] TLookup lookup, out TValue value) =>
@@ -63,5 +83,31 @@ namespace osu.Game.Database
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>The computed value.</returns>
         protected abstract Task<TValue> ComputeValueAsync(TLookup lookup, CancellationToken token = default);
+
+        private class MemoryCachingStatistics
+        {
+            /// <summary>
+            /// Total number of cache hits.
+            /// </summary>
+            public int HitCount;
+
+            /// <summary>
+            /// Total number of cache misses.
+            /// </summary>
+            public int MissCount;
+
+            /// <summary>
+            /// Total number of cached entities.
+            /// </summary>
+            public int Usage;
+
+            public override string ToString()
+            {
+                int totalAccesses = HitCount + MissCount;
+                double hitRate = totalAccesses == 0 ? 0 : (double)HitCount / totalAccesses;
+
+                return $"i:{Usage} h:{HitCount} m:{MissCount} {hitRate:0%}";
+            }
+        }
     }
 }

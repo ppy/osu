@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual
 
             action?.Invoke();
 
-            AddStep(CreatePlayerRuleset().Description, LoadPlayer);
+            AddStep($"Load player for {CreatePlayerRuleset().Description}", LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
