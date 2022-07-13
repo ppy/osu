@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -103,6 +104,8 @@ namespace osu.Game.Tests.Visual.Editing
          */
         public void TestAddAudioTrack()
         {
+            AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
+
             AddAssert("switch track to real track", () =>
             {
                 var setup = Editor.ChildrenOfType<SetupScreen>().First();
@@ -131,6 +134,7 @@ namespace osu.Game.Tests.Visual.Editing
                 }
             });
 
+            AddAssert("track is not virtual", () => Beatmap.Value.Track is not TrackVirtual);
             AddAssert("track length changed", () => Beatmap.Value.Track.Length > 60000);
         }
 
