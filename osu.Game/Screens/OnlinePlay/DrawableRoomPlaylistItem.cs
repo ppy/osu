@@ -30,6 +30,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
@@ -106,6 +107,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private BeatmapSetOverlay beatmapOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
         private CollectionManager collectionManager { get; set; }
@@ -496,18 +500,16 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (beatmap != null && collectionManager != null)
-                {
-                    if (downloadTracker.State.Value == DownloadState.LocallyAvailable)
-                    {
-                        var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
-                        if (manageCollectionsDialog != null)
-                            collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+                if (beatmapOverlay != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
 
-                        items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
-                    }
-                    else
-                        items.Add(new OsuMenuItem("Download to add to collection") { Action = { Disabled = true } });
+                if (beatmap != null && collectionManager != null && downloadTracker.State.Value == DownloadState.LocallyAvailable)
+                {
+                    var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
+                    if (manageCollectionsDialog != null)
+                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+
+                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
                 }
 
                 return items.ToArray();
