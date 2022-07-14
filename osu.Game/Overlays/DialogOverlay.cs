@@ -98,7 +98,8 @@ namespace osu.Game.Overlays
             base.PopOut();
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
 
-            if (CurrentDialog?.State.Value == Visibility.Visible)
+            // PopOut gets called initially, but we only want to hide dialog when we have been loaded and are present.
+            if (IsLoaded && CurrentDialog?.State.Value == Visibility.Visible)
                 CurrentDialog.Hide();
         }
 
