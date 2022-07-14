@@ -1,5 +1,4 @@
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 
@@ -66,17 +65,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                     monoEncoding.EncodedData[0].Colour!.EvaluatedDifficulty += EvaluateDifficultyOf(monoEncoding, j) * colourEncodingDifficulty * 0.5;
                 }
             }
-        }
-
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
-        {
-            TaikoDifficultyHitObject? taikoObject = current as TaikoDifficultyHitObject;
-            if (taikoObject != null && taikoObject.Colour != null)
-            {
-                return taikoObject.Colour.EvaluatedDifficulty;
-            }
-
-            return 0;
         }
     }
 }

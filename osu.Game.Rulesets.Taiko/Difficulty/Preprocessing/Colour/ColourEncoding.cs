@@ -1,43 +1,38 @@
 using System.Collections.Generic;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
 {
+    /// <summary>
+    /// Encodes a list of <see cref="MonoEncoding"/>s.
+    /// <see cref="MonoEncoding"/>s with the same <see cref="MonoEncoding.RunLength"/> are grouped together.
+    /// </summary>
     public class ColourEncoding
     {
+        /// <summary>
+        /// <see cref="MonoEncoding"/>s that are grouped together within this <see cref="ColourEncoding"/>.
+        /// </summary>
         public List<MonoEncoding> Payload { get; private set; } = new List<MonoEncoding>();
 
+        /// <summary>
+        /// Determine if this <see cref="ColourEncoding"/> is a repetition of another <see cref="ColourEncoding"/>. This
+        /// is a strict comparison and is true if and only if the colour sequence is exactly the same.
+        /// This does not require the <see cref="ColourEncoding"/>s to have the same amount of <see cref="MonoEncoding"/>s.
+        /// </summary>
         public bool isRepetitionOf(ColourEncoding other)
         {
             return hasIdenticalMonoLength(other) &&
                 other.Payload.Count == Payload.Count &&
-                other.Payload[0].EncodedData[0].HitType == Payload[0].EncodedData[0].HitType;
+                (other.Payload[0].EncodedData[0].BaseObject as Hit)?.Type == 
+                (Payload[0].EncodedData[0].BaseObject as Hit)?.Type;
         }
 
+        /// <summary>
+        /// Determine if this <see cref="ColourEncoding"/> has the same mono length of another <see cref="ColourEncoding"/>.
+        /// </summary>
         public bool hasIdenticalMonoLength(ColourEncoding other)
         {
             return other.Payload[0].RunLength == Payload[0].RunLength;
-        }
-
-        public static List<ColourEncoding> Encode(List<MonoEncoding> data)
-        {
-            // Compute encoding lengths
-            List<ColourEncoding> encoded = new List<ColourEncoding>();
-            ColourEncoding? lastEncoded = null;
-            for (int i = 0; i < data.Count; i++)
-            {
-                if (i == 0 || lastEncoded == null || data[i].RunLength != data[i - 1].RunLength)
-                {
-                    lastEncoded = new ColourEncoding();
-                    lastEncoded.Payload.Add(data[i]);
-                    encoded.Add(lastEncoded);
-                    continue;
-                }
-
-                lastEncoded.Payload.Add(data[i]);
-            }
-
-            return encoded;
         }
     }
 }
