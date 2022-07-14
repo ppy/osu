@@ -3,7 +3,7 @@
 
 #nullable disable
 
-namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
+namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
 {
     /// <summary>
     /// Represents a rhythm change in a taiko map.
