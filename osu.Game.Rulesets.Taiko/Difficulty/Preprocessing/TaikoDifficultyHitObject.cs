@@ -4,12 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
-using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
@@ -36,40 +34,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public TaikoDifficultyHitObjectColour? Colour;
 
         /// <summary>
-        /// The hit type of this hit object.
-        /// </summary>
-        public readonly HitType? HitType;
-
-        /// <summary>
-        /// Creates a list of <see cref="TaikoDifficultyHitObject"/>s from a <see cref="IBeatmap"/>s.
-        /// TODO: Review this - this is moved here from TaikoDifficultyCalculator so that TaikoDifficultyCalculator can
-        ///       have less knowledge of implementation details (i.e. creating all the different hitObject lists, and
-        ///       calling FindRepetitionInterval for the final object). The down side of this is
-        ///       TaikoDifficultyHitObejct.CreateDifficultyHitObjects is now pretty much a proxy for this.
-        /// </summary>
-        /// <param name="beatmap">The beatmap from which the list of <see cref="TaikoDifficultyHitObject"/> is created.</param>
-        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
-        public static List<DifficultyHitObject> Create(IBeatmap beatmap, double clockRate)
-        {
-            List<DifficultyHitObject> difficultyHitObjects = new List<DifficultyHitObject>();
-            List<TaikoDifficultyHitObject> centreObjects = new List<TaikoDifficultyHitObject>();
-            List<TaikoDifficultyHitObject> rimObjects = new List<TaikoDifficultyHitObject>();
-            List<TaikoDifficultyHitObject> noteObjects = new List<TaikoDifficultyHitObject>();
-
-            for (int i = 2; i < beatmap.HitObjects.Count; i++)
-            {
-                difficultyHitObjects.Add(
-                    new TaikoDifficultyHitObject(
-                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, difficultyHitObjects,
-                        centreObjects, rimObjects, noteObjects, difficultyHitObjects.Count)
-                );
-            }
-            var encoded = TaikoDifficultyHitObjectColour.EncodeAndAssign(difficultyHitObjects);
-
-            return difficultyHitObjects;
-        }
-
-        /// <summary>
         /// Creates a new difficulty hit object.
         /// </summary>
         /// <param name="hitObject">The gameplay <see cref="HitObject"/> associated with this difficulty object.</param>
@@ -81,10 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="rimHitObjects">The list of rim (kat) <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="noteObjects">The list of <see cref="DifficultyHitObject"/>s that is a hit (i.e. not a slider or spinner) in the current beatmap.</param>
         /// <param name="index">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
-        ///
-        /// TODO: This argument list is getting long, we might want to refactor this into a static method that create
-        ///       all <see cref="DifficultyHitObject"/>s from a <see cref="IBeatmap"/>.
-        private TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate,
+        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate,
             List<DifficultyHitObject> objects,
             List<TaikoDifficultyHitObject> centreHitObjects,
             List<TaikoDifficultyHitObject> rimHitObjects,
@@ -95,15 +56,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             this.noteObjects = noteObjects;
 
             Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRate);
-            HitType = currentHit?.Type;
+            HitType? hitType = currentHit?.Type;
 
-            if (HitType == Objects.HitType.Centre)
+            if (hitType == Objects.HitType.Centre)
             {
                 MonoIndex = centreHitObjects.Count;
                 centreHitObjects.Add(this);
                 monoDifficultyHitObjects = centreHitObjects;
             }
-            else if (HitType == Objects.HitType.Rim)
+            else if (hitType == Objects.HitType.Rim)
             {
                 MonoIndex = rimHitObjects.Count;
                 rimHitObjects.Add(this);
@@ -111,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             }
 
             // Need to be done after HitType is set.
-            if (HitType == null) return;
+            if (hitType == null) return;
 
             NoteIndex = noteObjects.Count;
             noteObjects.Add(this);

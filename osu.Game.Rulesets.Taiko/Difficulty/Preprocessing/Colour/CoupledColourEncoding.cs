@@ -1,77 +1,34 @@
 using System;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
 {
+    /// <summary>
+    /// Encodes a list of <see cref="ColourEncoding"/>s, grouped together by back and forth repetition of the same 
+    /// <see cref="ColourEncoding"/>. Also stores the repetition interval between this and the previous <see cref="CoupledColourEncoding"/>.
+    /// </summary>
     public class CoupledColourEncoding
     {
+        /// <summary>
+        /// Maximum amount of <see cref="CoupledColourEncoding"/>s to look back to find a repetition.
+        /// </summary>
         private const int max_repetition_interval = 16;
 
+        /// <summary>
+        /// The <see cref="ColourEncoding"/>s that are grouped together within this <see cref="CoupledColourEncoding"/>.
+        /// </summary>
         public List<ColourEncoding> Payload = new List<ColourEncoding>();
 
-        public CoupledColourEncoding? Previous { get; private set; } = null;
+        /// <summary>
+        /// The previous <see cref="CoupledColourEncoding"/>. This is used to determine the repetition interval.
+        /// </summary>
+        public CoupledColourEncoding? Previous = null;
 
         /// <summary>
-        /// How many notes between the current and previous identical <see cref="TaikoDifficultyHitObjectColour"/>.
-        /// Negative number means that there is no repetition in range.
+        /// How many <see cref="CoupledColourEncoding"/> between the current and previous identical <see cref="CoupledColourEncoding"/>.
         /// If no repetition is found this will have a value of <see cref="max_repetition_interval"/> + 1.
         /// </summary>
         public int RepetitionInterval { get; private set; } = max_repetition_interval + 1;
-
-        public static List<CoupledColourEncoding> Encode(List<DifficultyHitObject> data)
-        {
-            List<MonoEncoding> firstPass = MonoEncoding.Encode(data);
-            List<ColourEncoding> secondPass = ColourEncoding.Encode(firstPass);
-            List<CoupledColourEncoding> thirdPass = CoupledColourEncoding.Encode(secondPass);
-
-            return thirdPass;
-        }
-
-        public static List<CoupledColourEncoding> Encode(List<ColourEncoding> data)
-        {
-            List<CoupledColourEncoding> encoded = new List<CoupledColourEncoding>();
-
-            CoupledColourEncoding? lastEncoded = null;
-            for (int i = 0; i < data.Count; i++)
-            {
-                lastEncoded = new CoupledColourEncoding()
-                {
-                    Previous = lastEncoded
-                };
-
-                bool isCoupled = i < data.Count - 2 && data[i].isRepetitionOf(data[i + 2]);
-                if (!isCoupled)
-                {
-                    lastEncoded.Payload.Add(data[i]);
-                }
-                else
-                {
-                    while (isCoupled)
-                    {
-                        lastEncoded.Payload.Add(data[i]);
-                        i++;
-
-                        isCoupled = i < data.Count - 2 && data[i].isRepetitionOf(data[i + 2]);
-                    }
-
-                    // Skip over peeked data and add the rest to the payload
-                    lastEncoded.Payload.Add(data[i]);
-                    lastEncoded.Payload.Add(data[i + 1]);
-                    i++;
-                }
-
-                encoded.Add(lastEncoded);
-            }
-
-            // Final pass to find repetition interval
-            for (int i = 0; i < encoded.Count; i++)
-            {
-                encoded[i].FindRepetitionInterval();
-            }
-
-            return encoded;
-        }
 
         /// <summary>
         /// Returns true if other is considered a repetition of this encoding. This is true if other's first two payload
@@ -90,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         }
 
         /// <summary>
-        /// Finds the closest previous <see cref="TaikoDifficultyHitObjectColour"/> that has the identical <see cref="CoupledColourEncoding.Payload"/>.
+        /// Finds the closest previous <see cref="CoupledColourEncoding"/> that has the identical <see cref="Payload"/>.
         /// Interval is defined as the amount of <see cref="CoupledColourEncoding"/> chunks between the current and repeated encoding.
         /// </summary>
         public void FindRepetitionInterval()
