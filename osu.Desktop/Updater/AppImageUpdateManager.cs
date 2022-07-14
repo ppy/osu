@@ -221,7 +221,6 @@ namespace osu.Desktop.Updater
                         process.WaitForExit();
                         return output;
                     }
-
                 }
                 catch
                 {
@@ -339,7 +338,6 @@ namespace osu.Desktop.Updater
 
         private async Task<bool> checkForUpdateAsync(UpdateProgressNotification notification = null)
         {
-
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
 
@@ -453,7 +451,6 @@ namespace osu.Desktop.Updater
 
                 Activated = () =>
                 {
-
                     Task.Run(() =>
                     {
                         //TODO make the game say bye at least
