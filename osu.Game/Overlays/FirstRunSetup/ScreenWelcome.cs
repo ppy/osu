@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -63,6 +64,8 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             private Bindable<string> frameworkLocale = null!;
 
+            private ScheduledDelegate? updateSelectedDelegate;
+
             [BackgroundDependencyLoader]
             private void load(FrameworkConfigManager frameworkConfig)
             {
@@ -82,9 +85,18 @@ namespace osu.Game.Overlays.FirstRunSetup
                     if (!LanguageExtensions.TryParseCultureCode(locale.NewValue, out var language))
                         language = Language.en;
 
-                    foreach (var c in Children.OfType<LanguageButton>())
-                        c.Selected = c.Language == language;
+                    // Changing language may cause a short period of blocking the UI thread while the new glyphs are loaded.
+                    // Scheduling ensures the button animation plays smoothly after any blocking operation completes.
+                    // Note that a delay is required (the alternative would be a double-schedule; delay feels better).
+                    updateSelectedDelegate?.Cancel();
+                    updateSelectedDelegate = Scheduler.AddDelayed(() => updateSelectedStates(language), 50);
                 }, true);
+            }
+
+            private void updateSelectedStates(Language language)
+            {
+                foreach (var c in Children.OfType<LanguageButton>())
+                    c.Selected = c.Language == language;
             }
 
             private class LanguageButton : OsuClickableContainer
