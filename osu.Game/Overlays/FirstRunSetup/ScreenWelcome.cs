@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
                 frameworkLocale.BindValueChanged(locale =>
                 {
-                    if (!LanguageExtensions.TryParseCultureCode(frameworkLocale.Value, out var language))
+                    if (!LanguageExtensions.TryParseCultureCode(locale.NewValue, out var language))
                         language = Language.en;
 
                     foreach (var c in Children.OfType<LanguageButton>())
@@ -110,7 +110,8 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                         selected = value;
 
-                        updateState();
+                        if (IsLoaded)
+                            updateState();
                     }
                 }
 
@@ -142,6 +143,12 @@ namespace osu.Game.Overlays.FirstRunSetup
                             Text = Language.GetDescription(),
                         }
                     };
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+                    updateState();
                 }
 
                 protected override bool OnHover(HoverEvent e)
