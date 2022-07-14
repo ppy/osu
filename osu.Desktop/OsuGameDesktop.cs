@@ -113,7 +113,9 @@ namespace osu.Desktop
                 case RuntimeInfo.Platform.Linux:
                     Debug.Assert(OperatingSystem.IsLinux());
 
-                    return new AppImageUpdateManager();
+                    return  AppImageUpdateManager.IsInstalled?
+                            new AppImageUpdateManager():
+                            new SimpleUpdateManager();
 
                 default:
                     return new SimpleUpdateManager();
