@@ -12,7 +12,8 @@ namespace osu.Game.Tournament.Components
 {
     public class TournamentSpriteTextWithBackground : CompositeDrawable
     {
-        protected readonly TournamentSpriteText Text;
+        public readonly TournamentSpriteText Text;
+
         protected readonly Box Background;
 
         public TournamentSpriteTextWithBackground(string text = "")
