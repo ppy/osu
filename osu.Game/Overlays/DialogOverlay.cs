@@ -62,7 +62,7 @@ namespace osu.Game.Overlays
                 // if any existing dialog is being displayed, dismiss it before showing a new one.
                 lastDialog?.Hide();
 
-                dialog.State.ValueChanged += state => onDialogStateChanged(dialog, state.NewValue), true);
+                dialog.State.BindValueChanged(state => onDialogStateChanged(dialog, state.NewValue), true);
                 dialogContainer.Add(dialog);
 
                 Show();
