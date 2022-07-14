@@ -65,7 +65,7 @@ namespace osu.Game.Overlays
                 dialogContainer.Add(dialog);
 
                 Show();
-            }, false);
+            }, !IsLoaded);
         }
 
         public override bool IsPresent => Scheduler.HasPendingTasks || dialogContainer.Children.Count > 0;
