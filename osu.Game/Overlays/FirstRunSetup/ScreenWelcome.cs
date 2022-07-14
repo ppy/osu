@@ -179,19 +179,23 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                 private void updateState()
                 {
-                    const double duration = 1000;
-
                     if (selected)
                     {
-                        backgroundBox.FadeTo(1, duration, Easing.OutQuint);
-                        text.FadeColour(colourProvider.Content1, duration, Easing.OutQuint);
-                        text.ScaleTo(1.2f, duration, Easing.OutQuint);
+                        const double selected_duration = 1000;
+
+                        backgroundBox.FadeTo(1, selected_duration, Easing.OutQuint);
+                        backgroundBox.FadeColour(colourProvider.Background2, selected_duration, Easing.OutQuint);
+                        text.FadeColour(colourProvider.Content1, selected_duration, Easing.OutQuint);
+                        text.ScaleTo(1.2f, selected_duration, Easing.OutQuint);
                     }
                     else
                     {
-                        backgroundBox.FadeTo(IsHovered ? 0.4f : 0, duration / 2, Easing.OutQuint);
-                        text.ScaleTo(1, duration / 2, Easing.OutQuint);
-                        text.FadeColour(colourProvider.Light1, duration / 2, Easing.OutQuint);
+                        const double duration = 500;
+
+                        backgroundBox.FadeTo(IsHovered ? 1 : 0, duration, Easing.OutQuint);
+                        backgroundBox.FadeColour(colourProvider.Background5, duration, Easing.OutQuint);
+                        text.FadeColour(colourProvider.Light1, duration, Easing.OutQuint);
+                        text.ScaleTo(1, duration, Easing.OutQuint);
                     }
                 }
             }
