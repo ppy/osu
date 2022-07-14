@@ -66,7 +66,8 @@ namespace osu.Game.Overlays
             {
                 // if any existing dialog is being displayed, dismiss it before showing a new one.
                 lastDialog?.Hide();
-                dialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
+
+                dialog.State.ValueChanged += state => onDialogStateChanged(dialog, state.NewValue), true);
                 dialogContainer.Add(dialog);
 
                 Show();
@@ -77,9 +78,9 @@ namespace osu.Game.Overlays
 
         protected override bool BlockNonPositionalInput => true;
 
-        private void onDialogOnStateChanged(VisibilityContainer dialog, Visibility v)
+        private void onDialogStateChanged(VisibilityContainer dialog, Visibility newState)
         {
-            if (v != Visibility.Hidden) return;
+            if (newState != Visibility.Hidden) return;
 
             // handle the dialog being dismissed.
             dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
