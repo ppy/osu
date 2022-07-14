@@ -39,6 +39,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneDrawableRoomPlaylist : MultiplayerTestScene
     {
+        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+
         private TestPlaylist playlist;
 
         private BeatmapManager manager;
@@ -54,6 +56,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
+
+            base.Content.AddRange(new Drawable[]
+            {
+                collections = new CollectionManager(LocalStorage),
+                Content
+            });
+
+            Dependencies.Cache(collections);
         }
 
         [Test]
@@ -466,12 +476,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     CachedDependencies = new (Type, object)[]
                     {
                         (typeof(BeatmapSetOverlay), beatmapOverlay = new BeatmapSetOverlay()),
-                        (typeof(CollectionManager), collections = new CollectionManager(LocalStorage)),
                         (typeof(ManageCollectionsDialog), manageCollectionsDialog = new ManageCollectionsDialog()),
                     },
                     Children = new Drawable[]
                     {
-                        collections,
                         new OsuContextMenuContainer
                         {
                             RelativeSizeAxes = Axes.Both,
