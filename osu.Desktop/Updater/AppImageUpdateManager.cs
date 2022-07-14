@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.IO;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -35,6 +36,8 @@ namespace osu.Desktop.Updater
     {
         private class AppImageUpdateTool
         {
+            [Resolved]
+            private OsuGame game { get; set; }
             public enum ARGS
             {
                 CHECK,
@@ -102,10 +105,7 @@ namespace osu.Desktop.Updater
                 ProcessStartInfo info = new ProcessStartInfo
                 {
                     FileName = Command,
-                    //TODO For Debugging put a test osu.AppImage next to the osu binary
-                    Arguments = $"{arguments}{argument_spacer}\"{RuntimeInfo.StartupDirectory}/osu.AppImage\"",
-                    //TODO For deployed builds use the APPIMAGE environment variable
-                    //Arguments = $"{arguments}{argument_spacer}\"{ImagePath}\"",
+                    Arguments = $"{arguments}{argument_spacer}\"{ImagePath}\"",
                     UseShellExecute = false,
                     RedirectStandardError = true,
                     RedirectStandardOutput = true,
@@ -162,7 +162,11 @@ namespace osu.Desktop.Updater
                 {
                     try
                     {
-                        return Environment.GetEnvironmentVariable("APPIMAGE");
+                        return Instance.game.IsDeployedBuild ?
+                            //TODO verify if environment variable APPIMAGE whether set in the deployed build
+                            Environment.GetEnvironmentVariable("APPIMAGE") :
+                            //Assume osu.AppImage otherwise (use this for debugging a test image)
+                            $"{RuntimeInfo.StartupDirectory}osu.AppImage";
                     }
                     catch
                     {
@@ -189,14 +193,14 @@ namespace osu.Desktop.Updater
                 {
                     try
                     {
-                        var process = new Process();
-                        process.StartInfo = Instance.StartInfo(ARGS.CHECK);
-                        process.Start();
+                        using (var process = new Process())
+                        {
+                            process.StartInfo = Instance.StartInfo(ARGS.CHECK);
+                            process.Start();
 
-                        process.WaitForExit();
-                        var hasUpdates = process.ExitCode == 1;
-                        process.Dispose();
-                        return hasUpdates;
+                            process.WaitForExit();
+                            return process.ExitCode == 1;
+                        }
                     }
                     catch
                     {
@@ -208,14 +212,16 @@ namespace osu.Desktop.Updater
             {
                 try
                 {
-                    var process = new Process();
-                    process.StartInfo = StartInfo(arg);
-                    process.Start();
+                    using (var process = new Process())
+                    {
+                        process.StartInfo = StartInfo(arg);
+                        process.Start();
 
-                    var output = process.StandardError.ReadToEnd();
-                    process.WaitForExit();
-                    process.Dispose();
-                    return output;
+                        var output = process.StandardError.ReadToEnd();
+                        process.WaitForExit();
+                        return output;
+                    }
+
                 }
                 catch
                 {
@@ -333,6 +339,7 @@ namespace osu.Desktop.Updater
 
         private async Task<bool> checkForUpdateAsync(UpdateProgressNotification notification = null)
         {
+
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
 
@@ -446,8 +453,24 @@ namespace osu.Desktop.Updater
 
                 Activated = () =>
                 {
-                    //TODO implement proper restart functionality
-                    game.AttemptExit();
+
+                    Task.Run(() =>
+                    {
+                        //TODO make the game say bye at least
+                        game.Exit();
+                    }).
+                    ContinueWith(_ => updateManager.Schedule(() =>
+                    {
+                        using (Process process = new Process())
+                        {
+                            process.StartInfo = new ProcessStartInfo
+                            {
+                                FileName = AppImageUpdateTool.ImagePath,
+                                UseShellExecute = false,
+                            };
+                            process.Start();
+                        }
+                    }));
                     return true;
                 };
             }
