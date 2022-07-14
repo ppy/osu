@@ -57,12 +57,7 @@ namespace osu.Game.Overlays
             // a DialogOverlay instance has finished loading.
             CurrentDialog = dialog;
 
-            if (IsLoaded)
-                Scheduler.Add(pushDialog, false);
-            else
-                Schedule(pushDialog);
-
-            void pushDialog()
+            Schedule(() =>
             {
                 // if any existing dialog is being displayed, dismiss it before showing a new one.
                 lastDialog?.Hide();
@@ -71,7 +66,7 @@ namespace osu.Game.Overlays
                 dialogContainer.Add(dialog);
 
                 Show();
-            }
+            });
         }
 
         public override bool IsPresent => Scheduler.HasPendingTasks || dialogContainer.Children.Count > 0;
