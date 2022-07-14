@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -94,6 +95,7 @@ namespace osu.Game.Screens.OnlinePlay
         private PanelBackground panelBackground;
         private FillFlowContainer mainFillFlow;
 
+        [CanBeNull]
         private BeatmapDownloadTracker downloadTracker;
 
         [Resolved]
@@ -503,7 +505,7 @@ namespace osu.Game.Screens.OnlinePlay
                 if (beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
 
-                if (beatmap != null && collectionManager != null && downloadTracker.State.Value == DownloadState.LocallyAvailable)
+                if (beatmap != null && collectionManager != null && downloadTracker?.State.Value == DownloadState.LocallyAvailable)
                 {
                     var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
                     if (manageCollectionsDialog != null)
