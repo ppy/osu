@@ -73,7 +73,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
         {
-            // see comment in LegacySliderBall.updateStateTransforms
+            // Gets called by slider ticks, tails, etc., leading to duplicated
+            // animations which may negatively affect performance
             if (drawableObject is not DrawableSlider)
                 return;
 
