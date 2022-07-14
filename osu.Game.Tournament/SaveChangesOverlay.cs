@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -17,9 +16,9 @@ namespace osu.Game.Tournament
     internal class SaveChangesOverlay : CompositeDrawable
     {
         [Resolved]
-        private TournamentGame tournamentGame { get; set; }
+        private TournamentGame tournamentGame { get; set; } = null!;
 
-        private string lastSerialisedLadder;
+        private string? lastSerialisedLadder;
         private readonly TourneyButton saveChangesButton;
 
         public SaveChangesOverlay()
@@ -57,7 +56,7 @@ namespace osu.Game.Tournament
                             Bottom = 10,
                         },
                         Action = saveChanges,
-                        Enabled = { Value = false },
+                        // Enabled = { Value = false },
                     },
                 }
             };
