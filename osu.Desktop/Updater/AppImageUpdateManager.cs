@@ -373,7 +373,6 @@ namespace osu.Desktop.Updater
                                 notification.Text = @"Downloading update...";
                                 AppImageUpdateTool.Instance.ApplyUpdateAsync((progress, state) =>
                                 {
-
                                     notification.Progress = progress;
                                     switch (state)
                                     {
@@ -393,7 +392,6 @@ namespace osu.Desktop.Updater
                                         case AppImageUpdateTool.UpdateStates.CANCELLED:
                                             notification.State = ProgressNotificationState.Cancelled;
                                             break;
-
                                     }
                                 });
                                 return true;
