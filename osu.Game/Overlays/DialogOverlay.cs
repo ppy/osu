@@ -49,12 +49,11 @@ namespace osu.Game.Overlays
 
         public void Push(PopupDialog dialog)
         {
-            if (dialog == CurrentDialog || dialog.State.Value != Visibility.Visible) return;
-
-            var lastDialog = CurrentDialog;
+            if (dialog == CurrentDialog || dialog.State.Value == Visibility.Hidden) return;
 
             // Immediately update the externally accessible property as this may be used for checks even before
             // a DialogOverlay instance has finished loading.
+            var lastDialog = CurrentDialog;
             CurrentDialog = dialog;
 
             Schedule(() =>
@@ -62,30 +61,41 @@ namespace osu.Game.Overlays
                 // if any existing dialog is being displayed, dismiss it before showing a new one.
                 lastDialog?.Hide();
 
-                dialog.State.BindValueChanged(state => onDialogStateChanged(dialog, state.NewValue), true);
-                dialogContainer.Add(dialog);
+                // is the new dialog is hidden before added to the dialogContainer, bypass any further operations.
+                if (dialog.State.Value == Visibility.Hidden)
+                {
+                    dismiss();
+                    return;
+                }
 
+                dialogContainer.Add(dialog);
                 Show();
+
+                dialog.State.BindValueChanged(state =>
+                {
+                    if (state.NewValue != Visibility.Hidden) return;
+
+                    // Trigger the demise of the dialog as soon as it hides.
+                    dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
+
+                    dismiss();
+                });
             });
+
+            void dismiss()
+            {
+                if (dialog != CurrentDialog) return;
+
+                // Handle the case where the dialog is the currently displayed dialog.
+                // In this scenario, the overlay itself should also be hidden.
+                Hide();
+                CurrentDialog = null;
+            }
         }
 
         public override bool IsPresent => Scheduler.HasPendingTasks || dialogContainer.Children.Count > 0;
 
         protected override bool BlockNonPositionalInput => true;
-
-        private void onDialogStateChanged(VisibilityContainer dialog, Visibility newState)
-        {
-            if (newState != Visibility.Hidden) return;
-
-            // handle the dialog being dismissed.
-            dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
-
-            if (dialog == CurrentDialog)
-            {
-                Hide();
-                CurrentDialog = null;
-            }
-        }
 
         protected override void PopIn()
         {
