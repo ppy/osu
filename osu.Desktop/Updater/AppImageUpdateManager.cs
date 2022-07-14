@@ -102,9 +102,9 @@ namespace osu.Desktop.Updater
                 ProcessStartInfo info = new ProcessStartInfo
                 {
                     FileName = Command,
-                    //For Debugging put a test osu.AppImage next to the osu binary
+                    //TODO For Debugging put a test osu.AppImage next to the osu binary
                     Arguments = $"{arguments}{argument_spacer}\"{RuntimeInfo.StartupDirectory}/osu.AppImage\"",
-                    //For deployed builds use the APPIMAGE environment variable
+                    //TODO For deployed builds use the APPIMAGE environment variable
                     //Arguments = $"{arguments}{argument_spacer}\"{ImagePath}\"",
                     UseShellExecute = false,
                     RedirectStandardError = true,
@@ -194,6 +194,7 @@ namespace osu.Desktop.Updater
                         process.Start();
 
                         process.WaitForExit();
+                        process.Dispose();
                         return process.ExitCode == 1;
                     }
                     catch
@@ -212,7 +213,7 @@ namespace osu.Desktop.Updater
 
                     var output = process.StandardError.ReadToEnd();
                     process.WaitForExit();
-
+                    process.Dispose();
                     return output;
                 }
                 catch
