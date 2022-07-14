@@ -57,6 +57,7 @@ namespace osu.Game.Tournament
                             Bottom = 10,
                         },
                         Action = saveChanges,
+                        Enabled = { Value = false },
                     },
                 }
             };
