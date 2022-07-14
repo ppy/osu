@@ -1,27 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultFollowCircle : CompositeDrawable
+    public class DefaultFollowCircle : FollowCircle
     {
-        [Resolved(canBeNull: true)]
-        private DrawableHitObject? parentObject { get; set; }
-
         public DefaultFollowCircle()
         {
-            Alpha = 0f;
-            RelativeSizeAxes = Axes.Both;
-
             InternalChild = new CircularContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -38,28 +30,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (parentObject != null)
-            {
-                var slider = (DrawableSlider)parentObject;
-                slider.Tracking.BindValueChanged(trackingChanged, true);
-            }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            if (parentObject != null)
-            {
-                parentObject.ApplyCustomUpdateState += updateStateTransforms;
-                updateStateTransforms(parentObject, parentObject.State.Value);
-            }
-        }
-
-        private void trackingChanged(ValueChangedEvent<bool> tracking)
+        protected override void OnTrackingChanged(ValueChangedEvent<bool> tracking)
         {
             const float scale_duration = 300f;
             const float fade_duration = 300f;
@@ -68,25 +39,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 .FadeTo(tracking.NewValue ? 1f : 0, fade_duration, Easing.OutQuint);
         }
 
-        private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
+        protected override void OnSliderEnd()
         {
-            // see comment in LegacySliderBall.updateStateTransforms
-            if (drawableObject is not DrawableSlider)
-                return;
-
             const float fade_duration = 450f;
 
             // intentionally pile on an extra FadeOut to make it happen much faster
-            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
-                this.FadeOut(fade_duration / 4, Easing.Out);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (parentObject != null)
-                parentObject.ApplyCustomUpdateState -= updateStateTransforms;
+            this.FadeOut(fade_duration / 4, Easing.Out);
         }
     }
 }
