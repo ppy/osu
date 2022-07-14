@@ -194,8 +194,9 @@ namespace osu.Desktop.Updater
                         process.Start();
 
                         process.WaitForExit();
+                        var hasUpdates = process.ExitCode == 1;
                         process.Dispose();
-                        return process.ExitCode == 1;
+                        return hasUpdates;
                     }
                     catch
                     {
