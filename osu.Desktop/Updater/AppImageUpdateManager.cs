@@ -163,7 +163,7 @@ namespace osu.Desktop.Updater
                     try
                     {
                         return Instance.game.IsDeployedBuild ?
-                            //TODO verify if environment variable APPIMAGE whether set in the deployed build
+                            //TODO verify whether environment variable APPIMAGE is set in the deployed build
                             Environment.GetEnvironmentVariable("APPIMAGE") :
                             //Assume osu.AppImage otherwise (use this for debugging a test image)
                             $"{RuntimeInfo.StartupDirectory}osu.AppImage";
