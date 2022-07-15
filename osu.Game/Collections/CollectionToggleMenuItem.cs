@@ -9,9 +9,9 @@ namespace osu.Game.Collections
     public class CollectionToggleMenuItem : ToggleMenuItem
     {
         public CollectionToggleMenuItem(BeatmapCollection collection, IBeatmapInfo beatmap)
-            : base(collection.Name.Value, MenuItemType.Standard, s =>
+            : base(collection.Name.Value, MenuItemType.Standard, state =>
             {
-                if (s)
+                if (state)
                     collection.BeatmapHashes.Add(beatmap.MD5Hash);
                 else
                     collection.BeatmapHashes.Remove(beatmap.MD5Hash);
