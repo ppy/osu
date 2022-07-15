@@ -28,7 +28,7 @@ using osuTK.Graphics;
 namespace osu.Desktop.Updater
 {
     /// <summary>
-    /// An update manager that shows notifications if a newer release is detected.
+    /// An update manager that shows notifications if a newer release is detected.<para />
     /// Updates the AppImage and backups the previous version with a .zs-old suffix.
     /// </summary>
     [SupportedOSPlatform("linux")]
@@ -153,35 +153,28 @@ namespace osu.Desktop.Updater
                 }
             }
             /// <summary>
-            /// (Absolute) path to AppImage file (with symlinks resolved)
-            /// See: https://docs.appimage.org/packaging-guide/environment-variables.html
+            /// Absolute) path to AppImage file (with symlinks resolved)<para />
+            /// See: <see href="https://docs.appimage.org/packaging-guide/environment-variables.html" />
             /// </summary>
             public static string ImagePath
             {
                 get
                 {
-                    try
-                    {
-                        return Instance.game.IsDeployedBuild ?
+                    return IsAppImage ?
                             //TODO verify whether environment variable APPIMAGE is set in the deployed build
                             Environment.GetEnvironmentVariable("APPIMAGE") :
                             //Assume osu.AppImage otherwise (use this for debugging a test image)
                             $"{RuntimeInfo.StartupDirectory}osu.AppImage";
-                    }
-                    catch
-                    {
-                        return null;
-                    }
                 }
             }
             /// <summary>
             /// Checks if osu was launched as an AppImage
             /// </summary>
-            public static bool AppIsAppImage
+            public static bool IsAppImage
             {
                 get
                 {
-                    return ImagePath is string;
+                    return Environment.GetEnvironmentVariable("APPIMAGE") is string;
                 }
             }
             /// <summary>
@@ -260,10 +253,12 @@ namespace osu.Desktop.Updater
             }
             public static bool IsInstalled()
             {
-                return Version is string ?
-                                true :
-                                false;
+                return Version is string;
             }
+            /// <summary>
+            /// Fetches updated blocks via zsync and updates the appimage<para />
+            /// Note: Progress begins with the amount of usable data from the seed file
+            /// </summary>
             public void ApplyUpdate(Action<float, UpdateStates> update = null, bool overwrite = false)
             {
                 if (State == UpdateStates.UPDATESAVAILABLE)
@@ -283,13 +278,17 @@ namespace osu.Desktop.Updater
                         {
                             if (e.Data != null)
                             {
-                                var match = Regex.Match(e.Data, @"^(?:(\d*(?:\.\d+)?)% done)(?:\s\((\d*(?:\.\d+)?) of (\d*(?:\.\d+)?))", RegexOptions.IgnoreCase);
+                                var match = Regex.Match(e.Data, @"^(?:(\d*(?:\.\d+)?)% done)((?:\s\((\d*(?:\.\d+)?) of (\d*(?:\.\d+)?)))?", RegexOptions.IgnoreCase);
 
                                 if (match.Success)
                                 {
                                     progress = float.Parse(match.Groups[1].ToString()) / 100;
-                                    //float downloadedSize = float.Parse(match.Groups[2].ToString());
-                                    //float downloadSize = float.Parse(match.Groups[3].ToString());
+
+                                    if (match.Groups[3].Success && match.Groups[4].Success)
+                                    {
+                                        float downloadedSize = float.Parse(match.Groups[3].ToString());
+                                        float downloadSize = float.Parse(match.Groups[4].ToString());
+                                    }
                                 }
                                 else if (Regex.Match(e.Data, @"verifying", RegexOptions.IgnoreCase).Success)
                                 {
@@ -463,8 +462,9 @@ namespace osu.Desktop.Updater
                             process.StartInfo = new ProcessStartInfo
                             {
                                 FileName = AppImageUpdateTool.ImagePath,
-                                UseShellExecute = false,
+                                UseShellExecute = false
                             };
+                            //HINT: throws an Exception if the debugged AppImage is not made executable
                             process.Start();
                         }
                     }));
