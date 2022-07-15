@@ -267,6 +267,12 @@ namespace osu.Game.Screens.Play
                 },
                 FailOverlay = new FailOverlay
                 {
+                    SaveReplay = () =>
+                    {
+                        Score.ScoreInfo.Passed = false;
+                        Score.ScoreInfo.Rank = ScoreRank.F;
+                        return prepareAndImportScore();
+                    },
                     OnRetry = Restart,
                     OnQuit = () => PerformExit(true),
                 },
@@ -720,7 +726,7 @@ namespace osu.Game.Screens.Play
             if (!Configuration.ShowResults)
                 return;
 
-            prepareScoreForDisplayTask ??= Task.Run(prepareScoreForResults);
+            prepareScoreForDisplayTask ??= Task.Run(prepareAndImportScore);
 
             bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
@@ -739,7 +745,7 @@ namespace osu.Game.Screens.Play
         /// Asynchronously run score preparation operations (database import, online submission etc.).
         /// </summary>
         /// <returns>The final score.</returns>
-        private async Task<ScoreInfo> prepareScoreForResults()
+        private async Task<ScoreInfo> prepareAndImportScore()
         {
             var scoreCopy = Score.DeepClone();
 
@@ -1024,8 +1030,7 @@ namespace osu.Game.Screens.Play
                 if (prepareScoreForDisplayTask == null)
                 {
                     Score.ScoreInfo.Passed = false;
-                    // potentially should be ScoreRank.F instead? this is the best alternative for now.
-                    Score.ScoreInfo.Rank = ScoreRank.D;
+                    Score.ScoreInfo.Rank = ScoreRank.F;
                 }
 
                 // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
