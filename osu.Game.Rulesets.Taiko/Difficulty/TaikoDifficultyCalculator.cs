@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 1.9;
+        private const double difficulty_multiplier = 1.35;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -57,12 +57,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             var combined = (Peaks)skills[0];
 
-            double colourRating = Math.Sqrt(combined.ColourDifficultyValue * difficulty_multiplier);
-            double rhythmRating = Math.Sqrt(combined.RhythmDifficultyValue * difficulty_multiplier);
-            double staminaRating = Math.Sqrt(combined.StaminaDifficultyValue * difficulty_multiplier);
+            double colourRating = combined.ColourDifficultyValue * difficulty_multiplier;
+            double rhythmRating = combined.RhythmDifficultyValue * difficulty_multiplier;
+            double staminaRating = combined.StaminaDifficultyValue * difficulty_multiplier;
 
-            double combinedRating = combined.DifficultyValue();
-            double starRating = rescale(combinedRating * difficulty_multiplier);
+            double combinedRating = combined.DifficultyValue() * difficulty_multiplier;
+            double starRating = rescale(combinedRating * 1.4);
+
+            // TODO: This is temporary measure as we don't detect abuse-type playstyles of converts within the current system.
+            if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0)
+            {
+                starRating *= 0.80;
+            }
 
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
@@ -81,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         }
 
         /// <summary>
-        /// Applies a final re-scaling of the star rating to bring maps with recorded full combos below 9.5 stars.
+        /// Applies a final re-scaling of the star rating.
         /// </summary>
         /// <param name="sr">The raw star rating value before re-scaling.</param>
         private double rescale(double sr)
