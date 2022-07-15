@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 {
     public abstract class FollowCircle : CompositeDrawable
     {
-        [Resolved(canBeNull: true)]
+        [Resolved]
         protected DrawableHitObject? ParentObject { get; private set; }
 
         protected FollowCircle()
@@ -23,11 +23,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (ParentObject != null)
-            {
-                var slider = (DrawableSlider)ParentObject;
-                slider.Tracking.BindValueChanged(OnTrackingChanged, true);
-            }
+            ((DrawableSlider?)ParentObject)?.Tracking.BindValueChanged(OnTrackingChanged, true);
         }
 
         protected override void LoadComplete()
