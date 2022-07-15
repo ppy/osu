@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (ParentObject.Judged)
                 return;
 
-            double remainingTime = ParentObject.HitStateUpdateTime - Time.Current;
+            double remainingTime = Math.Max(0, ParentObject.HitStateUpdateTime - Time.Current);
 
             // Note that the scale adjust here is 2 instead of DrawableSliderBall.FOLLOW_AREA to match legacy behaviour.
             // This means the actual tracking area for gameplay purposes is larger than the sprite (but skins may be accounting for this).
