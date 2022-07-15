@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -18,22 +16,24 @@ namespace osu.Game.Screens.Play
 {
     public class SaveFailedScoreButton : CompositeDrawable
     {
-        public Func<Task<ScoreInfo>> ImportFailedScore;
-        private Task<ScoreInfo> saveFailedScoreTask;
-        private ScoreInfo score;
+        private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
 
-        protected readonly Bindable<ImportState> State = new Bindable<ImportState>();
+        private readonly Func<Task<ScoreInfo>> importFailedScore;
 
-        private DownloadButton button;
+        private Task<ScoreInfo>? saveFailedScoreTask;
+
+        private ScoreInfo? score;
+
+        private DownloadButton button = null!;
 
         public SaveFailedScoreButton(Func<Task<ScoreInfo>> requestImportFailedScore)
         {
             Size = new Vector2(50, 30);
-            ImportFailedScore = requestImportFailedScore;
+            importFailedScore = requestImportFailedScore;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game)
+        [BackgroundDependencyLoader]
+        private void load(OsuGame? game)
         {
             InternalChild = button = new DownloadButton
             {
@@ -42,13 +42,13 @@ namespace osu.Game.Screens.Play
 
             button.Action = () =>
             {
-                switch (State.Value)
+                switch (state.Value)
                 {
-                    case ImportState.Imported:
+                    case DownloadState.LocallyAvailable:
                         game?.PresentScore(score, ScorePresentType.Gameplay);
                         break;
 
-                    case ImportState.Importing:
+                    case DownloadState.Importing:
                         break;
 
                     default:
@@ -56,24 +56,24 @@ namespace osu.Game.Screens.Play
                         break;
                 }
             };
-            State.BindValueChanged(state =>
+            state.BindValueChanged(state =>
             {
                 switch (state.NewValue)
                 {
-                    case ImportState.Imported:
+                    case DownloadState.LocallyAvailable:
                         button.State.Value = DownloadState.LocallyAvailable;
                         break;
 
-                    case ImportState.Importing:
+                    case DownloadState.Importing:
                         button.State.Value = DownloadState.Importing;
                         break;
 
-                    case ImportState.Failed:
+                    case DownloadState.NotDownloaded:
                         button.State.Value = DownloadState.NotDownloaded;
                         break;
                 }
             }, true);
-            State.BindValueChanged(updateState, true);
+            state.BindValueChanged(updateState, true);
         }
 
         private void saveScore()
@@ -83,33 +83,28 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            State.Value = ImportState.Importing;
+            state.Value = DownloadState.Importing;
 
-            saveFailedScoreTask = Task.Run(ImportFailedScore);
+            saveFailedScoreTask = Task.Run(importFailedScore);
             saveFailedScoreTask.ContinueWith(s => Schedule(() =>
             {
                 score = s.GetAwaiter().GetResult();
-                State.Value = score != null ? ImportState.Imported : ImportState.Failed;
+                state.Value = score != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded;
             }));
         }
 
-        private void updateState(ValueChangedEvent<ImportState> state)
+        private void updateState(ValueChangedEvent<DownloadState> state)
         {
             switch (state.NewValue)
             {
-                case ImportState.Imported:
+                case DownloadState.LocallyAvailable:
                     button.TooltipText = @"Watch replay";
                     button.Enabled.Value = true;
                     break;
 
-                case ImportState.Importing:
+                case DownloadState.Importing:
                     button.TooltipText = @"Importing score";
                     button.Enabled.Value = false;
-                    break;
-
-                case ImportState.Failed:
-                    button.TooltipText = @"Import failed, click button to re-import";
-                    button.Enabled.Value = true;
                     break;
 
                 default:
@@ -117,14 +112,6 @@ namespace osu.Game.Screens.Play
                     button.Enabled.Value = true;
                     break;
             }
-        }
-
-        public enum ImportState
-        {
-            NotImported,
-            Failed,
-            Importing,
-            Imported
         }
     }
 }
