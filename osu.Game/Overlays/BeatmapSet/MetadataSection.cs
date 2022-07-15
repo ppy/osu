@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -22,11 +23,14 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly MetadataType type;
         private TextFlowContainer textFlow;
 
+        private readonly Action<string> searchAction;
+
         private const float transition_duration = 250;
 
-        public MetadataSection(MetadataType type)
+        public MetadataSection(MetadataType type, Action<string> searchAction = null)
         {
             this.type = type;
+            this.searchAction = searchAction;
 
             Alpha = 0;
 
@@ -91,7 +95,12 @@ namespace osu.Game.Overlays.BeatmapSet
 
                         for (int i = 0; i <= tags.Length - 1; i++)
                         {
-                            loaded.AddLink(tags[i], LinkAction.SearchBeatmapSet, tags[i]);
+                            string tag = tags[i];
+
+                            if (searchAction != null)
+                                loaded.AddLink(tag, () => searchAction(tag));
+                            else
+                                loaded.AddLink(tag, LinkAction.SearchBeatmapSet, tag);
 
                             if (i != tags.Length - 1)
                                 loaded.AddText(" ");
@@ -100,7 +109,11 @@ namespace osu.Game.Overlays.BeatmapSet
                         break;
 
                     case MetadataType.Source:
-                        loaded.AddLink(text, LinkAction.SearchBeatmapSet, text);
+                        if (searchAction != null)
+                            loaded.AddLink(text, () => searchAction(text));
+                        else
+                            loaded.AddLink(text, LinkAction.SearchBeatmapSet, text);
+
                         break;
 
                     default:
