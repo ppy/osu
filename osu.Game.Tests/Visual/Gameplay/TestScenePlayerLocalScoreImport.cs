@@ -8,14 +8,18 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
 
@@ -58,14 +62,35 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override bool HasCustomSteps => true;
 
-        protected override bool AllowFail => false;
+        protected override bool AllowFail => allowFail;
+
+        private bool allowFail;
+
+        [SetUp]
+        public void SetUp()
+        {
+            allowFail = false;
+            customRuleset = null;
+        }
+
+        [Test]
+        public void TestSaveFailedReplay()
+        {
+            AddStep("allow fail", () => allowFail = true);
+
+            CreateTest();
+
+            AddUntilStep("fail screen displayed", () => Player.ChildrenOfType<FailOverlay>().First().State.Value == Visibility.Visible);
+            AddUntilStep("score not in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) == null));
+            AddStep("click save button", () => Player.ChildrenOfType<SaveFailedScoreButton>().First().ChildrenOfType<OsuClickableContainer>().First().TriggerClick());
+            AddUntilStep("score not in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
+        }
 
         [Test]
         public void TestLastPlayedUpdated()
         {
             DateTimeOffset? getLastPlayed() => Realm.Run(r => r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID)?.LastPlayed);
 
-            AddStep("set no custom ruleset", () => customRuleset = null);
             AddAssert("last played is null", () => getLastPlayed() == null);
 
             CreateTest();
@@ -77,8 +102,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestScoreStoredLocally()
         {
-            AddStep("set no custom ruleset", () => customRuleset = null);
-
             CreateTest();
 
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
