@@ -9,17 +9,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -27,6 +30,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
@@ -38,7 +42,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>
+    public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>, IHasContextMenu
     {
         public const float HEIGHT = 50;
 
@@ -94,6 +98,9 @@ namespace osu.Game.Screens.OnlinePlay
         private RulesetStore rulesets { get; set; }
 
         [Resolved]
+        private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
         private OsuColour colours { get; set; }
 
         [Resolved]
@@ -101,6 +108,15 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private BeatmapSetOverlay beatmapOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private CollectionManager collectionManager { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => AllowReordering || AllowDeletion || !AllowSelection || SelectedItem.Value == Model;
 
@@ -433,7 +449,7 @@ namespace osu.Game.Screens.OnlinePlay
                             }
                         }
                     },
-                }
+                },
             };
         }
 
@@ -468,6 +484,31 @@ namespace osu.Game.Screens.OnlinePlay
             if (AllowSelection && valid.Value)
                 SelectedItem.Value = Model;
             return true;
+        }
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (beatmapOverlay != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
+
+                if (collectionManager != null && beatmap != null)
+                {
+                    if (beatmaps.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID) is BeatmapInfo local && !local.BeatmapSet.AsNonNull().DeletePending)
+                    {
+                        var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
+                        if (manageCollectionsDialog != null)
+                            collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+
+                        items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                    }
+                }
+
+                return items.ToArray();
+            }
         }
 
         public class PlaylistEditButton : GrayButton
