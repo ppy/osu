@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [Resolved(canBeNull: true)]
         protected DrawableHitObject? ParentObject { get; private set; }
 
-        public FollowCircle()
+        protected FollowCircle()
         {
             RelativeSizeAxes = Axes.Both;
         }
