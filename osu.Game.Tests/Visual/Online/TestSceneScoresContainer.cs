@@ -274,14 +274,18 @@ namespace osu.Game.Tests.Visual.Online
                 }
             };
 
+            const int initial_great_count = 2000;
+
+            int greatCount = initial_great_count;
+
             foreach (var s in scores.Scores)
             {
                 s.Statistics = new Dictionary<HitResult, int>
                 {
-                    { HitResult.Great, RNG.Next(2000) },
-                    { HitResult.Ok, RNG.Next(2000) },
-                    { HitResult.Meh, RNG.Next(2000) },
-                    { HitResult.Miss, RNG.Next(2000) }
+                    { HitResult.Great, greatCount -= 100 },
+                    { HitResult.Ok, RNG.Next(100) },
+                    { HitResult.Meh, RNG.Next(100) },
+                    { HitResult.Miss, initial_great_count - greatCount }
                 };
             }
 
