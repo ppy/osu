@@ -267,7 +267,12 @@ namespace osu.Game.Screens.Play
                 },
                 FailOverlay = new FailOverlay
                 {
-                    SaveReplay = saveFailedReplay,
+                    SaveReplay = () =>
+                    {
+                        Score.ScoreInfo.Passed = false;
+                        Score.ScoreInfo.Rank = ScoreRank.F;
+                        return prepareAndImportScore();
+                    },
                     OnRetry = Restart,
                     OnQuit = () => PerformExit(true),
                 },
@@ -721,7 +726,7 @@ namespace osu.Game.Screens.Play
             if (!Configuration.ShowResults)
                 return;
 
-            prepareScoreForDisplayTask ??= Task.Run(prepareScoreForResults);
+            prepareScoreForDisplayTask ??= Task.Run(prepareAndImportScore);
 
             bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
@@ -740,7 +745,7 @@ namespace osu.Game.Screens.Play
         /// Asynchronously run score preparation operations (database import, online submission etc.).
         /// </summary>
         /// <returns>The final score.</returns>
-        private async Task<ScoreInfo> prepareScoreForResults()
+        private async Task<ScoreInfo> prepareAndImportScore()
         {
             var scoreCopy = Score.DeepClone();
 
@@ -1042,26 +1047,6 @@ namespace osu.Game.Screens.Play
 
             fadeOut();
             return base.OnExiting(e);
-        }
-
-        private async Task<ScoreInfo> saveFailedReplay()
-        {
-            Score.ScoreInfo.Passed = false;
-            Score.ScoreInfo.Rank = ScoreRank.F;
-
-            var scoreCopy = Score.DeepClone();
-
-            try
-            {
-                await ImportScore(scoreCopy);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, @"Score import failed!");
-                return null;
-            }
-
-            return scoreCopy.ScoreInfo;
         }
 
         /// <summary>
