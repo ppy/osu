@@ -22,12 +22,21 @@ namespace osu.Game.Screens.Play
     {
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
+        private readonly bool replayIsFailedScore;
+
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
-        protected override bool CheckModsAllowFailure() => false;
+        protected override bool CheckModsAllowFailure()
+        {
+            if (!replayIsFailedScore)
+                return false;
+
+            return base.CheckModsAllowFailure();
+        }
 
         public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
             : this((_, _) => score, configuration)
         {
+            replayIsFailedScore = score.ScoreInfo.Rank == ScoreRank.F;
         }
 
         public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
