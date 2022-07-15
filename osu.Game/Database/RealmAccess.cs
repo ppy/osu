@@ -59,8 +59,9 @@ namespace osu.Game.Database
         /// 13   2022-01-13    Final migration of beatmaps and scores to realm (multiple new storage fields).
         /// 14   2022-03-01    Added BeatmapUserSettings to BeatmapInfo.
         /// 15   2022-07-13    Added LastPlayed to BeatmapInfo.
+        /// 16   2022-07-15    Removed HasReplay from ScoreInfo.
         /// </summary>
-        private const int schema_version = 15;
+        private const int schema_version = 16;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
