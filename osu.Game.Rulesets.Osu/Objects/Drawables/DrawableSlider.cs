@@ -319,13 +319,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             const float fade_out_time = 450;
 
-            // intentionally pile on an extra FadeOut to make it happen much faster.
-            Ball.FadeOut(fade_out_time / 4, Easing.Out);
-
             switch (state)
             {
                 case ArmedState.Hit:
-                    Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
                     if (SliderBody?.SnakingOut.Value == true)
                         Body.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
                     break;
