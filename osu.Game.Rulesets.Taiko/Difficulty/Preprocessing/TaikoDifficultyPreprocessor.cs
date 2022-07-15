@@ -1,3 +1,6 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Beatmaps;
@@ -30,7 +33,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                         centreObjects, rimObjects, noteObjects, difficultyHitObjects.Count)
                 );
             }
-            var encoded = TaikoColourDifficultyPreprocessor.ProcessAndAssign(difficultyHitObjects);
+
+            TaikoColourDifficultyPreprocessor.ProcessAndAssign(difficultyHitObjects);
 
             return difficultyHitObjects;
         }

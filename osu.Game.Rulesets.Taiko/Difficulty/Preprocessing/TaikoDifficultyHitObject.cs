@@ -47,10 +47,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="noteObjects">The list of <see cref="DifficultyHitObject"/>s that is a hit (i.e. not a slider or spinner) in the current beatmap.</param>
         /// <param name="index">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
         public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate,
-            List<DifficultyHitObject> objects,
-            List<TaikoDifficultyHitObject> centreHitObjects,
-            List<TaikoDifficultyHitObject> rimHitObjects,
-            List<TaikoDifficultyHitObject> noteObjects, int index)
+                                        List<DifficultyHitObject> objects,
+                                        List<TaikoDifficultyHitObject> centreHitObjects,
+                                        List<TaikoDifficultyHitObject> rimHitObjects,
+                                        List<TaikoDifficultyHitObject> noteObjects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             var currentHit = hitObject as Hit;
@@ -59,13 +59,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRate);
             HitType? hitType = currentHit?.Type;
 
-            if (hitType == Objects.HitType.Centre)
+            if (hitType == HitType.Centre)
             {
                 MonoIndex = centreHitObjects.Count;
                 centreHitObjects.Add(this);
                 monoDifficultyHitObjects = centreHitObjects;
             }
-            else if (hitType == Objects.HitType.Rim)
+            else if (hitType == HitType.Rim)
             {
                 MonoIndex = rimHitObjects.Count;
                 rimHitObjects.Add(this);
@@ -116,12 +116,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             return common_rhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();
         }
 
-        public TaikoDifficultyHitObject PreviousMono(int backwardsIndex) => monoDifficultyHitObjects.ElementAtOrDefault(MonoIndex - (backwardsIndex + 1));
+        public TaikoDifficultyHitObject? PreviousMono(int backwardsIndex) => monoDifficultyHitObjects?.ElementAtOrDefault(MonoIndex - (backwardsIndex + 1));
 
-        public TaikoDifficultyHitObject NextMono(int forwardsIndex) => monoDifficultyHitObjects.ElementAtOrDefault(MonoIndex + (forwardsIndex + 1));
+        public TaikoDifficultyHitObject? NextMono(int forwardsIndex) => monoDifficultyHitObjects?.ElementAtOrDefault(MonoIndex + (forwardsIndex + 1));
 
-        public TaikoDifficultyHitObject PreviousNote(int backwardsIndex) => noteObjects.ElementAtOrDefault(NoteIndex - (backwardsIndex + 1));
+        public TaikoDifficultyHitObject? PreviousNote(int backwardsIndex) => noteObjects.ElementAtOrDefault(NoteIndex - (backwardsIndex + 1));
 
-        public TaikoDifficultyHitObject NextNote(int forwardsIndex) => noteObjects.ElementAtOrDefault(NoteIndex + (forwardsIndex + 1));
+        public TaikoDifficultyHitObject? NextNote(int forwardsIndex) => noteObjects.ElementAtOrDefault(NoteIndex + (forwardsIndex + 1));
     }
 }

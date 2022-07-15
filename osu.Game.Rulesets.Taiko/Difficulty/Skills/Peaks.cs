@@ -1,11 +1,14 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+#nullable disable
+
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
@@ -25,33 +28,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         public double RhythmDifficultyValue => rhythm.DifficultyValue() * rhythm_skill_multiplier;
         public double StaminaDifficultyValue => stamina.DifficultyValue() * stamina_skill_multiplier;
 
-        // TODO: remove before pr
-        private StreamWriter? colourDebugOutput;
-        bool debugColour = false;
-        private StreamWriter? strainPeakDebugOutput;
-        bool debugStrain = false;
-
-        public Peaks(Mod[] mods, IBeatmap beatmap)
+        public Peaks(Mod[] mods)
             : base(mods)
         {
             rhythm = new Rhythm(mods);
             colour = new Colour(mods);
             stamina = new Stamina(mods);
-
-            if (debugColour)
-            {
-                String filename = $"{beatmap.BeatmapInfo.OnlineID} - {beatmap.BeatmapInfo.Metadata.Title}[{beatmap.BeatmapInfo.DifficultyName}].csv";
-                filename = filename.Replace('/', '_');
-                colourDebugOutput = new StreamWriter(File.OpenWrite($"/run/mount/secondary/workspace/osu/output/colour-debug/{filename}"));
-                colourDebugOutput.WriteLine(Colour.GetDebugHeaderLabels());
-            }
-            if (debugStrain)
-            {
-                String filename = $"{beatmap.BeatmapInfo.OnlineID} - {beatmap.BeatmapInfo.Metadata.Title}[{beatmap.BeatmapInfo.DifficultyName}].csv";
-                filename = filename.Replace('/', '_');
-                strainPeakDebugOutput = new StreamWriter(File.OpenWrite($"/run/mount/secondary/workspace/osu/output/strain-debug/{filename}"));
-                strainPeakDebugOutput.WriteLine("Colour,Stamina,Rhythm,Combined");
-            }
         }
 
         /// <summary>
@@ -66,12 +48,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             rhythm.Process(current);
             colour.Process(current);
             stamina.Process(current);
-
-            // if (debugColour && colourDebugOutput != null)
-            // {
-            //     colourDebugOutput.WriteLine(colour.GetDebugString(current));
-            //     colourDebugOutput.Flush();
-            // }
         }
 
         /// <summary>
@@ -97,11 +73,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
                 double peak = norm(1.5, colourPeak, staminaPeak);
                 peak = norm(2, peak, rhythmPeak);
-
-                if (debugStrain && strainPeakDebugOutput != null)
-                {
-                    strainPeakDebugOutput.WriteLine($"{colourPeak},{staminaPeak},{rhythmPeak},{peak}");
-                }
 
                 // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
                 // These sections will not contribute to the difficulty.
