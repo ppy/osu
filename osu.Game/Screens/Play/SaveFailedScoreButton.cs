@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<Task<ScoreInfo>> importFailedScore;
 
-        private ScoreInfo? score;
+        private ScoreInfo? importedScore;
 
         private DownloadButton button = null!;
 
@@ -45,17 +45,16 @@ namespace osu.Game.Screens.Play
                     switch (state.Value)
                     {
                         case DownloadState.LocallyAvailable:
-                            game?.PresentScore(score, ScorePresentType.Gameplay);
+                            game?.PresentScore(importedScore, ScorePresentType.Gameplay);
                             break;
 
                         case DownloadState.NotDownloaded:
                             state.Value = DownloadState.Importing;
-
-                            Task.Run(importFailedScore).ContinueWith(result => Schedule(() =>
+                            Task.Run(importFailedScore).ContinueWith(t =>
                             {
-                                score = result.GetResultSafely();
-                                state.Value = score != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded;
-                            }));
+                                importedScore = realm.Run(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.Detach());
+                                Schedule(() => state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded);
+                            });
                             break;
                     }
                 }
@@ -63,8 +62,8 @@ namespace osu.Game.Screens.Play
 
             if (player != null)
             {
-                score = realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID)?.Detach());
-                if (score != null)
+                importedScore = realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID)?.Detach());
+                if (importedScore != null)
                     state.Value = DownloadState.LocallyAvailable;
             }
 

@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play
                         Direction = FillDirection.Horizontal,
                         Children = new Drawable[]
                         {
-                            new SaveFailedScoreButton(() => SaveReplay())
+                            new SaveFailedScoreButton(SaveReplay)
                             {
                                 Width = 300
                             },
