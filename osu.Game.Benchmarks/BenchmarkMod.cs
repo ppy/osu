@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using BenchmarkDotNet.Attributes;
 using osu.Game.Rulesets.Osu.Mods;
@@ -11,7 +9,7 @@ namespace osu.Game.Benchmarks
 {
     public class BenchmarkMod : BenchmarkTest
     {
-        private OsuModDoubleTime mod;
+        private OsuModDoubleTime mod = null!;
 
         [Params(1, 10, 100)]
         public int Times { get; set; }

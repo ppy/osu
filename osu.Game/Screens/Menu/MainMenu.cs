@@ -65,9 +65,7 @@ namespace osu.Game.Screens.Menu
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
-        private BackgroundScreenDefault background;
-
-        protected override BackgroundScreen CreateBackground() => background;
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         protected override bool PlayExitSound => false;
 
@@ -148,7 +146,6 @@ namespace osu.Game.Screens.Menu
             Buttons.OnSettings = () => settings?.ToggleVisibility();
             Buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
 
-            LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
         }
 

@@ -298,10 +298,10 @@ namespace osu.Game.Tournament.Screens.Editors
                         }, true);
                     }
 
-                    private void updatePanel()
+                    private void updatePanel() => Scheduler.AddOnce(() =>
                     {
                         drawableContainer.Child = new UserGridPanel(user.ToAPIUser()) { Width = 300 };
-                    }
+                    });
                 }
             }
         }

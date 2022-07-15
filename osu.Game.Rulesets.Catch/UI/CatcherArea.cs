@@ -120,10 +120,10 @@ namespace osu.Game.Rulesets.Catch.UI
             lastHyperDashState = Catcher.HyperDashing;
         }
 
-        public void SetCatcherPosition(float X)
+        public void SetCatcherPosition(float x)
         {
             float lastPosition = Catcher.X;
-            float newPosition = Math.Clamp(X, 0, CatchPlayfield.WIDTH);
+            float newPosition = Math.Clamp(x, 0, CatchPlayfield.WIDTH);
 
             Catcher.X = newPosition;
 

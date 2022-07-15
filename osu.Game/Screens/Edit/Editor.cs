@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Edit
                 loadableBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
 
                 // required so we can get the track length in EditorClock.
-                // this is safe as nothing has yet got a reference to this new beatmap.
+                // this is ONLY safe because the track being provided is a `TrackVirtual` which we don't really care about disposing.
                 loadableBeatmap.LoadTrack();
 
                 // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
@@ -657,9 +657,7 @@ namespace osu.Game.Screens.Edit
             // To update the game-wide beatmap with any changes, perform a re-fetch on exit/suspend.
             // This is required as the editor makes its local changes via EditorBeatmap
             // (which are not propagated outwards to a potentially cached WorkingBeatmap).
-            ((IWorkingBeatmapCache)beatmapManager).Invalidate(Beatmap.Value.BeatmapInfo);
-            var refetchedBeatmapInfo = beatmapManager.QueryBeatmap(b => b.ID == Beatmap.Value.BeatmapInfo.ID);
-            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(refetchedBeatmapInfo);
+            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
 
             if (!(refetchedBeatmap is DummyWorkingBeatmap))
             {
@@ -923,7 +921,7 @@ namespace osu.Game.Screens.Edit
 
         private void cancelExit()
         {
-            samplePlaybackDisabled.Value = false;
+            updateSampleDisabledState();
             loader?.CancelPendingDifficultySwitch();
         }
 
