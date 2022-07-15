@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamWin
 {
-    public class TeamWinScreen : TournamentMatchScreen, IProvideVideo
+    public class TeamWinScreen : TournamentMatchScreen
     {
         private Container mainContainer;
 
@@ -66,7 +66,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
 
         private bool firstDisplay = true;
 
-        private void update() => Schedule(() =>
+        private void update() => Scheduler.AddOnce(() =>
         {
             var match = CurrentMatch.Value;
 

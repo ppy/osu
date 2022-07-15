@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Automation;
         public override string Description => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail), typeof(ModAutoplay), typeof(OsuModMagnetised) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail), typeof(ModAutoplay), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
         public bool PerformFail() => false;
 
