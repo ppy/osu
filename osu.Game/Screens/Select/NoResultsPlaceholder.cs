@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Select
                 textFlow.AddParagraph("No beatmaps found!");
                 textFlow.AddParagraph(string.Empty);
 
-                textFlow.AddParagraph("Consider using the \"");
+                textFlow.AddParagraph("- Consider running the \"");
                 textFlow.AddLink(FirstRunSetupOverlayStrings.FirstRunSetupTitle, () => firstRunSetupOverlay?.Show());
                 textFlow.AddText("\" to download or import some beatmaps!");
             }
@@ -141,15 +141,14 @@ namespace osu.Game.Screens.Select
                     textFlow.AddLink(" enabling ", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
                     textFlow.AddText("automatic conversion!");
                 }
-
-                if (!string.IsNullOrEmpty(filter?.SearchText))
-                {
-                    textFlow.AddParagraph("- Try ");
-                    textFlow.AddLink("searching online", LinkAction.SearchBeatmapSet, filter.SearchText);
-                    textFlow.AddText($" for \"{filter.SearchText}\".");
-                }
             }
 
+            if (!string.IsNullOrEmpty(filter?.SearchText))
+            {
+                textFlow.AddParagraph("- Try ");
+                textFlow.AddLink("searching online", LinkAction.SearchBeatmapSet, filter.SearchText);
+                textFlow.AddText($" for \"{filter.SearchText}\".");
+            }
             // TODO: add clickable link to reset criteria.
         }
     }
