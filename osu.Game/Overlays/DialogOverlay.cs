@@ -61,7 +61,7 @@ namespace osu.Game.Overlays
                 // if any existing dialog is being displayed, dismiss it before showing a new one.
                 lastDialog?.Hide();
 
-                // is the new dialog is hidden before added to the dialogContainer, bypass any further operations.
+                // if the new dialog is hidden before added to the dialogContainer, bypass any further operations.
                 if (dialog.State.Value == Visibility.Hidden)
                 {
                     dismiss();
