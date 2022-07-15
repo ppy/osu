@@ -1,10 +1,13 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System;
 using System.Collections.Generic;
 
-namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
+namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
 {
     /// <summary>
-    /// Encodes a list of <see cref="ColourEncoding"/>s, grouped together by back and forth repetition of the same 
+    /// Encodes a list of <see cref="ColourEncoding"/>s, grouped together by back and forth repetition of the same
     /// <see cref="ColourEncoding"/>. Also stores the repetition interval between this and the previous <see cref="CoupledColourEncoding"/>.
     /// </summary>
     public class CoupledColourEncoding
@@ -34,13 +37,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// Returns true if other is considered a repetition of this encoding. This is true if other's first two payload
         /// identical mono lengths.
         /// </summary>
-        public bool isRepetitionOf(CoupledColourEncoding other)
+        private bool isRepetitionOf(CoupledColourEncoding other)
         {
-            if (this.Payload.Count != other.Payload.Count) return false;
+            if (Payload.Count != other.Payload.Count) return false;
 
-            for (int i = 0; i < Math.Min(this.Payload.Count, 2); i++)
+            for (int i = 0; i < Math.Min(Payload.Count, 2); i++)
             {
-                if (!this.Payload[i].hasIdenticalMonoLength(other.Payload[i])) return false;
+                if (!Payload[i].HasIdenticalMonoLength(other.Payload[i])) return false;
             }
 
             return true;
@@ -60,9 +63,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
 
             CoupledColourEncoding? other = Previous.Previous;
             int interval = 2;
+
             while (interval < max_repetition_interval)
             {
-                if (this.isRepetitionOf(other))
+                if (isRepetitionOf(other))
                 {
                     RepetitionInterval = Math.Min(interval, max_repetition_interval);
                     return;
@@ -70,6 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
 
                 other = other.Previous;
                 if (other == null) break;
+
                 ++interval;
             }
 

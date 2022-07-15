@@ -1,3 +1,8 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data;
+
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
 {
     /// <summary>
@@ -6,7 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
     /// </summary>
     public class TaikoDifficultyHitObjectColour
     {
-        public CoupledColourEncoding Encoding { get; private set; }
+        public CoupledColourEncoding Encoding { get; }
 
         public double EvaluatedDifficulty = 0;
 

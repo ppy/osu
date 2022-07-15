@@ -1,6 +1,10 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
@@ -50,16 +54,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
             List<MonoEncoding> encoded = new List<MonoEncoding>();
 
             MonoEncoding? lastEncoded = null;
+
             for (int i = 0; i < data.Count; i++)
             {
                 TaikoDifficultyHitObject taikoObject = (TaikoDifficultyHitObject)data[i];
                 // This ignores all non-note objects, which may or may not be the desired behaviour
-                TaikoDifficultyHitObject previousObject = taikoObject.PreviousNote(0);
+                TaikoDifficultyHitObject? previousObject = taikoObject.PreviousNote(0);
 
                 // If the colour changed, or if this is the first object in the run, create a new mono encoding
-                if (
+                if
+                (
                     previousObject == null || // First object in the list
-                    (taikoObject.BaseObject as Hit)?.Type != (previousObject.BaseObject as Hit)?.Type)
+                    (taikoObject.BaseObject as Hit)?.Type != (previousObject.BaseObject as Hit)?.Type
+                )
+
                 {
                     lastEncoded = new MonoEncoding();
                     lastEncoded.EncodedData.Add(taikoObject);
@@ -82,6 +90,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         {
             List<ColourEncoding> encoded = new List<ColourEncoding>();
             ColourEncoding? lastEncoded = null;
+
             for (int i = 0; i < data.Count; i++)
             {
                 // Starts a new ColourEncoding if the previous MonoEncoding has a different mono length, or if this is
@@ -121,17 +130,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         {
             List<CoupledColourEncoding> encoded = new List<CoupledColourEncoding>();
             CoupledColourEncoding? lastEncoded = null;
+
             for (int i = 0; i < data.Count; i++)
             {
                 // Starts a new CoupledColourEncoding. ColourEncodings that should be grouped together will be handled
                 // later within this loop.
-                lastEncoded = new CoupledColourEncoding()
+                lastEncoded = new CoupledColourEncoding
                 {
                     Previous = lastEncoded
                 };
 
                 // Determine if future ColourEncodings should be grouped.
-                bool isCoupled = i < data.Count - 2 && data[i].isRepetitionOf(data[i + 2]);
+                bool isCoupled = i < data.Count - 2 && data[i].IsRepetitionOf(data[i + 2]);
+
                 if (!isCoupled)
                 {
                     // If not, add the current ColourEncoding to the encoded payload and continue.
@@ -139,14 +150,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                 }
                 else
                 {
-                    // If so, add the current ColourEncoding to the encoded payload and start repeatedly checking if 
-                    // subsequent ColourEncodings should be grouped by increasing i and doing the appropriate isCoupled
-                    // check;
+                    // If so, add the current ColourEncoding to the encoded payload and start repeatedly checking if the
+                    // subsequent ColourEncodings should be grouped by increasing i and doing the appropriate isCoupled check.
                     while (isCoupled)
                     {
                         lastEncoded.Payload.Add(data[i]);
                         i++;
-                        isCoupled = i < data.Count - 2 && data[i].isRepetitionOf(data[i + 2]);
+                        isCoupled = i < data.Count - 2 && data[i].IsRepetitionOf(data[i + 2]);
                     }
 
                     // Skip over peeked data and add the rest to the payload

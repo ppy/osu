@@ -1,13 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
+#nullable disable
+
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
@@ -32,35 +31,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
             double difficulty = ((TaikoDifficultyHitObject)current).Colour?.EvaluatedDifficulty ?? 0;
             return difficulty;
-        }
-
-        // TODO: Remove before pr
-        public static String GetDebugHeaderLabels()
-        {
-            return "StartTime,Raw,Decayed,CoupledRunLength,RepetitionInterval,EncodingRunLength,Payload(MonoRunLength|MonoCount)";
-        }
-
-        // TODO: Remove before pr
-        public string GetDebugString(DifficultyHitObject current)
-        {
-            double difficulty = ((TaikoDifficultyHitObject)current).Colour?.EvaluatedDifficulty ?? 0;
-            TaikoDifficultyHitObject? taikoCurrent = (TaikoDifficultyHitObject)current;
-            TaikoDifficultyHitObjectColour? colour = taikoCurrent?.Colour;
-            if (taikoCurrent != null && colour != null)
-            {
-                List<ColourEncoding> payload = colour.Encoding.Payload;
-                string payloadDisplay = "";
-                for (int i = 0; i < payload.Count; ++i)
-                {
-                    payloadDisplay += $"({payload[i].Payload[0].RunLength}|{payload[i].Payload.Count})";
-                }
-
-                return $"{current.StartTime},{difficulty},{CurrentStrain},{colour.Encoding.Payload[0].Payload.Count},{colour.Encoding.RepetitionInterval},{colour.Encoding.Payload.Count},{payloadDisplay}";
-            }
-            else
-            {
-                return $"{current.StartTime},{difficulty},{CurrentStrain},0,0,0,0,0";
-            }
         }
     }
 }

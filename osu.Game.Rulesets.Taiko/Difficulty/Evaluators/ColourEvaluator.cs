@@ -1,12 +1,15 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 {
     public class ColourEvaluator
     {
-        // TODO - Share this sigmoid
         private static double sigmoid(double val, double center, double width)
         {
             return Math.Tanh(Math.E * -(val - center) / width);
@@ -54,11 +57,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         {
             double coupledEncodingDifficulty = 2 * EvaluateDifficultyOf(encoding);
             encoding.Payload[0].Payload[0].EncodedData[0].Colour!.EvaluatedDifficulty += coupledEncodingDifficulty;
+
             for (int i = 0; i < encoding.Payload.Count; i++)
             {
                 ColourEncoding colourEncoding = encoding.Payload[i];
                 double colourEncodingDifficulty = EvaluateDifficultyOf(colourEncoding, i) * coupledEncodingDifficulty;
                 colourEncoding.Payload[0].EncodedData[0].Colour!.EvaluatedDifficulty += colourEncodingDifficulty;
+
                 for (int j = 0; j < colourEncoding.Payload.Count; j++)
                 {
                     MonoEncoding monoEncoding = colourEncoding.Payload[j];

@@ -22,8 +22,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // be removed when that is implemented.
             interval = Math.Max(interval, 100);
 
-            // return 15 / Math.Pow(interval, 0.6);
-            // return Math.Pow(0.2, interval / 1000);
             return 30 / interval;
         }
 
@@ -33,14 +31,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
-            if (!(current.BaseObject is Hit))
+            if (current.BaseObject is not Hit)
             {
                 return 0.0;
             }
 
             // Find the previous hit object hit by the current key, which is two notes of the same colour prior.
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
-            TaikoDifficultyHitObject keyPrevious = taikoCurrent.PreviousMono(1);
+            TaikoDifficultyHitObject? keyPrevious = taikoCurrent.PreviousMono(1);
 
             if (keyPrevious == null)
             {
@@ -49,7 +47,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             }
 
             double objectStrain = 0.5; // Add a base strain to all objects
-            // double objectStrain = 0;
             objectStrain += speedBonus(taikoCurrent.StartTime - keyPrevious.StartTime);
             return objectStrain;
         }
