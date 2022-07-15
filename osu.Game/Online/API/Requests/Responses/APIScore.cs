@@ -88,7 +88,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// <returns></returns>
         public ScoreInfo CreateScoreInfo(RulesetStore rulesets, BeatmapInfo beatmap = null)
         {
-            var ruleset = rulesets.GetRuleset(RulesetID) ?? throw new InvalidOperationException();
+            var ruleset = rulesets.GetRuleset(RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {RulesetID} not found locally");
 
             var rulesetInstance = ruleset.CreateInstance();
 

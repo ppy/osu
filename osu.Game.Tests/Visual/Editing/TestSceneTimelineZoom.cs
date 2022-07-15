@@ -14,6 +14,16 @@ namespace osu.Game.Tests.Visual.Editing
         public override Drawable CreateTestComponent() => Empty();
 
         [Test]
+        [FlakyTest]
+        /*
+         * Fail rate around 0.3%
+         *
+         * TearDown : osu.Framework.Testing.Drawables.Steps.AssertButton+TracedException : range halved
+         *   --TearDown
+         *      at osu.Framework.Threading.ScheduledDelegate.RunTaskInternal()
+         *      at osu.Framework.Threading.Scheduler.Update()
+         *      at osu.Framework.Graphics.Drawable.UpdateSubTree()
+         */
         public void TestVisibleRangeUpdatesOnZoomChange()
         {
             double initialVisibleRange = 0;

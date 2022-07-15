@@ -6,17 +6,14 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -38,15 +35,18 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("switch ruleset", () => Game.Ruleset.Value = new ManiaRuleset().RulesetInfo);
 
             AddStep("open editor", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).Edit(beatmapSet.Beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == 0)));
-            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.IsLoaded);
-            AddStep("test gameplay", () =>
+            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
+            AddStep("test gameplay", () => ((Editor)Game.ScreenStack.CurrentScreen).TestGameplay());
+
+            AddUntilStep("wait for player", () =>
             {
-                var testGameplayButton = this.ChildrenOfType<TestGameplayButton>().Single();
-                InputManager.MoveMouseTo(testGameplayButton);
-                InputManager.Click(MouseButton.Left);
+                // notifications may fire at almost any inopportune time and cause annoying test failures.
+                // relentlessly attempt to dismiss any and all interfering overlays, which includes notifications.
+                // this is theoretically not foolproof, but it's the best that can be done here.
+                Game.CloseAllOverlays();
+                return Game.ScreenStack.CurrentScreen is EditorPlayer editorPlayer && editorPlayer.IsLoaded;
             });
 
-            AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen is EditorPlayer editorPlayer && editorPlayer.IsLoaded);
             AddAssert("current ruleset is osu!", () => Game.Ruleset.Value.Equals(new OsuRuleset().RulesetInfo));
 
             AddStep("exit to song select", () => Game.PerformFromScreen(_ => { }, typeof(PlaySongSelect).Yield()));

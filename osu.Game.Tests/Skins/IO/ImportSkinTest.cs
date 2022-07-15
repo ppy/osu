@@ -83,20 +83,20 @@ namespace osu.Game.Tests.Skins.IO
         #region Cases where imports should match existing
 
         [Test]
-        public Task TestImportTwiceWithSameMetadataAndFilename() => runSkinTest(async osu =>
+        public Task TestImportTwiceWithSameMetadataAndFilename([Values] bool batchImport) => runSkinTest(async osu =>
         {
-            var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("test skin", "skinner"), "skin.osk"));
-            var import2 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("test skin", "skinner"), "skin.osk"));
+            var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("test skin", "skinner"), "skin.osk"), batchImport);
+            var import2 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("test skin", "skinner"), "skin.osk"), batchImport);
 
             assertImportedOnce(import1, import2);
         });
 
         [Test]
-        public Task TestImportTwiceWithNoMetadataSameDownloadFilename() => runSkinTest(async osu =>
+        public Task TestImportTwiceWithNoMetadataSameDownloadFilename([Values] bool batchImport) => runSkinTest(async osu =>
         {
             // if a user downloads two skins that do have skin.ini files but don't have any creator metadata in the skin.ini, they should both import separately just for safety.
-            var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni(string.Empty, string.Empty), "download.osk"));
-            var import2 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni(string.Empty, string.Empty), "download.osk"));
+            var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni(string.Empty, string.Empty), "download.osk"), batchImport);
+            var import2 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni(string.Empty, string.Empty), "download.osk"), batchImport);
 
             assertImportedOnce(import1, import2);
         });
@@ -134,10 +134,10 @@ namespace osu.Game.Tests.Skins.IO
         });
 
         [Test]
-        public Task TestSameMetadataNameSameFolderName() => runSkinTest(async osu =>
+        public Task TestSameMetadataNameSameFolderName([Values] bool batchImport) => runSkinTest(async osu =>
         {
-            var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "my custom skin 1"));
-            var import2 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "my custom skin 1"));
+            var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "my custom skin 1"), batchImport);
+            var import2 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "my custom skin 1"), batchImport);
 
             assertImportedOnce(import1, import2);
             assertCorrectMetadata(import1, "name 1 [my custom skin 1]", "author 1", osu);
@@ -357,10 +357,10 @@ namespace osu.Game.Tests.Skins.IO
             }
         }
 
-        private async Task<Live<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ImportTask import)
+        private async Task<Live<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ImportTask import, bool batchImport = false)
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
-            return await skinManager.Import(import);
+            return await skinManager.Import(import, batchImport);
         }
     }
 }

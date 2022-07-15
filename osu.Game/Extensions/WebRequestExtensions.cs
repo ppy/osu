@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Globalization;
 using Newtonsoft.Json.Linq;
 using osu.Framework.IO.Network;
@@ -18,7 +16,7 @@ namespace osu.Game.Extensions
         /// </summary>
         public static void AddCursor(this WebRequest webRequest, Cursor cursor)
         {
-            cursor?.Properties.ForEach(x =>
+            cursor.Properties.ForEach(x =>
             {
                 webRequest.AddParameter("cursor[" + x.Key + "]", (x.Value as JValue)?.ToString(CultureInfo.InvariantCulture) ?? x.Value.ToString());
             });

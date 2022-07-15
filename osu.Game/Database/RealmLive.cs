@@ -104,9 +104,12 @@ namespace osu.Game.Database
 
             PerformRead(t =>
             {
-                var transaction = t.Realm.BeginWrite();
-                perform(t);
-                transaction.Commit();
+                using (var transaction = t.Realm.BeginWrite())
+                {
+                    perform(t);
+                    transaction.Commit();
+                }
+
                 RealmLiveStatistics.WRITES.Value++;
             });
         }

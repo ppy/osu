@@ -3,11 +3,15 @@
 
 #nullable disable
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -27,6 +31,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
+        private Dropdown<RoomPermissionsFilter> roomAccessTypeDropdown;
+
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
@@ -40,10 +46,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
+        protected override IEnumerable<Drawable> CreateFilterControls()
+        {
+            roomAccessTypeDropdown = new SlimEnumDropdown<RoomPermissionsFilter>
+            {
+                RelativeSizeAxes = Axes.None,
+                Width = 160,
+            };
+
+            roomAccessTypeDropdown.Current.BindValueChanged(_ => UpdateFilter());
+
+            return base.CreateFilterControls().Prepend(roomAccessTypeDropdown);
+        }
+
         protected override FilterCriteria CreateFilterCriteria()
         {
             var criteria = base.CreateFilterCriteria();
             criteria.Category = @"realtime";
+            criteria.Permissions = roomAccessTypeDropdown.Current.Value;
             return criteria;
         }
 
