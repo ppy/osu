@@ -103,9 +103,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
             var mods = Mods.Select(apiMod => rulesetInstance.CreateModFromAcronym(apiMod.Acronym)).Where(m => m != null).ToArray();
 
-            // all API scores provided by this class are considered to be legacy.
-            mods = mods.Append(rulesetInstance.CreateMod<ModClassic>()).ToArray();
-
             var scoreInfo = ToScoreInfo(mods);
 
             scoreInfo.Ruleset = ruleset;
@@ -132,8 +129,7 @@ namespace osu.Game.Online.API.Requests.Responses
             Rank = Rank,
             Statistics = Statistics,
             Date = EndedAt ?? DateTimeOffset.Now,
-            Hash = "online", // TODO: temporary?
-            HasReplay = HasReplay,
+            Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
             Mods = mods,
             PP = PP,
         };
