@@ -12,20 +12,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -39,16 +35,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneDrawableRoomPlaylist : MultiplayerTestScene
     {
-        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
-
         private TestPlaylist playlist;
 
         private BeatmapManager manager;
         private RulesetStore rulesets;
-        private CollectionManager collections;
-
-        private BeatmapSetOverlay beatmapOverlay;
-        private ManageCollectionsDialog manageCollectionsDialog;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -56,14 +46,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
-
-            base.Content.AddRange(new Drawable[]
-            {
-                collections = new CollectionManager(LocalStorage),
-                Content
-            });
-
-            Dependencies.Cache(collections);
         }
 
         [Test]
@@ -321,111 +303,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        [Test]
-        public void TestContextMenuDetails()
-        {
-            OsuContextMenu contextMenu = null;
-
-            createPlaylist();
-
-            AddAssert("beatmap overlay hidden", () => beatmapOverlay.State.Value == Visibility.Hidden);
-
-            moveToItem(0);
-            AddStep("right click", () => InputManager.Click(MouseButton.Right));
-            AddAssert("context menu open", () => (contextMenu = this.ChildrenOfType<OsuContextMenu>().SingleOrDefault())?.State == MenuState.Open);
-
-            AddStep("click details", () =>
-            {
-                InputManager.MoveMouseTo(contextMenu.ChildrenOfType<DrawableOsuMenuItem>().First());
-                InputManager.Click(MouseButton.Left);
-            });
-            AddAssert("beatmap overlay visible", () => beatmapOverlay.State.Value == Visibility.Visible);
-        }
-
-        [Test]
-        public void TestContextMenuCollection()
-        {
-            OsuContextMenu contextMenu = null;
-            BeatmapInfo beatmap = null;
-            Live<BeatmapSetInfo> imported = null;
-
-            AddStep("import beatmap", () =>
-            {
-                beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-
-                Debug.Assert(beatmap.BeatmapSet != null);
-                imported = manager.Import(beatmap.BeatmapSet);
-            });
-
-            createPlaylistWithBeatmaps(() => imported.PerformRead(s => s.Beatmaps.Detach()));
-
-            AddStep("add two collections", () =>
-            {
-                collections.Collections.Clear();
-                collections.Collections.AddRange(new[]
-                {
-                    new BeatmapCollection { Name = { Value = "Collection #1" }, BeatmapHashes = { beatmap.MD5Hash } },
-                    new BeatmapCollection { Name = { Value = "Collection #2" } },
-                });
-            });
-
-            moveToItem(0);
-            AddStep("right click", () => InputManager.Click(MouseButton.Right));
-            AddAssert("context menu open", () => (contextMenu = this.ChildrenOfType<OsuContextMenu>().SingleOrDefault())?.State == MenuState.Open);
-
-            AddStep("select collections", () => InputManager.MoveMouseTo(contextMenu.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(1)));
-            AddAssert("collection 1 present and beatmap added", () =>
-            {
-                var item = (ToggleMenuItem)contextMenu.Items[1].Items[0];
-                return item.Text.Value == "Collection #1" && item.State.Value;
-            });
-            AddAssert("collection 2 present", () =>
-            {
-                var item = (ToggleMenuItem)contextMenu.Items[1].Items[1];
-                return item.Text.Value == "Collection #2" && !item.State.Value;
-            });
-
-            AddStep("select second collection", () =>
-            {
-                InputManager.MoveMouseTo(contextMenu.ChildrenOfType<DrawableStatefulMenuItem>().ElementAt(1));
-                InputManager.Click(MouseButton.Left);
-            });
-            AddAssert("beatmap added to second collection", () => collections.Collections[1].BeatmapHashes.Contains(beatmap.MD5Hash));
-            AddAssert("item state updated", () => ((ToggleMenuItem)contextMenu.Items[1].Items[1]).State.Value);
-        }
-
-        [Test]
-        public void TestContextMenuManageCollections()
-        {
-            OsuContextMenu contextMenu = null;
-            Live<BeatmapSetInfo> imported = null;
-
-            AddStep("import beatmap", () =>
-            {
-                var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-
-                Debug.Assert(beatmap.BeatmapSet != null);
-                imported = manager.Import(beatmap.BeatmapSet);
-            });
-
-            createPlaylistWithBeatmaps(() => imported.PerformRead(s => s.Beatmaps.Detach()));
-
-            AddStep("clear collections", () => collections.Collections.Clear());
-            AddAssert("manage collections dialog hidden", () => manageCollectionsDialog.State.Value == Visibility.Hidden);
-
-            moveToItem(0);
-            AddStep("right click", () => InputManager.Click(MouseButton.Right));
-            AddAssert("context menu open", () => (contextMenu = this.ChildrenOfType<OsuContextMenu>().SingleOrDefault())?.State == MenuState.Open);
-
-            AddStep("select collections", () => InputManager.MoveMouseTo(contextMenu.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(1)));
-            AddStep("click manage", () =>
-            {
-                InputManager.MoveMouseTo(contextMenu.ChildrenOfType<OsuContextMenu>().ElementAt(1).ChildrenOfType<DrawableOsuMenuItem>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
-            AddAssert("manage collections dialog open", () => manageCollectionsDialog.State.Value == Visibility.Visible);
-        }
-
         private void moveToItem(int index, Vector2? offset = null)
             => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DrawableRoomPlaylistItem>().ElementAt(index), offset));
 
@@ -470,29 +347,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create playlist", () =>
             {
-                Child = new DependencyProvidingContainer
+                Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    CachedDependencies = new (Type, object)[]
+                    Child = playlist = new TestPlaylist
                     {
-                        (typeof(BeatmapSetOverlay), beatmapOverlay = new BeatmapSetOverlay()),
-                        (typeof(ManageCollectionsDialog), manageCollectionsDialog = new ManageCollectionsDialog()),
-                    },
-                    Children = new Drawable[]
-                    {
-                        new OsuContextMenuContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = playlist = new TestPlaylist
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(500, 300),
-                            },
-                        },
-                        beatmapOverlay,
-                        manageCollectionsDialog,
-                    },
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(500, 300)
+                    }
                 };
 
                 for (int i = 0; i < 20; i++)
