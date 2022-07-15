@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -38,18 +36,18 @@ namespace osu.Game.Screens.Select
         private readonly LoadingLayer loading;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private SongSelect songSelect { get; set; }
+        [Resolved]
+        private SongSelect? songSelect { get; set; }
 
-        private IBeatmapInfo beatmapInfo;
+        private IBeatmapInfo? beatmapInfo;
 
-        private APIFailTimes failTimes;
+        private APIFailTimes? failTimes;
 
-        private int[] ratings;
+        private int[]? ratings;
 
-        public IBeatmapInfo BeatmapInfo
+        public IBeatmapInfo? BeatmapInfo
         {
             get => beatmapInfo;
             set
@@ -59,7 +57,7 @@ namespace osu.Game.Screens.Select
                 beatmapInfo = value;
 
                 var onlineInfo = beatmapInfo as IBeatmapOnlineInfo;
-                var onlineSetInfo = beatmapInfo.BeatmapSet as IBeatmapSetOnlineInfo;
+                var onlineSetInfo = beatmapInfo?.BeatmapSet as IBeatmapSetOnlineInfo;
 
                 failTimes = onlineInfo?.FailTimes;
                 ratings = onlineSetInfo?.Ratings;
