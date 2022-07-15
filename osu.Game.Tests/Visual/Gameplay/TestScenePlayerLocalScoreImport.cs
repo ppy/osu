@@ -66,11 +66,17 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private bool allowFail;
 
+        [SetUp]
+        public void SetUp()
+        {
+            allowFail = false;
+            customRuleset = null;
+        }
+
         [Test]
         public void TestSaveFailedReplay()
         {
-            AddStep("set fail", () => allowFail = true);
-            AddStep("set no custom ruleset", () => customRuleset = null);
+            AddStep("allow fail", () => allowFail = true);
 
             CreateTest();
 
@@ -85,8 +91,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             DateTimeOffset? getLastPlayed() => Realm.Run(r => r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID)?.LastPlayed);
 
-            AddStep("set no fail", () => allowFail = false);
-            AddStep("set no custom ruleset", () => customRuleset = null);
             AddAssert("last played is null", () => getLastPlayed() == null);
 
             CreateTest();
@@ -98,9 +102,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestScoreStoredLocally()
         {
-            AddStep("set no fail", () => allowFail = false);
-            AddStep("set no custom ruleset", () => customRuleset = null);
-
             CreateTest();
 
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
@@ -116,7 +117,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             Ruleset createCustomRuleset() => new CustomRuleset();
 
-            AddStep("set no fail", () => allowFail = false);
             AddStep("import custom ruleset", () => Realm.Write(r => r.Add(createCustomRuleset().RulesetInfo)));
             AddStep("set custom ruleset", () => customRuleset = createCustomRuleset());
 
