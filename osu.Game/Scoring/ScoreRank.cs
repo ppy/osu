@@ -11,6 +11,7 @@ namespace osu.Game.Scoring
 {
     public enum ScoreRank
     {
+        // TODO: Localisable?
         [Description(@"F")]
         F = -1,
 
