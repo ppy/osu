@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Database
                 resolvedItems = null;
                 lastChanges = null;
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                     Assert.That(resolvedItems, Is.Empty);
 
                 realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
@@ -154,7 +154,7 @@ namespace osu.Game.Tests.Database
                 testEventsArriving(false);
 
                 // And make sure even after another context loss we don't get firings.
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                     Assert.That(resolvedItems, Is.Null);
 
                 realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
@@ -212,7 +212,7 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(beatmapSetInfo, Is.Not.Null);
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                 {
                     // custom disposal action fired when context lost.
                     Assert.That(beatmapSetInfo, Is.Null);
@@ -226,7 +226,7 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(beatmapSetInfo, Is.Null);
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                     Assert.That(beatmapSetInfo, Is.Null);
 
                 realm.Run(r => r.Refresh());
@@ -251,7 +251,7 @@ namespace osu.Game.Tests.Database
                 Assert.That(receivedValue, Is.Not.Null);
                 receivedValue = null;
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                 {
                 }
 
@@ -262,7 +262,7 @@ namespace osu.Game.Tests.Database
                 subscription.Dispose();
                 receivedValue = null;
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                     Assert.That(receivedValue, Is.Null);
 
                 realm.Run(r => r.Refresh());

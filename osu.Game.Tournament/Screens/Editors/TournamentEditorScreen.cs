@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen, IProvideVideo
+    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen
         where TDrawable : Drawable, IModelBacked<TModel>
         where TModel : class, new()
     {

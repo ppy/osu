@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osuTK;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -95,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             double endTime = prev.GetEndTime();
 
-            HitWindows hitWindows = null;
+            HitWindows? hitWindows = null;
 
             switch (h)
             {
@@ -245,7 +243,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
 
             double timeDifference = ApplyModsToTimeDelta(lastFrame.Time, h.StartTime);
-            OsuReplayFrame lastLastFrame = Frames.Count >= 2 ? (OsuReplayFrame)Frames[^2] : null;
+            OsuReplayFrame? lastLastFrame = Frames.Count >= 2 ? (OsuReplayFrame)Frames[^2] : null;
 
             if (timeDifference > 0)
             {

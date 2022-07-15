@@ -74,6 +74,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest]
+        /*
+         * Fail rate around 1.5%
+         *
+         * TearDown : System.AggregateException : One or more errors occurred. (Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index'))
+  ----> System.ArgumentOutOfRangeException : Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+         * --TearDown
+         *    at System.Threading.Tasks.Task.ThrowIfExceptional(Boolean includeTaskCanceledExceptions)
+         *   at System.Threading.Tasks.Task.Wait(Int32 millisecondsTimeout, CancellationToken cancellationToken)
+         *   at osu.Framework.Extensions.TaskExtensions.WaitSafely(Task task)
+         *   at osu.Framework.Testing.TestScene.checkForErrors()
+         *   at osu.Framework.Testing.TestScene.RunTestsFromNUnit()
+         *--ArgumentOutOfRangeException
+         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
+         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
+         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
+         *   at osu.Game.Online.Multiplayer.MultiplayerClient.<>c__DisplayClass106_0.<PlaylistItemChanged>b__0() in C:\BuildAgent\work\ecd860037212ac52\osu.Game\Online\Multiplayer\MultiplayerClient     .cs:line 702
+         *   at osu.Framework.Threading.ScheduledDelegate.RunTaskInternal()
+         */
         public void TestCreatedRoom()
         {
             AddStep("add playlist item", () =>
@@ -90,6 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestTaikoOnlyMod()
         {
             AddStep("add playlist item", () =>
@@ -110,6 +130,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestSettingValidity()
         {
             AddAssert("create button not enabled", () => !this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
@@ -126,6 +147,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestStartMatchWhileSpectating()
         {
             AddStep("set playlist", () =>
@@ -152,10 +174,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
-            AddUntilStep("match started", () => MultiplayerClient.Room?.State == MultiplayerRoomState.WaitingForLoad);
+            AddUntilStep("match started", () => MultiplayerClient.ClientRoom?.State == MultiplayerRoomState.WaitingForLoad);
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestFreeModSelectionHasAllowedMods()
         {
             AddStep("add playlist item with allowed mod", () =>
@@ -182,6 +205,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestModSelectKeyWithAllowedMods()
         {
             AddStep("add playlist item with allowed mod", () =>
@@ -203,6 +227,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestModSelectKeyWithNoAllowedMods()
         {
             AddStep("add playlist item with no allowed mods", () =>
@@ -223,6 +248,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        [FlakyTest] // See above
         public void TestNextPlaylistItemSelectedAfterCompletion()
         {
             AddStep("add two playlist items", () =>
@@ -253,7 +279,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("last playlist item selected", () =>
             {
-                var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.APIRoom?.Playlist.Last().ID);
+                var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.ServerAPIRoom?.Playlist.Last().ID);
                 return lastItem.IsSelectedItem;
             });
         }

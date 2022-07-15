@@ -315,6 +315,26 @@ namespace osu.Game.Tests.NonVisual
             }
         }
 
+        [Test]
+        public void TestBackupCreatedOnCorruptRealm()
+        {
+            using (var host = new CustomTestHeadlessGameHost())
+            {
+                try
+                {
+                    File.WriteAllText(host.InitialStorage.GetFullPath(OsuGameBase.CLIENT_DATABASE_FILENAME, true), "i am definitely not a realm file");
+
+                    LoadOsuIntoHost(host);
+
+                    Assert.That(host.InitialStorage.GetFiles(string.Empty, "*_corrupt.realm"), Has.One.Items);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         private static string getDefaultLocationFor(CustomTestHeadlessGameHost host)
         {
             string path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, host.Name);
@@ -347,7 +367,7 @@ namespace osu.Game.Tests.NonVisual
             public Storage InitialStorage { get; }
 
             public CustomTestHeadlessGameHost([CallerMemberName] string callingMethodName = @"")
-                : base(callingMethodName: callingMethodName)
+                : base(callingMethodName: callingMethodName, bypassCleanupOnSetup: true)
             {
                 string defaultStorageLocation = getDefaultLocationFor(this);
 

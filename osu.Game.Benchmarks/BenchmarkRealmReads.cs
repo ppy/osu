@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
@@ -17,9 +15,9 @@ namespace osu.Game.Benchmarks
 {
     public class BenchmarkRealmReads : BenchmarkTest
     {
-        private TemporaryNativeStorage storage;
-        private RealmAccess realm;
-        private UpdateThread updateThread;
+        private TemporaryNativeStorage storage = null!;
+        private RealmAccess realm = null!;
+        private UpdateThread updateThread = null!;
 
         [Params(1, 100, 1000)]
         public int ReadsPerFetch { get; set; }
@@ -135,9 +133,9 @@ namespace osu.Game.Benchmarks
         [GlobalCleanup]
         public void Cleanup()
         {
-            realm?.Dispose();
-            storage?.Dispose();
-            updateThread?.Exit();
+            realm.Dispose();
+            storage.Dispose();
+            updateThread.Exit();
         }
     }
 }
