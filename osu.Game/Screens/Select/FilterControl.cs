@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Select
 
         public FilterCriteria CreateCriteria()
         {
-            string query = searchTextBox.Text;
+            string query = SearchTextBox.Text;
 
             var criteria = new FilterCriteria
             {
@@ -62,7 +62,8 @@ namespace osu.Game.Screens.Select
             return criteria;
         }
 
-        private SeekLimitedSearchTextBox searchTextBox;
+        public SeekLimitedSearchTextBox SearchTextBox { get; private set; }
+
         private CollectionFilterDropdown collectionDropdown;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
@@ -103,7 +104,7 @@ namespace osu.Game.Screens.Select
                                 Height = 60,
                                 Children = new Drawable[]
                                 {
-                                    searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
+                                    SearchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -204,23 +205,23 @@ namespace osu.Game.Screens.Select
                 updateCriteria();
             };
 
-            searchTextBox.Current.ValueChanged += _ => updateCriteria();
+            SearchTextBox.Current.ValueChanged += _ => updateCriteria();
 
             updateCriteria();
         }
 
         public void Deactivate()
         {
-            searchTextBox.ReadOnly = true;
-            searchTextBox.HoldFocus = false;
-            if (searchTextBox.HasFocus)
-                GetContainingInputManager().ChangeFocus(searchTextBox);
+            SearchTextBox.ReadOnly = true;
+            SearchTextBox.HoldFocus = false;
+            if (SearchTextBox.HasFocus)
+                GetContainingInputManager().ChangeFocus(SearchTextBox);
         }
 
         public void Activate()
         {
-            searchTextBox.ReadOnly = false;
-            searchTextBox.HoldFocus = true;
+            SearchTextBox.ReadOnly = false;
+            SearchTextBox.HoldFocus = true;
         }
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
