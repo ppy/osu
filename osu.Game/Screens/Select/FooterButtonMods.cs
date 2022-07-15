@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Select
             Current.BindValueChanged(_ => updateMultiplierText(), true);
         }
 
-        private void updateMultiplierText()
+        private void updateMultiplierText() => Schedule(() =>
         {
             double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
 
@@ -85,6 +85,6 @@ namespace osu.Game.Screens.Select
                 modDisplay.FadeIn();
             else
                 modDisplay.FadeOut();
-        }
+        });
     }
 }

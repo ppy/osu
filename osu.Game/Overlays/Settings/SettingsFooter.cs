@@ -3,11 +3,11 @@
 
 #nullable disable
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -28,32 +28,17 @@ namespace osu.Game.Overlays.Settings
             Direction = FillDirection.Vertical;
             Padding = new MarginPadding { Top = 20, Bottom = 30, Horizontal = SettingsPanel.CONTENT_MARGINS };
 
-            var modes = new List<Drawable>();
-
-            foreach (var ruleset in rulesets.AvailableRulesets)
-            {
-                var icon = new ConstrainedIconContainer
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Icon = ruleset.CreateInstance().CreateIcon(),
-                    Colour = Color4.Gray,
-                    Size = new Vector2(20),
-                };
-
-                modes.Add(icon);
-            }
+            FillFlowContainer modes;
 
             Children = new Drawable[]
             {
-                new FillFlowContainer
+                modes = new FillFlowContainer
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Direction = FillDirection.Full,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Children = modes,
                     Spacing = new Vector2(5),
                     Padding = new MarginPadding { Bottom = 10 },
                 },
@@ -70,6 +55,27 @@ namespace osu.Game.Overlays.Settings
                     Origin = Anchor.TopCentre,
                 }
             };
+
+            foreach (var ruleset in rulesets.AvailableRulesets)
+            {
+                try
+                {
+                    var icon = new ConstrainedIconContainer
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Icon = ruleset.CreateInstance().CreateIcon(),
+                        Colour = Color4.Gray,
+                        Size = new Vector2(20),
+                    };
+
+                    modes.Add(icon);
+                }
+                catch
+                {
+                    Logger.Log($"Could not create ruleset icon for {ruleset.Name}. Please check for an update from the developer.", level: LogLevel.Error);
+                }
+            }
         }
 
         private class BuildDisplay : OsuAnimatedButton

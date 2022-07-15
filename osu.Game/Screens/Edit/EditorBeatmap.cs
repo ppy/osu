@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Edit
         public BeatmapInfo BeatmapInfo
         {
             get => beatmapInfo;
-            set => throw new InvalidOperationException();
+            set => throw new InvalidOperationException($"Can't set {nameof(BeatmapInfo)} on {nameof(EditorBeatmap)}");
         }
 
         public BeatmapMetadata Metadata => beatmapInfo.Metadata;

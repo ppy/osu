@@ -81,6 +81,11 @@ namespace osu.Game.Beatmaps
             }, true);
         }
 
+        public void Invalidate(IBeatmapInfo beatmap)
+        {
+            base.Invalidate(lookup => lookup.BeatmapInfo.Equals(beatmap));
+        }
+
         /// <summary>
         /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the currently-selected ruleset and mods.
         /// </summary>
@@ -207,7 +212,7 @@ namespace osu.Game.Beatmaps
                         if (cancellationToken.IsCancellationRequested)
                             return;
 
-                        var starDifficulty = task.GetResultSafely();
+                        StarDifficulty? starDifficulty = task.GetResultSafely();
 
                         if (starDifficulty != null)
                             bindable.Value = starDifficulty.Value;

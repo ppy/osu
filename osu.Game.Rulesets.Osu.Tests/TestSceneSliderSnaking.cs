@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Storyboards;
+using osu.Game.Tests;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -66,18 +67,25 @@ namespace osu.Game.Rulesets.Osu.Tests
             drawableSlider = null;
         });
 
-        [SetUpSteps]
-        public override void SetUpSteps()
-        {
-        }
+        protected override bool HasCustomSteps => true;
 
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(2)]
+        [FlakyTest]
+        /*
+         * Fail rate around 0.15%
+         *
+         * TearDown : System.TimeoutException : "wait for seek to finish" timed out
+         *   --TearDown
+         *      at osu.Framework.Testing.Drawables.Steps.UntilStepButton.<>c__DisplayClass11_0.<.ctor>b__0()
+         *      at osu.Framework.Testing.Drawables.Steps.StepButton.PerformStep(Boolean userTriggered)
+         *      at osu.Framework.Testing.TestScene.runNextStep(Action onCompletion, Action`1 onError, Func`2 stopCondition)
+         */
         public void TestSnakingEnabled(int sliderIndex)
         {
             AddStep("enable autoplay", () => autoplay = true);
-            base.SetUpSteps();
+            CreateTest();
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
 
             retrieveSlider(sliderIndex);
@@ -98,10 +106,20 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(2)]
+        [FlakyTest]
+        /*
+         * Fail rate around 0.15%
+         *
+         * TearDown : System.TimeoutException : "wait for seek to finish" timed out
+         *   --TearDown
+         *      at osu.Framework.Testing.Drawables.Steps.UntilStepButton.<>c__DisplayClass11_0.<.ctor>b__0()
+         *      at osu.Framework.Testing.Drawables.Steps.StepButton.PerformStep(Boolean userTriggered)
+         *      at osu.Framework.Testing.TestScene.runNextStep(Action onCompletion, Action`1 onError, Func`2 stopCondition)
+         */
         public void TestSnakingDisabled(int sliderIndex)
         {
             AddStep("have autoplay", () => autoplay = true);
-            base.SetUpSteps();
+            CreateTest();
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
 
             retrieveSlider(sliderIndex);
@@ -121,8 +139,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("enable autoplay", () => autoplay = true);
             setSnaking(true);
-            base.SetUpSteps();
-
+            CreateTest();
             // repeat might have a chance to update its position depending on where in the frame its hit,
             // so some leniency is allowed here instead of checking strict equality
             addCheckPositionChangeSteps(() => 16600, getSliderRepeat, positionAlmostSame);
@@ -133,15 +150,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("disable autoplay", () => autoplay = false);
             setSnaking(true);
-            base.SetUpSteps();
-
+            CreateTest();
             addCheckPositionChangeSteps(() => 16600, getSliderRepeat, positionDecreased);
         }
 
         private void retrieveSlider(int index)
         {
             AddStep("retrieve slider at index", () => slider = (Slider)beatmap.HitObjects[index]);
-            addSeekStep(() => slider);
+            addSeekStep(() => slider.StartTime);
             AddUntilStep("retrieve drawable slider", () =>
                 (drawableSlider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.SingleOrDefault(d => d.HitObject == slider)) != null);
         }
@@ -205,16 +221,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        private void addSeekStep(Func<Slider> slider)
+        private void addSeekStep(Func<double> getTime)
         {
-            AddStep("seek to slider", () => Player.GameplayClockContainer.Seek(slider().StartTime));
-            AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(slider().StartTime, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
-        }
-
-        private void addSeekStep(Func<double> time)
-        {
-            AddStep("seek to time", () => Player.GameplayClockContainer.Seek(time()));
-            AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time(), Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
+            AddStep("seek to time", () => Player.GameplayClockContainer.Seek(getTime()));
+            AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(getTime(), Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
         }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap { HitObjects = createHitObjects() };
