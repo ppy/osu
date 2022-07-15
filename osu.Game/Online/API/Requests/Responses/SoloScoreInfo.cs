@@ -129,8 +129,7 @@ namespace osu.Game.Online.API.Requests.Responses
             Rank = Rank,
             Statistics = Statistics,
             Date = EndedAt ?? DateTimeOffset.Now,
-            Hash = "online", // TODO: temporary?
-            HasReplay = HasReplay,
+            Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
             Mods = mods,
             PP = PP,
         };
