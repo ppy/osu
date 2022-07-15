@@ -1048,6 +1048,7 @@ namespace osu.Game.Screens.Play
         {
             Score.ScoreInfo.Passed = false;
             Score.ScoreInfo.Rank = ScoreRank.F;
+
             var scoreCopy = Score.DeepClone();
 
             try
