@@ -244,7 +244,7 @@ namespace osu.Game.Screens.Select.Carousel
 
                 if (collectionManager != null)
                 {
-                    var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
+                    var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmapInfo)).Cast<OsuMenuItem>().ToList();
                     if (manageCollectionsDialog != null)
                         collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
@@ -256,20 +256,6 @@ namespace osu.Game.Screens.Select.Carousel
 
                 return items.ToArray();
             }
-        }
-
-        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
-        {
-            return new ToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
-            {
-                if (s)
-                    collection.BeatmapHashes.Add(beatmapInfo.MD5Hash);
-                else
-                    collection.BeatmapHashes.Remove(beatmapInfo.MD5Hash);
-            })
-            {
-                State = { Value = collection.BeatmapHashes.Contains(beatmapInfo.MD5Hash) }
-            };
         }
 
         protected override void Dispose(bool isDisposing)
