@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Select
             void searchOnSongSelect(string text)
             {
                 if (songSelect != null)
-                    songSelect.FilterControl.SearchTextBox.Text = text;
+                    songSelect.FilterControl.CurrentTextSearch.Value = text;
             }
         }
 
