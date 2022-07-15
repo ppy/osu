@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Database;
 using osu.Game.Scoring;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
@@ -33,7 +34,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame? game)
+        private void load(OsuGame? game, Player? player, RealmAccess realm)
         {
             InternalChild = button = new DownloadButton
             {
@@ -59,6 +60,13 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+
+            if (player != null)
+            {
+                score = realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID)?.Detach());
+                if (score != null)
+                    state.Value = DownloadState.LocallyAvailable;
+            }
 
             state.BindValueChanged(state =>
             {
