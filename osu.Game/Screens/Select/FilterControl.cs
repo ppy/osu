@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Select
 
         public Action<FilterCriteria> FilterChanged;
 
+        public Bindable<string> CurrentTextSearch => searchTextBox.Current;
+
         private OsuTabControl<SortMode> sortTabs;
 
         private Bindable<SortMode> sortMode;
@@ -63,6 +65,7 @@ namespace osu.Game.Screens.Select
         }
 
         private SeekLimitedSearchTextBox searchTextBox;
+
         private CollectionFilterDropdown collectionDropdown;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
