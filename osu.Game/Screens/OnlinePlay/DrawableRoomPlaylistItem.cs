@@ -5,12 +5,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -95,11 +94,11 @@ namespace osu.Game.Screens.OnlinePlay
         private PanelBackground panelBackground;
         private FillFlowContainer mainFillFlow;
 
-        [CanBeNull]
-        private BeatmapDownloadTracker downloadTracker;
-
         [Resolved]
         private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -321,15 +320,6 @@ namespace osu.Game.Screens.OnlinePlay
 
             difficultyIconContainer.FadeInFromZero(500, Easing.OutQuint);
             mainFillFlow.FadeInFromZero(500, Easing.OutQuint);
-
-            downloadTracker?.RemoveAndDisposeImmediately();
-
-            if (beatmap != null)
-            {
-                Debug.Assert(beatmap.BeatmapSet != null);
-                downloadTracker = new BeatmapDownloadTracker(beatmap.BeatmapSet);
-                AddInternal(downloadTracker);
-            }
         }
 
         protected override Drawable CreateContent()
@@ -505,13 +495,16 @@ namespace osu.Game.Screens.OnlinePlay
                 if (beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
 
-                if (beatmap != null && collectionManager != null && downloadTracker?.State.Value == DownloadState.LocallyAvailable)
+                if (collectionManager != null && beatmap != null)
                 {
-                    var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
-                    if (manageCollectionsDialog != null)
-                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+                    if (beatmaps.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID) is BeatmapInfo local && !local.BeatmapSet.AsNonNull().DeletePending)
+                    {
+                        var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
+                        if (manageCollectionsDialog != null)
+                            collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                        items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                    }
                 }
 
                 return items.ToArray();
