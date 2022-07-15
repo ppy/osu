@@ -40,6 +40,9 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private SongSelect songSelect { get; set; }
+
         private IBeatmapInfo beatmapInfo;
 
         private APIFailTimes failTimes;
@@ -140,9 +143,9 @@ namespace osu.Game.Screens.Select
                                                     LayoutEasing = Easing.OutQuad,
                                                     Children = new[]
                                                     {
-                                                        description = new MetadataSection(MetadataType.Description),
-                                                        source = new MetadataSection(MetadataType.Source),
-                                                        tags = new MetadataSection(MetadataType.Tags),
+                                                        description = new MetadataSection(MetadataType.Description, searchOnSongSelect),
+                                                        source = new MetadataSection(MetadataType.Source, searchOnSongSelect),
+                                                        tags = new MetadataSection(MetadataType.Tags, searchOnSongSelect),
                                                     },
                                                 },
                                             },
@@ -175,6 +178,12 @@ namespace osu.Game.Screens.Select
                 },
                 loading = new LoadingLayer(true)
             };
+
+            void searchOnSongSelect(string text)
+            {
+                if (songSelect != null)
+                    songSelect.FilterControl.SearchTextBox.Text = text;
+            }
         }
 
         private void updateStatistics()
