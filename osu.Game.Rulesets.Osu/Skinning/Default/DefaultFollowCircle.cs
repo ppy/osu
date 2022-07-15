@@ -5,6 +5,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK.Graphics;
 
@@ -32,11 +33,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         protected override void OnTrackingChanged(ValueChangedEvent<bool> tracking)
         {
-            const float scale_duration = 300f;
-            const float fade_duration = 300f;
+            const float duration = 300f;
 
-            this.ScaleTo(tracking.NewValue ? DrawableSliderBall.FOLLOW_AREA : 1f, scale_duration, Easing.OutQuint)
-                .FadeTo(tracking.NewValue ? 1f : 0, fade_duration, Easing.OutQuint);
+            if (tracking.NewValue)
+            {
+                if (Precision.AlmostEquals(0, Alpha))
+                    this.ScaleTo(1);
+
+                this.ScaleTo(DrawableSliderBall.FOLLOW_AREA, duration, Easing.OutQuint)
+                    .FadeTo(1f, duration, Easing.OutQuint);
+            }
+            else
+            {
+                this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 1.2f, duration / 2, Easing.OutQuint)
+                    .FadeTo(0, duration / 2, Easing.OutQuint);
+            }
         }
 
         protected override void OnSliderEnd()
