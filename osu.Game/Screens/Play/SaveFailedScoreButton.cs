@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Scoring;
@@ -20,16 +21,15 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<Task<ScoreInfo>> importFailedScore;
 
-        private Task<ScoreInfo>? saveFailedScoreTask;
-
         private ScoreInfo? score;
 
         private DownloadButton button = null!;
 
-        public SaveFailedScoreButton(Func<Task<ScoreInfo>> requestImportFailedScore)
+        public SaveFailedScoreButton(Func<Task<ScoreInfo>> importFailedScore)
         {
             Size = new Vector2(50, 30);
-            importFailedScore = requestImportFailedScore;
+
+            this.importFailedScore = importFailedScore;
         }
 
         [BackgroundDependencyLoader]
@@ -38,80 +38,48 @@ namespace osu.Game.Screens.Play
             InternalChild = button = new DownloadButton
             {
                 RelativeSizeAxes = Axes.Both,
-            };
-
-            button.Action = () =>
-            {
-                switch (state.Value)
+                State = { BindTarget = state },
+                Action = () =>
                 {
-                    case DownloadState.LocallyAvailable:
-                        game?.PresentScore(score, ScorePresentType.Gameplay);
-                        break;
+                    switch (state.Value)
+                    {
+                        case DownloadState.LocallyAvailable:
+                            game?.PresentScore(score, ScorePresentType.Gameplay);
+                            break;
 
-                    case DownloadState.Importing:
-                        break;
+                        case DownloadState.NotDownloaded:
+                            state.Value = DownloadState.Importing;
 
-                    default:
-                        saveScore();
-                        break;
+                            Task.Run(importFailedScore).ContinueWith(result => Schedule(() =>
+                            {
+                                score = result.GetResultSafely();
+                                state.Value = score != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded;
+                            }));
+                            break;
+                    }
                 }
             };
+
             state.BindValueChanged(state =>
             {
                 switch (state.NewValue)
                 {
                     case DownloadState.LocallyAvailable:
-                        button.State.Value = DownloadState.LocallyAvailable;
+                        button.TooltipText = @"watch replay";
+                        button.Enabled.Value = true;
                         break;
 
                     case DownloadState.Importing:
-                        button.State.Value = DownloadState.Importing;
+                        button.TooltipText = @"importing score";
+                        button.Enabled.Value = false;
                         break;
 
-                    case DownloadState.NotDownloaded:
-                        button.State.Value = DownloadState.NotDownloaded;
+                    default:
+                        button.TooltipText = @"save score";
+                        button.Enabled.Value = true;
                         break;
                 }
             }, true);
-            state.BindValueChanged(updateState, true);
-        }
-
-        private void saveScore()
-        {
-            if (saveFailedScoreTask != null)
-            {
-                return;
-            }
-
-            state.Value = DownloadState.Importing;
-
-            saveFailedScoreTask = Task.Run(importFailedScore);
-            saveFailedScoreTask.ContinueWith(s => Schedule(() =>
-            {
-                score = s.GetAwaiter().GetResult();
-                state.Value = score != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded;
-            }));
-        }
-
-        private void updateState(ValueChangedEvent<DownloadState> state)
-        {
-            switch (state.NewValue)
-            {
-                case DownloadState.LocallyAvailable:
-                    button.TooltipText = @"Watch replay";
-                    button.Enabled.Value = true;
-                    break;
-
-                case DownloadState.Importing:
-                    button.TooltipText = @"Importing score";
-                    button.Enabled.Value = false;
-                    break;
-
-                default:
-                    button.TooltipText = @"Save score";
-                    button.Enabled.Value = true;
-                    break;
-            }
         }
     }
 }
