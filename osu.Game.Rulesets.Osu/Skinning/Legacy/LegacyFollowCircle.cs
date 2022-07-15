@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -28,28 +28,28 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (ParentObject.Judged)
                 return;
 
-            const float scale_duration = 180f;
-            const float fade_duration = 90f;
+            double remainingTime = ParentObject.HitStateUpdateTime - Time.Current;
 
-            double maxScaleDuration = ParentObject.HitStateUpdateTime - Time.Current;
-            double realScaleDuration = scale_duration;
-            if (tracking.NewValue && maxScaleDuration < realScaleDuration && maxScaleDuration >= 0)
-                realScaleDuration = maxScaleDuration;
-            double realFadeDuration = fade_duration * realScaleDuration / fade_duration;
-
-            this.ScaleTo(tracking.NewValue ? DrawableSliderBall.FOLLOW_AREA : 1f, realScaleDuration, Easing.OutQuad)
-                .FadeTo(tracking.NewValue ? 1f : 0f, realFadeDuration, Easing.OutQuad);
+            // Note that the scale adjust here is 2 instead of DrawableSliderBall.FOLLOW_AREA to match legacy behaviour.
+            // This means the actual tracking area for gameplay purposes is larger than the sprite (but skins may be accounting for this).
+            if (tracking.NewValue)
+            {
+                // TODO: Follow circle should bounce on each slider tick.
+                this.ScaleTo(0.5f).ScaleTo(2f, Math.Min(180f, remainingTime), Easing.Out)
+                    .FadeTo(0).FadeTo(1f, Math.Min(60f, remainingTime));
+            }
+            else
+            {
+                // TODO: Should animate only at the next slider tick if we want to match stable perfectly.
+                this.ScaleTo(4f, 100)
+                    .FadeTo(0f, 100);
+            }
         }
 
         protected override void OnSliderEnd()
         {
-            const float shrink_duration = 200f;
-            const float fade_delay = 175f;
-            const float fade_duration = 35f;
-
-            this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 0.75f, shrink_duration, Easing.OutQuad)
-                .Delay(fade_delay)
-                .FadeOut(fade_duration);
+            this.ScaleTo(1.6f, 200, Easing.Out)
+                .FadeOut(200, Easing.In);
         }
     }
 }
