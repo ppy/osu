@@ -38,11 +38,12 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public Country Country
         {
-            get => country ??= (Enum.TryParse(userCountry.Code, out Country result) ? result : default);
+            get => country ??= (Enum.TryParse(userCountry?.Code, out Country result) ? result : default);
             set => country = value;
         }
 
 #pragma warning disable 649
+        [CanBeNull]
         [JsonProperty(@"country")]
         private UserCountry userCountry;
 
