@@ -80,6 +80,7 @@ namespace osu.Game.Online.Multiplayer
 
             try
             {
+                // Importantly, use Invoke rather than Send to capture exceptions.
                 return await connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty);
             }
             catch (HubException exception)

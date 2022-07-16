@@ -56,7 +56,8 @@ namespace osu.Game.Online.Spectator
 
             try
             {
-                await connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), state);
+                // Importantly, use Invoke rather than Send to capture exceptions.
+                await connection.InvokeAsync(nameof(ISpectatorServer.BeginPlaySession), state);
             }
             catch (HubException exception)
             {
