@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new UpdateableFlag(score.User.Country)
                 {
                     Size = new Vector2(19, 14),
-                    ShowPlaceholderOnNull = false,
+                    ShowPlaceholderOnUnknown = false,
                 },
                 username,
                 new OsuSpriteText

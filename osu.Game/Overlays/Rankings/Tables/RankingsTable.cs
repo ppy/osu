@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 new UpdateableFlag(GetCountry(item))
                 {
                     Size = new Vector2(28, 20),
-                    ShowPlaceholderOnNull = false,
+                    ShowPlaceholderOnUnknown = false,
                 },
                 CreateFlagContent(item)
             }

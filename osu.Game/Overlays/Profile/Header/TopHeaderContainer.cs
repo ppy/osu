@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                 userFlag = new UpdateableFlag
                                                 {
                                                     Size = new Vector2(28, 20),
-                                                    ShowPlaceholderOnNull = false,
+                                                    ShowPlaceholderOnUnknown = false,
                                                 },
                                                 userCountryText = new OsuSpriteText
                                                 {
