@@ -48,15 +48,15 @@ namespace osu.Game.Tests.Visual.Online
         public void TestFlagScopeDependency()
         {
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
-            AddAssert("Check country is Null", () => countryBindable.Value == null);
-            AddStep("Set country", () => countryBindable.Value = us_country);
+            AddAssert("Check country is default", () => countryBindable.Value == default);
+            AddStep("Set country", () => countryBindable.Value = Country.US);
             AddAssert("Check scope is Performance", () => scope.Value == RankingsScope.Performance);
         }
 
         [Test]
         public void TestShowCountry()
         {
-            AddStep("Show US", () => rankingsOverlay.ShowCountry(us_country));
+            AddStep("Show US", () => rankingsOverlay.ShowCountry(Country.US));
         }
 
         private void loadRankingsOverlay()
@@ -68,12 +68,6 @@ namespace osu.Game.Tests.Visual.Online
                 State = { Value = Visibility.Visible },
             };
         }
-
-        private static readonly Country us_country = new Country
-        {
-            FlagName = "US",
-            FullName = "United States"
-        };
 
         private class TestRankingsOverlay : RankingsOverlay
         {

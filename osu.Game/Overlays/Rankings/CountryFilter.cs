@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Rankings
 
         private void onCountryChanged(ValueChangedEvent<Country> country)
         {
-            if (country.NewValue == null)
+            if (country.NewValue == default)
             {
                 countryPill.Collapse();
                 this.ResizeHeightTo(0, duration, Easing.OutQuint);

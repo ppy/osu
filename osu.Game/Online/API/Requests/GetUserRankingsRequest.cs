@@ -5,6 +5,7 @@
 
 using osu.Framework.IO.Network;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -12,9 +13,9 @@ namespace osu.Game.Online.API.Requests
     {
         public readonly UserRankingsType Type;
 
-        private readonly string country;
+        private readonly Country country;
 
-        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, string country = null)
+        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, Country country = default)
             : base(ruleset, page)
         {
             Type = type;
@@ -25,8 +26,8 @@ namespace osu.Game.Online.API.Requests
         {
             var req = base.CreateWebRequest();
 
-            if (country != null)
-                req.AddParameter("country", country);
+            if (country != default)
+                req.AddParameter("country", country.ToString());
 
             return req;
         }

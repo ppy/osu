@@ -56,20 +56,12 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            var country = new Country
-            {
-                FlagName = "BY",
-                FullName = "Belarus"
-            };
-            var unknownCountry = new Country
-            {
-                FlagName = "CK",
-                FullName = "Cook Islands"
-            };
+            const Country country = Country.BY;
+            const Country unknown_country = Country.CK;
 
             AddStep("Set country", () => countryBindable.Value = country);
-            AddStep("Set null country", () => countryBindable.Value = null);
-            AddStep("Set country with no flag", () => countryBindable.Value = unknownCountry);
+            AddStep("Set default country", () => countryBindable.Value = default);
+            AddStep("Set country with no flag", () => countryBindable.Value = unknown_country);
         }
     }
 }

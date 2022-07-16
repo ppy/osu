@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
             Country.BindValueChanged(_ =>
             {
                 // if a country is requested, force performance scope.
-                if (Country.Value != null)
+                if (!Country.IsDefault)
                     Header.Current.Value = RankingsScope.Performance;
 
                 Scheduler.AddOnce(triggerTabChanged);
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays
         {
             // country filtering is only valid for performance scope.
             if (Header.Current.Value != RankingsScope.Performance)
-                Country.Value = null;
+                Country.SetDefault();
 
             Scheduler.AddOnce(triggerTabChanged);
         }
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays
 
         public void ShowCountry(Country requested)
         {
-            if (requested == null)
+            if (requested == default)
                 return;
 
             Show();
@@ -128,7 +128,7 @@ namespace osu.Game.Overlays
             switch (Header.Current.Value)
             {
                 case RankingsScope.Performance:
-                    return new GetUserRankingsRequest(ruleset.Value, country: Country.Value?.FlagName);
+                    return new GetUserRankingsRequest(ruleset.Value, country: Country.Value);
 
                 case RankingsScope.Country:
                     return new GetCountryRankingsRequest(ruleset.Value);
