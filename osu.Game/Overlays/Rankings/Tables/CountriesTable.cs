@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Resources.Localisation.Web;
 
@@ -77,8 +78,8 @@ namespace osu.Game.Overlays.Rankings.Tables
                 RelativeSizeAxes = Axes.Y;
                 TextAnchor = Anchor.CentreLeft;
 
-                if (!string.IsNullOrEmpty(country.FullName))
-                    AddLink(country.FullName, () => rankings?.ShowCountry(country));
+                if (country != default)
+                    AddLink(country.GetDescription(), () => rankings?.ShowCountry(country));
             }
         }
     }

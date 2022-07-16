@@ -5,6 +5,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -16,7 +17,7 @@ namespace osu.Game.Users.Drawables
     {
         private readonly Country country;
 
-        public LocalisableString TooltipText => country?.FullName;
+        public LocalisableString TooltipText => country == default ? string.Empty : country.GetDescription();
 
         public DrawableFlag(Country country)
         {
@@ -29,7 +30,8 @@ namespace osu.Game.Users.Drawables
             if (ts == null)
                 throw new ArgumentNullException(nameof(ts));
 
-            Texture = ts.Get($@"Flags/{country?.FlagName ?? @"__"}") ?? ts.Get(@"Flags/__");
+            string textureName = country == default ? "__" : country.ToString();
+            Texture = ts.Get($@"Flags/{textureName}") ?? ts.Get(@"Flags/__");
         }
     }
 }

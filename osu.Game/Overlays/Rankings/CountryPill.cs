@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -93,7 +94,7 @@ namespace osu.Game.Overlays.Rankings
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Action = () => Current.Value = null
+                                Action = Current.SetDefault,
                             }
                         }
                     }
@@ -132,11 +133,11 @@ namespace osu.Game.Overlays.Rankings
 
         private void onCountryChanged(ValueChangedEvent<Country> country)
         {
-            if (country.NewValue == null)
+            if (country.NewValue == default)
                 return;
 
             flag.Country = country.NewValue;
-            countryName.Text = country.NewValue.FullName;
+            countryName.Text = country.NewValue.GetDescription();
         }
 
         private class CloseButton : OsuHoverContainer
