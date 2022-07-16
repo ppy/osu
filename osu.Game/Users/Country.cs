@@ -9,6 +9,7 @@ using Newtonsoft.Json.Converters;
 namespace osu.Game.Users
 {
     [JsonConverter(typeof(StringEnumConverter))]
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public enum Country
     {
         [Description("Alien")]
