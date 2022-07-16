@@ -25,9 +25,6 @@ namespace osu.Game.Tournament.Screens.Editors
 {
     public class TeamEditorScreen : TournamentEditorScreen<TeamEditorScreen.TeamRow, TournamentTeam>
     {
-        [Resolved]
-        private TournamentGameBase game { get; set; }
-
         protected override BindableList<TournamentTeam> Storage => LadderInfo.Teams;
 
         [BackgroundDependencyLoader]
