@@ -8,18 +8,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
+using osu.Desktop.Linux;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game;
-using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Desktop.Updater
 {
@@ -30,10 +24,12 @@ namespace osu.Desktop.Updater
     [SupportedOSPlatform("linux")]
     public class AppImageUpdateManager : osu.Game.Updater.UpdateManager
     {
+        private INotificationOverlay notificationOverlay;
+
         /// <summary>
         /// Implements appimageupdatetool functionality via cli
         /// </summary>
-        private INotificationOverlay notificationOverlay;
+        private readonly AppImageUpdateTool appimageupdatetool;
 
         private string version;
 
@@ -61,61 +57,50 @@ namespace osu.Desktop.Updater
 
                 // avoid any discrepancies due to build suffixes for now.
                 // eventually we will want to support release streams and consider these.
-                string currentTagName = version.Split('-').First();
                 string latestTagName = latest.TagName.Split('-').First();
 
                 if (latestTagName != version)
                 {
-                    if (AppImageUpdateTool.State == AppImageUpdateTool.States.COMPLETED)
+                    if (appimageupdatetool.State == AppImageUpdateTool.States.Completed)
                     {
                         // the user may have dismissed the completion notice, so show it again.
-                        notificationOverlay.Post(new UpdateCompleteNotification(this));
+                        notificationOverlay.Post(new ProgressCompleteNotification(this));
                         return true;
                     }
 
-                    if (AppImageUpdateTool.HasUpdates)
+                    if (appimageupdatetool.HasUpdates())
                     {
-                        notificationOverlay.Post(new SimpleNotification
+                        if (notification == null)
                         {
-                            Text = $"A newer release of osu! has been found ({currentTagName} → {latestTagName}).\n\n"
-                                   + "Click here to download the new version.",
-                            Icon = FontAwesome.Solid.Upload,
-                            Activated = () =>
+                            notification = new UpdateProgressNotification(this);
+                            Schedule(() => notificationOverlay.Post(notification));
+                        }
+
+                        notification.Text = @"Downloading update...";
+                        await appimageupdatetool.ApplyUpdateAsync((progress, state) =>
+                        {
+                            notification.Progress = progress;
+
+                            switch (state)
                             {
-                                if (notification == null)
-                                {
-                                    notification = new UpdateProgressNotification(this);
-                                    Schedule(() => notificationOverlay.Post(notification));
-                                }
+                                case AppImageUpdateTool.States.Downloading:
+                                    notification.State = ProgressNotificationState.Active;
+                                    break;
 
-                                notification.Text = @"Downloading update...";
-                                AppImageUpdateTool.ApplyUpdateAsync((progress, state) =>
-                                {
-                                    notification.Progress = progress;
+                                case AppImageUpdateTool.States.Verifying:
+                                    notification.Text = @"Installing update...";
+                                    notification.State = ProgressNotificationState.Active;
+                                    break;
 
-                                    switch (state)
-                                    {
-                                        case AppImageUpdateTool.States.DOWNLOADING:
-                                            notification.State = ProgressNotificationState.Active;
-                                            break;
+                                case AppImageUpdateTool.States.Completed:
+                                    notification.State = ProgressNotificationState.Completed;
+                                    break;
 
-                                        case AppImageUpdateTool.States.VERIFYING:
-                                            notification.Text = @"Installing update...";
-                                            notification.State = ProgressNotificationState.Active;
-                                            break;
-
-                                        case AppImageUpdateTool.States.COMPLETED:
-                                            notification.State = ProgressNotificationState.Completed;
-                                            break;
-
-                                        case AppImageUpdateTool.States.CANCELLED:
-                                            notification.State = ProgressNotificationState.Cancelled;
-                                            break;
-                                    }
-                                });
-                                return true;
+                                case AppImageUpdateTool.States.Canceled:
+                                    notification.State = ProgressNotificationState.Cancelled;
+                                    break;
                             }
-                        });
+                        }).ConfigureAwait((false));
                     }
 
                     return true;
@@ -144,6 +129,11 @@ namespace osu.Desktop.Updater
 
         private bool preparedToRestart;
 
+        public AppImageUpdateManager(AppImageUpdateTool appimageupdatetool)
+        {
+            this.appimageupdatetool = appimageupdatetool;
+        }
+
         public override Task PrepareUpdateAsync() =>
             Task.Run(() =>
             {
@@ -165,75 +155,5 @@ namespace osu.Desktop.Updater
                     preparedToRestart = true;
                 }
             });
-
-        /// <inheritdoc cref="AppImageUpdateTool.IsInstalled"/>
-        public static bool IsInstalled => AppImageUpdateTool.IsInstalled;
-
-        private class UpdateCompleteNotification : ProgressCompletionNotification
-        {
-            [Resolved]
-            private OsuGame game { get; set; }
-
-            public UpdateCompleteNotification(AppImageUpdateManager updateManager)
-            {
-                Text = @"Update ready to install. Click to restart!";
-
-                Activated = () =>
-                {
-                    updateManager.PrepareUpdateAsync()
-                                 .ContinueWith(_ => updateManager.Schedule(() => game?.AttemptExit()));
-                    return true;
-                };
-            }
-        }
-
-        private class UpdateProgressNotification : ProgressNotification
-        {
-            private readonly AppImageUpdateManager updateManager;
-
-            public UpdateProgressNotification(AppImageUpdateManager updateManager)
-            {
-                this.updateManager = updateManager;
-            }
-
-            protected override Notification CreateCompletionNotification()
-            {
-                return new UpdateCompleteNotification(updateManager);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                IconContent.AddRange(new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
-                    },
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.Upload,
-                        Colour = Color4.White,
-                        Size = new Vector2(20),
-                    }
-                });
-            }
-
-            public override void Close()
-            {
-                // cancelling updates is not currently supported by the underlying updater.
-                // only allow dismissing for now.
-
-                switch (State)
-                {
-                    case ProgressNotificationState.Cancelled:
-                        base.Close();
-                        break;
-                }
-            }
-        }
     }
 }

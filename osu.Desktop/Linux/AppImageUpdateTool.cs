@@ -10,81 +10,62 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using osu.Framework;
 
-namespace osu.Desktop.Updater
+namespace osu.Desktop.Linux
 {
     [SupportedOSPlatform("linux")]
-    public static class AppImageUpdateTool
+    public class AppImageUpdateTool
     {
         /// <summary>
         /// Arguments passed to the appimageupdatetool
-        /// <list type="bullet">
-        /// <item><see cref="Check"/><description></description></item>
-        /// <item><see cref="Update"/></item>
-        /// <item><see cref="Overwrite"/></item>
-        /// <item><see cref="ToolVersion"/></item>
-        /// <item><see cref="ToolHelp"/></item>
-        /// </list>
         /// </summary>
         public enum ToolArguments
         {
-            /// <summary>
-            /// Used to check for available updates with the embedded update information within the AppImage
-            /// </summary>
+            None,
             Check,
-
-            /// <summary>
-            /// Used to update the AppImage and renaming the old file with a .zs-old suffix
-            /// </summary>
             Update,
-
-            /// <summary>
-            /// Used to update the AppImage without keeping a backup
-            /// </summary>
             Overwrite,
-
-            /// <summary>
-            /// Used to get the appimageupdatetool version
-            /// </summary>
             ToolVersion,
-
-            /// <summary>
-            /// Used to get the appimageupdatetool cli help message
-            /// </summary>
             ToolHelp
         }
 
-        /// TODO: Set commandFile to match the shipped binary to prevent searching and remove the unnecessary code
-        private static string commandFile;
+        /// TODO: Set commandFile to match the shipped binary to prevent searching and remove the unnecessary loop in the constructor
+        private readonly string commandFile;
 
-        private static readonly string[] toollookupfilenames =
-        {
-            "appimageupdatetool",
-            "appimageupdatetool-x86_64.AppImage"
-        };
+        /// <summary>
+        /// Gets version information of the appimageupdatetool binary
+        /// </summary>
+        public readonly string Version;
 
-        private static string command
+        /// <summary>
+        /// Checks if appimageupdatetool is installed
+        /// </summary>
+        public readonly bool IsInstalled;
+
+        public States State { get; private set; } = States.NotChecked;
+
+        public AppImageUpdateTool()
         {
-            get
+            string[] toollookupfilenames =
             {
-                if (commandFile is default(string))
-                {
-                    foreach (string file in toollookupfilenames)
-                    {
-                        commandFile = file;
-                        if (IsInstalled) break;
-                    }
-                }
+                "appimageupdatetool",
+                "appimageupdatetool-x86_64.AppImage"
+            };
 
-                return commandFile;
+            foreach (string file in toollookupfilenames)
+            {
+                commandFile = file;
+                Version = getVersion();
+                if (Version != null) break;
             }
+
+            IsInstalled = Version != null;
         }
 
-        private static ProcessStartInfo startInfo(ToolArguments args = ToolArguments.Check)
+        private ProcessStartInfo startInfo(ToolArguments toolArguments = ToolArguments.None)
         {
             string arguments = "";
-            string argumentSpacer = " ";
 
-            switch (args)
+            switch (toolArguments)
             {
                 case ToolArguments.Check:
                     arguments = "--check-for-update";
@@ -105,16 +86,12 @@ namespace osu.Desktop.Updater
                 case ToolArguments.ToolHelp:
                     arguments = "--help";
                     break;
-
-                default:
-                    argumentSpacer = "";
-                    break;
             }
 
             ProcessStartInfo info = new ProcessStartInfo
             {
-                FileName = command,
-                Arguments = $"{arguments}{argumentSpacer}\"{AppImagePath}\"",
+                FileName = commandFile,
+                Arguments = $"{arguments} \"{AppImagePath}\"",
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
@@ -125,28 +102,13 @@ namespace osu.Desktop.Updater
 
         public enum States
         {
-            NOUPDATESAVAILABLE,
-            UPDATESAVAILABLE,
-            DOWNLOADING,
-            VERIFYING,
-            COMPLETED,
-            CANCELLED
-        }
-
-        private static States state;
-
-        public static States State
-        {
-            get
-            {
-                if (state is default(States))
-                {
-                    state = hasUpdates() ? States.UPDATESAVAILABLE : States.NOUPDATESAVAILABLE;
-                }
-
-                return state;
-            }
-            private set => state = value;
+            NotChecked,
+            NoUpdatesAvailable,
+            UpdatesAvailable,
+            Downloading,
+            Verifying,
+            Completed,
+            Canceled
         }
 
         /// <summary>
@@ -155,23 +117,31 @@ namespace osu.Desktop.Updater
         /// TODO: verify whether environment variable APPIMAGE is set in the deployed build<para />
         /// Will Assume osu.AppImage in the <see cref="RuntimeInfo.StartupDirectory" /> otherwise
         /// </summary>
-        public static string AppImagePath => IsAppImage ? Environment.GetEnvironmentVariable("APPIMAGE") : $"{RuntimeInfo.StartupDirectory}osu.AppImage";
+        public static string AppImagePath => IsAppImage
+            ? Environment.GetEnvironmentVariable("APPIMAGE")
+            : $"{RuntimeInfo.StartupDirectory}osu.AppImage";
 
         /// <summary>
         /// Checks if osu was launched as an AppImage
         /// </summary>
         public static bool IsAppImage => Environment.GetEnvironmentVariable("APPIMAGE") != null;
 
-        private static bool hasUpdates()
+        /// <summary>
+        /// Checks if there is a new release of the AppImage with the embedded update information and updates the state
+        /// </summary>
+        public bool HasUpdates()
         {
             try
             {
                 using (var process = new Process())
                 {
-                    process.StartInfo = startInfo();
+                    process.StartInfo = startInfo(ToolArguments.Check);
                     process.Start();
 
                     process.WaitForExit();
+                    State = process.ExitCode == 1
+                        ? States.UpdatesAvailable
+                        : States.NoUpdatesAvailable;
                     return process.ExitCode == 1;
                 }
             }
@@ -181,12 +151,7 @@ namespace osu.Desktop.Updater
             }
         }
 
-        /// <summary>
-        /// Checks if there is a new release of the AppImage with the embedded update information
-        /// </summary>
-        public static bool HasUpdates => State == States.UPDATESAVAILABLE;
-
-        private static string getOutput(ToolArguments arg)
+        private string getOutput(ToolArguments arg)
         {
             try
             {
@@ -202,52 +167,31 @@ namespace osu.Desktop.Updater
             }
             catch
             {
+                // In case the appimageupdatetool got uninstalled after calling IsInstalled
                 return null;
             }
         }
 
-        private static string version;
-
-        /// <summary>
-        /// Gets version information of the appimageupdatetool binary
-        /// </summary>
-        public static string Version
+        private string getVersion()
         {
-            get
-            {
-                if (version is default(string))
-                {
-                    string output = getOutput(ToolArguments.ToolVersion);
+            string output = getOutput(ToolArguments.ToolVersion);
 
-                    if (output != null)
-                    {
-                        var match = Regex.Match(output, @"version\s([a-zA-Z0-9\._-]*).*$", RegexOptions.IgnoreCase);
+            if (output == null) return null;
 
-                        if (match.Success)
-                        {
-                            output = match.Groups[1].ToString();
-                        }
-                    }
+            var match = Regex.Match(output, @"version\s([^\s]*)\s.*$", RegexOptions.IgnoreCase);
 
-                    version = output;
-                }
-
-                return version;
-            }
+            return match.Success
+                ? match.Groups[1].ToString()
+                : null;
         }
 
         /// <summary>
         /// Help information of the appimageupdatetool binary
         /// </summary>
-        public static string GetHelp()
+        public string GetHelp()
         {
             return getOutput(ToolArguments.ToolHelp);
         }
-
-        /// <summary>
-        /// Checks if appimageupdatetool is installed
-        /// </summary>
-        public static bool IsInstalled => Version != null;
 
         /// <summary>
         /// Fetches updated blocks via zsync and updates the appimage
@@ -257,9 +201,9 @@ namespace osu.Desktop.Updater
         /// </remarks>
         /// <param name="update">Delegate to handle state changes</param>
         /// <param name="overwrite">Whether to overwrite the AppImage</param>
-        public static void ApplyUpdate(Action<float, States> update = null, bool overwrite = false)
+        public void ApplyUpdate(Action<float, States> update = null, bool overwrite = false)
         {
-            if (State == States.UPDATESAVAILABLE)
+            if (State == States.UpdatesAvailable)
             {
                 var process = new Process
                 {
@@ -278,6 +222,10 @@ namespace osu.Desktop.Updater
                     {
                         if (e.Data != null)
                         {
+                            // match.Groups[1]: progress 0-100
+                            // match.Groups[2]: optional string containing file sizes
+                            // match.Groups[3]: usable + downloaded size
+                            // match.Groups[4]: final file size
                             var match = Regex.Match(e.Data, @"^(?:(\d*(?:\.\d+)?)% done)((?:\s\((\d*(?:\.\d+)?) of (\d*(?:\.\d+)?)))?", RegexOptions.IgnoreCase);
 
                             if (match.Success)
@@ -292,16 +240,16 @@ namespace osu.Desktop.Updater
                             }
                             else if (Regex.Match(e.Data, @"verifying", RegexOptions.IgnoreCase).Success)
                             {
-                                State = States.VERIFYING;
+                                State = States.Verifying;
                             }
 
                             update(progress, State);
                         }
                     };
-                    update(0, States.DOWNLOADING);
+                    update(0, States.Downloading);
                     process.Exited += (sender, e) =>
                     {
-                        State = process.ExitCode == 0 ? States.COMPLETED : States.CANCELLED;
+                        State = process.ExitCode == 0 ? States.Completed : States.Canceled;
                         update(progress, State);
                         process.Dispose();
                     };
@@ -316,7 +264,7 @@ namespace osu.Desktop.Updater
         /// <inheritdoc cref="ApplyUpdate"/>
         /// <param name="update">Delegate to handle state changes</param>
         /// <param name="overwrite">Whether to overwrite the AppImage</param>
-        public static Task ApplyUpdateAsync(Action<float, States> update = null, bool overwrite = false)
+        public Task ApplyUpdateAsync(Action<float, States> update = null, bool overwrite = false)
         {
             return Task.Run(() => ApplyUpdate(update, overwrite));
         }

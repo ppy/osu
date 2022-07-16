@@ -17,6 +17,7 @@ using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
+using osu.Desktop.Linux;
 using osu.Desktop.Windows;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Input.Handlers.Joystick;
@@ -113,8 +114,9 @@ namespace osu.Desktop
                 case RuntimeInfo.Platform.Linux:
                     Debug.Assert(OperatingSystem.IsLinux());
 
-                    return AppImageUpdateManager.IsInstalled
-                        ? new AppImageUpdateManager()
+                    var appimageupdatetool = new AppImageUpdateTool();
+                    return appimageupdatetool.IsInstalled
+                        ? new AppImageUpdateManager(appimageupdatetool)
                         : new SimpleUpdateManager();
 
                 default:
