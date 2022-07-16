@@ -16,13 +16,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <param name="interval">The interval between the current and previous note hit using the same key.</param>
         private static double speedBonus(double interval)
         {
-            // Cap to 300bpm 1/4, 50ms note interval, 100ms key interval
-            // This is a temporary measure to prevent absurdly high speed mono convert maps being rated too high
-            // There is a plan to replace this with detecting mono that can be hit by special techniques, and this will
-            // be removed when that is implemented.
+            // Cap to 600bpm 1/4, 25ms note interval, 50ms key interval
+            // This is a measure to prevent absurdly high speed maps giving infinity/negative values.
             interval = Math.Max(interval, 100);
 
-            return 30 / interval;
+            return 60 / interval;
         }
 
         /// <summary>
