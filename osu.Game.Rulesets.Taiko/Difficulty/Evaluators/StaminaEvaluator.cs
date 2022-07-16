@@ -17,10 +17,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         private static double speedBonus(double interval)
         {
             // Cap to 600bpm 1/4, 25ms note interval, 50ms key interval
-            // This is a measure to prevent absurdly high speed maps giving infinity/negative values.
-            interval = Math.Max(interval, 100);
+            // This is temporary measure to prevent mono abuses. Once that is properly addressed, interval will be
+            // capped at a very small value to avoid infinite/negative speed bonuses.
+            interval = Math.Max(interval, 50);
 
-            return 60 / interval;
+            return 30 / interval;
         }
 
         /// <summary>
