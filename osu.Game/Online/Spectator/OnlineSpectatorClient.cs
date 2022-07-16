@@ -62,7 +62,14 @@ namespace osu.Game.Online.Spectator
             catch (HubException exception)
             {
                 if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
-                    connector?.Reconnect();
+                {
+                    Debug.Assert(connector != null);
+
+                    await connector.Reconnect();
+                    await BeginPlayingInternal(state);
+                    return;
+                }
+
                 throw;
             }
         }
