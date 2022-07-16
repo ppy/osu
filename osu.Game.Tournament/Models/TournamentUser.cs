@@ -22,7 +22,8 @@ namespace osu.Game.Tournament.Models
         /// <summary>
         /// The player's country.
         /// </summary>
-        public Country? Country { get; set; }
+        [JsonProperty("country_code")]
+        public Country Country { get; set; }
 
         /// <summary>
         /// The player's global rank, or null if not available.

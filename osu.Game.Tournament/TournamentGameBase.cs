@@ -186,7 +186,9 @@ namespace osu.Game.Tournament
         {
             var playersRequiringPopulation = ladder.Teams
                                                    .SelectMany(t => t.Players)
-                                                   .Where(p => string.IsNullOrEmpty(p.Username) || p.Rank == null).ToList();
+                                                   .Where(p => string.IsNullOrEmpty(p.Username)
+                                                               || p.Country == default
+                                                               || p.Rank == null).ToList();
 
             if (playersRequiringPopulation.Count == 0)
                 return false;
