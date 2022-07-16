@@ -72,24 +72,22 @@ namespace osu.Desktop.Updater
                     {
                         if (notification == null)
                         {
-                            notification = new UpdateProgressNotification(this);
+                            notification = new UpdateProgressNotification(this)
+                            {
+                                Text = @"Downloading update...",
+                                State = ProgressNotificationState.Active
+                            };
                             Schedule(() => notificationOverlay.Post(notification));
                         }
 
-                        notification.Text = @"Downloading update...";
                         await appimageupdatetool.ApplyUpdateAsync((progress, state) =>
                         {
                             notification.Progress = progress;
 
                             switch (state)
                             {
-                                case AppImageUpdateTool.States.Downloading:
-                                    notification.State = ProgressNotificationState.Active;
-                                    break;
-
                                 case AppImageUpdateTool.States.Verifying:
                                     notification.Text = @"Installing update...";
-                                    notification.State = ProgressNotificationState.Active;
                                     break;
 
                                 case AppImageUpdateTool.States.Completed:

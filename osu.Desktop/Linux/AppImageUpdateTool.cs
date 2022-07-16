@@ -203,62 +203,63 @@ namespace osu.Desktop.Linux
         /// <param name="overwrite">Whether to overwrite the AppImage</param>
         public void ApplyUpdate(Action<float, States> update = null, bool overwrite = false)
         {
-            if (State == States.UpdatesAvailable)
-            {
-                var process = new Process
-                {
-                    EnableRaisingEvents = true,
-                    StartInfo = startInfo(overwrite ? ToolArguments.Overwrite : ToolArguments.Update)
-                };
-
-                process.Start();
-                process.BeginOutputReadLine();
-
-                float progress = 0;
-
-                if (update != null)
-                {
-                    process.OutputDataReceived += (sender, e) =>
-                    {
-                        if (e.Data != null)
-                        {
-                            // match.Groups[1]: progress 0-100
-                            // match.Groups[2]: optional string containing file sizes
-                            // match.Groups[3]: usable + downloaded size
-                            // match.Groups[4]: final file size
-                            var match = Regex.Match(e.Data, @"^(?:(\d*(?:\.\d+)?)% done)((?:\s\((\d*(?:\.\d+)?) of (\d*(?:\.\d+)?)))?", RegexOptions.IgnoreCase);
-
-                            if (match.Success)
-                            {
-                                progress = float.Parse(match.Groups[1].ToString()) / 100;
-
-                                if (match.Groups[3].Success && match.Groups[4].Success)
-                                {
-                                    //float downloadedSize = float.Parse(match.Groups[3].ToString());
-                                    //float downloadSize = float.Parse(match.Groups[4].ToString());
-                                }
-                            }
-                            else if (Regex.Match(e.Data, @"verifying", RegexOptions.IgnoreCase).Success)
-                            {
-                                State = States.Verifying;
-                            }
-
-                            update(progress, State);
-                        }
-                    };
-                    update(0, States.Downloading);
-                    process.Exited += (sender, e) =>
-                    {
-                        State = process.ExitCode == 0 ? States.Completed : States.Canceled;
-                        update(progress, State);
-                        process.Dispose();
-                    };
-                }
-            }
-            else
+            if (State != States.UpdatesAvailable)
             {
                 update?.Invoke(1, State);
+                return;
             }
+
+            var process = new Process
+            {
+                EnableRaisingEvents = true,
+                StartInfo = startInfo(overwrite ? ToolArguments.Overwrite : ToolArguments.Update)
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+
+            Action cleanUp = () =>
+            {
+                State = process.ExitCode == 0 ? States.Completed : States.Canceled;
+                process.Dispose();
+            };
+
+            if (update == null)
+            {
+                process.WaitForExit();
+                cleanUp();
+                return;
+            }
+
+            float progress = 0;
+
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (e.Data == null) return;
+
+                // match.Groups[1]: progress 0-100
+                // match.Groups[2]: optional string containing file sizes
+                // match.Groups[3]: usable + downloaded size (depends on Groups[2])
+                // match.Groups[4]: final file size (depends on Groups[2])
+                var match = Regex.Match(e.Data, @"^(?:(\d*(?:\.\d+)?)% done)((?:\s\((\d*(?:\.\d+)?) of (\d*(?:\.\d+)?)))?", RegexOptions.IgnoreCase);
+
+                if (match.Success)
+                {
+                    progress = float.Parse(match.Groups[1].ToString()) / 100;
+                    update(progress, State);
+                }
+                else if (Regex.Match(e.Data, @"verifying", RegexOptions.IgnoreCase).Success)
+                {
+                    State = States.Verifying;
+                    update(progress, State);
+                }
+            };
+            update(0, States.Downloading);
+            process.Exited += (sender, e) =>
+            {
+                cleanUp();
+                update(progress, State);
+            };
         }
 
         /// <inheritdoc cref="ApplyUpdate"/>
