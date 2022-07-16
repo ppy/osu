@@ -22,9 +22,9 @@ namespace osu.Game.Users.Drawables
         }
 
         /// <summary>
-        /// Whether to show a place holder on null country.
+        /// Whether to show a place holder on unknown country.
         /// </summary>
-        public bool ShowPlaceholderOnNull = true;
+        public bool ShowPlaceholderOnUnknown = true;
 
         /// <summary>
         /// Perform an action in addition to showing the country ranking.
@@ -39,7 +39,7 @@ namespace osu.Game.Users.Drawables
 
         protected override Drawable CreateDrawable(Country country)
         {
-            if (country == default && !ShowPlaceholderOnNull)
+            if (country == default && !ShowPlaceholderOnUnknown)
                 return null;
 
             return new Container
