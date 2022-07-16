@@ -34,8 +34,24 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"previous_usernames")]
         public string[] PreviousUsernames;
 
+        private Country? country;
+
+        public Country Country
+        {
+            get => country ??= (Enum.TryParse(userCountry.Code, out Country result) ? result : default);
+            set => country = value;
+        }
+
+#pragma warning disable 649
         [JsonProperty(@"country")]
-        public Country Country;
+        private UserCountry userCountry;
+
+        private class UserCountry
+        {
+            [JsonProperty(@"code")]
+            public string Code;
+        }
+#pragma warning restore 649
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
