@@ -12,7 +12,7 @@ namespace osu.Game.Users
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public enum Country
     {
-        [Description("Alien")]
+        [Description("Unknown")]
         XX = 0,
 
         [Description("Bangladesh")]
