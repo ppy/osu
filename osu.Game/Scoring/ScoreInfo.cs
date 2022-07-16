@@ -85,8 +85,9 @@ namespace osu.Game.Scoring
         {
             get => user ??= new APIUser
             {
-                Username = RealmUser.Username,
                 Id = RealmUser.OnlineID,
+                Username = RealmUser.Username,
+                Country = RealmUser.Country,
             };
             set
             {
@@ -95,7 +96,8 @@ namespace osu.Game.Scoring
                 RealmUser = new RealmUser
                 {
                     OnlineID = user.OnlineID,
-                    Username = user.Username
+                    Username = user.Username,
+                    Country = user.Country,
                 };
             }
         }
@@ -135,6 +137,7 @@ namespace osu.Game.Scoring
             {
                 OnlineID = RealmUser.OnlineID,
                 Username = RealmUser.Username,
+                Country = RealmUser.Country,
             };
 
             return clone;
