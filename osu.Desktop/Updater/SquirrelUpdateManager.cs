@@ -29,7 +29,7 @@ namespace osu.Desktop.Updater
         private UpdateManager updateManager;
         private INotificationOverlay notificationOverlay;
 
-        public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
+        public override Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
         private static readonly Logger logger = Logger.GetLogger("updater");
 

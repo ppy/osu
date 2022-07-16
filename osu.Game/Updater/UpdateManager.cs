@@ -85,6 +85,8 @@ namespace osu.Game.Updater
         /// <returns>Whether any update is waiting. May return true if an error occured (there is potentially an update available).</returns>
         protected virtual Task<bool> PerformUpdateCheck() => Task.FromResult(false);
 
+        public virtual Task PrepareUpdateAsync() => Task.Run(() => { });
+
         private class UpdateCompleteNotification : SimpleNotification
         {
             private readonly string version;
