@@ -87,8 +87,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public APIBeatmap? Beatmap { get; set; }
 
         [JsonProperty("beatmapset")]
-        [CanBeNull]
-        public APIBeatmapSet BeatmapSet
+        public APIBeatmapSet? BeatmapSet
         {
             set
             {
