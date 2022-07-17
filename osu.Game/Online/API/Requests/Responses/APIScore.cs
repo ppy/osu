@@ -36,7 +36,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"replay")]
         public bool HasReplay { get; set; }
 
-        [JsonProperty(@"created_at")]
+        [JsonProperty(@"ended_at")]
         public DateTimeOffset Date { get; set; }
 
         [JsonProperty(@"beatmap")]
