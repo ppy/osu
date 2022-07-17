@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         private readonly double weight;
 
-        public DrawableProfileWeightedScore(SoloScoreInfo score, APIBeatmap beatmap, double weight)
-            : base(score, beatmap)
+        public DrawableProfileWeightedScore(SoloScoreInfo score, double weight)
+            : base(score)
         {
             this.weight = weight;
         }

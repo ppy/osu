@@ -17,7 +17,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedProfileScoreSubsection
+    public class PaginatedScoreContainer : PaginatedProfileSubsection<SoloScoreInfo>
     {
         private readonly ScoreType type;
 
@@ -54,28 +54,28 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             }
         }
 
-        protected override void OnItemsReceived(List<Tuple<SoloScoreInfo, APIBeatmap>> scoreBeatmapPairs)
+        protected override void OnItemsReceived(List<SoloScoreInfo> items)
         {
             if (CurrentPage == null || CurrentPage?.Offset == 0)
                 drawableItemIndex = 0;
 
-            base.OnItemsReceived(scoreBeatmapPairs);
+            base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<SoloScoreInfo>> CreateScoreRequest(PaginationParameters pagination) =>
+        protected override APIRequest<List<SoloScoreInfo>> CreateRequest(PaginationParameters pagination) =>
             new GetUserScoresRequest(User.Value.Id, type, pagination);
 
         private int drawableItemIndex;
 
-        protected override Drawable CreateDrawableItem(Tuple<SoloScoreInfo, APIBeatmap> scoreBeatmapPair)
+        protected override Drawable CreateDrawableItem(SoloScoreInfo item)
         {
             switch (type)
             {
                 default:
-                    return new DrawableProfileScore(scoreBeatmapPair.Item1, scoreBeatmapPair.Item2);
+                    return new DrawableProfileScore(item);
 
                 case ScoreType.Best:
-                    return new DrawableProfileWeightedScore(scoreBeatmapPair.Item1, scoreBeatmapPair.Item2, Math.Pow(0.95, drawableItemIndex++));
+                    return new DrawableProfileWeightedScore(item, Math.Pow(0.95, drawableItemIndex++));
             }
         }
     }

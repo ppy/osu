@@ -32,7 +32,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private const float performance_background_shear = 0.45f;
 
         protected readonly SoloScoreInfo Score;
-        protected readonly APIBeatmap Beatmap;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -40,10 +39,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        public DrawableProfileScore(SoloScoreInfo score, APIBeatmap beatmap)
+        public DrawableProfileScore(SoloScoreInfo score)
         {
             Score = score;
-            Beatmap = beatmap;
 
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -86,7 +84,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Spacing = new Vector2(0, 2),
                                         Children = new Drawable[]
                                         {
-                                            new ScoreBeatmapMetadataContainer(Beatmap),
+                                            new ScoreBeatmapMetadataContainer(Score.Beatmap),
                                             new FillFlowContainer
                                             {
                                                 AutoSizeAxes = Axes.Both,
@@ -96,7 +94,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                 {
                                                     new OsuSpriteText
                                                     {
-                                                        Text = $"{Beatmap.DifficultyName}",
+                                                        Text = $"{Score.Beatmap?.DifficultyName}",
                                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                         Colour = colours.Yellow
                                                     },
