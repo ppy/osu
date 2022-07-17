@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModPerfect : ModPerfect
     {
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new Type[] { typeof(OsuModAutopilot) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
     }
 }
