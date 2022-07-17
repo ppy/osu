@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -14,6 +15,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double max_opacity_bonus = 0.4;
         private const double hidden_bonus = 0.2;
+
+        private const double min_velocity = 0.5;
+        private const double slider_multiplier = 1.3;
 
         /// <summary>
         /// Evaluates the difficulty of memorising and hitting an object, based on:
@@ -72,6 +76,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Additional bonus for Hidden due to there being no approach circles.
             if (hidden)
                 result *= 1.0 + hidden_bonus;
+
+            double sliderBonus = 0.0;
+
+            if (osuCurrent.BaseObject is Slider)
+            {
+                Debug.Assert(osuCurrent.TravelTime > 0);
+
+                // Invert the scaling factor to determine the true travel distance independent of circle size.
+                double pixelTravelDistance = osuCurrent.TravelDistance / scalingFactor;
+
+                // Reward sliders based on velocity.
+                sliderBonus = Math.Pow(Math.Max(0.0, pixelTravelDistance / osuCurrent.TravelTime - min_velocity), 0.5);
+
+                // Longer sliders require more memorisation.
+                sliderBonus *= pixelTravelDistance;
+            }
+
+            result += sliderBonus * slider_multiplier;
 
             return result;
         }
