@@ -21,7 +21,6 @@ using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -91,7 +90,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The joined <see cref="MultiplayerRoom"/>.
         /// </summary>
-        public virtual MultiplayerRoom? Room
+        public virtual MultiplayerRoom? Room // virtual for moq
         {
             get
             {
@@ -150,7 +149,7 @@ namespace osu.Game.Online.Multiplayer
                 // clean up local room state on server disconnect.
                 if (!connected.NewValue && Room != null)
                 {
-                    Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
+                    Logger.Log("Clearing room due to multiplayer server connection loss.", LoggingTarget.Runtime, LogLevel.Important);
                     LeaveRoom();
                 }
             }));
