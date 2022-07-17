@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         var incompatibleMod = modInstances.First(m => incompatibleModType.IsInstanceOfType(m));
                         Assert.That(
-                            incompatibleMod.IncompatibleMods.Contains(mod.GetType()),
+                            incompatibleMod.IncompatibleMods.Any(m => m.IsInstanceOfType(mod)),
                             $"{mod} has {incompatibleMod} in it's incompatible mods, but {incompatibleMod} does not have {mod} in it's incompatible mods."
                         );
                     }
