@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     foreach (var incompatibleModType in modIncompatibilities)
                     {
-                        var incompatibleMod = modInstances.First(m => m.GetType().IsInstanceOfType(incompatibleModType));
+                        var incompatibleMod = modInstances.First(m => incompatibleModType.IsInstanceOfType(m));
                         Assert.That(incompatibleMod.IncompatibleMods.Contains(mod.GetType()));
                     }
                 }
