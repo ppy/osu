@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const double min_velocity = 0.5;
         private const double slider_multiplier = 1.3;
+        private const double repeat_bonus = 3.0;
 
         /// <summary>
         /// Evaluates the difficulty of memorising and hitting an object, based on:
@@ -83,6 +84,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 Debug.Assert(osuCurrent.TravelTime > 0);
 
+                Slider osuSlider = (Slider)(osuCurrent.BaseObject);
+
                 // Invert the scaling factor to determine the true travel distance independent of circle size.
                 double pixelTravelDistance = osuCurrent.TravelDistance / scalingFactor;
 
@@ -91,6 +94,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Longer sliders require more memorisation.
                 sliderBonus *= pixelTravelDistance;
+
+                // Reward sliders with repeats.
+                if (osuSlider.RepeatCount > 0)
+                    sliderBonus *= repeat_bonus;
             }
 
             result += sliderBonus * slider_multiplier;
