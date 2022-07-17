@@ -25,7 +25,15 @@ namespace osu.Game.Tests.Visual.Online
             {
                 PP = 1047.21,
                 Rank = ScoreRank.SH,
-                BeatmapID = 2058788,
+                Beatmap = new APIBeatmap
+                {
+                    BeatmapSet = new APIBeatmapSet
+                    {
+                        Title = "JUSTadICE (TV Size)",
+                        Artist = "Oomori Seiko",
+                    },
+                    DifficultyName = "Extreme"
+                },
                 EndedAt = DateTimeOffset.Now,
                 Mods = new[]
                 {
@@ -35,21 +43,20 @@ namespace osu.Game.Tests.Visual.Online
                 },
                 Accuracy = 0.9813
             };
-            var firstBeatmap = new APIBeatmap
-            {
-                BeatmapSet = new APIBeatmapSet()
-                {
-                    Title = "JUSTadICE (TV Size)",
-                    Artist = "Oomori Seiko",
-                },
-                DifficultyName = "Extreme"
-            };
 
             var secondScore = new SoloScoreInfo
             {
                 PP = 134.32,
                 Rank = ScoreRank.A,
-                BeatmapID = 767046,
+                Beatmap = new APIBeatmap
+                {
+                    BeatmapSet = new APIBeatmapSet
+                    {
+                        Title = "Triumph & Regret",
+                        Artist = "typeMARS",
+                    },
+                    DifficultyName = "[4K] Regret"
+                },
                 EndedAt = DateTimeOffset.Now,
                 Mods = new[]
                 {
@@ -58,49 +65,38 @@ namespace osu.Game.Tests.Visual.Online
                 },
                 Accuracy = 0.998546
             };
-            var secondBeatmap = new APIBeatmap
-            {
-                BeatmapSet = new APIBeatmapSet()
-                {
-                    Title = "Triumph & Regret",
-                    Artist = "typeMARS",
-                },
-                DifficultyName = "[4K] Regret"
-            };
 
             var thirdScore = new SoloScoreInfo
             {
                 PP = 96.83,
                 Rank = ScoreRank.S,
-                BeatmapID = 2134713,
+                Beatmap = new APIBeatmap
+                {
+                    BeatmapSet = new APIBeatmapSet
+                    {
+                        Title = "Idolize",
+                        Artist = "Creo",
+                    },
+                    DifficultyName = "Insane"
+                },
                 EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.9726
-            };
-            var thirdBeatmap = new APIBeatmap
-            {
-                BeatmapSet = new APIBeatmapSet()
-                {
-                    Title = "Idolize",
-                    Artist = "Creo",
-                },
-                DifficultyName = "Insane"
             };
 
             var noPPScore = new SoloScoreInfo
             {
                 Rank = ScoreRank.B,
-                BeatmapID = 992512,
+                Beatmap = new APIBeatmap
+                {
+                    BeatmapSet = new APIBeatmapSet
+                    {
+                        Title = "C18H27NO3(extend)",
+                        Artist = "Team Grimoire",
+                    },
+                    DifficultyName = "[4K] Cataclysmic Hypernova"
+                },
                 EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.55879
-            };
-            var noPPBeatmap = new APIBeatmap
-            {
-                BeatmapSet = new APIBeatmapSet()
-                {
-                    Title = "Galaxy Collapse",
-                    Artist = "Kurokotei",
-                },
-                DifficultyName = "[4K] Cataclysmic Hypernova"
             };
 
             Add(new FillFlowContainer
@@ -113,12 +109,12 @@ namespace osu.Game.Tests.Visual.Online
                 Spacing = new Vector2(0, 10),
                 Children = new[]
                 {
-                    new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(firstScore, firstBeatmap)),
-                    new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(secondScore, secondBeatmap)),
-                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(noPPScore, noPPBeatmap)),
-                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(firstScore, firstBeatmap, 0.97)),
-                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(secondScore, secondBeatmap, 0.85)),
-                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(thirdScore, thirdBeatmap, 0.66)),
+                    new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(firstScore)),
+                    new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(secondScore)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(noPPScore)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(firstScore, 0.97)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(secondScore, 0.85)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(thirdScore, 0.66)),
                 }
             });
         }
