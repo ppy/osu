@@ -295,7 +295,7 @@ namespace osu.Game.Tournament
             }
         }
 
-        protected virtual void SaveChanges()
+        public void SaveChanges()
         {
             if (!bracketLoadTaskCompletionSource.Task.IsCompletedSuccessfully)
             {
@@ -311,7 +311,16 @@ namespace osu.Game.Tournament
                                         .ToList();
 
             // Serialise before opening stream for writing, so if there's a failure it will leave the file in the previous state.
-            string serialisedLadder = JsonConvert.SerializeObject(ladder,
+            string serialisedLadder = GetSerialisedLadder();
+
+            using (var stream = storage.CreateFileSafely(BRACKET_FILENAME))
+            using (var sw = new StreamWriter(stream))
+                sw.Write(serialisedLadder);
+        }
+
+        public string GetSerialisedLadder()
+        {
+            return JsonConvert.SerializeObject(ladder,
                 new JsonSerializerSettings
                 {
                     Formatting = Formatting.Indented,
@@ -319,10 +328,6 @@ namespace osu.Game.Tournament
                     DefaultValueHandling = DefaultValueHandling.Ignore,
                     Converters = new JsonConverter[] { new JsonPointConverter() }
                 });
-
-            using (var stream = storage.CreateFileSafely(BRACKET_FILENAME))
-            using (var sw = new StreamWriter(stream))
-                sw.Write(serialisedLadder);
         }
 
         protected override UserInputManager CreateUserInputManager() => new TournamentInputManager();
