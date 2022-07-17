@@ -85,6 +85,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("beatmap")]
         public APIBeatmap? Beatmap { get; set; }
 
+        [JsonProperty("beatmapset")]
+        public APIBeatmapSet? BeatmapSet { get; set; }
+
         [JsonProperty("pp")]
         public double? PP { get; set; }
 
