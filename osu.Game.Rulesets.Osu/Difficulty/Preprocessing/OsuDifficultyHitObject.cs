@@ -252,8 +252,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (i == slider.NestedHitObjects.Count - 1)
                     slider.LazyEndPosition = currCursorPosition;
             }
-
-            slider.LazyTravelDistance *= (float)Math.Pow(1 + slider.RepeatCount / 2.5, 1.0 / 2.5); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
         }
 
         private Vector2 getEndCursorPosition(OsuHitObject hitObject)

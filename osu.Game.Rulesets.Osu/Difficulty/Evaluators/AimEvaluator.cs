@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -120,10 +121,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
             }
 
-            if (osuLastObj.TravelTime != 0)
+            if (osuLastObj.BaseObject is Slider)
             {
+                Debug.Assert(osuLastObj.TravelTime > 0);
+
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+
+                Slider osuSlider = (Slider)(osuLastObj.BaseObject);
+                sliderBonus *= (float)Math.Pow(1 + osuSlider.RepeatCount / 2.5, 1.0 / 2.5); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
