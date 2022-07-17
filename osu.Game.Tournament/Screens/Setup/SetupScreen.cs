@@ -1,12 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -17,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    public class SetupScreen : TournamentScreen, IProvideVideo
+    public class SetupScreen : TournamentScreen
     {
         private FillFlowContainer fillFlow;
 
@@ -46,13 +50,21 @@ namespace osu.Game.Tournament.Screens.Setup
         {
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
 
-            InternalChild = fillFlow = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Padding = new MarginPadding(10),
-                Spacing = new Vector2(10),
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.2f),
+                },
+                fillFlow = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding(10),
+                    Spacing = new Vector2(10),
+                }
             };
 
             api.LocalUser.BindValueChanged(_ => Schedule(reload));
@@ -72,7 +84,8 @@ namespace osu.Game.Tournament.Screens.Setup
                     Action = () => sceneManager?.SetScreen(new StablePathSelectScreen()),
                     Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "Not found",
                     Failing = fileBasedIpc?.IPCStorage == null,
-                    Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation."
+                    Description =
+                        "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation."
                 },
                 new ActionableInfo
                 {

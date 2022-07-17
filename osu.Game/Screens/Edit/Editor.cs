@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +21,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -37,6 +40,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.Design;
 using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Edit.Setup;
@@ -62,6 +66,8 @@ namespace osu.Game.Screens.Edit
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         public override bool? AllowTrackAdjustments => false;
+
+        protected override bool PlayExitSound => !ExitConfirmed && !switchingDifficulty;
 
         protected bool HasUnsavedChanges
         {
@@ -93,11 +99,37 @@ namespace osu.Game.Screens.Edit
 
         public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
 
+        /// <summary>
+        /// Ensure all asynchronously loading pieces of the editor are in a good state.
+        /// This exists here for convenience for tests, not for actual use.
+        /// Eventually we'd probably want a better way to signal this.
+        /// </summary>
+        public bool ReadyForUse
+        {
+            get
+            {
+                if (!workingBeatmapUpdated)
+                    return false;
+
+                if (currentScreen?.IsLoaded != true)
+                    return false;
+
+                if (currentScreen is EditorScreenWithTimeline)
+                    return currentScreen.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true;
+
+                return true;
+            }
+        }
+
+        private bool workingBeatmapUpdated;
+
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         private bool canSave;
 
         protected bool ExitConfirmed { get; private set; }
+
+        private bool switchingDifficulty;
 
         private string lastSavedHash;
 
@@ -154,7 +186,7 @@ namespace osu.Game.Screens.Edit
                 loadableBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
 
                 // required so we can get the track length in EditorClock.
-                // this is safe as nothing has yet got a reference to this new beatmap.
+                // this is ONLY safe because the track being provided is a `TrackVirtual` which we don't really care about disposing.
                 loadableBeatmap.LoadTrack();
 
                 // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
@@ -213,6 +245,7 @@ namespace osu.Game.Screens.Edit
                 // this assumes that nothing during the rest of this load() method is accessing Beatmap.Value (loadableBeatmap should be preferred).
                 // generally this is quite safe, as the actual load of editor content comes after menuBar.Mode.ValueChanged is fired in its own LoadComplete.
                 Beatmap.Value = loadableBeatmap;
+                workingBeatmapUpdated = true;
             });
 
             OsuMenuItem undoMenuItem;
@@ -422,6 +455,8 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed) return false;
+
             switch (e.Key)
             {
                 case Key.Left:
@@ -622,9 +657,7 @@ namespace osu.Game.Screens.Edit
             // To update the game-wide beatmap with any changes, perform a re-fetch on exit/suspend.
             // This is required as the editor makes its local changes via EditorBeatmap
             // (which are not propagated outwards to a potentially cached WorkingBeatmap).
-            ((IWorkingBeatmapCache)beatmapManager).Invalidate(Beatmap.Value.BeatmapInfo);
-            var refetchedBeatmapInfo = beatmapManager.QueryBeatmap(b => b.ID == Beatmap.Value.BeatmapInfo.ID);
-            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(refetchedBeatmapInfo);
+            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
 
             if (!(refetchedBeatmap is DummyWorkingBeatmap))
             {
@@ -790,10 +823,11 @@ namespace osu.Game.Screens.Edit
 
             if (trackPlaying)
             {
-                // generally users are not looking to perform tiny seeks when the track is playing,
-                // so seeks should always be by one full beat, bypassing the beatDivisor.
+                // generally users are not looking to perform tiny seeks when the track is playing.
                 // this multiplication undoes the division that will be applied in the underlying seek operation.
-                amount *= beatDivisor.Value;
+                // scale by BPM to keep the seek amount constant across all BPMs.
+                var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(clock.CurrentTimeAccurate);
+                amount *= beatDivisor.Value * (timingPoint.BPM / 120);
             }
 
             if (direction < 1)
@@ -855,7 +889,10 @@ namespace osu.Game.Screens.Edit
         }
 
         private void switchToNewDifficulty(RulesetInfo rulesetInfo, bool createCopy)
-            => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo, rulesetInfo, createCopy, GetState(rulesetInfo));
+        {
+            switchingDifficulty = true;
+            loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo, rulesetInfo, createCopy, GetState(rulesetInfo));
+        }
 
         private EditorMenuItem createDifficultySwitchMenu()
         {
@@ -884,7 +921,7 @@ namespace osu.Game.Screens.Edit
 
         private void cancelExit()
         {
-            samplePlaybackDisabled.Value = false;
+            updateSampleDisabledState();
             loader?.CancelPendingDifficultySwitch();
         }
 
@@ -896,6 +933,6 @@ namespace osu.Game.Screens.Edit
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => editorBeatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => clock;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : (ChannelAmplitudes?)null;
+        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
     }
 }

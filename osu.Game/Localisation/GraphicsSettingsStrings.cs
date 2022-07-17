@@ -35,11 +35,6 @@ namespace osu.Game.Localisation
         public static LocalisableString ShowFPS => new TranslatableString(getKey(@"show_fps"), @"Show FPS");
 
         /// <summary>
-        /// "Using unlimited frame limiter can lead to stutters, bad performance and overheating. It will not improve perceived latency. "2x refresh rate" is recommended."
-        /// </summary>
-        public static LocalisableString UnlimitedFramesNote => new TranslatableString(getKey(@"unlimited_frames_note"), @"Using unlimited frame limiter can lead to stutters, bad performance and overheating. It will not improve perceived latency. ""2x refresh rate"" is recommended.");
-
-        /// <summary>
         /// "Layout"
         /// </summary>
         public static LocalisableString LayoutHeader => new TranslatableString(getKey(@"layout_header"), @"Layout");

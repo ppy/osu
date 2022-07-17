@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -39,7 +41,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             linkColour = colours.Blue;
 
-            var chatManager = new ChannelManager();
+            var chatManager = new ChannelManager(API);
             BindableList<Channel> availableChannels = (BindableList<Channel>)chatManager.AvailableChannels;
             availableChannels.Add(new Channel { Name = "#english" });
             availableChannels.Add(new Channel { Name = "#japanese" });

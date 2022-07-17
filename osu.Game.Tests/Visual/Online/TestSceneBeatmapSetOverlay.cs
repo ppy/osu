@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
@@ -18,12 +20,9 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    [TestFixture]
     public class TestSceneBeatmapSetOverlay : OsuTestScene
     {
         private readonly TestBeatmapSetOverlay overlay;
-
-        protected override bool UseOnlineAPI => true;
 
         private int nextBeatmapSetId = 1;
 
@@ -39,12 +38,6 @@ namespace osu.Game.Tests.Visual.Online
         public void TestLoading()
         {
             AddStep(@"show loading", () => overlay.ShowBeatmapSet(null));
-        }
-
-        [Test]
-        public void TestOnline()
-        {
-            AddStep(@"show online", () => overlay.FetchAndShowBeatmapSet(55));
         }
 
         [Test]
@@ -107,6 +100,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddAssert("status is loved", () => overlay.ChildrenOfType<BeatmapSetOnlineStatusPill>().Single().Status == BeatmapOnlineStatus.Loved);
             AddAssert("scores container is visible", () => overlay.ChildrenOfType<ScoresContainer>().Single().Alpha == 1);
+            AddAssert("mod selector is visible", () => overlay.ChildrenOfType<LeaderboardModSelector>().Single().Alpha == 1);
 
             AddStep("go to second beatmap", () => overlay.ChildrenOfType<BeatmapPicker.DifficultySelectorButton>().ElementAt(1).TriggerClick());
 

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -460,6 +458,7 @@ namespace osu.Game.Rulesets.Scoring
             currentMaximumScoringValues.BaseScore = maximum.BaseScore;
             currentMaximumScoringValues.MaxCombo = maximum.MaxCombo;
 
+            Combo.Value = frame.Header.Combo;
             HighestCombo.Value = frame.Header.MaxCombo;
 
             scoreResultCounts.Clear();

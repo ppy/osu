@@ -20,8 +20,6 @@ using osu.Game.Users;
 using osu.Game.Utils;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Scoring
 {
     [ExcludeFromDynamicCompile]
@@ -47,7 +45,7 @@ namespace osu.Game.Scoring
 
         public double Accuracy { get; set; }
 
-        public bool HasReplay { get; set; }
+        public bool HasReplay => !string.IsNullOrEmpty(Hash);
 
         public DateTimeOffset Date { get; set; }
 

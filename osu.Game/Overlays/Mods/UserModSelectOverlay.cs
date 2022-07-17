@@ -3,10 +3,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
-using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -17,7 +15,7 @@ namespace osu.Game.Overlays.Mods
         {
         }
 
-        protected override ModColumn CreateModColumn(ModType modType, Key[] toggleKeys = null) => new UserModColumn(modType, false, toggleKeys);
+        protected override ModColumn CreateModColumn(ModType modType) => new UserModColumn(modType, false);
 
         protected override IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection)
         {
@@ -42,8 +40,8 @@ namespace osu.Game.Overlays.Mods
 
         private class UserModColumn : ModColumn
         {
-            public UserModColumn(ModType modType, bool allowBulkSelection, [CanBeNull] Key[] toggleKeys = null)
-                : base(modType, allowBulkSelection, toggleKeys)
+            public UserModColumn(ModType modType, bool allowIncompatibleSelection)
+                : base(modType, allowIncompatibleSelection)
             {
             }
 

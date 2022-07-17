@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -78,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 skin.Setup(s => s.GetTexture(It.IsAny<string>())).CallBase();
 
                 skin.Setup(s => s.GetTexture(It.IsIn(textureFilenames), It.IsAny<WrapMode>(), It.IsAny<WrapMode>()))
-                    .Returns((string componentName, WrapMode _, WrapMode __) => new Texture(1, 1) { AssetName = componentName });
+                    .Returns((string componentName, WrapMode _, WrapMode _) => new Texture(1, 1) { AssetName = componentName });
 
                 Child = new DependencyProvidingContainer
                 {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osuTK;
 using osuTK.Graphics;
@@ -54,7 +56,7 @@ namespace osu.Game.Storyboards
             {
                 var first = Alpha.Commands.FirstOrDefault();
 
-                return first?.StartValue == 0 ? first.StartTime : (double?)null;
+                return first?.StartValue == 0 ? first.StartTime : null;
             }
         }
 

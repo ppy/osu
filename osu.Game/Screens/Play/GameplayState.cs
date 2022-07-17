@@ -8,9 +8,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-
-#nullable enable
 
 namespace osu.Game.Screens.Play
 {
@@ -39,6 +38,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public readonly Score Score;
 
+        public readonly ScoreProcessor ScoreProcessor;
+
         /// <summary>
         /// Whether gameplay completed without the user failing.
         /// </summary>
@@ -61,7 +62,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
 
-        public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod>? mods = null, Score? score = null)
+        public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod>? mods = null, Score? score = null, ScoreProcessor? scoreProcessor = null)
         {
             Beatmap = beatmap;
             Ruleset = ruleset;
@@ -72,7 +73,8 @@ namespace osu.Game.Screens.Play
                     Ruleset = ruleset.RulesetInfo
                 }
             };
-            Mods = mods ?? ArraySegment<Mod>.Empty;
+            Mods = mods ?? Array.Empty<Mod>();
+            ScoreProcessor = scoreProcessor ?? ruleset.CreateScoreProcessor();
         }
 
         /// <summary>

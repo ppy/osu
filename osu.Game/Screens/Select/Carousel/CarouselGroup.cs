@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-#nullable enable
-
 namespace osu.Game.Screens.Select.Carousel
 {
     /// <summary>
