@@ -53,6 +53,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             editorInfo.Selected.ValueChanged += selection =>
             {
+                // ensure any ongoing edits are committed out to the *current* selection before changing to a new one.
+                GetContainingInputManager().TriggerFocusContention(null);
+
                 roundDropdown.Current = selection.NewValue?.Round;
                 losersCheckbox.Current = selection.NewValue?.Losers;
                 dateTimeBox.Current = selection.NewValue?.Date;

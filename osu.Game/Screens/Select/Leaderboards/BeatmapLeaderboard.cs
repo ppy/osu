@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             req.Success += r =>
             {
-                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), cancellationToken)
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), cancellationToken)
                             .ContinueWith(task => Schedule(() =>
                             {
                                 if (cancellationToken.IsCancellationRequested)
