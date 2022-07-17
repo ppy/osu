@@ -71,6 +71,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int RulesetID { get; set; }
 
         [JsonProperty(@"mods")]
+        [NotNull]
         public IEnumerable<APIMod> Mods { get; set; } = Array.Empty<APIMod>();
 
         [JsonProperty("rank")]
