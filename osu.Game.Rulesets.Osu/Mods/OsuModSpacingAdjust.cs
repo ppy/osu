@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -57,7 +58,16 @@ namespace osu.Game.Rulesets.Osu.Mods
                     positionInfo.StayInPlace = true;
                 }
 
-                positionInfo.DistanceFromPrevious *= ObjectSpacing.Value;
+                if (ObjectSpacing.Value >= 1)
+                {
+                    // When increasing jump distance, longer jumps get a smaller increase in distance
+                    positionInfo.DistanceFromPrevious *= MathF.Pow(ObjectSpacing.Value, 1f - positionInfo.DistanceFromPrevious / 640f);
+                }
+                else
+                {
+                    // When reducing jump distance, shorter jumps get a smaller reduction in distance
+                    positionInfo.DistanceFromPrevious *= MathF.Pow(ObjectSpacing.Value, positionInfo.DistanceFromPrevious / 640f);
+                }
             }
 
             osuBeatmap.HitObjects = OsuHitObjectGenerationUtils.RepositionHitObjects(positionInfos);
