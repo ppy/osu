@@ -10,8 +10,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Input
 {
     public class RealmKeyBindingStore

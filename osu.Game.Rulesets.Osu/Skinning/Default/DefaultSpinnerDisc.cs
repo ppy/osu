@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -88,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.LoadComplete();
 
-            complete.BindValueChanged(complete => updateComplete(complete.NewValue, 200));
+            complete.BindValueChanged(complete => updateDiscColour(complete.NewValue, 200));
             drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
 
             updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
@@ -135,6 +137,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 this.ScaleTo(initial_scale);
                 this.RotateTo(0);
 
+                updateDiscColour(false);
+
                 using (BeginDelayedSequence(spinner.TimePreempt / 2))
                 {
                     // constant ambient rotation to give the spinner "spinning" character.
@@ -175,12 +179,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 }
             }
 
-            // transforms we have from completing the spinner will be rolled back, so reapply immediately.
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
-                updateComplete(state == ArmedState.Hit, 0);
+            if (drawableSpinner.Result?.TimeCompleted is double completionTime)
+            {
+                using (BeginAbsoluteSequence(completionTime))
+                    updateDiscColour(true, 200);
+            }
         }
 
-        private void updateComplete(bool complete, double duration)
+        private void updateDiscColour(bool complete, double duration = 0)
         {
             var colour = complete ? completeColour : normalColour;
 

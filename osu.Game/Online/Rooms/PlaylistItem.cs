@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -61,14 +59,20 @@ namespace osu.Game.Online.Rooms
         /// Used for serialising to the API.
         /// </summary>
         [JsonProperty("beatmap_id")]
-        private int onlineBeatmapId => Beatmap.OnlineID;
+        private int onlineBeatmapId
+        {
+            get => Beatmap.OnlineID;
+            // This setter is only required for client-side serialise-then-deserialise operations.
+            // Serialisation is supposed to emit only a `beatmap_id`, but a (non-null) `beatmap` is required on deserialise.
+            set => Beatmap = new APIBeatmap { OnlineID = value };
+        }
 
         /// <summary>
         /// A beatmap representing this playlist item.
         /// In many cases, this will *not* contain any usable information apart from OnlineID.
         /// </summary>
         [JsonIgnore]
-        public IBeatmapInfo Beatmap { get; set; } = null!;
+        public IBeatmapInfo Beatmap { get; private set; }
 
         [JsonIgnore]
         public IBindable<bool> Valid => valid;
@@ -77,6 +81,7 @@ namespace osu.Game.Online.Rooms
 
         [JsonConstructor]
         private PlaylistItem()
+            : this(new APIBeatmap())
         {
         }
 

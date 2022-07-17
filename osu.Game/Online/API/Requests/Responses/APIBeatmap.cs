@@ -7,8 +7,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Rulesets;
 
-#nullable enable
-
 namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIBeatmap : IBeatmapInfo, IBeatmapOnlineInfo
@@ -70,6 +68,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"count_sliders")]
         public int SliderCount { get; set; }
+
+        [JsonProperty(@"count_spinners")]
+        public int SpinnerCount { get; set; }
 
         [JsonProperty(@"version")]
         public string DifficultyName { get; set; } = string.Empty;

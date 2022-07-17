@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
@@ -40,10 +43,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved(canBeNull: true)]
         private IFrameBasedClock editorClock { get; set; }
 
+        private readonly LayoutValue zoomedContentWidthCache = new LayoutValue(Invalidation.DrawSize);
+
         public ZoomableScrollContainer()
             : base(Direction.Horizontal)
         {
             base.Content.Add(zoomedContent = new Container { RelativeSizeAxes = Axes.Y });
+
+            AddLayout(zoomedContentWidthCache);
         }
 
         private float minZoom = 1;
@@ -61,8 +68,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 minZoom = value;
 
-                if (Zoom < value)
-                    Zoom = value;
+                // ensure zoom range is in valid state before updating zoom.
+                if (MinZoom < MaxZoom)
+                    updateZoom();
             }
         }
 
@@ -81,8 +89,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 maxZoom = value;
 
-                if (Zoom > value)
-                    Zoom = value;
+                // ensure zoom range is in valid state before updating zoom.
+                if (MaxZoom > MinZoom)
+                    updateZoom();
             }
         }
 
@@ -92,23 +101,25 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public float Zoom
         {
             get => zoomTarget;
-            set
-            {
-                value = Math.Clamp(value, MinZoom, MaxZoom);
-
-                if (IsLoaded)
-                    setZoomTarget(value, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
-                else
-                    currentZoom = zoomTarget = value;
-            }
+            set => updateZoom(value);
         }
 
-        protected override void LoadComplete()
+        private void updateZoom(float? value = null)
         {
-            base.LoadComplete();
+            float newZoom = Math.Clamp(value ?? Zoom, MinZoom, MaxZoom);
 
-            // This width only gets updated on the application of a transform, so this needs to be initialized here.
-            updateZoomedContentWidth();
+            if (IsLoaded)
+                setZoomTarget(newZoom, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
+            else
+                currentZoom = zoomTarget = newZoom;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!zoomedContentWidthCache.IsValid)
+                updateZoomedContentWidth();
         }
 
         protected override bool OnScroll(ScrollEvent e)
@@ -128,7 +139,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return base.OnScroll(e);
         }
 
-        private void updateZoomedContentWidth() => zoomedContent.Width = DrawWidth * currentZoom;
+        private void updateZoomedContentWidth()
+        {
+            zoomedContent.Width = DrawWidth * currentZoom;
+            zoomedContentWidthCache.Validate();
+        }
 
         private float zoomTarget = 1;
 
@@ -199,8 +214,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 float targetOffset = expectedWidth * (focusPoint / contentSize) - focusOffset;
 
                 d.currentZoom = newZoom;
-
                 d.updateZoomedContentWidth();
+
                 // Temporarily here to make sure ScrollTo gets the correct DrawSize for scrollable area.
                 // TODO: Make sure draw size gets invalidated properly on the framework side, and remove this once it is.
                 d.Invalidate(Invalidation.DrawSize);

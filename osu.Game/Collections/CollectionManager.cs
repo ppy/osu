@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -13,7 +15,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Legacy;
@@ -39,9 +40,6 @@ namespace osu.Game.Collections
         private const string database_backup_name = "collection.db.bak";
 
         public readonly BindableList<BeatmapCollection> Collections = new BindableList<BeatmapCollection>();
-
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
 
         private readonly Storage storage;
 
@@ -173,10 +171,10 @@ namespace osu.Game.Collections
                         if (existing == null)
                             Collections.Add(existing = new BeatmapCollection { Name = { Value = newCol.Name.Value } });
 
-                        foreach (var newBeatmap in newCol.Beatmaps)
+                        foreach (string newBeatmap in newCol.BeatmapHashes)
                         {
-                            if (!existing.Beatmaps.Contains(newBeatmap))
-                                existing.Beatmaps.Add(newBeatmap);
+                            if (!existing.BeatmapHashes.Contains(newBeatmap))
+                                existing.BeatmapHashes.Add(newBeatmap);
                         }
                     }
 
@@ -226,9 +224,7 @@ namespace osu.Game.Collections
 
                             string checksum = sr.ReadString();
 
-                            var beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == checksum);
-                            if (beatmap != null)
-                                collection.Beatmaps.Add(beatmap);
+                            collection.BeatmapHashes.Add(checksum);
                         }
 
                         if (notification != null)
@@ -265,7 +261,7 @@ namespace osu.Game.Collections
         private void backgroundSave()
         {
             int current = Interlocked.Increment(ref lastSave);
-            Task.Delay(100).ContinueWith(task =>
+            Task.Delay(100).ContinueWith(_ =>
             {
                 if (current != lastSave)
                     return;
@@ -299,11 +295,12 @@ namespace osu.Game.Collections
                             {
                                 sw.Write(c.Name.Value);
 
-                                var beatmapsCopy = c.Beatmaps.ToArray();
+                                string[] beatmapsCopy = c.BeatmapHashes.ToArray();
+
                                 sw.Write(beatmapsCopy.Length);
 
-                                foreach (var b in beatmapsCopy)
-                                    sw.Write(b.MD5Hash);
+                                foreach (string b in beatmapsCopy)
+                                    sw.Write(b);
                             }
                         }
 

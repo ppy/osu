@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -21,7 +23,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Size = TwoLayerButton.SIZE_EXTENDED;
 
-            Child = button = new TwoLayerButton(HoverSampleSet.Submit)
+            Child = button = new TwoLayerButton
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,

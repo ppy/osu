@@ -31,20 +31,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiSpectatorScreen : MultiplayerTestScene
     {
         [Resolved]
-        private OsuGameBase game { get; set; }
+        private OsuGameBase game { get; set; } = null!;
 
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
+        private BeatmapManager beatmapManager { get; set; } = null!;
 
-        private MultiSpectatorScreen spectatorScreen;
+        private MultiSpectatorScreen spectatorScreen = null!;
 
         private readonly List<MultiplayerRoomUser> playingUsers = new List<MultiplayerRoomUser>();
 
-        private BeatmapSetInfo importedSet;
-        private BeatmapInfo importedBeatmap;
+        private BeatmapSetInfo importedSet = null!;
+        private BeatmapInfo importedBeatmap = null!;
+
         private int importedBeatmapId;
 
         [BackgroundDependencyLoader]
@@ -338,7 +339,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 sendFrames(getPlayerIds(count), 300);
             }
 
-            Player player = null;
+            Player? player = null;
 
             AddStep($"get {PLAYER_1_ID} player instance", () => player = getInstance(PLAYER_1_ID).ChildrenOfType<Player>().Single());
 
@@ -367,7 +368,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             b.Storyboard.GetLayer("Background").Add(sprite);
         });
 
-        private void testLeadIn(Action<WorkingBeatmap> applyToBeatmap = null)
+        private void testLeadIn(Action<WorkingBeatmap>? applyToBeatmap = null)
         {
             start(PLAYER_1_ID);
 
@@ -385,7 +386,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertRunning(PLAYER_1_ID);
         }
 
-        private void loadSpectateScreen(bool waitForPlayerLoad = true, Action<WorkingBeatmap> applyToBeatmap = null)
+        private void loadSpectateScreen(bool waitForPlayerLoad = true, Action<WorkingBeatmap>? applyToBeatmap = null)
         {
             AddStep("load screen", () =>
             {

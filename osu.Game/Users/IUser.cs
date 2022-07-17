@@ -4,8 +4,6 @@
 using System;
 using osu.Game.Database;
 
-#nullable enable
-
 namespace osu.Game.Users
 {
     public interface IUser : IHasOnlineID<int>, IEquatable<IUser>

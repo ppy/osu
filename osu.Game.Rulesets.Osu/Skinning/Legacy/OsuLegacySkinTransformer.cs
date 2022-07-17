@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -39,11 +41,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return this.GetAnimation(component.LookupName, false, false);
 
                     case OsuSkinComponents.SliderFollowCircle:
-                        var followCircle = this.GetAnimation("sliderfollowcircle", true, true, true);
-                        if (followCircle != null)
-                            // follow circles are 2x the hitcircle resolution in legacy skins (since they are scaled down from >1x
-                            followCircle.Scale *= 0.5f;
-                        return followCircle;
+                        var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true);
+                        if (followCircleContent != null)
+                            return new LegacyFollowCircle(followCircleContent);
+
+                        return null;
 
                     case OsuSkinComponents.SliderBall:
                         var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "");

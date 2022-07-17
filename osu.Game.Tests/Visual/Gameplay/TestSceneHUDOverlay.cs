@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -14,8 +16,9 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
-using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -33,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         [Cached]
-        private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
+        private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
         [Cached]
         private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
@@ -146,6 +149,26 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestHiddenHUDDoesntBlockComponentUpdates()
+        {
+            int updateCount = 0;
+
+            AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
+
+            createNew();
+
+            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
+
+            AddStep("bind on update", () =>
+            {
+                hudOverlay.ChildrenOfType<BarHitErrorMeter>().First().OnUpdate += _ => updateCount++;
+            });
+
+            AddUntilStep("wait for updates", () => updateCount > 0);
+        }
+
+        [Test]
         public void TestHiddenHUDDoesntBlockSkinnableComponentsLoad()
         {
             AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
@@ -153,7 +176,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             createNew();
 
             AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
-            AddUntilStep("wait for components to be hidden", () => !hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().IsPresent);
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
 
             AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Reload());
             AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().ComponentsLoaded);

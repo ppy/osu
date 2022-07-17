@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -72,7 +74,7 @@ namespace osu.Game.Skinning
                     switch (target.Target)
                     {
                         case SkinnableTarget.SongSelect:
-                            var songSelectComponents = new SkinnableTargetComponentsContainer(container =>
+                            var songSelectComponents = new SkinnableTargetComponentsContainer(_ =>
                             {
                                 // do stuff when we need to.
                             });
@@ -111,12 +113,12 @@ namespace osu.Game.Skinning
                                         accuracy.Position = new Vector2(-accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 - horizontal_padding, vertical_offset + 5);
                                         accuracy.Origin = Anchor.TopRight;
                                         accuracy.Anchor = Anchor.TopCentre;
-                                    }
 
-                                    if (combo != null)
-                                    {
-                                        combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
-                                        combo.Anchor = Anchor.TopCentre;
+                                        if (combo != null)
+                                        {
+                                            combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
+                                            combo.Anchor = Anchor.TopCentre;
+                                        }
                                     }
 
                                     var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();

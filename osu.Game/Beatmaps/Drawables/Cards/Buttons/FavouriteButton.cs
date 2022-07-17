@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
@@ -62,7 +64,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             };
             favouriteRequest.Failure += e =>
             {
-                Logger.Error(e, $"Failed to {actionType.ToString().ToLower()} beatmap: {e.Message}");
+                Logger.Error(e, $"Failed to {actionType.ToString().ToLowerInvariant()} beatmap: {e.Message}");
                 Enabled.Value = true;
             };
 

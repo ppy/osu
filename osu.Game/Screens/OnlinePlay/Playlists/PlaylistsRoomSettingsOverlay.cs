@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Specialized;
 using System.Linq;
@@ -138,9 +140,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                         },
                                                         new Section("Duration")
                                                         {
-                                                            Child = DurationField = new DurationDropdown
+                                                            Child = new Container
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
+                                                                Height = 40,
+                                                                Child = DurationField = new DurationDropdown
+                                                                {
+                                                                    RelativeSizeAxes = Axes.X
+                                                                }
                                                             }
                                                         },
                                                         new Section("Allowed attempts (across all playlist items)")

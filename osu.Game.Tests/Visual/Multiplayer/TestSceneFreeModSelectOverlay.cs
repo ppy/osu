@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -9,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Testing;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Mods;
@@ -73,19 +74,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createFreeModSelect();
 
+            AddAssert("select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
+
             AddStep("click select all button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().ElementAt(1));
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectAllModsButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("all mods selected", assertAllAvailableModsSelected);
+            AddAssert("select all button disabled", () => !this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
 
             AddStep("click deselect all button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().Last());
+                InputManager.MoveMouseTo(this.ChildrenOfType<DeselectAllModsButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("all mods deselected", () => !freeModSelectOverlay.SelectedMods.Value.Any());
+            AddAssert("select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
         }
 
         private void createFreeModSelect()

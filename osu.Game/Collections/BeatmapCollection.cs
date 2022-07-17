@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -23,9 +25,9 @@ namespace osu.Game.Collections
         public readonly Bindable<string> Name = new Bindable<string>();
 
         /// <summary>
-        /// The beatmaps contained by the collection.
+        /// The <see cref="BeatmapInfo.MD5Hash"/>es of beatmaps contained by the collection.
         /// </summary>
-        public readonly BindableList<BeatmapInfo> Beatmaps = new BindableList<BeatmapInfo>();
+        public readonly BindableList<string> BeatmapHashes = new BindableList<string>();
 
         /// <summary>
         /// The date when this collection was last modified.
@@ -34,7 +36,7 @@ namespace osu.Game.Collections
 
         public BeatmapCollection()
         {
-            Beatmaps.CollectionChanged += (_, __) => onChange();
+            BeatmapHashes.CollectionChanged += (_, _) => onChange();
             Name.ValueChanged += _ => onChange();
         }
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
@@ -10,17 +12,17 @@ using osu.Game.Rulesets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Testing;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.BeatmapSet.Scores;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    [TestFixture]
     public class TestSceneBeatmapSetOverlay : OsuTestScene
     {
         private readonly TestBeatmapSetOverlay overlay;
-
-        protected override bool UseOnlineAPI => true;
 
         private int nextBeatmapSetId = 1;
 
@@ -36,12 +38,6 @@ namespace osu.Game.Tests.Visual.Online
         public void TestLoading()
         {
             AddStep(@"show loading", () => overlay.ShowBeatmapSet(null));
-        }
-
-        [Test]
-        public void TestOnline()
-        {
-            AddStep(@"show online", () => overlay.FetchAndShowBeatmapSet(55));
         }
 
         [Test]
@@ -101,6 +97,15 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("show many difficulties", () => overlay.ShowBeatmapSet(createManyDifficultiesBeatmapSet()));
             downloadAssert(true);
+
+            AddAssert("status is loved", () => overlay.ChildrenOfType<BeatmapSetOnlineStatusPill>().Single().Status == BeatmapOnlineStatus.Loved);
+            AddAssert("scores container is visible", () => overlay.ChildrenOfType<ScoresContainer>().Single().Alpha == 1);
+            AddAssert("mod selector is visible", () => overlay.ChildrenOfType<LeaderboardModSelector>().Single().Alpha == 1);
+
+            AddStep("go to second beatmap", () => overlay.ChildrenOfType<BeatmapPicker.DifficultySelectorButton>().ElementAt(1).TriggerClick());
+
+            AddAssert("status is graveyard", () => overlay.ChildrenOfType<BeatmapSetOnlineStatusPill>().Single().Status == BeatmapOnlineStatus.Graveyard);
+            AddAssert("scores container is hidden", () => overlay.ChildrenOfType<ScoresContainer>().Single().Alpha == 0);
         }
 
         [Test]
@@ -232,6 +237,7 @@ namespace osu.Game.Tests.Visual.Online
                         Fails = Enumerable.Range(1, 100).Select(j => j % 12 - 6).ToArray(),
                         Retries = Enumerable.Range(-2, 100).Select(j => j % 12 - 6).ToArray(),
                     },
+                    Status = i % 2 == 0 ? BeatmapOnlineStatus.Graveyard : BeatmapOnlineStatus.Loved,
                 });
             }
 

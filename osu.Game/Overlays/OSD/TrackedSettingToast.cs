@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -66,7 +68,7 @@ namespace osu.Game.Overlays.OSD
                     if (val) selectedOption = 0;
                     break;
 
-                case Enum _:
+                case Enum:
                     var values = Enum.GetValues(description.RawValue.GetType());
                     optionCount = values.Length;
                     selectedOption = Convert.ToInt32(description.RawValue);

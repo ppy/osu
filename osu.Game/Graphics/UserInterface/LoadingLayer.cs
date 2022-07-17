@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
@@ -53,12 +55,12 @@ namespace osu.Game.Graphics.UserInterface
             switch (e)
             {
                 // blocking scroll can cause weird behaviour when this layer is used within a ScrollContainer.
-                case ScrollEvent _:
+                case ScrollEvent:
                     return false;
 
                 // blocking touch events causes the ISourcedFromTouch versions to not be fired, potentially impeding behaviour of drawables *above* the loading layer that may utilise these.
                 // note that this will not work well if touch handling elements are beneath this loading layer (something to consider for the future).
-                case TouchEvent _:
+                case TouchEvent:
                     return false;
             }
 

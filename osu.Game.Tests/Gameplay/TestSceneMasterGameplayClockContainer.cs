@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
@@ -76,6 +77,16 @@ namespace osu.Game.Tests.Gameplay
         }
 
         [Test]
+        [FlakyTest]
+        /*
+         * Fail rate around 0.15%
+         *
+         * TearDown : osu.Framework.Testing.Drawables.Steps.AssertButton+TracedException : gameplay clock time = 2500
+         * --TearDown
+         *    at osu.Framework.Threading.ScheduledDelegate.RunTaskInternal()
+         *    at osu.Framework.Threading.Scheduler.Update()
+         *    at osu.Framework.Graphics.Drawable.UpdateSubTree()
+         */
         public void TestSeekPerformsInGameplayTime(
             [Values(1.0, 0.5, 2.0)] double clockRate,
             [Values(0.0, 200.0, -200.0)] double userOffset,
@@ -104,10 +115,10 @@ namespace osu.Game.Tests.Gameplay
                 AddStep($"set audio offset to {userOffset}", () => localConfig.SetValue(OsuSetting.AudioOffset, userOffset));
 
             AddStep("seek to 2500", () => gameplayClockContainer.Seek(2500));
-            AddAssert("gameplay clock time = 2500", () => Precision.AlmostEquals(gameplayClockContainer.CurrentTime, 2500, 10f));
+            AddStep("gameplay clock time = 2500", () => Assert.AreEqual(gameplayClockContainer.CurrentTime, 2500, 10f));
 
             AddStep("seek to 10000", () => gameplayClockContainer.Seek(10000));
-            AddAssert("gameplay clock time = 10000", () => Precision.AlmostEquals(gameplayClockContainer.CurrentTime, 10000, 10f));
+            AddStep("gameplay clock time = 10000", () => Assert.AreEqual(gameplayClockContainer.CurrentTime, 10000, 10f));
         }
 
         protected override void Dispose(bool isDisposing)

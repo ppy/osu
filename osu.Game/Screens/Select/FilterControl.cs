@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -28,6 +30,8 @@ namespace osu.Game.Screens.Select
         private const float side_margin = 20;
 
         public Action<FilterCriteria> FilterChanged;
+
+        public Bindable<string> CurrentTextSearch => searchTextBox.Current;
 
         private OsuTabControl<SortMode> sortTabs;
 
@@ -61,6 +65,7 @@ namespace osu.Game.Screens.Select
         }
 
         private SeekLimitedSearchTextBox searchTextBox;
+
         private CollectionFilterDropdown collectionDropdown;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
@@ -153,15 +158,23 @@ namespace osu.Game.Screens.Select
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 20,
+                                Height = 40,
                                 Children = new Drawable[]
                                 {
+                                    new DifficultyRangeFilterControl
+                                    {
+                                        Anchor = Anchor.TopLeft,
+                                        Origin = Anchor.TopLeft,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Width = 0.48f,
+                                    },
                                     collectionDropdown = new CollectionFilterDropdown
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                         RelativeSizeAxes = Axes.X,
-                                        Width = 0.4f,
+                                        Y = 4,
+                                        Width = 0.5f,
                                     }
                                 }
                             },

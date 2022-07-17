@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,6 +16,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Rulesets.Osu.Objects;
@@ -114,10 +118,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 throw new NotImplementedException();
             }
 
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap)
-            {
-                throw new NotImplementedException();
-            }
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap);
 
             public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap)
             {
@@ -151,6 +152,24 @@ namespace osu.Game.Tests.Visual.Ranking
                     }
                 }
             };
+
+            private class TestBeatmapConverter : IBeatmapConverter
+            {
+#pragma warning disable CS0067 // The event is never used
+                public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+#pragma warning restore CS0067
+
+                public IBeatmap Beatmap { get; }
+
+                public TestBeatmapConverter(IBeatmap beatmap)
+                {
+                    Beatmap = beatmap;
+                }
+
+                public bool CanConvert() => true;
+
+                public IBeatmap Convert(CancellationToken cancellationToken = default) => Beatmap.Clone();
+            }
         }
 
         private class TestRulesetAllStatsRequireHitEvents : TestRuleset

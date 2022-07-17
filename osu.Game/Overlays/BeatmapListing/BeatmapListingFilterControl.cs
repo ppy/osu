@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -141,7 +143,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         public void Search(string query)
-            => searchControl.Query.Value = query;
+            => Schedule(() => searchControl.Query.Value = query);
 
         protected override void LoadComplete()
         {
@@ -159,13 +161,13 @@ namespace osu.Game.Overlays.BeatmapListing
                 queueUpdateSearch(true);
             });
 
-            searchControl.General.CollectionChanged += (_, __) => queueUpdateSearch();
+            searchControl.General.CollectionChanged += (_, _) => queueUpdateSearch();
             searchControl.Ruleset.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Category.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Genre.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Language.BindValueChanged(_ => queueUpdateSearch());
-            searchControl.Extra.CollectionChanged += (_, __) => queueUpdateSearch();
-            searchControl.Ranks.CollectionChanged += (_, __) => queueUpdateSearch();
+            searchControl.Extra.CollectionChanged += (_, _) => queueUpdateSearch();
+            searchControl.Ranks.CollectionChanged += (_, _) => queueUpdateSearch();
             searchControl.Played.BindValueChanged(_ => queueUpdateSearch());
             searchControl.ExplicitContent.BindValueChanged(_ => queueUpdateSearch());
 
