@@ -67,15 +67,15 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private int drawableItemIndex;
 
-        protected override Drawable CreateDrawableItem(SoloScoreInfo item)
+        protected override Drawable CreateDrawableItem(SoloScoreInfo model)
         {
             switch (type)
             {
                 default:
-                    return new DrawableProfileScore(item);
+                    return new DrawableProfileScore(model);
 
                 case ScoreType.Best:
-                    return new DrawableProfileWeightedScore(item, Math.Pow(0.95, drawableItemIndex++));
+                    return new DrawableProfileWeightedScore(model, Math.Pow(0.95, drawableItemIndex++));
             }
         }
     }
