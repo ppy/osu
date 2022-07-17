@@ -50,24 +50,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            var beatmapSet = Score.BeatmapSet ?? Score.Beatmap?.BeatmapSet;
-            var beatmapInfo = new BeatmapInfo();
-
-            if (beatmapSet != null)
-            {
-                var beatmapMetadata = new BeatmapMetadata
-                {
-                    Artist = beatmapSet.Artist,
-                    ArtistUnicode = beatmapSet.ArtistUnicode,
-                    Title = beatmapSet.Title,
-                    TitleUnicode = beatmapSet.TitleUnicode,
-                };
-
-                beatmapInfo.Metadata = beatmapMetadata;
-                if (Score.Beatmap?.DifficultyName != null)
-                    beatmapInfo.DifficultyName = Score.Beatmap.DifficultyName;
-            }
-
             AddInternal(new ProfileItemContainer
             {
                 Children = new Drawable[]
@@ -102,7 +84,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Spacing = new Vector2(0, 2),
                                         Children = new Drawable[]
                                         {
-                                            new ScoreBeatmapMetadataContainer(beatmapInfo),
+                                            new ScoreBeatmapMetadataContainer(Score.Beatmap),
                                             new FillFlowContainer
                                             {
                                                 AutoSizeAxes = Axes.Both,
