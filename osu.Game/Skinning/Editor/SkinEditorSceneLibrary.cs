@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -27,6 +29,8 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinEditorSceneLibrary : CompositeDrawable
     {
+        public const float HEIGHT = BUTTON_HEIGHT + padding * 2;
+
         public const float BUTTON_HEIGHT = 40;
 
         private const float padding = 10;
@@ -42,7 +46,7 @@ namespace osu.Game.Skinning.Editor
 
         public SkinEditorSceneLibrary()
         {
-            Height = BUTTON_HEIGHT + padding * 2;
+            Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]

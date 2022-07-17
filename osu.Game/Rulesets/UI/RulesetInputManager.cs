@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -26,8 +28,6 @@ namespace osu.Game.Rulesets.UI
         where T : struct
     {
         public readonly KeyBindingContainer<T> KeyBindingContainer;
-
-        private readonly Ruleset ruleset;
 
         [Resolved(CanBeNull = true)]
         private ScoreProcessor scoreProcessor { get; set; }
@@ -57,8 +57,6 @@ namespace osu.Game.Rulesets.UI
 
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
-            this.ruleset = ruleset.CreateInstance();
-
             InternalChild = KeyBindingContainer =
                 CreateKeyBindingContainer(ruleset, variant, unique)
                     .WithChild(content = new Container { RelativeSizeAxes = Axes.Both });
@@ -85,7 +83,7 @@ namespace osu.Game.Rulesets.UI
                     break;
 
                 case ReplayStatisticsFrameEvent statisticsStateChangeEvent:
-                    scoreProcessor?.ResetFromReplayFrame(ruleset, statisticsStateChangeEvent.Frame);
+                    scoreProcessor?.ResetFromReplayFrame(statisticsStateChangeEvent.Frame);
                     break;
 
                 default:
@@ -125,7 +123,7 @@ namespace osu.Game.Rulesets.UI
         {
             switch (e)
             {
-                case MouseDownEvent _:
+                case MouseDownEvent:
                     if (mouseDisabled.Value)
                         return true; // importantly, block upwards propagation so global bindings also don't fire.
 

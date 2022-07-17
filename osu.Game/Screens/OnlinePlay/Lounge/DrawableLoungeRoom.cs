@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -55,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private void load(AudioManager audio)
         {
             sampleSelect = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
-            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Submit.GetDescription()}-select");
+            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-select");
 
             AddRangeInternal(new Drawable[]
             {
@@ -248,7 +250,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 base.LoadComplete();
 
                 ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(passwordTextBox));
-                passwordTextBox.OnCommit += (_, __) => performJoin();
+                passwordTextBox.OnCommit += (_, _) => performJoin();
             }
 
             private void performJoin()

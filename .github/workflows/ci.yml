@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ github.workspace }}/inspectcode
-          key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', '.editorconfig', '.globalconfig', 'CodeAnalysis/*') }}
+          key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', 'osu*.slnf', '.editorconfig', '.globalconfig', 'CodeAnalysis/*', '**/*.csproj', '**/*.props') }}
 
       - name: Dotnet code style
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf -p:EnforceCodeStyleInBuild=true
@@ -82,7 +82,7 @@ jobs:
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
 
       - name: Test
-        run: dotnet test $pwd/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
+        run: dotnet test $pwd/**/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
         shell: pwsh
 
       # Attempt to upload results even if test fails.
@@ -96,27 +96,20 @@ jobs:
 
   build-only-android:
     name: Build only (Android)
-    runs-on: macos-latest
+    runs-on: windows-latest
     timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      # Pin Xamarin.Android version to 11.2 for now to avoid build failures caused by a Xamarin-side regression.
-      # See: https://github.com/xamarin/xamarin-android/issues/6284
-      # This can be removed/reverted when the fix makes it to upstream and is deployed on github runners.
-      - name: Set default Xamarin SDK version
-        run: |
-            $VM_ASSETS/select-xamarin-sdk-v2.sh --mono=6.12 --android=11.2
 
       - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "6.0.x"
 
-      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
-      # cannot accept .sln(f) files as arguments.
-      # Build just the main game for now.
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
       - name: Build
         run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
 

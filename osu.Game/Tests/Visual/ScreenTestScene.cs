@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -47,8 +49,8 @@ namespace osu.Game.Tests.Visual
                 }
             });
 
-            Stack.ScreenPushed += (lastScreen, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");
-            Stack.ScreenExited += (lastScreen, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed ← {newScreen}");
+            Stack.ScreenPushed += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");
+            Stack.ScreenExited += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed ← {newScreen}");
         }
 
         protected void LoadScreen(OsuScreen screen) => Stack.Push(screen);

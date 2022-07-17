@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -155,39 +157,42 @@ namespace osu.Game.Online.Chat
         {
             public Func<Message, ChatLine> CreateChatLineAction;
 
-            [Resolved]
-            private OsuColour colours { get; set; }
-
             public StandAloneDrawableChannel(Channel channel)
                 : base(channel)
             {
             }
 
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                ChatLineFlow.Padding = new MarginPadding { Horizontal = 0 };
-            }
-
             protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
 
-            protected override Drawable CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
+            protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new StandAloneDaySeparator(time);
+        }
+
+        protected class StandAloneDaySeparator : DaySeparator
+        {
+            protected override float TextSize => 14;
+            protected override float LineHeight => 1;
+            protected override float Spacing => 5;
+            protected override float DateAlign => 125;
+
+            public StandAloneDaySeparator(DateTimeOffset time)
+                : base(time)
             {
-                TextSize = 14,
-                Colour = colours.Yellow,
-                LineHeight = 1,
-                Padding = new MarginPadding { Horizontal = 10 },
-                Margin = new MarginPadding { Vertical = 5 },
-            };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Height = 25;
+                Colour = colours.Yellow;
+            }
         }
 
         protected class StandAloneMessage : ChatLine
         {
             protected override float TextSize => 15;
-
-            protected override float HorizontalPadding => 10;
-            protected override float MessagePadding => 120;
-            protected override float TimestampPadding => 50;
+            protected override float Spacing => 5;
+            protected override float TimestampWidth => 45;
+            protected override float UsernameWidth => 75;
 
             public StandAloneMessage(Message message)
                 : base(message)

@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -83,7 +86,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("clear label", () => textBox.LabelText = default);
             AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
 
-            AddStep("set warning text", () => textBox.WarningText = "This is some very important warning text! Hopefully it doesn't break the alignment of the default value indicator...");
+            AddStep("set warning text", () => textBox.SetNoticeText("This is some very important warning text! Hopefully it doesn't break the alignment of the default value indicator...", true));
             AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
         }
 
@@ -129,16 +132,18 @@ namespace osu.Game.Tests.Visual.Settings
             SettingsNumberBox numberBox = null;
 
             AddStep("create settings item", () => Child = numberBox = new SettingsNumberBox());
-            AddAssert("warning text not created", () => !numberBox.ChildrenOfType<SettingsNoticeText>().Any());
+            AddAssert("warning text not created", () => !numberBox.ChildrenOfType<LinkFlowContainer>().Any());
 
-            AddStep("set warning text", () => numberBox.WarningText = "this is a warning!");
-            AddAssert("warning text created", () => numberBox.ChildrenOfType<SettingsNoticeText>().Single().Alpha == 1);
+            AddStep("set warning text", () => numberBox.SetNoticeText("this is a warning!", true));
+            AddAssert("warning text created", () => numberBox.ChildrenOfType<LinkFlowContainer>().Single().Alpha == 1);
 
-            AddStep("unset warning text", () => numberBox.WarningText = default);
-            AddAssert("warning text hidden", () => numberBox.ChildrenOfType<SettingsNoticeText>().Single().Alpha == 0);
+            AddStep("unset warning text", () => numberBox.ClearNoticeText());
+            AddAssert("warning text hidden", () => !numberBox.ChildrenOfType<LinkFlowContainer>().Any());
 
-            AddStep("set warning text again", () => numberBox.WarningText = "another warning!");
-            AddAssert("warning text shown again", () => numberBox.ChildrenOfType<SettingsNoticeText>().Single().Alpha == 1);
+            AddStep("set warning text again", () => numberBox.SetNoticeText("another warning!", true));
+            AddAssert("warning text shown again", () => numberBox.ChildrenOfType<LinkFlowContainer>().Single().Alpha == 1);
+
+            AddStep("set non warning text", () => numberBox.SetNoticeText("you did good!"));
         }
     }
 }

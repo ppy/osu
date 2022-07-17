@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -303,8 +301,13 @@ namespace osu.Game.Skinning
                 if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out string val))
                 {
                     // special case for handling skins which use 1 or 0 to signify a boolean state.
+                    // ..or in some cases 2 (https://github.com/ppy/osu/issues/18579).
                     if (typeof(TValue) == typeof(bool))
-                        val = val == "1" ? "true" : "false";
+                    {
+                        val = bool.TryParse(val, out bool boolVal)
+                            ? Convert.ChangeType(boolVal, typeof(bool)).ToString()
+                            : Convert.ChangeType(Convert.ToInt32(val), typeof(bool)).ToString();
+                    }
 
                     var bindable = new Bindable<TValue>();
                     if (val != null)

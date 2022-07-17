@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,8 +12,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
@@ -43,7 +43,7 @@ namespace osu.Game.Tournament.Screens.Drawings
         public ITeamList TeamList;
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, Storage storage)
+        private void load(Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -89,11 +89,10 @@ namespace osu.Game.Tournament.Screens.Drawings
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new Sprite
+                        new TourneyVideo("drawings")
                         {
+                            Loop = true,
                             RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Fill,
-                            Texture = textures.Get(@"Backgrounds/Drawings/background.png")
                         },
                         // Visualiser
                         new VisualiserContainer
@@ -217,7 +216,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                 }
             }
 
-            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run(writeAction);
+            writeOp = writeOp?.ContinueWith(_ => { writeAction(); }) ?? Task.Run(writeAction);
         }
 
         private void reloadTeams()

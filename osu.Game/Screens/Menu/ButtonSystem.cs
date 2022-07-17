@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -189,18 +191,46 @@ namespace osu.Game.Screens.Menu
                 State = ButtonSystemState.Initial;
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        /// <summary>
+        /// Triggers the <see cref="logo"/> if the current <see cref="State"/> is <see cref="ButtonSystemState.Initial"/>.
+        /// </summary>
+        /// <returns><c>true</c> if the <see cref="logo"/> was triggered, <c>false</c> otherwise.</returns>
+        private bool triggerInitialOsuLogo()
         {
-            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed || e.SuperPressed)
-                return false;
-
             if (State == ButtonSystemState.Initial)
             {
                 logo?.TriggerClick();
                 return true;
             }
 
+            return false;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed || e.SuperPressed)
+                return false;
+
+            if (triggerInitialOsuLogo())
+                return true;
+
             return base.OnKeyDown(e);
+        }
+
+        protected override bool OnJoystickPress(JoystickPressEvent e)
+        {
+            if (triggerInitialOsuLogo())
+                return true;
+
+            return base.OnJoystickPress(e);
+        }
+
+        protected override bool OnMidiDown(MidiDownEvent e)
+        {
+            if (triggerInitialOsuLogo())
+                return true;
+
+            return base.OnMidiDown(e);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

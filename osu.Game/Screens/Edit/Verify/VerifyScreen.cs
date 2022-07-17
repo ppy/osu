@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -29,7 +31,7 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load()
         {
-            InterpretedDifficulty.Default = BeatmapDifficultyCache.GetDifficultyRating(EditorBeatmap.BeatmapInfo.StarRating);
+            InterpretedDifficulty.Default = StarDifficulty.GetDifficultyRating(EditorBeatmap.BeatmapInfo.StarRating);
             InterpretedDifficulty.SetDefault();
 
             Child = new Container
@@ -41,7 +43,7 @@ namespace osu.Game.Screens.Edit.Verify
                     ColumnDimensions = new[]
                     {
                         new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 200),
+                        new Dimension(GridSizeMode.Absolute, 250),
                     },
                     Content = new[]
                     {

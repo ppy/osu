@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -179,7 +181,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             // schedules added as the properties may change value while the drawable items haven't been created yet.
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(scrollToSelection));
-            Items.BindCollectionChanged((_, __) => Scheduler.AddOnce(scrollToSelection), true);
+            Items.BindCollectionChanged((_, _) => Scheduler.AddOnce(scrollToSelection), true);
         }
 
         private void scrollToSelection()

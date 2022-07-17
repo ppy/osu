@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -82,7 +84,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
-            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(GameplayState.Ruleset.RulesetInfo, ScoreProcessor, users), l =>
+            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(users), l =>
             {
                 if (!LoadedBeatmapSuccessfully)
                     return;
@@ -123,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             client.GameplayStarted += onGameplayStarted;
             client.ResultsReady += onResultsReady;
 
-            ScoreProcessor.HasCompleted.BindValueChanged(completed =>
+            ScoreProcessor.HasCompleted.BindValueChanged(_ =>
             {
                 // wait for server to tell us that results are ready (see SubmitScore implementation)
                 loadingDisplay.Show();
@@ -149,9 +151,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void StartGameplay()
         {
+            // We can enter this screen one of two ways:
+            // 1. Via the automatic natural progression of PlayerLoader into Player.
+            //    We'll arrive here in a Loaded state, and we need to let the server know that we're ready to start.
+            // 2. Via the server forcefully starting gameplay because players have been hanging out in PlayerLoader for too long.
+            //    We'll arrive here in a Playing state, and we should neither show the loading spinner nor tell the server that we're ready to start (gameplay has already started).
+            //
+            // The base call is blocked here because in both cases gameplay is started only when the server says so via onGameplayStarted().
+
             if (client.LocalUser?.State == MultiplayerUserState.Loaded)
             {
-                // block base call, but let the server know we are ready to start.
                 loadingDisplay.Show();
                 client.ChangeState(MultiplayerUserState.ReadyForGameplay);
             }
