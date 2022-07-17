@@ -31,7 +31,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private const float performance_background_shear = 0.45f;
 
-        protected readonly APIScore Score;
+        protected readonly SoloScoreInfo Score;
+        protected readonly APIBeatmap Beatmap;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -39,9 +40,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        public DrawableProfileScore(APIScore score)
+        public DrawableProfileScore(SoloScoreInfo score, APIBeatmap beatmap)
         {
             Score = score;
+            Beatmap = beatmap;
 
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -84,7 +86,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Spacing = new Vector2(0, 2),
                                         Children = new Drawable[]
                                         {
-                                            new ScoreBeatmapMetadataContainer(Score.Beatmap),
+                                            new ScoreBeatmapMetadataContainer(Beatmap),
                                             new FillFlowContainer
                                             {
                                                 AutoSizeAxes = Axes.Both,
@@ -94,11 +96,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                 {
                                                     new OsuSpriteText
                                                     {
-                                                        Text = $"{Score.Beatmap?.DifficultyName}",
+                                                        Text = $"{Beatmap.DifficultyName}",
                                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                         Colour = colours.Yellow
                                                     },
-                                                    new DrawableDate(Score.Date, 12)
+                                                    new DrawableDate(Score.EndedAt ?? DateTimeOffset.Now, 12)
                                                     {
                                                         Colour = colourProvider.Foreground1
                                                     }
