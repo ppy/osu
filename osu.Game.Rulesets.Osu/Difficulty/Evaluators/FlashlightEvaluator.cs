@@ -23,8 +23,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <summary>
         /// Evaluates the difficulty of memorising and hitting an object, based on:
         /// <list type="bullet">
-        /// <item><description>distance between the previous and current object,</description></item>
+        /// <item><description>distance between previous objects and the current object,</description></item>
         /// <item><description>the visual opacity of the current object,</description></item>
+        /// <item><description>length and speed of the current object (for sliders),</description></item>
         /// <item><description>and whether the hidden mod is enabled.</description></item>
         /// </list>
         /// </summary>
