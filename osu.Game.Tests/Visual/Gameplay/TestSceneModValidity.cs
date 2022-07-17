@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -37,8 +36,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     foreach (var incompatibleModType in modIncompatibilities)
                     {
-                        var incompatibleMod = (Mod)Activator.CreateInstance(incompatibleModType);
-                        Assert.That(incompatibleMod?.IncompatibleMods.Contains(mod.GetType()) ?? false);
+                        var incompatibleMod = modInstances.First(m => m.GetType().IsInstanceOfType(incompatibleModType));
+                        Assert.That(incompatibleMod.IncompatibleMods.Contains(mod.GetType()));
                     }
                 }
             });
