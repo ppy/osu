@@ -34,20 +34,20 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"previous_usernames")]
         public string[] PreviousUsernames;
 
-        private Country? country;
+        private CountryCode? countryCode;
 
-        public Country Country
+        public CountryCode CountryCode
         {
-            get => country ??= (Enum.TryParse(userCountry?.Code, out Country result) ? result : default);
-            set => country = value;
+            get => countryCode ??= (Enum.TryParse(country?.Code, out CountryCode result) ? result : default);
+            set => countryCode = value;
         }
 
 #pragma warning disable 649
         [CanBeNull]
         [JsonProperty(@"country")]
-        private UserCountry userCountry;
+        private Country country;
 
-        private class UserCountry
+        private class Country
         {
             [JsonProperty(@"code")]
             public string Code;
