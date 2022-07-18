@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Humanizer;
 using MessagePack;
@@ -46,7 +49,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        public Mod ToMod(Ruleset ruleset)
+        public Mod ToMod([NotNull] Ruleset ruleset)
         {
             Mod resultMod = ruleset.CreateModFromAcronym(Acronym);
 
@@ -63,7 +66,14 @@ namespace osu.Game.Online.API
                     if (!Settings.TryGetValue(property.Name.Underscore(), out object settingValue))
                         continue;
 
-                    resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                    try
+                    {
+                        resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Failed to copy mod setting value '{settingValue ?? "null"}' to \"{property.Name}\": {ex.Message}");
+                    }
                 }
             }
 

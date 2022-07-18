@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -128,15 +130,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 syncManager.AddPlayerClock(instances[i].GameplayClock);
             }
 
-            // Todo: This is not quite correct - it should be per-user to adjust for other mod combinations.
-            var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
-            var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
-            scoreProcessor.ApplyBeatmap(playableBeatmap);
-
-            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(Ruleset.Value, scoreProcessor, users)
+            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(users)
             {
                 Expanded = { Value = true },
-            }, l =>
+            }, _ =>
             {
                 foreach (var instance in instances)
                     leaderboard.AddClock(instance.UserId, instance.GameplayClock);
@@ -164,7 +161,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             base.LoadComplete();
 
             masterClockContainer.Reset();
-            masterClockContainer.Stop();
 
             syncManager.ReadyToStart += onReadyToStart;
             syncManager.MasterState.BindValueChanged(onMasterStateChanged, true);
@@ -198,8 +194,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                                         .DefaultIfEmpty(0)
                                         .Min();
 
-            masterClockContainer.Seek(startTime);
-            masterClockContainer.Start();
+            masterClockContainer.StartTime = startTime;
+            masterClockContainer.Reset(true);
 
             // Although the clock has been started, this flag is set to allow for later synchronisation state changes to also be able to start it.
             canStartMasterClock = true;
@@ -241,7 +237,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             instance.FadeColour(colours.Gray4, 400, Easing.OutQuint);
             syncManager.RemovePlayerClock(instance.GameplayClock);
-            leaderboard.RemoveClock(userId);
         }
 
         public override bool OnBackButton()

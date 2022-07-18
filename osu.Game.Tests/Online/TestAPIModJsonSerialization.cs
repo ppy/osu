@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -33,9 +35,10 @@ namespace osu.Game.Tests.Online
 
             var converted = deserialized?.ToMod(new TestRuleset());
 
+            Assert.NotNull(converted);
             Assert.That(converted, Is.TypeOf(typeof(UnknownMod)));
-            Assert.That(converted?.Type, Is.EqualTo(ModType.System));
-            Assert.That(converted?.Acronym, Is.EqualTo("WNG??"));
+            Assert.That(converted.Type, Is.EqualTo(ModType.System));
+            Assert.That(converted.Acronym, Is.EqualTo("WNG??"));
         }
 
         [Test]

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -150,7 +152,7 @@ namespace osu.Game.Overlays.Comments
                                                         {
                                                             Alpha = Comment.IsDeleted ? 1 : 0,
                                                             Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                                            Text = "deleted"
+                                                            Text = CommentsStrings.Deleted
                                                         }
                                                     }
                                                 },

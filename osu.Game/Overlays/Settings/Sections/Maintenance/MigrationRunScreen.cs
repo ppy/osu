@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -27,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private OsuGame game { get; set; }
 
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         [Resolved]
         private Storage storage { get; set; }
@@ -124,20 +126,20 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected virtual bool PerformMigration() => game?.Migrate(destination.FullName) != false;
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             this.FadeOut().Delay(250).Then().FadeIn(250);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             // block until migration is finished
             if (migrationTask?.IsCompleted == false)
                 return true;
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
     }
 }

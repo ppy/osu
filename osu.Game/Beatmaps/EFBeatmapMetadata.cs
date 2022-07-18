@@ -10,8 +10,6 @@ using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 
-#nullable enable
-
 namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]

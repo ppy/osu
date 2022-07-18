@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -25,7 +27,7 @@ namespace osu.Desktop.Updater
     public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
         private UpdateManager updateManager;
-        private NotificationOverlay notificationOverlay;
+        private INotificationOverlay notificationOverlay;
 
         public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
@@ -39,9 +41,9 @@ namespace osu.Desktop.Updater
         private readonly SquirrelLogger squirrelLogger = new SquirrelLogger();
 
         [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification)
+        private void load(INotificationOverlay notifications)
         {
-            notificationOverlay = notification;
+            notificationOverlay = notifications;
 
             SquirrelLocator.CurrentMutable.Register(() => squirrelLogger, typeof(ILogger));
         }
@@ -152,7 +154,7 @@ namespace osu.Desktop.Updater
                 Activated = () =>
                 {
                     updateManager.PrepareUpdateAsync()
-                                 .ContinueWith(_ => updateManager.Schedule(() => game?.GracefullyExit()));
+                                 .ContinueWith(_ => updateManager.Schedule(() => game?.AttemptExit()));
                     return true;
                 };
             }

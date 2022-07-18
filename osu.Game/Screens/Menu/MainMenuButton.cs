@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -185,8 +187,7 @@ namespace osu.Game.Screens.Menu
         private void load(AudioManager audio)
         {
             sampleHover = audio.Samples.Get(@"Menu/button-hover");
-            if (!string.IsNullOrEmpty(sampleName))
-                sampleClick = audio.Samples.Get($@"Menu/{sampleName}");
+            sampleClick = audio.Samples.Get(!string.IsNullOrEmpty(sampleName) ? $@"Menu/{sampleName}" : @"UI/button-select");
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

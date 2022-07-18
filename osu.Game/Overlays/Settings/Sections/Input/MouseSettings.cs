@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -117,14 +119,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
                 {
                     if (highPrecision.NewValue)
-                        highPrecisionMouse.WarningText = MouseSettingsStrings.HighPrecisionPlatformWarning;
+                        highPrecisionMouse.SetNoticeText(MouseSettingsStrings.HighPrecisionPlatformWarning, true);
                     else
-                        highPrecisionMouse.WarningText = null;
+                        highPrecisionMouse.ClearNoticeText();
                 }
             }, true);
         }
 
-        private class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
+        public class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
         {
             public SensitivitySetting()
             {
@@ -133,7 +135,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
         }
 
-        private class SensitivitySlider : OsuSliderBar<double>
+        public class SensitivitySlider : OsuSliderBar<double>
         {
             public override LocalisableString TooltipText => Current.Disabled ? MouseSettingsStrings.EnableHighPrecisionForSensitivityAdjust : $"{base.TooltipText}x";
         }

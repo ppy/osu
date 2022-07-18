@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -88,7 +90,7 @@ namespace osu.Game.Tests.Gameplay
         [Test]
         public void TestSampleHasLifetimeEndWithInitialClockTime()
         {
-            GameplayClockContainer gameplayContainer = null;
+            MasterGameplayClockContainer gameplayContainer = null;
             DrawableStoryboardSample sample = null;
 
             AddStep("create container", () =>
@@ -96,8 +98,11 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gameplayContainer = new MasterGameplayClockContainer(working, 1000, true)
+                const double start_time = 1000;
+
+                Add(gameplayContainer = new MasterGameplayClockContainer(working, start_time)
                 {
+                    StartTime = start_time,
                     IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {

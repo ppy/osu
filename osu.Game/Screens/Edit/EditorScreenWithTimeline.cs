@@ -1,23 +1,23 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
     public abstract class EditorScreenWithTimeline : EditorScreen
     {
-        private const float vertical_margins = 10;
-        private const float horizontal_margins = 20;
+        private const float padding = 10;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit
         private LoadingSpinner spinner;
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] BindableBeatDivisor beatDivisor)
+        private void load(OverlayColourProvider colourProvider, [CanBeNull] BindableBeatDivisor beatDivisor)
         {
             if (beatDivisor != null)
                 this.beatDivisor.BindTo(beatDivisor);
@@ -60,14 +60,14 @@ namespace osu.Game.Screens.Edit
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black.Opacity(0.5f)
+                                    Colour = colourProvider.Background4
                                 },
                                 new Container
                                 {
                                     Name = "Timeline content",
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
+                                    Padding = new MarginPadding { Horizontal = padding, Top = padding },
                                     Child = new GridContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -106,12 +106,6 @@ namespace osu.Game.Screens.Edit
                             Name = "Main content",
                             RelativeSizeAxes = Axes.Both,
                             Depth = float.MaxValue,
-                            Padding = new MarginPadding
-                            {
-                                Horizontal = horizontal_margins,
-                                Top = vertical_margins,
-                                Bottom = vertical_margins
-                            },
                             Child = spinner = new LoadingSpinner(true)
                             {
                                 State = { Value = Visibility.Visible },
@@ -133,16 +127,8 @@ namespace osu.Game.Screens.Edit
                 mainContent.Add(content);
                 content.FadeInFromZero(300, Easing.OutQuint);
 
-                LoadComponentAsync(new TimelineArea(CreateTimelineContent()), t =>
-                {
-                    timelineContainer.Add(t);
-                    OnTimelineLoaded(t);
-                });
+                LoadComponentAsync(new TimelineArea(CreateTimelineContent()), timelineContainer.Add);
             });
-        }
-
-        protected virtual void OnTimelineLoaded(TimelineArea timelineArea)
-        {
         }
 
         protected abstract Drawable CreateMainContent();

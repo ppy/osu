@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osuTK.Input;
@@ -32,13 +35,48 @@ namespace osu.Game.Tests.Visual.Settings
                     State = { Value = Visibility.Visible }
                 });
             });
+
+            AddStep("reset mouse", () => InputManager.MoveMouseTo(settings));
+        }
+
+        [Test]
+        public void TestFiltering([Values] bool beforeLoad)
+        {
+            if (beforeLoad)
+                AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "scaling");
+
+            AddUntilStep("wait for items to load", () => settings.SectionsContainer.ChildrenOfType<IFilterable>().Any());
+
+            if (!beforeLoad)
+                AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "scaling");
+
+            AddAssert("ensure all items match filter", () => settings.SectionsContainer
+                                                                     .ChildrenOfType<SettingsSection>().Where(f => f.IsPresent)
+                                                                     .All(section =>
+                                                                         section.Children.Where(f => f.IsPresent)
+                                                                                .OfType<ISettingsItem>()
+                                                                                .OfType<IFilterable>()
+                                                                                .Where(f => !(f is IHasFilterableChildren))
+                                                                                .All(f => f.FilterTerms.Any(t => t.ToString().Contains("scaling")))
+                                                                     ));
+
+            AddAssert("ensure section is current", () => settings.CurrentSection.Value is GraphicsSection);
+            AddAssert("ensure section is placed first", () => settings.CurrentSection.Value.Y == 0);
+        }
+
+        [Test]
+        public void TestFilterAfterLoad()
+        {
+            AddUntilStep("wait for items to load", () => settings.SectionsContainer.ChildrenOfType<IFilterable>().Any());
+
+            AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "scaling");
         }
 
         [Test]
         public void ToggleVisibility()
         {
             AddWaitStep("wait some", 5);
-            AddToggleStep("toggle visibility", visible => settings.ToggleVisibility());
+            AddToggleStep("toggle visibility", _ => settings.ToggleVisibility());
         }
 
         [Test]
@@ -97,7 +135,7 @@ namespace osu.Game.Tests.Visual.Settings
                 Depth = -1
             });
 
-            Dependencies.Cache(dialogOverlay);
+            Dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -109,7 +111,7 @@ namespace osu.Game.Screens.Menu
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        logoBounceContainer = new Container
+                        logoBounceContainer = new DragContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
@@ -283,9 +285,15 @@ namespace osu.Game.Screens.Menu
                 this.Delay(early_activation).Schedule(() =>
                 {
                     if (beatIndex % timingPoint.TimeSignature.Numerator == 0)
-                        sampleDownbeat.Play();
+                    {
+                        sampleDownbeat?.Play();
+                    }
                     else
-                        sampleBeat.Play();
+                    {
+                        var channel = sampleBeat.GetChannel();
+                        channel.Frequency.Value = 0.95 + RNG.NextDouble(0.1);
+                        channel.Play();
+                    }
                 });
             }
 
@@ -395,6 +403,29 @@ namespace osu.Game.Screens.Menu
             impactContainer.FadeOutFromOne(250, Easing.In);
             impactContainer.ScaleTo(0.96f);
             impactContainer.ScaleTo(1.12f, 250);
+        }
+
+        private class DragContainer : Container
+        {
+            public override bool DragBlocksClick => false;
+
+            protected override bool OnDragStart(DragStartEvent e) => true;
+
+            protected override void OnDrag(DragEvent e)
+            {
+                Vector2 change = e.MousePosition - e.MouseDownPosition;
+
+                // Diminish the drag distance as we go further to simulate "rubber band" feeling.
+                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.6f) / change.Length;
+
+                this.MoveTo(change);
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
+                base.OnDragEnd(e);
+            }
         }
     }
 }

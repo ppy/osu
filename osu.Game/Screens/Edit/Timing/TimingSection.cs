@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -19,6 +21,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             Flow.AddRange(new Drawable[]
             {
+                new TapTimingControl(),
                 bpmTextEntry = new BPMTextBox(),
                 timeSignature = new LabelledTimeSignature
                 {
@@ -27,15 +30,31 @@ namespace osu.Game.Screens.Edit.Timing
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            bpmTextEntry.Current.BindValueChanged(_ => saveChanges());
+            timeSignature.Current.BindValueChanged(_ => saveChanges());
+
+            void saveChanges()
+            {
+                if (!isRebinding) ChangeHandler?.SaveState();
+            }
+        }
+
+        private bool isRebinding;
+
         protected override void OnControlPointChanged(ValueChangedEvent<TimingControlPoint> point)
         {
             if (point.NewValue != null)
             {
-                bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
-                bpmTextEntry.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+                isRebinding = true;
 
+                bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
                 timeSignature.Current = point.NewValue.TimeSignatureBindable;
-                timeSignature.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+
+                isRebinding = false;
             }
         }
 
@@ -58,7 +77,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 Label = "BPM";
 
-                OnCommit += (val, isNew) =>
+                OnCommit += (_, isNew) =>
                 {
                     if (!isNew) return;
 

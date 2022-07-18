@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
@@ -263,7 +266,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     barLinePlayfield.Add(barLine);
                     break;
 
-                case DrawableTaikoHitObject _:
+                case DrawableTaikoHitObject:
                     base.Add(h);
                     break;
 
@@ -279,7 +282,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case DrawableBarLine barLine:
                     return barLinePlayfield.Remove(barLine);
 
-                case DrawableTaikoHitObject _:
+                case DrawableTaikoHitObject:
                     return base.Remove(h);
 
                 default:
@@ -298,12 +301,12 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             switch (result.Judgement)
             {
-                case TaikoStrongJudgement _:
+                case TaikoStrongJudgement:
                     if (result.IsHit)
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
                     break;
 
-                case TaikoDrumRollTickJudgement _:
+                case TaikoDrumRollTickJudgement:
                     if (!result.IsHit)
                         break;
 
@@ -342,12 +345,14 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private class ProxyContainer : LifetimeManagementContainer
         {
-            public new MarginPadding Padding
-            {
-                set => base.Padding = value;
-            }
-
             public void Add(Drawable proxy) => AddInternal(proxy);
+
+            public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds)
+            {
+                // DrawableHitObject disables masking.
+                // Hitobject content is proxied and unproxied based on hit status and the IsMaskedAway value could get stuck because of this.
+                return false;
+            }
         }
     }
 }

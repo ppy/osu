@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Compose.Components;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
@@ -97,6 +100,32 @@ namespace osu.Game.Screens.Edit
 
                 default:
                     return Color4.Red;
+            }
+        }
+
+        /// <summary>
+        /// Get a relative display size for the specified divisor.
+        /// </summary>
+        /// <param name="beatDivisor">The beat divisor.</param>
+        /// <returns>A relative size which can be used to display ticks.</returns>
+        public static Vector2 GetSize(int beatDivisor)
+        {
+            switch (beatDivisor)
+            {
+                case 1:
+                case 2:
+                    return new Vector2(0.6f, 0.9f);
+
+                case 3:
+                case 4:
+                    return new Vector2(0.5f, 0.8f);
+
+                case 6:
+                case 8:
+                    return new Vector2(0.4f, 0.7f);
+
+                default:
+                    return new Vector2(0.3f, 0.6f);
             }
         }
 

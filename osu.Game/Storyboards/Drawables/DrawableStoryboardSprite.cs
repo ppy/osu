@@ -1,17 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardSprite : CompositeDrawable, IFlippable, IVectorScalable
+    public class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
 
@@ -85,19 +88,33 @@ namespace osu.Game.Storyboards.Drawables
 
             LifetimeStart = sprite.StartTime;
             LifetimeEnd = sprite.EndTime;
-
-            AutoSizeAxes = Axes.Both;
         }
+
+        [Resolved]
+        private ISkinSource skin { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            var drawable = storyboard.CreateSpriteFromResourcePath(Sprite.Path, textureStore);
+            Texture = storyboard.GetTextureFromPath(Sprite.Path, textureStore);
 
-            if (drawable != null)
-                InternalChild = drawable;
+            if (Texture == null && storyboard.UseSkinSprites)
+            {
+                skin.SourceChanged += skinSourceChanged;
+                skinSourceChanged();
+            }
 
             Sprite.ApplyTransforms(this);
+        }
+
+        private void skinSourceChanged() => Texture = skin.GetTexture(Sprite.Path);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skin != null)
+                skin.SourceChanged -= skinSourceChanged;
         }
     }
 }
