@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Username = @"Somebody",
             Id = 1,
-            CountryCode = CountryCode.XX,
+            CountryCode = CountryCode.Unknown,
             CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
