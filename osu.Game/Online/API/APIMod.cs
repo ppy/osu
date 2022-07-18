@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Humanizer;
 using MessagePack;
@@ -48,7 +49,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        public Mod ToMod(Ruleset ruleset)
+        public Mod ToMod([NotNull] Ruleset ruleset)
         {
             Mod resultMod = ruleset.CreateModFromAcronym(Acronym);
 

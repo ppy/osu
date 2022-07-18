@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -35,18 +33,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         public readonly MultiplayerRoomUser User;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private IRulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; } = null!;
 
-        private SpriteIcon crown;
+        private SpriteIcon crown = null!;
 
-        private OsuSpriteText userRankText;
-        private ModDisplay userModsDisplay;
-        private StateDisplay userStateDisplay;
+        private OsuSpriteText userRankText = null!;
+        private ModDisplay userModsDisplay = null!;
+        private StateDisplay userStateDisplay = null!;
 
-        private IconButton kickButton;
+        private IconButton kickButton = null!;
 
         public ParticipantPanel(MultiplayerRoomUser user)
         {
@@ -135,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
-                                            Text = user?.Username
+                                            Text = user?.Username ?? string.Empty
                                         },
                                         userRankText = new OsuSpriteText
                                         {
@@ -188,7 +186,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             const double fade_time = 50;
 
             var currentItem = Playlist.GetCurrentItem();
-            var ruleset = currentItem != null ? rulesets.GetRuleset(currentItem.RulesetID)?.CreateInstance() : null;
+            Ruleset? ruleset = currentItem != null ? rulesets.GetRuleset(currentItem.RulesetID)?.CreateInstance() : null;
 
             int? currentModeRank = ruleset != null ? User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank : null;
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
@@ -208,7 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             Schedule(() => userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset)).ToList());
         }
 
-        public MenuItem[] ContextMenuItems
+        public MenuItem[]? ContextMenuItems
         {
             get
             {
