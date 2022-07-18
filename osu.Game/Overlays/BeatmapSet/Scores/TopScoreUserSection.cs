@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             set
             {
                 avatar.User = value.User;
-                flag.Country = value.User.Country;
+                flag.CountryCode = value.User.CountryCode;
                 achievedOn.Date = value.Date;
 
                 usernameText.Clear();

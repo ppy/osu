@@ -257,10 +257,14 @@ namespace osu.Game.Overlays.Chat
             }
 
             [BackgroundDependencyLoader]
-            private void load(UserProfileOverlay? profile, ChannelManager? chatManager)
+            private void load(UserProfileOverlay? profile, ChannelManager? chatManager, ChatOverlay? chatOverlay)
             {
                 Action = () => profile?.ShowUser(sender);
-                startChatAction = () => chatManager?.OpenPrivateChannel(sender);
+                startChatAction = () =>
+                {
+                    chatManager?.OpenPrivateChannel(sender);
+                    chatOverlay?.Show();
+                };
             }
 
             public MenuItem[] ContextMenuItems
