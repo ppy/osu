@@ -65,7 +65,14 @@ namespace osu.Game.Online.API
                     if (!Settings.TryGetValue(property.Name.Underscore(), out object settingValue))
                         continue;
 
-                    resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                    try
+                    {
+                        resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Failed to copy mod setting value '{settingValue ?? "null"}' to \"{property.Name}\": {ex.Message}");
+                    }
                 }
             }
 
