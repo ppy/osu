@@ -76,8 +76,11 @@ namespace osu.Game.Screens.Select
 
                 updateMultiplierText();
 
-                modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
-                modSettingChangeTracker.SettingChanged += _ => updateMultiplierText();
+                if (mods.NewValue != null)
+                {
+                    modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+                    modSettingChangeTracker.SettingChanged += _ => updateMultiplierText();
+                }
             }, true);
         }
 
