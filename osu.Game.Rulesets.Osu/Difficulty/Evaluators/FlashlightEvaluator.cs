@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Diagnostics;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -83,8 +82,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuCurrent.BaseObject is Slider)
             {
-                Debug.Assert(osuCurrent.TravelTime > 0);
-
                 Slider osuSlider = (Slider)(osuCurrent.BaseObject);
 
                 // Invert the scaling factor to determine the true travel distance independent of circle size.
