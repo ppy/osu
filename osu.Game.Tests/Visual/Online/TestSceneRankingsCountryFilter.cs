@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneRankingsCountryFilter()
         {
-            var countryBindable = new Bindable<Country>();
+            var countryBindable = new Bindable<CountryCode>();
 
             AddRange(new Drawable[]
             {
@@ -56,8 +56,8 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            const Country country = Country.BY;
-            const Country unknown_country = Country.CK;
+            const CountryCode country = CountryCode.BY;
+            const CountryCode unknown_country = CountryCode.CK;
 
             AddStep("Set country", () => countryBindable.Value = country);
             AddStep("Set default country", () => countryBindable.Value = default);

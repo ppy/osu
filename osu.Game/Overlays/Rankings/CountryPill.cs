@@ -22,13 +22,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class CountryPill : CompositeDrawable, IHasCurrentValue<Country>
+    public class CountryPill : CompositeDrawable, IHasCurrentValue<CountryCode>
     {
         private const int duration = 200;
 
-        private readonly BindableWithCurrent<Country> current = new BindableWithCurrent<Country>();
+        private readonly BindableWithCurrent<CountryCode> current = new BindableWithCurrent<CountryCode>();
 
-        public Bindable<Country> Current
+        public Bindable<CountryCode> Current
         {
             get => current.Current;
             set => current.Current = value;
@@ -131,12 +131,12 @@ namespace osu.Game.Overlays.Rankings
             this.FadeOut(duration, Easing.OutQuint);
         }
 
-        private void onCountryChanged(ValueChangedEvent<Country> country)
+        private void onCountryChanged(ValueChangedEvent<CountryCode> country)
         {
-            if (country.NewValue == default)
+            if (Current.Value == CountryCode.Unknown)
                 return;
 
-            flag.Country = country.NewValue;
+            flag.CountryCode = country.NewValue;
             countryName.Text = country.NewValue.GetDescription();
         }
 
