@@ -21,6 +21,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
+using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tournament
@@ -186,7 +187,9 @@ namespace osu.Game.Tournament
         {
             var playersRequiringPopulation = ladder.Teams
                                                    .SelectMany(t => t.Players)
-                                                   .Where(p => string.IsNullOrEmpty(p.Username) || p.Rank == null).ToList();
+                                                   .Where(p => string.IsNullOrEmpty(p.Username)
+                                                               || p.CountryCode == CountryCode.Unknown
+                                                               || p.Rank == null).ToList();
 
             if (playersRequiringPopulation.Count == 0)
                 return false;
@@ -288,7 +291,7 @@ namespace osu.Game.Tournament
 
                 user.Username = res.Username;
                 user.CoverUrl = res.CoverUrl;
-                user.Country = res.Country;
+                user.CountryCode = res.CountryCode;
                 user.Rank = res.Statistics?.GlobalRank;
 
                 success?.Invoke();
