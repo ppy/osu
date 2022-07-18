@@ -129,6 +129,11 @@ namespace osu.Game.Rulesets.Mods
                                     .ToList();
 
         /// <summary>
+        /// Whether all settings in this mod are set to their default state.
+        /// </summary>
+        protected virtual bool UsesDefaultConfiguration => Settings.All(s => s.IsDefault);
+
+        /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
         public virtual Mod DeepClone()
