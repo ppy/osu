@@ -120,12 +120,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
             }
 
-            if (osuLastObj.BaseObject is Slider)
+            if (osuLastObj.BaseObject is Slider osuSlider)
             {
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
-
-                Slider osuSlider = (Slider)(osuLastObj.BaseObject);
                 sliderBonus *= (float)Math.Pow(1 + osuSlider.RepeatCount / 2.5, 1.0 / 2.5); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
             }
 
