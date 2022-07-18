@@ -168,7 +168,7 @@ namespace osu.Game.Beatmaps
 
                     if (texture == null)
                     {
-                        Logger.Log($"Beatmap background failed to load (file {Metadata.BackgroundFile} not found on disk at expected location {fileStorePath}).", level: LogLevel.Error);
+                        Logger.Log($"Beatmap background failed to load (file {Metadata.BackgroundFile} not found on disk at expected location {fileStorePath}).");
                         return null;
                     }
 
