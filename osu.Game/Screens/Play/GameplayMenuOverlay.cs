@@ -255,7 +255,9 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                State = SelectionState.Selected;
+                if (IsHovered)
+                    State = SelectionState.Selected;
+
                 return base.OnMouseMove(e);
             }
         }
