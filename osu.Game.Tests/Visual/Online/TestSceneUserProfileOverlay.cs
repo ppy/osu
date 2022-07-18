@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Username = @"Somebody",
             Id = 1,
-            Country = new Country { FullName = @"Alien" },
+            CountryCode = CountryCode.Unknown,
             CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = @"peppy",
                 Id = 2,
                 IsSupporter = true,
-                Country = new Country { FullName = @"Australia", FlagName = @"AU" },
+                CountryCode = CountryCode.AU,
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
             }));
 
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Username = @"flyte",
                 Id = 3103765,
-                Country = new Country { FullName = @"Japan", FlagName = @"JP" },
+                CountryCode = CountryCode.JP,
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             }));
 
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = @"BanchoBot",
                 Id = 3,
                 IsBot = true,
-                Country = new Country { FullName = @"Saint Helena", FlagName = @"SH" },
+                CountryCode = CountryCode.SH,
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg"
             }));
 
