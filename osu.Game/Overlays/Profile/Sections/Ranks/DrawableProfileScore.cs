@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         {
                                             var ruleset = rulesets.GetRuleset(Score.RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {Score.RulesetID} not found locally");
 
-                                            return new ModIcon(ruleset.CreateInstance().CreateModFromAcronym(mod.Acronym))
+                                            return new ModIcon(mod.ToMod(ruleset.CreateInstance()))
                                             {
                                                 Scale = new Vector2(0.35f)
                                             };
