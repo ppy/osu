@@ -18,7 +18,7 @@ namespace osu.Game.Models
         [Ignored]
         public CountryCode CountryCode
         {
-            get => Enum.TryParse(CountryString, out CountryCode country) ? country : default;
+            get => Enum.TryParse(CountryString, out CountryCode country) ? country : CountryCode.Unknown;
             set => CountryString = value.ToString();
         }
 
