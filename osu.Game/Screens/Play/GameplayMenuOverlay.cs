@@ -255,8 +255,13 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                if (IsHovered)
-                    State = SelectionState.Selected;
+                // hover state updates after mouse move propagation, therefore we have to schedule to ensure this invokes afterwards.
+                // see: https://github.com/ppy/osu-framework/issues/3153
+                Schedule(() =>
+                {
+                    if (IsHovered)
+                        State = SelectionState.Selected;
+                });
 
                 return base.OnMouseMove(e);
             }
