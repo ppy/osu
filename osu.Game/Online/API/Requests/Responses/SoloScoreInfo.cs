@@ -101,7 +101,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             var rulesetInstance = ruleset.CreateInstance();
 
-            var mods = Mods.Select(apiMod => rulesetInstance.CreateModFromAcronym(apiMod.Acronym)).Where(m => m != null).ToArray();
+            var mods = Mods.Select(apiMod => apiMod.ToMod(rulesetInstance)).ToArray();
 
             var scoreInfo = ToScoreInfo(mods);
 
