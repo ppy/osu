@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -20,6 +21,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -203,7 +205,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
             // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
-            Schedule(() => userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset)).ToList());
+            Schedule(() =>
+            {
+                userModsDisplay.Current.Value = ruleset != null ? User.Mods.Select(m => m.ToMod(ruleset)).ToList() : Array.Empty<Mod>();
+            });
         }
 
         public MenuItem[]? ContextMenuItems
