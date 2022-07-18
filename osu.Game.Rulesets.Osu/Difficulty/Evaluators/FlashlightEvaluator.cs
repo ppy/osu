@@ -80,10 +80,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double sliderBonus = 0.0;
 
-            if (osuCurrent.BaseObject is Slider)
+            if (osuCurrent.BaseObject is Slider osuSlider)
             {
-                Slider osuSlider = (Slider)(osuCurrent.BaseObject);
-
                 // Invert the scaling factor to determine the true travel distance independent of circle size.
                 double pixelTravelDistance = osuCurrent.TravelDistance / scalingFactor;
 
