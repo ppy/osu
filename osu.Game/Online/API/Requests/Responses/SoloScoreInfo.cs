@@ -82,6 +82,23 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("user")]
         public APIUser? User { get; set; }
 
+        [JsonProperty("beatmap")]
+        public APIBeatmap? Beatmap { get; set; }
+
+        [JsonProperty("beatmapset")]
+        public APIBeatmapSet? BeatmapSet
+        {
+            set
+            {
+                // in the deserialisation case we need to ferry this data across.
+                // the order of properties returned by the API guarantees that the beatmap is populated by this point.
+                if (!(Beatmap is APIBeatmap apiBeatmap))
+                    throw new InvalidOperationException("Beatmap set metadata arrived before beatmap metadata in response");
+
+                apiBeatmap.BeatmapSet = value;
+            }
+        }
+
         [JsonProperty("pp")]
         public double? PP { get; set; }
 
