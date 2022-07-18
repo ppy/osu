@@ -187,7 +187,7 @@ namespace osu.Game.Tournament
             var playersRequiringPopulation = ladder.Teams
                                                    .SelectMany(t => t.Players)
                                                    .Where(p => string.IsNullOrEmpty(p.Username)
-                                                               || p.Country == default
+                                                               || p.CountryCode == default
                                                                || p.Rank == null).ToList();
 
             if (playersRequiringPopulation.Count == 0)
@@ -290,7 +290,7 @@ namespace osu.Game.Tournament
 
                 user.Username = res.Username;
                 user.CoverUrl = res.CoverUrl;
-                user.Country = res.Country;
+                user.CountryCode = res.CountryCode;
                 user.Rank = res.Statistics?.GlobalRank;
 
                 success?.Invoke();

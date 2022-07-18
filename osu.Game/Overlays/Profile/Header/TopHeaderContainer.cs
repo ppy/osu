@@ -175,8 +175,8 @@ namespace osu.Game.Overlays.Profile.Header
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
             openUserExternally.Link = $@"{api.WebsiteRootUrl}/users/{user?.Id ?? 0}";
-            userFlag.Country = user?.Country ?? default;
-            userCountryText.Text = (user?.Country ?? default).GetDescription();
+            userFlag.CountryCode = user?.CountryCode ?? default;
+            userCountryText.Text = (user?.CountryCode ?? default).GetDescription();
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
