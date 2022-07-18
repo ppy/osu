@@ -15,13 +15,13 @@ namespace osu.Game.Users.Drawables
 {
     public class DrawableFlag : Sprite, IHasTooltip
     {
-        private readonly Country country;
+        private readonly CountryCode countryCode;
 
-        public LocalisableString TooltipText => country == default ? string.Empty : country.GetDescription();
+        public LocalisableString TooltipText => countryCode == CountryCode.Unknown ? string.Empty : countryCode.GetDescription();
 
-        public DrawableFlag(Country country)
+        public DrawableFlag(CountryCode countryCode)
         {
-            this.country = country;
+            this.countryCode = countryCode;
         }
 
         [BackgroundDependencyLoader]
@@ -30,7 +30,7 @@ namespace osu.Game.Users.Drawables
             if (ts == null)
                 throw new ArgumentNullException(nameof(ts));
 
-            string textureName = country == default ? "__" : country.ToString();
+            string textureName = countryCode == CountryCode.Unknown ? "__" : countryCode.ToString();
             Texture = ts.Get($@"Flags/{textureName}") ?? ts.Get(@"Flags/__");
         }
     }

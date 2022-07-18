@@ -10,7 +10,7 @@ namespace osu.Game.Users
     public class CountryStatistics
     {
         [JsonProperty(@"code")]
-        public Country Country;
+        public CountryCode Code;
 
         [JsonProperty(@"active_users")]
         public long ActiveUsers;

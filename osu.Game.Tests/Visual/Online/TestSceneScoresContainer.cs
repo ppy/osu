@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Id = 6602580,
                             Username = @"waaiiru",
-                            Country = Country.ES,
+                            CountryCode = CountryCode.ES,
                         },
                         Mods = new[]
                         {
@@ -180,7 +180,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Id = 4608074,
                             Username = @"Skycries",
-                            Country = Country.BR,
+                            CountryCode = CountryCode.BR,
                         },
                         Mods = new[]
                         {
@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Id = 1014222,
                             Username = @"eLy",
-                            Country = Country.JP,
+                            CountryCode = CountryCode.JP,
                         },
                         Mods = new[]
                         {
@@ -223,7 +223,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Id = 1541390,
                             Username = @"Toukai",
-                            Country = Country.CA,
+                            CountryCode = CountryCode.CA,
                         },
                         Mods = new[]
                         {
@@ -243,7 +243,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Id = 7151382,
                             Username = @"Mayuri Hana",
-                            Country = Country.TH,
+                            CountryCode = CountryCode.TH,
                         },
                         Rank = ScoreRank.D,
                         PP = 160,
@@ -282,7 +282,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Id = 7151382,
                     Username = @"Mayuri Hana",
-                    Country = Country.TH,
+                    CountryCode = CountryCode.TH,
                 },
                 Rank = ScoreRank.D,
                 PP = 160,
