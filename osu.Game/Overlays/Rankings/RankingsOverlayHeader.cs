@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Rankings
     {
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 
-        public Bindable<Country> Country => countryFilter.Current;
+        public Bindable<CountryCode> Country => countryFilter.Current;
 
         private OverlayRulesetSelector rulesetSelector;
         private CountryFilter countryFilter;
