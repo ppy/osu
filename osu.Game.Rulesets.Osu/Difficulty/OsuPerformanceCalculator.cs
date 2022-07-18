@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
-            double multiplier = 1.11; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+            double multiplier = 1.125; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
@@ -276,6 +276,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
         private int totalHits => countGreat + countOk + countMeh + countMiss;
-        private int totalSuccessfulHits => countGreat + countOk + countMeh;
     }
 }
