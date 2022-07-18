@@ -128,7 +128,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Size = new Vector2(28, 20),
-                                            Country = user?.Country
+                                            CountryCode = user?.CountryCode ?? default
                                         },
                                         new OsuSpriteText
                                         {
