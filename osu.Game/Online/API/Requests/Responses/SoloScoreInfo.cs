@@ -54,7 +54,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset? StartedAt { get; set; }
 
         [JsonProperty("ended_at")]
-        public DateTimeOffset? EndedAt { get; set; }
+        public DateTimeOffset EndedAt { get; set; }
 
         [JsonProperty("mods")]
         public APIMod[] Mods { get; set; } = Array.Empty<APIMod>();
@@ -128,7 +128,7 @@ namespace osu.Game.Online.API.Requests.Responses
             MaxCombo = MaxCombo,
             Rank = Rank,
             Statistics = Statistics,
-            Date = EndedAt ?? DateTimeOffset.Now,
+            Date = EndedAt,
             Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
             Mods = mods,
             PP = PP,
