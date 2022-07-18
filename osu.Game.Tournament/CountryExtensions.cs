@@ -8,758 +8,758 @@ namespace osu.Game.Tournament
 {
     public static class CountryExtensions
     {
-        public static string GetAcronym(this Country country)
+        public static string GetAcronym(this CountryCode country)
         {
             switch (country)
             {
-                case Country.BD:
+                case CountryCode.BD:
                     return "BGD";
 
-                case Country.BE:
+                case CountryCode.BE:
                     return "BEL";
 
-                case Country.BF:
+                case CountryCode.BF:
                     return "BFA";
 
-                case Country.BG:
+                case CountryCode.BG:
                     return "BGR";
 
-                case Country.BA:
+                case CountryCode.BA:
                     return "BIH";
 
-                case Country.BB:
+                case CountryCode.BB:
                     return "BRB";
 
-                case Country.WF:
+                case CountryCode.WF:
                     return "WLF";
 
-                case Country.BL:
+                case CountryCode.BL:
                     return "BLM";
 
-                case Country.BM:
+                case CountryCode.BM:
                     return "BMU";
 
-                case Country.BN:
+                case CountryCode.BN:
                     return "BRN";
 
-                case Country.BO:
+                case CountryCode.BO:
                     return "BOL";
 
-                case Country.BH:
+                case CountryCode.BH:
                     return "BHR";
 
-                case Country.BI:
+                case CountryCode.BI:
                     return "BDI";
 
-                case Country.BJ:
+                case CountryCode.BJ:
                     return "BEN";
 
-                case Country.BT:
+                case CountryCode.BT:
                     return "BTN";
 
-                case Country.JM:
+                case CountryCode.JM:
                     return "JAM";
 
-                case Country.BV:
+                case CountryCode.BV:
                     return "BVT";
 
-                case Country.BW:
+                case CountryCode.BW:
                     return "BWA";
 
-                case Country.WS:
+                case CountryCode.WS:
                     return "WSM";
 
-                case Country.BQ:
+                case CountryCode.BQ:
                     return "BES";
 
-                case Country.BR:
+                case CountryCode.BR:
                     return "BRA";
 
-                case Country.BS:
+                case CountryCode.BS:
                     return "BHS";
 
-                case Country.JE:
+                case CountryCode.JE:
                     return "JEY";
 
-                case Country.BY:
+                case CountryCode.BY:
                     return "BLR";
 
-                case Country.BZ:
+                case CountryCode.BZ:
                     return "BLZ";
 
-                case Country.RU:
+                case CountryCode.RU:
                     return "RUS";
 
-                case Country.RW:
+                case CountryCode.RW:
                     return "RWA";
 
-                case Country.RS:
+                case CountryCode.RS:
                     return "SRB";
 
-                case Country.TL:
+                case CountryCode.TL:
                     return "TLS";
 
-                case Country.RE:
+                case CountryCode.RE:
                     return "REU";
 
-                case Country.TM:
+                case CountryCode.TM:
                     return "TKM";
 
-                case Country.TJ:
+                case CountryCode.TJ:
                     return "TJK";
 
-                case Country.RO:
+                case CountryCode.RO:
                     return "ROU";
 
-                case Country.TK:
+                case CountryCode.TK:
                     return "TKL";
 
-                case Country.GW:
+                case CountryCode.GW:
                     return "GNB";
 
-                case Country.GU:
+                case CountryCode.GU:
                     return "GUM";
 
-                case Country.GT:
+                case CountryCode.GT:
                     return "GTM";
 
-                case Country.GS:
+                case CountryCode.GS:
                     return "SGS";
 
-                case Country.GR:
+                case CountryCode.GR:
                     return "GRC";
 
-                case Country.GQ:
+                case CountryCode.GQ:
                     return "GNQ";
 
-                case Country.GP:
+                case CountryCode.GP:
                     return "GLP";
 
-                case Country.JP:
+                case CountryCode.JP:
                     return "JPN";
 
-                case Country.GY:
+                case CountryCode.GY:
                     return "GUY";
 
-                case Country.GG:
+                case CountryCode.GG:
                     return "GGY";
 
-                case Country.GF:
+                case CountryCode.GF:
                     return "GUF";
 
-                case Country.GE:
+                case CountryCode.GE:
                     return "GEO";
 
-                case Country.GD:
+                case CountryCode.GD:
                     return "GRD";
 
-                case Country.GB:
+                case CountryCode.GB:
                     return "GBR";
 
-                case Country.GA:
+                case CountryCode.GA:
                     return "GAB";
 
-                case Country.SV:
+                case CountryCode.SV:
                     return "SLV";
 
-                case Country.GN:
+                case CountryCode.GN:
                     return "GIN";
 
-                case Country.GM:
+                case CountryCode.GM:
                     return "GMB";
 
-                case Country.GL:
+                case CountryCode.GL:
                     return "GRL";
 
-                case Country.GI:
+                case CountryCode.GI:
                     return "GIB";
 
-                case Country.GH:
+                case CountryCode.GH:
                     return "GHA";
 
-                case Country.OM:
+                case CountryCode.OM:
                     return "OMN";
 
-                case Country.TN:
+                case CountryCode.TN:
                     return "TUN";
 
-                case Country.JO:
+                case CountryCode.JO:
                     return "JOR";
 
-                case Country.HR:
+                case CountryCode.HR:
                     return "HRV";
 
-                case Country.HT:
+                case CountryCode.HT:
                     return "HTI";
 
-                case Country.HU:
+                case CountryCode.HU:
                     return "HUN";
 
-                case Country.HK:
+                case CountryCode.HK:
                     return "HKG";
 
-                case Country.HN:
+                case CountryCode.HN:
                     return "HND";
 
-                case Country.HM:
+                case CountryCode.HM:
                     return "HMD";
 
-                case Country.VE:
+                case CountryCode.VE:
                     return "VEN";
 
-                case Country.PR:
+                case CountryCode.PR:
                     return "PRI";
 
-                case Country.PS:
+                case CountryCode.PS:
                     return "PSE";
 
-                case Country.PW:
+                case CountryCode.PW:
                     return "PLW";
 
-                case Country.PT:
+                case CountryCode.PT:
                     return "PRT";
 
-                case Country.SJ:
+                case CountryCode.SJ:
                     return "SJM";
 
-                case Country.PY:
+                case CountryCode.PY:
                     return "PRY";
 
-                case Country.IQ:
+                case CountryCode.IQ:
                     return "IRQ";
 
-                case Country.PA:
+                case CountryCode.PA:
                     return "PAN";
 
-                case Country.PF:
+                case CountryCode.PF:
                     return "PYF";
 
-                case Country.PG:
+                case CountryCode.PG:
                     return "PNG";
 
-                case Country.PE:
+                case CountryCode.PE:
                     return "PER";
 
-                case Country.PK:
+                case CountryCode.PK:
                     return "PAK";
 
-                case Country.PH:
+                case CountryCode.PH:
                     return "PHL";
 
-                case Country.PN:
+                case CountryCode.PN:
                     return "PCN";
 
-                case Country.PL:
+                case CountryCode.PL:
                     return "POL";
 
-                case Country.PM:
+                case CountryCode.PM:
                     return "SPM";
 
-                case Country.ZM:
+                case CountryCode.ZM:
                     return "ZMB";
 
-                case Country.EH:
+                case CountryCode.EH:
                     return "ESH";
 
-                case Country.EE:
+                case CountryCode.EE:
                     return "EST";
 
-                case Country.EG:
+                case CountryCode.EG:
                     return "EGY";
 
-                case Country.ZA:
+                case CountryCode.ZA:
                     return "ZAF";
 
-                case Country.EC:
+                case CountryCode.EC:
                     return "ECU";
 
-                case Country.IT:
+                case CountryCode.IT:
                     return "ITA";
 
-                case Country.VN:
+                case CountryCode.VN:
                     return "VNM";
 
-                case Country.SB:
+                case CountryCode.SB:
                     return "SLB";
 
-                case Country.ET:
+                case CountryCode.ET:
                     return "ETH";
 
-                case Country.SO:
+                case CountryCode.SO:
                     return "SOM";
 
-                case Country.ZW:
+                case CountryCode.ZW:
                     return "ZWE";
 
-                case Country.SA:
+                case CountryCode.SA:
                     return "SAU";
 
-                case Country.ES:
+                case CountryCode.ES:
                     return "ESP";
 
-                case Country.ER:
+                case CountryCode.ER:
                     return "ERI";
 
-                case Country.ME:
+                case CountryCode.ME:
                     return "MNE";
 
-                case Country.MD:
+                case CountryCode.MD:
                     return "MDA";
 
-                case Country.MG:
+                case CountryCode.MG:
                     return "MDG";
 
-                case Country.MF:
+                case CountryCode.MF:
                     return "MAF";
 
-                case Country.MA:
+                case CountryCode.MA:
                     return "MAR";
 
-                case Country.MC:
+                case CountryCode.MC:
                     return "MCO";
 
-                case Country.UZ:
+                case CountryCode.UZ:
                     return "UZB";
 
-                case Country.MM:
+                case CountryCode.MM:
                     return "MMR";
 
-                case Country.ML:
+                case CountryCode.ML:
                     return "MLI";
 
-                case Country.MO:
+                case CountryCode.MO:
                     return "MAC";
 
-                case Country.MN:
+                case CountryCode.MN:
                     return "MNG";
 
-                case Country.MH:
+                case CountryCode.MH:
                     return "MHL";
 
-                case Country.MK:
+                case CountryCode.MK:
                     return "MKD";
 
-                case Country.MU:
+                case CountryCode.MU:
                     return "MUS";
 
-                case Country.MT:
+                case CountryCode.MT:
                     return "MLT";
 
-                case Country.MW:
+                case CountryCode.MW:
                     return "MWI";
 
-                case Country.MV:
+                case CountryCode.MV:
                     return "MDV";
 
-                case Country.MQ:
+                case CountryCode.MQ:
                     return "MTQ";
 
-                case Country.MP:
+                case CountryCode.MP:
                     return "MNP";
 
-                case Country.MS:
+                case CountryCode.MS:
                     return "MSR";
 
-                case Country.MR:
+                case CountryCode.MR:
                     return "MRT";
 
-                case Country.IM:
+                case CountryCode.IM:
                     return "IMN";
 
-                case Country.UG:
+                case CountryCode.UG:
                     return "UGA";
 
-                case Country.TZ:
+                case CountryCode.TZ:
                     return "TZA";
 
-                case Country.MY:
+                case CountryCode.MY:
                     return "MYS";
 
-                case Country.MX:
+                case CountryCode.MX:
                     return "MEX";
 
-                case Country.IL:
+                case CountryCode.IL:
                     return "ISR";
 
-                case Country.FR:
+                case CountryCode.FR:
                     return "FRA";
 
-                case Country.IO:
+                case CountryCode.IO:
                     return "IOT";
 
-                case Country.SH:
+                case CountryCode.SH:
                     return "SHN";
 
-                case Country.FI:
+                case CountryCode.FI:
                     return "FIN";
 
-                case Country.FJ:
+                case CountryCode.FJ:
                     return "FJI";
 
-                case Country.FK:
+                case CountryCode.FK:
                     return "FLK";
 
-                case Country.FM:
+                case CountryCode.FM:
                     return "FSM";
 
-                case Country.FO:
+                case CountryCode.FO:
                     return "FRO";
 
-                case Country.NI:
+                case CountryCode.NI:
                     return "NIC";
 
-                case Country.NL:
+                case CountryCode.NL:
                     return "NLD";
 
-                case Country.NO:
+                case CountryCode.NO:
                     return "NOR";
 
-                case Country.NA:
+                case CountryCode.NA:
                     return "NAM";
 
-                case Country.VU:
+                case CountryCode.VU:
                     return "VUT";
 
-                case Country.NC:
+                case CountryCode.NC:
                     return "NCL";
 
-                case Country.NE:
+                case CountryCode.NE:
                     return "NER";
 
-                case Country.NF:
+                case CountryCode.NF:
                     return "NFK";
 
-                case Country.NG:
+                case CountryCode.NG:
                     return "NGA";
 
-                case Country.NZ:
+                case CountryCode.NZ:
                     return "NZL";
 
-                case Country.NP:
+                case CountryCode.NP:
                     return "NPL";
 
-                case Country.NR:
+                case CountryCode.NR:
                     return "NRU";
 
-                case Country.NU:
+                case CountryCode.NU:
                     return "NIU";
 
-                case Country.CK:
+                case CountryCode.CK:
                     return "COK";
 
-                case Country.XK:
+                case CountryCode.XK:
                     return "XKX";
 
-                case Country.CI:
+                case CountryCode.CI:
                     return "CIV";
 
-                case Country.CH:
+                case CountryCode.CH:
                     return "CHE";
 
-                case Country.CO:
+                case CountryCode.CO:
                     return "COL";
 
-                case Country.CN:
+                case CountryCode.CN:
                     return "CHN";
 
-                case Country.CM:
+                case CountryCode.CM:
                     return "CMR";
 
-                case Country.CL:
+                case CountryCode.CL:
                     return "CHL";
 
-                case Country.CC:
+                case CountryCode.CC:
                     return "CCK";
 
-                case Country.CA:
+                case CountryCode.CA:
                     return "CAN";
 
-                case Country.CG:
+                case CountryCode.CG:
                     return "COG";
 
-                case Country.CF:
+                case CountryCode.CF:
                     return "CAF";
 
-                case Country.CD:
+                case CountryCode.CD:
                     return "COD";
 
-                case Country.CZ:
+                case CountryCode.CZ:
                     return "CZE";
 
-                case Country.CY:
+                case CountryCode.CY:
                     return "CYP";
 
-                case Country.CX:
+                case CountryCode.CX:
                     return "CXR";
 
-                case Country.CR:
+                case CountryCode.CR:
                     return "CRI";
 
-                case Country.CW:
+                case CountryCode.CW:
                     return "CUW";
 
-                case Country.CV:
+                case CountryCode.CV:
                     return "CPV";
 
-                case Country.CU:
+                case CountryCode.CU:
                     return "CUB";
 
-                case Country.SZ:
+                case CountryCode.SZ:
                     return "SWZ";
 
-                case Country.SY:
+                case CountryCode.SY:
                     return "SYR";
 
-                case Country.SX:
+                case CountryCode.SX:
                     return "SXM";
 
-                case Country.KG:
+                case CountryCode.KG:
                     return "KGZ";
 
-                case Country.KE:
+                case CountryCode.KE:
                     return "KEN";
 
-                case Country.SS:
+                case CountryCode.SS:
                     return "SSD";
 
-                case Country.SR:
+                case CountryCode.SR:
                     return "SUR";
 
-                case Country.KI:
+                case CountryCode.KI:
                     return "KIR";
 
-                case Country.KH:
+                case CountryCode.KH:
                     return "KHM";
 
-                case Country.KN:
+                case CountryCode.KN:
                     return "KNA";
 
-                case Country.KM:
+                case CountryCode.KM:
                     return "COM";
 
-                case Country.ST:
+                case CountryCode.ST:
                     return "STP";
 
-                case Country.SK:
+                case CountryCode.SK:
                     return "SVK";
 
-                case Country.KR:
+                case CountryCode.KR:
                     return "KOR";
 
-                case Country.SI:
+                case CountryCode.SI:
                     return "SVN";
 
-                case Country.KP:
+                case CountryCode.KP:
                     return "PRK";
 
-                case Country.KW:
+                case CountryCode.KW:
                     return "KWT";
 
-                case Country.SN:
+                case CountryCode.SN:
                     return "SEN";
 
-                case Country.SM:
+                case CountryCode.SM:
                     return "SMR";
 
-                case Country.SL:
+                case CountryCode.SL:
                     return "SLE";
 
-                case Country.SC:
+                case CountryCode.SC:
                     return "SYC";
 
-                case Country.KZ:
+                case CountryCode.KZ:
                     return "KAZ";
 
-                case Country.KY:
+                case CountryCode.KY:
                     return "CYM";
 
-                case Country.SG:
+                case CountryCode.SG:
                     return "SGP";
 
-                case Country.SE:
+                case CountryCode.SE:
                     return "SWE";
 
-                case Country.SD:
+                case CountryCode.SD:
                     return "SDN";
 
-                case Country.DO:
+                case CountryCode.DO:
                     return "DOM";
 
-                case Country.DM:
+                case CountryCode.DM:
                     return "DMA";
 
-                case Country.DJ:
+                case CountryCode.DJ:
                     return "DJI";
 
-                case Country.DK:
+                case CountryCode.DK:
                     return "DNK";
 
-                case Country.VG:
+                case CountryCode.VG:
                     return "VGB";
 
-                case Country.DE:
+                case CountryCode.DE:
                     return "DEU";
 
-                case Country.YE:
+                case CountryCode.YE:
                     return "YEM";
 
-                case Country.DZ:
+                case CountryCode.DZ:
                     return "DZA";
 
-                case Country.US:
+                case CountryCode.US:
                     return "USA";
 
-                case Country.UY:
+                case CountryCode.UY:
                     return "URY";
 
-                case Country.YT:
+                case CountryCode.YT:
                     return "MYT";
 
-                case Country.UM:
+                case CountryCode.UM:
                     return "UMI";
 
-                case Country.LB:
+                case CountryCode.LB:
                     return "LBN";
 
-                case Country.LC:
+                case CountryCode.LC:
                     return "LCA";
 
-                case Country.LA:
+                case CountryCode.LA:
                     return "LAO";
 
-                case Country.TV:
+                case CountryCode.TV:
                     return "TUV";
 
-                case Country.TW:
+                case CountryCode.TW:
                     return "TWN";
 
-                case Country.TT:
+                case CountryCode.TT:
                     return "TTO";
 
-                case Country.TR:
+                case CountryCode.TR:
                     return "TUR";
 
-                case Country.LK:
+                case CountryCode.LK:
                     return "LKA";
 
-                case Country.LI:
+                case CountryCode.LI:
                     return "LIE";
 
-                case Country.LV:
+                case CountryCode.LV:
                     return "LVA";
 
-                case Country.TO:
+                case CountryCode.TO:
                     return "TON";
 
-                case Country.LT:
+                case CountryCode.LT:
                     return "LTU";
 
-                case Country.LU:
+                case CountryCode.LU:
                     return "LUX";
 
-                case Country.LR:
+                case CountryCode.LR:
                     return "LBR";
 
-                case Country.LS:
+                case CountryCode.LS:
                     return "LSO";
 
-                case Country.TH:
+                case CountryCode.TH:
                     return "THA";
 
-                case Country.TF:
+                case CountryCode.TF:
                     return "ATF";
 
-                case Country.TG:
+                case CountryCode.TG:
                     return "TGO";
 
-                case Country.TD:
+                case CountryCode.TD:
                     return "TCD";
 
-                case Country.TC:
+                case CountryCode.TC:
                     return "TCA";
 
-                case Country.LY:
+                case CountryCode.LY:
                     return "LBY";
 
-                case Country.VA:
+                case CountryCode.VA:
                     return "VAT";
 
-                case Country.VC:
+                case CountryCode.VC:
                     return "VCT";
 
-                case Country.AE:
+                case CountryCode.AE:
                     return "ARE";
 
-                case Country.AD:
+                case CountryCode.AD:
                     return "AND";
 
-                case Country.AG:
+                case CountryCode.AG:
                     return "ATG";
 
-                case Country.AF:
+                case CountryCode.AF:
                     return "AFG";
 
-                case Country.AI:
+                case CountryCode.AI:
                     return "AIA";
 
-                case Country.VI:
+                case CountryCode.VI:
                     return "VIR";
 
-                case Country.IS:
+                case CountryCode.IS:
                     return "ISL";
 
-                case Country.IR:
+                case CountryCode.IR:
                     return "IRN";
 
-                case Country.AM:
+                case CountryCode.AM:
                     return "ARM";
 
-                case Country.AL:
+                case CountryCode.AL:
                     return "ALB";
 
-                case Country.AO:
+                case CountryCode.AO:
                     return "AGO";
 
-                case Country.AQ:
+                case CountryCode.AQ:
                     return "ATA";
 
-                case Country.AS:
+                case CountryCode.AS:
                     return "ASM";
 
-                case Country.AR:
+                case CountryCode.AR:
                     return "ARG";
 
-                case Country.AU:
+                case CountryCode.AU:
                     return "AUS";
 
-                case Country.AT:
+                case CountryCode.AT:
                     return "AUT";
 
-                case Country.AW:
+                case CountryCode.AW:
                     return "ABW";
 
-                case Country.IN:
+                case CountryCode.IN:
                     return "IND";
 
-                case Country.AX:
+                case CountryCode.AX:
                     return "ALA";
 
-                case Country.AZ:
+                case CountryCode.AZ:
                     return "AZE";
 
-                case Country.IE:
+                case CountryCode.IE:
                     return "IRL";
 
-                case Country.ID:
+                case CountryCode.ID:
                     return "IDN";
 
-                case Country.UA:
+                case CountryCode.UA:
                     return "UKR";
 
-                case Country.QA:
+                case CountryCode.QA:
                     return "QAT";
 
-                case Country.MZ:
+                case CountryCode.MZ:
                     return "MOZ";
 
                 default:
