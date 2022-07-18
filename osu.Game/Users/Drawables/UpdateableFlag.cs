@@ -32,14 +32,14 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public Action Action;
 
-        public UpdateableFlag(CountryCode countryCode = default)
+        public UpdateableFlag(CountryCode countryCode = CountryCode.Unknown)
         {
             CountryCode = countryCode;
         }
 
         protected override Drawable CreateDrawable(CountryCode countryCode)
         {
-            if (countryCode == default && !ShowPlaceholderOnUnknown)
+            if (countryCode == CountryCode.Unknown && !ShowPlaceholderOnUnknown)
                 return null;
 
             return new Container

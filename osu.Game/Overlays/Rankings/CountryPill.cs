@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Rankings
 
         private void onCountryChanged(ValueChangedEvent<CountryCode> country)
         {
-            if (country.NewValue == default)
+            if (Current.Value == CountryCode.Unknown)
                 return;
 
             flag.CountryCode = country.NewValue;
