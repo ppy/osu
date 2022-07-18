@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
     public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>
     {
         public override string Description => @"Beats fade out before you hit them!";
-        public override double ScoreMultiplier => 1.06;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         /// <summary>
         /// How far away from the hit target should hitobjects start to fade out.
