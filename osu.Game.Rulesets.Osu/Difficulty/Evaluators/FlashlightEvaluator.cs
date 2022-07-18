@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const double min_velocity = 0.5;
         private const double slider_multiplier = 1.3;
-        private const double repeat_bonus = 3.0;
 
         /// <summary>
         /// Evaluates the difficulty of memorising and hitting an object, based on:
@@ -91,9 +90,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Longer sliders require more memorisation.
                 sliderBonus *= pixelTravelDistance;
 
-                // Reward sliders with repeats.
+                // Nerf sliders with repeats, as less memorisation is required.
                 if (osuSlider.RepeatCount > 0)
-                    sliderBonus *= repeat_bonus;
+                    sliderBonus /= (osuSlider.RepeatCount + 1);
             }
 
             result += sliderBonus * slider_multiplier;
