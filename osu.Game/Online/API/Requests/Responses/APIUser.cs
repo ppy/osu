@@ -46,12 +46,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [CanBeNull]
         [JsonProperty(@"country")]
         private Country country;
-
-        private class Country
-        {
-            [JsonProperty(@"code")]
-            public string Code;
-        }
 #pragma warning restore 649
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
@@ -273,5 +267,13 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineID => Id;
 
         public bool Equals(APIUser other) => this.MatchesOnlineID(other);
+
+#pragma warning disable 649
+        private class Country
+        {
+            [JsonProperty(@"code")]
+            public string Code;
+        }
+#pragma warning restore 649
     }
 }
