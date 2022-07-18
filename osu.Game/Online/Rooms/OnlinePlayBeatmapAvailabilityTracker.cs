@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -25,7 +27,7 @@ namespace osu.Game.Online.Rooms
     /// This differs from a regular download tracking composite as this accounts for the
     /// databased beatmap set's checksum, to disallow from playing with an altered version of the beatmap.
     /// </summary>
-    public sealed class OnlinePlayBeatmapAvailabilityTracker : CompositeDrawable
+    public class OnlinePlayBeatmapAvailabilityTracker : CompositeDrawable
     {
         public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
@@ -41,7 +43,7 @@ namespace osu.Game.Online.Rooms
         /// <summary>
         /// The availability state of the currently selected playlist item.
         /// </summary>
-        public IBindable<BeatmapAvailability> Availability => availability;
+        public virtual IBindable<BeatmapAvailability> Availability => availability;
 
         private readonly Bindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>(BeatmapAvailability.NotDownloaded());
 
@@ -99,7 +101,7 @@ namespace osu.Game.Online.Rooms
 
             // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
             realmSubscription?.Dispose();
-            realmSubscription = realm.RegisterForNotifications(r => filteredBeatmaps(), (items, changes, ___) =>
+            realmSubscription = realm.RegisterForNotifications(_ => filteredBeatmaps(), (_, changes, _) =>
             {
                 if (changes == null)
                     return;

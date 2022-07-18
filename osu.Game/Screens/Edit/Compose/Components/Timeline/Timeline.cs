@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -15,12 +17,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    [Cached(typeof(IPositionSnapProvider))]
     [Cached]
     public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
@@ -165,10 +166,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
+            WaveformVisible.BindValueChanged(_ => updateWaveformOpacity());
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
 
-            WaveformVisible.ValueChanged += _ => updateWaveformOpacity();
-            TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            TicksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
+
             ControlPointsVisible.BindValueChanged(visible =>
             {
                 if (visible.NewValue)
@@ -272,12 +274,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (base.OnMouseDown(e))
-            {
                 beginUserDrag();
-                return true;
-            }
 
-            return false;
+            // handling right button as well breaks context menus inside the timeline, only handle left button for now.
+            return e.Button == MouseButton.Left;
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
@@ -308,23 +308,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public double VisibleRange => track.Length / Zoom;
 
-        public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
-            new SnapResult(screenSpacePosition, null);
-
-        public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) =>
+        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All) =>
             new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(screenSpacePosition))));
 
         private double getTimeFromPosition(Vector2 localPosition) =>
             (localPosition.X / Content.DrawWidth) * track.Length;
-
-        public float GetBeatSnapDistanceAt(HitObject referenceObject) => throw new NotImplementedException();
-
-        public float DurationToDistance(HitObject referenceObject, double duration) => throw new NotImplementedException();
-
-        public double DistanceToDuration(HitObject referenceObject, float distance) => throw new NotImplementedException();
-
-        public double GetSnappedDurationFromDistance(HitObject referenceObject, float distance) => throw new NotImplementedException();
-
-        public float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance) => throw new NotImplementedException();
     }
 }

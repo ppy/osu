@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -28,7 +30,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                         // ReSharper disable once AccessToDisposedClosure
                         var storage = host.Storage.GetStorageForDirectory(Path.Combine("tournaments", "default"));
 
-                        using (var stream = storage.GetStream("bracket.json", FileAccess.Write, FileMode.Create))
+                        using (var stream = storage.CreateFileSafely("bracket.json"))
                         using (var writer = new StreamWriter(stream))
                         {
                             writer.Write(@"{

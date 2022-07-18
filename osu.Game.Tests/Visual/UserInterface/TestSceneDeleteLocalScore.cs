@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private BeatmapInfo beatmapInfo;
 
-        [Cached]
+        [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay;
 
         public TestSceneDeleteLocalScore()
@@ -60,20 +61,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Anchor = Anchor.Centre,
                         Size = new Vector2(550f, 450f),
                         Scope = BeatmapLeaderboardScope.Local,
-                        BeatmapInfo = new BeatmapInfo
-                        {
-                            ID = Guid.NewGuid(),
-                            Metadata = new BeatmapMetadata
-                            {
-                                Title = "TestSong",
-                                Artist = "TestArtist",
-                                Author = new RealmUser
-                                {
-                                    Username = "TestAuthor"
-                                },
-                            },
-                            DifficultyName = "Insane"
-                        },
+                        BeatmapInfo = TestResources.CreateTestBeatmapSetInfo().Beatmaps.First()
                     }
                 },
                 dialogOverlay = new DialogOverlay()
@@ -86,7 +74,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, Scheduler));
+            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, Scheduler, API));
             Dependencies.Cache(Realm);
 
             return dependencies;
@@ -113,6 +101,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Rank = ScoreRank.XH,
                         User = new APIUser { Username = "TestUser" },
                         Ruleset = new OsuRuleset().RulesetInfo,
+                        Files = { new RealmNamedFileUsage(new RealmFile { Hash = $"{i}" }, string.Empty) }
                     };
 
                     importedScores.Add(scoreManager.Import(score).Value);

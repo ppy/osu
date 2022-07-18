@@ -15,6 +15,16 @@ namespace osu.Game.Models
 
         public string Username { get; set; } = string.Empty;
 
+        [Ignored]
+        public CountryCode CountryCode
+        {
+            get => Enum.TryParse(CountryString, out CountryCode country) ? country : CountryCode.Unknown;
+            set => CountryString = value.ToString();
+        }
+
+        [MapTo(nameof(CountryCode))]
+        public string CountryString { get; set; } = default(CountryCode).ToString();
+
         public bool IsBot => false;
 
         public bool Equals(RealmUser other)

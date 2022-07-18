@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -133,6 +135,11 @@ namespace osu.Game.Rulesets.UI
                 p.NewResult += (_, r) => NewResult?.Invoke(r);
                 p.RevertResult += (_, r) => RevertResult?.Invoke(r);
             }));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             IsPaused.ValueChanged += paused =>
             {

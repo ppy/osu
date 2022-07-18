@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -29,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override double ScoreMultiplier => 1.12;
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight) };
+
         private DrawableOsuBlinds blinds;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)

@@ -1,14 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class SetupScreen : EditorRoundedScreen
+    public class SetupScreen : EditorScreen
     {
         [Cached]
         private SectionsContainer<SetupSection> sections { get; } = new SetupScreenSectionsContainer();
@@ -22,7 +26,7 @@ namespace osu.Game.Screens.Edit.Setup
         }
 
         [BackgroundDependencyLoader]
-        private void load(EditorBeatmap beatmap)
+        private void load(EditorBeatmap beatmap, OverlayColourProvider colourProvider)
         {
             var sectionsEnumerable = new List<SetupSection>
             {
@@ -36,6 +40,12 @@ namespace osu.Game.Screens.Edit.Setup
             var rulesetSpecificSection = beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateEditorSetupSection();
             if (rulesetSpecificSection != null)
                 sectionsEnumerable.Add(rulesetSpecificSection);
+
+            Add(new Box
+            {
+                Colour = colourProvider.Background3,
+                RelativeSizeAxes = Axes.Both,
+            });
 
             Add(sections.With(s =>
             {

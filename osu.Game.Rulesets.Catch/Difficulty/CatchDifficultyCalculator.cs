@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,6 +51,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             CatchHitObject lastObject = null;
 
+            List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+
             // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
             foreach (var hitObject in beatmap.HitObjects
                                              .SelectMany(obj => obj is JuiceStream stream ? stream.NestedHitObjects.AsEnumerable() : new[] { obj })
@@ -60,10 +64,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     continue;
 
                 if (lastObject != null)
-                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth);
+                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth, objects, objects.Count));
 
                 lastObject = hitObject;
             }
+
+            return objects;
         }
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)

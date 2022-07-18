@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework;
@@ -154,7 +156,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             base.LoadComplete();
 
-            ruleset.ValueChanged += r => updateDisplay();
+            ruleset.ValueChanged += _ => updateDisplay();
 
             // done here so everything can bind in intialization and get the first trigger
             Beatmap.TriggerChange();
@@ -272,8 +274,10 @@ namespace osu.Game.Overlays.BeatmapSet
                             Alpha = 0.5f
                         }
                     },
-                    icon = new DifficultyIcon(beatmapInfo, shouldShowTooltip: false)
+                    icon = new DifficultyIcon(beatmapInfo)
                     {
+                        ShowTooltip = false,
+                        Current = { Value = new StarDifficulty(beatmapInfo.StarRating, 0) },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(size - tile_icon_padding * 2),

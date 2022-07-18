@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
@@ -33,6 +31,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public void Start() => IsRunning = true;
 
         public void Stop() => IsRunning = false;
+
+        void IAdjustableClock.Start()
+        {
+            // Our running state should only be managed by an ISyncManager, ignore calls from external sources.
+        }
+
+        void IAdjustableClock.Stop()
+        {
+            // Our running state should only be managed by an ISyncManager, ignore calls from external sources.
+        }
 
         public bool Seek(double position)
         {

@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -22,7 +23,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
-using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -32,18 +32,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Resolved]
         private SkinManager skinManager { get; set; }
-
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
-
-        [Cached(typeof(HealthProcessor))]
-        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
-
-        [Cached]
-        private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
-
-        [Cached]
-        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
 
         protected override bool HasCustomSteps => true;
 
@@ -81,11 +69,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             if (expectedComponentsContainer == null)
                 return false;
 
-            var expectedComponentsAdjustmentContainer = new Container
+            var expectedComponentsAdjustmentContainer = new DependencyProvidingContainer
             {
                 Position = actualComponentsContainer.Parent.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
                 Size = actualComponentsContainer.DrawSize,
                 Child = expectedComponentsContainer,
+                // proxy the same required dependencies that `actualComponentsContainer` is using.
+                CachedDependencies = new (Type, object)[]
+                {
+                    (typeof(ScoreProcessor), actualComponentsContainer.Dependencies.Get<ScoreProcessor>()),
+                    (typeof(HealthProcessor), actualComponentsContainer.Dependencies.Get<HealthProcessor>()),
+                    (typeof(GameplayState), actualComponentsContainer.Dependencies.Get<GameplayState>()),
+                    (typeof(GameplayClock), actualComponentsContainer.Dependencies.Get<GameplayClock>())
+                },
             };
 
             Add(expectedComponentsAdjustmentContainer);

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System;
@@ -336,8 +338,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             while (++endIndex < vertices.Length - endPointLength)
             {
-                // Keep incrementing while an implicit segment doesn't need to be started
+                // Keep incrementing while an implicit segment doesn't need to be started.
                 if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
+                    continue;
+
+                // Legacy Catmull sliders don't support multiple segments, so adjacent Catmull segments should be treated as a single one.
+                // Importantly, this is not applied to the first control point, which may duplicate the slider path's position
+                // resulting in a duplicate (0,0) control point in the resultant list.
+                if (type == PathType.Catmull && endIndex > 1 && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
                     continue;
 
                 // The last control point of each segment is not allowed to start a new implicit segment.

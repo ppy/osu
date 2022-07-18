@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -163,6 +165,7 @@ namespace osu.Game.Overlays
             Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
 
+            searchTextBox.TakeFocus();
             searchTextBox.HoldFocus = true;
         }
 
@@ -197,7 +200,7 @@ namespace osu.Game.Overlays
             ContentContainer.Margin = new MarginPadding { Left = Sidebar?.DrawWidth ?? 0 };
         }
 
-        private const double fade_in_duration = 1000;
+        private const double fade_in_duration = 500;
 
         private void loadSections()
         {
@@ -213,7 +216,6 @@ namespace osu.Game.Overlays
                 loading.Hide();
 
                 searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchTerm = term.NewValue, true);
-                searchTextBox.TakeFocus();
 
                 loadSidebarButtons();
             });
@@ -284,11 +286,7 @@ namespace osu.Game.Overlays
             public string SearchTerm
             {
                 get => SearchContainer.SearchTerm;
-                set
-                {
-                    SearchContainer.SearchTerm = value;
-                    InvalidateScrollPosition();
-                }
+                set => SearchContainer.SearchTerm = value;
             }
 
             protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
@@ -307,6 +305,8 @@ namespace osu.Game.Overlays
                     Colour = colourProvider.Background4,
                     RelativeSizeAxes = Axes.Both
                 };
+
+                SearchContainer.FilterCompleted += InvalidateScrollPosition;
             }
 
             protected override void UpdateAfterChildren()

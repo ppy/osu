@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using Newtonsoft.Json;
@@ -162,6 +164,13 @@ namespace osu.Game.Online.Rooms
             Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
         }
 
+        /// <summary>
+        /// Copies values from another <see cref="Room"/> into this one.
+        /// </summary>
+        /// <remarks>
+        /// **Beware**: This will store references between <see cref="Room"/>s.
+        /// </remarks>
+        /// <param name="other">The <see cref="Room"/> to copy values from.</param>
         public void CopyFrom(Room other)
         {
             RoomID.Value = other.RoomID.Value;

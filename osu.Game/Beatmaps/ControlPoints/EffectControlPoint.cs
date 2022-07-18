@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class EffectControlPoint : ControlPoint
+    public class EffectControlPoint : ControlPoint, IEquatable<EffectControlPoint>
     {
         public static readonly EffectControlPoint DEFAULT = new EffectControlPoint
         {
@@ -66,7 +67,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => KiaiModeBindable.Value = value;
         }
 
-        public override bool IsRedundant(ControlPoint existing)
+        public override bool IsRedundant(ControlPoint? existing)
             => !OmitFirstBarLine
                && existing is EffectControlPoint existingEffect
                && KiaiMode == existingEffect.KiaiMode
@@ -81,5 +82,17 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             base.CopyFrom(other);
         }
+
+        public override bool Equals(ControlPoint? other)
+            => other is EffectControlPoint otherEffectControlPoint
+               && Equals(otherEffectControlPoint);
+
+        public bool Equals(EffectControlPoint? other)
+            => base.Equals(other)
+               && OmitFirstBarLine == other.OmitFirstBarLine
+               && ScrollSpeed == other.ScrollSpeed
+               && KiaiMode == other.KiaiMode;
+
+        public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), OmitFirstBarLine, ScrollSpeed, KiaiMode);
     }
 }

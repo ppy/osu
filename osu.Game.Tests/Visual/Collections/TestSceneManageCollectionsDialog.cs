@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -50,7 +52,7 @@ namespace osu.Game.Tests.Visual.Collections
             });
 
             Dependencies.Cache(manager);
-            Dependencies.Cache(dialogOverlay);
+            Dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
         }
 
         [SetUp]
@@ -142,18 +144,17 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("add dropdown", () =>
             {
                 Add(new CollectionFilterDropdown
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        RelativeSizeAxes = Axes.X,
-                        Width = 0.4f,
-                    }
-                );
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.4f,
+                });
             });
             AddStep("add two collections with same name", () => manager.Collections.AddRange(new[]
             {
                 new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "1" }, Beatmaps = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0] } },
+                new BeatmapCollection { Name = { Value = "1" }, BeatmapHashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash } },
             }));
         }
 
@@ -163,7 +164,7 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("add two collections", () => manager.Collections.AddRange(new[]
             {
                 new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "2" }, Beatmaps = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0] } },
+                new BeatmapCollection { Name = { Value = "2" }, BeatmapHashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash } },
             }));
 
             assertCollectionCount(2);
@@ -199,7 +200,7 @@ namespace osu.Game.Tests.Visual.Collections
         {
             AddStep("add two collections", () => manager.Collections.AddRange(new[]
             {
-                new BeatmapCollection { Name = { Value = "1" }, Beatmaps = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0] } },
+                new BeatmapCollection { Name = { Value = "1" }, BeatmapHashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash } },
             }));
 
             assertCollectionCount(1);

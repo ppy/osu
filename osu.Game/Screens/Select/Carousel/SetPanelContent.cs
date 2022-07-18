@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -90,8 +92,8 @@ namespace osu.Game.Screens.Select.Carousel
             var beatmaps = carouselSet.Beatmaps.ToList();
 
             return beatmaps.Count > maximum_difficulty_icons
-                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.BeatmapInfo.Ruleset)
-                                                       .Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Last().BeatmapInfo.Ruleset))
+                ? beatmaps.GroupBy(b => b.BeatmapInfo.Ruleset)
+                          .Select(group => new GroupedDifficultyIcon(group.ToList(), group.Last().BeatmapInfo.Ruleset))
                 : beatmaps.Select(b => new FilterableDifficultyIcon(b));
         }
     }

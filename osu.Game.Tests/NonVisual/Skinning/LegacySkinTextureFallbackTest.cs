@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,6 +71,34 @@ namespace osu.Game.Tests.NonVisual.Skinning
                 "Gameplay/osu/followpoint",
                 "followpoint", 1
             },
+            new object[]
+            {
+                // Looking up a filename with extension specified should work.
+                new[] { "followpoint.png" },
+                "followpoint.png",
+                "followpoint.png", 1
+            },
+            new object[]
+            {
+                // Looking up a filename with extension specified should also work with @2x sprites.
+                new[] { "followpoint@2x.png" },
+                "followpoint.png",
+                "followpoint@2x.png", 2
+            },
+            new object[]
+            {
+                // Looking up a path with extension specified should work.
+                new[] { "Gameplay/osu/followpoint.png" },
+                "Gameplay/osu/followpoint.png",
+                "Gameplay/osu/followpoint.png", 1
+            },
+            new object[]
+            {
+                // Looking up a path with extension specified should also work with @2x sprites.
+                new[] { "Gameplay/osu/followpoint@2x.png" },
+                "Gameplay/osu/followpoint.png",
+                "Gameplay/osu/followpoint@2x.png", 2
+            },
         };
 
         [TestCaseSource(nameof(fallbackTestCases))]
@@ -127,7 +157,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
             {
                 // use an incrementing width to allow assertion matching on correct textures as they turn from uploads into actual textures.
                 int width = 1;
-                Textures = fileNames.ToDictionary(fileName => fileName, fileName => new TextureUpload(new Image<Rgba32>(width, width++)));
+                Textures = fileNames.ToDictionary(fileName => fileName, _ => new TextureUpload(new Image<Rgba32>(width, width++)));
             }
 
             public TextureUpload Get(string name) => Textures.GetValueOrDefault(name);

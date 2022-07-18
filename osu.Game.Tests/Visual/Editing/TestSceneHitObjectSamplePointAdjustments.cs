@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using Humanizer;
 using NUnit.Framework;
@@ -55,6 +57,13 @@ namespace osu.Game.Tests.Visual.Editing
                     }
                 });
             });
+        }
+
+        [Test]
+        public void TestPopoverHasFocus()
+        {
+            clickSamplePiece(0);
+            samplePopoverHasFocus();
         }
 
         [Test]
@@ -173,12 +182,21 @@ namespace osu.Game.Tests.Visual.Editing
             samplePopoverHasSingleBank("normal");
         }
 
-        private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} difficulty piece", () =>
+        private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
         {
-            var difficultyPiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
+            var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
 
-            InputManager.MoveMouseTo(difficultyPiece);
+            InputManager.MoveMouseTo(samplePiece);
             InputManager.Click(MouseButton.Left);
+        });
+
+        private void samplePopoverHasFocus() => AddUntilStep("sample popover textbox focused", () =>
+        {
+            var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
+            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+            var textbox = slider?.ChildrenOfType<OsuTextBox>().Single();
+
+            return textbox?.HasFocus == true;
         });
 
         private void samplePopoverHasSingleVolume(int volume) => AddUntilStep($"sample popover has volume {volume}", () =>
@@ -215,8 +233,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void dismissPopover()
         {
+            AddStep("unfocus textbox", () => InputManager.Key(Key.Escape));
             AddStep("dismiss popover", () => InputManager.Key(Key.Escape));
-            AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().Any(popover => popover.IsPresent));
+            AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Any(popover => popover.IsPresent));
         }
 
         private void setVolumeViaPopover(int volume) => AddStep($"set volume {volume} via popover", () =>

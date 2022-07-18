@@ -4,8 +4,6 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
-#nullable enable
-
 namespace osu.Game.Online
 {
     public abstract class DownloadTracker<T> : Component

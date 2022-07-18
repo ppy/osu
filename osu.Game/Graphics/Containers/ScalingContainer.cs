@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -21,6 +23,8 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class ScalingContainer : Container
     {
+        internal const float TRANSITION_DURATION = 500;
+
         private Bindable<float> sizeX;
         private Bindable<float> sizeY;
         private Bindable<float> posX;
@@ -77,10 +81,12 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        private class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
+        public class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
         {
             private readonly bool applyUIScale;
             private Bindable<float> uiScale;
+
+            protected float CurrentScale { get; private set; } = 1;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -95,14 +101,16 @@ namespace osu.Game.Graphics.Containers
                 if (applyUIScale)
                 {
                     uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
-                    uiScale.BindValueChanged(scaleChanged, true);
+                    uiScale.BindValueChanged(args => this.TransformTo(nameof(CurrentScale), args.NewValue, TRANSITION_DURATION, Easing.OutQuart), true);
                 }
             }
 
-            private void scaleChanged(ValueChangedEvent<float> args)
+            protected override void Update()
             {
-                this.ScaleTo(new Vector2(args.NewValue), 500, Easing.Out);
-                this.ResizeTo(new Vector2(1 / args.NewValue), 500, Easing.Out);
+                Scale = new Vector2(CurrentScale);
+                Size = new Vector2(1 / CurrentScale);
+
+                base.Update();
             }
         }
 
@@ -140,8 +148,6 @@ namespace osu.Game.Graphics.Containers
 
         private void updateSize()
         {
-            const float duration = 500;
-
             if (targetMode == ScalingMode.Everything)
             {
                 // the top level scaling container manages the background to be displayed while scaling.
@@ -159,10 +165,10 @@ namespace osu.Game.Graphics.Containers
                         backgroundStack.Push(new ScalingBackgroundScreen());
                     }
 
-                    backgroundStack.FadeIn(duration);
+                    backgroundStack.FadeIn(TRANSITION_DURATION);
                 }
                 else
-                    backgroundStack?.FadeOut(duration);
+                    backgroundStack?.FadeOut(TRANSITION_DURATION);
             }
 
             RectangleF targetRect = new RectangleF(Vector2.Zero, Vector2.One);
@@ -191,13 +197,13 @@ namespace osu.Game.Graphics.Containers
             if (requiresMasking)
                 sizableContainer.Masking = true;
 
-            sizableContainer.MoveTo(targetRect.Location, duration, Easing.OutQuart);
-            sizableContainer.ResizeTo(targetRect.Size, duration, Easing.OutQuart);
+            sizableContainer.MoveTo(targetRect.Location, TRANSITION_DURATION, Easing.OutQuart);
+            sizableContainer.ResizeTo(targetRect.Size, TRANSITION_DURATION, Easing.OutQuart);
 
             // Of note, this will not work great in the case of nested ScalingContainers where multiple are applying corner radius.
             // Masking and corner radius should likely only be applied at one point in the full game stack to fix this.
             // An example of how this can occur is when the skin editor is visible and the game screen scaling is set to "Everything".
-            sizableContainer.TransformTo(nameof(CornerRadius), requiresMasking ? corner_radius : 0, duration, requiresMasking ? Easing.OutQuart : Easing.None)
+            sizableContainer.TransformTo(nameof(CornerRadius), requiresMasking ? corner_radius : 0, TRANSITION_DURATION, requiresMasking ? Easing.OutQuart : Easing.None)
                             .OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
         }
 
@@ -205,7 +211,7 @@ namespace osu.Game.Graphics.Containers
         {
             protected override bool AllowStoryboardBackground => false;
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
                 this.FadeInFromZero(4000, Easing.OutQuint);
             }
@@ -254,7 +260,7 @@ namespace osu.Game.Graphics.Containers
                 if (host.Window == null) return;
 
                 bool coversWholeScreen = Size == Vector2.One && safeArea.SafeAreaPadding.Value.Total == Vector2.Zero;
-                host.Window.CursorConfineRect = coversWholeScreen ? (RectangleF?)null : ToScreenSpace(DrawRectangle).AABBFloat;
+                host.Window.CursorConfineRect = coversWholeScreen ? null : ToScreenSpace(DrawRectangle).AABBFloat;
             }
         }
     }

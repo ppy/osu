@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,6 +95,12 @@ namespace osu.Game.Rulesets.Mods
 
         [JsonIgnore]
         public virtual bool UserPlayable => true;
+
+        [JsonIgnore]
+        public virtual bool ValidForMultiplayer => true;
+
+        [JsonIgnore]
+        public virtual bool ValidForMultiplayerAsFreeMod => true;
 
         [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override and set UserPlayable to false.")] // Can be removed 20211009
         public virtual bool Ranked => false;

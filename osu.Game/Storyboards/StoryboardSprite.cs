@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,20 +109,20 @@ namespace osu.Game.Storyboards
             generateCommands(generated, getCommands(g => g.Rotation, triggeredGroups), (d, value) => d.Rotation = value, (d, value, duration, easing) => d.RotateTo(value, duration, easing));
             generateCommands(generated, getCommands(g => g.Colour, triggeredGroups), (d, value) => d.Colour = value, (d, value, duration, easing) => d.FadeColour(value, duration, easing));
             generateCommands(generated, getCommands(g => g.Alpha, triggeredGroups), (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.BlendingParameters, triggeredGroups), (d, value) => d.Blending = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration),
+            generateCommands(generated, getCommands(g => g.BlendingParameters, triggeredGroups), (d, value) => d.Blending = value, (d, value, duration, _) => d.TransformBlendingMode(value, duration),
                 false);
 
             if (drawable is IVectorScalable vectorScalable)
             {
-                generateCommands(generated, getCommands(g => g.VectorScale, triggeredGroups), (d, value) => vectorScalable.VectorScale = value,
-                    (d, value, duration, easing) => vectorScalable.VectorScaleTo(value, duration, easing));
+                generateCommands(generated, getCommands(g => g.VectorScale, triggeredGroups), (_, value) => vectorScalable.VectorScale = value,
+                    (_, value, duration, easing) => vectorScalable.VectorScaleTo(value, duration, easing));
             }
 
             if (drawable is IFlippable flippable)
             {
-                generateCommands(generated, getCommands(g => g.FlipH, triggeredGroups), (d, value) => flippable.FlipH = value, (d, value, duration, easing) => flippable.TransformFlipH(value, duration),
+                generateCommands(generated, getCommands(g => g.FlipH, triggeredGroups), (_, value) => flippable.FlipH = value, (_, value, duration, _) => flippable.TransformFlipH(value, duration),
                     false);
-                generateCommands(generated, getCommands(g => g.FlipV, triggeredGroups), (d, value) => flippable.FlipV = value, (d, value, duration, easing) => flippable.TransformFlipV(value, duration),
+                generateCommands(generated, getCommands(g => g.FlipV, triggeredGroups), (_, value) => flippable.FlipV = value, (_, value, duration, _) => flippable.TransformFlipV(value, duration),
                     false);
             }
 

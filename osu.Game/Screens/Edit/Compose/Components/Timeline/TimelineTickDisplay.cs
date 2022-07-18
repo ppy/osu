@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -11,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -132,10 +135,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                         // even though "bar lines" take up the full vertical space, we render them in two pieces because it allows for less anchor/origin churn.
 
+                        Vector2 size = Vector2.One;
+
+                        if (indexInBar != 0)
+                            size = BindableBeatDivisor.GetSize(divisor);
+
                         var line = getNextUsableLine();
                         line.X = xPos;
-                        line.Width = PointVisualisation.MAX_WIDTH * getWidth(indexInBar, divisor);
-                        line.Height = 0.9f * getHeight(indexInBar, divisor);
+                        line.Width = PointVisualisation.MAX_WIDTH * size.X;
+                        line.Height = 0.9f * size.Y;
                         line.Colour = colour;
                     }
 
@@ -167,54 +175,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 point.Show();
 
                 return point;
-            }
-        }
-
-        private static float getWidth(int indexInBar, int divisor)
-        {
-            if (indexInBar == 0)
-                return 1;
-
-            switch (divisor)
-            {
-                case 1:
-                case 2:
-                    return 0.6f;
-
-                case 3:
-                case 4:
-                    return 0.5f;
-
-                case 6:
-                case 8:
-                    return 0.4f;
-
-                default:
-                    return 0.3f;
-            }
-        }
-
-        private static float getHeight(int indexInBar, int divisor)
-        {
-            if (indexInBar == 0)
-                return 1;
-
-            switch (divisor)
-            {
-                case 1:
-                case 2:
-                    return 0.9f;
-
-                case 3:
-                case 4:
-                    return 0.8f;
-
-                case 6:
-                case 8:
-                    return 0.7f;
-
-                default:
-                    return 0.6f;
             }
         }
 

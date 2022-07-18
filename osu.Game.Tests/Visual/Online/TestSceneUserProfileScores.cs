@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,7 +21,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         public TestSceneUserProfileScores()
         {
-            var firstScore = new APIScore
+            var firstScore = new SoloScoreInfo
             {
                 PP = 1047.21,
                 Rank = ScoreRank.SH,
@@ -32,7 +34,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     DifficultyName = "Extreme"
                 },
-                Date = DateTimeOffset.Now,
+                EndedAt = DateTimeOffset.Now,
                 Mods = new[]
                 {
                     new APIMod { Acronym = new OsuModHidden().Acronym },
@@ -42,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
                 Accuracy = 0.9813
             };
 
-            var secondScore = new APIScore
+            var secondScore = new SoloScoreInfo
             {
                 PP = 134.32,
                 Rank = ScoreRank.A,
@@ -55,7 +57,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     DifficultyName = "[4K] Regret"
                 },
-                Date = DateTimeOffset.Now,
+                EndedAt = DateTimeOffset.Now,
                 Mods = new[]
                 {
                     new APIMod { Acronym = new OsuModHardRock().Acronym },
@@ -64,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
                 Accuracy = 0.998546
             };
 
-            var thirdScore = new APIScore
+            var thirdScore = new SoloScoreInfo
             {
                 PP = 96.83,
                 Rank = ScoreRank.S,
@@ -77,11 +79,11 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     DifficultyName = "Insane"
                 },
-                Date = DateTimeOffset.Now,
+                EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.9726
             };
 
-            var noPPScore = new APIScore
+            var noPPScore = new SoloScoreInfo
             {
                 Rank = ScoreRank.B,
                 Beatmap = new APIBeatmap
@@ -93,7 +95,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     DifficultyName = "[4K] Cataclysmic Hypernova"
                 },
-                Date = DateTimeOffset.Now,
+                EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.55879
             };
 

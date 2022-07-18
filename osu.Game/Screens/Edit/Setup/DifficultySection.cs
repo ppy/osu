@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -27,7 +30,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 circleSizeSlider = new LabelledSliderBar<float>
                 {
-                    Label = "Object Size",
+                    Label = BeatmapsetsStrings.ShowStatsCs,
                     FixedLabelWidth = LABEL_WIDTH,
                     Description = "The size of all hit objects",
                     Current = new BindableFloat(Beatmap.Difficulty.CircleSize)
@@ -40,7 +43,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 healthDrainSlider = new LabelledSliderBar<float>
                 {
-                    Label = "Health Drain",
+                    Label = BeatmapsetsStrings.ShowStatsDrain,
                     FixedLabelWidth = LABEL_WIDTH,
                     Description = "The rate of passive health drain throughout playable time",
                     Current = new BindableFloat(Beatmap.Difficulty.DrainRate)
@@ -53,7 +56,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 approachRateSlider = new LabelledSliderBar<float>
                 {
-                    Label = "Approach Rate",
+                    Label = BeatmapsetsStrings.ShowStatsAr,
                     FixedLabelWidth = LABEL_WIDTH,
                     Description = "The speed at which objects are presented to the player",
                     Current = new BindableFloat(Beatmap.Difficulty.ApproachRate)
@@ -66,7 +69,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 overallDifficultySlider = new LabelledSliderBar<float>
                 {
-                    Label = "Overall Difficulty",
+                    Label = BeatmapsetsStrings.ShowStatsAccuracy,
                     FixedLabelWidth = LABEL_WIDTH,
                     Description = "The harshness of hit windows and difficulty of special objects (ie. spinners)",
                     Current = new BindableFloat(Beatmap.Difficulty.OverallDifficulty)

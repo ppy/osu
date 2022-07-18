@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -21,15 +22,15 @@ using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Input;
 
-#nullable enable
-
 namespace osu.Game.Overlays.Mods
 {
     public class ModPanel : OsuClickableContainer
     {
-        public Mod Mod { get; }
-        public BindableBool Active { get; } = new BindableBool();
-        public BindableBool Filtered { get; } = new BindableBool();
+        public Mod Mod => modState.Mod;
+        public BindableBool Active => modState.Active;
+        public BindableBool Filtered => modState.Filtered;
+
+        private readonly ModState modState;
 
         protected readonly Box Background;
         protected readonly Container SwitchContainer;
@@ -42,7 +43,6 @@ namespace osu.Game.Overlays.Mods
 
         protected const double TRANSITION_DURATION = 150;
 
-        public const float SHEAR_X = 0.2f;
         public const float CORNER_RADIUS = 7;
 
         protected const float HEIGHT = 42;
@@ -51,12 +51,13 @@ namespace osu.Game.Overlays.Mods
 
         private Colour4 activeColour;
 
+        private readonly Bindable<bool> samplePlaybackDisabled = new BindableBool();
         private Sample? sampleOff;
         private Sample? sampleOn;
 
-        public ModPanel(Mod mod)
+        public ModPanel(ModState modState)
         {
-            Mod = mod;
+            this.modState = modState;
 
             RelativeSizeAxes = Axes.X;
             Height = 42;
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays.Mods
             Content.Masking = true;
             Content.CornerRadius = CORNER_RADIUS;
             Content.BorderThickness = 2;
-            Content.Shear = new Vector2(SHEAR_X, 0);
+            Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
 
             Children = new Drawable[]
             {
@@ -78,12 +79,12 @@ namespace osu.Game.Overlays.Mods
                 SwitchContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Child = new ModSwitchSmall(mod)
+                    Child = new ModSwitchSmall(Mod)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Active = { BindTarget = Active },
-                        Shear = new Vector2(-SHEAR_X, 0),
+                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                         Scale = new Vector2(HEIGHT / ModSwitchSmall.DEFAULT_SIZE)
                     }
                 },
@@ -114,21 +115,21 @@ namespace osu.Game.Overlays.Mods
                                 {
                                     new OsuSpriteText
                                     {
-                                        Text = mod.Name,
+                                        Text = Mod.Name,
                                         Font = OsuFont.TorusAlternate.With(size: 18, weight: FontWeight.SemiBold),
-                                        Shear = new Vector2(-SHEAR_X, 0),
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                         Margin = new MarginPadding
                                         {
-                                            Left = -18 * SHEAR_X
+                                            Left = -18 * ShearedOverlayContainer.SHEAR
                                         }
                                     },
                                     new OsuSpriteText
                                     {
-                                        Text = mod.Description,
+                                        Text = Mod.Description,
                                         Font = OsuFont.Default.With(size: 12),
                                         RelativeSizeAxes = Axes.X,
                                         Truncate = true,
-                                        Shear = new Vector2(-SHEAR_X, 0)
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)
                                     }
                                 }
                             }
@@ -140,13 +141,21 @@ namespace osu.Game.Overlays.Mods
             Action = Active.Toggle;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        public ModPanel(Mod mod)
+            : this(new ModState(mod))
+        {
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio, OsuColour colours, ISamplePlaybackDisabler? samplePlaybackDisabler)
         {
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
 
             activeColour = colours.ForModType(Mod.Type);
+
+            if (samplePlaybackDisabler != null)
+                ((IBindable<bool>)samplePlaybackDisabled).BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
         }
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(sampleSet);
@@ -159,7 +168,7 @@ namespace osu.Game.Overlays.Mods
                 playStateChangeSamples();
                 UpdateState();
             });
-            Filtered.BindValueChanged(_ => updateFilterState());
+            Filtered.BindValueChanged(_ => updateFilterState(), true);
 
             UpdateState();
             FinishTransforms(true);
@@ -167,6 +176,9 @@ namespace osu.Game.Overlays.Mods
 
         private void playStateChangeSamples()
         {
+            if (samplePlaybackDisabled.Value)
+                return;
+
             if (Active.Value)
                 sampleOn?.Play();
             else
@@ -204,20 +216,24 @@ namespace osu.Game.Overlays.Mods
             base.OnMouseUp(e);
         }
 
+        protected virtual Colour4 BackgroundColour => Active.Value ? activeColour.Darken(0.3f) : ColourProvider.Background3;
+        protected virtual Colour4 ForegroundColour => Active.Value ? activeColour : ColourProvider.Background2;
+        protected virtual Colour4 TextColour => Active.Value ? ColourProvider.Background6 : Colour4.White;
+
         protected virtual void UpdateState()
         {
             float targetWidth = Active.Value ? EXPANDED_SWITCH_WIDTH : IDLE_SWITCH_WIDTH;
             double transitionDuration = TRANSITION_DURATION;
 
-            Colour4 textBackgroundColour = Active.Value ? activeColour : (Colour4)ColourProvider.Background2;
-            Colour4 mainBackgroundColour = Active.Value ? activeColour.Darken(0.3f) : (Colour4)ColourProvider.Background3;
-            Colour4 textColour = Active.Value ? (Colour4)ColourProvider.Background6 : Colour4.White;
+            Colour4 backgroundColour = BackgroundColour;
+            Colour4 foregroundColour = ForegroundColour;
+            Colour4 textColour = TextColour;
 
             // Hover affects colour of button background
             if (IsHovered)
             {
-                textBackgroundColour = textBackgroundColour.Lighten(0.1f);
-                mainBackgroundColour = mainBackgroundColour.Lighten(0.1f);
+                backgroundColour = backgroundColour.Lighten(0.1f);
+                foregroundColour = foregroundColour.Lighten(0.1f);
             }
 
             // Mouse down adds a halfway tween of the movement
@@ -227,15 +243,15 @@ namespace osu.Game.Overlays.Mods
                 transitionDuration *= 4;
             }
 
-            Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(mainBackgroundColour, textBackgroundColour), transitionDuration, Easing.OutQuint);
-            Background.FadeColour(mainBackgroundColour, transitionDuration, Easing.OutQuint);
+            Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(backgroundColour, foregroundColour), transitionDuration, Easing.OutQuint);
+            Background.FadeColour(backgroundColour, transitionDuration, Easing.OutQuint);
             SwitchContainer.ResizeWidthTo(targetWidth, transitionDuration, Easing.OutQuint);
             MainContentContainer.TransformTo(nameof(Padding), new MarginPadding
             {
                 Left = targetWidth,
                 Right = CORNER_RADIUS
             }, transitionDuration, Easing.OutQuint);
-            TextBackground.FadeColour(textBackgroundColour, transitionDuration, Easing.OutQuint);
+            TextBackground.FadeColour(foregroundColour, transitionDuration, Easing.OutQuint);
             TextFlow.FadeColour(textColour, transitionDuration, Easing.OutQuint);
         }
 
