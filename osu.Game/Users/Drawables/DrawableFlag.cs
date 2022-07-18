@@ -17,7 +17,7 @@ namespace osu.Game.Users.Drawables
     {
         private readonly CountryCode countryCode;
 
-        public LocalisableString TooltipText => countryCode == default ? string.Empty : countryCode.GetDescription();
+        public LocalisableString TooltipText => countryCode == CountryCode.Unknown ? string.Empty : countryCode.GetDescription();
 
         public DrawableFlag(CountryCode countryCode)
         {
@@ -30,7 +30,7 @@ namespace osu.Game.Users.Drawables
             if (ts == null)
                 throw new ArgumentNullException(nameof(ts));
 
-            string textureName = countryCode == default ? "__" : countryCode.ToString();
+            string textureName = countryCode == CountryCode.Unknown ? "__" : countryCode.ToString();
             Texture = ts.Get($@"Flags/{textureName}") ?? ts.Get(@"Flags/__");
         }
     }

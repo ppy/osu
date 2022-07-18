@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestFlagScopeDependency()
         {
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
-            AddAssert("Check country is default", () => countryBindable.Value == default);
+            AddAssert("Check country is default", () => countryBindable.IsDefault);
             AddStep("Set country", () => countryBindable.Value = CountryCode.US);
             AddAssert("Check scope is Performance", () => scope.Value == RankingsScope.Performance);
         }

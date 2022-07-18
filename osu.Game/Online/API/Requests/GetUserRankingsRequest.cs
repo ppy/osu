@@ -15,7 +15,7 @@ namespace osu.Game.Online.API.Requests
 
         private readonly CountryCode countryCode;
 
-        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, CountryCode countryCode = default)
+        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, CountryCode countryCode = CountryCode.Unknown)
             : base(ruleset, page)
         {
             Type = type;
@@ -26,7 +26,7 @@ namespace osu.Game.Online.API.Requests
         {
             var req = base.CreateWebRequest();
 
-            if (countryCode != default)
+            if (countryCode != CountryCode.Unknown)
                 req.AddParameter("country", countryCode.ToString());
 
             return req;
