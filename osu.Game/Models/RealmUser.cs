@@ -16,14 +16,14 @@ namespace osu.Game.Models
         public string Username { get; set; } = string.Empty;
 
         [Ignored]
-        public Country Country
+        public CountryCode CountryCode
         {
-            get => Enum.TryParse(CountryString, out Country country) ? country : default;
+            get => Enum.TryParse(CountryString, out CountryCode country) ? country : default;
             set => CountryString = value.ToString();
         }
 
-        [MapTo(nameof(Country))]
-        public string CountryString { get; set; } = default(Country).ToString();
+        [MapTo(nameof(CountryCode))]
+        public string CountryString { get; set; } = default(CountryCode).ToString();
 
         public bool IsBot => false;
 
