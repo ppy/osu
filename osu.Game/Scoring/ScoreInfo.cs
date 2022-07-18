@@ -87,7 +87,7 @@ namespace osu.Game.Scoring
             {
                 Id = RealmUser.OnlineID,
                 Username = RealmUser.Username,
-                Country = RealmUser.Country,
+                CountryCode = RealmUser.CountryCode,
             };
             set
             {
@@ -97,7 +97,7 @@ namespace osu.Game.Scoring
                 {
                     OnlineID = user.OnlineID,
                     Username = user.Username,
-                    Country = user.Country,
+                    CountryCode = user.CountryCode,
                 };
             }
         }
@@ -137,7 +137,7 @@ namespace osu.Game.Scoring
             {
                 OnlineID = RealmUser.OnlineID,
                 Username = RealmUser.Username,
-                Country = RealmUser.Country,
+                CountryCode = RealmUser.CountryCode,
             };
 
             return clone;

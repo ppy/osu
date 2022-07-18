@@ -60,7 +60,7 @@ namespace osu.Game.Database
         /// 14   2022-03-01    Added BeatmapUserSettings to BeatmapInfo.
         /// 15   2022-07-13    Added LastPlayed to BeatmapInfo.
         /// 16   2022-07-15    Removed HasReplay from ScoreInfo.
-        /// 17   2022-07-16    Added Country to RealmUser.
+        /// 17   2022-07-16    Added CountryCode to RealmUser.
         /// </summary>
         private const int schema_version = 17;
 
