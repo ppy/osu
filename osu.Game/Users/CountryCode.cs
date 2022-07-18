@@ -10,7 +10,7 @@ namespace osu.Game.Users
 {
     [JsonConverter(typeof(StringEnumConverter))]
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    public enum Country
+    public enum CountryCode
     {
         [Description("Unknown")]
         XX = 0,

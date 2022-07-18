@@ -13,21 +13,21 @@ namespace osu.Game.Online.API.Requests
     {
         public readonly UserRankingsType Type;
 
-        private readonly Country country;
+        private readonly CountryCode countryCode;
 
-        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, Country country = default)
+        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, CountryCode countryCode = default)
             : base(ruleset, page)
         {
             Type = type;
-            this.country = country;
+            this.countryCode = countryCode;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
 
-            if (country != default)
-                req.AddParameter("country", country.ToString());
+            if (countryCode != default)
+                req.AddParameter("country", countryCode.ToString());
 
             return req;
         }

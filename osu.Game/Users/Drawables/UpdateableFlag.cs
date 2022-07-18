@@ -13,9 +13,9 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Users.Drawables
 {
-    public class UpdateableFlag : ModelBackedDrawable<Country>
+    public class UpdateableFlag : ModelBackedDrawable<CountryCode>
     {
-        public Country Country
+        public CountryCode CountryCode
         {
             get => Model;
             set => Model = value;
@@ -32,14 +32,14 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public Action Action;
 
-        public UpdateableFlag(Country country = default)
+        public UpdateableFlag(CountryCode countryCode = default)
         {
-            Country = country;
+            CountryCode = countryCode;
         }
 
-        protected override Drawable CreateDrawable(Country country)
+        protected override Drawable CreateDrawable(CountryCode countryCode)
         {
-            if (country == default && !ShowPlaceholderOnUnknown)
+            if (countryCode == default && !ShowPlaceholderOnUnknown)
                 return null;
 
             return new Container
@@ -47,7 +47,7 @@ namespace osu.Game.Users.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new DrawableFlag(country)
+                    new DrawableFlag(countryCode)
                     {
                         RelativeSizeAxes = Axes.Both
                     },
@@ -62,7 +62,7 @@ namespace osu.Game.Users.Drawables
         protected override bool OnClick(ClickEvent e)
         {
             Action?.Invoke();
-            rankingsOverlay?.ShowCountry(Country);
+            rankingsOverlay?.ShowCountry(CountryCode);
             return true;
         }
     }

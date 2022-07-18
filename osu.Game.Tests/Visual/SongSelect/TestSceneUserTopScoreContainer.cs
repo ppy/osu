@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Id = 6602580,
                         Username = @"waaiiru",
-                        Country = Country.ES,
+                        CountryCode = CountryCode.ES,
                     },
                 },
                 new ScoreInfo
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Id = 4608074,
                         Username = @"Skycries",
-                        Country = Country.BR,
+                        CountryCode = CountryCode.BR,
                     },
                 },
                 new ScoreInfo
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Id = 1541390,
                         Username = @"Toukai",
-                        Country = Country.CA,
+                        CountryCode = CountryCode.CA,
                     },
                 }
             };
