@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Diagnostics;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -123,8 +122,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuLastObj.BaseObject is Slider)
             {
-                Debug.Assert(osuLastObj.TravelTime > 0);
-
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
 
