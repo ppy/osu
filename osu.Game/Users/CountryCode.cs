@@ -13,7 +13,7 @@ namespace osu.Game.Users
     public enum CountryCode
     {
         [Description("Unknown")]
-        XX = 0,
+        Unknown = 0,
 
         [Description("Bangladesh")]
         BD,
