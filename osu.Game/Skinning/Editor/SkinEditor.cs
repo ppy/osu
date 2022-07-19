@@ -403,13 +403,10 @@ namespace osu.Game.Skinning.Editor
             game?.UnregisterImportHandler(this);
         }
 
-
         private class SkinEditorToast : Toast
         {
             public SkinEditorToast(LocalisableString value, string skinDisplayName)
                 : base(ToastStrings.SkinEditor, value, skinDisplayName) { }
-
         }
-
     }
 }

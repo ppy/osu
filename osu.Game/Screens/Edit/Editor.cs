@@ -942,12 +942,10 @@ namespace osu.Game.Screens.Edit
         IClock IBeatSyncProvider.Clock => clock;
         ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
 
-
         private class BeatmapEditorToast : Toast
         {
             public BeatmapEditorToast(LocalisableString value, string beatmapDisplayName)
                 : base(ToastStrings.BeatmapEditor, value, beatmapDisplayName) { }
-
         }
     }
 }
