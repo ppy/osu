@@ -64,7 +64,17 @@ namespace osu.Game.Screens.Select.Carousel
                         Spacing = new Vector2(5),
                         Children = new[]
                         {
-                            beatmapSet.AllBeatmapsUpToDate ? Empty() : new UpdateRequiredIcon(beatmapSet),
+                            beatmapSet.AllBeatmapsUpToDate
+                                ? Empty()
+                                : new Container
+                                {
+                                    AutoSizeAxes = Axes.X,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
+                                    {
+                                        new UpdateRequiredIcon(beatmapSet),
+                                    }
+                                },
                             new BeatmapSetOnlineStatusPill
                             {
                                 AutoSizeAxes = Axes.Both,
