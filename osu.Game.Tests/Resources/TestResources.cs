@@ -134,10 +134,11 @@ namespace osu.Game.Tests.Resources
                         DifficultyName = $"{version} {beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                         StarRating = diff,
                         Length = length,
+                        BeatmapSet = beatmapSet,
                         BPM = bpm,
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
                         Ruleset = rulesetInfo,
-                        Metadata = metadata,
+                        Metadata = metadata.DeepClone(),
                         Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = diff,

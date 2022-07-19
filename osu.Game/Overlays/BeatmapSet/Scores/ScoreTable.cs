@@ -165,10 +165,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Font = OsuFont.GetFont(size: text_size),
                     Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
                 },
-                new UpdateableFlag(score.User.Country)
+                new UpdateableFlag(score.User.CountryCode)
                 {
                     Size = new Vector2(19, 14),
-                    ShowPlaceholderOnNull = false,
+                    ShowPlaceholderOnUnknown = false,
                 },
                 username,
                 new OsuSpriteText

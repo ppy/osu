@@ -26,6 +26,7 @@
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AndroidJoystickSettings.cs" />
     <Compile Include="AndroidMouseSettings.cs" />
     <Compile Include="GameplayScreenRotationLocker.cs" />
     <Compile Include="OsuGameActivity.cs" />
