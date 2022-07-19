@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             set => lastInCombo.Value = value;
         }
 
-        private HitObjectProperty<float> scale;
+        private HitObjectProperty<float> scale = new HitObjectProperty<float>(1);
 
         public Bindable<float> ScaleBindable => scale.Bindable;
 
