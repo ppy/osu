@@ -11,7 +11,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -42,29 +41,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
-        }
-
-        [Test]
-        public void TestBeatmapWithOnlineUpdates()
-        {
-            var testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo();
-
-            createCarousel(new List<BeatmapSetInfo>
-            {
-                testBeatmapSetInfo,
-            });
-
-            AddAssert("update button not visible", () => !carousel.ChildrenOfType<UpdateBeatmapSetButton>().Any());
-
-            AddStep("update online hash", () =>
-            {
-                testBeatmapSetInfo.Beatmaps.First().OnlineMD5Hash = "different hash";
-                testBeatmapSetInfo.Beatmaps.First().LastOnlineUpdate = DateTimeOffset.Now;
-
-                carousel.UpdateBeatmapSet(testBeatmapSetInfo);
-            });
-
-            AddUntilStep("update button visible", () => carousel.ChildrenOfType<UpdateBeatmapSetButton>().Any());
         }
 
         [Test]
