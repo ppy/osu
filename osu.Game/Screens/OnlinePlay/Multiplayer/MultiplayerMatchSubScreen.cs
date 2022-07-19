@@ -231,7 +231,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen())
                 return;
 
-            var localBeatmap = itemToEdit == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineID == itemToEdit.Beatmap.OnlineID);
+            int id = itemToEdit?.Beatmap.OnlineID ?? Room.Playlist.LastOrDefault().Beatmap.OnlineID;
+            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == id);
+
             var workingBeatmap = localBeatmap == null ? null : beatmapManager.GetWorkingBeatmap(localBeatmap);
 
             this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit?.ID, workingBeatmap));
