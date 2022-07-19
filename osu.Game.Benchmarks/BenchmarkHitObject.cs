@@ -39,6 +39,29 @@ namespace osu.Game.Benchmarks
                     _ = circles[i].SamplesBindable;
                     _ = circles[i].StartTimeBindable;
                 }
+                else
+                {
+                    _ = circles[i].Position;
+                    _ = circles[i].Scale;
+                    _ = circles[i].ComboIndex;
+                    _ = circles[i].ComboOffset;
+                    _ = circles[i].StackHeight;
+                    _ = circles[i].LastInCombo;
+                    _ = circles[i].ComboIndexWithOffsets;
+                    _ = circles[i].IndexInCurrentCombo;
+                    _ = circles[i].Samples;
+                    _ = circles[i].StartTime;
+                    _ = circles[i].Position;
+                    _ = circles[i].Scale;
+                    _ = circles[i].ComboIndex;
+                    _ = circles[i].ComboOffset;
+                    _ = circles[i].StackHeight;
+                    _ = circles[i].LastInCombo;
+                    _ = circles[i].ComboIndexWithOffsets;
+                    _ = circles[i].IndexInCurrentCombo;
+                    _ = circles[i].Samples;
+                    _ = circles[i].StartTime;
+                }
             }
 
             return circles;
@@ -59,6 +82,13 @@ namespace osu.Game.Benchmarks
                     _ = hits[i].IsStrongBindable;
                     _ = hits[i].SamplesBindable;
                     _ = hits[i].StartTimeBindable;
+                }
+                else
+                {
+                    _ = hits[i].Type;
+                    _ = hits[i].IsStrong;
+                    _ = hits[i].Samples;
+                    _ = hits[i].StartTime;
                 }
             }
 
@@ -88,6 +118,20 @@ namespace osu.Game.Benchmarks
                     _ = fruit[i].SamplesBindable;
                     _ = fruit[i].StartTimeBindable;
                 }
+                else
+                {
+                    _ = fruit[i].OriginalX;
+                    _ = fruit[i].XOffset;
+                    _ = fruit[i].Scale;
+                    _ = fruit[i].ComboIndex;
+                    _ = fruit[i].HyperDash;
+                    _ = fruit[i].LastInCombo;
+                    _ = fruit[i].ComboIndexWithOffsets;
+                    _ = fruit[i].IndexInCurrentCombo;
+                    _ = fruit[i].IndexInBeatmap;
+                    _ = fruit[i].Samples;
+                    _ = fruit[i].StartTime;
+                }
             }
 
             return fruit;
@@ -107,6 +151,12 @@ namespace osu.Game.Benchmarks
                     _ = notes[i].ColumnBindable;
                     _ = notes[i].SamplesBindable;
                     _ = notes[i].StartTimeBindable;
+                }
+                else
+                {
+                    _ = notes[i].Column;
+                    _ = notes[i].Samples;
+                    _ = notes[i].StartTime;
                 }
             }
 
