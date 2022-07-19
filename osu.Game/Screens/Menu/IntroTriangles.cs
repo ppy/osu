@@ -72,9 +72,17 @@ namespace osu.Game.Screens.Menu
                     RelativeSizeAxes = Axes.Both,
                     Clock = decoupledClock,
                     LoadMenu = LoadMenu
-                }, t =>
+                }, _ =>
                 {
-                    AddInternal(t);
+                    AddInternal(intro);
+
+                    // There is a chance that the intro timed out before being displayed, and this scheduled callback could
+                    // happen during the outro rather than intro.
+                    // In such a scenario, we don't want to play the intro sample, nor attempt to start the intro track
+                    // (that may have already been since disposed by MusicController).
+                    if (DidLoadMenu)
+                        return;
+
                     if (!UsingThemedIntro)
                         welcome?.Play();
 

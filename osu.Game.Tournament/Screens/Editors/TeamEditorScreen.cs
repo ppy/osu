@@ -3,13 +3,13 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -25,9 +25,6 @@ namespace osu.Game.Tournament.Screens.Editors
 {
     public class TeamEditorScreen : TournamentEditorScreen<TeamEditorScreen.TeamRow, TournamentTeam>
     {
-        [Resolved]
-        private TournamentGameBase game { get; set; }
-
         protected override BindableList<TournamentTeam> Storage => LadderInfo.Teams;
 
         [BackgroundDependencyLoader]
@@ -45,11 +42,17 @@ namespace osu.Game.Tournament.Screens.Editors
 
         private void addAllCountries()
         {
-            List<TournamentTeam> countries;
+            var countries = new List<TournamentTeam>();
 
-            using (Stream stream = game.Resources.GetStream("Resources/countries.json"))
-            using (var sr = new StreamReader(stream))
-                countries = JsonConvert.DeserializeObject<List<TournamentTeam>>(sr.ReadToEnd());
+            foreach (var country in Enum.GetValues(typeof(CountryCode)).Cast<CountryCode>().Skip(1))
+            {
+                countries.Add(new TournamentTeam
+                {
+                    FlagName = { Value = country.ToString() },
+                    FullName = { Value = country.GetDescription() },
+                    Acronym = { Value = country.GetAcronym() },
+                });
+            }
 
             Debug.Assert(countries != null);
 
@@ -298,10 +301,10 @@ namespace osu.Game.Tournament.Screens.Editors
                         }, true);
                     }
 
-                    private void updatePanel()
+                    private void updatePanel() => Scheduler.AddOnce(() =>
                     {
                         drawableContainer.Child = new UserGridPanel(user.ToAPIUser()) { Width = 300 };
-                    }
+                    });
                 }
             }
         }
