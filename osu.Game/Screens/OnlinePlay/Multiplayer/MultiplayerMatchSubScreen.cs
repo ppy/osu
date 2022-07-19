@@ -148,7 +148,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                         new MultiplayerPlaylist
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            RequestEdit = item => OpenSongSelection(item)
+                                            RequestEdit = OpenSongSelection
                                         }
                                     },
                                     new[]
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen())
                 return;
 
-            int id = itemToEdit?.Beatmap.OnlineID ?? Room.Playlist.LastOrDefault().Beatmap.OnlineID;
+            int id = itemToEdit?.Beatmap.OnlineID ?? Room.Playlist.LastOrDefault()!.Beatmap.OnlineID;
             var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == id);
 
             var workingBeatmap = localBeatmap == null ? null : beatmapManager.GetWorkingBeatmap(localBeatmap);
