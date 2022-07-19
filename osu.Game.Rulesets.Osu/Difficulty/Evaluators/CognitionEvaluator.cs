@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Extensions.ObjectExtensions;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -19,32 +19,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var currObj = (OsuDifficultyHitObject)current;
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
 
+            List<DifficultyHitObject> pastVisibleObjects = retrievePastVisibleObjects(currObj);
+            List<DifficultyHitObject> currentVisibleObjects = retrieveCurrentVisibleObjects(currObj);
+
+            // Rather than note density being the number of on-screen objects visible at the current object,
+            // consider it as how many objects the current object has been visible for.
             double noteDensity = 1.0;
 
-            // This loop sucks so much lol.
-            // Will be replaced in conjuction with the "objects with current visible" and the "currently visible objects" lists
-            // Also variable names like opacity and note density don't seem accurate anymore :face_with_monocole:...
-            for (int i = 0; i < 100; i++)
+            double loopOpacity = 1.0;
+            int previousIndex = 0;
+
+            while (loopOpacity > 0)
             {
-                if (currObj.Next(i + 1).IsNull())
-                    break;
-
-                var currLoopObj = (OsuDifficultyHitObject)currObj.Next(i);
-                var nextLoopObj = (OsuDifficultyHitObject)currObj.Next(i + 1);
-
-                double opacity = currLoopObj.OpacityAt(currObj.BaseObject.StartTime, false);
-
-                if (opacity == 0)
-                    break;
-
-                // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                opacity *= logistic((currLoopObj.MinimumJumpDistance - 100) / 15);
-
-                // Objects that are arranged in a mostly-linear fashion should be easy to read (such as circles in a stream).
-                if (nextLoopObj.Angle.IsNotNull())
-                    opacity *= 1 - Math.Pow(Math.Sin(0.5 * nextLoopObj.Angle.Value), 5);
-
-                noteDensity += opacity;
+                var loopObj = (OsuDifficultyHitObject)currObj.Previous(previousIndex);
+                loopOpacity = currObj.OpacityAt(loopObj.StartTime, false);
+                noteDensity += loopOpacity;
+                previousIndex++;
             }
 
             double noteDensityDifficulty = Math.Pow(Math.Max(0, noteDensity - 2), 2);
@@ -69,6 +59,44 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double difficulty = Math.Max(preemptDifficulty, hiddenDifficulty) + noteDensityDifficulty;
 
             return difficulty;
+        }
+
+        // Returns a list of objects that are visible on screen at
+        // the point in time at which the current object becomes visible.
+        private static List<DifficultyHitObject> retrievePastVisibleObjects(OsuDifficultyHitObject current)
+        {
+            List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+
+            for (int i = 0; i < current.Index; i++)
+            {
+                DifficultyHitObject currentObj = current.Previous(i);
+
+                if (current.OpacityAt(currentObj.StartTime, false) <= 0)
+                    break;
+
+                objects.Add(currentObj);
+            }
+
+            return objects;
+        }
+
+        // Returns a list of objects that are visible on screen at
+        // the point in time at which the current object needs is clicked.
+        private static List<DifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
+        {
+            List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+
+            for (int i = 0; i < current.Count; i++)
+            {
+                OsuDifficultyHitObject currentObj = (OsuDifficultyHitObject)current.Next(i);
+
+                if (currentObj.OpacityAt(current.StartTime, false) <= 0)
+                    break;
+
+                objects.Add(currentObj);
+            }
+
+            return objects;
         }
 
         private static double logistic(double x) => 1 / (1 + Math.Pow(Math.E, -x));
