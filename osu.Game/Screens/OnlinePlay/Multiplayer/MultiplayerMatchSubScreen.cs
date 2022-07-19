@@ -73,12 +73,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             client.LoadRequested += onLoadRequested;
             client.RoomUpdated += onRoomUpdated;
 
-            isConnected.BindTo(client.IsConnected);
-            isConnected.BindValueChanged(connected =>
-            {
-                if (!connected.NewValue)
-                    handleRoomLost();
-            }, true);
+            if (!client.IsConnected.Value)
+                handleRoomLost();
         }
 
         protected override Drawable CreateMainContent() => new Container
