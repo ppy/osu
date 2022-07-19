@@ -13,7 +13,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"scores")]
         public List<SoloScoreInfo> Scores;
 
-        [JsonProperty(@"userScore")]
+        [JsonProperty(@"user_score")]
         public APIScoreWithPosition UserScore;
     }
 }
