@@ -44,6 +44,17 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorSaveBeatmap => new TranslatableString(getKey(@"beatmap_editor_save"), @"Beatmap Saved");
 
+        /// <summary>
+        /// "Skin Editor"
+        /// </summary>
+        public static LocalisableString SkinEditor => new TranslatableString(getKey(@"skin_editor"), @"Skin Editor");
+
+        /// <summary>
+        /// "Skin Saved"
+        /// </summary>
+        public static LocalisableString EditorSaveSkin => new TranslatableString(getKey(@"skin_editor_save"), @"Skin Saved");
+
+
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
