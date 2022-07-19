@@ -34,6 +34,17 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString RestartTrack => new TranslatableString(getKey(@"restart_track"), @"Restart track");
 
+        /// <summary>
+        /// "Beatmap Editor"
+        /// </summary>r
+        public static LocalisableString BeatmapEditor => new TranslatableString(getKey(@"beatmap_editor"), @"Beatmap Editor");
+
+        /// <summary>
+        /// "Beatmap Saved"
+        /// </summary>
+        public static LocalisableString EditorSaveBeatmap => new TranslatableString(getKey(@"beatmap_editor_save"), @"Beatmap Saved");
+
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
