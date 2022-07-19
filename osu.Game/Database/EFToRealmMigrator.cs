@@ -443,7 +443,6 @@ namespace osu.Game.Database
                             TotalScore = score.TotalScore,
                             MaxCombo = score.MaxCombo,
                             Accuracy = score.Accuracy,
-                            HasReplay = ((IScoreInfo)score).HasReplay,
                             Date = score.Date,
                             PP = score.PP,
                             Rank = score.Rank,

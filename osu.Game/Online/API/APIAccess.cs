@@ -163,7 +163,13 @@ namespace osu.Game.Online.API
 
                         userReq.Failure += ex =>
                         {
-                            if (ex is WebException webException && webException.Message == @"Unauthorized")
+                            if (ex is APIException)
+                            {
+                                LastLoginError = ex;
+                                log.Add("Login failed on local user retrieval!");
+                                Logout();
+                            }
+                            else if (ex is WebException webException && webException.Message == @"Unauthorized")
                             {
                                 log.Add(@"Login no longer valid");
                                 Logout();
