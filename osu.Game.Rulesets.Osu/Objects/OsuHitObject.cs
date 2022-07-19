@@ -55,80 +55,80 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedEndPosition => EndPosition + StackOffset;
 
-        private HitObjectProperty<int> stackHeightProperty;
+        private HitObjectProperty<int> stackHeight;
 
-        public Bindable<int> StackHeightBindable => stackHeightProperty.Bindable;
+        public Bindable<int> StackHeightBindable => stackHeight.Bindable;
 
         public int StackHeight
         {
-            get => StackHeightBindable.Value;
-            set => StackHeightBindable.Value = value;
+            get => stackHeight.Value;
+            set => stackHeight.Value = value;
         }
 
         public virtual Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        private HitObjectProperty<float> scaleProperty = new HitObjectProperty<float>(1);
+        private HitObjectProperty<float> scale = new HitObjectProperty<float>(1);
 
-        public Bindable<float> ScaleBindable => scaleProperty.Bindable;
+        public Bindable<float> ScaleBindable => scale.Bindable;
 
         public float Scale
         {
-            get => ScaleBindable.Value;
-            set => ScaleBindable.Value = value;
+            get => scale.Value;
+            set => scale.Value = value;
         }
 
         public virtual bool NewCombo { get; set; }
 
-        private HitObjectProperty<int> comboOffsetProperty;
+        private HitObjectProperty<int> comboOffset;
 
-        public Bindable<int> ComboOffsetBindable => comboOffsetProperty.Bindable;
+        public Bindable<int> ComboOffsetBindable => comboOffset.Bindable;
 
         public int ComboOffset
         {
-            get => ComboOffsetBindable.Value;
-            set => ComboOffsetBindable.Value = value;
+            get => comboOffset.Value;
+            set => comboOffset.Value = value;
         }
 
-        private HitObjectProperty<int> indexInCurrentComboProperty;
+        private HitObjectProperty<int> indexInCurrentCombo;
 
-        public Bindable<int> IndexInCurrentComboBindable => indexInCurrentComboProperty.Bindable;
+        public Bindable<int> IndexInCurrentComboBindable => indexInCurrentCombo.Bindable;
 
         public virtual int IndexInCurrentCombo
         {
-            get => IndexInCurrentComboBindable.Value;
-            set => IndexInCurrentComboBindable.Value = value;
+            get => indexInCurrentCombo.Value;
+            set => indexInCurrentCombo.Value = value;
         }
 
-        private HitObjectProperty<int> comboIndexProperty;
+        private HitObjectProperty<int> comboIndex;
 
-        public Bindable<int> ComboIndexBindable => comboIndexProperty.Bindable;
+        public Bindable<int> ComboIndexBindable => comboIndex.Bindable;
 
         public virtual int ComboIndex
         {
-            get => ComboIndexBindable.Value;
-            set => ComboIndexBindable.Value = value;
+            get => comboIndex.Value;
+            set => comboIndex.Value = value;
         }
 
-        private HitObjectProperty<int> comboIndexWithOffsetsProperty;
+        private HitObjectProperty<int> comboIndexWithOffsets;
 
-        public Bindable<int> ComboIndexWithOffsetsBindable => comboIndexWithOffsetsProperty.Bindable;
+        public Bindable<int> ComboIndexWithOffsetsBindable => comboIndexWithOffsets.Bindable;
 
         public int ComboIndexWithOffsets
         {
-            get => ComboIndexWithOffsetsBindable.Value;
-            set => ComboIndexWithOffsetsBindable.Value = value;
+            get => comboIndexWithOffsets.Value;
+            set => comboIndexWithOffsets.Value = value;
         }
 
-        private HitObjectProperty<bool> lastInComboProperty;
+        private HitObjectProperty<bool> lastInCombo;
 
-        public Bindable<bool> LastInComboBindable => lastInComboProperty.Bindable;
+        public Bindable<bool> LastInComboBindable => lastInCombo.Bindable;
 
         public bool LastInCombo
         {
-            get => LastInComboBindable.Value;
-            set => LastInComboBindable.Value = value;
+            get => lastInCombo.Value;
+            set => lastInCombo.Value = value;
         }
 
         protected OsuHitObject()
