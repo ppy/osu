@@ -101,7 +101,7 @@ namespace osu.Game.Database
                 notification.State = ProgressNotificationState.Cancelled;
 
                 if (!(error is OperationCanceledException))
-                    Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} download failed!");
+                    Logger.Error(error, $"{importer?.HumanisedModelName.Titleize()} download failed!");
             }
         }
 

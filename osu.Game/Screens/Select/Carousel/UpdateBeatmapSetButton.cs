@@ -90,12 +90,9 @@ namespace osu.Game.Screens.Select.Carousel
                 },
             });
 
-            TooltipText = "Update beatmap with online changes";
-
             Action = () =>
             {
                 beatmapDownloader.Download(beatmapSetInfo);
-
                 attachExistingDownload();
             };
         }
@@ -116,7 +113,15 @@ namespace osu.Game.Screens.Select.Carousel
                 Enabled.Value = false;
                 TooltipText = string.Empty;
 
-                download.DownloadProgressed += progress => progressFill.ResizeWidthTo(progress, 100);
+                download.DownloadProgressed += progress => progressFill.ResizeWidthTo(progress, 100, Easing.OutQuint);
+                download.Failure += _ => attachExistingDownload();
+            }
+            else
+            {
+                Enabled.Value = true;
+                TooltipText = "Update beatmap with online changes";
+
+                progressFill.ResizeWidthTo(0, 100, Easing.OutQuint);
             }
         }
 
