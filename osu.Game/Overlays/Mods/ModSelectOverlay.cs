@@ -246,8 +246,11 @@ namespace osu.Game.Overlays.Mods
                 updateCustomisation(val);
                 updateFromExternalSelection();
 
-                modSettingChangeTracker = new ModSettingChangeTracker(val.NewValue);
-                modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
+                if (AllowCustomisation)
+                {
+                    modSettingChangeTracker = new ModSettingChangeTracker(val.NewValue);
+                    modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
+                }
             }, true);
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
