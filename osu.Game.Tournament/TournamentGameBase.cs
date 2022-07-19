@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -19,8 +21,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
+using osu.Game.Users;
 using osuTK.Input;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tournament
 {
@@ -61,7 +63,7 @@ namespace osu.Game.Tournament
 
             dependencies.Cache(new TournamentVideoResourceStore(storage));
 
-            Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
+            Textures.AddTextureSource(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
             dependencies.CacheAs(new StableInfo(storage));
         }
@@ -186,8 +188,8 @@ namespace osu.Game.Tournament
             var playersRequiringPopulation = ladder.Teams
                                                    .SelectMany(t => t.Players)
                                                    .Where(p => string.IsNullOrEmpty(p.Username)
-                                                               || p.Statistics?.GlobalRank == null
-                                                               || p.Statistics?.CountryRank == null).ToList();
+                                                               || p.CountryCode == CountryCode.Unknown
+                                                               || p.Rank == null).ToList();
 
             if (playersRequiringPopulation.Count == 0)
                 return false;
@@ -195,7 +197,7 @@ namespace osu.Game.Tournament
             for (int i = 0; i < playersRequiringPopulation.Count; i++)
             {
                 var p = playersRequiringPopulation[i];
-                PopulateUser(p, immediate: true);
+                PopulatePlayer(p, immediate: true);
                 updateLoadProgressMessage($"Populating user stats ({i} / {playersRequiringPopulation.Count})");
             }
 
@@ -209,7 +211,7 @@ namespace osu.Game.Tournament
         {
             var beatmapsRequiringPopulation = ladder.Rounds
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => string.IsNullOrEmpty(b.Beatmap?.BeatmapSet?.Title) && b.ID > 0).ToList();
+                                                    .Where(b => b.Beatmap?.OnlineID == 0 && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -220,7 +222,7 @@ namespace osu.Game.Tournament
 
                 var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
                 API.Perform(req);
-                b.Beatmap = req.Response ?? new APIBeatmap();
+                b.Beatmap = new TournamentBeatmap(req.Response ?? new APIBeatmap());
 
                 updateLoadProgressMessage($"Populating round beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -236,7 +238,7 @@ namespace osu.Game.Tournament
             var beatmapsRequiringPopulation = ladder.Teams
                                                     .SelectMany(r => r.SeedingResults)
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => string.IsNullOrEmpty(b.Beatmap?.BeatmapSet?.Title) && b.ID > 0).ToList();
+                                                    .Where(b => b.Beatmap?.OnlineID == 0 && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -247,7 +249,7 @@ namespace osu.Game.Tournament
 
                 var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
                 API.Perform(req);
-                b.Beatmap = req.Response ?? new APIBeatmap();
+                b.Beatmap = new TournamentBeatmap(req.Response ?? new APIBeatmap());
 
                 updateLoadProgressMessage($"Populating seeding beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -257,9 +259,9 @@ namespace osu.Game.Tournament
 
         private void updateLoadProgressMessage(string s) => Schedule(() => initialisationText.Text = s);
 
-        public void PopulateUser(APIUser user, Action success = null, Action failure = null, bool immediate = false)
+        public void PopulatePlayer(TournamentUser user, Action success = null, Action failure = null, bool immediate = false)
         {
-            var req = new GetUserRequest(user.Id, ladder.Ruleset.Value);
+            var req = new GetUserRequest(user.OnlineID, ladder.Ruleset.Value);
 
             if (immediate)
             {
@@ -268,10 +270,10 @@ namespace osu.Game.Tournament
             }
             else
             {
-                req.Success += res => { populate(); };
+                req.Success += _ => { populate(); };
                 req.Failure += _ =>
                 {
-                    user.Id = 1;
+                    user.OnlineID = 1;
                     failure?.Invoke();
                 };
 
@@ -285,18 +287,18 @@ namespace osu.Game.Tournament
                 if (res == null)
                     return;
 
-                user.Id = res.Id;
+                user.OnlineID = res.Id;
 
                 user.Username = res.Username;
-                user.Statistics = res.Statistics;
-                user.Country = res.Country;
-                user.Cover = res.Cover;
+                user.CoverUrl = res.CoverUrl;
+                user.CountryCode = res.CountryCode;
+                user.Rank = res.Statistics?.GlobalRank;
 
                 success?.Invoke();
             }
         }
 
-        protected virtual void SaveChanges()
+        public void SaveChanges()
         {
             if (!bracketLoadTaskCompletionSource.Task.IsCompletedSuccessfully)
             {
@@ -312,7 +314,16 @@ namespace osu.Game.Tournament
                                         .ToList();
 
             // Serialise before opening stream for writing, so if there's a failure it will leave the file in the previous state.
-            string serialisedLadder = JsonConvert.SerializeObject(ladder,
+            string serialisedLadder = GetSerialisedLadder();
+
+            using (var stream = storage.CreateFileSafely(BRACKET_FILENAME))
+            using (var sw = new StreamWriter(stream))
+                sw.Write(serialisedLadder);
+        }
+
+        public string GetSerialisedLadder()
+        {
+            return JsonConvert.SerializeObject(ladder,
                 new JsonSerializerSettings
                 {
                     Formatting = Formatting.Indented,
@@ -320,10 +331,6 @@ namespace osu.Game.Tournament
                     DefaultValueHandling = DefaultValueHandling.Ignore,
                     Converters = new JsonConverter[] { new JsonPointConverter() }
                 });
-
-            using (var stream = storage.CreateFileSafely(BRACKET_FILENAME))
-            using (var sw = new StreamWriter(stream))
-                sw.Write(serialisedLadder);
         }
 
         protected override UserInputManager CreateUserInputManager() => new TournamentInputManager();

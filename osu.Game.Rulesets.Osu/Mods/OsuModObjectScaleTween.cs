@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -42,13 +44,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             // apply grow effect
             switch (drawable)
             {
-                case DrawableSliderHead _:
-                case DrawableSliderTail _:
+                case DrawableSliderHead:
+                case DrawableSliderTail:
                     // special cases we should *not* be scaling.
                     break;
 
-                case DrawableSlider _:
-                case DrawableHitCircle _:
+                case DrawableSlider:
+                case DrawableHitCircle:
                 {
                     using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                         drawable.ScaleTo(StartScale.Value).Then().ScaleTo(EndScale, h.TimePreempt, Easing.OutSine);

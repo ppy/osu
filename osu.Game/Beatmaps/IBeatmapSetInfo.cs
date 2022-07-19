@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Database;
 
-#nullable enable
-
 namespace osu.Game.Beatmaps
 {
     /// <summary>

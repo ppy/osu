@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -957,7 +959,7 @@ namespace osu.Game.Screens.Select
             {
                 // root should always remain selected. if not, PerformSelection will not be called.
                 State.Value = CarouselItemState.Selected;
-                State.ValueChanged += state => State.Value = CarouselItemState.Selected;
+                State.ValueChanged += _ => State.Value = CarouselItemState.Selected;
 
                 this.carousel = carousel;
             }

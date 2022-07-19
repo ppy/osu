@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -243,7 +245,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     barLinePlayfield.Add(barLine);
                     break;
 
-                case DrawableTaikoHitObject _:
+                case DrawableTaikoHitObject:
                     base.Add(h);
                     break;
 
@@ -259,7 +261,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case DrawableBarLine barLine:
                     return barLinePlayfield.Remove(barLine);
 
-                case DrawableTaikoHitObject _:
+                case DrawableTaikoHitObject:
                     return base.Remove(h);
 
                 default:
@@ -278,12 +280,12 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             switch (result.Judgement)
             {
-                case TaikoStrongJudgement _:
+                case TaikoStrongJudgement:
                     if (result.IsHit)
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
                     break;
 
-                case TaikoDrumRollTickJudgement _:
+                case TaikoDrumRollTickJudgement:
                     if (!result.IsHit)
                         break;
 

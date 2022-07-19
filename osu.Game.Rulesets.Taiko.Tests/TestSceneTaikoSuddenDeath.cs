@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -42,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Setup judgements", () =>
             {
                 judged = false;
-                Player.ScoreProcessor.NewJudgement += b => judged = true;
+                Player.ScoreProcessor.NewJudgement += _ => judged = true;
             });
             AddUntilStep("swell judged", () => judged);
             AddAssert("failed", () => Player.GameplayState.HasFailed);

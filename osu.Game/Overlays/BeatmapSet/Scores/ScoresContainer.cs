@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -85,7 +87,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     MD5Hash = apiBeatmap.MD5Hash
                 };
 
-                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
                             .ContinueWith(task => Schedule(() =>
                             {
                                 if (loadCancellationSource.IsCancellationRequested)
@@ -99,7 +101,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 scoreTable.Show();
 
                                 var userScore = value.UserScore;
-                                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets, beatmapInfo);
+                                var userScoreInfo = userScore?.Score.ToScoreInfo(rulesets, beatmapInfo);
 
                                 topScoresContainer.Add(new DrawableTopScore(topScore));
 
@@ -215,7 +217,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             scope.BindValueChanged(_ => getScores());
             ruleset.BindValueChanged(_ => getScores());
 
-            modSelector.SelectedMods.CollectionChanged += (_, __) => getScores();
+            modSelector.SelectedMods.CollectionChanged += (_, _) => getScores();
 
             Beatmap.BindValueChanged(onBeatmapChanged);
             user.BindValueChanged(onUserChanged, true);

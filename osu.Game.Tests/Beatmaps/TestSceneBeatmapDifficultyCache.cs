@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -155,7 +157,7 @@ namespace osu.Game.Tests.Beatmaps
         [TestCase(8.3, DifficultyRating.ExpertPlus)]
         public void TestDifficultyRatingMapping(double starRating, DifficultyRating expectedBracket)
         {
-            var actualBracket = BeatmapDifficultyCache.GetDifficultyRating(starRating);
+            var actualBracket = StarDifficulty.GetDifficultyRating(starRating);
 
             Assert.AreEqual(expectedBracket, actualBracket);
         }

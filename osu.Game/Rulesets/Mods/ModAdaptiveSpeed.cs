@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +34,7 @@ namespace osu.Game.Rulesets.Mods
         public override bool ValidForMultiplayer => false;
         public override bool ValidForMultiplayerAsFreeMod => false;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp), typeof(ModAutoplay) };
 
         [SettingSource("Initial rate", "The starting speed of the track")]
         public BindableNumber<double> InitialRate { get; } = new BindableDouble
@@ -163,7 +165,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            drawable.OnNewResult += (o, result) =>
+            drawable.OnNewResult += (_, result) =>
             {
                 if (ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;
@@ -175,7 +177,7 @@ namespace osu.Game.Rulesets.Mods
 
                 updateTargetRate();
             };
-            drawable.OnRevertResult += (o, result) =>
+            drawable.OnRevertResult += (_, result) =>
             {
                 if (!ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;

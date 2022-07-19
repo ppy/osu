@@ -13,8 +13,6 @@ using osu.Game.Online.Rooms;
 using osuTK;
 using osuTK.Graphics;
 
-#nullable enable
-
 namespace osu.Game.Screens.OnlinePlay.Components
 {
     public abstract class OnlinePlayBackgroundScreen : BackgroundScreen

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Audio.Sample;
@@ -39,7 +41,7 @@ namespace osu.Game.Screens.Edit
             ComboColours = new BindableList<Colour4>();
             if (Skin.Configuration.ComboColours != null)
                 ComboColours.AddRange(Skin.Configuration.ComboColours.Select(c => (Colour4)c));
-            ComboColours.BindCollectionChanged((_, __) => updateColours());
+            ComboColours.BindCollectionChanged((_, _) => updateColours());
         }
 
         private void invokeSkinChanged() => BeatmapSkinChanged?.Invoke();

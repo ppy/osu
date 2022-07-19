@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -50,8 +48,6 @@ namespace osu.Game.Screens.Play
 
         // We show the previous screen status
         protected override UserActivity? InitialActivity => null;
-
-        protected override bool PlayResumeSound => false;
 
         protected BeatmapMetadataDisplay MetadataInfo { get; private set; } = null!;
 

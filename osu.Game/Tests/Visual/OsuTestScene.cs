@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -428,9 +430,17 @@ namespace osu.Game.Tests.Visual
                     return accumulated == seek;
                 }
 
+                public override Task<bool> SeekAsync(double seek) => Task.FromResult(Seek(seek));
+
                 public override void Start()
                 {
                     running = true;
+                }
+
+                public override Task StartAsync()
+                {
+                    Start();
+                    return Task.CompletedTask;
                 }
 
                 public override void Reset()
@@ -446,6 +456,12 @@ namespace osu.Game.Tests.Visual
                         running = false;
                         lastReferenceTime = null;
                     }
+                }
+
+                public override Task StopAsync()
+                {
+                    Stop();
+                    return Task.CompletedTask;
                 }
 
                 public override bool IsRunning => running;

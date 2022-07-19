@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -72,7 +74,7 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             if (line == null)
-                throw new IOException("Unknown file format (null)");
+                throw new IOException("Unknown file format (no content)");
 
             var decoder = typedDecoders.Where(d => line.StartsWith(d.Key, StringComparison.InvariantCulture)).Select(d => d.Value).FirstOrDefault();
 
