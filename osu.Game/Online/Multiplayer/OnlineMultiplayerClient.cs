@@ -85,7 +85,13 @@ namespace osu.Game.Online.Multiplayer
             catch (HubException exception)
             {
                 if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
-                    connector?.Reconnect();
+                {
+                    Debug.Assert(connector != null);
+
+                    await connector.Reconnect();
+                    return await JoinRoom(roomId, password);
+                }
+
                 throw;
             }
         }
