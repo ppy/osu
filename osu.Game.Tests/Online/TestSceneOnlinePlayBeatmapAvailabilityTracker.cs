@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Online
                 => new TestDownloadRequest(set);
         }
 
-        private class TestDownloadRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
+        internal class TestDownloadRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
         {
             public new void SetProgress(float progress) => base.SetProgress(progress);
             public new void TriggerSuccess(string filename) => base.TriggerSuccess(filename);
