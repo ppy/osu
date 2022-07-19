@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        private HitObjectProperty<float> scaleProperty;
+        private HitObjectProperty<float> scaleProperty = new HitObjectProperty<float>(1);
 
         public Bindable<float> ScaleBindable => scaleProperty.Bindable;
 
