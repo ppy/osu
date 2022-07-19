@@ -44,8 +44,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         /// <summary>
-        /// Sealed empty. Override <see cref="OnSliderBreak" /> instead, since animations
-        /// should only play on slider ticks.
+        /// Sealed empty intentionally. Override <see cref="OnSliderBreak" /> instead, since
+        /// animations should only play on slider ticks.
         /// </summary>
         protected sealed override void OnSliderRelease()
         {
