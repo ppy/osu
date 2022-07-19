@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         public void Search(string query)
-            => searchControl.Query.Value = query;
+            => Schedule(() => searchControl.Query.Value = query);
 
         protected override void LoadComplete()
         {

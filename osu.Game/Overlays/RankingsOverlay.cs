@@ -17,7 +17,7 @@ namespace osu.Game.Overlays
 {
     public class RankingsOverlay : TabbableOnlineOverlay<RankingsOverlayHeader, RankingsScope>
     {
-        protected Bindable<Country> Country => Header.Country;
+        protected Bindable<CountryCode> Country => Header.Country;
 
         private APIRequest lastRequest;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
             Country.BindValueChanged(_ =>
             {
                 // if a country is requested, force performance scope.
-                if (Country.Value != null)
+                if (!Country.IsDefault)
                     Header.Current.Value = RankingsScope.Performance;
 
                 Scheduler.AddOnce(triggerTabChanged);
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays
         {
             // country filtering is only valid for performance scope.
             if (Header.Current.Value != RankingsScope.Performance)
-                Country.Value = null;
+                Country.SetDefault();
 
             Scheduler.AddOnce(triggerTabChanged);
         }
@@ -85,9 +85,9 @@ namespace osu.Game.Overlays
 
         protected override RankingsOverlayHeader CreateHeader() => new RankingsOverlayHeader();
 
-        public void ShowCountry(Country requested)
+        public void ShowCountry(CountryCode requested)
         {
-            if (requested == null)
+            if (requested == default)
                 return;
 
             Show();
@@ -128,7 +128,7 @@ namespace osu.Game.Overlays
             switch (Header.Current.Value)
             {
                 case RankingsScope.Performance:
-                    return new GetUserRankingsRequest(ruleset.Value, country: Country.Value?.FlagName);
+                    return new GetUserRankingsRequest(ruleset.Value, countryCode: Country.Value);
 
                 case RankingsScope.Country:
                     return new GetCountryRankingsRequest(ruleset.Value);

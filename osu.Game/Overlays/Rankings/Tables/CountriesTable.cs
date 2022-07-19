@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Resources.Localisation.Web;
 
@@ -33,9 +34,9 @@ namespace osu.Game.Overlays.Rankings.Tables
             new RankingsTableColumn(RankingsStrings.StatAveragePerformance, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
-        protected override Country GetCountry(CountryStatistics item) => item.Country;
+        protected override CountryCode GetCountryCode(CountryStatistics item) => item.Code;
 
-        protected override Drawable CreateFlagContent(CountryStatistics item) => new CountryName(item.Country);
+        protected override Drawable CreateFlagContent(CountryStatistics item) => new CountryName(item.Code);
 
         protected override Drawable[] CreateAdditionalContent(CountryStatistics item) => new Drawable[]
         {
@@ -70,15 +71,15 @@ namespace osu.Game.Overlays.Rankings.Tables
             [Resolved(canBeNull: true)]
             private RankingsOverlay rankings { get; set; }
 
-            public CountryName(Country country)
+            public CountryName(CountryCode countryCode)
                 : base(t => t.Font = OsuFont.GetFont(size: 12))
             {
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
                 TextAnchor = Anchor.CentreLeft;
 
-                if (!string.IsNullOrEmpty(country.FullName))
-                    AddLink(country.FullName, () => rankings?.ShowCountry(country));
+                if (countryCode != CountryCode.Unknown)
+                    AddLink(countryCode.GetDescription(), () => rankings?.ShowCountry(countryCode));
             }
         }
     }

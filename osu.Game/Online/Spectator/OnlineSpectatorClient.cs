@@ -56,12 +56,19 @@ namespace osu.Game.Online.Spectator
 
             try
             {
-                await connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), state);
+                await connection.InvokeAsync(nameof(ISpectatorServer.BeginPlaySession), state);
             }
             catch (HubException exception)
             {
                 if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
-                    connector?.Reconnect();
+                {
+                    Debug.Assert(connector != null);
+
+                    await connector.Reconnect();
+                    await BeginPlayingInternal(state);
+                    return;
+                }
+
                 throw;
             }
         }
@@ -73,7 +80,7 @@ namespace osu.Game.Online.Spectator
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), bundle);
+            return connection.InvokeAsync(nameof(ISpectatorServer.SendFrameData), bundle);
         }
 
         protected override Task EndPlayingInternal(SpectatorState state)
@@ -83,7 +90,7 @@ namespace osu.Game.Online.Spectator
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), state);
+            return connection.InvokeAsync(nameof(ISpectatorServer.EndPlaySession), state);
         }
 
         protected override Task WatchUserInternal(int userId)
@@ -93,7 +100,7 @@ namespace osu.Game.Online.Spectator
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
+            return connection.InvokeAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
         }
 
         protected override Task StopWatchingUserInternal(int userId)
@@ -103,7 +110,7 @@ namespace osu.Game.Online.Spectator
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
+            return connection.InvokeAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
         }
     }
 }

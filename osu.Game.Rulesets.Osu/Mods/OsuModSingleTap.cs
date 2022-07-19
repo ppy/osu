@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModSingleTap : InputBlockingMod
     {
         public override string Name => @"Single Tap";
-        public override string Acronym => @"ST";
+        public override string Acronym => @"SG";
         public override string Description => @"You must only use one key!";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAlternate) }).ToArray();
 
