@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Select.Carousel
                                     RelativeSizeAxes = Axes.Y,
                                     Children = new Drawable[]
                                     {
-                                        new UpdateRequiredIcon(beatmapSet),
+                                        new UpdateBeatmapSetButton(beatmapSet),
                                     }
                                 },
                             new BeatmapSetOnlineStatusPill

@@ -5,6 +5,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -12,15 +13,18 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class UpdateRequiredIcon : OsuAnimatedButton
+    public class UpdateBeatmapSetButton : OsuAnimatedButton
     {
         private readonly BeatmapSetInfo beatmapSetInfo;
         private SpriteIcon icon;
 
-        public UpdateRequiredIcon(BeatmapSetInfo beatmapSetInfo)
+        private Box progressFill;
+
+        public UpdateBeatmapSetButton(BeatmapSetInfo beatmapSetInfo)
         {
             this.beatmapSetInfo = beatmapSetInfo;
 
@@ -31,7 +35,7 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [Resolved]
-        private BeatmapModelDownloader beatmaps { get; set; } = null!;
+        private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -43,6 +47,14 @@ namespace osu.Game.Screens.Select.Carousel
 
             Content.AddRange(new Drawable[]
             {
+                progressFill = new Box
+                {
+                    Colour = Color4.White,
+                    Alpha = 0.2f,
+                    Blending = BlendingParameters.Additive,
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0,
+                },
                 new FillFlowContainer
                 {
                     Padding = new MarginPadding { Horizontal = 5, Vertical = 3 },
@@ -80,7 +92,12 @@ namespace osu.Game.Screens.Select.Carousel
 
             TooltipText = "Update beatmap with online changes";
 
-            Action = () => beatmaps.Download(beatmapSetInfo);
+            Action = () =>
+            {
+                beatmapDownloader.Download(beatmapSetInfo);
+
+                attachExistingDownload();
+            };
         }
 
         protected override void LoadComplete()
@@ -88,6 +105,19 @@ namespace osu.Game.Screens.Select.Carousel
             base.LoadComplete();
 
             icon.Spin(4000, RotationDirection.Clockwise);
+        }
+
+        private void attachExistingDownload()
+        {
+            var download = beatmapDownloader.GetExistingDownload(beatmapSetInfo);
+
+            if (download != null)
+            {
+                Enabled.Value = false;
+                TooltipText = string.Empty;
+
+                download.DownloadProgressed += progress => progressFill.ResizeWidthTo(progress, 100);
+            }
         }
 
         protected override bool OnHover(HoverEvent e)
