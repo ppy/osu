@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -33,7 +34,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         protected override void OnTrackingChanged(ValueChangedEvent<bool> tracking)
         {
+            Debug.Assert(ParentObject != null);
+
             const float duration = 300f;
+
+            if (ParentObject.Judged)
+                return;
 
             if (tracking.NewValue)
             {
@@ -52,10 +58,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         protected override void OnSliderEnd()
         {
-            const float fade_duration = 450f;
+            const float fade_duration = 300;
 
             // intentionally pile on an extra FadeOut to make it happen much faster
-            this.FadeOut(fade_duration / 4, Easing.Out);
+            this.ScaleTo(1, fade_duration, Easing.OutQuint);
+            this.FadeOut(fade_duration / 2, Easing.OutQuint);
         }
     }
 }
