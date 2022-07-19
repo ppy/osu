@@ -54,8 +54,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorSaveSkin => new TranslatableString(getKey(@"skin_editor_save"), @"Skin Saved");
 
-
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
