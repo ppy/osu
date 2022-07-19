@@ -7,12 +7,12 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects;
-using osuTK;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -36,12 +36,14 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
 
-        public readonly Bindable<Vector2> PositionBindable = new Bindable<Vector2>();
+        private HitObjectProperty<Vector2> position;
+
+        public Bindable<Vector2> PositionBindable => position.Bindable;
 
         public virtual Vector2 Position
         {
-            get => PositionBindable.Value;
-            set => PositionBindable.Value = value;
+            get => position.Value;
+            set => position.Value = value;
         }
 
         public float X => Position.X;
@@ -53,7 +55,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedEndPosition => EndPosition + StackOffset;
 
-        public readonly Bindable<int> StackHeightBindable = new Bindable<int>();
+        private HitObjectProperty<int> stackHeightProperty;
+
+        public Bindable<int> StackHeightBindable => stackHeightProperty.Bindable;
 
         public int StackHeight
         {
@@ -65,7 +69,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        public readonly Bindable<float> ScaleBindable = new BindableFloat(1);
+        private HitObjectProperty<float> scaleProperty;
+
+        public Bindable<float> ScaleBindable => scaleProperty.Bindable;
 
         public float Scale
         {
@@ -75,7 +81,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public virtual bool NewCombo { get; set; }
 
-        public readonly Bindable<int> ComboOffsetBindable = new Bindable<int>();
+        private HitObjectProperty<int> comboOffsetProperty;
+
+        public Bindable<int> ComboOffsetBindable => comboOffsetProperty.Bindable;
 
         public int ComboOffset
         {
@@ -83,7 +91,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => ComboOffsetBindable.Value = value;
         }
 
-        public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
+        private HitObjectProperty<int> indexInCurrentComboProperty;
+
+        public Bindable<int> IndexInCurrentComboBindable => indexInCurrentComboProperty.Bindable;
 
         public virtual int IndexInCurrentCombo
         {
@@ -91,7 +101,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => IndexInCurrentComboBindable.Value = value;
         }
 
-        public Bindable<int> ComboIndexBindable { get; } = new Bindable<int>();
+        private HitObjectProperty<int> comboIndexProperty;
+
+        public Bindable<int> ComboIndexBindable => comboIndexProperty.Bindable;
 
         public virtual int ComboIndex
         {
@@ -99,7 +111,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => ComboIndexBindable.Value = value;
         }
 
-        public Bindable<int> ComboIndexWithOffsetsBindable { get; } = new Bindable<int>();
+        private HitObjectProperty<int> comboIndexWithOffsetsProperty;
+
+        public Bindable<int> ComboIndexWithOffsetsBindable => comboIndexWithOffsetsProperty.Bindable;
 
         public int ComboIndexWithOffsets
         {
@@ -107,7 +121,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => ComboIndexWithOffsetsBindable.Value = value;
         }
 
-        public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
+        private HitObjectProperty<bool> lastInComboProperty;
+
+        public Bindable<bool> LastInComboBindable => lastInComboProperty.Bindable;
 
         public bool LastInCombo
         {
