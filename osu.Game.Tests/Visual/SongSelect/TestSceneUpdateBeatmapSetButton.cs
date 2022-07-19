@@ -24,6 +24,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private TestSceneOnlinePlayBeatmapAvailabilityTracker.TestBeatmapModelDownloader beatmapDownloader = null!;
 
+        private BeatmapSetInfo testBeatmapSetInfo = null!;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -34,15 +36,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             return dependencies;
         }
 
-        [Test]
-        public void TestBeatmapWithOnlineUpdates()
+        private UpdateBeatmapSetButton? getUpdateButton() => carousel.ChildrenOfType<UpdateBeatmapSetButton>().SingleOrDefault();
+
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            ArchiveDownloadRequest<IBeatmapSetInfo>? downloadRequest = null;
-
-            UpdateBeatmapSetButton? getUpdateButton() => carousel.ChildrenOfType<UpdateBeatmapSetButton>().SingleOrDefault();
-
-            var testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo();
-
             AddStep("create carousel", () =>
             {
                 Child = carousel = new BeatmapCarousel
@@ -50,7 +48,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     RelativeSizeAxes = Axes.Both,
                     BeatmapSets = new List<BeatmapSetInfo>
                     {
-                        testBeatmapSetInfo,
+                        (testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo()),
                     }
                 };
             });
@@ -58,6 +56,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("wait for load", () => carousel.BeatmapSetsLoaded);
 
             AddAssert("update button not visible", () => getUpdateButton() == null);
+        }
+
+        [Test]
+        public void TestDownloadToCompletion()
+        {
+            ArchiveDownloadRequest<IBeatmapSetInfo>? downloadRequest = null;
 
             AddStep("update online hash", () =>
             {
@@ -76,6 +80,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 downloadRequest = beatmapDownloader.GetExistingDownload(testBeatmapSetInfo);
                 return downloadRequest != null;
             });
+
+            AddUntilStep("wait for button disabled", () => getUpdateButton()?.Enabled.Value == false);
 
             AddUntilStep("progress download to completion", () =>
             {
@@ -99,6 +105,50 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 return false;
             });
+        }
+
+        [Test]
+        public void TestDownloadFailed()
+        {
+            ArchiveDownloadRequest<IBeatmapSetInfo>? downloadRequest = null;
+
+            AddStep("update online hash", () =>
+            {
+                testBeatmapSetInfo.Beatmaps.First().OnlineMD5Hash = "different hash";
+                testBeatmapSetInfo.Beatmaps.First().LastOnlineUpdate = DateTimeOffset.Now;
+
+                carousel.UpdateBeatmapSet(testBeatmapSetInfo);
+            });
+
+            AddUntilStep("update button visible", () => getUpdateButton() != null);
+
+            AddStep("click button", () => getUpdateButton()?.TriggerClick());
+
+            AddUntilStep("wait for download started", () =>
+            {
+                downloadRequest = beatmapDownloader.GetExistingDownload(testBeatmapSetInfo);
+                return downloadRequest != null;
+            });
+
+            AddUntilStep("wait for button disabled", () => getUpdateButton()?.Enabled.Value == false);
+
+            AddUntilStep("progress download to failure", () =>
+            {
+                if (downloadRequest is TestSceneOnlinePlayBeatmapAvailabilityTracker.TestDownloadRequest testRequest)
+                {
+                    testRequest.SetProgress(testRequest.Progress + 0.1f);
+
+                    if (testRequest.Progress >= 0.5f)
+                    {
+                        testRequest.TriggerFailure(new Exception());
+                        return true;
+                    }
+                }
+
+                return false;
+            });
+
+            AddUntilStep("wait for button enabled", () => getUpdateButton()?.Enabled.Value == true);
         }
     }
 }
