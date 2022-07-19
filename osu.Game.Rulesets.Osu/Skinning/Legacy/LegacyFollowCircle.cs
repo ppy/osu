@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 .FadeTo(0).FadeTo(1f, Math.Min(60f, remainingTime));
         }
 
-        protected override void OnSliderTail()
+        protected override void OnSliderEnd()
         {
             this.ScaleTo(1.6f, 200, Easing.Out)
                 .FadeOut(200, Easing.In);

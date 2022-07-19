@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        OnSliderTail();
+                        OnSliderEnd();
                         break;
                 }
             }
@@ -90,6 +90,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         protected abstract void OnSliderRelease();
 
-        protected abstract void OnSliderTail();
+        protected abstract void OnSliderEnd();
     }
 }

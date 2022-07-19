@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 .FadeTo(0, duration, Easing.OutQuint);
         }
 
-        protected override void OnSliderTail()
+        protected override void OnSliderEnd()
         {
             const float duration = 300;
 
