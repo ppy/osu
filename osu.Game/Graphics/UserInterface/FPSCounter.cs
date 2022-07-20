@@ -7,6 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -22,6 +24,10 @@ namespace osu.Game.Graphics.UserInterface
         private RollingCounter<double> fpsCounter = null!;
 
         private Container mainContent = null!;
+
+        private Container background = null!;
+
+        private const float idle_background_alpha = 0.4f;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -39,9 +45,24 @@ namespace osu.Game.Graphics.UserInterface
                 mainContent = new Container
                 {
                     Alpha = 0,
-                    Size = new Vector2(30),
+                    AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        background = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            CornerRadius = 5,
+                            Masking = true,
+                            Alpha = idle_background_alpha,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    Colour = colours.Gray0,
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                            }
+                        },
                         msCounter = new FrameTimeCounter
                         {
                             Anchor = Anchor.TopRight,
@@ -65,6 +86,20 @@ namespace osu.Game.Graphics.UserInterface
             displayTemporarily();
         }
 
+        protected override bool OnHover(HoverEvent e)
+        {
+            background.FadeTo(1, 200);
+            displayTemporarily();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            background.FadeTo(idle_background_alpha, 200);
+            displayTemporarily();
+            base.OnHoverLost(e);
+        }
+
         private bool isDisplayed;
 
         private ScheduledDelegate? fadeOutDelegate;
@@ -75,11 +110,15 @@ namespace osu.Game.Graphics.UserInterface
                 mainContent.FadeTo(1, 300, Easing.OutQuint);
 
             fadeOutDelegate?.Cancel();
-            fadeOutDelegate = Scheduler.AddDelayed(() =>
+
+            if (!IsHovered)
             {
-                mainContent.FadeTo(0, 1000, Easing.In);
-                isDisplayed = false;
-            }, 2000);
+                fadeOutDelegate = Scheduler.AddDelayed(() =>
+                {
+                    mainContent.FadeTo(0, 1000, Easing.In);
+                    isDisplayed = false;
+                }, 2000);
+            }
         }
 
         [Resolved]
