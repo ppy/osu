@@ -23,6 +23,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
@@ -37,8 +38,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private ScoreManager scoreManager { get; set; }
 
         private readonly FillFlowContainer backgroundFlow;
-
-        private Color4 highAccuracyColour;
 
         public ScoreTable()
         {
@@ -55,12 +54,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Padding = new MarginPadding { Horizontal = -horizontal_inset },
                 Margin = new MarginPadding { Top = row_height }
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            highAccuracyColour = colours.GreenLight;
         }
 
         /// <summary>
@@ -158,12 +151,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Current = scoreManager.GetBindableTotalScoreString(score),
                     Font = OsuFont.GetFont(size: text_size, weight: index == 0 ? FontWeight.Bold : FontWeight.Medium)
                 },
-                new OsuSpriteText
+                new StatisticText(score.Accuracy, 1, showTooltip: false)
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
                     Text = score.DisplayAccuracy,
-                    Font = OsuFont.GetFont(size: text_size),
-                    Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
                 },
                 new UpdateableFlag(score.User.CountryCode)
                 {
@@ -171,14 +162,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     ShowPlaceholderOnUnknown = false,
                 },
                 username,
-                new OsuSpriteText
-                {
-                    Text = score.MaxCombo.ToLocalisableString(@"0\x"),
-                    Font = OsuFont.GetFont(size: text_size),
 #pragma warning disable 618
-                    Colour = score.MaxCombo == score.BeatmapInfo.MaxCombo ? highAccuracyColour : Color4.White
+                new StatisticText(score.MaxCombo, score.BeatmapInfo.MaxCombo, @"0\x"),
 #pragma warning restore 618
-                }
             };
 
             var availableStatistics = score.GetStatisticsForDisplay().ToDictionary(tuple => tuple.Result);
@@ -188,23 +174,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (!availableStatistics.TryGetValue(result.result, out var stat))
                     stat = new HitResultDisplayStatistic(result.result, 0, null, result.displayName);
 
-                content.Add(new OsuSpriteText
-                {
-                    Text = stat.MaxCount == null ? stat.Count.ToLocalisableString(@"N0") : (LocalisableString)$"{stat.Count}/{stat.MaxCount}",
-                    Font = OsuFont.GetFont(size: text_size),
-                    Colour = stat.Count == 0 ? Color4.Gray : Color4.White
-                });
+                content.Add(new StatisticText(stat.Count, stat.MaxCount, @"N0") { Colour = stat.Count == 0 ? Color4.Gray : Color4.White });
             }
 
             if (showPerformancePoints)
             {
                 Debug.Assert(score.PP != null);
-
-                content.Add(new OsuSpriteText
-                {
-                    Text = score.PP.ToLocalisableString(@"N0"),
-                    Font = OsuFont.GetFont(size: text_size)
-                });
+                content.Add(new StatisticText(score.PP.Value, format: @"N0"));
             }
 
             content.Add(new ScoreboardTime(score.Date, text_size)
@@ -241,6 +217,32 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             private void load(OverlayColourProvider colourProvider)
             {
                 Colour = colourProvider.Foreground1;
+            }
+        }
+
+        private class StatisticText : OsuSpriteText, IHasTooltip
+        {
+            private readonly double count;
+            private readonly double? maxCount;
+            private readonly bool showTooltip;
+
+            public LocalisableString TooltipText => maxCount == null || !showTooltip ? string.Empty : $"{count}/{maxCount}";
+
+            public StatisticText(double count, double? maxCount = null, string format = null, bool showTooltip = true)
+            {
+                this.count = count;
+                this.maxCount = maxCount;
+                this.showTooltip = showTooltip;
+
+                Text = count.ToLocalisableString(format);
+                Font = OsuFont.GetFont(size: text_size);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                if (count == maxCount)
+                    Colour = colours.GreenLight;
             }
         }
     }
