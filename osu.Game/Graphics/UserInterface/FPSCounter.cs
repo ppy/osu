@@ -4,11 +4,13 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
@@ -21,13 +23,16 @@ namespace osu.Game.Graphics.UserInterface
 
         private Container mainContent = null!;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         public FPSCounter()
         {
             AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
@@ -41,7 +46,6 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
-                            Colour = colours.Orange2,
                         },
                         fpsCounter = new FramesPerSecondCounter
                         {
@@ -49,7 +53,6 @@ namespace osu.Game.Graphics.UserInterface
                             Origin = Anchor.TopRight,
                             Y = 11,
                             Scale = new Vector2(0.8f),
-                            Colour = colours.Lime3,
                         }
                     }
                 },
@@ -97,8 +100,27 @@ namespace osu.Game.Graphics.UserInterface
             if (hasSignificantChanges)
                 displayTemporarily();
 
-            msCounter.Current.Value = newFrameTime;
+            // If the frame time spikes up, make sure it shows immediately on the counter.
+            if (msCounter.Current.Value < 20 && newFrameTime > 20)
+                msCounter.SetCountWithoutRolling(newFrameTime);
+            else
+                msCounter.Current.Value = newFrameTime;
+
             fpsCounter.Current.Value = newFps;
+
+            fpsCounter.Colour = getColour(fpsCounter.DisplayedCount / gameHost.DrawThread.Clock.MaximumUpdateHz);
+
+            double equivalentHz = 1000 / msCounter.DisplayedCount;
+
+            msCounter.Colour = getColour(equivalentHz / gameHost.UpdateThread.Clock.MaximumUpdateHz);
+        }
+
+        private ColourInfo getColour(double performanceRatio)
+        {
+            if (performanceRatio < 0.5f)
+                return Interpolation.ValueAt(performanceRatio, colours.Red, colours.Orange2, 0, 0.5, Easing.Out);
+
+            return Interpolation.ValueAt(performanceRatio, colours.Orange2, colours.Lime3, 0.5, 1, Easing.Out);
         }
 
         public ITooltip GetCustomTooltip() => new FPSCounterTooltip();
