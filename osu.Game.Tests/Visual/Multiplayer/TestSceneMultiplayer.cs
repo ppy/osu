@@ -402,16 +402,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestPlayStartsWithCorrectBeatmapWhileAtSongSelect()
         {
-            createRoom(() => new Room
+            PlaylistItem? item = null;
+            createRoom(() =>
             {
-                Name = { Value = "Test Room" },
-                Playlist =
+                item = new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                 {
-                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
-                    {
-                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
-                    }
-                }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                };
+                return new Room
+                {
+                    Name = { Value = "Test Room" },
+                    Playlist = { item }
+                };
             });
 
             pressReadyButton();
@@ -419,7 +421,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(multiplayerClient.ClientRoom?.Settings.PlaylistItemId);
+                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
             });
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
@@ -440,16 +442,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestPlayStartsWithCorrectRulesetWhileAtSongSelect()
         {
-            createRoom(() => new Room
+            PlaylistItem? item = null;
+            createRoom(() =>
             {
-                Name = { Value = "Test Room" },
-                Playlist =
+                item = new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                 {
-                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
-                    {
-                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
-                    }
-                }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                };
+                return new Room
+                {
+                    Name = { Value = "Test Room" },
+                    Playlist = { item }
+                };
             });
 
             pressReadyButton();
@@ -457,7 +461,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(multiplayerClient.ClientRoom?.Settings.PlaylistItemId);
+                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
             });
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
@@ -478,16 +482,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestPlayStartsWithCorrectModsWhileAtSongSelect()
         {
-            createRoom(() => new Room
+            PlaylistItem? item = null;
+            createRoom(() =>
             {
-                Name = { Value = "Test Room" },
-                Playlist =
+                item = new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                 {
-                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
-                    {
-                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
-                    }
-                }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                };
+                return new Room
+                {
+                    Name = { Value = "Test Room" },
+                    Playlist = { item }
+                };
             });
 
             pressReadyButton();
@@ -495,7 +501,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(multiplayerClient.ClientRoom?.Settings.PlaylistItemId);
+                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
             });
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
