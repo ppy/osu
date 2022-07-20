@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -17,7 +15,7 @@ namespace osu.Game.Tests.Mods
     [TestFixture]
     public class ModDifficultyAdjustTest
     {
-        private TestModDifficultyAdjust testMod;
+        private TestModDifficultyAdjust testMod = null!;
 
         [SetUp]
         public void Setup()
@@ -148,7 +146,7 @@ namespace osu.Game.Tests.Mods
                     yield return new TestModDifficultyAdjust();
             }
 
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             {
                 throw new System.NotImplementedException();
             }

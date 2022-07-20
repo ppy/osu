@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -29,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// A function that can extract the current value of this setting from a beatmap difficulty for display purposes.
         /// </summary>
-        public Func<IBeatmapDifficultyInfo, float> ReadCurrentFromDifficulty;
+        public Func<IBeatmapDifficultyInfo, float>? ReadCurrentFromDifficulty;
 
         public float Precision
         {
