@@ -22,10 +22,12 @@ using osu.Framework.Input.Handlers;
 using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.Threading;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Desktop
@@ -155,6 +157,9 @@ namespace osu.Desktop
 
                 case JoystickHandler jh:
                     return new JoystickSettings(jh);
+
+                case TouchHandler th:
+                    return new InputSection.HandlerSection(th);
 
                 default:
                     return base.CreateSettingsSubsectionFor(handler);
