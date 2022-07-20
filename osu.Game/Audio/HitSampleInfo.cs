@@ -14,15 +14,15 @@ namespace osu.Game.Audio
     [Serializable]
     public class HitSampleInfo : ISampleInfo, IEquatable<HitSampleInfo>
     {
+        public const string HIT_NORMAL = @"hitnormal";
         public const string HIT_WHISTLE = @"hitwhistle";
         public const string HIT_FINISH = @"hitfinish";
-        public const string HIT_NORMAL = @"hitnormal";
         public const string HIT_CLAP = @"hitclap";
 
         /// <summary>
         /// All valid sample addition constants.
         /// </summary>
-        public static IEnumerable<string> AllAdditions => new[] { HIT_WHISTLE, HIT_CLAP, HIT_FINISH };
+        public static IEnumerable<string> AllAdditions => new[] { HIT_WHISTLE, HIT_FINISH, HIT_CLAP };
 
         /// <summary>
         /// The name of the sample to load.
