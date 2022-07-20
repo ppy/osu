@@ -100,7 +100,7 @@ namespace osu.Game.Overlays
 
         private void onPathChanged(ValueChangedEvent<string> e)
         {
-            // the path could change as a result of redirecting to another path cof the same page.
+            // the path could change as a result of redirecting to a newer location of the same page.
             // we already have the correct wiki data, so we can safely return here.
             if (e.NewValue == wikiData.Value?.Path)
                 return;
