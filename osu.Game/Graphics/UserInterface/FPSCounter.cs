@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -13,6 +14,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
@@ -29,6 +31,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float idle_background_alpha = 0.4f;
 
+        private Bindable<bool> showFpsDisplay = null!;
+
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
@@ -38,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             InternalChildren = new Drawable[]
             {
@@ -78,12 +82,21 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 },
             };
+
+            showFpsDisplay = config.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             displayTemporarily();
+
+            showFpsDisplay.BindValueChanged(showFps =>
+            {
+                this.FadeTo(showFps.NewValue ? 1 : 0, 100);
+                displayTemporarily();
+            }, true);
         }
 
         protected override bool OnHover(HoverEvent e)
