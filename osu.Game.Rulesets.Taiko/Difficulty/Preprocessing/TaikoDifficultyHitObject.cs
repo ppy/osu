@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     {
         private readonly IReadOnlyList<TaikoDifficultyHitObject>? monoDifficultyHitObjects;
         public readonly int MonoIndex;
-        private readonly IReadOnlyList<TaikoDifficultyHitObject> noteObjects;
+        private readonly IReadOnlyList<TaikoDifficultyHitObject> noteDifficultyHitObjects;
         public readonly int NoteIndex;
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             var currentHit = hitObject as Hit;
-            this.noteObjects = noteObjects;
+            noteDifficultyHitObjects = noteObjects;
 
             Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRate);
             HitType? hitType = currentHit?.Type;
@@ -120,8 +120,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
         public TaikoDifficultyHitObject? NextMono(int forwardsIndex) => monoDifficultyHitObjects?.ElementAtOrDefault(MonoIndex + (forwardsIndex + 1));
 
-        public TaikoDifficultyHitObject? PreviousNote(int backwardsIndex) => noteObjects.ElementAtOrDefault(NoteIndex - (backwardsIndex + 1));
+        public TaikoDifficultyHitObject? PreviousNote(int backwardsIndex) => noteDifficultyHitObjects.ElementAtOrDefault(NoteIndex - (backwardsIndex + 1));
 
-        public TaikoDifficultyHitObject? NextNote(int forwardsIndex) => noteObjects.ElementAtOrDefault(NoteIndex + (forwardsIndex + 1));
+        public TaikoDifficultyHitObject? NextNote(int forwardsIndex) => noteDifficultyHitObjects.ElementAtOrDefault(NoteIndex + (forwardsIndex + 1));
     }
 }

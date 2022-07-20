@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         public int RepetitionInterval { get; private set; } = max_repetition_interval + 1;
 
         /// <summary>
-        /// Returns true if other is considered a repetition of this encoding. This is true if other's first two payload
-        /// identical mono lengths.
+        /// Returns true if other is considered a repetition of this encoding. This is true if other's first two payloads
+        /// have identical mono lengths.
         /// </summary>
         private bool isRepetitionOf(CoupledColourEncoding other)
         {

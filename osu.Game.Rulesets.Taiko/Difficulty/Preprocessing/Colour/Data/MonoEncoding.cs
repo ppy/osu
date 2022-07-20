@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// <summary>
         /// List of <see cref="DifficultyHitObject"/>s that are encoded within this <see cref="MonoEncoding"/>.
         /// This is not declared as <see cref="TaikoDifficultyHitObject"/> to avoid circular dependencies.
-        /// TODO: Review this, are circular dependencies within data-only classes are acceptable?
         /// </summary>
         public List<TaikoDifficultyHitObject> EncodedData { get; private set; } = new List<TaikoDifficultyHitObject>();
 

@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
         /// <summary>
         /// Evaluates the minimum mechanical stamina required to play the current object. This is calculated using the
-        /// maximum  possible interval between two hits using the same key, by alternating 2 keys for each colour.
+        /// maximum possible interval between two hits using the same key, by alternating 2 keys for each colour.
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {

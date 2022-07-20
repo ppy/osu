@@ -10,14 +10,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 {
     public class ColourEvaluator
     {
-        private static double sigmoid(double val, double center, double width)
+        /// <summary>
+        /// A sigmoid function. It gives a value between (middle - height/2) and (middle + height/2).
+        /// </summary>
+        /// <param name="val">The input value.</param>
+        /// <param name="center">The center of the sigmoid, where the largest gradient occurs and value is equal to middle.</param>
+        /// <param name="width">The radius of the sigmoid, outside of which values are near the minimum/maximum.</param>
+        /// <param name="middle">The middle of the sigmoid output.</param>
+        /// <param name="height">The height of the sigmoid output. This will be equal to max value - min value.</param>
+        public static double Sigmoid(double val, double center, double width, double middle, double height)
         {
-            return Math.Tanh(Math.E * -(val - center) / width);
-        }
-
-        private static double sigmoid(double val, double center, double width, double middle, double height)
-        {
-            return sigmoid(val, center, width) * (height / 2) + middle;
+            double sigmoid = Math.Tanh(Math.E * -(val - center) / width);
+            return sigmoid * (height / 2) + middle;
         }
 
         /// <summary>
@@ -27,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(MonoEncoding encoding, int i)
         {
-            return sigmoid(i, 2, 2, 0.5, 1);
+            return Sigmoid(i, 2, 2, 0.5, 1);
         }
 
         /// <summary>
@@ -37,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <param name="i">The index of the colour encoding within it's parent <see cref="CoupledColourEncoding"/>.</param>
         public static double EvaluateDifficultyOf(ColourEncoding encoding, int i)
         {
-            return sigmoid(i, 2, 2, 0.5, 1);
+            return Sigmoid(i, 2, 2, 0.5, 1);
         }
 
         /// <summary>
@@ -45,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(CoupledColourEncoding encoding)
         {
-            return 1 - sigmoid(encoding.RepetitionInterval, 2, 2, 0.5, 1);
+            return 1 - Sigmoid(encoding.RepetitionInterval, 2, 2, 0.5, 1);
         }
 
         /// <summary>
