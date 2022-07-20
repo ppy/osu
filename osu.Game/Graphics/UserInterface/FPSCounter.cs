@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class FPSCounter : CompositeDrawable, IHasCustomTooltip
+    public class FPSCounter : VisibilityContainer, IHasCustomTooltip
     {
         private RollingCounter<double> msCounter = null!;
         private RollingCounter<double> fpsCounter = null!;
@@ -31,7 +31,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float idle_background_alpha = 0.4f;
 
-        private Bindable<bool> showFpsDisplay = null!;
+        private readonly BindableBool showFpsDisplay = new BindableBool(true);
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -83,7 +83,7 @@ namespace osu.Game.Graphics.UserInterface
                 },
             };
 
-            showFpsDisplay = config.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
+            config.BindWith(OsuSetting.ShowFpsDisplay, showFpsDisplay);
         }
 
         protected override void LoadComplete()
@@ -94,10 +94,17 @@ namespace osu.Game.Graphics.UserInterface
 
             showFpsDisplay.BindValueChanged(showFps =>
             {
-                this.FadeTo(showFps.NewValue ? 1 : 0, 100);
-                displayTemporarily();
+                State.Value = showFps.NewValue ? Visibility.Visible : Visibility.Hidden;
+                if (showFps.NewValue)
+                    displayTemporarily();
             }, true);
+
+            State.BindValueChanged(state => showFpsDisplay.Value = state.NewValue == Visibility.Visible);
         }
+
+        protected override void PopIn() => this.FadeIn(100);
+
+        protected override void PopOut() => this.FadeOut(100);
 
         protected override bool OnHover(HoverEvent e)
         {
