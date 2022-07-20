@@ -150,7 +150,8 @@ namespace osu.Game.Graphics.UserInterface
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             TriangleScale = 4,
-                                            ColourDark = OsuColour.Gray(0.88f),
+                                            AccentColours = new Tuple<Color4, Color4>[] { new Tuple<Color4, Color4>(OsuColour.Gray(0.88f), Color4.White) },
+//                                            ColourDark = OsuColour.Gray(0.88f),
                                             Shear = new Vector2(-0.2f, 0),
                                         },
                                     },

@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -38,8 +39,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void load(OsuColour colours)
         {
             BackgroundColour = colours.Green;
-            Triangles.ColourDark = colours.Green;
-            Triangles.ColourLight = colours.GreenLight;
+            Triangles.AccentColours = new Tuple<Color4, Color4>[] {
+                Tuple.Create(colours.Green, colours.GreenLight)
+            };
+            // Triangles.ColourDark = colours.Green;
+            // Triangles.ColourLight = colours.GreenLight;
         }
 
         private bool hasRemainingAttempts = true;

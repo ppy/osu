@@ -18,6 +18,8 @@ using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Buffers;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Lists;
+using System.Linq;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -31,34 +33,22 @@ namespace osu.Game.Graphics.Backgrounds
         /// Same behavior as Sprite's EdgeSmoothness.
         /// </summary>
         private const float edge_smoothness = 1;
-
-        private Color4 colourLight = Color4.White;
-
-        public Color4 ColourLight
+        private Tuple<Color4, Color4>[] accentColours = new Tuple<Color4, Color4>[] { new Tuple<Color4, Color4>(Color4.Gray.Darken(0.5f), Color4.Gray.Lighten(0.5f)) };
+        public Tuple<Color4, Color4>[] AccentColours
         {
-            get => colourLight;
+            get => accentColours;
             set
             {
-                if (colourLight == value) return;
-
-                colourLight = value;
+                accentColours = value;
                 updateColours();
             }
         }
 
-        private Color4 colourDark = Color4.Black;
+        // will move it to osu framework color4extension if it will be approved, please don't mind it being right there for now
 
-        public Color4 ColourDark
-        {
-            get => colourDark;
-            set
-            {
-                if (colourDark == value) return;
+        public static Tuple<Color4, Color4> InRange(/* this */ Color4 colour, float amount) =>
+            new Tuple<Color4, Color4>(colour.Darken(amount), colour.Lighten(amount));
 
-                colourDark = value;
-                updateColours();
-            }
-        }
 
         /// <summary>
         /// Whether we should create new triangles as others expire.
@@ -225,7 +215,11 @@ namespace osu.Game.Graphics.Backgrounds
         /// Creates a shade of colour for the triangles.
         /// </summary>
         /// <returns>The colour.</returns>
-        protected virtual Color4 CreateTriangleShade(float shade) => Interpolation.ValueAt(shade, colourDark, colourLight, 0, 1);
+        protected virtual Color4 CreateTriangleShade(float shade)
+        {
+            var accent = accentColours.ElementAt(RNG.Next(0, accentColours.Count()));
+            return Interpolation.ValueAt(shade, accent.Item1, accent.Item2, 0, 1);
+        }
 
         private void updateColours()
         {
@@ -326,7 +320,7 @@ namespace osu.Game.Graphics.Backgrounds
 
             /// <summary>
             /// The colour shade of the triangle.
-            /// This is needed for colour recalculation of visible triangles when <see cref="ColourDark"/> or <see cref="ColourLight"/> is changed.
+            /// This is needed for colour recalculation of visible triangles when <see cref="AccentColours"/> is changed.
             /// </summary>
             public float ColourShade;
 

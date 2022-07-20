@@ -21,6 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
         private IBindable<APIUser> user;
 
         private SettingsEnumDropdown<BackgroundSource> backgroundSourceDropdown;
+        private SettingsCheckbox logoBackgroundColours;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
@@ -38,6 +39,11 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 {
                     LabelText = UserInterfaceStrings.OsuMusicTheme,
                     Current = config.GetBindable<bool>(OsuSetting.MenuMusic)
+                },
+                logoBackgroundColours = new SettingsCheckbox // maybe it can be a list in future to allow skin custom colors for triangles
+                {
+                    LabelText = UserInterfaceStrings.LogoBackgroundColours,
+                    Current = config.GetBindable<bool>(OsuSetting.LogoBackgroundColours)
                 },
                 new SettingsEnumDropdown<IntroSequence>
                 {

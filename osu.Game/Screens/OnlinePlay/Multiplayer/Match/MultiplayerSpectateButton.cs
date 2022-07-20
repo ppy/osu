@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -11,6 +12,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
@@ -67,15 +69,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 default:
                     button.Text = "Spectate";
                     button.BackgroundColour = colours.BlueDark;
-                    button.Triangles.ColourDark = colours.BlueDarker;
-                    button.Triangles.ColourLight = colours.Blue;
+                    button.Triangles.AccentColours = new Tuple<Color4, Color4>[] {
+                        Tuple.Create(colours.BlueDarker, colours.Blue)
+                    };
+                    // button.Triangles.ColourDark = colours.BlueDarker;
+                    // button.Triangles.ColourLight = colours.Blue;
                     break;
 
                 case MultiplayerUserState.Spectating:
                     button.Text = "Stop spectating";
                     button.BackgroundColour = colours.Gray4;
-                    button.Triangles.ColourDark = colours.Gray5;
-                    button.Triangles.ColourLight = colours.Gray6;
+                    button.Triangles.AccentColours = new Tuple<Color4, Color4>[] {
+                        Tuple.Create(colours.Gray5, colours.Gray6)
+                    };
+                    // button.Triangles.ColourDark = colours.Gray5;
+                    // button.Triangles.ColourLight = colours.Gray6;
                     break;
             }
 

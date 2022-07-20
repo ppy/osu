@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -102,8 +103,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            ColourLight = Color4.White,
-                            ColourDark = Color4.White.Darken(0.1f)
+                            AccentColours = new Tuple<Color4, Color4>[] {
+                                Tuple.Create(Color4.White.Darken(0.1f), Color4.White)
+                            }
+                            // ColourLight = Color4.White,
+                            // ColourDark = Color4.White.Darken(0.1f)
                         }
                     }
                 },

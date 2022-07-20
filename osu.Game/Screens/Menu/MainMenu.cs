@@ -71,6 +71,7 @@ namespace osu.Game.Screens.Menu
 
         private Bindable<double> holdDelay;
         private Bindable<bool> loginDisplayed;
+        private Bindable<bool> logoColours;
 
         private ExitConfirmOverlay exitConfirmOverlay;
 
@@ -81,6 +82,7 @@ namespace osu.Game.Screens.Menu
         private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
+            logoColours = config.GetBindable<bool>(OsuSetting.LogoBackgroundColours);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
 
             if (host.CanExit)
@@ -207,7 +209,10 @@ namespace osu.Game.Screens.Menu
         {
             base.LogoArriving(logo, resuming);
 
-            Buttons.SetOsuLogo(logo);
+            Buttons.Logo = logo;
+
+            logoColours.ValueChanged += OnLogoColoursSwitch;
+            logoColours.TriggerChange();
 
             logo.FadeColour(Color4.White, 100, Easing.OutQuint);
             logo.FadeIn(100, Easing.OutQuint);
@@ -246,11 +251,12 @@ namespace osu.Game.Screens.Menu
 
         protected override void LogoSuspending(OsuLogo logo)
         {
+            logoColours.ValueChanged -= OnLogoColoursSwitch;
             var seq = logo.FadeOut(300, Easing.InSine)
                           .ScaleTo(0.2f, 300, Easing.InSine);
 
-            seq.OnComplete(_ => Buttons.SetOsuLogo(null));
-            seq.OnAbort(_ => Buttons.SetOsuLogo(null));
+            seq.OnComplete(_ => Buttons.Logo = null);
+            seq.OnAbort(_ => Buttons.Logo = null);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -269,7 +275,11 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(e);
 
-            ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());
+            ApplyToBackground(b =>
+            {
+                logoColours.TriggerChange();
+                (b as BackgroundScreenDefault)?.Next();
+            });
 
             // we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
@@ -327,6 +337,29 @@ namespace osu.Game.Screens.Menu
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+        public void OnLogoColoursSwitch(ValueChangedEvent<bool> enabled)
+        {
+            var logo = Buttons.Logo;
+
+            if (logo == null || (enabled.OldValue == false && enabled.NewValue == false)) return;
+
+            Tuple<Color4, Tuple<Color4, Color4>[]> colors = enabled.NewValue ? GetBackgroundColours(31) : null;
+
+            this.Delay(60).Schedule(() =>
+            {
+                if (enabled.NewValue)
+                    logo.SetColours(colors.Item1, colors.Item2);
+                else
+                    logo.ResetColours();
+            });
+
+            if (logo.Scale.X != 0.5f && logo.Scale.X != 1f) return;
+
+            logo.Impact();
+            logo
+                .ScaleTo(logo.Scale.X * 0.9f, 60, Easing.Out).Then()
+                .ScaleTo(logo.Scale.X, 250, Easing.OutQuint);
         }
     }
 }

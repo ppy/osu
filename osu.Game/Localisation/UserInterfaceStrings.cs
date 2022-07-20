@@ -55,6 +55,11 @@ namespace osu.Game.Localisation
         public static LocalisableString OsuMusicTheme => new TranslatableString(getKey(@"osu_music_theme"), @"osu! music theme");
 
         /// <summary>
+        /// "Logo background colours"
+        /// </summary>
+        public static LocalisableString LogoBackgroundColours => new TranslatableString(getKey(@"logo_background_colours"), @"Logo background colours");
+
+        /// <summary>
         /// "Intro sequence"
         /// </summary>
         public static LocalisableString IntroSequence => new TranslatableString(getKey(@"intro_sequence"), @"Intro sequence");

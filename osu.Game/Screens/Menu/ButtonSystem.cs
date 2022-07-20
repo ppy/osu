@@ -56,25 +56,29 @@ namespace osu.Game.Screens.Menu
 
         /// <summary>
         /// Assign the <see cref="OsuLogo"/> that this ButtonSystem should manage the position of.
+        /// If logo is null, we are suspending from the screen that uses this ButtonSystem.
         /// </summary>
-        /// <param name="logo">The instance of the logo to be assigned. If null, we are suspending from the screen that uses this ButtonSystem.</param>
-        public void SetOsuLogo(OsuLogo logo)
+        public OsuLogo Logo
         {
-            this.logo = logo;
-
-            if (this.logo != null)
+            get => logo;
+            set
             {
-                this.logo.Action = onOsuLogo;
+                logo = value;
 
-                // osuLogo.SizeForFlow relies on loading to be complete.
-                buttonArea.Flow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4), 0);
+                if (logo != null)
+                {
+                    logo.Action = onOsuLogo;
 
-                updateLogoState();
-            }
-            else
-            {
-                // We should stop tracking as the facade is now out of scope.
-                logoTrackingContainer.StopTracking();
+                    // osuLogo.SizeForFlow relies on loading to be complete.
+                    buttonArea.Flow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + logo.SizeForFlow / 4), 0);
+
+                    updateLogoState();
+                }
+                else
+                {
+                    // We should stop tracking as the facade is now out of scope.
+                    logoTrackingContainer.StopTracking();
+                }
             }
         }
 

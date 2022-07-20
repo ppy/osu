@@ -3,9 +3,11 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.UserInterface;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
@@ -15,8 +17,11 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         private void load()
         {
             BackgroundColour = Color4Extensions.FromHex(@"593790");
-            Triangles.ColourLight = Color4Extensions.FromHex(@"7247b6");
-            Triangles.ColourDark = Color4Extensions.FromHex(@"593790");
+            Triangles.AccentColours = new Tuple<Color4, Color4>[] {
+                Tuple.Create(Color4Extensions.FromHex(@"593790"), Color4Extensions.FromHex(@"7247b6"))
+            };
+            // Triangles.ColourLight = Color4Extensions.FromHex(@"7247b6");
+            // Triangles.ColourDark = Color4Extensions.FromHex(@"593790");
         }
     }
 }

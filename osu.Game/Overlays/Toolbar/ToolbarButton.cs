@@ -25,6 +25,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
+using System;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -243,8 +244,9 @@ namespace osu.Game.Overlays.Toolbar
                 new Triangles
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColourLight = OsuColour.Gray(40),
-                    ColourDark = OsuColour.Gray(20),
+                    AccentColours = new Tuple<Color4, Color4>[] { Tuple.Create(OsuColour.Gray(20), OsuColour.Gray(40)) },
+                    // ColourLight = OsuColour.Gray(40),
+                    // ColourDark = OsuColour.Gray(20),
                 },
             };
         }

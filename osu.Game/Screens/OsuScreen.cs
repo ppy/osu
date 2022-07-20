@@ -16,8 +16,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Menu;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens
 {
@@ -292,5 +294,12 @@ namespace osu.Game.Screens
         protected virtual BackgroundScreen CreateBackground() => null;
 
         public virtual bool OnBackButton() => false;
+        public Tuple<Color4, Tuple<Color4, Color4>[]> GetBackgroundColours(uint divideAmount = 0)
+        {
+            return
+                background.GetType() == typeof(BackgroundScreenDefault)
+                ? ((BackgroundScreenDefault)background).GetBackgroundColours(divideAmount)
+                : Tuple.Create(Color4.Black, new Tuple<Color4, Color4>[] { Tuple.Create(Color4.Black, Color4.Black) });
+        }
     }
 }

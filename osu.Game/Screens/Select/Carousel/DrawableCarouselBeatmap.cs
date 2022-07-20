@@ -103,8 +103,11 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     TriangleScale = 2,
                     RelativeSizeAxes = Axes.Both,
-                    ColourLight = Color4Extensions.FromHex(@"3a7285"),
-                    ColourDark = Color4Extensions.FromHex(@"123744")
+                    AccentColours = new Tuple<Color4, Color4>[] {
+                        Tuple.Create(Color4Extensions.FromHex(@"123744"), Color4Extensions.FromHex(@"3a7285"))
+                    }
+                    // ColourLight = Color4Extensions.FromHex(@"3a7285"),
+                    // ColourDark = Color4Extensions.FromHex(@"123744")
                 },
                 new FillFlowContainer
                 {

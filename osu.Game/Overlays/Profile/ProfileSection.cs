@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -16,6 +17,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -136,8 +138,11 @@ namespace osu.Game.Overlays.Profile
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                triangles.ColourLight = colourProvider.Background4;
-                triangles.ColourDark = colourProvider.Background5.Darken(0.2f);
+                triangles.AccentColours = new Tuple<Color4, Color4>[] {
+                    Tuple.Create(colourProvider.Background5.Darken(0.2f), colourProvider.Background4)
+                };
+                // triangles.ColourLight = colourProvider.Background4;
+                // triangles.ColourDark = colourProvider.Background5.Darken(0.2f);
                 foreground.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Background5.Opacity(0));
             }
         }

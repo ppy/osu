@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
@@ -134,8 +135,11 @@ namespace osu.Game.Overlays.Dialog
                                 new Triangles
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ColourLight = Color4Extensions.FromHex(@"271e26"),
-                                    ColourDark = Color4Extensions.FromHex(@"1e171e"),
+                                    AccentColours = new Tuple<Color4, Color4>[] {
+                                        Tuple.Create(Color4Extensions.FromHex(@"1e171e"), Color4Extensions.FromHex(@"271e26"))
+                                    },
+                                    // ColourLight = Color4Extensions.FromHex(@"271e26"),
+                                    // ColourDark = Color4Extensions.FromHex(@"1e171e"),
                                     TriangleScale = 4,
                                 },
                             },

@@ -134,8 +134,11 @@ namespace osu.Game.Overlays
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 TriangleScale = 2,
-                                ColourDark = Color4Extensions.FromHex(@"04222b"),
-                                ColourLight = Color4Extensions.FromHex(@"052933"),
+                                AccentColours = new Tuple<Color4, Color4>[] {
+                                    Tuple.Create(Color4Extensions.FromHex(@"04222b"), Color4Extensions.FromHex(@"052933"))
+                                },
+                                // ColourDark = Color4Extensions.FromHex(@"04222b"),
+                                // ColourLight = Color4Extensions.FromHex(@"052933"),
                             },
                             innerSpin = new Sprite
                             {

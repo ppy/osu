@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Components;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
@@ -224,15 +225,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             void setYellow()
             {
                 BackgroundColour = colours.YellowDark;
-                Triangles.ColourDark = colours.YellowDark;
-                Triangles.ColourLight = colours.Yellow;
+                Triangles.AccentColours = new Tuple<Color4, Color4>[] {
+                    Tuple.Create(colours.YellowDark, colours.Yellow)
+                };
+                // Triangles.ColourDark = colours.YellowDark;
+                // Triangles.ColourLight = colours.Yellow;
             }
 
             void setGreen()
             {
                 BackgroundColour = colours.Green;
-                Triangles.ColourDark = colours.Green;
-                Triangles.ColourLight = colours.GreenLight;
+                Triangles.AccentColours = new Tuple<Color4, Color4>[] {
+                    Tuple.Create(colours.Green, colours.GreenLight)
+                };
+                // Triangles.ColourDark = colours.Green;
+                // Triangles.ColourLight = colours.GreenLight;
             }
         }
 

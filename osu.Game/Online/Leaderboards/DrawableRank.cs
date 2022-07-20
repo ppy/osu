@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -49,8 +50,10 @@ namespace osu.Game.Online.Leaderboards
                         new Triangles
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ColourDark = rankColour.Darken(0.1f),
-                            ColourLight = rankColour.Lighten(0.1f),
+                            // if approved - InRange will be moved into color4extensions, please don't mind it being right there for now
+                            AccentColours = new Tuple<Color4, Color4>[] { Triangles.InRange(rankColour, 0.1f) },
+                            // ColourDark = rankColour.Darken(0.1f),
+                            // ColourLight = rankColour.Lighten(0.1f),
                             Velocity = 0.25f,
                         },
                         new OsuSpriteText

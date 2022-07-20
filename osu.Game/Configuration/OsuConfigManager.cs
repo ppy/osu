@@ -161,6 +161,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
+            SetDefault(OsuSetting.LogoBackgroundColours, false);
             SetDefault(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
             SetDefault(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
 
@@ -361,6 +362,7 @@ namespace osu.Game.Configuration
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
+        LogoBackgroundColours,
         EditorWaveformOpacity,
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,

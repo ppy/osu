@@ -3,7 +3,9 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -13,8 +15,11 @@ namespace osu.Game.Graphics.UserInterface
         private void load(OsuColour colours)
         {
             BackgroundColour = colours.PinkDark;
-            Triangles.ColourDark = colours.PinkDarker;
-            Triangles.ColourLight = colours.Pink;
+            Triangles.AccentColours = new Tuple<Color4, Color4>[] {
+                Tuple.Create(colours.PinkDarker, colours.Pink)
+            };
+            // Triangles.ColourDark = colours.PinkDarker;
+            // Triangles.ColourLight = colours.Pink;
         }
     }
 }

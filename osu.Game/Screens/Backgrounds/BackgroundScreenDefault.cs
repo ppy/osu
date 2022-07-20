@@ -3,10 +3,13 @@
 
 #nullable disable
 
+using System;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -16,6 +19,9 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Skinning;
+using osuTK.Graphics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -30,6 +36,8 @@ namespace osu.Game.Screens.Backgrounds
         private Bindable<BackgroundSource> source;
         private Bindable<IntroSequence> introSequence;
         private readonly SeasonalBackgroundLoader seasonalBackgroundLoader = new SeasonalBackgroundLoader();
+        private LargeTextureStore textureStore;
+        private Bindable<bool> logoColours;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -42,12 +50,15 @@ namespace osu.Game.Screens.Backgrounds
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config)
+        private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config, LargeTextureStore textureStore)
         {
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
             source = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
+            logoColours = config.GetBindable<bool>(OsuSetting.LogoBackgroundColours);
+
+            this.textureStore = textureStore;
 
             AddInternal(seasonalBackgroundLoader);
 
@@ -106,6 +117,9 @@ namespace osu.Game.Screens.Backgrounds
             background?.Expire();
 
             AddInternal(background = newBackground);
+            var menu = (this.FindClosestParent<OsuScreenStack>().CurrentScreen is Menu.MainMenu m) ? m : null;
+            if (menu != null)
+                menu.OnLogoColoursSwitch(new ValueChangedEvent<bool>(logoColours.Value, logoColours.Value));
             currentDisplay++;
         }
 
@@ -159,6 +173,40 @@ namespace osu.Game.Screens.Backgrounds
                 default:
                     return $@"Menu/menu-background-{currentDisplay % background_count + 1}";
             }
+        }
+
+        /// <param name="divideAmount">Square root of requested colors</param>
+        public Tuple<Color4, Tuple<Color4, Color4>[]> GetBackgroundColours(uint divideAmount = 0)
+        {
+            if (background == null || background.Sprite == null)
+                return Tuple.Create(Color4.Black, new Tuple<Color4, Color4>[] { Tuple.Create(Color4.Black, Color4.Black) });
+
+            int amount = (int)(1 + divideAmount);
+            var stream = textureStore.GetStream(background.TextureName); // haven't found anything that can provide me rgba array
+
+            var image = Image.Load(stream); // lag spike, probably because of decoding :(
+
+            image.Mutate(x => x.Resize(amount, amount, KnownResamplers.RobidouxSharp));
+            var colors = new Tuple<Color4, Color4>[image.Size().Width * image.Size().Height];
+
+            int i = 0;
+            image.Mutate(img => img.ProcessPixelRowsAsVector4(row =>
+            {
+                for (int x = 0; x < row.Length; x++)
+                {
+                    var color = new Color4(row[x].X, row[x].Y, row[x].Z, row[x].W);
+                    colors[i] = Tuple.Create(color, color);
+                    i++;
+                }
+            }));
+            colors = colors.Distinct().ToArray();
+            Logger.Log($"Amount of colors: {image.Size().Width * image.Size().Height} | {colors.Length}");
+
+            Color4 backgroundColor = Color4.Black;
+            image.Mutate(x => x.Resize(1, 1));
+            image.Mutate(x => x.ProcessPixelRowsAsVector4(row => backgroundColor = new Color4(row[0].X, row[0].Y, row[0].Z, row[0].W)));
+
+            return Tuple.Create(backgroundColor, colors);
         }
     }
 }

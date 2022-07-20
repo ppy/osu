@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Backgrounds;
@@ -50,6 +51,7 @@ namespace osu.Game.Screens.Menu
         private Sample sampleDownbeat;
 
         private readonly Container colourAndTriangles;
+        private readonly Box background;
         private readonly Triangles triangles;
 
         /// <summary>
@@ -89,6 +91,7 @@ namespace osu.Game.Screens.Menu
         private readonly Container impactContainer;
 
         private const double early_activation = 60;
+        private const float triangles_paused_velocity = 0.5f;
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
@@ -171,7 +174,7 @@ namespace osu.Game.Screens.Menu
                                                                     Origin = Anchor.Centre,
                                                                     Children = new Drawable[]
                                                                     {
-                                                                        new Box
+                                                                        background = new Box
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
                                                                             Colour = OsuPink,
@@ -179,8 +182,11 @@ namespace osu.Game.Screens.Menu
                                                                         triangles = new Triangles
                                                                         {
                                                                             TriangleScale = 4,
-                                                                            ColourLight = Color4Extensions.FromHex(@"ff7db7"),
-                                                                            ColourDark = Color4Extensions.FromHex(@"de5b95"),
+                                                                            AccentColours = new Tuple<Color4, Color4>[] {
+                                                                                new Tuple<Color4, Color4>(Color4Extensions.FromHex(@"de5b95"), Color4Extensions.FromHex(@"ff7db7"))
+                                                                            },
+//                                                                            ColourLight = Color4Extensions.FromHex(@"ff7db7"),
+//                                                                            ColourDark = Color4Extensions.FromHex(@"de5b95"),
                                                                             RelativeSizeAxes = Axes.Both,
                                                                         },
                                                                     }
@@ -307,8 +313,9 @@ namespace osu.Game.Screens.Menu
                 .ScaleTo(logoAmplitudeContainer.Scale * (1 + 0.04f * amplitudeAdjust), beatLength, Easing.OutQuint)
                 .FadeTo(0.15f * amplitudeAdjust).FadeOut(beatLength, Easing.OutQuint);
 
-            if (effectPoint.KiaiMode && flashLayer.Alpha < 0.4f)
+            if (effectPoint.KiaiMode)
             {
+                if (flashLayer.Alpha >= 0.4f) return;
                 flashLayer.ClearTransforms();
                 flashLayer
                     .FadeTo(0.2f * amplitudeAdjust, early_activation, Easing.Out).Then()
@@ -319,6 +326,15 @@ namespace osu.Game.Screens.Menu
                     .FadeTo(visualizer_default_alpha * 1.8f * amplitudeAdjust, early_activation, Easing.Out).Then()
                     .FadeTo(visualizer_default_alpha, beatLength);
             }
+
+            if (musicController.CurrentTrack.IsRunning && amplitudes.Maximum > 0.4f)
+                this.Delay(early_activation / 2).Schedule(() =>
+                    triangles.Velocity = (float)Interpolation.Damp(
+                        triangles.Velocity,
+                        triangles_paused_velocity * (effectPoint.KiaiMode ? 6 : 2) + amplitudeAdjust * (effectPoint.KiaiMode ? 8 : 4),
+                        0.3f,
+                        Time.Elapsed
+                    ));
         }
 
         public void PlayIntro()
@@ -340,22 +356,23 @@ namespace osu.Game.Screens.Menu
             base.Update();
 
             const float scale_adjust_cutoff = 0.4f;
-            const float velocity_adjust_cutoff = 0.98f;
-            const float paused_velocity = 0.5f;
+            // const float velocity_adjust_cutoff = 0.98f;
 
             if (musicController.CurrentTrack.IsRunning)
             {
                 float maxAmplitude = lastBeatIndex >= 0 ? musicController.CurrentTrack.CurrentAmplitudes.Maximum : 0;
                 logoAmplitudeContainer.Scale = new Vector2((float)Interpolation.Damp(logoAmplitudeContainer.Scale.X, 1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 0.9f, Time.Elapsed));
 
-                if (maxAmplitude > velocity_adjust_cutoff)
-                    triangles.Velocity = 1 + Math.Max(0, maxAmplitude - velocity_adjust_cutoff) * 50;
-                else
-                    triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, 1, 0.995f, Time.Elapsed);
+                // moved to onnewbeat
+
+                // if (maxAmplitude > velocity_adjust_cutoff)
+                //     triangles.Velocity = 1 + Math.Max(0, maxAmplitude - velocity_adjust_cutoff) * 50;
+                // else
+                triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, triangles_paused_velocity * (LastEffectPoint.KiaiMode ? 6 : 2), 0.995f, Time.Elapsed);
             }
             else
             {
-                triangles.Velocity = paused_velocity;
+                triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, triangles_paused_velocity, 0.9f, Time.Elapsed);
             }
         }
 
@@ -378,6 +395,10 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnClick(ClickEvent e)
         {
+            Logger.Log(Parent.Name);
+            //triangles.AccentColours = this.FindClosestParent<MainMenu>()!.GetBackgroundColours(2).Select(x => Graphics.Backgrounds.Triangles.InRange(x, 0)).ToArray();
+            //background.Colour = this.FindClosestParent<MainMenu>()!.GetBackgroundColours()[0];
+
             if (Action?.Invoke() ?? true)
                 sampleClick.Play();
 
@@ -403,6 +424,19 @@ namespace osu.Game.Screens.Menu
             impactContainer.FadeOutFromOne(250, Easing.In);
             impactContainer.ScaleTo(0.96f);
             impactContainer.ScaleTo(1.12f, 250);
+        }
+
+        public void SetColours(Color4 background, params Tuple<Color4, Color4>[] accents)
+        {
+            this.background.Colour = background;
+            triangles.AccentColours = accents;
+        }
+        public void ResetColours()
+        {
+            triangles.AccentColours = new Tuple<Color4, Color4>[] {
+                new Tuple<Color4, Color4>(Color4Extensions.FromHex(@"de5b95"), Color4Extensions.FromHex(@"ff7db7"))
+            };
+            background.Colour = OsuPink;
         }
 
         private class DragContainer : Container

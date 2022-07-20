@@ -24,6 +24,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
+using osuTK.Graphics;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
@@ -467,8 +468,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private void load(OsuColour colours)
             {
                 BackgroundColour = colours.Yellow;
-                Triangles.ColourLight = colours.YellowLight;
-                Triangles.ColourDark = colours.YellowDark;
+                Triangles.AccentColours = new Tuple<Color4, Color4>[] {
+                    Tuple.Create(colours.YellowDark, colours.YellowLight)
+                };
+                // Triangles.ColourLight = colours.YellowLight;
+                // Triangles.ColourDark = colours.YellowDark;
             }
         }
 
