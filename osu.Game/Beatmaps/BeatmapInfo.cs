@@ -92,6 +92,16 @@ namespace osu.Game.Beatmaps
         [Indexed]
         public string MD5Hash { get; set; } = string.Empty;
 
+        public string OnlineMD5Hash { get; set; } = string.Empty;
+
+        public DateTimeOffset? LastOnlineUpdate { get; set; }
+
+        /// <summary>
+        /// Whether this beatmap matches the online version, based on fetched online metadata.
+        /// Will return <c>true</c> if no online metadata is available.
+        /// </summary>
+        public bool MatchesOnlineVersion => LastOnlineUpdate == null || MD5Hash == OnlineMD5Hash;
+
         [JsonIgnore]
         public bool Hidden { get; set; }
 
@@ -169,8 +179,8 @@ namespace osu.Game.Beatmaps
             Debug.Assert(x.BeatmapSet != null);
             Debug.Assert(y.BeatmapSet != null);
 
-            string? fileHashX = x.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(x.BeatmapSet.Metadata))?.File.Hash;
-            string? fileHashY = y.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(y.BeatmapSet.Metadata))?.File.Hash;
+            string? fileHashX = x.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(x.Metadata))?.File.Hash;
+            string? fileHashY = y.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(y.Metadata))?.File.Hash;
 
             return fileHashX == fileHashY;
         }

@@ -3,8 +3,8 @@
 
 #nullable disable
 
-using Humanizer;
 using System.Collections.Generic;
+using osu.Game.Extensions;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
@@ -22,7 +22,7 @@ namespace osu.Game.Online.API.Requests
             this.type = type;
         }
 
-        protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().Underscore()}";
+        protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().ToSnakeCase()}";
     }
 
     public enum BeatmapSetType
