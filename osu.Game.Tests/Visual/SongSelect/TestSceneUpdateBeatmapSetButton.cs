@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            var importer = parent.Get<BeatmapImporter>();
+            var importer = parent.Get<BeatmapManager>();
 
             dependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new TestSceneOnlinePlayBeatmapAvailabilityTracker.TestBeatmapModelDownloader(importer, API));
             return dependencies;
