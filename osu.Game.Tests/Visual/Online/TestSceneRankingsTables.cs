@@ -57,8 +57,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 new CountryStatistics
                 {
-                    Country = new Country { FlagName = "US", FullName = "United States" },
-                    FlagName = "US",
+                    Code = CountryCode.US,
                     ActiveUsers = 2_972_623,
                     PlayCount = 3_086_515_743,
                     RankedScore = 449_407_643_332_546,
@@ -66,8 +65,7 @@ namespace osu.Game.Tests.Visual.Online
                 },
                 new CountryStatistics
                 {
-                    Country = new Country { FlagName = "RU", FullName = "Russian Federation" },
-                    FlagName = "RU",
+                    Code = CountryCode.RU,
                     ActiveUsers = 1_609_989,
                     PlayCount = 1_637_052_841,
                     RankedScore = 221_660_827_473_004,
@@ -86,7 +84,7 @@ namespace osu.Game.Tests.Visual.Online
                 User = new APIUser
                 {
                     Username = "first active user",
-                    Country = new Country { FlagName = "JP" },
+                    CountryCode = CountryCode.JP,
                     Active = true,
                 },
                 Accuracy = 0.9972,
@@ -106,7 +104,7 @@ namespace osu.Game.Tests.Visual.Online
                 User = new APIUser
                 {
                     Username = "inactive user",
-                    Country = new Country { FlagName = "AU" },
+                    CountryCode = CountryCode.AU,
                     Active = false,
                 },
                 Accuracy = 0.9831,
@@ -126,7 +124,7 @@ namespace osu.Game.Tests.Visual.Online
                 User = new APIUser
                 {
                     Username = "second active user",
-                    Country = new Country { FlagName = "PL" },
+                    CountryCode = CountryCode.PL,
                     Active = true,
                 },
                 Accuracy = 0.9584,

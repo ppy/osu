@@ -84,7 +84,7 @@ namespace osu.Game.Scoring
             api.Perform(userRequest);
 
             if (userRequest.Response is APIUser user)
-                model.RealmUser.OnlineID = user.Id;
+                model.User = user;
         }
     }
 }
