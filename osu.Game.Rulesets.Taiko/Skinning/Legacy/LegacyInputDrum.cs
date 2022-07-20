@@ -22,13 +22,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     /// </summary>
     internal class LegacyInputDrum : Container
     {
+        private Container content;
         private LegacyHalfDrum left;
         private LegacyHalfDrum right;
-        private Container content;
 
         public LegacyInputDrum()
         {
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
