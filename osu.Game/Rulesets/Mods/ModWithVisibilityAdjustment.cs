@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -21,7 +19,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// The first adjustable object.
         /// </summary>
-        protected HitObject FirstObject { get; private set; }
+        protected HitObject? FirstObject { get; private set; }
 
         /// <summary>
         /// Whether the visibility of <see cref="FirstObject"/> should be increased.
@@ -59,7 +57,7 @@ namespace osu.Game.Rulesets.Mods
         {
             FirstObject = getFirstAdjustableObjectRecursive(beatmap.HitObjects);
 
-            HitObject getFirstAdjustableObjectRecursive(IReadOnlyList<HitObject> hitObjects)
+            HitObject? getFirstAdjustableObjectRecursive(IReadOnlyList<HitObject> hitObjects)
             {
                 foreach (var h in hitObjects)
                 {
@@ -93,7 +91,7 @@ namespace osu.Game.Rulesets.Mods
         /// <param name="toCheck">The <see cref="HitObject"/> to check.</param>
         /// <param name="target">The <see cref="HitObject"/> which may be equal to or contain <paramref name="toCheck"/> as a nested object.</param>
         /// <returns>Whether <paramref name="toCheck"/> is equal to or nested within <paramref name="target"/>.</returns>
-        private bool isObjectEqualToOrNestedIn(HitObject toCheck, HitObject target)
+        private bool isObjectEqualToOrNestedIn(HitObject toCheck, HitObject? target)
         {
             if (target == null)
                 return false;
