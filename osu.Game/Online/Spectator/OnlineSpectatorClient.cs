@@ -61,8 +61,15 @@ namespace osu.Game.Online.Spectator
             catch (HubException exception)
             {
                 if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
-                    connector?.Reconnect();
-                throw;
+                {
+                    Debug.Assert(connector != null);
+
+                    await connector.Reconnect();
+                    await BeginPlayingInternal(state);
+                }
+
+                // Exceptions can occur if, for instance, the locally played beatmap doesn't have a server-side counterpart.
+                // For now, let's ignore these so they don't cause unobserved exceptions to appear to the user (and sentry).
             }
         }
 

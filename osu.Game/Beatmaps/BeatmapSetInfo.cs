@@ -93,5 +93,7 @@ namespace osu.Game.Beatmaps
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
 
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
+
+        public bool AllBeatmapsUpToDate => Beatmaps.All(b => b.MatchesOnlineVersion);
     }
 }
