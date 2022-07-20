@@ -820,7 +820,7 @@ namespace osu.Game
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
-                Margin = new MarginPadding(10),
+                Margin = new MarginPadding(5),
             }, topMostOverlayContent.Add);
 
             if (!args?.Any(a => a == @"--no-version-overlay") ?? true)

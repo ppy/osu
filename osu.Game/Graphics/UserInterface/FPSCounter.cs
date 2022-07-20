@@ -49,13 +49,14 @@ namespace osu.Game.Graphics.UserInterface
                 mainContent = new Container
                 {
                     Alpha = 0,
-                    AutoSizeAxes = Axes.Both,
+                    Size = new Vector2(42, 26),
                     Children = new Drawable[]
                     {
                         background = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             CornerRadius = 5,
+                            CornerExponent = 5f,
                             Masking = true,
                             Alpha = idle_background_alpha,
                             Children = new Drawable[]
@@ -71,12 +72,15 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
+                            Margin = new MarginPadding(1),
+                            Y = -1,
                         },
                         fpsCounter = new FramesPerSecondCounter
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
-                            Y = 11,
+                            Margin = new MarginPadding(1),
+                            Y = 10,
                             Scale = new Vector2(0.8f),
                         }
                     }
@@ -135,7 +139,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 fadeOutDelegate = Scheduler.AddDelayed(() =>
                 {
-                    mainContent.FadeTo(0, 1000, Easing.In);
+                    mainContent.FadeTo(0, 300, Easing.OutQuint);
                     isDisplayed = false;
                 }, 2000);
             }
@@ -177,9 +181,9 @@ namespace osu.Game.Graphics.UserInterface
         private ColourInfo getColour(double performanceRatio)
         {
             if (performanceRatio < 0.5f)
-                return Interpolation.ValueAt(performanceRatio, colours.Red, colours.Orange2, 0, 0.5, Easing.Out);
+                return Interpolation.ValueAt(performanceRatio, colours.Red, colours.Orange2, 0, 0.5);
 
-            return Interpolation.ValueAt(performanceRatio, colours.Orange2, colours.Lime3, 0.5, 1, Easing.Out);
+            return Interpolation.ValueAt(performanceRatio, colours.Orange2, colours.Lime0, 0.5, 0.9);
         }
 
         public ITooltip GetCustomTooltip() => new FPSCounterTooltip();
