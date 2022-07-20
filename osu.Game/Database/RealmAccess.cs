@@ -61,8 +61,9 @@ namespace osu.Game.Database
         /// 15   2022-07-13    Added LastPlayed to BeatmapInfo.
         /// 16   2022-07-15    Removed HasReplay from ScoreInfo.
         /// 17   2022-07-16    Added CountryCode to RealmUser.
+        /// 18   2022-07-19    Added OnlineMD5Hash and LastOnlineUpdate to BeatmapInfo.
         /// </summary>
-        private const int schema_version = 17;
+        private const int schema_version = 18;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
