@@ -809,6 +809,7 @@ See the LICENCE file in the repository root for full licence text.&#xD;
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=NUnit_002EFramework_002EInternal_002ELogger/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=OpenTabletDriver_002EPlugin_002EDependencyInjection_002E_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=Realms_002ELogging_002ELogger/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002EComponentModel_002EComponent/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002EComponentModel_002EContainer/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002ENumerics_002E_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002ESecurity_002ECryptography_002ERSA/@EntryIndexedValue">True</s:Boolean>
