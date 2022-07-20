@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
+        public const double PERFORMANCE_BASE_MULTIPLIER = 1.125; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
@@ -41,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
-            double multiplier = 1.125; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+            double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
