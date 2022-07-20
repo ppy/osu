@@ -26,6 +26,16 @@ namespace osu.Game.Beatmaps
 
         public DateTimeOffset DateAdded { get; set; }
 
+        /// <summary>
+        /// The date this beatmap set was first submitted.
+        /// </summary>
+        public DateTimeOffset? DateSubmitted { get; set; }
+
+        /// <summary>
+        /// The date this beatmap set was ranked.
+        /// </summary>
+        public DateTimeOffset? DateRanked { get; set; }
+
         [JsonIgnore]
         public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
 

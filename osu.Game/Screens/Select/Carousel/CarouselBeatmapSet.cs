@@ -81,6 +81,13 @@ namespace osu.Game.Screens.Select.Carousel
                 case SortMode.DateAdded:
                     return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
 
+                case SortMode.DateRanked:
+                    // Beatmaps which have no ranked date should already be filtered away in this mode.
+                    if (BeatmapSet.DateRanked == null || otherSet.BeatmapSet.DateRanked == null)
+                        return 0;
+
+                    return otherSet.BeatmapSet.DateRanked.Value.CompareTo(BeatmapSet.DateRanked.Value);
+
                 case SortMode.LastPlayed:
                     return -compareUsingAggregateMax(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
 
