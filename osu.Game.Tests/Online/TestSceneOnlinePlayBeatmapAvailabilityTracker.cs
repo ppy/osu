@@ -126,10 +126,10 @@ namespace osu.Game.Tests.Online
             AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
             addAvailabilityCheckStep("state downloading 0%", () => BeatmapAvailability.Downloading(0.0f));
 
-            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)).SetProgress(0.4f));
+            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet))!.SetProgress(0.4f));
             addAvailabilityCheckStep("state downloading 40%", () => BeatmapAvailability.Downloading(0.4f));
 
-            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)).TriggerSuccess(testBeatmapFile));
+            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet))!.TriggerSuccess(testBeatmapFile));
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
             AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
