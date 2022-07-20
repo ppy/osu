@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,6 +14,7 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Play;
 
 namespace osu.Game
 {
@@ -29,6 +31,9 @@ namespace osu.Game
 
         [Resolved]
         private IBindable<WorkingBeatmap> gameBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private ILocalUserPlayInfo? localUserPlayInfo { get; set; }
 
         protected override void LoadComplete()
         {
@@ -81,9 +86,9 @@ namespace osu.Game
 
         private void processBeatmapSetsWithMissingMetrics()
         {
-            // TODO: rate limit and pause processing during gameplay.
-
             HashSet<Guid> beatmapSetIds = new HashSet<Guid>();
+
+            Logger.Log("Querying for beatmap sets to reprocess...");
 
             realmAccess.Run(r =>
             {
@@ -94,15 +99,25 @@ namespace osu.Game
                 }
             });
 
+            Logger.Log($"Found {beatmapSetIds.Count} beatmap sets which require reprocessing.");
+
+            int i = 0;
+
             foreach (var id in beatmapSetIds)
             {
+                while (localUserPlayInfo?.IsPlaying.Value == true)
+                {
+                    Logger.Log("Background processing sleeping 30s due to active gameplay...");
+                    Thread.Sleep(30000);
+                }
+
                 realmAccess.Run(r =>
                 {
                     var set = r.Find<BeatmapSetInfo>(id);
 
                     if (set != null)
                     {
-                        Logger.Log($"Background processing {set}");
+                        Logger.Log($"Background processing {set} ({++i} / {beatmapSetIds.Count})");
                         beatmapUpdater.Process(set);
                     }
                 });
