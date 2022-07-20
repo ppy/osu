@@ -7,6 +7,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
@@ -107,7 +108,7 @@ namespace osu.Game.Graphics
                 sourceSize = Source.DrawSize;
             }
 
-            protected override void Blit(Action<TexturedVertex2D> vertexAction)
+            protected override void Blit(in VertexGroupUsage<TexturedVertex2D> usage)
             {
                 foreach (var p in particles)
                 {
@@ -136,9 +137,9 @@ namespace osu.Game.Graphics
                         transformPosition(rect.BottomRight, rect.Centre, angle)
                     );
 
-                    DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
-                        new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
-                        null, TextureCoords);
+                    DrawQuad(usage,
+                        Texture,
+                        quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height), textureCoords: TextureCoords);
                 }
             }
 

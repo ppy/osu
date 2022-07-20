@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
@@ -254,65 +255,70 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Source.parts.CopyTo(parts, 0);
             }
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            private readonly VertexGroup<TexturedTrailVertex> vertices = new VertexGroup<TexturedTrailVertex>();
+
+            public override void Draw(IRenderer renderer)
             {
-                base.Draw(vertexAction);
+                base.Draw(renderer);
 
-                shader.Bind();
-                shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
-                shader.GetUniform<float>("g_FadeExponent").UpdateValue(ref fadeExponent);
-
-                texture.TextureGL.Bind();
-
-                RectangleF textureRect = texture.GetTextureRect();
-
-                foreach (var part in parts)
+                using (var usage = vertexBatch.BeginUsage(this, vertices))
                 {
-                    if (part.InvalidationID == -1)
-                        continue;
+                    shader.Bind();
+                    shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
+                    shader.GetUniform<float>("g_FadeExponent").UpdateValue(ref fadeExponent);
 
-                    if (time - part.Time >= 1)
-                        continue;
+                    texture.TextureGL.Bind();
 
-                    vertexBatch.Add(new TexturedTrailVertex
+                    RectangleF textureRect = texture.GetTextureRect();
+
+                    foreach (var part in parts)
                     {
-                        Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y + size.Y * (1 - originPosition.Y)),
-                        TexturePosition = textureRect.BottomLeft,
-                        TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.BottomLeft.Linear,
-                        Time = part.Time
-                    });
+                        if (part.InvalidationID == -1)
+                            continue;
 
-                    vertexBatch.Add(new TexturedTrailVertex
-                    {
-                        Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y + size.Y * (1 - originPosition.Y)),
-                        TexturePosition = textureRect.BottomRight,
-                        TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.BottomRight.Linear,
-                        Time = part.Time
-                    });
+                        if (time - part.Time >= 1)
+                            continue;
 
-                    vertexBatch.Add(new TexturedTrailVertex
-                    {
-                        Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y - size.Y * originPosition.Y),
-                        TexturePosition = textureRect.TopRight,
-                        TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.TopRight.Linear,
-                        Time = part.Time
-                    });
+                        usage.Add(new TexturedTrailVertex
+                        {
+                            Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y + size.Y * (1 - originPosition.Y)),
+                            TexturePosition = textureRect.BottomLeft,
+                            TextureRect = new Vector4(0, 0, 1, 1),
+                            Colour = DrawColourInfo.Colour.BottomLeft.Linear,
+                            Time = part.Time
+                        });
 
-                    vertexBatch.Add(new TexturedTrailVertex
-                    {
-                        Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y - size.Y * originPosition.Y),
-                        TexturePosition = textureRect.TopLeft,
-                        TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.TopLeft.Linear,
-                        Time = part.Time
-                    });
+                        usage.Add(new TexturedTrailVertex
+                        {
+                            Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y + size.Y * (1 - originPosition.Y)),
+                            TexturePosition = textureRect.BottomRight,
+                            TextureRect = new Vector4(0, 0, 1, 1),
+                            Colour = DrawColourInfo.Colour.BottomRight.Linear,
+                            Time = part.Time
+                        });
+
+                        usage.Add(new TexturedTrailVertex
+                        {
+                            Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y - size.Y * originPosition.Y),
+                            TexturePosition = textureRect.TopRight,
+                            TextureRect = new Vector4(0, 0, 1, 1),
+                            Colour = DrawColourInfo.Colour.TopRight.Linear,
+                            Time = part.Time
+                        });
+
+                        usage.Add(new TexturedTrailVertex
+                        {
+                            Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y - size.Y * originPosition.Y),
+                            TexturePosition = textureRect.TopLeft,
+                            TextureRect = new Vector4(0, 0, 1, 1),
+                            Colour = DrawColourInfo.Colour.TopLeft.Linear,
+                            Time = part.Time
+                        });
+                    }
+
+                    vertexBatch.Draw();
+                    shader.Unbind();
                 }
-
-                vertexBatch.Draw();
-                shader.Unbind();
             }
 
             protected override void Dispose(bool isDisposing)
