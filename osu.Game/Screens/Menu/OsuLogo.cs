@@ -388,9 +388,6 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnClick(ClickEvent e)
         {
-            //triangles.AccentColours = this.FindClosestParent<MainMenu>()!.GetBackgroundColours(2).Select(x => Graphics.Backgrounds.Triangles.InRange(x, 0)).ToArray();
-            //background.Colour = this.FindClosestParent<MainMenu>()!.GetBackgroundColours()[0];
-
             if (Action?.Invoke() ?? true)
                 sampleClick.Play();
 
