@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Select
         {
             List<string> parts = new List<string>();
 
-            if (Regex.IsMatch(val, @"^\d+(:\d+(:\d+)?)?$")) // formats like 12:34
+            if (Regex.IsMatch(val, @"^\d+(:\d+){1,2}$")) // formats like 12:34
             {
                 string[] splited = val.Split(':');
                 for (int i = splited.Length - 1; i >= 0; i--)
