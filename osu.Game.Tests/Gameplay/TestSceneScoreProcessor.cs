@@ -103,9 +103,11 @@ namespace osu.Game.Tests.Gameplay
                     new TestHitObject(),
                     new TestHitObject(HitResult.LargeTickHit),
                     new TestHitObject(HitResult.SmallTickHit),
+                    new TestHitObject(HitResult.SmallBonus),
                     new TestHitObject(),
                     new TestHitObject(HitResult.LargeTickHit),
                     new TestHitObject(HitResult.SmallTickHit),
+                    new TestHitObject(HitResult.LargeBonus),
                 }
             };
 
@@ -115,17 +117,21 @@ namespace osu.Game.Tests.Gameplay
             scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Ok });
             scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.LargeTickHit });
             scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[2], beatmap.HitObjects[2].CreateJudgement()) { Type = HitResult.SmallTickMiss });
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[3], beatmap.HitObjects[3].CreateJudgement()) { Type = HitResult.SmallBonus });
 
             var score = new ScoreInfo { Ruleset = new OsuRuleset().RulesetInfo };
             scoreProcessor.FailScore(score);
 
             Assert.That(score.Rank, Is.EqualTo(ScoreRank.F));
-            Assert.That(score.Statistics.Count(kvp => kvp.Value > 0), Is.EqualTo(5));
+            Assert.That(score.Passed, Is.False);
+            Assert.That(score.Statistics.Count(kvp => kvp.Value > 0), Is.EqualTo(7));
             Assert.That(score.Statistics[HitResult.Ok], Is.EqualTo(1));
             Assert.That(score.Statistics[HitResult.Miss], Is.EqualTo(1));
             Assert.That(score.Statistics[HitResult.LargeTickHit], Is.EqualTo(1));
             Assert.That(score.Statistics[HitResult.LargeTickMiss], Is.EqualTo(1));
             Assert.That(score.Statistics[HitResult.SmallTickMiss], Is.EqualTo(2));
+            Assert.That(score.Statistics[HitResult.SmallBonus], Is.EqualTo(1));
+            Assert.That(score.Statistics[HitResult.IgnoreMiss], Is.EqualTo(1));
         }
 
         private class TestJudgement : Judgement
