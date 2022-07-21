@@ -316,8 +316,13 @@ namespace osu.Game.Screens.Select
                 previouslySelectedID = selectedBeatmap?.BeatmapInfo.ID;
 
             var newSet = createCarouselSet(beatmapSet);
+            var removedSet = root.RemoveChild(beatmapSet.ID);
 
-            root.RemoveChild(beatmapSet.ID);
+            // If we don't remove this here, it may remain in a hidden state until scrolled off screen.
+            // Doesn't really affect anything during actual user interaction, but makes testing annoying.
+            var removedDrawable = Scroll.FirstOrDefault(c => c.Item == removedSet);
+            if (removedDrawable != null)
+                expirePanelImmediately(removedDrawable);
 
             if (newSet != null)
             {
@@ -696,11 +701,7 @@ namespace osu.Game.Screens.Select
                         // panel loaded as drawable but not required by visible range.
                         // remove but only if too far off-screen
                         if (panel.Y + panel.DrawHeight < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
-                        {
-                            // may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
-                            panel.ClearTransforms();
-                            panel.Expire();
-                        }
+                            expirePanelImmediately(panel);
                     }
 
                     // Add those items within the previously found index range that should be displayed.
@@ -728,6 +729,13 @@ namespace osu.Game.Screens.Select
                         updateItem(diff, item);
                 }
             }
+        }
+
+        private static void expirePanelImmediately(DrawableCarouselItem panel)
+        {
+            // may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
+            panel.ClearTransforms();
+            panel.Expire();
         }
 
         private readonly CarouselBoundsItem carouselBoundsItem = new CarouselBoundsItem();
@@ -972,10 +980,15 @@ namespace osu.Game.Screens.Select
                 base.AddItem(i);
             }
 
-            public void RemoveChild(Guid beatmapSetID)
+            public CarouselBeatmapSet RemoveChild(Guid beatmapSetID)
             {
                 if (BeatmapSetsByID.TryGetValue(beatmapSetID, out var carouselBeatmapSet))
+                {
                     RemoveItem(carouselBeatmapSet);
+                    return carouselBeatmapSet;
+                }
+
+                return null;
             }
 
             public override void RemoveItem(CarouselItem i)
