@@ -16,9 +16,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
     public class TaikoColourDifficultyPreprocessor
     {
         /// <summary>
-        /// Process and encode a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="TaikoDifficultyHitObjectColour"/>s,
-        /// assign the appropriate <see cref="TaikoDifficultyHitObjectColour"/>s to each <see cref="TaikoDifficultyHitObject"/>,
-        /// and preevaluate colour difficulty of each <see cref="TaikoDifficultyHitObject"/>.
+        /// Processes and encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="TaikoDifficultyHitObjectColour"/>s,
+        /// assigning the appropriate <see cref="TaikoDifficultyHitObjectColour"/>s to each <see cref="TaikoDifficultyHitObject"/>,
+        /// and pre-evaluating colour difficulty of each <see cref="TaikoDifficultyHitObject"/>.
         /// </summary>
         public static List<TaikoDifficultyHitObjectColour> ProcessAndAssign(List<DifficultyHitObject> hitObjects)
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                     });
                 });
 
-                // Preevaluate and assign difficulty values
+                // Pre-evaluate and assign difficulty values
                 ColourEvaluator.PreEvaluateDifficulties(coupledEncoding);
             });
 
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                 // This ignores all non-note objects, which may or may not be the desired behaviour
                 TaikoDifficultyHitObject? previousObject = taikoObject.PreviousNote(0);
 
-                // If the colour changed, or if this is the first object in the run, create a new mono encoding
+                // If the colour changed or if this is the first object in the run, create a new mono encoding
                 if
                 (
                     previousObject == null || // First object in the list
@@ -75,8 +75,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                     continue;
                 }
 
-                // If we're here, we're in the same encoding as the previous object, thus lastEncoded is not null. Add
-                // the current object to the encoded payload.
+                // If we're here, we're in the same encoding as the previous object, thus lastEncoded is not null.
+                // Add the current object to the encoded payload.
                 lastEncoded!.EncodedData.Add(taikoObject);
             }
 
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                         isCoupled = i < data.Count - 2 && data[i].IsRepetitionOf(data[i + 2]);
                     }
 
-                    // Skip over peeked data and add the rest to the payload
+                    // Skip over viewed data and add the rest to the payload
                     lastEncoded.Payload.Add(data[i]);
                     lastEncoded.Payload.Add(data[i + 1]);
                     i++;

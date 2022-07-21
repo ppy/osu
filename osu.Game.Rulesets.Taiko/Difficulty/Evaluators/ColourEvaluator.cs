@@ -25,21 +25,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
-        /// Evaluate the difficulty of the first note of a <see cref="MonoEncoding"/>.
-        /// <param name="encoding">The encoding to evaluate.</param>
-        /// <param name="i">The index of the mono encoding within it's parent <see cref="ColourEncoding"/>.</param>
+        /// Evaluate the difficulty of the first note of a <see cref="MonoEncoding"/> or a <see cref="ColourEncoding"/>.
+        /// <param name="i">The index of either encoding within it's respective parent.</param>
         /// </summary>
-        public static double EvaluateDifficultyOf(MonoEncoding encoding, int i)
-        {
-            return Sigmoid(i, 2, 2, 0.5, 1);
-        }
-
-        /// <summary>
-        /// Evaluate the difficulty of the first note of a <see cref="ColourEncoding"/>.
-        /// </summary>
-        /// <param name="encoding">The encoding to evaluate.</param>
-        /// <param name="i">The index of the colour encoding within it's parent <see cref="CoupledColourEncoding"/>.</param>
-        public static double EvaluateDifficultyOf(ColourEncoding encoding, int i)
+        public static double EvaluateDifficultyOf(int i)
         {
             return Sigmoid(i, 2, 2, 0.5, 1);
         }
@@ -65,13 +54,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             for (int i = 0; i < encoding.Payload.Count; i++)
             {
                 ColourEncoding colourEncoding = encoding.Payload[i];
-                double colourEncodingDifficulty = EvaluateDifficultyOf(colourEncoding, i) * coupledEncodingDifficulty;
+                double colourEncodingDifficulty = EvaluateDifficultyOf(i) * coupledEncodingDifficulty;
                 colourEncoding.Payload[0].EncodedData[0].Colour!.EvaluatedDifficulty += colourEncodingDifficulty;
 
                 for (int j = 0; j < colourEncoding.Payload.Count; j++)
                 {
                     MonoEncoding monoEncoding = colourEncoding.Payload[j];
-                    monoEncoding.EncodedData[0].Colour!.EvaluatedDifficulty += EvaluateDifficultyOf(monoEncoding, j) * colourEncodingDifficulty * 0.5;
+                    monoEncoding.EncodedData[0].Colour!.EvaluatedDifficulty += EvaluateDifficultyOf(j) * colourEncodingDifficulty * 0.5;
                 }
             }
         }
