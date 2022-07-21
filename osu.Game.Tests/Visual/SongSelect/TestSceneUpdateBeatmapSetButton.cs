@@ -71,6 +71,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 carousel.UpdateBeatmapSet(testBeatmapSetInfo);
             });
 
+            AddUntilStep("only one set visible", () => carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().Count() == 1);
             AddUntilStep("update button visible", () => getUpdateButton() != null);
 
             AddStep("click button", () => getUpdateButton()?.TriggerClick());
@@ -120,6 +121,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 carousel.UpdateBeatmapSet(testBeatmapSetInfo);
             });
 
+            AddUntilStep("only one set visible", () => carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().Count() == 1);
             AddUntilStep("update button visible", () => getUpdateButton() != null);
 
             AddStep("click button", () => getUpdateButton()?.TriggerClick());
