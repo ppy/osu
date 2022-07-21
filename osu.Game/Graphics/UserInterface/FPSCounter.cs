@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -165,7 +166,7 @@ namespace osu.Game.Graphics.UserInterface
             // TODO: this is wrong (elapsed clock time, not actual run time).
             double newUpdateFrameTime = gameHost.UpdateThread.Clock.ElapsedFrameTime;
             // use elapsed frame time rather then FramesPerSecond to better catch stutter frames.
-            double newDrawFps = 1000 / gameHost.DrawThread.Clock.ElapsedFrameTime;
+            double newDrawFps = 1000 / Math.Max(0.001, gameHost.DrawThread.Clock.ElapsedFrameTime);
 
             const double spike_time_ms = 20;
 
