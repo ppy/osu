@@ -255,18 +255,25 @@ namespace osu.Game.Tests.Visual.Online
             };
 
             const int initial_great_count = 2000;
+            const int initial_tick_count = 100;
 
             int greatCount = initial_great_count;
+            int tickCount = initial_tick_count;
 
             foreach (var s in scores.Scores)
             {
                 s.Statistics = new Dictionary<HitResult, int>
                 {
-                    { HitResult.Great, greatCount -= 100 },
+                    { HitResult.Great, greatCount },
+                    { HitResult.LargeTickHit, tickCount },
                     { HitResult.Ok, RNG.Next(100) },
                     { HitResult.Meh, RNG.Next(100) },
-                    { HitResult.Miss, initial_great_count - greatCount }
+                    { HitResult.Miss, initial_great_count - greatCount },
+                    { HitResult.LargeTickMiss, initial_tick_count - tickCount },
                 };
+
+                greatCount -= 100;
+                tickCount -= RNG.Next(1, 5);
             }
 
             return scores;
