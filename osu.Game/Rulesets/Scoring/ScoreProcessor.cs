@@ -472,7 +472,7 @@ namespace osu.Game.Rulesets.Scoring
             if (maximumResultCounts.TryGetValue(HitResult.SmallTickHit, out int maximumSmallTick))
                 scoreResultCounts[HitResult.SmallTickMiss] = maximumSmallTick - scoreResultCounts.GetValueOrDefault(HitResult.SmallTickHit);
 
-            int maximumBasic = maximumResultCounts.Single(kvp => kvp.Key.IsBasic()).Value;
+            int maximumBasic = maximumResultCounts.SingleOrDefault(kvp => kvp.Key.IsBasic()).Value;
             int currentBasic = scoreResultCounts.Where(kvp => kvp.Key.IsBasic() && kvp.Key != HitResult.Miss).Sum(kvp => kvp.Value);
             scoreResultCounts[HitResult.Miss] = maximumBasic - currentBasic;
 
