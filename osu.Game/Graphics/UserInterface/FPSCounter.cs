@@ -127,6 +127,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private ScheduledDelegate? fadeOutDelegate;
 
+        private double aimDrawFPS;
+        private double aimUpdateFPS;
+
         private void displayTemporarily()
         {
             if (!isDisplayed)
@@ -155,13 +158,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
-            double aimDrawFPS = gameHost.DrawThread.Clock.MaximumUpdateHz;
-            double aimUpdateFPS = gameHost.UpdateThread.Clock.MaximumUpdateHz;
-
-            if (!gameHost.UpdateThread.Clock.Throttling)
-            {
-                aimUpdateFPS = aimDrawFPS = gameHost.InputThread.Clock.MaximumUpdateHz;
-            }
+            // Handle the case where the window has become inactive or the user changed the
+            // frame limiter (we want to show the FPS as it's changing, even if it isn't an outlier).
+            bool aimRatesChanged = updateAimFPS();
 
             // TODO: this is wrong (elapsed clock time, not actual run time).
             double newUpdateFrameTime = gameHost.UpdateThread.Clock.ElapsedFrameTime;
@@ -189,13 +188,42 @@ namespace osu.Game.Graphics.UserInterface
             double displayedUpdateFPS = 1000 / counterUpdateFrameTime.DisplayedCount;
             counterUpdateFrameTime.Colour = getColour(displayedUpdateFPS / aimUpdateFPS);
 
-            bool hasSignificantChanges = hasDrawSpike
+            bool hasSignificantChanges = aimRatesChanged
+                                         || hasDrawSpike
                                          || hasUpdateSpike
                                          || counterDrawFPS.DisplayedCount < aimDrawFPS * 0.8
                                          || displayedUpdateFPS < aimUpdateFPS * 0.8;
 
             if (hasSignificantChanges)
                 displayTemporarily();
+        }
+
+        private bool updateAimFPS()
+        {
+            if (gameHost.UpdateThread.Clock.Throttling)
+            {
+                double newAimDrawFPS = gameHost.DrawThread.Clock.MaximumUpdateHz;
+                double newAimUpdateFPS = gameHost.UpdateThread.Clock.MaximumUpdateHz;
+
+                if (aimDrawFPS != newAimDrawFPS || aimUpdateFPS != newAimUpdateFPS)
+                {
+                    aimDrawFPS = newAimDrawFPS;
+                    aimUpdateFPS = newAimUpdateFPS;
+                    return true;
+                }
+            }
+            else
+            {
+                double newAimFPS = gameHost.InputThread.Clock.MaximumUpdateHz;
+
+                if (aimDrawFPS != newAimFPS || aimUpdateFPS != newAimFPS)
+                {
+                    aimUpdateFPS = aimDrawFPS = newAimFPS;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private ColourInfo getColour(double performanceRatio)
