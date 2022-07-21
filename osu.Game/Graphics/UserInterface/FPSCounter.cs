@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -270,50 +269,5 @@ namespace osu.Game.Graphics.UserInterface
         public ITooltip GetCustomTooltip() => new FPSCounterTooltip();
 
         public object TooltipContent => this;
-
-        public class FramesPerSecondCounter : RollingCounter<double>
-        {
-            protected override double RollingDuration => 1000;
-
-            protected override OsuSpriteText CreateSpriteText()
-            {
-                return new OsuSpriteText
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Font = OsuFont.Default.With(fixedWidth: true, size: 16, weight: FontWeight.SemiBold),
-                    Spacing = new Vector2(-2),
-                };
-            }
-
-            protected override LocalisableString FormatCount(double count)
-            {
-                return $"{count:#,0}fps";
-            }
-        }
-
-        public class FrameTimeCounter : RollingCounter<double>
-        {
-            protected override double RollingDuration => 1000;
-
-            protected override OsuSpriteText CreateSpriteText()
-            {
-                return new OsuSpriteText
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Font = OsuFont.Default.With(fixedWidth: true, size: 16, weight: FontWeight.SemiBold),
-                    Spacing = new Vector2(-1),
-                };
-            }
-
-            protected override LocalisableString FormatCount(double count)
-            {
-                if (count < 1)
-                    return $"{count:N1}ms";
-
-                return $"{count:N0}ms";
-            }
-        }
     }
 }
