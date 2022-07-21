@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModDoubleTime : ModDoubleTime
     {
-        public override double ScoreMultiplier => 1.06;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
     }
 }
