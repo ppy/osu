@@ -73,13 +73,13 @@ namespace osu.Game.Graphics.UserInterface
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             Margin = new MarginPadding(1),
-                            Y = -1,
+                            Y = -2,
                         },
                         fpsCounter = new FramesPerSecondCounter
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
-                            Margin = new MarginPadding(1),
+                            Margin = new MarginPadding(2),
                             Y = 10,
                             Scale = new Vector2(0.8f),
                         }
