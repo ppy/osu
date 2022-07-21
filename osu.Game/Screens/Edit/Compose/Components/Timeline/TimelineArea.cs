@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Drawable userContent;
 
+        private const float zoom_button_sensitivity = 0.02f;
+
         public TimelineArea(Drawable content = null)
         {
             RelativeSizeAxes = Axes.X;
@@ -154,6 +156,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Timeline.TicksVisible.BindTo(ticksCheckbox.Current);
         }
 
-        private void changeZoom(float change) => Timeline.Zoom += change;
+        private void changeZoom(float change) => Timeline.Zoom += change * Timeline.MaxZoom * zoom_button_sensitivity;
     }
 }
