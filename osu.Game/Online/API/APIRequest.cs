@@ -212,7 +212,6 @@ namespace osu.Game.Online.API
                     }
                 }
 
-                Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
                 TriggerFailure(e);
             }
         }
