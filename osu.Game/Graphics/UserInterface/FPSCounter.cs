@@ -198,6 +198,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 return new OsuSpriteText
                 {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
                     Font = OsuFont.Default.With(fixedWidth: true, size: 16, weight: FontWeight.SemiBold),
                     Spacing = new Vector2(-2),
                 };
@@ -217,6 +219,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 return new OsuSpriteText
                 {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
                     Font = OsuFont.Default.With(fixedWidth: true, size: 16, weight: FontWeight.SemiBold),
                     Spacing = new Vector2(-1),
                 };
