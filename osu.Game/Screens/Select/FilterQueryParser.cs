@@ -312,11 +312,18 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateLengthRange(FilterCriteria criteria, Operator op, string val)
         {
-            if (!tryParseDoubleWithPoint(val.TrimEnd('m', 's', 'h'), out double length))
-                return false;
-
-            int scale = getLengthScale(val);
-            return tryUpdateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
+            string[] parts = Regex.Split(val, @"(?<=[msh])").Where(x => x.Length > 0).ToArray();
+            double totalLength = 0;
+            int minScale = 1000;
+            foreach (string part in parts)
+            {
+                if (!tryParseDoubleWithPoint(part.TrimEnd('m', 's', 'h'), out double length))
+                    return false;
+                int scale = getLengthScale(part);
+                totalLength += length * scale;
+                minScale = Math.Min(minScale, scale);
+            }
+            return tryUpdateCriteriaRange(ref criteria.Length, op, totalLength, minScale / 2.0);
         }
     }
 }
