@@ -198,13 +198,13 @@ namespace osu.Game.Graphics.UserInterface
 
             // note that we use an elapsed time here of 1 intentionally.
             // this weights all updates equally. if we passed in the elapsed time, longer frames would be weighted incorrectly lower.
-            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, updateClock.ElapsedFrameTime, hasUpdateSpike ? 0 : 200, 1);
+            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, updateClock.ElapsedFrameTime, hasUpdateSpike ? 0 : 100, 1);
 
             if (hasDrawSpike)
                 // show spike time using raw elapsed value, to account for `FramesPerSecond` being so averaged spike frames don't show.
                 displayedFpsCount = 1000 / drawClock.ElapsedFrameTime;
             else
-                displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, drawClock.FramesPerSecond, 200, Time.Elapsed);
+                displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, drawClock.FramesPerSecond, 100, Time.Elapsed);
 
             if (Time.Current - lastUpdate > min_time_between_updates)
             {
