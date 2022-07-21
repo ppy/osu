@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -312,34 +313,50 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateLengthRange(FilterCriteria criteria, Operator op, string val)
         {
-            if (val.Contains(':'))
+            List<string> parts = new List<string>();
+
+            if (Regex.IsMatch(val, @"^\d+(:\d+(:\d+)?)?$")) // formats like 12:34
             {
-                if (val.Contains('h') || val.Contains('m') || val.Contains('s'))
+                string[] splited = val.Split(':');
+                for (int i = splited.Length - 1; i >= 0; i--)
+                    parts.Add(splited[i] + "smh"[splited.Length - i - 1]);
+            }
+            else if (Regex.IsMatch(val, @"^(\d+(\.\d+)?[hms]){1,3}$")) // formats like 1h2m3s
+            {
+                if (!"hms".Contains(Regex.Replace(val, @"[\d\.]", "")))
                     return false;
 
-                int count = val.Count(c => c == ':');
-                if (count > 3)
-                    return false;
-
-                if (count > 2)
-                    val = val.Replace(':', 'h');
-                
-                val = val.Replace(':', 'm');
+                string[] splited = Regex.Split(val, @"(?<=[hms])").Where(x => x.Length > 0).ToArray();
+                for (int i = splited.Length - 1; i >= 0; i--)
+                    parts.Add(splited[i]);
+            }
+            else if (Regex.IsMatch(val, @"^\d+(\.\d+)?$")) // only one number
+            {
+                parts.Add(val + 's');
             }
 
-            string[] parts = Regex.Split(val, @"(?<=[msh])").Where(x => x.Length > 0).ToArray();
-            double totalLength = 0;
-            int minScale = 1000;
+            if (parts.Count == 0)
+                return false;
 
-            foreach (string part in parts)
+            double totalLength = 0;
+            int minScale = 3600000;
+
+            for (int i = 0; i < parts.Count; i++)
             {
-                if (!tryParseDoubleWithPoint(part.TrimEnd('m', 's', 'h'), out double length))
+                string part = parts[i];
+                string partNoUnit = part.TrimEnd('m', 's', 'h');
+                if (!tryParseDoubleWithPoint(partNoUnit, out double length))
                     return false;
+
+                if (i != parts.Count - 1 && length >= 60)
+                    return false;
+                if (i != 0 && partNoUnit.Contains('.'))
+                    return false;
+
                 int scale = getLengthScale(part);
                 totalLength += length * scale;
                 minScale = Math.Min(minScale, scale);
             }
-
             return tryUpdateCriteriaRange(ref criteria.Length, op, totalLength, minScale / 2.0);
         }
     }
