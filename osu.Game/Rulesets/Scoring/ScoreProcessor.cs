@@ -461,6 +461,8 @@ namespace osu.Game.Rulesets.Scoring
             if (Rank.Value == ScoreRank.F)
                 return;
 
+            score.Passed = false;
+
             Rank.Value = ScoreRank.F;
             Rank.Disabled = true;
 
