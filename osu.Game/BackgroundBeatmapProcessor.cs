@@ -35,6 +35,8 @@ namespace osu.Game
         [Resolved]
         private ILocalUserPlayInfo? localUserPlayInfo { get; set; }
 
+        protected virtual int TimeToSleepDuringGameplay => 30000;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -107,8 +109,8 @@ namespace osu.Game
             {
                 while (localUserPlayInfo?.IsPlaying.Value == true)
                 {
-                    Logger.Log("Background processing sleeping 30s due to active gameplay...");
-                    Thread.Sleep(30000);
+                    Logger.Log("Background processing sleeping due to active gameplay...");
+                    Thread.Sleep(TimeToSleepDuringGameplay);
                 }
 
                 realmAccess.Run(r =>
