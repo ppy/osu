@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// by other skills in the future.
         /// This need to be writeable by TaikoDifficultyHitObjectColour so that it can assign potentially reused instances
         /// </summary>
-        public TaikoDifficultyHitObjectColour? Colour;
+        public TaikoDifficultyHitObjectColour Colour;
 
         /// <summary>
         /// Creates a new difficulty hit object.
@@ -53,6 +53,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                                         List<TaikoDifficultyHitObject> noteObjects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
+            // Create the Colour object, its properties should be filled in by TaikoDifficultyPreprocessor
+            Colour = new TaikoDifficultyHitObjectColour();
+
             var currentHit = hitObject as Hit;
             noteDifficultyHitObjects = noteObjects;
 

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data;
@@ -18,19 +19,26 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <param name="width">The radius of the sigmoid, outside of which values are near the minimum/maximum.</param>
         /// <param name="middle">The middle of the sigmoid output.</param>
         /// <param name="height">The height of the sigmoid output. This will be equal to max value - min value.</param>
-        public static double Sigmoid(double val, double center, double width, double middle, double height)
+        private static double sigmoid(double val, double center, double width, double middle, double height)
         {
             double sigmoid = Math.Tanh(Math.E * -(val - center) / width);
             return sigmoid * (height / 2) + middle;
         }
 
         /// <summary>
-        /// Evaluate the difficulty of the first note of a <see cref="MonoEncoding"/> or a <see cref="ColourEncoding"/>.
-        /// <param name="i">The index of either encoding within it's respective parent.</param>
+        /// Evaluate the difficulty of the first note of a <see cref="MonoEncoding"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(int i)
+        public static double EvaluateDifficultyOf(MonoEncoding encoding)
         {
-            return Sigmoid(i, 2, 2, 0.5, 1);
+            return sigmoid(encoding.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(encoding.Parent!) * 0.5;
+        }
+
+        /// <summary>
+        /// Evaluate the difficulty of the first note of a <see cref="ColourEncoding"/>.
+        /// </summary>
+        public static double EvaluateDifficultyOf(ColourEncoding encoding)
+        {
+            return sigmoid(encoding.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(encoding.Parent!);
         }
 
         /// <summary>
@@ -38,31 +46,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(CoupledColourEncoding encoding)
         {
-            return 1 - Sigmoid(encoding.RepetitionInterval, 2, 2, 0.5, 1);
+            return 2 * (1 - sigmoid(encoding.RepetitionInterval, 2, 2, 0.5, 1));
         }
 
-        /// <summary>
-        /// Pre-evaluate and *assign* difficulty values of all hit objects encoded in a <see cref="CoupledColourEncoding"/>.
-        /// Difficulty values are assigned to <see cref="TaikoDifficultyHitObjectColour.EvaluatedDifficulty"/> of each
-        /// <see cref="TaikoDifficultyHitObject"/> encoded within.
-        /// </summary>
-        public static void PreEvaluateDifficulties(CoupledColourEncoding encoding)
+        public static double EvaluateDifficultyOf(DifficultyHitObject hitObject)
         {
-            double coupledEncodingDifficulty = 2 * EvaluateDifficultyOf(encoding);
-            encoding.Payload[0].Payload[0].EncodedData[0].Colour!.EvaluatedDifficulty += coupledEncodingDifficulty;
+            TaikoDifficultyHitObjectColour colour = ((TaikoDifficultyHitObject)hitObject).Colour;
+            double difficulty = 0.0d;
 
-            for (int i = 0; i < encoding.Payload.Count; i++)
-            {
-                ColourEncoding colourEncoding = encoding.Payload[i];
-                double colourEncodingDifficulty = EvaluateDifficultyOf(i) * coupledEncodingDifficulty;
-                colourEncoding.Payload[0].EncodedData[0].Colour!.EvaluatedDifficulty += colourEncodingDifficulty;
+            if (colour.MonoEncoding != null) // Difficulty for MonoEncoding
+                difficulty += EvaluateDifficultyOf(colour.MonoEncoding);
+            if (colour.ColourEncoding != null) // Difficulty for ColourEncoding
+                difficulty += EvaluateDifficultyOf(colour.ColourEncoding);
+            if (colour.CoupledColourEncoding != null) // Difficulty for CoupledColourEncoding
+                difficulty += EvaluateDifficultyOf(colour.CoupledColourEncoding);
 
-                for (int j = 0; j < colourEncoding.Payload.Count; j++)
-                {
-                    MonoEncoding monoEncoding = colourEncoding.Payload[j];
-                    monoEncoding.EncodedData[0].Colour!.EvaluatedDifficulty += EvaluateDifficultyOf(j) * colourEncodingDifficulty * 0.5;
-                }
-            }
+            return difficulty;
         }
     }
 }
