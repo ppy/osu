@@ -3,17 +3,22 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModPresetPanel : ModSelectOverlayPanel
+    public class ModPresetPanel : ModSelectOverlayPanel, IHasCustomTooltip<ModPreset>
     {
+        public readonly ModPreset Preset;
+
         public override BindableBool Active { get; } = new BindableBool();
 
         public ModPresetPanel(ModPreset preset)
         {
+            Preset = preset;
+
             Title = preset.Name;
             Description = preset.Description;
         }
@@ -23,5 +28,8 @@ namespace osu.Game.Overlays.Mods
         {
             AccentColour = colours.Orange1;
         }
+
+        public ModPreset TooltipContent => Preset;
+        public ITooltip<ModPreset> GetCustomTooltip() => new ModPresetTooltip(ColourProvider);
     }
 }
