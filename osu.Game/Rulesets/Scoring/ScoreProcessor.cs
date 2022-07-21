@@ -462,9 +462,7 @@ namespace osu.Game.Rulesets.Scoring
                 return;
 
             score.Passed = false;
-
             Rank.Value = ScoreRank.F;
-            Rank.Disabled = true;
 
             Debug.Assert(maximumResultCounts != null);
 
