@@ -29,6 +29,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private Container background = null!;
 
+        private Container counters = null!;
+
         private const float idle_background_alpha = 0.4f;
 
         private readonly BindableBool showFpsDisplay = new BindableBool(true);
@@ -49,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
                 mainContent = new Container
                 {
                     Alpha = 0,
-                    Size = new Vector2(42, 26),
+                    Height = 26,
                     Children = new Drawable[]
                     {
                         background = new Container
@@ -68,21 +70,30 @@ namespace osu.Game.Graphics.UserInterface
                                 },
                             }
                         },
-                        counterUpdateFrameTime = new FrameTimeCounter
+                        counters = new Container
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
-                            Margin = new MarginPadding(1),
-                            Y = -2,
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                counterUpdateFrameTime = new FrameTimeCounter
+                                {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Margin = new MarginPadding(1),
+                                    Y = -2,
+                                },
+                                counterDrawFPS = new FramesPerSecondCounter
+                                {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Margin = new MarginPadding(2),
+                                    Y = 10,
+                                    Scale = new Vector2(0.8f),
+                                }
+                            }
                         },
-                        counterDrawFPS = new FramesPerSecondCounter
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Margin = new MarginPadding(2),
-                            Y = 10,
-                            Scale = new Vector2(0.8f),
-                        }
                     }
                 },
             };
@@ -158,6 +169,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override void Update()
         {
             base.Update();
+
+            mainContent.Width = Math.Max(mainContent.Width, counters.DrawWidth);
 
             // Handle the case where the window has become inactive or the user changed the
             // frame limiter (we want to show the FPS as it's changing, even if it isn't an outlier).
