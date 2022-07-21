@@ -6,18 +6,26 @@ using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data;
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
 {
     /// <summary>
-    /// Stores colour compression information for a <see cref="TaikoDifficultyHitObject"/>. This is only present for the
-    /// first <see cref="TaikoDifficultyHitObject"/> in a <see cref="CoupledColourEncoding"/> chunk.
+    /// Stores colour compression information for a <see cref="TaikoDifficultyHitObject"/>.
     /// </summary>
     public class TaikoDifficultyHitObjectColour
     {
-        public CoupledColourEncoding Encoding { get; }
+        /// <summary>
+        /// <see cref="MonoEncoding"/> encoding that encodes this note, only present if this is the first note within a
+        /// <see cref="MonoEncoding"/>
+        /// </summary>
+        public MonoEncoding? MonoEncoding;
 
-        public double EvaluatedDifficulty = 0;
+        /// <summary>
+        /// <see cref="ColourEncoding"/> encoding that encodes this note, only present if this is the first note within
+        /// a <see cref="ColourEncoding"/>
+        /// </summary>
+        public ColourEncoding? ColourEncoding;
 
-        public TaikoDifficultyHitObjectColour(CoupledColourEncoding encoding)
-        {
-            Encoding = encoding;
-        }
+        /// <summary>
+        /// <see cref="CoupledColourEncoding"/> encoding that encodes this note, only present if this is the first note
+        /// within a <see cref="CoupledColourEncoding"/>
+        /// </summary>
+        public CoupledColourEncoding? CoupledColourEncoding;
     }
 }

@@ -17,6 +17,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// </summary>
         public List<MonoEncoding> Payload { get; private set; } = new List<MonoEncoding>();
 
+        public CoupledColourEncoding? Parent;
+
+        /// <summary>
+        /// Index of this encoding within it's parent encoding
+        /// </summary>
+        public int Index;
+
         /// <summary>
         /// Determine if this <see cref="ColourEncoding"/> is a repetition of another <see cref="ColourEncoding"/>. This
         /// is a strict comparison and is true if and only if the colour sequence is exactly the same.
