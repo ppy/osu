@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -22,8 +21,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class FPSCounter : VisibilityContainer, IHasCustomTooltip
     {
-        private RollingCounter<double> msCounter = null!;
-        private RollingCounter<double> fpsCounter = null!;
+        private RollingCounter<double> counterUpdateFrameTime = null!;
+        private RollingCounter<double> counterDrawFPS = null!;
 
         private Container mainContent = null!;
 
@@ -68,14 +67,14 @@ namespace osu.Game.Graphics.UserInterface
                                 },
                             }
                         },
-                        msCounter = new FrameTimeCounter
+                        counterUpdateFrameTime = new FrameTimeCounter
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             Margin = new MarginPadding(1),
                             Y = -2,
                         },
-                        fpsCounter = new FramesPerSecondCounter
+                        counterDrawFPS = new FramesPerSecondCounter
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -156,30 +155,47 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
-            // TODO: this is wrong (elapsed clock time, not actual run time).
-            double newFrameTime = gameHost.UpdateThread.Clock.ElapsedFrameTime;
-            double newFps = gameHost.DrawThread.Clock.FramesPerSecond;
+            double aimDrawFPS = gameHost.DrawThread.Clock.MaximumUpdateHz;
+            double aimUpdateFPS = gameHost.UpdateThread.Clock.MaximumUpdateHz;
 
-            bool hasSignificantChanges =
-                Math.Abs(msCounter.Current.Value - newFrameTime) > 5 ||
-                Math.Abs(fpsCounter.Current.Value - newFps) > 10;
+            if (!gameHost.UpdateThread.Clock.Throttling)
+            {
+                aimUpdateFPS = aimDrawFPS = gameHost.InputThread.Clock.MaximumUpdateHz;
+            }
+
+            // TODO: this is wrong (elapsed clock time, not actual run time).
+            double newUpdateFrameTime = gameHost.UpdateThread.Clock.ElapsedFrameTime;
+            // use elapsed frame time rather then FramesPerSecond to better catch stutter frames.
+            double newDrawFps = 1000 / gameHost.DrawThread.Clock.ElapsedFrameTime;
+
+            const double spike_time_ms = 20;
+
+            bool hasUpdateSpike = counterUpdateFrameTime.Current.Value < spike_time_ms && newUpdateFrameTime > spike_time_ms;
+            bool hasDrawSpike = counterDrawFPS.Current.Value > (1000 / spike_time_ms) && newDrawFps <= (1000 / spike_time_ms);
+
+            // If the frame time spikes up, make sure it shows immediately on the counter.
+            if (hasUpdateSpike)
+                counterUpdateFrameTime.SetCountWithoutRolling(newUpdateFrameTime);
+            else
+                counterUpdateFrameTime.Current.Value = newUpdateFrameTime;
+
+            if (hasDrawSpike)
+                counterDrawFPS.SetCountWithoutRolling(newDrawFps);
+            else
+                counterDrawFPS.Current.Value = newDrawFps;
+
+            counterDrawFPS.Colour = getColour(counterDrawFPS.DisplayedCount / aimDrawFPS);
+
+            double displayedUpdateFPS = 1000 / counterUpdateFrameTime.DisplayedCount;
+            counterUpdateFrameTime.Colour = getColour(displayedUpdateFPS / aimUpdateFPS);
+
+            bool hasSignificantChanges = hasDrawSpike
+                                         || hasUpdateSpike
+                                         || counterDrawFPS.DisplayedCount < aimDrawFPS * 0.8
+                                         || displayedUpdateFPS < aimUpdateFPS * 0.8;
 
             if (hasSignificantChanges)
                 displayTemporarily();
-
-            // If the frame time spikes up, make sure it shows immediately on the counter.
-            if (msCounter.Current.Value < 20 && newFrameTime > 20)
-                msCounter.SetCountWithoutRolling(newFrameTime);
-            else
-                msCounter.Current.Value = newFrameTime;
-
-            fpsCounter.Current.Value = newFps;
-
-            fpsCounter.Colour = getColour(fpsCounter.DisplayedCount / gameHost.DrawThread.Clock.MaximumUpdateHz);
-
-            double equivalentHz = 1000 / msCounter.DisplayedCount;
-
-            msCounter.Colour = getColour(equivalentHz / gameHost.UpdateThread.Clock.MaximumUpdateHz);
         }
 
         private ColourInfo getColour(double performanceRatio)
@@ -196,7 +212,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public class FramesPerSecondCounter : RollingCounter<double>
         {
-            protected override double RollingDuration => 400;
+            protected override double RollingDuration => 1000;
 
             protected override OsuSpriteText CreateSpriteText()
             {
