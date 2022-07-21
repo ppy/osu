@@ -275,6 +275,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleSkinEditor => new TranslatableString(getKey(@"toggle_skin_editor"), @"Toggle skin editor");
 
         /// <summary>
+        /// "Toggle FPS counter"
+        /// </summary>
+        public static LocalisableString ToggleFPSCounter => new TranslatableString(getKey(@"toggle_fps_counter"), @"Toggle FPS counter");
+
+        /// <summary>
         /// "Previous volume meter"
         /// </summary>
         public static LocalisableString PreviousVolumeMeter => new TranslatableString(getKey(@"previous_volume_meter"), @"Previous volume meter");
