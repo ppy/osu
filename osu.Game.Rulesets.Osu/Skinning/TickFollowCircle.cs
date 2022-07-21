@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
         {
+            // Fine to use drawableObject.HitStateUpdateTime even for DrawableSliderTail, since on
+            // stable, the break anim plays right when the tail is missed, not when the slider ends
             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
                 switch (state)
@@ -28,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         break;
 
                     case ArmedState.Miss:
-                        if (drawableObject is DrawableSlider or DrawableSliderTick or DrawableSliderRepeat)
+                        if (drawableObject is DrawableSliderTail or DrawableSliderTick or DrawableSliderRepeat)
                             OnSliderBreak();
                         break;
                 }

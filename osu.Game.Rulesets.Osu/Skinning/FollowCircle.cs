@@ -58,13 +58,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
         {
-            // We only want DrawableSlider here. DrawableSliderTail doesn't quite work because its
-            // HitStateUpdateTime is ~36ms before DrawableSlider's HitStateUpdateTime (aka slider
-            // end leniency).
-            if (drawableObject is not DrawableSlider)
+            if (drawableObject is not DrawableSliderTail)
                 return;
 
-            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
+            Debug.Assert(ParentObject != null);
+
+            // Use ParentObject instead of drawableObject because slider tail hit state update time
+            // is ~36ms before the actual slider end (aka slider tail leniency)
+            using (BeginAbsoluteSequence(ParentObject.HitStateUpdateTime))
             {
                 switch (state)
                 {
