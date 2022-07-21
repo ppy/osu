@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
         }
 
-        public float CalculateZoomChange(float rawChange) => rawChange * MaxZoom * zoom_change_sensitivity;
+        public float CalculateZoomChange(float rawChange) => rawChange * (MaxZoom - minZoom) * zoom_change_sensitivity;
 
         private class TransformZoom : Transform<float, ZoomableScrollContainer>
         {
