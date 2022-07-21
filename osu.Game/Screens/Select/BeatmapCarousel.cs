@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Select
 
         private readonly NoResultsPlaceholder noResultsPlaceholder;
 
-        private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
+        private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Items.OfType<CarouselBeatmapSet>();
 
         // todo: only used for testing, maybe remove.
         private bool loadedTestBeatmaps;
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Select
         {
             CarouselRoot newRoot = new CarouselRoot(this);
 
-            newRoot.AddChildren(beatmapSets.Select(s => createCarouselSet(s.Detach())).Where(g => g != null));
+            newRoot.AddItems(beatmapSets.Select(s => createCarouselSet(s.Detach())).Where(g => g != null));
 
             root = newRoot;
 
@@ -300,7 +300,7 @@ namespace osu.Game.Screens.Select
             if (!root.BeatmapSetsByID.TryGetValue(beatmapSetID, out var existingSet))
                 return;
 
-            root.RemoveChild(existingSet);
+            root.RemoveItem(existingSet);
             itemsCache.Invalidate();
 
             if (!Scroll.UserScrolling)
@@ -321,7 +321,7 @@ namespace osu.Game.Screens.Select
 
             if (newSet != null)
             {
-                root.AddChild(newSet);
+                root.AddItem(newSet);
 
                 // check if we can/need to maintain our current selection.
                 if (previouslySelectedID != null)
@@ -415,7 +415,7 @@ namespace osu.Game.Screens.Select
             if (selectedBeatmap == null)
                 return;
 
-            var unfilteredDifficulties = selectedBeatmapSet.Children.Where(s => !s.Filtered.Value).ToList();
+            var unfilteredDifficulties = selectedBeatmapSet.Items.Where(s => !s.Filtered.Value).ToList();
 
             int index = unfilteredDifficulties.IndexOf(selectedBeatmap);
 
@@ -798,7 +798,7 @@ namespace osu.Game.Screens.Select
 
             scrollTarget = null;
 
-            foreach (CarouselItem item in root.Children)
+            foreach (CarouselItem item in root.Items)
             {
                 if (item.Filtered.Value)
                     continue;
@@ -964,26 +964,26 @@ namespace osu.Game.Screens.Select
                 this.carousel = carousel;
             }
 
-            public override void AddChild(CarouselItem i)
+            public override void AddItem(CarouselItem i)
             {
                 CarouselBeatmapSet set = (CarouselBeatmapSet)i;
                 BeatmapSetsByID.Add(set.BeatmapSet.ID, set);
 
-                base.AddChild(i);
+                base.AddItem(i);
             }
 
             public void RemoveChild(Guid beatmapSetID)
             {
                 if (BeatmapSetsByID.TryGetValue(beatmapSetID, out var carouselBeatmapSet))
-                    RemoveChild(carouselBeatmapSet);
+                    RemoveItem(carouselBeatmapSet);
             }
 
-            public override void RemoveChild(CarouselItem i)
+            public override void RemoveItem(CarouselItem i)
             {
                 CarouselBeatmapSet set = (CarouselBeatmapSet)i;
                 BeatmapSetsByID.Remove(set.BeatmapSet.ID);
 
-                base.RemoveChild(i);
+                base.RemoveItem(i);
             }
 
             protected override void PerformSelection()
