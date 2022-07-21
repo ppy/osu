@@ -430,6 +430,7 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = 0;
             Accuracy.Value = 1;
             Combo.Value = 0;
+            Rank.Disabled = false;
             Rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
         }
@@ -450,6 +451,32 @@ namespace osu.Game.Rulesets.Scoring
 
             // Populate total score after everything else.
             score.TotalScore = (long)Math.Round(ComputeFinalScore(ScoringMode.Standardised, score));
+        }
+
+        /// <summary>
+        /// Populates the given score with remaining statistics as "missed" and marks it with <see cref="ScoreRank.F"/> rank.
+        /// </summary>
+        public void FailScore(ScoreInfo score)
+        {
+            if (Rank.Value == ScoreRank.F)
+                return;
+
+            Rank.Value = ScoreRank.F;
+            Rank.Disabled = true;
+
+            Debug.Assert(maximumResultCounts != null);
+
+            if (maximumResultCounts.TryGetValue(HitResult.LargeTickHit, out int maximumLargeTick))
+                scoreResultCounts[HitResult.LargeTickMiss] = maximumLargeTick - scoreResultCounts.GetValueOrDefault(HitResult.LargeTickHit);
+
+            if (maximumResultCounts.TryGetValue(HitResult.SmallTickHit, out int maximumSmallTick))
+                scoreResultCounts[HitResult.SmallTickMiss] = maximumSmallTick - scoreResultCounts.GetValueOrDefault(HitResult.SmallTickHit);
+
+            int maximumBasic = maximumResultCounts.Single(kvp => kvp.Key.IsBasic()).Value;
+            int currentBasic = scoreResultCounts.Where(kvp => kvp.Key.IsBasic() && kvp.Key != HitResult.Miss).Sum(kvp => kvp.Value);
+            scoreResultCounts[HitResult.Miss] = maximumBasic - currentBasic;
+
+            PopulateScore(score);
         }
 
         public override void ResetFromReplayFrame(ReplayFrame frame)
