@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             set => updateZoom(value);
         }
 
-        private const float zoom_scroll_sensitivity = 0.02f;
+        private const float zoom_change_sensitivity = 0.02f;
 
         private void updateZoom(float? value = null)
         {
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (e.AltPressed)
             {
                 // zoom when holding alt.
-                setZoomTarget(zoomTarget + e.ScrollDelta.Y * MaxZoom * zoom_scroll_sensitivity, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+                setZoomTarget(zoomTarget + CalculateZoomChange(e.ScrollDelta.Y), zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
                 return true;
             }
 
@@ -166,6 +166,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected virtual void OnZoomChanged()
         {
         }
+
+        public float CalculateZoomChange(float rawChange) => rawChange * MaxZoom * zoom_change_sensitivity;
 
         private class TransformZoom : Transform<float, ZoomableScrollContainer>
         {
