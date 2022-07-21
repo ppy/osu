@@ -125,6 +125,10 @@ namespace osu.Game.Tests.NonVisual.Filtering
             new object[] { "9m", TimeSpan.FromMinutes(9), TimeSpan.FromMinutes(1) },
             new object[] { "0.25h", TimeSpan.FromHours(0.25), TimeSpan.FromHours(1) },
             new object[] { "70", TimeSpan.FromSeconds(70), TimeSpan.FromSeconds(1) },
+            new object[] { "7m27s", TimeSpan.FromSeconds(447), TimeSpan.FromSeconds(1) },
+            new object[] { "6h5m", TimeSpan.FromMinutes(365), TimeSpan.FromMinutes(1) },
+            new object[] { "7:27", TimeSpan.FromSeconds(447), TimeSpan.FromSeconds(1) },
+            new object[] { "0:2:35", TimeSpan.FromSeconds(155), TimeSpan.FromSeconds(1) },
         };
 
         [Test]
