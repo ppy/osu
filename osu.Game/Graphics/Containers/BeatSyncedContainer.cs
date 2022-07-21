@@ -28,8 +28,8 @@ namespace osu.Game.Graphics.Containers
     public class BeatSyncedContainer : Container
     {
         private int lastBeat;
-        protected TimingControlPoint LastTimingPoint;
-        protected EffectControlPoint LastEffectPoint;
+        protected TimingControlPoint LastTimingPoint { get; private set; }
+        protected EffectControlPoint LastEffectPoint { get; private set; }
 
         /// <summary>
         /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes)"/>.
