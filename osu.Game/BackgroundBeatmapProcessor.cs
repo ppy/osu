@@ -46,6 +46,14 @@ namespace osu.Game
                 Logger.Log("Beginning background beatmap processing..");
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
+            }).ContinueWith(t =>
+            {
+                if (t.Exception?.InnerException is ObjectDisposedException)
+                {
+                    Logger.Log("Finished background aborted during shutdown");
+                    return;
+                }
+
                 Logger.Log("Finished background beatmap processing!");
             });
         }
