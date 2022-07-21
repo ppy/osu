@@ -178,13 +178,14 @@ namespace osu.Game.Graphics.UserInterface
 
             // TODO: this is wrong (elapsed clock time, not actual run time).
             double newUpdateFrameTime = gameHost.UpdateThread.Clock.ElapsedFrameTime;
-            // use elapsed frame time rather then FramesPerSecond to better catch stutter frames.
-            double newDrawFps = 1000 / Math.Max(0.001, gameHost.DrawThread.Clock.ElapsedFrameTime);
+            double newDrawFrameTime = gameHost.DrawThread.Clock.ElapsedFrameTime;
+            double newDrawFps = gameHost.DrawThread.Clock.FramesPerSecond;
 
             const double spike_time_ms = 20;
 
             bool hasUpdateSpike = counterUpdateFrameTime.Current.Value < spike_time_ms && newUpdateFrameTime > spike_time_ms;
-            bool hasDrawSpike = counterDrawFPS.Current.Value > (1000 / spike_time_ms) && newDrawFps <= (1000 / spike_time_ms);
+            // use elapsed frame time rather then FramesPerSecond to better catch stutter frames.
+            bool hasDrawSpike = counterDrawFPS.Current.Value > (1000 / spike_time_ms) && newDrawFrameTime > spike_time_ms;
 
             // If the frame time spikes up, make sure it shows immediately on the counter.
             if (hasUpdateSpike)
@@ -193,7 +194,8 @@ namespace osu.Game.Graphics.UserInterface
                 counterUpdateFrameTime.Current.Value = newUpdateFrameTime;
 
             if (hasDrawSpike)
-                counterDrawFPS.SetCountWithoutRolling(newDrawFps);
+                // show spike time using raw elapsed value, to account for `FramesPerSecond` being so averaged spike frames don't show.
+                counterDrawFPS.SetCountWithoutRolling(1000 / newDrawFrameTime);
             else
                 counterDrawFPS.Current.Value = newDrawFps;
 
