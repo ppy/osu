@@ -39,7 +39,6 @@ namespace osu.Game.Graphics.UserInterface
                 new OsuTextFlowContainer(cp =>
                 {
                     cp.Font = OsuFont.Default.With(weight: FontWeight.SemiBold);
-                    cp.Spacing = new Vector2(-1);
                 })
                 {
                     AutoSizeAxes = Axes.Both,
