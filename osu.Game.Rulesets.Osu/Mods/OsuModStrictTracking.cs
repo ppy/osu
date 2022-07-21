@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => @"Strict Tracking";
         public override string Acronym => @"ST";
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => @"Once you start a slider, follow precisely or get a sliderbreak.";
+        public override string Description => @"Once you start a slider, follow precisely or break combo.";
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModClassic), typeof(OsuModTarget) };
 
