@@ -323,13 +323,17 @@ namespace osu.Game.Screens.Menu
             }
 
             if (amplitudes.Maximum > 0.3f)
+            {
                 this.Delay(early_activation / 2).Schedule(() =>
+                {
                     triangles.Velocity = (float)Interpolation.Damp(
                         triangles.Velocity,
                         triangles_paused_velocity * (effectPoint.KiaiMode ? 6 : 2) + amplitudeAdjust * (effectPoint.KiaiMode ? 8 : 4),
                         0.3f,
                         Time.Elapsed
-                    ));
+                    );
+                });
+            }
         }
 
         public void PlayIntro()
