@@ -104,6 +104,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             set => updateZoom(value);
         }
 
+        private const float zoom_scroll_sensitivity = 0.02f;
+
         private void updateZoom(float? value = null)
         {
             float newZoom = Math.Clamp(value ?? Zoom, MinZoom, MaxZoom);
@@ -127,7 +129,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (e.AltPressed)
             {
                 // zoom when holding alt.
-                setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+                setZoomTarget(zoomTarget + e.ScrollDelta.Y * MaxZoom * zoom_scroll_sensitivity, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
                 return true;
             }
 
