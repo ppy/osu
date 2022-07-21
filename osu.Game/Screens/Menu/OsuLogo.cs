@@ -322,18 +322,10 @@ namespace osu.Game.Screens.Menu
                     .FadeTo(visualizer_default_alpha, beatLength);
             }
 
-            if (amplitudes.Maximum > 0.3f)
+            this.Delay(early_activation).Schedule(() =>
             {
-                this.Delay(early_activation / 2).Schedule(() =>
-                {
-                    triangles.Velocity = (float)Interpolation.Damp(
-                        triangles.Velocity,
-                        triangles_paused_velocity * (effectPoint.KiaiMode ? 6 : 2) + amplitudeAdjust * (effectPoint.KiaiMode ? 8 : 4),
-                        0.3f,
-                        Time.Elapsed
-                    );
-                });
-            }
+                triangles.Velocity += amplitudeAdjust * (effectPoint.KiaiMode ? 6 : 3);
+            });
         }
 
         public void PlayIntro()
@@ -361,7 +353,7 @@ namespace osu.Game.Screens.Menu
                 float maxAmplitude = lastBeatIndex >= 0 ? musicController.CurrentTrack.CurrentAmplitudes.Maximum : 0;
                 logoAmplitudeContainer.Scale = new Vector2((float)Interpolation.Damp(logoAmplitudeContainer.Scale.X, 1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 0.9f, Time.Elapsed));
 
-                triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, triangles_paused_velocity * (LastEffectPoint.KiaiMode ? 6 : 2), 0.995f, Time.Elapsed);
+                triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, triangles_paused_velocity * (LastEffectPoint.KiaiMode ? 4 : 2), 0.995f, Time.Elapsed);
             }
             else
             {
