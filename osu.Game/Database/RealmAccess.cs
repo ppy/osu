@@ -63,7 +63,7 @@ namespace osu.Game.Database
         /// 17   2022-07-16    Added CountryCode to RealmUser.
         /// 18   2022-07-19    Added OnlineMD5Hash and LastOnlineUpdate to BeatmapInfo.
         /// 19   2022-07-19    Added DateSubmitted and DateRanked to BeatmapSetInfo.
-        /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo.
+        /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
         /// </summary>
         private const int schema_version = 20;
 
@@ -781,6 +781,16 @@ namespace osu.Game.Database
                 case 14:
                     foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
                         beatmap.UserSettings = new BeatmapUserSettings();
+
+                    break;
+
+                case 20:
+                    foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
+                    {
+                        if (beatmap.StarRating == 0)
+                            beatmap.StarRating = -1;
+                    }
+
                     break;
             }
         }
