@@ -30,6 +30,10 @@ namespace osu.Game.Graphics.UserInterface
 
         private Container counters = null!;
 
+        private const double min_time_between_updates = 10;
+
+        private const double spike_time_ms = 20;
+
         private const float idle_background_alpha = 0.4f;
 
         private readonly BindableBool showFpsDisplay = new BindableBool(true);
@@ -147,6 +151,8 @@ namespace osu.Game.Graphics.UserInterface
         private double aimDrawFPS;
         private double aimUpdateFPS;
 
+        private double lastUpdate;
+
         private void displayTemporarily()
         {
             if (!isDisplayed)
@@ -186,8 +192,6 @@ namespace osu.Game.Graphics.UserInterface
             double newDrawFrameTime = gameHost.DrawThread.Clock.ElapsedFrameTime;
             double newDrawFps = gameHost.DrawThread.Clock.FramesPerSecond;
 
-            const double spike_time_ms = 20;
-
             bool hasUpdateSpike = displayedFrameTime < spike_time_ms && newUpdateFrameTime > spike_time_ms;
             // use elapsed frame time rather then FramesPerSecond to better catch stutter frames.
             bool hasDrawSpike = displayedFpsCount > (1000 / spike_time_ms) && newDrawFrameTime > spike_time_ms;
@@ -202,8 +206,13 @@ namespace osu.Game.Graphics.UserInterface
             else
                 displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, newDrawFps, 200, Time.Elapsed);
 
-            updateFpsDisplay();
-            updateFrameTimeDisplay();
+            if (Time.Current - lastUpdate > min_time_between_updates)
+            {
+                updateFpsDisplay();
+                updateFrameTimeDisplay();
+
+                lastUpdate = Time.Current;
+            }
 
             bool hasSignificantChanges = aimRatesChanged
                                          || hasDrawSpike
