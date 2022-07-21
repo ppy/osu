@@ -785,11 +785,10 @@ namespace osu.Game.Database
                     break;
 
                 case 20:
+                    // As we now have versioned difficulty calculations, let's reset
+                    // all star ratings and have `BackgroundBeatmapProcessor` recalculate them.
                     foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
-                    {
-                        if (beatmap.StarRating == 0)
-                            beatmap.StarRating = -1;
-                    }
+                        beatmap.StarRating = -1;
 
                     break;
             }
