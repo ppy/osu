@@ -25,13 +25,26 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        if (drawableObject is DrawableSliderTick or DrawableSliderRepeat)
-                            OnSliderTick();
+                        switch (drawableObject)
+                        {
+                            case DrawableSliderTick:
+                            case DrawableSliderRepeat:
+                                OnSliderTick();
+                                break;
+                        }
+
                         break;
 
                     case ArmedState.Miss:
-                        if (drawableObject is DrawableSliderTail or DrawableSliderTick or DrawableSliderRepeat)
-                            OnSliderBreak();
+                        switch (drawableObject)
+                        {
+                            case DrawableSliderTail:
+                            case DrawableSliderTick:
+                            case DrawableSliderRepeat:
+                                OnSliderBreak();
+                                break;
+                        }
+
                         break;
                 }
             }
