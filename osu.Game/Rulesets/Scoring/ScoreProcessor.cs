@@ -126,6 +126,9 @@ namespace osu.Game.Rulesets.Scoring
         private bool beatmapApplied;
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
+
+        private Dictionary<HitResult, int>? maximumResultCounts;
+
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
 
@@ -410,12 +413,16 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.Reset(storeResults);
 
-            scoreResultCounts.Clear();
             hitEvents.Clear();
             lastHitObject = null;
 
             if (storeResults)
+            {
                 maximumScoringValues = currentScoringValues;
+                maximumResultCounts = new Dictionary<HitResult, int>(scoreResultCounts);
+            }
+
+            scoreResultCounts.Clear();
 
             currentScoringValues = default;
             currentMaximumScoringValues = default;
