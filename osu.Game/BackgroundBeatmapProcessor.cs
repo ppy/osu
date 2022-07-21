@@ -71,7 +71,7 @@ namespace osu.Game
                         {
                             if (b.Ruleset.ShortName == ruleset.ShortName)
                             {
-                                b.StarRating = 0;
+                                b.StarRating = -1;
                                 countReset++;
                             }
                         }
@@ -92,7 +92,7 @@ namespace osu.Game
 
             realmAccess.Run(r =>
             {
-                foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating == 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)))
+                foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)))
                 {
                     Debug.Assert(b.BeatmapSet != null);
                     beatmapSetIds.Add(b.BeatmapSet.ID);
