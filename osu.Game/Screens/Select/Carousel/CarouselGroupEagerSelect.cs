@@ -57,16 +57,16 @@ namespace osu.Game.Screens.Select.Carousel
                 updateSelectedIndex();
         }
 
-        private bool addingChildren;
+        private bool addingItems;
 
-        public void AddChildren(IEnumerable<CarouselItem> items)
+        public void AddItems(IEnumerable<CarouselItem> items)
         {
-            addingChildren = true;
+            addingItems = true;
 
             foreach (var i in items)
                 AddItem(i);
 
-            addingChildren = false;
+            addingItems = false;
 
             attemptSelection();
         }
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Select.Carousel
         public override void AddItem(CarouselItem i)
         {
             base.AddItem(i);
-            if (!addingChildren)
+            if (!addingItems)
                 attemptSelection();
         }
 
