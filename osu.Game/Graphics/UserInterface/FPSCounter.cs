@@ -131,9 +131,13 @@ namespace osu.Game.Graphics.UserInterface
         private void displayTemporarily()
         {
             if (!isDisplayed)
+            {
                 mainContent.FadeTo(1, 300, Easing.OutQuint);
+                isDisplayed = true;
+            }
 
             fadeOutDelegate?.Cancel();
+            fadeOutDelegate = null;
 
             if (!IsHovered)
             {
