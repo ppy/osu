@@ -122,6 +122,8 @@ namespace osu.Game.Overlays.Mods
                                     titleText = new OsuSpriteText
                                     {
                                         Font = OsuFont.TorusAlternate.With(size: 18, weight: FontWeight.SemiBold),
+                                        RelativeSizeAxes = Axes.X,
+                                        Truncate = true,
                                         Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                         Margin = new MarginPadding
                                         {
