@@ -157,11 +157,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Id = 6602580,
                             Username = @"waaiiru",
-                            Country = new Country
-                            {
-                                FullName = @"Spain",
-                                FlagName = @"ES",
-                            },
+                            CountryCode = CountryCode.ES,
                         },
                         Mods = new[]
                         {
@@ -184,11 +180,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Id = 4608074,
                             Username = @"Skycries",
-                            Country = new Country
-                            {
-                                FullName = @"Brazil",
-                                FlagName = @"BR",
-                            },
+                            CountryCode = CountryCode.BR,
                         },
                         Mods = new[]
                         {
@@ -210,11 +202,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Id = 1014222,
                             Username = @"eLy",
-                            Country = new Country
-                            {
-                                FullName = @"Japan",
-                                FlagName = @"JP",
-                            },
+                            CountryCode = CountryCode.JP,
                         },
                         Mods = new[]
                         {
@@ -235,11 +223,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Id = 1541390,
                             Username = @"Toukai",
-                            Country = new Country
-                            {
-                                FullName = @"Canada",
-                                FlagName = @"CA",
-                            },
+                            CountryCode = CountryCode.CA,
                         },
                         Mods = new[]
                         {
@@ -259,11 +243,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Id = 7151382,
                             Username = @"Mayuri Hana",
-                            Country = new Country
-                            {
-                                FullName = @"Thailand",
-                                FlagName = @"TH",
-                            },
+                            CountryCode = CountryCode.TH,
                         },
                         Rank = ScoreRank.D,
                         PP = 160,
@@ -274,15 +254,26 @@ namespace osu.Game.Tests.Visual.Online
                 }
             };
 
+            const int initial_great_count = 2000;
+            const int initial_tick_count = 100;
+
+            int greatCount = initial_great_count;
+            int tickCount = initial_tick_count;
+
             foreach (var s in scores.Scores)
             {
                 s.Statistics = new Dictionary<HitResult, int>
                 {
-                    { HitResult.Great, RNG.Next(2000) },
-                    { HitResult.Ok, RNG.Next(2000) },
-                    { HitResult.Meh, RNG.Next(2000) },
-                    { HitResult.Miss, RNG.Next(2000) }
+                    { HitResult.Great, greatCount },
+                    { HitResult.LargeTickHit, tickCount },
+                    { HitResult.Ok, RNG.Next(100) },
+                    { HitResult.Meh, RNG.Next(100) },
+                    { HitResult.Miss, initial_great_count - greatCount },
+                    { HitResult.LargeTickMiss, initial_tick_count - tickCount },
                 };
+
+                greatCount -= 100;
+                tickCount -= RNG.Next(1, 5);
             }
 
             return scores;
@@ -298,11 +289,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Id = 7151382,
                     Username = @"Mayuri Hana",
-                    Country = new Country
-                    {
-                        FullName = @"Thailand",
-                        FlagName = @"TH",
-                    },
+                    CountryCode = CountryCode.TH,
                 },
                 Rank = ScoreRank.D,
                 PP = 160,

@@ -96,6 +96,9 @@ namespace osu.Android
                 case AndroidMouseHandler mh:
                     return new AndroidMouseSettings(mh);
 
+                case AndroidJoystickHandler jh:
+                    return new AndroidJoystickSettings(jh);
+
                 default:
                     return base.CreateSettingsSubsectionFor(handler);
             }

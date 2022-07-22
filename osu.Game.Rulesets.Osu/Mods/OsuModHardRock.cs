@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHardRock : ModHardRock, IApplicableToHitObject
     {
-        public override double ScoreMultiplier => 1.06;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModMirror)).ToArray();
 
