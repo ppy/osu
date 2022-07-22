@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select.Details
             }
         }
 
-        public AdvancedStats()
+        public AdvancedStats(bool updateWithModSelection = true)
         {
             Child = new FillFlowContainer
             {
@@ -65,11 +65,11 @@ namespace osu.Game.Screens.Select.Details
                 AutoSizeAxes = Axes.Y,
                 Children = new[]
                 {
-                    FirstValue = new StatisticRow(), // circle size/key amount
-                    HpDrain = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsDrain },
-                    Accuracy = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAccuracy },
-                    ApproachRate = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAr },
-                    starDifficulty = new StatisticRow(10, true) { Title = BeatmapsetsStrings.ShowStatsStars },
+                    FirstValue = new StatisticRow(updateWithModSelection), // circle size/key amount
+                    HpDrain = new StatisticRow(updateWithModSelection) { Title = BeatmapsetsStrings.ShowStatsDrain },
+                    Accuracy = new StatisticRow(updateWithModSelection) { Title = BeatmapsetsStrings.ShowStatsAccuracy },
+                    ApproachRate = new StatisticRow(updateWithModSelection) { Title = BeatmapsetsStrings.ShowStatsAr },
+                    starDifficulty = new StatisticRow(updateWithModSelection, 10, true) { Title = BeatmapsetsStrings.ShowStatsStars },
                 },
             };
         }
@@ -183,6 +183,7 @@ namespace osu.Game.Screens.Select.Details
             private readonly OsuSpriteText name, valueText;
             private readonly Bar bar;
             public readonly Bar ModBar;
+            private readonly bool showModdedValue;
 
             [Resolved]
             private OsuColour colours { get; set; }
@@ -202,6 +203,9 @@ namespace osu.Game.Screens.Select.Details
                 {
                     if (value == this.value)
                         return;
+
+                    if (!showModdedValue)
+                        value.adjustedValue = null;
 
                     this.value = value;
 
@@ -225,13 +229,14 @@ namespace osu.Game.Screens.Select.Details
                 set => bar.AccentColour = value;
             }
 
-            public StatisticRow(float maxValue = 10, bool forceDecimalPlaces = false)
+            public StatisticRow(bool showModdedValue, float maxValue = 10, bool forceDecimalPlaces = false)
             {
                 this.maxValue = maxValue;
                 this.forceDecimalPlaces = forceDecimalPlaces;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
                 Padding = new MarginPadding { Vertical = 2.5f };
+                this.showModdedValue = showModdedValue;
 
                 Children = new Drawable[]
                 {
