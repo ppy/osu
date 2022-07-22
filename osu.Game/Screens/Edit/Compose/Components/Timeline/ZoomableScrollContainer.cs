@@ -157,7 +157,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void setZoomTarget(float newZoom, float? focusPoint = null)
         {
             zoomTarget = Math.Clamp(newZoom, MinZoom, MaxZoom);
-            transformZoomTo(zoomTarget, focusPoint ?? DrawWidth / 2, ZoomDuration, ZoomEasing);
+            focusPoint ??= zoomedContent.ToLocalSpace(ToScreenSpace(new Vector2(DrawWidth / 2, 0))).X;
+
+            transformZoomTo(zoomTarget, focusPoint.Value, ZoomDuration, ZoomEasing);
 
             OnZoomChanged();
         }
