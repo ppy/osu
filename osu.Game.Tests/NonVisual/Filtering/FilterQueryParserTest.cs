@@ -120,35 +120,54 @@ namespace osu.Game.Tests.NonVisual.Filtering
 
         private static readonly object[] length_query_examples =
         {
-            new object[] { "6ms", TimeSpan.FromMilliseconds(6), TimeSpan.FromMilliseconds(1) },
-            new object[] { "23s", TimeSpan.FromSeconds(23), TimeSpan.FromSeconds(1) },
-            new object[] { "9m", TimeSpan.FromMinutes(9), TimeSpan.FromMinutes(1) },
-            new object[] { "0.25h", TimeSpan.FromHours(0.25), TimeSpan.FromHours(1) },
-            new object[] { "70", TimeSpan.FromSeconds(70), TimeSpan.FromSeconds(1) },
-            new object[] { "7m27s", TimeSpan.FromSeconds(447), TimeSpan.FromSeconds(1) },
-            new object[] { "7:27", TimeSpan.FromSeconds(447), TimeSpan.FromSeconds(1) },
-            new object[] { "1h2m3s", TimeSpan.FromSeconds(3723), TimeSpan.FromSeconds(1) },
-            new object[] { "1h2m3.5s", TimeSpan.FromSeconds(3723.5), TimeSpan.FromSeconds(1) },
-            new object[] { "1:2:3", TimeSpan.FromSeconds(3723), TimeSpan.FromSeconds(1) },
-            new object[] { "1:02:03", TimeSpan.FromSeconds(3723), TimeSpan.FromSeconds(1) },
-            new object[] { "6", TimeSpan.FromSeconds(6), TimeSpan.FromSeconds(1) },
-            new object[] { "6.5", TimeSpan.FromSeconds(6.5), TimeSpan.FromSeconds(1) },
-            new object[] { "6.5s", TimeSpan.FromSeconds(6.5), TimeSpan.FromSeconds(1) },
-            new object[] { "6.5m", TimeSpan.FromMinutes(6.5), TimeSpan.FromMinutes(1) },
-            new object[] { "6h5m", TimeSpan.FromMinutes(365), TimeSpan.FromMinutes(1) },
+            new object[] { "23s", TimeSpan.FromSeconds(23), TimeSpan.FromSeconds(1), true },
+            new object[] { "9m", TimeSpan.FromMinutes(9), TimeSpan.FromMinutes(1), true },
+            new object[] { "0.25h", TimeSpan.FromHours(0.25), TimeSpan.FromHours(1), true },
+            new object[] { "70", TimeSpan.FromSeconds(70), TimeSpan.FromSeconds(1), true },
+            new object[] { "7m27s", TimeSpan.FromSeconds(447), TimeSpan.FromSeconds(1), true },
+            new object[] { "7:27", TimeSpan.FromSeconds(447), TimeSpan.FromSeconds(1), true },
+            new object[] { "1h2m3s", TimeSpan.FromSeconds(3723), TimeSpan.FromSeconds(1), true },
+            new object[] { "1h2m3.5s", TimeSpan.FromSeconds(3723.5), TimeSpan.FromSeconds(1), true },
+            new object[] { "1:2:3", TimeSpan.FromSeconds(3723), TimeSpan.FromSeconds(1), true },
+            new object[] { "1:02:03", TimeSpan.FromSeconds(3723), TimeSpan.FromSeconds(1), true },
+            new object[] { "6", TimeSpan.FromSeconds(6), TimeSpan.FromSeconds(1), true },
+            new object[] { "6.5", TimeSpan.FromSeconds(6.5), TimeSpan.FromSeconds(1), true },
+            new object[] { "6.5s", TimeSpan.FromSeconds(6.5), TimeSpan.FromSeconds(1), true },
+            new object[] { "6.5m", TimeSpan.FromMinutes(6.5), TimeSpan.FromMinutes(1), true },
+            new object[] { "6h5m", TimeSpan.FromMinutes(365), TimeSpan.FromMinutes(1), true },
+            new object[] { "65m", TimeSpan.FromMinutes(65), TimeSpan.FromMinutes(1), true },
+            new object[] { "90s", TimeSpan.FromSeconds(90), TimeSpan.FromSeconds(1), true },
+            new object[] { "80m20s", TimeSpan.FromSeconds(4820), TimeSpan.FromSeconds(1), true },
+            new object[] { "7.5m27s", new TimeSpan(), new TimeSpan(), false },
+            new object[] { "7m27", new TimeSpan(), new TimeSpan(), false },
+            new object[] { "7m7m7m", new TimeSpan(), new TimeSpan(), false },
+            new object[] { "7m70s", new TimeSpan(), new TimeSpan(), false },
+            new object[] { "5s6m", new TimeSpan(), new TimeSpan(), false },
+            new object[] { "0:", new TimeSpan(), new TimeSpan(), false },
+            new object[] { ":0", new TimeSpan(), new TimeSpan(), false },
+            new object[] { "0:3:", new TimeSpan(), new TimeSpan(), false },
+            new object[] { "3:15.5", new TimeSpan(), new TimeSpan(), false },
         };
 
         [Test]
         [TestCaseSource(nameof(length_query_examples))]
-        public void TestApplyLengthQueries(string lengthQuery, TimeSpan expectedLength, TimeSpan scale)
+        public void TestApplyLengthQueries(string lengthQuery, TimeSpan expectedLength, TimeSpan scale, bool isValid)
         {
             string query = $"length={lengthQuery} time";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("time", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(expectedLength.TotalMilliseconds - scale.TotalMilliseconds / 2.0, filterCriteria.Length.Min);
-            Assert.AreEqual(expectedLength.TotalMilliseconds + scale.TotalMilliseconds / 2.0, filterCriteria.Length.Max);
+            if (isValid)
+            {
+                Assert.AreEqual("time", filterCriteria.SearchText.Trim());
+                Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
+                Assert.AreEqual(expectedLength.TotalMilliseconds - scale.TotalMilliseconds / 2.0, filterCriteria.Length.Min);
+                Assert.AreEqual(expectedLength.TotalMilliseconds + scale.TotalMilliseconds / 2.0, filterCriteria.Length.Max);
+            }
+            else
+            {
+                Assert.AreEqual(false, filterCriteria.Length.HasFilter);
+            }
+            
         }
 
         [Test]
