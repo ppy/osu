@@ -9,6 +9,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -22,6 +23,9 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         protected override bool UseFreshStoragePerRun => true;
 
+        private Container<Drawable> content = null!;
+        protected override Container<Drawable> Content => content;
+
         private RulesetStore rulesets = null!;
 
         [Cached]
@@ -32,6 +36,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(Realm);
+
+            base.Content.Add(content = new PopoverContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding(30),
+            });
         }
 
         [SetUpSteps]
@@ -57,15 +67,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestBasicOperation()
         {
             AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
-            AddStep("create content", () => Child = new Container
+            AddStep("create content", () => Child = new ModPresetColumn
             {
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding(30),
-                Child = new ModPresetColumn
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
             });
             AddUntilStep("3 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 3);
 
@@ -112,15 +117,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestSoftDeleteSupport()
         {
             AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
-            AddStep("create content", () => Child = new Container
+            AddStep("create content", () => Child = new ModPresetColumn
             {
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding(30),
-                Child = new ModPresetColumn
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
             });
             AddUntilStep("3 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 3);
 
