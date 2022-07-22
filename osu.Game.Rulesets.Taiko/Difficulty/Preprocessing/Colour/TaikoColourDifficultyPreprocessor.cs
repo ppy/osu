@@ -33,9 +33,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                 // The outermost loop is kept a ForEach loop since it doesn't need index information, and we want to
                 // keep i and j for ColourEncoding's and MonoEncoding's index respectively, to keep it in line with
                 // documentation.
-                //
-                // While parent and index should be part of the encoding process, they are assigned here instead due to
-                // this being a simple one location to assign them.
                 for (int i = 0; i < coupledEncoding.Payload.Count; ++i)
                 {
                     ColourEncoding colourEncoding = coupledEncoding.Payload[i];
