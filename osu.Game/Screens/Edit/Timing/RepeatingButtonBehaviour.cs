@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -23,6 +25,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         private Sample sample;
 
+        public Action RepeatBegan;
+        public Action RepeatEnded;
+
         /// <summary>
         /// An additive modifier for the frequency of the sample played on next actuation.
         /// This can be adjusted during the button's <see cref="Drawable.OnClick"/> event to affect the repeat sample playback of that click.
@@ -44,6 +49,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
+            RepeatBegan?.Invoke();
             beginRepeat();
             return true;
         }
@@ -51,6 +57,7 @@ namespace osu.Game.Screens.Edit.Timing
         protected override void OnMouseUp(MouseUpEvent e)
         {
             adjustDelegate?.Cancel();
+            RepeatEnded?.Invoke();
             base.OnMouseUp(e);
         }
 

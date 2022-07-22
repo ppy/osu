@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mods
         public override bool ValidForMultiplayer => false;
         public override bool ValidForMultiplayerAsFreeMod => false;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp), typeof(ModAutoplay) };
 
         [SettingSource("Initial rate", "The starting speed of the track")]
         public BindableNumber<double> InitialRate { get; } = new BindableDouble
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mods
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
         private const double rate_change_on_miss = 0.95d;
 
-        private IAdjustableAudioComponent track;
+        private IAdjustableAudioComponent? track;
         private double targetRate = 1d;
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            drawable.OnNewResult += (o, result) =>
+            drawable.OnNewResult += (_, result) =>
             {
                 if (ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;
@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Mods
 
                 updateTargetRate();
             };
-            drawable.OnRevertResult += (o, result) =>
+            drawable.OnRevertResult += (_, result) =>
             {
                 if (!ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;

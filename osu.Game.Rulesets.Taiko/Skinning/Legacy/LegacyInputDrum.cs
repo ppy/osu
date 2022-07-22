@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -18,13 +20,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     /// </summary>
     internal class LegacyInputDrum : Container
     {
+        private Container content;
         private LegacyHalfDrum left;
         private LegacyHalfDrum right;
-        private Container content;
 
         public LegacyInputDrum()
         {
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -41,6 +43,20 @@ namespace osu.Game.Screens.Play
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
+            {
+                if (GameplayClockContainer is MasterGameplayClockContainer master)
+                {
+                    if (master.UserPlaybackRate.Value > 1 && waiting.NewValue)
+                        master.UserPlaybackRate.Value = 1;
+                }
+            }, true);
         }
 
         protected override void StartGameplay()

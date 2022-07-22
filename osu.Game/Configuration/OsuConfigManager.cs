@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,6 +20,7 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -45,6 +48,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.SongSelectSortingMode, SortMode.Title);
 
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
+            SetDefault(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential);
 
             SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
 
@@ -163,6 +167,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
+
+            SetDefault(OsuSetting.LastProcessedMetadataId, -1);
         }
 
         public IDictionary<OsuSetting, string> GetLoggableState() =>
@@ -218,6 +224,12 @@ namespace osu.Game.Configuration
 
             return new TrackedSettings
             {
+                new TrackedSetting<bool>(OsuSetting.ShowFpsDisplay, state => new SettingDescription(
+                    rawValue: state,
+                    name: GlobalActionKeyBindingStrings.ToggleFPSCounter,
+                    value: state ? CommonStrings.Enabled.ToLower() : CommonStrings.Disabled.ToLower(),
+                    shortcut: LookupKeyBindings(GlobalAction.ToggleFPSDisplay))
+                ),
                 new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, disabledState => new SettingDescription(
                     rawValue: !disabledState,
                     name: GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons,
@@ -322,6 +334,7 @@ namespace osu.Game.Configuration
         SongSelectGroupingMode,
         SongSelectSortingMode,
         RandomSelectAlgorithm,
+        ModSelectHotkeyStyle,
         ShowFpsDisplay,
         ChatDisplayHeight,
         BeatmapListingCardSize,
@@ -358,5 +371,6 @@ namespace osu.Game.Configuration
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
+        LastProcessedMetadataId
     }
 }

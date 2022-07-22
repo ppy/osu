@@ -1,13 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.Break;
@@ -29,19 +31,20 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override void AddCheckSteps()
         {
+            // It doesn't matter which ruleset is used - this beatmap is only used for reference.
+            var beatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+
             AddUntilStep("score above zero", () => Player.ScoreProcessor.TotalScore.Value > 0);
             AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 2));
-            seekToBreak(0);
+
+            seekTo(beatmap.Beatmap.Breaks[0].StartTime);
             AddAssert("keys not counting", () => !Player.HUDOverlay.KeyCounter.IsCounting);
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
+
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
             AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
 
-            seekToBreak(0);
-            seekToBreak(1);
-
-            AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
-
+            seekTo(beatmap.Beatmap.HitObjects[^1].GetEndTime());
             AddUntilStep("results displayed", () => getResultsScreen()?.IsLoaded == true);
 
             AddAssert("score has combo", () => getResultsScreen().Score.Combo > 100);
@@ -56,12 +59,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             ResultsScreen getResultsScreen() => Stack.CurrentScreen as ResultsScreen;
         }
 
-        private void seekToBreak(int breakIndex)
+        private void seekTo(double time)
         {
-            AddStep($"seek to break {breakIndex}", () => Player.GameplayClockContainer.Seek(destBreak().StartTime));
-            AddUntilStep("wait for seek to complete", () => Player.DrawableRuleset.FrameStableClock.CurrentTime >= destBreak().StartTime);
+            AddStep($"seek to {time}", () => Player.GameplayClockContainer.Seek(time));
 
-            BreakPeriod destBreak() => Beatmap.Value.Beatmap.Breaks.ElementAt(breakIndex);
+            // Prevent test timeouts by seeking in 10 second increments.
+            for (double t = 0; t < time; t += 10000)
+            {
+                double expectedTime = t;
+                AddUntilStep($"current time >= {t}", () => Player.DrawableRuleset.FrameStableClock.CurrentTime >= expectedTime);
+            }
+
+            AddUntilStep("wait for seek to complete", () => Player.DrawableRuleset.FrameStableClock.CurrentTime >= time);
         }
     }
 }

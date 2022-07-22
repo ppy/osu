@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public class TestSceneComposeScreen : EditorClockTestScene
     {
-        private EditorBeatmap editorBeatmap;
+        private EditorBeatmap editorBeatmap = null!;
 
         [Cached]
         private EditorClipboard clipboard = new EditorClipboard();

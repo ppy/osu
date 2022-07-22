@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
@@ -154,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.CollectionChanged += (_, __) => UpdateNestedSamples();
+            SamplesBindable.CollectionChanged += (_, _) => UpdateNestedSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 

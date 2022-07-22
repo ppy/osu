@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -225,7 +227,7 @@ namespace osu.Game.Collections
             {
                 background.FlashColour(Color4.White, 150);
 
-                if (collection.Beatmaps.Count == 0)
+                if (collection.BeatmapHashes.Count == 0)
                     deleteCollection();
                 else
                     dialogOverlay?.Push(new DeleteCollectionDialog(collection, deleteCollection));

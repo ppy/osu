@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,7 +62,8 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 skinDropdown = new SkinSettingsDropdown
                 {
-                    LabelText = SkinSettingsStrings.CurrentSkin
+                    LabelText = SkinSettingsStrings.CurrentSkin,
+                    Keywords = new[] { @"skins" }
                 },
                 new SettingsButton
                 {
@@ -80,12 +83,12 @@ namespace osu.Game.Overlays.Settings.Sections
 
             skinDropdown.Current = dropdownBindable;
 
-            realmSubscription = realm.RegisterForNotifications(r => realm.Realm.All<SkinInfo>()
+            realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
                                                                          .Where(s => !s.DeletePending)
                                                                          .OrderByDescending(s => s.Protected) // protected skins should be at the top.
                                                                          .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase), skinsChanged);
 
-            configBindable.BindValueChanged(id => Scheduler.AddOnce(updateSelectedSkinFromConfig));
+            configBindable.BindValueChanged(_ => Scheduler.AddOnce(updateSelectedSkinFromConfig));
 
             dropdownBindable.BindValueChanged(dropdownSelectionChanged);
         }

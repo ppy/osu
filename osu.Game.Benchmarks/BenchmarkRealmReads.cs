@@ -15,9 +15,9 @@ namespace osu.Game.Benchmarks
 {
     public class BenchmarkRealmReads : BenchmarkTest
     {
-        private TemporaryNativeStorage storage;
-        private RealmAccess realm;
-        private UpdateThread updateThread;
+        private TemporaryNativeStorage storage = null!;
+        private RealmAccess realm = null!;
+        private UpdateThread updateThread = null!;
 
         [Params(1, 100, 1000)]
         public int ReadsPerFetch { get; set; }
@@ -29,7 +29,7 @@ namespace osu.Game.Benchmarks
 
             realm = new RealmAccess(storage, OsuGameBase.CLIENT_DATABASE_FILENAME);
 
-            realm.Run(r =>
+            realm.Run(_ =>
             {
                 realm.Write(c => c.Add(TestResources.CreateTestBeatmapSetInfo(rulesets: new[] { new OsuRuleset().RulesetInfo })));
             });
@@ -74,7 +74,7 @@ namespace osu.Game.Benchmarks
                 }
             });
 
-            done.Wait();
+            done.Wait(60000);
         }
 
         [Benchmark]
@@ -113,7 +113,7 @@ namespace osu.Game.Benchmarks
                 }
             });
 
-            done.Wait();
+            done.Wait(60000);
         }
 
         [Benchmark]
@@ -133,9 +133,9 @@ namespace osu.Game.Benchmarks
         [GlobalCleanup]
         public void Cleanup()
         {
-            realm?.Dispose();
-            storage?.Dispose();
-            updateThread?.Exit();
+            realm.Dispose();
+            storage.Dispose();
+            updateThread.Exit();
         }
     }
 }

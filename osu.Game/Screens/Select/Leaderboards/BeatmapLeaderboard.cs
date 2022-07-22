@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -109,7 +112,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                subscribeToLocalScores(cancellationToken);
+                subscribeToLocalScores(fetchBeatmapInfo, cancellationToken);
                 return null;
             }
 
@@ -149,7 +152,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             req.Success += r =>
             {
-                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), cancellationToken)
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), cancellationToken)
                             .ContinueWith(task => Schedule(() =>
                             {
                                 if (cancellationToken.IsCancellationRequested)
@@ -172,13 +175,12 @@ namespace osu.Game.Screens.Select.Leaderboards
             Action = () => ScoreSelected?.Invoke(model)
         };
 
-        private void subscribeToLocalScores(CancellationToken cancellationToken)
+        private void subscribeToLocalScores(BeatmapInfo beatmapInfo, CancellationToken cancellationToken)
         {
+            Debug.Assert(beatmapInfo != null);
+
             scoreSubscription?.Dispose();
             scoreSubscription = null;
-
-            if (beatmapInfo == null)
-                return;
 
             scoreSubscription = realm.RegisterForNotifications(r =>
                 r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"

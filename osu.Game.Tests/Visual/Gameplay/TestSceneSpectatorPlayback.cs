@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -165,11 +167,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("start failing sends", () =>
             {
                 spectatorClient.ShouldFailSendingFrames = true;
-                framesReceivedSoFar = replay.Frames.Count;
                 frameSendAttemptsSoFar = spectatorClient.FrameSendAttempts;
             });
 
-            AddUntilStep("wait for send attempts", () => spectatorClient.FrameSendAttempts > frameSendAttemptsSoFar + 5);
+            AddUntilStep("wait for next send attempt", () =>
+            {
+                framesReceivedSoFar = replay.Frames.Count;
+                return spectatorClient.FrameSendAttempts > frameSendAttemptsSoFar + 1;
+            });
+
+            AddUntilStep("wait for more send attempts", () => spectatorClient.FrameSendAttempts > frameSendAttemptsSoFar + 10);
             AddAssert("frames did not increase", () => framesReceivedSoFar == replay.Frames.Count);
 
             AddStep("stop failing sends", () => spectatorClient.ShouldFailSendingFrames = false);

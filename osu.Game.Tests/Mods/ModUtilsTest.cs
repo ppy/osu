@@ -162,19 +162,19 @@ namespace osu.Game.Tests.Mods
             new object[]
             {
                 new Mod[] { new OsuModHidden(), new InvalidMultiplayerMod() },
-                null
+                Array.Empty<Type>()
             },
             // invalid free mod is valid for local.
             new object[]
             {
                 new Mod[] { new OsuModHidden(), new InvalidMultiplayerFreeMod() },
-                null
+                Array.Empty<Type>()
             },
             // valid pair.
             new object[]
             {
                 new Mod[] { new OsuModHidden(), new OsuModHardRock() },
-                null
+                Array.Empty<Type>()
             },
         };
 
@@ -214,13 +214,13 @@ namespace osu.Game.Tests.Mods
             new object[]
             {
                 new Mod[] { new OsuModHidden(), new InvalidMultiplayerFreeMod() },
-                null
+                Array.Empty<Type>()
             },
             // valid pair.
             new object[]
             {
                 new Mod[] { new OsuModHidden(), new OsuModHardRock() },
-                null
+                Array.Empty<Type>()
             },
         };
 
@@ -254,19 +254,19 @@ namespace osu.Game.Tests.Mods
             new object[]
             {
                 new Mod[] { new OsuModHidden(), new OsuModApproachDifferent() },
-                null,
+                Array.Empty<Type>(),
             },
             // incompatible pair with derived class is valid for free mods.
             new object[]
             {
                 new Mod[] { new OsuModDeflate(), new OsuModSpinIn() },
-                null,
+                Array.Empty<Type>(),
             },
             // valid pair.
             new object[]
             {
                 new Mod[] { new OsuModHidden(), new OsuModHardRock() },
-                null
+                Array.Empty<Type>()
             },
         };
 
@@ -275,12 +275,12 @@ namespace osu.Game.Tests.Mods
         {
             bool isValid = ModUtils.CheckValidForGameplay(inputMods, out var invalid);
 
-            Assert.That(isValid, Is.EqualTo(expectedInvalid == null));
+            Assert.That(isValid, Is.EqualTo(expectedInvalid.Length == 0));
 
             if (isValid)
                 Assert.IsNull(invalid);
             else
-                Assert.That(invalid.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
+                Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
 
         [TestCaseSource(nameof(invalid_multiplayer_mod_test_scenarios))]
@@ -288,12 +288,12 @@ namespace osu.Game.Tests.Mods
         {
             bool isValid = ModUtils.CheckValidRequiredModsForMultiplayer(inputMods, out var invalid);
 
-            Assert.That(isValid, Is.EqualTo(expectedInvalid == null));
+            Assert.That(isValid, Is.EqualTo(expectedInvalid.Length == 0));
 
             if (isValid)
                 Assert.IsNull(invalid);
             else
-                Assert.That(invalid.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
+                Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
 
         [TestCaseSource(nameof(invalid_free_mod_test_scenarios))]
@@ -301,12 +301,12 @@ namespace osu.Game.Tests.Mods
         {
             bool isValid = ModUtils.CheckValidFreeModsForMultiplayer(inputMods, out var invalid);
 
-            Assert.That(isValid, Is.EqualTo(expectedInvalid == null));
+            Assert.That(isValid, Is.EqualTo(expectedInvalid.Length == 0));
 
             if (isValid)
                 Assert.IsNull(invalid);
             else
-                Assert.That(invalid.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
+                Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
 
         public abstract class CustomMod1 : Mod, IModCompatibilitySpecification

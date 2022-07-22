@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Runtime.Versioning;
@@ -9,8 +11,10 @@ using osu.Framework;
 using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Tournament;
+using SDL2;
 using Squirrel;
 
 namespace osu.Desktop
@@ -26,7 +30,27 @@ namespace osu.Desktop
         {
             // run Squirrel first, as the app may exit after these run
             if (OperatingSystem.IsWindows())
+            {
+                var windowsVersion = Environment.OSVersion.Version;
+
+                // While .NET 6 still supports Windows 7 and above, we are limited by realm currently, as they choose to only support 8.1 and higher.
+                // See https://www.mongodb.com/docs/realm/sdk/dotnet/#supported-platforms
+                if (windowsVersion.Major < 6 || (windowsVersion.Major == 6 && windowsVersion.Minor <= 2))
+                {
+                    // If users running in compatibility mode becomes more of a common thing, we may want to provide better guidance or even consider
+                    // disabling it ourselves.
+                    // We could also better detect compatibility mode if required:
+                    // https://stackoverflow.com/questions/10744651/how-i-can-detect-if-my-application-is-running-under-compatibility-mode#comment58183249_10744730
+                    SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
+                        "Your operating system is too old to run osu!",
+                        "This version of osu! requires at least Windows 8.1 to run.\n"
+                        + "Please upgrade your operating system or consider using an older version of osu!.\n\n"
+                        + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!", IntPtr.Zero);
+                    return;
+                }
+
                 setupSquirrel();
+            }
 
             // Back up the cwd before DesktopGameHost changes it
             string cwd = Environment.CurrentDirectory;
@@ -63,19 +87,8 @@ namespace osu.Desktop
             {
                 if (!host.IsPrimaryInstance)
                 {
-                    if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
-                    {
-                        var importer = new ArchiveImportIPCChannel(host);
-
-                        foreach (string file in args)
-                        {
-                            Console.WriteLine(@"Importing {0}", file);
-                            if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
-                                throw new TimeoutException(@"IPC took too long to send");
-                        }
-
+                    if (trySendIPCMessage(host, cwd, args))
                         return;
-                    }
 
                     // we want to allow multiple instances to be started when in debug.
                     if (!DebugUtils.IsDebugBuild)
@@ -106,18 +119,49 @@ namespace osu.Desktop
             }
         }
 
+        private static bool trySendIPCMessage(IIpcHost host, string cwd, string[] args)
+        {
+            if (args.Length == 1 && args[0].StartsWith(OsuGameBase.OSU_PROTOCOL, StringComparison.Ordinal))
+            {
+                var osuSchemeLinkHandler = new OsuSchemeLinkIPCChannel(host);
+                if (!osuSchemeLinkHandler.HandleLinkAsync(args[0]).Wait(3000))
+                    throw new IPCTimeoutException(osuSchemeLinkHandler.GetType());
+
+                return true;
+            }
+
+            if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
+            {
+                var importer = new ArchiveImportIPCChannel(host);
+
+                foreach (string file in args)
+                {
+                    Console.WriteLine(@"Importing {0}", file);
+                    if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
+                        throw new IPCTimeoutException(importer.GetType());
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         [SupportedOSPlatform("windows")]
         private static void setupSquirrel()
         {
-            SquirrelAwareApp.HandleEvents(onInitialInstall: (version, tools) =>
+            SquirrelAwareApp.HandleEvents(onInitialInstall: (_, tools) =>
             {
                 tools.CreateShortcutForThisExe();
                 tools.CreateUninstallerRegistryEntry();
-            }, onAppUninstall: (version, tools) =>
+            }, onAppUpdate: (_, tools) =>
+            {
+                tools.CreateUninstallerRegistryEntry();
+            }, onAppUninstall: (_, tools) =>
             {
                 tools.RemoveShortcutForThisExe();
                 tools.RemoveUninstallerRegistryEntry();
-            }, onEveryRun: (version, tools, firstRun) =>
+            }, onEveryRun: (_, _, _) =>
             {
                 // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
                 // causes the right-click context menu to function incorrectly.

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -57,7 +59,7 @@ namespace osu.Game.Overlays.Rankings.Tables
              .Concat(GradeColumns.Select(grade => new GradeTableColumn(grade, Anchor.Centre, new Dimension(GridSizeMode.AutoSize))))
              .ToArray();
 
-        protected sealed override Country GetCountry(UserStatistics item) => item.User.Country;
+        protected sealed override CountryCode GetCountryCode(UserStatistics item) => item.User.CountryCode;
 
         protected sealed override Drawable CreateFlagContent(UserStatistics item)
         {

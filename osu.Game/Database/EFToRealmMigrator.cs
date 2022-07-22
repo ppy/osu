@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.IO;
 using System.Linq;
@@ -123,8 +121,29 @@ namespace osu.Game.Database
 
         private void beginMigration()
         {
+            const string backup_folder = "backups";
+
+            string backupSuffix = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+            // required for initial backup.
+            var realmBlockOperations = realm.BlockAllOperations("EF migration");
+
             Task.Factory.StartNew(() =>
             {
+                try
+                {
+                    realm.CreateBackup(Path.Combine(backup_folder, $"client.{backupSuffix}.realm"));
+                }
+                finally
+                {
+                    // Once the backup is created, we need to stop blocking operations so the migration can complete.
+                    realmBlockOperations.Dispose();
+                    // Clean up here so we don't accidentally dispose twice.
+                    realmBlockOperations = null;
+                }
+
+                efContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{backupSuffix}.db"));
+
                 using (var ef = efContextFactory.Get())
                 {
                     realm.Write(r =>
@@ -182,7 +201,6 @@ namespace osu.Game.Database
                                 true);
 
                             const string attachment_filename = "attach_me.zip";
-                            const string backup_folder = "backups";
 
                             var backupStorage = storage.GetStorageForDirectory(backup_folder);
 
@@ -208,6 +226,9 @@ namespace osu.Game.Database
                 // Regardless of success, since the game is going to continue with startup let's move the ef database out of the way.
                 // If we were to not do this, the migration would run another time the next time the user starts the game.
                 deletePreRealmData();
+
+                // If something went wrong and the disposal token wasn't invoked above, ensure it is here.
+                realmBlockOperations?.Dispose();
 
                 migrationCompleted.SetResult(true);
                 efContextFactory.SetMigrationCompletion();
@@ -422,7 +443,6 @@ namespace osu.Game.Database
                             TotalScore = score.TotalScore,
                             MaxCombo = score.MaxCombo,
                             Accuracy = score.Accuracy,
-                            HasReplay = ((IScoreInfo)score).HasReplay,
                             Date = score.Date,
                             PP = score.PP,
                             Rank = score.Rank,

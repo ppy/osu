@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,10 +15,12 @@ namespace osu.Game.Online.API
 {
     public class DummyAPIAccess : Component, IAPIProvider
     {
+        public const int DUMMY_USER_ID = 1001;
+
         public Bindable<APIUser> LocalUser { get; } = new Bindable<APIUser>(new APIUser
         {
             Username = @"Dummy",
-            Id = 1001,
+            Id = DUMMY_USER_ID,
         });
 
         public BindableList<APIUser> Friends { get; } = new BindableList<APIUser>();
