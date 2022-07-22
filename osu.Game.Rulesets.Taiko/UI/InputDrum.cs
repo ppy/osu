@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osuTK;
@@ -24,7 +23,6 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     internal class InputDrum : Container
     {
-        public float CentreSize = 0.7f;
         private const float middle_split = 0.025f;
 
         public InputDrum()
@@ -64,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Scale = new Vector2(0.9f),
                     Children = new[]
                     {
-                        new TaikoHalfDrum(false, CentreSize)
+                        new TaikoHalfDrum(false)
                         {
                             Name = "Left Half",
                             Anchor = Anchor.Centre,
@@ -75,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RimAction = TaikoAction.LeftRim,
                             CentreAction = TaikoAction.LeftCentre
                         },
-                        new TaikoHalfDrum(true, CentreSize)
+                        new TaikoHalfDrum(true)
                         {
                             Name = "Right Half",
                             Anchor = Anchor.Centre,
@@ -109,9 +107,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 private readonly Sprite rimHit;
                 private readonly Sprite centre;
                 private readonly Sprite centreHit;
-
-                [Resolved]
-                private DrumSampleTriggerSource sampleTriggerSource { get; set; }
 
                 public TaikoHalfDrum(bool flipped)
                 {
@@ -173,15 +168,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                     {
                         target = centreHit;
                         back = centre;
-
-                        sampleTriggerSource.Play(HitType.Centre);
                     }
                     else if (e.Action == RimAction)
                     {
                         target = rimHit;
                         back = rim;
-
-                        sampleTriggerSource.Play(HitType.Rim);
                     }
 
                     if (target != null)

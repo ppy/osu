@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,10 +26,10 @@ namespace osu.Game.Rulesets.Taiko.UI
         // The percent of the drum that extends past the bottom of the screen (set to 0.0f to show the full drum)
         private const float offscreen_percent = 0.35f;
 
-        private readonly InputDrum touchInputDrum;
+        private readonly TouchInputDrum touchInputDrum;
         private readonly Circle drumBackground;
 
-        private KeyBindingContainer<TaikoAction> keyBindingContainer;
+        private KeyBindingContainer<TaikoAction> keyBindingContainer = null!;
 
         // Which Taiko action was pressed by the last OnMouseDown event, so that the corresponding action can be released OnMouseUp even if the cursor position moved
         private TaikoAction mouseAction;
@@ -62,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             FillMode = FillMode.Fit,
                             Alpha = 0.9f,
                         },
-                        touchInputDrum = new InputDrum
+                        touchInputDrum = new TouchInputDrum
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -84,7 +85,10 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(TaikoInputManager taikoInputManager, OsuColour colours)
         {
-            keyBindingContainer = taikoInputManager?.KeyBindingContainer;
+            Debug.Assert(taikoInputManager?.KeyBindingContainer != null);
+
+            keyBindingContainer = taikoInputManager.KeyBindingContainer;
+
             drumBackground.Colour = colours.Gray0;
         }
 
