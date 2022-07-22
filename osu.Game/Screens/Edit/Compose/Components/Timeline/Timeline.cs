@@ -196,8 +196,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
                 MaxZoom = getZoomLevelForVisibleMilliseconds(500);
                 MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-
                 Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
+
+                // The above zoom causes an initial seek to the middle of the track (since the focus point is the centre of the timeline).
+                // This seek, because it happens as a result of an interaction with the timeline, causes the track to seek to the timeline's position, which we don't want.
+                // To get around this, we'll finish the transform immediately and give the last scroll position an initial value.
+                FinishTransforms(targetMember: nameof(Zoom));
+                lastScrollPosition = Current;
             }
 
             // The extrema of track time should be positioned at the centre of the container when scrolled to the start or end

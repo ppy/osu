@@ -204,7 +204,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 this.scrollOffset = scrollOffset;
             }
 
-            public override string TargetMember => nameof(currentZoom);
+            public override string TargetMember => nameof(Zoom);
 
             private float valueAt(double time)
             {
