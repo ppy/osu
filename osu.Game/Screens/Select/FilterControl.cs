@@ -115,42 +115,53 @@ namespace osu.Game.Screens.Select
                                         Origin = Anchor.BottomLeft,
                                         Anchor = Anchor.BottomLeft,
                                     },
-                                    new FillFlowContainer
+                                    new GridContainer
                                     {
                                         Anchor = Anchor.BottomRight,
                                         Origin = Anchor.BottomRight,
-                                        Direction = FillDirection.Horizontal,
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
-                                        Children = new Drawable[]
+                                        ColumnDimensions = new[]
                                         {
-                                            new OsuTabControlCheckbox
+                                            new Dimension(GridSizeMode.AutoSize),
+                                            new Dimension(GridSizeMode.Absolute, OsuTabControl<SortMode>.HORIZONTAL_SPACING),
+                                            new Dimension(),
+                                            new Dimension(GridSizeMode.Absolute, OsuTabControl<SortMode>.HORIZONTAL_SPACING),
+                                            new Dimension(GridSizeMode.AutoSize),
+                                        },
+                                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                        Content = new[]
+                                        {
+                                            new[]
                                             {
-                                                Text = "Show converted",
-                                                Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
-                                                Anchor = Anchor.BottomRight,
-                                                Origin = Anchor.BottomRight,
-                                            },
-                                            sortTabs = new OsuTabControl<SortMode>
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                Width = 0.5f,
-                                                Height = 24,
-                                                AutoSort = true,
-                                                Anchor = Anchor.BottomRight,
-                                                Origin = Anchor.BottomRight,
-                                                AccentColour = colours.GreenLight,
-                                                Current = { BindTarget = sortMode }
-                                            },
-                                            new OsuSpriteText
-                                            {
-                                                Text = SortStrings.Default,
-                                                Font = OsuFont.GetFont(size: 14),
-                                                Margin = new MarginPadding(5),
-                                                Anchor = Anchor.BottomRight,
-                                                Origin = Anchor.BottomRight,
-                                            },
+                                                new OsuSpriteText
+                                                {
+                                                    Text = SortStrings.Default,
+                                                    Font = OsuFont.GetFont(size: 14),
+                                                    Margin = new MarginPadding(5),
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                },
+                                                Empty(),
+                                                sortTabs = new OsuTabControl<SortMode>
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Height = 24,
+                                                    AutoSort = true,
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                    AccentColour = colours.GreenLight,
+                                                    Current = { BindTarget = sortMode }
+                                                },
+                                                Empty(),
+                                                new OsuTabControlCheckbox
+                                                {
+                                                    Text = "Show converted",
+                                                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                },
+                                            }
                                         }
                                     },
                                 }
