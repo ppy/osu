@@ -12,8 +12,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osuTK;
@@ -27,13 +25,8 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         private const float middle_split = 0.025f;
 
-        [Cached]
-        private DrumSampleTriggerSource sampleTriggerSource;
-
-        public InputDrum(HitObjectContainer hitObjectContainer)
+        public InputDrum()
         {
-            sampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer);
-
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
         }
@@ -48,7 +41,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                 },
-                sampleTriggerSource
             };
         }
 
@@ -116,9 +108,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 private readonly Sprite centre;
                 private readonly Sprite centreHit;
 
-                [Resolved]
-                private DrumSampleTriggerSource sampleTriggerSource { get; set; }
-
                 public TaikoHalfDrum(bool flipped)
                 {
                     Masking = true;
@@ -179,15 +168,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                     {
                         target = centreHit;
                         back = centre;
-
-                        sampleTriggerSource.Play(HitType.Centre);
                     }
                     else if (e.Action == RimAction)
                     {
                         target = rimHit;
                         back = rim;
-
-                        sampleTriggerSource.Play(HitType.Rim);
                     }
 
                     if (target != null)
