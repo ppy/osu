@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModPanel : ModSelectOverlayPanel
+    public class ModPanel : ModSelectPanel
     {
         public Mod Mod => modState.Mod;
         public override BindableBool Active => modState.Active;
