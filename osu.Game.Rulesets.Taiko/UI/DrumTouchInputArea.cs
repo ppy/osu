@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -64,27 +65,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(TaikoAction.LeftRim, colours.YellowDark)
+                                leftRim = new QuarterCircle(TaikoAction.LeftRim, colours.Blue)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new QuarterCircle(TaikoAction.RightRim, colours.YellowDark)
+                                rightRim = new QuarterCircle(TaikoAction.RightRim, colours.Blue)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new QuarterCircle(TaikoAction.LeftCentre, colours.BlueDark)
+                                leftCentre = new QuarterCircle(TaikoAction.LeftCentre, colours.Pink)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(TaikoAction.RightCentre, colours.BlueDark)
+                                rightCentre = new QuarterCircle(TaikoAction.RightCentre, colours.Pink)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -205,7 +206,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             circle = new Circle
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = colour,
+                                Colour = colour.Multiply(1.4f).Darken(2.8f),
                                 Alpha = 0.8f,
                                 Scale = new Vector2(2),
                             },
@@ -225,7 +226,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
                 if (e.Action == handledAction)
-                    overlay.FadeTo(0.4f, 80, Easing.OutQuint);
+                    overlay.FadeTo(1f, 80, Easing.OutQuint);
                 return false;
             }
 
