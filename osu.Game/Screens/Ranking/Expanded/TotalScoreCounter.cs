@@ -93,11 +93,9 @@ namespace osu.Game.Screens.Ranking.Expanded
             const double tick_volume_start = 0.5f;
             const double tick_volume_end = 1.0f;
 
-            double tickDuration = RollingDuration;
-
             this.TransformBindableTo(tickPlaybackRate, tick_debounce_rate_start);
-            this.TransformBindableTo(tickPlaybackRate, tick_debounce_rate_end, tickDuration, Easing.OutSine);
-            sampleTick.VolumeTo(tick_volume_start).Then().VolumeTo(tick_volume_end, tickDuration, Easing.OutSine);
+            this.TransformBindableTo(tickPlaybackRate, tick_debounce_rate_end, RollingDuration, Easing.OutSine);
+            sampleTick.VolumeTo(tick_volume_start).Then().VolumeTo(tick_volume_end, RollingDuration, Easing.OutSine);
         }
     }
 }
