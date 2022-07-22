@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -60,6 +62,8 @@ namespace osu.Game.Screens.Ranking
         private readonly bool allowRetry;
         private readonly bool allowWatchingReplay;
 
+        private Sample popInSample;
+
         protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
             Score = score;
@@ -70,9 +74,11 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             FillFlowContainer buttons;
+
+            popInSample = audio.Samples.Get(@"UI/overlay-pop-in");
 
             InternalChild = new GridContainer
             {
@@ -244,6 +250,8 @@ namespace osu.Game.Screens.Ranking
             });
 
             bottomPanel.FadeTo(1, 250);
+
+            popInSample?.Play();
         }
 
         public override bool OnExiting(ScreenExitEvent e)
