@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyFollowCircle : TickFollowCircle
+    public class LegacyFollowCircle : FollowCircle
     {
         public LegacyFollowCircle(Drawable animationContent)
         {
@@ -30,6 +30,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // This means the actual tracking area for gameplay purposes is larger than the sprite (but skins may be accounting for this).
             this.ScaleTo(0.5f).ScaleTo(2f, Math.Min(180f, remainingTime), Easing.Out)
                 .FadeTo(0).FadeTo(1f, Math.Min(60f, remainingTime));
+        }
+
+        protected override void OnSliderRelease()
+        {
         }
 
         protected override void OnSliderEnd()

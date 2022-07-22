@@ -56,5 +56,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             this.ScaleTo(1, duration, Easing.OutQuint)
                 .FadeOut(duration / 2, Easing.OutQuint);
         }
+
+        protected override void OnSliderTick()
+        {
+            // TODO: Follow circle should bounce on each slider tick.
+
+            // TEMP DUMMY ANIMS
+            this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 1.1f)
+                .ScaleTo(DrawableSliderBall.FOLLOW_AREA, 175f);
+        }
+
+        protected override void OnSliderBreak()
+        {
+        }
     }
 }
