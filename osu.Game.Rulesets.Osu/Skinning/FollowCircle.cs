@@ -58,21 +58,45 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
         {
-            if (drawableObject is not DrawableSliderTail)
-                return;
-
             Debug.Assert(ParentObject != null);
 
-            // Use ParentObject instead of drawableObject because slider tail hit state update time
-            // is ~36ms before the actual slider end (aka slider tail leniency)
-            using (BeginAbsoluteSequence(ParentObject.HitStateUpdateTime))
+            switch (state)
             {
-                switch (state)
-                {
-                    case ArmedState.Hit:
-                        OnSliderEnd();
-                        break;
-                }
+                case ArmedState.Hit:
+                    switch (drawableObject)
+                    {
+                        case DrawableSliderTail:
+                            // Use ParentObject instead of drawableObject because slider tail's
+                            // HitStateUpdateTime is ~36ms before the actual slider end (aka slider
+                            // tail leniency)
+                            using (BeginAbsoluteSequence(ParentObject.HitStateUpdateTime))
+                                OnSliderEnd();
+                            break;
+
+                        case DrawableSliderTick:
+                        case DrawableSliderRepeat:
+                            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
+                                OnSliderTick();
+                            break;
+                    }
+
+                    break;
+
+                case ArmedState.Miss:
+                    switch (drawableObject)
+                    {
+                        case DrawableSliderTail:
+                        case DrawableSliderTick:
+                        case DrawableSliderRepeat:
+                            // Despite above comment, ok to use drawableObject.HitStateUpdateTime
+                            // here, since on stable, the break anim plays right when the tail is
+                            // missed, not when the slider ends
+                            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
+                                OnSliderBreak();
+                            break;
+                    }
+
+                    break;
             }
         }
 
@@ -92,5 +116,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected abstract void OnSliderRelease();
 
         protected abstract void OnSliderEnd();
+
+        protected abstract void OnSliderTick();
+
+        protected abstract void OnSliderBreak();
     }
 }
