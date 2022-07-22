@@ -96,9 +96,9 @@ namespace osu.Game.Screens.Ranking
 
         public readonly ScoreInfo Score;
 
-        private bool displayWithFlair;
+        public DrawableAudioMixer Mixer;
 
-        private Container content;
+        private bool displayWithFlair;
 
         private Container topLayerContainer;
         private Drawable topLayerBackground;
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Ranking
             // Adding a manual offset here allows the expanded version to take on an "acceptable" vertical centre when at 100% UI scale.
             const float vertical_fudge = 20;
 
-            InternalChild = content = new Container
+            InternalChild = Mixer = new DrawableAudioMixer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Ranking
                     break;
             }
 
-            content.ResizeTo(Size, RESIZE_DURATION, Easing.OutQuint);
+            Mixer.ResizeTo(Size, RESIZE_DURATION, Easing.OutQuint);
 
             bool topLayerExpanded = topLayerContainer.Y < 0;
 
