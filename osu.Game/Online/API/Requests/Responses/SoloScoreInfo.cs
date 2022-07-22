@@ -54,7 +54,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset? StartedAt { get; set; }
 
         [JsonProperty("ended_at")]
-        public DateTimeOffset? EndedAt { get; set; }
+        public DateTimeOffset EndedAt { get; set; }
 
         [JsonProperty("mods")]
         public APIMod[] Mods { get; set; } = Array.Empty<APIMod>();
@@ -82,6 +82,23 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("user")]
         public APIUser? User { get; set; }
 
+        [JsonProperty("beatmap")]
+        public APIBeatmap? Beatmap { get; set; }
+
+        [JsonProperty("beatmapset")]
+        public APIBeatmapSet? BeatmapSet
+        {
+            set
+            {
+                // in the deserialisation case we need to ferry this data across.
+                // the order of properties returned by the API guarantees that the beatmap is populated by this point.
+                if (!(Beatmap is APIBeatmap apiBeatmap))
+                    throw new InvalidOperationException("Beatmap set metadata arrived before beatmap metadata in response");
+
+                apiBeatmap.BeatmapSet = value;
+            }
+        }
+
         [JsonProperty("pp")]
         public double? PP { get; set; }
 
@@ -101,10 +118,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             var rulesetInstance = ruleset.CreateInstance();
 
-            var mods = Mods.Select(apiMod => rulesetInstance.CreateModFromAcronym(apiMod.Acronym)).Where(m => m != null).ToArray();
-
-            // all API scores provided by this class are considered to be legacy.
-            mods = mods.Append(rulesetInstance.CreateMod<ModClassic>()).ToArray();
+            var mods = Mods.Select(apiMod => apiMod.ToMod(rulesetInstance)).ToArray();
 
             var scoreInfo = ToScoreInfo(mods);
 
@@ -131,9 +145,8 @@ namespace osu.Game.Online.API.Requests.Responses
             MaxCombo = MaxCombo,
             Rank = Rank,
             Statistics = Statistics,
-            Date = EndedAt ?? DateTimeOffset.Now,
-            Hash = "online", // TODO: temporary?
-            HasReplay = HasReplay,
+            Date = EndedAt,
+            Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
             Mods = mods,
             PP = PP,
         };

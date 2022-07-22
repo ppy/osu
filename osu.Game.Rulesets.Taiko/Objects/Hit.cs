@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
 
@@ -14,18 +15,20 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class Hit : TaikoStrongableHitObject, IHasDisplayColour
     {
-        public readonly Bindable<HitType> TypeBindable = new Bindable<HitType>();
+        private HitObjectProperty<HitType> type;
 
-        public Bindable<Color4> DisplayColour { get; } = new Bindable<Color4>(COLOUR_CENTRE);
+        public Bindable<HitType> TypeBindable => type.Bindable;
 
         /// <summary>
         /// The <see cref="HitType"/> that actuates this <see cref="Hit"/>.
         /// </summary>
         public HitType Type
         {
-            get => TypeBindable.Value;
-            set => TypeBindable.Value = value;
+            get => type.Value;
+            set => type.Value = value;
         }
+
+        public Bindable<Color4> DisplayColour { get; } = new Bindable<Color4>(COLOUR_CENTRE);
 
         public static readonly Color4 COLOUR_CENTRE = Color4Extensions.FromHex(@"bb1177");
         public static readonly Color4 COLOUR_RIM = Color4Extensions.FromHex(@"2299bb");
