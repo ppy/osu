@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModDoubleTime : ModDoubleTime
     {
-        public override double ScoreMultiplier => 1.12;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
     }
 }

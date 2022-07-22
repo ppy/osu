@@ -23,6 +23,9 @@ namespace osu.Game.Screens.Select.Filter
         [Description("Date Added")]
         DateAdded,
 
+        [Description("Date Ranked")]
+        DateRanked,
+
         [Description("Last Played")]
         LastPlayed,
 

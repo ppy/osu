@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Select.Carousel
 
                     if (item is CarouselGroup group)
                     {
-                        foreach (var c in group.Children)
+                        foreach (var c in group.Items)
                             c.Filtered.ValueChanged -= onStateChange;
                     }
                 }
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (Item is CarouselGroup group)
             {
-                foreach (var c in group.Children)
+                foreach (var c in group.Items)
                     c.Filtered.ValueChanged += onStateChange;
             }
         }
