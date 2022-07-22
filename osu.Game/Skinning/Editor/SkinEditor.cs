@@ -406,7 +406,9 @@ namespace osu.Game.Skinning.Editor
         private class SkinEditorToast : Toast
         {
             public SkinEditorToast(LocalisableString value, string skinDisplayName)
-                : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName) { }
+                : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)
+            {
+            }
         }
     }
 }
