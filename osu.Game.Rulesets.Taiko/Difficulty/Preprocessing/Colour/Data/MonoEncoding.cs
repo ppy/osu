@@ -19,6 +19,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// </summary>
         public List<TaikoDifficultyHitObject> EncodedData { get; private set; } = new List<TaikoDifficultyHitObject>();
 
+        /// <summary>
+        /// The parent <see cref="ColourEncoding"/> that contains this <see cref="MonoEncoding"/>
+        /// </summary>
         public ColourEncoding? Parent;
 
         /// <summary>
