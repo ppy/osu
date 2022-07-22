@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int greatCountOnCircles = Math.Max(0, attributes.HitCircleCount - countOk - countMeh - countMiss);
             int okCountOnCircles = Math.Min(countOk, attributes.HitCircleCount) + 1; // Add one 100 to process SS scores.
             int mehCountOnCircles = Math.Min(countMeh, attributes.HitCircleCount);
-            int slidersHit = attributes.SliderCount - countMiss;
+            int slidersHit = Math.Max(0, attributes.SliderCount - countMiss);
 
             // Derivative of erf(x)
             double erfPrime(double x) => 2 / Math.Sqrt(Math.PI) * Math.Exp(-x * x);
