@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private QuarterCircle leftCentre = null!;
         private QuarterCircle rightCentre = null!;
+        private QuarterCircle leftRim = null!;
+        private QuarterCircle rightRim = null!;
 
         [BackgroundDependencyLoader]
         private void load(TaikoInputManager taikoInputManager, OsuColour colours)
@@ -62,13 +64,13 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new QuarterCircle(TaikoAction.LeftRim, colours.YellowDark)
+                                leftRim = new QuarterCircle(TaikoAction.LeftRim, colours.YellowDark)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                new QuarterCircle(TaikoAction.RightRim, colours.YellowDark)
+                                rightRim = new QuarterCircle(TaikoAction.RightRim, colours.YellowDark)
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -106,12 +108,18 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
+            if (validMouse(e))
+                return false;
+
             handleDown(e.Button, e.ScreenSpaceMousePosition);
             return true;
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
+            if (validMouse(e))
+                return;
+
             handleUp(e.Button);
             base.OnMouseUp(e);
         }
@@ -143,6 +151,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             keyBindingContainer.TriggerReleased(trackedActions[source]);
             trackedActions.Remove(source);
         }
+
+        private bool validMouse(MouseButtonEvent e) =>
+            !leftRim.Contains(e.ScreenSpaceMouseDownPosition)
+            && !rightRim.Contains(e.ScreenSpaceMouseDownPosition);
 
         private TaikoAction getTaikoActionFromInput(Vector2 inputPosition)
         {

@@ -50,6 +50,8 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
+            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
+            new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
             new KeyBinding(InputKey.D, TaikoAction.LeftRim),
             new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.J, TaikoAction.RightCentre),
