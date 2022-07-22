@@ -344,23 +344,6 @@ namespace osu.Game.Screens.Ranking
             private IEnumerable<ScorePanelTrackingContainer> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanelTrackingContainer>()
                                                                                                                        .OrderByDescending(GetLayoutPosition)
                                                                                                                        .ThenBy(s => s.Panel.Score.OnlineID);
-
-            protected override void Update()
-            {
-                foreach (ScorePanelTrackingContainer trackingContainer in FlowingChildren.OfType<ScorePanelTrackingContainer>())
-                {
-                    var panel = trackingContainer.Panel;
-
-                    if (panel.State != PanelState.Expanded) continue;
-
-                    var scrollContainer = Parent.Parent;
-                    float balance = scrollContainer.ToLocalSpace(panel.ToScreenSpace(panel.BoundingBox.Centre)).X / scrollContainer.RelativeToAbsoluteFactor.X;
-
-                    panel.Mixer.Balance.Value = Math.Clamp(-1 + balance * 2, -1, 1);
-                }
-
-                base.Update();
-            }
         }
 
         private class Scroll : OsuScrollContainer
