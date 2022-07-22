@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             var carouselBeatmapSet = (CarouselBeatmapSet)Item;
 
-            var visibleBeatmaps = carouselBeatmapSet.Children.Where(c => c.Visible).ToArray();
+            var visibleBeatmaps = carouselBeatmapSet.Items.Where(c => c.Visible).ToArray();
 
             // if we are already displaying all the correct beatmaps, only run animation updates.
             // note that the displayed beatmaps may change due to the applied filter.
