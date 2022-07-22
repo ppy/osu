@@ -71,6 +71,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         private float defaultTimelineZoom;
 
+        private bool trackWasLoaded;
+
         public Timeline(Drawable userContent)
         {
             this.userContent = userContent;
@@ -145,17 +147,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 waveform.Waveform = b.NewValue.Waveform;
                 track = b.NewValue.Track;
-
-                // todo: i don't think this is safe, the track may not be loaded yet.
-                if (track.Length > 0)
-                {
-                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
-                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                    defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
-                }
             }, true);
-
-            Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
         }
 
         protected override void LoadComplete()
@@ -197,6 +189,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.Update();
 
+            if (!trackWasLoaded && track.IsLoaded)
+            {
+                trackWasLoaded = true;
+
+                MaxZoom = getZoomLevelForVisibleMilliseconds(500);
+                MinZoom = getZoomLevelForVisibleMilliseconds(10000);
+                defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
+
+                Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
+            }
+
             // The extrema of track time should be positioned at the centre of the container when scrolled to the start or end
             Content.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
 
@@ -218,6 +221,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.OnZoomChanged();
             editorBeatmap.BeatmapInfo.TimelineZoom = Zoom / defaultTimelineZoom;
+        }
+
+        public override float Zoom
+        {
+            get => base.Zoom;
+            set
+            {
+                if (!trackWasLoaded)
+                    return;
+
+                base.Zoom = value;
+            }
+        }
+
+        public override void AdjustZoomRelatively(float change, float? focusPoint = null)
+        {
+            if (!trackWasLoaded)
+                return;
+
+            base.AdjustZoomRelatively(change, focusPoint);
         }
 
         protected override void UpdateAfterChildren()

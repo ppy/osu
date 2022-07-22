@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// <summary>
         /// Gets or sets the content zoom level of this <see cref="ZoomableScrollContainer"/>.
         /// </summary>
-        public float Zoom
+        public virtual float Zoom
         {
             get => zoomTarget;
             set => updateZoom(value);
@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             zoomedContentWidthCache.Validate();
         }
 
-        public void AdjustZoomRelatively(float change, float? focusPoint = null)
+        public virtual void AdjustZoomRelatively(float change, float? focusPoint = null)
         {
             const float zoom_change_sensitivity = 0.02f;
 
