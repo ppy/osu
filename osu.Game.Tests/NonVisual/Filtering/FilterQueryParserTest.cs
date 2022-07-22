@@ -167,7 +167,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
             {
                 Assert.AreEqual(false, filterCriteria.Length.HasFilter);
             }
-            
         }
 
         [Test]
