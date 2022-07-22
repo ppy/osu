@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (validMouse(e))
+            if (!validMouse(e))
                 return false;
 
             handleDown(e.Button, e.ScreenSpaceMousePosition);
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (validMouse(e))
+            if (!validMouse(e))
                 return;
 
             handleUp(e.Button);
@@ -154,8 +154,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         private bool validMouse(MouseButtonEvent e) =>
-            !leftRim.Contains(e.ScreenSpaceMouseDownPosition)
-            && !rightRim.Contains(e.ScreenSpaceMouseDownPosition);
+            leftRim.Contains(e.ScreenSpaceMouseDownPosition) || rightRim.Contains(e.ScreenSpaceMouseDownPosition);
 
         private TaikoAction getTaikoActionFromInput(Vector2 inputPosition)
         {
