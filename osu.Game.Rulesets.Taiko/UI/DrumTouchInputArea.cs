@@ -7,13 +7,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -26,8 +24,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private KeyBindingContainer<TaikoAction> keyBindingContainer = null!;
 
-        private readonly Dictionary<TouchSource, TaikoAction> trackedTouches = new Dictionary<TouchSource, TaikoAction>();
-        private readonly Dictionary<MouseButton, TaikoAction> trackedMouseButtons = new Dictionary<MouseButton, TaikoAction>();
+        private readonly Dictionary<object, TaikoAction> trackedActions = new Dictionary<object, TaikoAction>();
 
         private readonly Container mainContent;
 
@@ -87,46 +84,51 @@ namespace osu.Game.Rulesets.Taiko.UI
             outerCircle.Colour = colours.Gray0;
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            // Hide whenever the keyboard is used.
+            mainContent.Hide();
+            return false;
+        }
+
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            mainContent.Show();
-
-            TaikoAction taikoAction = getTaikoActionFromInput(e.ScreenSpaceMouseDownPosition);
-
-            trackedMouseButtons.Add(e.Button, taikoAction);
-            keyBindingContainer.TriggerPressed(taikoAction);
+            handleDown(e.Button, e.ScreenSpaceMousePosition);
             return true;
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            keyBindingContainer.TriggerReleased(trackedMouseButtons[e.Button]);
-            trackedMouseButtons.Remove(e.Button);
+            handleUp(e.Button);
             base.OnMouseUp(e);
         }
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
-            mainContent.Show();
-
-            TaikoAction taikoAction = getTaikoActionFromInput(e.ScreenSpaceTouchDownPosition);
-
-            trackedTouches.Add(e.Touch.Source, taikoAction);
-            keyBindingContainer.TriggerPressed(taikoAction);
+            handleDown(e.Touch.Source, e.ScreenSpaceTouchDownPosition);
             return true;
         }
 
         protected override void OnTouchUp(TouchUpEvent e)
         {
-            keyBindingContainer.TriggerReleased(trackedTouches[e.Touch.Source]);
-            trackedTouches.Remove(e.Touch.Source);
+            handleUp(e.Touch.Source);
             base.OnTouchUp(e);
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        private void handleDown(object source, Vector2 position)
         {
-            mainContent.Hide();
-            return false;
+            mainContent.Show();
+
+            TaikoAction taikoAction = getTaikoActionFromInput(position);
+
+            trackedActions.Add(source, taikoAction);
+            keyBindingContainer.TriggerPressed(taikoAction);
+        }
+
+        private void handleUp(object source)
+        {
+            keyBindingContainer.TriggerReleased(trackedActions[source]);
+            trackedActions.Remove(source);
         }
 
         private TaikoAction getTaikoActionFromInput(Vector2 inputPosition)
