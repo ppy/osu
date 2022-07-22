@@ -193,9 +193,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 trackWasLoaded = true;
 
+                defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
                 MaxZoom = getZoomLevelForVisibleMilliseconds(500);
                 MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
 
                 Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
             }
