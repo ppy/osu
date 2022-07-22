@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Taiko.UI;
@@ -13,9 +12,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
     [TestFixture]
     public class TestSceneDrumTouchInputArea : OsuTestScene
     {
-        [Cached]
-        private TaikoInputManager taikoInputManager = new TaikoInputManager(new TaikoRuleset().RulesetInfo);
-
         private DrumTouchInputArea drumTouchInputArea = null!;
 
         [SetUpSteps]
@@ -23,19 +19,22 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             AddStep("create drum", () =>
             {
-                Children = new Drawable[]
+                Child = new TaikoInputManager(new TaikoRuleset().RulesetInfo)
                 {
-                    new InputDrum
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Height = 0.5f,
-                    },
-                    drumTouchInputArea = new DrumTouchInputArea
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Height = 0.5f,
+                        new InputDrum
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Height = 0.2f,
+                        },
+                        drumTouchInputArea = new DrumTouchInputArea
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                        },
                     },
                 };
             });
