@@ -143,6 +143,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             TaikoAction taikoAction = getTaikoActionFromInput(position);
 
+            // Not too sure how this can happen, but let's avoid throwing.
+            if (trackedActions.ContainsKey(source))
+                return;
+
             trackedActions.Add(source, taikoAction);
             keyBindingContainer.TriggerPressed(taikoAction);
         }
