@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Ranking
         public readonly ScoreInfo Score;
 
         [Resolved]
-        private OsuGame game { get; set; }
+        private OsuGameBase game { get; set; }
 
         private DrawableAudioMixer mixer;
 
