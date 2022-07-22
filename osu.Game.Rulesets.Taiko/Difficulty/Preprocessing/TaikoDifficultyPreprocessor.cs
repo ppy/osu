@@ -11,7 +11,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     {
         /// <summary>
         /// Does preprocessing on a list of <see cref="TaikoDifficultyHitObject"/>s.
-        /// TODO: Review this - this is currently only a one-step process, but will potentially be expanded in the future.
         /// </summary>
         public static List<DifficultyHitObject> Process(List<DifficultyHitObject> difficultyHitObjects)
         {
