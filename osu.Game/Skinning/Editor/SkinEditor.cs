@@ -13,6 +13,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
 using osu.Game.Database;
@@ -27,7 +29,7 @@ using osu.Game.Screens.Edit.Components.Menus;
 namespace osu.Game.Skinning.Editor
 {
     [Cached(typeof(SkinEditor))]
-    public class SkinEditor : VisibilityContainer, ICanAcceptFiles
+    public class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
     {
         public const double TRANSITION_DURATION = 500;
 
@@ -197,6 +199,25 @@ namespace osu.Game.Skinning.Editor
             }, true);
 
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+        {
+            switch (e.Action)
+            {
+                case PlatformAction.Save:
+                    if (e.Repeat)
+                        return false;
+
+                    Save();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
+        {
         }
 
         public void UpdateTargetScreen(Drawable targetScreen)
