@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            inputDrum = new InputDrum()
+            inputDrum = new InputDrum
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,

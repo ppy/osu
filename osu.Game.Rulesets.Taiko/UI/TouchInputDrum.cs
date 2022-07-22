@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -34,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             Children = new Drawable[]
             {
-                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
@@ -64,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             CentreAction = TaikoAction.RightCentre
                         }
                     }
-                })
+                }
             };
         }
 
