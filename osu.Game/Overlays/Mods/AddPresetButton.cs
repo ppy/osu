@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -8,9 +10,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osuTK;
 using osu.Game.Localisation;
 
@@ -20,6 +26,9 @@ namespace osu.Game.Overlays.Mods
     {
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
         public AddPresetButton()
             : base(1)
@@ -33,6 +42,18 @@ namespace osu.Game.Overlays.Mods
 
             Text = "+";
             TextSize = 30;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            selectedMods.BindValueChanged(val => Enabled.Value = val.NewValue.Any(), true);
+            Enabled.BindValueChanged(val =>
+            {
+                if (!val.NewValue)
+                    Active.Value = false;
+            });
         }
 
         protected override void UpdateActiveState()
@@ -56,6 +77,15 @@ namespace osu.Game.Overlays.Mods
             private readonly LabelledTextBox nameTextBox;
             private readonly LabelledTextBox descriptionTextBox;
             private readonly ShearedButton createButton;
+
+            [Resolved]
+            private Bindable<RulesetInfo> ruleset { get; set; } = null!;
+
+            [Resolved]
+            private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
+
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
 
             public AddPresetPopover(AddPresetButton addPresetButton)
             {
@@ -87,7 +117,7 @@ namespace osu.Game.Overlays.Mods
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = ModSelectOverlayStrings.AddPreset,
-                            Action = this.HidePopover
+                            Action = tryCreatePreset
                         }
                     }
                 };
@@ -102,6 +132,25 @@ namespace osu.Game.Overlays.Mods
                 createButton.DarkerColour = colours.Orange1;
                 createButton.LighterColour = colours.Orange0;
                 createButton.TextColour = colourProvider.Background6;
+            }
+
+            private void tryCreatePreset()
+            {
+                if (string.IsNullOrWhiteSpace(nameTextBox.Current.Value))
+                {
+                    Body.Shake();
+                    return;
+                }
+
+                realm.Write(r => r.Add(new ModPreset
+                {
+                    Name = nameTextBox.Current.Value,
+                    Description = descriptionTextBox.Current.Value,
+                    Mods = selectedMods.Value.ToArray(),
+                    Ruleset = r.Find<RulesetInfo>(ruleset.Value.ShortName)
+                }));
+
+                this.HidePopover();
             }
 
             protected override void UpdateState(ValueChangedEvent<Visibility> state)
