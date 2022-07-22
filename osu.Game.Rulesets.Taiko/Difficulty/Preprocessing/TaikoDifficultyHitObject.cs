@@ -17,9 +17,24 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     /// </summary>
     public class TaikoDifficultyHitObject : DifficultyHitObject
     {
+        /// <summary>
+        /// The list of all <see cref="TaikoDifficultyHitObject"/> of the same colour as this <see cref="TaikoDifficultyHitObject"/> in the beatmap.
+        /// </summary>
         private readonly IReadOnlyList<TaikoDifficultyHitObject>? monoDifficultyHitObjects;
+
+        /// <summary>
+        /// The index of this <see cref="TaikoDifficultyHitObject"/> in <see cref="monoDifficultyHitObjects"/>.
+        /// </summary>
         public readonly int MonoIndex;
+
+        /// <summary>
+        /// The list of all <see cref="TaikoDifficultyHitObject"/> that is either a regular note or finisher in the beatmap
+        /// </summary>
         private readonly IReadOnlyList<TaikoDifficultyHitObject> noteDifficultyHitObjects;
+
+        /// <summary>
+        /// The index of this <see cref="TaikoDifficultyHitObject"/> in <see cref="noteDifficultyHitObjects"/>.
+        /// </summary>
         public readonly int NoteIndex;
 
         /// <summary>

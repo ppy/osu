@@ -30,12 +30,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
             {
                 coupledEncoding.Payload[0].Payload[0].EncodedData[0].Colour.CoupledColourEncoding = coupledEncoding;
 
-                // TODO: Review this -
                 // The outermost loop is kept a ForEach loop since it doesn't need index information, and we want to
                 // keep i and j for ColourEncoding's and MonoEncoding's index respectively, to keep it in line with
                 // documentation.
-                // If we want uniformity for the outermost loop, it can be switched to a for loop with h or something
-                // else as an index
                 //
                 // While parent and index should be part of the encoding process, they are assigned here instead due to
                 // this being a simple one location to assign them.

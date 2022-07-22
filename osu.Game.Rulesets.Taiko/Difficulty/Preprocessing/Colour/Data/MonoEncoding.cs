@@ -26,6 +26,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// </summary>
         public int Index;
 
+        /// <summary>
+        /// How long the mono pattern encoded within is
+        /// </summary>
         public int RunLength => EncodedData.Count;
     }
 }
