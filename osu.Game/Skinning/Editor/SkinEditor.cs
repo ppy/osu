@@ -322,7 +322,7 @@ namespace osu.Game.Skinning.Editor
                 currentSkin.Value.UpdateDrawableTarget(t);
 
             skins.Save(skins.CurrentSkin.Value);
-            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.EditorSaveSkin, currentSkin.Value.SkinInfo.ToString()));
+            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString()));
         }
 
         protected override bool OnHover(HoverEvent e) => true;
@@ -406,7 +406,7 @@ namespace osu.Game.Skinning.Editor
         private class SkinEditorToast : Toast
         {
             public SkinEditorToast(LocalisableString value, string skinDisplayName)
-                : base(ToastStrings.SkinEditor, value, skinDisplayName) { }
+                : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName) { }
         }
     }
 }

@@ -35,24 +35,14 @@ namespace osu.Game.Localisation
         public static LocalisableString RestartTrack => new TranslatableString(getKey(@"restart_track"), @"Restart track");
 
         /// <summary>
-        /// "Beatmap Editor"
-        /// </summary>r
-        public static LocalisableString BeatmapEditor => new TranslatableString(getKey(@"beatmap_editor"), @"Beatmap Editor");
+        /// "Beatmap saved"
+        /// </summary>
+        public static LocalisableString BeatmapSaved => new TranslatableString(getKey(@"beatmap_saved"), @"Beatmap saved");
 
         /// <summary>
-        /// "Beatmap Saved"
+        /// "Skin saved"
         /// </summary>
-        public static LocalisableString EditorSaveBeatmap => new TranslatableString(getKey(@"beatmap_editor_save"), @"Beatmap Saved");
-
-        /// <summary>
-        /// "Skin Editor"
-        /// </summary>
-        public static LocalisableString SkinEditor => new TranslatableString(getKey(@"skin_editor"), @"Skin Editor");
-
-        /// <summary>
-        /// "Skin Saved"
-        /// </summary>
-        public static LocalisableString EditorSaveSkin => new TranslatableString(getKey(@"skin_editor_save"), @"Skin Saved");
+        public static LocalisableString SkinSaved => new TranslatableString(getKey(@"skin_saved"), @"Skin saved");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

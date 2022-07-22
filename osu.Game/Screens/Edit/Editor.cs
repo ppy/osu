@@ -411,7 +411,7 @@ namespace osu.Game.Screens.Edit
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
             updateLastSavedHash();
-            onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.EditorSaveBeatmap, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
+            onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.BeatmapSaved, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
             return true;
         }
 
@@ -945,7 +945,7 @@ namespace osu.Game.Screens.Edit
         private class BeatmapEditorToast : Toast
         {
             public BeatmapEditorToast(LocalisableString value, string beatmapDisplayName)
-                : base(ToastStrings.BeatmapEditor, value, beatmapDisplayName) { }
+                : base(InputSettingsStrings.EditorSection, value, beatmapDisplayName) { }
         }
     }
 }
