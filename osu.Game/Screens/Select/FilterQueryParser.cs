@@ -317,18 +317,18 @@ namespace osu.Game.Screens.Select
 
             if (Regex.IsMatch(val, @"^\d+(:\d+){1,2}$")) // formats like 12:34
             {
-                string[] splited = val.Split(':');
-                for (int i = splited.Length - 1; i >= 0; i--)
-                    parts.Add(splited[i] + "smh"[splited.Length - i - 1]);
-            }
-            else if (Regex.IsMatch(val, @"^(\d+(\.\d+)?[hms]){1,3}$")) // formats like 1h2m3s
-            {
-                if (!"hms".Contains(Regex.Replace(val, @"[\d\.]", "")))
-                    return false;
+                List<string> splitted = val.Split(':').ToList();
+                while (splitted.Count < 3)
+                    splitted.Insert(0, "0");
 
-                string[] splited = Regex.Split(val, @"(?<=[hms])").Where(x => x.Length > 0).ToArray();
-                for (int i = splited.Length - 1; i >= 0; i--)
-                    parts.Add(splited[i]);
+                parts.Add(splitted[2] + 's');
+                parts.Add(splitted[1] + 'm');
+                parts.Add(splitted[0] + 'h');                
+            }
+            else if (Regex.IsMatch(val, @"^(\d+(\.\d+)?[hms]){1,3}$") && "hms".Contains(Regex.Replace(val, @"[\d\.]", ""))) // formats like 1h2m3s
+            {
+                string[] splitted = Regex.Split(val, @"(?<=[hms])").Where(x => x.Length > 0).Reverse().ToArray();
+                parts.AddRange(splitted);
             }
             else if (Regex.IsMatch(val, @"^\d+(\.\d+)?$")) // only one number
             {
