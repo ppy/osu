@@ -104,8 +104,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             set => updateZoom(value);
         }
 
-        private const float zoom_change_sensitivity = 0.02f;
-
         private void updateZoom(float? value = null)
         {
             float newZoom = Math.Clamp(value ?? Zoom, MinZoom, MaxZoom);
@@ -129,7 +127,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (e.AltPressed)
             {
                 // zoom when holding alt.
-                setZoomTarget(zoomTarget + CalculateZoomChange(e.ScrollDelta.Y), zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+                AdjustZoomRelatively(e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
                 return true;
             }
 
@@ -147,12 +145,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             zoomedContentWidthCache.Validate();
         }
 
+        public void AdjustZoomRelatively(float change, float? focusPoint = null)
+        {
+            const float zoom_change_sensitivity = 0.02f;
+
+            setZoomTarget(zoomTarget + change * (MaxZoom - minZoom) * zoom_change_sensitivity, focusPoint);
+        }
+
         private float zoomTarget = 1;
 
-        private void setZoomTarget(float newZoom, float focusPoint)
+        private void setZoomTarget(float newZoom, float? focusPoint = null)
         {
             zoomTarget = Math.Clamp(newZoom, MinZoom, MaxZoom);
-            transformZoomTo(zoomTarget, focusPoint, ZoomDuration, ZoomEasing);
+            transformZoomTo(zoomTarget, focusPoint ?? DrawWidth / 2, ZoomDuration, ZoomEasing);
 
             OnZoomChanged();
         }
@@ -166,8 +171,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected virtual void OnZoomChanged()
         {
         }
-
-        public float CalculateZoomChange(float rawChange) => rawChange * (MaxZoom - minZoom) * zoom_change_sensitivity;
 
         private class TransformZoom : Transform<float, ZoomableScrollContainer>
         {
