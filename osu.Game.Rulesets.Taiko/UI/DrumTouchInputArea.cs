@@ -20,68 +20,74 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     public class DrumTouchInputArea : Container
     {
-        private readonly Circle outerCircle;
-
         private KeyBindingContainer<TaikoAction> keyBindingContainer = null!;
 
         private readonly Dictionary<object, TaikoAction> trackedActions = new Dictionary<object, TaikoAction>();
 
-        private readonly Container mainContent;
+        private Container mainContent = null!;
 
-        private readonly Circle centreCircle;
-
-        public DrumTouchInputArea()
-        {
-            RelativeSizeAxes = Axes.X;
-            Height = 300;
-
-            Masking = true;
-
-            Children = new Drawable[]
-            {
-                mainContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 2,
-                    Children = new Drawable[]
-                    {
-                        outerCircle = new Circle
-                        {
-                            FillMode = FillMode.Fit,
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        centreCircle = new Circle
-                        {
-                            FillMode = FillMode.Fit,
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Scale = new Vector2(0.5f),
-                        },
-                        new Box
-                        {
-                            FillMode = FillMode.Fit,
-                            RelativeSizeAxes = Axes.Y,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Colour = Color4.Black,
-                            Width = 3,
-                        },
-                    }
-                },
-            };
-        }
+        private Circle centreCircle = null!;
+        private Circle outerCircle = null!;
 
         [BackgroundDependencyLoader]
         private void load(TaikoInputManager taikoInputManager, OsuColour colours)
         {
             Debug.Assert(taikoInputManager.KeyBindingContainer != null);
-
             keyBindingContainer = taikoInputManager.KeyBindingContainer;
 
-            outerCircle.Colour = colours.Gray0;
+            // Container should handle input everywhere.
+            RelativeSizeAxes = Axes.Both;
+
+            Children = new Drawable[]
+            {
+                new Container
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 300,
+                    Y = 20,
+                    Masking = true,
+                    FillMode = FillMode.Fit,
+                    Children = new Drawable[]
+                    {
+                        mainContent = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Height = 2,
+                            Children = new Drawable[]
+                            {
+                                outerCircle = new Circle
+                                {
+                                    FillMode = FillMode.Fit,
+                                    Colour = colours.BlueDarker,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                },
+                                centreCircle = new Circle
+                                {
+                                    FillMode = FillMode.Fit,
+                                    Colour = colours.YellowDark,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Scale = new Vector2(0.8f),
+                                },
+                                new Box
+                                {
+                                    Colour = colours.BlueDarker,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Height = 0.9f,
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomCentre,
+                                    Width = 7,
+                                },
+                            }
+                        },
+                    }
+                },
+            };
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -121,6 +127,19 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             TaikoAction taikoAction = getTaikoActionFromInput(position);
 
+            switch (taikoAction)
+            {
+                case TaikoAction.LeftCentre:
+                case TaikoAction.RightCentre:
+                    centreCircle.FlashColour(Color4.White, 2000, Easing.OutQuint);
+                    break;
+
+                case TaikoAction.LeftRim:
+                case TaikoAction.RightRim:
+                    outerCircle.FlashColour(Color4.White, 2000, Easing.OutQuint);
+                    break;
+            }
+
             trackedActions.Add(source, taikoAction);
             keyBindingContainer.TriggerPressed(taikoAction);
         }
@@ -133,7 +152,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private TaikoAction getTaikoActionFromInput(Vector2 inputPosition)
         {
-            bool centreHit = centreCircle.ScreenSpaceDrawQuad.Contains(inputPosition);
+            bool centreHit = centreCircle.Contains(inputPosition);
             bool leftSide = ToLocalSpace(inputPosition).X < DrawWidth / 2;
 
             if (leftSide)
