@@ -27,7 +27,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// <summary>
         /// Determine if this <see cref="ColourEncoding"/> is a repetition of another <see cref="ColourEncoding"/>. This
         /// is a strict comparison and is true if and only if the colour sequence is exactly the same.
-        /// This does not require the <see cref="ColourEncoding"/>s to have the same amount of <see cref="MonoEncoding"/>s.
         /// </summary>
         public bool IsRepetitionOf(ColourEncoding other)
         {
