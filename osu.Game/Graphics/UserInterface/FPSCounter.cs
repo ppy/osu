@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -22,8 +21,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class FPSCounter : VisibilityContainer, IHasCustomTooltip
     {
-        private RollingCounter<double> counterUpdateFrameTime = null!;
-        private RollingCounter<double> counterDrawFPS = null!;
+        private OsuSpriteText counterUpdateFrameTime = null!;
+        private OsuSpriteText counterDrawFPS = null!;
 
         private Container mainContent = null!;
 
@@ -34,6 +33,9 @@ namespace osu.Game.Graphics.UserInterface
         private const float idle_background_alpha = 0.4f;
 
         private readonly BindableBool showFpsDisplay = new BindableBool(true);
+
+        private double displayedFpsCount;
+        private double displayedFrameTime;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -77,20 +79,23 @@ namespace osu.Game.Graphics.UserInterface
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                counterUpdateFrameTime = new FrameTimeCounter
+                                counterUpdateFrameTime = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Margin = new MarginPadding(1),
+                                    Font = OsuFont.Default.With(fixedWidth: true, size: 16, weight: FontWeight.SemiBold),
+                                    Spacing = new Vector2(-1),
                                     Y = -2,
                                 },
-                                counterDrawFPS = new FramesPerSecondCounter
+                                counterDrawFPS = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Margin = new MarginPadding(2),
+                                    Font = OsuFont.Default.With(fixedWidth: true, size: 13, weight: FontWeight.SemiBold),
+                                    Spacing = new Vector2(-2),
                                     Y = 10,
-                                    Scale = new Vector2(0.8f),
                                 }
                             }
                         },
@@ -183,35 +188,46 @@ namespace osu.Game.Graphics.UserInterface
 
             const double spike_time_ms = 20;
 
-            bool hasUpdateSpike = counterUpdateFrameTime.Current.Value < spike_time_ms && newUpdateFrameTime > spike_time_ms;
+            bool hasUpdateSpike = displayedFrameTime < spike_time_ms && newUpdateFrameTime > spike_time_ms;
             // use elapsed frame time rather then FramesPerSecond to better catch stutter frames.
-            bool hasDrawSpike = counterDrawFPS.Current.Value > (1000 / spike_time_ms) && newDrawFrameTime > spike_time_ms;
+            bool hasDrawSpike = displayedFpsCount > (1000 / spike_time_ms) && newDrawFrameTime > spike_time_ms;
 
-            // If the frame time spikes up, make sure it shows immediately on the counter.
-            if (hasUpdateSpike)
-                counterUpdateFrameTime.SetCountWithoutRolling(newUpdateFrameTime);
-            else
-                counterUpdateFrameTime.Current.Value = newUpdateFrameTime;
+            // note that we use an elapsed time here of 1 intentionally.
+            // this weights all updates equally. if we passed in the elapsed time, longer frames would be weighted incorrectly lower.
+            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, newUpdateFrameTime, hasUpdateSpike ? 0 : 100, 1);
 
             if (hasDrawSpike)
                 // show spike time using raw elapsed value, to account for `FramesPerSecond` being so averaged spike frames don't show.
-                counterDrawFPS.SetCountWithoutRolling(1000 / newDrawFrameTime);
+                displayedFpsCount = 1000 / newDrawFrameTime;
             else
-                counterDrawFPS.Current.Value = newDrawFps;
+                displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, newDrawFps, 100, Time.Elapsed);
 
-            counterDrawFPS.Colour = getColour(counterDrawFPS.DisplayedCount / aimDrawFPS);
-
-            double displayedUpdateFPS = 1000 / counterUpdateFrameTime.DisplayedCount;
-            counterUpdateFrameTime.Colour = getColour(displayedUpdateFPS / aimUpdateFPS);
+            updateFpsDisplay();
+            updateFrameTimeDisplay();
 
             bool hasSignificantChanges = aimRatesChanged
                                          || hasDrawSpike
                                          || hasUpdateSpike
-                                         || counterDrawFPS.DisplayedCount < aimDrawFPS * 0.8
-                                         || displayedUpdateFPS < aimUpdateFPS * 0.8;
+                                         || displayedFpsCount < aimDrawFPS * 0.8
+                                         || 1000 / displayedFrameTime < aimUpdateFPS * 0.8;
 
             if (hasSignificantChanges)
                 displayTemporarily();
+        }
+
+        private void updateFpsDisplay()
+        {
+            counterDrawFPS.Colour = getColour(displayedFpsCount / aimDrawFPS);
+            counterDrawFPS.Text = $"{displayedFpsCount:#,0}fps";
+        }
+
+        private void updateFrameTimeDisplay()
+        {
+            counterUpdateFrameTime.Text = displayedFrameTime < 5
+                ? $"{displayedFrameTime:N1}ms"
+                : $"{displayedFrameTime:N0}ms";
+
+            counterUpdateFrameTime.Colour = getColour((1000 / displayedFrameTime) / aimUpdateFPS);
         }
 
         private bool updateAimFPS()
@@ -253,50 +269,5 @@ namespace osu.Game.Graphics.UserInterface
         public ITooltip GetCustomTooltip() => new FPSCounterTooltip();
 
         public object TooltipContent => this;
-
-        public class FramesPerSecondCounter : RollingCounter<double>
-        {
-            protected override double RollingDuration => 1000;
-
-            protected override OsuSpriteText CreateSpriteText()
-            {
-                return new OsuSpriteText
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Font = OsuFont.Default.With(fixedWidth: true, size: 16, weight: FontWeight.SemiBold),
-                    Spacing = new Vector2(-2),
-                };
-            }
-
-            protected override LocalisableString FormatCount(double count)
-            {
-                return $"{count:#,0}fps";
-            }
-        }
-
-        public class FrameTimeCounter : RollingCounter<double>
-        {
-            protected override double RollingDuration => 1000;
-
-            protected override OsuSpriteText CreateSpriteText()
-            {
-                return new OsuSpriteText
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Font = OsuFont.Default.With(fixedWidth: true, size: 16, weight: FontWeight.SemiBold),
-                    Spacing = new Vector2(-1),
-                };
-            }
-
-            protected override LocalisableString FormatCount(double count)
-            {
-                if (count < 1)
-                    return $"{count:N1}ms";
-
-                return $"{count:N0}ms";
-            }
-        }
     }
 }
