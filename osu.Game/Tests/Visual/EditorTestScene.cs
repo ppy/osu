@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -15,9 +17,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
 
@@ -56,15 +56,13 @@ namespace osu.Game.Tests.Visual
                 Dependencies.CacheAs<BeatmapManager>(testBeatmapManager = new TestBeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
         }
 
-        protected virtual bool EditorComponentsReady => Editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
-                                                        && Editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true;
-
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             AddStep("load editor", LoadEditor);
-            AddUntilStep("wait for editor to load", () => EditorComponentsReady);
+            AddUntilStep("wait for editor to load", () => Editor?.ReadyForUse == true);
+            AddUntilStep("wait for beatmap updated", () => !Beatmap.IsDefault);
         }
 
         protected virtual void LoadEditor()
@@ -145,11 +143,6 @@ namespace osu.Game.Tests.Visual
             {
             }
 
-            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
-            {
-                return new TestBeatmapModelManager(storage, realm, onlineLookupQueue);
-            }
-
             protected override WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host)
             {
                 return new TestWorkingBeatmapCache(this, audioManager, resources, storage, defaultBeatmap, host);
@@ -179,17 +172,6 @@ namespace osu.Game.Tests.Visual
 
                 public override WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
                     => testBeatmapManager.TestBeatmap;
-            }
-
-            internal class TestBeatmapModelManager : BeatmapModelManager
-            {
-                public TestBeatmapModelManager(Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
-                    : base(databaseAccess, storage, beatmapOnlineLookupQueue)
-                {
-                }
-
-                protected override string ComputeHash(BeatmapSetInfo item)
-                    => string.Empty;
             }
 
             public override void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)

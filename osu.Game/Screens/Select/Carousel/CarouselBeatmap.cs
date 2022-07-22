@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -53,6 +55,8 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(BeatmapInfo.Metadata.Artist) ||
                      criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
 
+            match &= criteria.Sort != SortMode.DateRanked || BeatmapInfo.BeatmapSet?.DateRanked != null;
+
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
             if (match && criteria.SearchTerms.Length > 0)
@@ -72,7 +76,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             if (match)
-                match &= criteria.Collection?.Beatmaps.Contains(BeatmapInfo) ?? true;
+                match &= criteria.Collection?.BeatmapHashes.Contains(BeatmapInfo.MD5Hash) ?? true;
 
             if (match && criteria.RulesetCriteria != null)
                 match &= criteria.RulesetCriteria.Matches(BeatmapInfo);

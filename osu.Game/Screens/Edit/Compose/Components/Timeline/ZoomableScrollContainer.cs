@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -66,8 +68,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 minZoom = value;
 
-                if (Zoom < value)
-                    Zoom = value;
+                // ensure zoom range is in valid state before updating zoom.
+                if (MinZoom < MaxZoom)
+                    updateZoom();
             }
         }
 
@@ -86,8 +89,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 maxZoom = value;
 
-                if (Zoom > value)
-                    Zoom = value;
+                // ensure zoom range is in valid state before updating zoom.
+                if (MaxZoom > MinZoom)
+                    updateZoom();
             }
         }
 
@@ -97,15 +101,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public float Zoom
         {
             get => zoomTarget;
-            set
-            {
-                value = Math.Clamp(value, MinZoom, MaxZoom);
+            set => updateZoom(value);
+        }
 
-                if (IsLoaded)
-                    setZoomTarget(value, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
-                else
-                    currentZoom = zoomTarget = value;
-            }
+        private void updateZoom(float? value = null)
+        {
+            float newZoom = Math.Clamp(value ?? Zoom, MinZoom, MaxZoom);
+
+            if (IsLoaded)
+                setZoomTarget(newZoom, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
+            else
+                currentZoom = zoomTarget = newZoom;
         }
 
         protected override void Update()
@@ -121,7 +127,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (e.AltPressed)
             {
                 // zoom when holding alt.
-                setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+                AdjustZoomRelatively(e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
                 return true;
             }
 
@@ -139,12 +145,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             zoomedContentWidthCache.Validate();
         }
 
+        public void AdjustZoomRelatively(float change, float? focusPoint = null)
+        {
+            const float zoom_change_sensitivity = 0.02f;
+
+            setZoomTarget(zoomTarget + change * (MaxZoom - minZoom) * zoom_change_sensitivity, focusPoint);
+        }
+
         private float zoomTarget = 1;
 
-        private void setZoomTarget(float newZoom, float focusPoint)
+        private void setZoomTarget(float newZoom, float? focusPoint = null)
         {
             zoomTarget = Math.Clamp(newZoom, MinZoom, MaxZoom);
-            transformZoomTo(zoomTarget, focusPoint, ZoomDuration, ZoomEasing);
+            transformZoomTo(zoomTarget, focusPoint ?? DrawWidth / 2, ZoomDuration, ZoomEasing);
 
             OnZoomChanged();
         }

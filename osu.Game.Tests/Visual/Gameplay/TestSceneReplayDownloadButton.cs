@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -141,6 +143,28 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestLocallyAvailableWithoutReplay()
+        {
+            Live<ScoreInfo> imported = null;
+
+            AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(false, false)));
+
+            AddStep("create button without replay", () =>
+            {
+                Child = downloadButton = new TestReplayDownloadButton(imported.Value)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
+
+            AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+
+            AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+        }
+
+        [Test]
         public void TestScoreImportThenDelete()
         {
             Live<ScoreInfo> imported = null;
@@ -187,11 +211,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
-        private ScoreInfo getScoreInfo(bool replayAvailable)
+        private ScoreInfo getScoreInfo(bool replayAvailable, bool hasOnlineId = true)
         {
             return new APIScore
             {
-                OnlineID = online_score_id,
+                OnlineID = hasOnlineId ? online_score_id : 0,
                 RulesetID = 0,
                 Beatmap = CreateAPIBeatmapSet(new OsuRuleset().RulesetInfo).Beatmaps.First(),
                 HasReplay = replayAvailable,

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -291,7 +293,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 base.LoadComplete();
                 BeatDivisor.BindValueChanged(_ => updateState(), true);
-                divisorTextBox.OnCommit += (_, __) => setPresets();
+                divisorTextBox.OnCommit += (_, _) => setPresets();
 
                 Schedule(() => GetContainingInputManager().ChangeFocus(divisorTextBox));
             }

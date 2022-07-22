@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -105,7 +106,7 @@ namespace osu.Game.Tournament.Screens.MapPool
             ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
 
-        private void beatmapChanged(ValueChangedEvent<APIBeatmap> beatmap)
+        private void beatmapChanged(ValueChangedEvent<TournamentBeatmap> beatmap)
         {
             if (CurrentMatch.Value == null || CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) < 2)
                 return;

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -93,6 +95,15 @@ namespace osu.Game.Rulesets
             return AllMods.FirstOrDefault(m => m is T)?.CreateInstance() as T;
         }
 
+        /// <summary>
+        /// Creates an enumerable with mods that are supported by the ruleset for the supplied <paramref name="type"/>.
+        /// </summary>
+        /// <remarks>
+        /// If there are no applicable mods from the given <paramref name="type"/> in this ruleset,
+        /// then the proper behaviour is to return an empty enumerable.
+        /// <see langword="null"/> mods should not be present in the returned enumerable.
+        /// </remarks>
+        [ItemNotNull]
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         /// <summary>
@@ -115,55 +126,55 @@ namespace osu.Game.Rulesets
             {
                 switch (mod)
                 {
-                    case ModNoFail _:
+                    case ModNoFail:
                         value |= LegacyMods.NoFail;
                         break;
 
-                    case ModEasy _:
+                    case ModEasy:
                         value |= LegacyMods.Easy;
                         break;
 
-                    case ModHidden _:
+                    case ModHidden:
                         value |= LegacyMods.Hidden;
                         break;
 
-                    case ModHardRock _:
+                    case ModHardRock:
                         value |= LegacyMods.HardRock;
                         break;
 
-                    case ModPerfect _:
-                        value |= LegacyMods.Perfect;
+                    case ModPerfect:
+                        value |= LegacyMods.Perfect | LegacyMods.SuddenDeath;
                         break;
 
-                    case ModSuddenDeath _:
+                    case ModSuddenDeath:
                         value |= LegacyMods.SuddenDeath;
                         break;
 
-                    case ModNightcore _:
-                        value |= LegacyMods.Nightcore;
+                    case ModNightcore:
+                        value |= LegacyMods.Nightcore | LegacyMods.DoubleTime;
                         break;
 
-                    case ModDoubleTime _:
+                    case ModDoubleTime:
                         value |= LegacyMods.DoubleTime;
                         break;
 
-                    case ModRelax _:
+                    case ModRelax:
                         value |= LegacyMods.Relax;
                         break;
 
-                    case ModHalfTime _:
+                    case ModHalfTime:
                         value |= LegacyMods.HalfTime;
                         break;
 
-                    case ModFlashlight _:
+                    case ModFlashlight:
                         value |= LegacyMods.Flashlight;
                         break;
 
-                    case ModCinema _:
-                        value |= LegacyMods.Cinema;
+                    case ModCinema:
+                        value |= LegacyMods.Cinema | LegacyMods.Autoplay;
                         break;
 
-                    case ModAutoplay _:
+                    case ModAutoplay:
                         value |= LegacyMods.Autoplay;
                         break;
                 }

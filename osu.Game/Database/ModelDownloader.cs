@@ -17,18 +17,18 @@ namespace osu.Game.Database
         where TModel : class, IHasGuidPrimaryKey, ISoftDelete, IEquatable<TModel>, T
         where T : class
     {
-        public Action<Notification> PostNotification { protected get; set; }
+        public Action<Notification>? PostNotification { protected get; set; }
 
-        public event Action<ArchiveDownloadRequest<T>> DownloadBegan;
+        public event Action<ArchiveDownloadRequest<T>>? DownloadBegan;
 
-        public event Action<ArchiveDownloadRequest<T>> DownloadFailed;
+        public event Action<ArchiveDownloadRequest<T>>? DownloadFailed;
 
         private readonly IModelImporter<TModel> importer;
-        private readonly IAPIProvider api;
+        private readonly IAPIProvider? api;
 
         protected readonly List<ArchiveDownloadRequest<T>> CurrentDownloads = new List<ArchiveDownloadRequest<T>>();
 
-        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider api)
+        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider? api)
         {
             this.importer = importer;
             this.api = api;
@@ -85,7 +85,7 @@ namespace osu.Game.Database
             CurrentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
-            api.PerformAsync(request);
+            api?.PerformAsync(request);
 
             DownloadBegan?.Invoke(request);
             return true;
@@ -103,7 +103,7 @@ namespace osu.Game.Database
             }
         }
 
-        public abstract ArchiveDownloadRequest<T> GetExistingDownload(T model);
+        public abstract ArchiveDownloadRequest<T>? GetExistingDownload(T model);
 
         private bool canDownload(T model) => GetExistingDownload(model) == null && api != null;
 

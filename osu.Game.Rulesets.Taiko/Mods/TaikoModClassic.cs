@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
@@ -16,6 +18,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
             drawableTaikoRuleset.LockPlayfieldAspect.Value = false;
+
+            var playfield = (TaikoPlayfield)drawableRuleset.Playfield;
+            playfield.ClassicHitTargetPosition.Value = true;
         }
 
         public void Update(Playfield playfield)

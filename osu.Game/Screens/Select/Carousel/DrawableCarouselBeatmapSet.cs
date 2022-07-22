@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -150,7 +152,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             var carouselBeatmapSet = (CarouselBeatmapSet)Item;
 
-            var visibleBeatmaps = carouselBeatmapSet.Children.Where(c => c.Visible).ToArray();
+            var visibleBeatmaps = carouselBeatmapSet.Items.Where(c => c.Visible).ToArray();
 
             // if we are already displaying all the correct beatmaps, only run animation updates.
             // note that the displayed beatmaps may change due to the applied filter.
@@ -245,7 +247,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             TernaryState state;
 
-            int countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
+            int countExisting = beatmapSet.Beatmaps.Count(b => collection.BeatmapHashes.Contains(b.MD5Hash));
 
             if (countExisting == beatmapSet.Beatmaps.Count)
                 state = TernaryState.True;
@@ -261,14 +263,14 @@ namespace osu.Game.Screens.Select.Carousel
                     switch (s)
                     {
                         case TernaryState.True:
-                            if (collection.Beatmaps.Contains(b))
+                            if (collection.BeatmapHashes.Contains(b.MD5Hash))
                                 continue;
 
-                            collection.Beatmaps.Add(b);
+                            collection.BeatmapHashes.Add(b.MD5Hash);
                             break;
 
                         case TernaryState.False:
-                            collection.Beatmaps.Remove(b);
+                            collection.BeatmapHashes.Remove(b.MD5Hash);
                             break;
                     }
                 }

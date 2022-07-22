@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -26,7 +28,8 @@ namespace osu.Game.Graphics.Containers
     public class BeatSyncedContainer : Container
     {
         private int lastBeat;
-        private TimingControlPoint lastTimingPoint;
+        protected TimingControlPoint LastTimingPoint { get; private set; }
+        protected EffectControlPoint LastEffectPoint { get; private set; }
 
         /// <summary>
         /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes)"/>.
@@ -84,7 +87,7 @@ namespace osu.Game.Graphics.Containers
             TimingControlPoint timingPoint;
             EffectControlPoint effectPoint;
 
-            IsBeatSyncedWithTrack = BeatSyncSource.Clock?.IsRunning == true;
+            IsBeatSyncedWithTrack = BeatSyncSource.Clock?.IsRunning == true && BeatSyncSource.ControlPoints != null;
 
             double currentTrackTime;
 
@@ -125,7 +128,7 @@ namespace osu.Game.Graphics.Containers
 
             TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
 
-            if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
+            if (ReferenceEquals(timingPoint, LastTimingPoint) && beatIndex == lastBeat)
                 return;
 
             // as this event is sometimes used for sound triggers where `BeginDelayedSequence` has no effect, avoid firing it if too far away from the beat.
@@ -137,7 +140,8 @@ namespace osu.Game.Graphics.Containers
             }
 
             lastBeat = beatIndex;
-            lastTimingPoint = timingPoint;
+            LastTimingPoint = timingPoint;
+            LastEffectPoint = effectPoint;
         }
     }
 }

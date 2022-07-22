@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -43,6 +45,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
             new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
             new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.F }, GlobalAction.ToggleFPSDisplay),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
@@ -326,5 +329,8 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTapForBPM))]
         EditorTapForBPM,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleFPSCounter))]
+        ToggleFPSDisplay,
     }
 }

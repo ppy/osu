@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -104,10 +107,12 @@ namespace osu.Game.Overlays
                 if (beatmap.Disabled)
                     return;
 
+                Logger.Log($"{nameof(MusicController)} skipping next track to {nameof(EnsurePlayingSomething)}");
                 NextTrack();
             }
             else if (!IsPlaying)
             {
+                Logger.Log($"{nameof(MusicController)} starting playback to {nameof(EnsurePlayingSomething)}");
                 Play();
             }
         }
@@ -128,9 +133,9 @@ namespace osu.Game.Overlays
                 UserPauseRequested = false;
 
             if (restart)
-                CurrentTrack.Restart();
+                CurrentTrack.RestartAsync();
             else if (!IsPlaying)
-                CurrentTrack.Start();
+                CurrentTrack.StartAsync();
 
             return true;
         }
@@ -147,7 +152,7 @@ namespace osu.Game.Overlays
         {
             UserPauseRequested |= requestedByUser;
             if (CurrentTrack.IsRunning)
-                CurrentTrack.Stop();
+                CurrentTrack.StopAsync();
         }
 
         /// <summary>
@@ -245,7 +250,7 @@ namespace osu.Game.Overlays
         {
             // if not scheduled, the previously track will be stopped one frame later (see ScheduleAfterChildren logic in GameBase).
             // we probably want to move this to a central method for switching to a new working beatmap in the future.
-            Schedule(() => CurrentTrack.Restart());
+            Schedule(() => CurrentTrack.RestartAsync());
         }
 
         private WorkingBeatmap current;

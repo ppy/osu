@@ -55,10 +55,10 @@ namespace osu.Game.Rulesets.Mods
 
         public class NightcoreBeatContainer : BeatSyncedContainer
         {
-            private PausableSkinnableSound hatSample;
-            private PausableSkinnableSound clapSample;
-            private PausableSkinnableSound kickSample;
-            private PausableSkinnableSound finishSample;
+            private PausableSkinnableSound? hatSample;
+            private PausableSkinnableSound? clapSample;
+            private PausableSkinnableSound? kickSample;
+            private PausableSkinnableSound? finishSample;
 
             private int? firstBeat;
 

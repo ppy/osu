@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Catch.Objects;
@@ -40,10 +42,10 @@ namespace osu.Game.Rulesets.Catch.Edit
                 case Droplet droplet:
                     return droplet is TinyDroplet ? PositionRange.EMPTY : new PositionRange(droplet.OriginalX);
 
-                case JuiceStream _:
+                case JuiceStream:
                     return GetPositionRange(hitObject.NestedHitObjects);
 
-                case BananaShower _:
+                case BananaShower:
                     // A banana shower occupies the whole screen width.
                     return new PositionRange(0, CatchPlayfield.WIDTH);
 
