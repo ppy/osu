@@ -18,16 +18,20 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// An overlay that captures and displays osu!taiko mouse and touch input.
     /// </summary>
-    public class DrumTouchInputArea : Container
+    public class DrumTouchInputArea : VisibilityContainer
     {
+        // visibility state affects our child. we always want to handle input.
+        public override bool PropagatePositionalInputSubTree => true;
+        public override bool PropagateNonPositionalInputSubTree => true;
+
         private KeyBindingContainer<TaikoAction> keyBindingContainer = null!;
 
         private readonly Dictionary<object, TaikoAction> trackedActions = new Dictionary<object, TaikoAction>();
 
         private Container mainContent = null!;
 
-        private Circle centreCircle = null!;
-        private Circle outerCircle = null!;
+        private QuarterCircle leftCentre = null!;
+        private QuarterCircle rightCentre = null!;
 
         [BackgroundDependencyLoader]
         private void load(TaikoInputManager taikoInputManager, OsuColour colours)
@@ -38,6 +42,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             // Container should handle input everywhere.
             RelativeSizeAxes = Axes.Both;
 
+            const float centre_region = 0.80f;
+
             Children = new Drawable[]
             {
                 new Container
@@ -45,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
-                    Height = 300,
+                    Height = 350,
                     Y = 20,
                     Masking = true,
                     FillMode = FillMode.Fit,
@@ -54,35 +60,36 @@ namespace osu.Game.Rulesets.Taiko.UI
                         mainContent = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Height = 2,
                             Children = new Drawable[]
                             {
-                                outerCircle = new Circle
+                                new QuarterCircle(TaikoAction.LeftRim, colours.YellowDark)
                                 {
-                                    FillMode = FillMode.Fit,
-                                    Colour = colours.BlueDarker,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                },
-                                centreCircle = new Circle
-                                {
-                                    FillMode = FillMode.Fit,
-                                    Colour = colours.YellowDark,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Scale = new Vector2(0.8f),
-                                },
-                                new Box
-                                {
-                                    Colour = colours.BlueDarker,
-                                    RelativeSizeAxes = Axes.Y,
-                                    Height = 0.9f,
                                     Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
-                                    Width = 7,
+                                    Origin = Anchor.BottomRight,
+                                    X = -2,
                                 },
+                                new QuarterCircle(TaikoAction.RightRim, colours.YellowDark)
+                                {
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomRight,
+                                    X = 2,
+                                    Rotation = 90,
+                                },
+                                leftCentre = new QuarterCircle(TaikoAction.LeftCentre, colours.BlueDark)
+                                {
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomRight,
+                                    X = -2,
+                                    Scale = new Vector2(centre_region),
+                                },
+                                rightCentre = new QuarterCircle(TaikoAction.RightCentre, colours.BlueDark)
+                                {
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomRight,
+                                    X = 2,
+                                    Scale = new Vector2(centre_region),
+                                    Rotation = 90,
+                                }
                             }
                         },
                     }
@@ -93,7 +100,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             // Hide whenever the keyboard is used.
-            mainContent.Hide();
+            Hide();
             return false;
         }
 
@@ -123,22 +130,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private void handleDown(object source, Vector2 position)
         {
-            mainContent.Show();
+            Show();
 
             TaikoAction taikoAction = getTaikoActionFromInput(position);
-
-            switch (taikoAction)
-            {
-                case TaikoAction.LeftCentre:
-                case TaikoAction.RightCentre:
-                    centreCircle.FlashColour(Color4.White, 2000, Easing.OutQuint);
-                    break;
-
-                case TaikoAction.LeftRim:
-                case TaikoAction.RightRim:
-                    outerCircle.FlashColour(Color4.White, 2000, Easing.OutQuint);
-                    break;
-            }
 
             trackedActions.Add(source, taikoAction);
             keyBindingContainer.TriggerPressed(taikoAction);
@@ -152,13 +146,82 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private TaikoAction getTaikoActionFromInput(Vector2 inputPosition)
         {
-            bool centreHit = centreCircle.Contains(inputPosition);
+            bool centreHit = leftCentre.Contains(inputPosition) || rightCentre.Contains(inputPosition);
             bool leftSide = ToLocalSpace(inputPosition).X < DrawWidth / 2;
 
             if (leftSide)
                 return centreHit ? TaikoAction.LeftCentre : TaikoAction.LeftRim;
 
             return centreHit ? TaikoAction.RightCentre : TaikoAction.RightRim;
+        }
+
+        protected override void PopIn()
+        {
+            mainContent.FadeIn(500, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            mainContent.FadeOut(300);
+        }
+
+        private class QuarterCircle : CompositeDrawable, IKeyBindingHandler<TaikoAction>
+        {
+            private readonly Circle overlay;
+
+            private readonly TaikoAction handledAction;
+
+            private readonly Circle circle;
+
+            public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
+
+            public QuarterCircle(TaikoAction handledAction, Color4 colour)
+            {
+                this.handledAction = handledAction;
+                RelativeSizeAxes = Axes.Both;
+
+                FillMode = FillMode.Fit;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Container
+                    {
+                        Masking = true,
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            circle = new Circle
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colour,
+                                Alpha = 0.8f,
+                                Scale = new Vector2(2),
+                            },
+                            overlay = new Circle
+                            {
+                                Alpha = 0,
+                                RelativeSizeAxes = Axes.Both,
+                                Blending = BlendingParameters.Additive,
+                                Colour = colour,
+                                Scale = new Vector2(2),
+                            }
+                        }
+                    },
+                };
+            }
+
+            public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
+            {
+                if (e.Action == handledAction)
+                    overlay.FadeTo(0.4f, 80, Easing.OutQuint);
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
+            {
+                if (e.Action == handledAction)
+                    overlay.FadeOut(1000, Easing.OutQuint);
+            }
         }
     }
 }
