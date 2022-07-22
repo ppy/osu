@@ -29,6 +29,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString PersonalPresets => new TranslatableString(getKey(@"personal_presets"), @"Personal Presets");
 
+        /// <summary>
+        /// "Add preset"
+        /// </summary>
+        public static LocalisableString AddPreset => new TranslatableString(getKey(@"add_preset"), @"Add preset");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

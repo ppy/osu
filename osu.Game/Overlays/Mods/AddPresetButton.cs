@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -71,21 +72,21 @@ namespace osu.Game.Overlays.Mods
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Label = "Name",
+                            Label = CommonStrings.Name,
                             TabbableContentContainer = this
                         },
                         descriptionTextBox = new LabelledTextBox
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Label = "Description",
+                            Label = CommonStrings.Description,
                             TabbableContentContainer = this
                         },
                         createButton = new ShearedButton
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "Create preset",
+                            Text = ModSelectOverlayStrings.AddPreset,
                             Action = this.HidePopover
                         }
                     }
