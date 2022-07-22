@@ -3,21 +3,21 @@
 
 #nullable disable
 
-using osuTK;
+using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Configuration;
-using System;
-using JetBrains.Annotations;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
+using osuTK;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -35,6 +35,7 @@ namespace osu.Game.Graphics.Cursor
         private Vector2 positionMouseDown;
 
         private Sample tapSample;
+        private Vector2 lastMovePosition;
 
         [BackgroundDependencyLoader(true)]
         private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager, AudioManager audio)
@@ -47,16 +48,25 @@ namespace osu.Game.Graphics.Cursor
             tapSample = audio.Samples.Get(@"UI/cursor-tap");
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (dragRotationState != DragRotationState.NotDragging
+                && Vector2.Distance(positionMouseDown, lastMovePosition) > 60)
+            {
+                // make the rotation centre point floating.
+                positionMouseDown = Interpolation.ValueAt(0.04f, positionMouseDown, lastMovePosition, 0, Clock.ElapsedFrameTime);
+            }
+        }
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             if (dragRotationState != DragRotationState.NotDragging)
             {
-                // make the rotation centre point floating.
-                if (Vector2.Distance(positionMouseDown, e.MousePosition) > 60)
-                    positionMouseDown = Interpolation.ValueAt(0.005f, positionMouseDown, e.MousePosition, 0, Clock.ElapsedFrameTime);
+                lastMovePosition = e.MousePosition;
 
-                var position = e.MousePosition;
-                float distance = Vector2Extensions.Distance(position, positionMouseDown);
+                float distance = Vector2Extensions.Distance(lastMovePosition, positionMouseDown);
 
                 // don't start rotating until we're moved a minimum distance away from the mouse down location,
                 // else it can have an annoying effect.

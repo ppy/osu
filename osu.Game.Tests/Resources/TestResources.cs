@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Resources
                         BPM = bpm,
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
                         Ruleset = rulesetInfo,
-                        Metadata = metadata,
+                        Metadata = metadata.DeepClone(),
                         Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = diff,
