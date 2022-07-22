@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModPresetPanel : ModSelectOverlayPanel, IHasCustomTooltip<ModPreset>
+    public class ModPresetPanel : ModSelectPanel, IHasCustomTooltip<ModPreset>
     {
         public readonly ModPreset Preset;
 

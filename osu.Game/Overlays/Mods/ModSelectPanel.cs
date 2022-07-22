@@ -24,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSelectOverlayPanel : OsuClickableContainer, IHasAccentColour
+    public abstract class ModSelectPanel : OsuClickableContainer, IHasAccentColour
     {
         public abstract BindableBool Active { get; }
 
@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Mods
         private Sample? sampleOff;
         private Sample? sampleOn;
 
-        protected ModSelectOverlayPanel()
+        protected ModSelectPanel()
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
