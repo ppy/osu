@@ -5,10 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 
@@ -16,29 +20,54 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneModPresetColumn : OsuTestScene
     {
+        protected override bool UseFreshStoragePerRun => true;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(Realm);
+        }
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("reset storage", () =>
+            {
+                Realm.Write(realm =>
+                {
+                    realm.RemoveAll<ModPreset>();
+                    realm.Add(createTestPresets());
+                });
+            });
+        }
 
         [Test]
         public void TestBasicAppearance()
         {
-            ModPresetColumn modPresetColumn = null!;
-
+            AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
             AddStep("create content", () => Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding(30),
-                Child = modPresetColumn = new ModPresetColumn
+                Child = new ModPresetColumn
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Presets = createTestPresets().ToArray()
                 }
             });
-            AddStep("change presets", () => modPresetColumn.Presets = createTestPresets().Skip(1).ToArray());
+            AddUntilStep("3 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 3);
+
+            AddStep("change ruleset to mania", () => Ruleset.Value = rulesets.GetRuleset(3));
+            AddUntilStep("1 panel visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 1);
         }
 
-        private static IEnumerable<ModPreset> createTestPresets() => new[]
+        private IEnumerable<ModPreset> createTestPresets() => new[]
         {
             new ModPreset
             {
@@ -48,7 +77,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new OsuModHardRock(),
                     new OsuModDoubleTime()
-                }
+                },
+                Ruleset = rulesets.GetRuleset(0).AsNonNull()
             },
             new ModPreset
             {
@@ -60,7 +90,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         ApproachRate = { Value = 0 }
                     }
-                }
+                },
+                Ruleset = rulesets.GetRuleset(0).AsNonNull()
             },
             new ModPreset
             {
@@ -70,7 +101,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new OsuModFlashlight(),
                     new OsuModSpinIn()
-                }
+                },
+                Ruleset = rulesets.GetRuleset(0).AsNonNull()
+            },
+            new ModPreset
+            {
+                Name = "Different ruleset",
+                Description = "Just to shake things up",
+                Mods = new Mod[]
+                {
+                    new ManiaModKey4(),
+                    new ManiaModFadeIn()
+                },
+                Ruleset = rulesets.GetRuleset(3).AsNonNull()
             }
         };
     }
