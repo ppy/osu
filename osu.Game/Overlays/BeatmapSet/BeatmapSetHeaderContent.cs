@@ -222,7 +222,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 TextSize = 14,
                                 TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 }
                             },
-                            Details = new Details(false),
+                            Details = new Details(),
                         },
                     },
                 }
