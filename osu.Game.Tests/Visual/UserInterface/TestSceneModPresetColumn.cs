@@ -22,8 +22,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         protected override bool UseFreshStoragePerRun => true;
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
+        private RulesetStore rulesets = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
@@ -31,18 +30,25 @@ namespace osu.Game.Tests.Visual.UserInterface
         [BackgroundDependencyLoader]
         private void load()
         {
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(Realm);
         }
 
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("clear contents", Clear);
             AddStep("reset storage", () =>
             {
                 Realm.Write(realm =>
                 {
                     realm.RemoveAll<ModPreset>();
-                    realm.Add(createTestPresets());
+
+                    var testPresets = createTestPresets();
+                    foreach (var preset in testPresets)
+                        preset.Ruleset = realm.Find<RulesetInfo>(preset.Ruleset.ShortName);
+
+                    realm.Add(testPresets);
                 });
             });
         }
@@ -75,7 +81,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new ManiaModNightcore(),
                     new ManiaModHardRock()
                 },
-                Ruleset = rulesets.GetRuleset(3).AsNonNull()
+                Ruleset = r.Find<RulesetInfo>("mania")
             })));
             AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
 
@@ -87,7 +93,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new OsuModHidden(),
                     new OsuModHardRock()
                 },
-                Ruleset = rulesets.GetRuleset(0).AsNonNull()
+                Ruleset = r.Find<RulesetInfo>("osu")
             })));
             AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
 
@@ -140,7 +146,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("3 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 3);
         }
 
-        private IEnumerable<ModPreset> createTestPresets() => new[]
+        private ICollection<ModPreset> createTestPresets() => new[]
         {
             new ModPreset
             {
