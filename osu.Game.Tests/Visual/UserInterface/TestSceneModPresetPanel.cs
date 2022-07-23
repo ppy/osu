@@ -11,6 +11,7 @@ using osu.Game.Database;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osuTK;
 
@@ -46,7 +47,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new OsuModHardRock(),
                     new OsuModDoubleTime()
-                }
+                },
+                Ruleset = new OsuRuleset().RulesetInfo
             },
             new ModPreset
             {
@@ -58,7 +60,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         ApproachRate = { Value = 0 }
                     }
-                }
+                },
+                Ruleset = new OsuRuleset().RulesetInfo
             },
             new ModPreset
             {
@@ -68,7 +71,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new OsuModFlashlight(),
                     new OsuModSpinIn()
-                }
+                },
+                Ruleset = new OsuRuleset().RulesetInfo
             }
         };
     }
