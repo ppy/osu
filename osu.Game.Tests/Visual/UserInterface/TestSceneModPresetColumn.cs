@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestBasicAppearance()
+        public void TestBasicOperation()
         {
             AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
             AddStep("create content", () => Child = new Container
@@ -65,6 +65,41 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("change ruleset to mania", () => Ruleset.Value = rulesets.GetRuleset(3));
             AddUntilStep("1 panel visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 1);
+
+            AddStep("add another mania preset", () => Realm.Write(r => r.Add(new ModPreset
+            {
+                Name = "and another one",
+                Mods = new Mod[]
+                {
+                    new ManiaModMirror(),
+                    new ManiaModNightcore(),
+                    new ManiaModHardRock()
+                },
+                Ruleset = rulesets.GetRuleset(3).AsNonNull()
+            })));
+            AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
+
+            AddStep("add another osu! preset", () => Realm.Write(r => r.Add(new ModPreset
+            {
+                Name = "hdhr",
+                Mods = new Mod[]
+                {
+                    new OsuModHidden(),
+                    new OsuModHardRock()
+                },
+                Ruleset = rulesets.GetRuleset(0).AsNonNull()
+            })));
+            AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
+
+            AddStep("remove mania preset", () => Realm.Write(r =>
+            {
+                var toRemove = r.All<ModPreset>().Single(preset => preset.Name == "Different ruleset");
+                r.Remove(toRemove);
+            }));
+            AddUntilStep("1 panel visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 1);
+
+            AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
+            AddUntilStep("4 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 4);
         }
 
         private IEnumerable<ModPreset> createTestPresets() => new[]
