@@ -102,6 +102,44 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("4 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 4);
         }
 
+        [Test]
+        public void TestSoftDeleteSupport()
+        {
+            AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
+            AddStep("create content", () => Child = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding(30),
+                Child = new ModPresetColumn
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                }
+            });
+            AddUntilStep("3 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 3);
+
+            AddStep("soft delete preset", () => Realm.Write(r =>
+            {
+                var toSoftDelete = r.All<ModPreset>().Single(preset => preset.Name == "AR0");
+                toSoftDelete.DeletePending = true;
+            }));
+            AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
+
+            AddStep("soft delete all presets", () => Realm.Write(r =>
+            {
+                foreach (var preset in r.All<ModPreset>())
+                    preset.DeletePending = true;
+            }));
+            AddUntilStep("no panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 0);
+
+            AddStep("undelete preset", () => Realm.Write(r =>
+            {
+                foreach (var preset in r.All<ModPreset>())
+                    preset.DeletePending = false;
+            }));
+            AddUntilStep("3 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 3);
+        }
+
         private IEnumerable<ModPreset> createTestPresets() => new[]
         {
             new ModPreset
