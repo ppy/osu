@@ -5,7 +5,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -32,12 +31,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("get initial range", () => initialVisibleRange = TimelineArea.Timeline.VisibleRange);
 
             AddStep("scale zoom", () => TimelineArea.Timeline.Zoom = 200);
-            AddAssert("range halved", () => Precision.AlmostEquals(TimelineArea.Timeline.VisibleRange, initialVisibleRange / 2, 1));
+            AddStep("range halved", () => Assert.That(TimelineArea.Timeline.VisibleRange, Is.EqualTo(initialVisibleRange / 2).Within(1)));
             AddStep("descale zoom", () => TimelineArea.Timeline.Zoom = 50);
-            AddAssert("range doubled", () => Precision.AlmostEquals(TimelineArea.Timeline.VisibleRange, initialVisibleRange * 2, 1));
+            AddStep("range doubled", () => Assert.That(TimelineArea.Timeline.VisibleRange, Is.EqualTo(initialVisibleRange * 2).Within(1)));
 
             AddStep("restore zoom", () => TimelineArea.Timeline.Zoom = 100);
-            AddAssert("range restored", () => Precision.AlmostEquals(TimelineArea.Timeline.VisibleRange, initialVisibleRange, 1));
+            AddStep("range restored", () => Assert.That(TimelineArea.Timeline.VisibleRange, Is.EqualTo(initialVisibleRange).Within(1)));
         }
 
         [Test]
