@@ -269,7 +269,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public void SelectAll()
         {
-            foreach (var column in columnFlow.Columns)
+            foreach (var column in columnFlow.Columns.OfType<ModColumn>())
                 column.SelectAll();
         }
 
@@ -278,7 +278,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public void DeselectAll()
         {
-            foreach (var column in columnFlow.Columns)
+            foreach (var column in columnFlow.Columns.OfType<ModColumn>())
                 column.DeselectAll();
         }
 
@@ -317,7 +317,7 @@ namespace osu.Game.Overlays.Mods
             AvailableMods.Value = newLocalAvailableMods;
             filterMods();
 
-            foreach (var column in columnFlow.Columns)
+            foreach (var column in columnFlow.Columns.OfType<ModColumn>())
                 column.AvailableMods = AvailableMods.Value.GetValueOrDefault(column.ModType, Array.Empty<ModState>());
         }
 
@@ -458,7 +458,7 @@ namespace osu.Game.Overlays.Mods
             {
                 var column = columnFlow[i].Column;
 
-                bool allFiltered = column.AvailableMods.All(modState => modState.Filtered.Value);
+                bool allFiltered = column is ModColumn modColumn && modColumn.AvailableMods.All(modState => modState.Filtered.Value);
 
                 double delay = allFiltered ? 0 : nonFilteredColumnCount * 30;
                 double duration = allFiltered ? 0 : fade_in_duration;
@@ -516,14 +516,19 @@ namespace osu.Game.Overlays.Mods
             {
                 var column = columnFlow[i].Column;
 
-                bool allFiltered = column.AvailableMods.All(modState => modState.Filtered.Value);
+                bool allFiltered = false;
+
+                if (column is ModColumn modColumn)
+                {
+                    allFiltered = modColumn.AvailableMods.All(modState => modState.Filtered.Value);
+                    modColumn.FlushPendingSelections();
+                }
 
                 double duration = allFiltered ? 0 : fade_out_duration;
                 float newYPosition = 0;
                 if (!allFiltered)
                     newYPosition = nonFilteredColumnCount % 2 == 0 ? -distance : distance;
 
-                column.FlushPendingSelections();
                 column.TopLevelContent
                       .MoveToY(newYPosition, duration, Easing.OutQuint)
                       .FadeOut(duration, Easing.OutQuint);
@@ -632,7 +637,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         internal class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
         {
-            public IEnumerable<ModColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
+            public IEnumerable<ModSelectColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
 
             public override void Add(ColumnDimContainer dimContainer)
             {
@@ -648,7 +653,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         internal class ColumnDimContainer : Container
         {
-            public ModColumn Column { get; }
+            public ModSelectColumn Column { get; }
 
             /// <summary>
             /// Tracks whether this column is in an interactive state. Generally only the case when the column is on-screen.
@@ -677,7 +682,7 @@ namespace osu.Game.Overlays.Mods
                 FinishTransforms();
             }
 
-            protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || Column.SelectionAnimationRunning;
+            protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || (Column as ModColumn)?.SelectionAnimationRunning == true;
 
             private void updateState()
             {
