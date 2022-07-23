@@ -138,6 +138,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             new object[] { "65m", TimeSpan.FromMinutes(65), TimeSpan.FromMinutes(1), true },
             new object[] { "90s", TimeSpan.FromSeconds(90), TimeSpan.FromSeconds(1), true },
             new object[] { "80m20s", TimeSpan.FromSeconds(4820), TimeSpan.FromSeconds(1), true },
+            new object[] { "1h20s", TimeSpan.FromSeconds(3620), TimeSpan.FromSeconds(1), true },
             new object[] { "7.5m27s", new TimeSpan(), new TimeSpan(), false },
             new object[] { "7m27", new TimeSpan(), new TimeSpan(), false },
             new object[] { "7m7m7m", new TimeSpan(), new TimeSpan(), false },
