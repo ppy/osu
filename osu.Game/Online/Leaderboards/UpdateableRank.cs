@@ -17,7 +17,7 @@ namespace osu.Game.Online.Leaderboards
             set => Model = value;
         }
 
-        public UpdateableRank(ScoreRank? rank)
+        public UpdateableRank(ScoreRank? rank = null)
         {
             Rank = rank;
         }
