@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -8,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -23,6 +25,12 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("reset selected mods", () => SelectedMods.SetDefault());
+        }
 
         [Test]
         public void TestVariousModPresets()
@@ -79,6 +87,36 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set mods to HD+HR+DT", () => SelectedMods.Value = new Mod[] { new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime() });
             AddAssert("panel is not active", () => !panel.AsNonNull().Active.Value);
         }
+
+        [Test]
+        public void TestActivatingPresetTogglesIncludedMods()
+        {
+            ModPresetPanel? panel = null;
+
+            AddStep("create panel", () => Child = panel = new ModPresetPanel(createTestPresets().First().ToLiveUnmanaged())
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Width = 0.5f
+            });
+
+            AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
+            assertSelectedModsEquivalentTo(new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() });
+
+            AddStep("deactivate panel", () => panel.AsNonNull().TriggerClick());
+            assertSelectedModsEquivalentTo(Array.Empty<Mod>());
+
+            AddStep("set different mod", () => SelectedMods.Value = new[] { new OsuModHidden() });
+            AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
+            assertSelectedModsEquivalentTo(new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() });
+
+            AddStep("set customised mod", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = 1.25 } } });
+            AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
+            assertSelectedModsEquivalentTo(new Mod[] { new OsuModHardRock(), new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
+        }
+
+        private void assertSelectedModsEquivalentTo(IEnumerable<Mod> mods)
+            => AddAssert("selected mods changed correctly", () => new HashSet<Mod>(SelectedMods.Value).SetEquals(mods));
 
         private static IEnumerable<ModPreset> createTestPresets() => new[]
         {
