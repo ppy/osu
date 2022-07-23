@@ -95,6 +95,9 @@ namespace osu.Game.Overlays.Mods
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
+                Body.BorderThickness = 3;
+                Body.BorderColour = colours.Orange1;
+
                 createButton.DarkerColour = colours.Orange1;
                 createButton.LighterColour = colours.Orange0;
                 createButton.TextColour = colourProvider.Background6;
