@@ -4,6 +4,7 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Testing;
+using osu.Game.Rulesets.Difficulty;
 using Realms;
 
 namespace osu.Game.Rulesets
@@ -21,6 +22,11 @@ namespace osu.Game.Rulesets
         public string Name { get; set; } = string.Empty;
 
         public string InstantiationInfo { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Stores the last applied <see cref="DifficultyCalculator.Version"/>
+        /// </summary>
+        public int LastAppliedDifficultyVersion { get; set; }
 
         public RulesetInfo(string shortName, string name, string instantiationInfo, int onlineID)
         {
@@ -86,7 +92,8 @@ namespace osu.Game.Rulesets
             Name = Name,
             ShortName = ShortName,
             InstantiationInfo = InstantiationInfo,
-            Available = Available
+            Available = Available,
+            LastAppliedDifficultyVersion = LastAppliedDifficultyVersion,
         };
 
         public Ruleset CreateInstance()
