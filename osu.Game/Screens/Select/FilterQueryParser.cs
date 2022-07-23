@@ -129,6 +129,16 @@ namespace osu.Game.Screens.Select
             value = Enum.GetNames(typeof(TEnum)).FirstOrDefault(name => name.StartsWith(value, true, CultureInfo.InvariantCulture));
             return Enum.TryParse(value, true, out result);
         }
+        private static bool tryMatchRegex(string value, string regex, ref GroupCollection result)
+        {
+            Match matchs = Regex.Match(value, regex);
+            if (matchs.Success)
+            {
+                result = matchs.Groups;
+                return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Attempts to parse a keyword filter with the specified <paramref name="op"/> and textual <paramref name="value"/>.
@@ -314,28 +324,22 @@ namespace osu.Game.Screens.Select
         private static bool tryUpdateLengthRange(FilterCriteria criteria, Operator op, string val)
         {
             List<string> parts = new List<string>();
+            GroupCollection groups = null;
 
-            if (Regex.IsMatch(val, @"^\d+(:\d+){1,2}$")) // formats like 12:34
+            if (
+                tryMatchRegex(val, @"^((?<hours>\d+):)?(?<minutes>\d+):(?<seconds>\d+)$", ref groups) ||
+                tryMatchRegex(val, @"^((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$", ref groups) ||
+                tryMatchRegex(val, @"^(?<seconds>\d+(\.\d+)?)$", ref groups)
+            )
             {
-                List<string> splitted = val.Split(':').ToList();
-                while (splitted.Count < 3)
-                    splitted.Insert(0, "0");
-
-                parts.Add(splitted[2] + 's');
-                parts.Add(splitted[1] + 'm');
-                parts.Add(splitted[0] + 'h');                
+                if (groups["seconds"].Success)
+                    parts.Add(groups["seconds"].Value + "s");
+                if (groups["minutes"].Success)
+                    parts.Add(groups["minutes"].Value + "m");
+                if (groups["hours"].Success)
+                    parts.Add(groups["hours"].Value + "h");
             }
-            else if (Regex.IsMatch(val, @"^(\d+(\.\d+)?[hms]){1,3}$") && "hms".Contains(Regex.Replace(val, @"[\d\.]", ""))) // formats like 1h2m3s
-            {
-                string[] splitted = Regex.Split(val, @"(?<=[hms])").Where(x => x.Length > 0).Reverse().ToArray();
-                parts.AddRange(splitted);
-            }
-            else if (Regex.IsMatch(val, @"^\d+(\.\d+)?$")) // only one number
-            {
-                parts.Add(val + 's');
-            }
-
-            if (parts.Count == 0)
+            else
                 return false;
 
             double totalLength = 0;
