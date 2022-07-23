@@ -190,7 +190,7 @@ namespace osu.Game.Tests.Resources
                 [HitResult.SmallTickMiss] = 25,
                 [HitResult.LargeTickHit] = 100,
                 [HitResult.LargeTickMiss] = 50,
-                [HitResult.SmallBonus] = 10,
+                [HitResult.LargeBonus] = 10,
                 [HitResult.SmallBonus] = 50
             },
         };
