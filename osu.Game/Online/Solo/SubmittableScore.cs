@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -46,9 +48,6 @@ namespace osu.Game.Online.Solo
         [JsonProperty("mods")]
         public APIMod[] Mods { get; set; }
 
-        [JsonProperty("user")]
-        public APIUser User { get; set; }
-
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics { get; set; }
 
@@ -67,7 +66,6 @@ namespace osu.Game.Online.Solo
             RulesetID = score.RulesetID;
             Passed = score.Passed;
             Mods = score.APIMods;
-            User = score.User;
             Statistics = score.Statistics;
         }
     }

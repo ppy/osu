@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -18,7 +21,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObject
     {
-        public override double ScoreMultiplier => 1.12;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModBlinds)).ToArray();
 
         private const double default_follow_delay = 120;
 
@@ -31,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
-        public override BindableNumber<float> SizeMultiplier { get; } = new BindableNumber<float>
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat
         {
             MinValue = 0.5f,
             MaxValue = 2f,

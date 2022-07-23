@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -25,6 +27,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     public class PlayerArea : CompositeDrawable
     {
         /// <summary>
+        /// Raised after <see cref="Player.StartGameplay"/> is called on <see cref="Player"/>.
+        /// </summary>
+        public event Action OnGameplayStarted;
+
+        /// <summary>
         /// Whether a <see cref="Player"/> is loaded in the area.
         /// </summary>
         public bool PlayerLoaded => (stack?.CurrentScreen as Player)?.IsLoaded == true;
@@ -45,9 +52,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         [CanBeNull]
         public Score Score { get; private set; }
-
-        [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble();
         private readonly Container gameplayContent;
@@ -77,6 +81,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             GameplayClock.Source = masterClock;
         }
 
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
         public void LoadScore([NotNull] Score score)
         {
             if (Score != null)
@@ -84,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             Score = score;
 
-            gameplayContent.Child = new PlayerIsolationContainer(beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.BeatmapInfo), Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
+            gameplayContent.Child = new PlayerIsolationContainer(beatmap.Value, Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = stack = new OsuScreenStack
@@ -93,7 +100,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 }
             };
 
-            stack.Push(new MultiSpectatorPlayerLoader(Score, () => new MultiSpectatorPlayer(Score, GameplayClock)));
+            stack.Push(new MultiSpectatorPlayerLoader(Score, () =>
+            {
+                var player = new MultiSpectatorPlayer(Score, GameplayClock);
+                player.OnGameplayStarted += () => OnGameplayStarted?.Invoke();
+                return player;
+            }));
+
             loadingLayer.Hide();
         }
 

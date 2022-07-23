@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -52,7 +54,7 @@ namespace osu.Game.Tests.Editing.Checks
             beatmap.BeatmapInfo.BeatmapSet.Files.Add(CheckTestHelpers.CreateMockFile("jpg"));
 
             // Should fail to load, but not produce an error due to the extension not being expected to load.
-            Assert.IsEmpty(check.Run(getContext(null, allowMissing: true)));
+            Assert.IsEmpty(check.Run(getContext(null)));
         }
 
         [Test]
@@ -91,7 +93,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             using (var resourceStream = TestResources.OpenResource("Samples/missing.mp3"))
             {
-                Assert.IsEmpty(check.Run(getContext(resourceStream, allowMissing: true)));
+                Assert.IsEmpty(check.Run(getContext(resourceStream)));
             }
         }
 
@@ -107,7 +109,7 @@ namespace osu.Game.Tests.Editing.Checks
             }
         }
 
-        private BeatmapVerifierContext getContext(Stream resourceStream, bool allowMissing = false)
+        private BeatmapVerifierContext getContext(Stream resourceStream)
         {
             var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null, null);
             mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);

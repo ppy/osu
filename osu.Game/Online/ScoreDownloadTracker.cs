@@ -9,8 +9,6 @@ using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Scoring;
 
-#nullable enable
-
 namespace osu.Game.Online
 {
     public class ScoreDownloadTracker : DownloadTracker<ScoreInfo>
@@ -47,7 +45,10 @@ namespace osu.Game.Online
             Downloader.DownloadBegan += downloadBegan;
             Downloader.DownloadFailed += downloadFailed;
 
-            realmSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s => ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID) || s.Hash == TrackedItem.Hash) && !s.DeletePending), (items, changes, ___) =>
+            realmSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s =>
+                ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID)
+                 || (!string.IsNullOrEmpty(s.Hash) && s.Hash == TrackedItem.Hash))
+                && !s.DeletePending), (items, _, _) =>
             {
                 if (items.Any())
                     Schedule(() => UpdateState(DownloadState.LocallyAvailable));

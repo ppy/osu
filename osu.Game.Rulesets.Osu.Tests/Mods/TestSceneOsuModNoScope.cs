@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -145,6 +147,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         private bool isBreak() => Player.IsBreakTime.Value;
 
-        private bool cursorAlphaAlmostEquals(float alpha) => Precision.AlmostEquals(Player.DrawableRuleset.Cursor.Alpha, alpha);
+        private bool cursorAlphaAlmostEquals(float alpha) => Precision.AlmostEquals(Player.DrawableRuleset.Cursor.Alpha, alpha, 0.1f);
     }
 }

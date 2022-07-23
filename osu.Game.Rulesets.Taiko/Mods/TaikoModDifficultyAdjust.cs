@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -23,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             get
             {
-                string scrollSpeed = ScrollSpeed.IsDefault ? string.Empty : $"Scroll x{ScrollSpeed.Value:N1}";
+                string scrollSpeed = ScrollSpeed.IsDefault ? string.Empty : $"Scroll x{ScrollSpeed.Value:N2}";
 
                 return string.Join(", ", new[]
                 {

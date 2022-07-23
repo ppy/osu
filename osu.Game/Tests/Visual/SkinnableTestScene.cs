@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -43,7 +45,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            var dllStore = new DllResourceStore(DynamicCompilationOriginal.GetType().Assembly);
+            var dllStore = new DllResourceStore(GetType().Assembly);
 
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), this, true);
             defaultSkin = new DefaultLegacySkin(this);
@@ -74,10 +76,14 @@ namespace osu.Game.Tests.Visual
 
             createdDrawables.Add(created);
 
-            SkinProvidingContainer mainProvider;
             Container childContainer;
             OutlineBox outlineBox;
             SkinProvidingContainer skinProvider;
+
+            ISkin provider = skin;
+
+            if (provider is LegacySkin legacyProvider)
+                provider = Ruleset.Value.CreateInstance().CreateLegacySkinProvider(legacyProvider, beatmap);
 
             var children = new Container
             {
@@ -96,7 +102,7 @@ namespace osu.Game.Tests.Visual
                     },
                     new OsuSpriteText
                     {
-                        Text = skin?.SkinInfo?.Value.Name ?? "none",
+                        Text = skin?.SkinInfo.Value.Name ?? "none",
                         Scale = new Vector2(1.5f),
                         Padding = new MarginPadding(5),
                     },
@@ -107,12 +113,10 @@ namespace osu.Game.Tests.Visual
                         Children = new Drawable[]
                         {
                             outlineBox = new OutlineBox(),
-                            (mainProvider = new SkinProvidingContainer(skin)).WithChild(
-                                skinProvider = new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
-                                {
-                                    Child = created,
-                                }
-                            )
+                            skinProvider = new SkinProvidingContainer(provider)
+                            {
+                                Child = created,
+                            }
                         }
                     },
                 }
@@ -130,7 +134,7 @@ namespace osu.Game.Tests.Visual
             {
                 bool autoSize = created.RelativeSizeAxes == Axes.None;
 
-                foreach (var c in new[] { mainProvider, childContainer, skinProvider })
+                foreach (var c in new[] { childContainer, skinProvider })
                 {
                     c.RelativeSizeAxes = Axes.None;
                     c.AutoSizeAxes = Axes.None;
@@ -187,7 +191,7 @@ namespace osu.Game.Tests.Visual
             private readonly bool extrapolateAnimations;
 
             public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, IStorageResourceProvider resources, bool extrapolateAnimations)
-                : base(skin, storage, resources, "skin.ini")
+                : base(skin, resources, storage)
             {
                 this.extrapolateAnimations = extrapolateAnimations;
             }

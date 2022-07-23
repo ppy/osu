@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -43,7 +44,7 @@ namespace osu.Game.Graphics
         private Storage storage;
 
         [Resolved]
-        private NotificationOverlay notificationOverlay { get; set; }
+        private INotificationOverlay notificationOverlay { get; set; }
 
         private Sample shutter;
 
@@ -102,7 +103,9 @@ namespace osu.Game.Graphics
                             framesWaitedEvent.Set();
                     }, 10, true);
 
-                    framesWaitedEvent.Wait();
+                    if (!framesWaitedEvent.Wait(1000))
+                        throw new TimeoutException("Screenshot data did not arrive in a timely fashion");
+
                     waitDelegate.Cancel();
                 }
             }
@@ -112,11 +115,13 @@ namespace osu.Game.Graphics
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
 
+                host.GetClipboard()?.SetImage(image);
+
                 string filename = getFilename();
 
                 if (filename == null) return;
 
-                using (var stream = storage.GetStream(filename, FileAccess.Write))
+                using (var stream = storage.CreateFileSafely(filename))
                 {
                     switch (screenshotFormat.Value)
                     {

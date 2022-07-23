@@ -1,33 +1,38 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
@@ -37,7 +42,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>
+    public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>, IHasContextMenu
     {
         public const float HEIGHT = 50;
 
@@ -66,17 +71,20 @@ namespace osu.Game.Screens.OnlinePlay
 
         public readonly PlaylistItem Item;
 
+        public bool IsSelectedItem => SelectedItem.Value?.ID == Item.ID;
+
         private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
         private readonly IBindable<bool> valid = new Bindable<bool>();
-        private readonly Bindable<IBeatmapInfo> beatmap = new Bindable<IBeatmapInfo>();
-        private readonly Bindable<IRulesetInfo> ruleset = new Bindable<IRulesetInfo>();
-        private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
+
+        private IBeatmapInfo beatmap;
+        private IRulesetInfo ruleset;
+        private Mod[] requiredMods;
 
         private Container maskingContainer;
         private Container difficultyIconContainer;
         private LinkFlowContainer beatmapText;
         private LinkFlowContainer authorText;
-        private ExplicitContentBeatmapPill explicitContentPill;
+        private ExplicitContentBeatmapBadge explicitContent;
         private ModDisplay modDisplay;
         private FillFlowContainer buttonsFlow;
         private UpdateableAvatar ownerAvatar;
@@ -87,17 +95,28 @@ namespace osu.Game.Screens.OnlinePlay
         private FillFlowContainer mainFillFlow;
 
         [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
         private OsuColour colours { get; set; }
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
 
-        [CanBeNull]
-        [Resolved(CanBeNull = true)]
-        private MultiplayerClient multiplayerClient { get; set; }
-
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private BeatmapSetOverlay beatmapOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private CollectionManager collectionManager { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => AllowReordering || AllowDeletion || !AllowSelection || SelectedItem.Value == Model;
 
@@ -106,10 +125,7 @@ namespace osu.Game.Screens.OnlinePlay
         {
             Item = item;
 
-            beatmap.BindTo(item.Beatmap);
             valid.BindTo(item.Valid);
-            ruleset.BindTo(item.Ruleset);
-            requiredMods.BindTo(item.RequiredMods);
 
             if (item.Expired)
                 Colour = OsuColour.Gray(0.5f);
@@ -119,6 +135,11 @@ namespace osu.Game.Screens.OnlinePlay
         private void load()
         {
             maskingContainer.BorderColour = colours.Yellow;
+
+            ruleset = rulesets.GetRuleset(Item.RulesetID);
+            var rulesetInstance = ruleset?.CreateInstance();
+
+            requiredMods = Item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
         }
 
         protected override void LoadComplete()
@@ -127,12 +148,10 @@ namespace osu.Game.Screens.OnlinePlay
 
             SelectedItem.BindValueChanged(selected =>
             {
-                bool isCurrent = selected.NewValue == Model;
-
                 if (!valid.Value)
                 {
                     // Don't allow selection when not valid.
-                    if (isCurrent)
+                    if (IsSelectedItem)
                     {
                         SelectedItem.Value = selected.OldValue;
                     }
@@ -141,13 +160,10 @@ namespace osu.Game.Screens.OnlinePlay
                     return;
                 }
 
-                maskingContainer.BorderThickness = isCurrent ? 5 : 0;
+                maskingContainer.BorderThickness = IsSelectedItem ? 5 : 0;
             }, true);
 
-            beatmap.BindValueChanged(_ => Scheduler.AddOnce(refresh));
-            ruleset.BindValueChanged(_ => Scheduler.AddOnce(refresh));
             valid.BindValueChanged(_ => Scheduler.AddOnce(refresh));
-            requiredMods.CollectionChanged += (_, __) => Scheduler.AddOnce(refresh);
 
             onScreenLoader.DelayedLoadStarted += _ =>
             {
@@ -161,19 +177,9 @@ namespace osu.Game.Screens.OnlinePlay
                             Schedule(() => ownerAvatar.User = foundUser);
                         }
 
-                        if (Item.Beatmap.Value == null)
-                        {
-                            IBeatmapInfo foundBeatmap;
+                        beatmap = await beatmapLookupCache.GetBeatmapAsync(Item.Beatmap.OnlineID).ConfigureAwait(false);
 
-                            if (multiplayerClient != null)
-                                // This call can eventually go away (and use the else case below).
-                                // Currently required only due to the method being overridden to provide special behaviour in tests.
-                                foundBeatmap = await multiplayerClient.GetAPIBeatmap(Item.BeatmapID).ConfigureAwait(false);
-                            else
-                                foundBeatmap = await beatmapLookupCache.GetBeatmapAsync(Item.BeatmapID).ConfigureAwait(false);
-
-                            Schedule(() => Item.Beatmap.Value = foundBeatmap);
-                        }
+                        Scheduler.AddOnce(refresh);
                     }
                     catch (Exception e)
                     {
@@ -275,33 +281,37 @@ namespace osu.Game.Screens.OnlinePlay
                 maskingContainer.BorderColour = colours.Red;
             }
 
-            if (Item.Beatmap.Value != null)
-                difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(icon_height) };
+            if (beatmap != null)
+                difficultyIconContainer.Child = new DifficultyIcon(beatmap, ruleset) { Size = new Vector2(icon_height) };
             else
                 difficultyIconContainer.Clear();
 
-            panelBackground.Beatmap.Value = Item.Beatmap.Value;
+            panelBackground.Beatmap.Value = beatmap;
 
             beatmapText.Clear();
 
-            if (Item.Beatmap.Value != null)
+            if (beatmap != null)
             {
-                beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineID.ToString(), null, text =>
-                {
-                    text.Truncate = true;
-                });
+                beatmapText.AddLink(beatmap.GetDisplayTitleRomanisable(includeCreator: false),
+                    LinkAction.OpenBeatmap,
+                    beatmap.OnlineID.ToString(),
+                    null,
+                    text =>
+                    {
+                        text.Truncate = true;
+                    });
             }
 
             authorText.Clear();
 
-            if (!string.IsNullOrEmpty(Item.Beatmap.Value?.Metadata.Author.Username))
+            if (!string.IsNullOrEmpty(beatmap?.Metadata.Author.Username))
             {
                 authorText.AddText("mapped by ");
-                authorText.AddUserLink(Item.Beatmap.Value.Metadata.Author);
+                authorText.AddUserLink(beatmap.Metadata.Author);
             }
 
-            bool hasExplicitContent = (Item.Beatmap.Value?.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
-            explicitContentPill.Alpha = hasExplicitContent ? 1 : 0;
+            bool hasExplicitContent = (beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
+            explicitContent.Alpha = hasExplicitContent ? 1 : 0;
 
             modDisplay.Current.Value = requiredMods.ToArray();
 
@@ -388,7 +398,7 @@ namespace osu.Game.Screens.OnlinePlay
                                                     Children = new Drawable[]
                                                     {
                                                         authorText = new LinkFlowContainer(fontParameters) { AutoSizeAxes = Axes.Both },
-                                                        explicitContentPill = new ExplicitContentBeatmapPill
+                                                        explicitContent = new ExplicitContentBeatmapBadge
                                                         {
                                                             Alpha = 0f,
                                                             Anchor = Anchor.CentreLeft,
@@ -439,7 +449,7 @@ namespace osu.Game.Screens.OnlinePlay
                             }
                         }
                     },
-                }
+                },
             };
         }
 
@@ -452,13 +462,13 @@ namespace osu.Game.Screens.OnlinePlay
                 Alpha = AllowShowingResults ? 1 : 0,
                 TooltipText = "View results"
             },
-            Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),
+            beatmap == null ? Empty() : new PlaylistDownloadButton(beatmap),
             editButton = new PlaylistEditButton
             {
                 Size = new Vector2(30, 30),
                 Alpha = AllowEditing ? 1 : 0,
                 Action = () => RequestEdit?.Invoke(Item),
-                TooltipText = "Edit"
+                TooltipText = CommonStrings.ButtonsEdit
             },
             removeButton = new PlaylistRemoveButton
             {
@@ -474,6 +484,31 @@ namespace osu.Game.Screens.OnlinePlay
             if (AllowSelection && valid.Value)
                 SelectedItem.Value = Model;
             return true;
+        }
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (beatmapOverlay != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
+
+                if (collectionManager != null && beatmap != null)
+                {
+                    if (beatmaps.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID) is BeatmapInfo local && !local.BeatmapSet.AsNonNull().DeletePending)
+                    {
+                        var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
+                        if (manageCollectionsDialog != null)
+                            collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+
+                        items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                    }
+                }
+
+                return items.ToArray();
+            }
         }
 
         public class PlaylistEditButton : GrayButton
@@ -494,7 +529,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private sealed class PlaylistDownloadButton : BeatmapDownloadButton
         {
-            private readonly PlaylistItem playlistItem;
+            private readonly IBeatmapInfo beatmap;
 
             [Resolved]
             private BeatmapManager beatmapManager { get; set; }
@@ -504,10 +539,10 @@ namespace osu.Game.Screens.OnlinePlay
 
             private const float width = 50;
 
-            public PlaylistDownloadButton(PlaylistItem playlistItem)
-                : base(playlistItem.Beatmap.Value.BeatmapSet)
+            public PlaylistDownloadButton(IBeatmapInfo beatmap)
+                : base(beatmap.BeatmapSet)
             {
-                this.playlistItem = playlistItem;
+                this.beatmap = beatmap;
 
                 Size = new Vector2(width, 30);
                 Alpha = 0;
@@ -527,7 +562,7 @@ namespace osu.Game.Screens.OnlinePlay
                 {
                     case DownloadState.LocallyAvailable:
                         // Perform a local query of the beatmap by beatmap checksum, and reset the state if not matching.
-                        if (beatmapManager.QueryBeatmap(b => b.MD5Hash == playlistItem.Beatmap.Value.MD5Hash) == null)
+                        if (beatmapManager.QueryBeatmap(b => b.MD5Hash == beatmap.MD5Hash) == null)
                             State.Value = DownloadState.NotDownloaded;
                         else
                         {

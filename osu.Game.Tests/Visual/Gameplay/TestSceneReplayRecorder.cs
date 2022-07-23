@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -14,17 +15,16 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Visual.UserInterface;
+using osu.Game.Tests.Gameplay;
+using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestReplayRecorder recorder;
 
         [Cached]
-        private GameplayState gameplayState = new GameplayState(new Beatmap(), new OsuRuleset(), Array.Empty<Mod>());
+        private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         new Drawable[]
                         {
-                            recordingManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                            recordingManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                             {
                                 Recorder = recorder = new TestReplayRecorder(new Score
                                 {
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         },
                         new Drawable[]
                         {
-                            playbackManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                            playbackManager = new TestRulesetInputManager(TestCustomisableModRuleset.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                             {
                                 ReplayInputHandler = new TestFramedReplayInputHandler(replay)
                                 {
@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            public override void CollectPendingInputs(List<IInput> inputs)
+            protected override void CollectReplayInputs(List<IInput> inputs)
             {
                 inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero) });
                 inputs.Add(new ReplayState<TestAction> { PressedActions = CurrentFrame?.Actions ?? new List<TestAction>() });

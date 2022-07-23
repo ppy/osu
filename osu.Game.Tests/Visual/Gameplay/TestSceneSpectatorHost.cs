@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
@@ -37,8 +39,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestClientSendsCorrectRuleset()
         {
-            AddUntilStep("spectator client sending frames", () => spectatorClient.PlayingUserStates.ContainsKey(dummy_user_id));
-            AddAssert("spectator client sent correct ruleset", () => spectatorClient.PlayingUserStates[dummy_user_id].RulesetID == Ruleset.Value.OnlineID);
+            AddUntilStep("spectator client sending frames", () => spectatorClient.WatchedUserStates.ContainsKey(dummy_user_id));
+            AddAssert("spectator client sent correct ruleset", () => spectatorClient.WatchedUserStates[dummy_user_id].RulesetID == Ruleset.Value.OnlineID);
         }
 
         public override void TearDownSteps()

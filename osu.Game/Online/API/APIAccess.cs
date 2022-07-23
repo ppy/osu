@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,6 +37,8 @@ namespace osu.Game.Online.API
         public string APIEndpointUrl { get; }
 
         public string WebsiteRootUrl { get; }
+
+        public int APIVersion => 20220705; // We may want to pull this from the game version eventually.
 
         public Exception LastLoginError { get; private set; }
 
@@ -159,7 +163,13 @@ namespace osu.Game.Online.API
 
                         userReq.Failure += ex =>
                         {
-                            if (ex is WebException webException && webException.Message == @"Unauthorized")
+                            if (ex is APIException)
+                            {
+                                LastLoginError = ex;
+                                log.Add("Login failed on local user retrieval!");
+                                Logout();
+                            }
+                            else if (ex is WebException webException && webException.Message == @"Unauthorized")
                             {
                                 log.Add(@"Login no longer valid");
                                 Logout();
@@ -399,7 +409,10 @@ namespace osu.Game.Online.API
             lock (queue)
             {
                 if (state.Value == APIState.Offline)
+                {
+                    request.Fail(new WebException(@"User not logged in"));
                     return;
+                }
 
                 queue.Enqueue(request);
             }
@@ -416,7 +429,7 @@ namespace osu.Game.Online.API
                 if (failOldRequests)
                 {
                     foreach (var req in oldQueueRequests)
-                        req.Fail(new WebException(@"Disconnected from server"));
+                        req.Fail(new WebException($@"Request failed from flush operation (state {state.Value})"));
                 }
             }
         }
@@ -453,7 +466,7 @@ namespace osu.Game.Online.API
         public GuestUser()
         {
             Username = @"Guest";
-            Id = 1;
+            Id = SYSTEM_USER_ID;
         }
     }
 

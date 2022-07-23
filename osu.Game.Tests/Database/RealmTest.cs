@@ -15,8 +15,6 @@ using osu.Game.IO;
 using osu.Game.Models;
 using osu.Game.Rulesets;
 
-#nullable enable
-
 namespace osu.Game.Tests.Database
 {
     [TestFixture]
@@ -39,7 +37,7 @@ namespace osu.Game.Tests.Database
                     // ReSharper disable once AccessToDisposedClosure
                     var testStorage = new OsuStorage(host, storage.GetStorageForDirectory(caller));
 
-                    using (var realm = new RealmAccess(testStorage, "client"))
+                    using (var realm = new RealmAccess(testStorage, OsuGameBase.CLIENT_DATABASE_FILENAME))
                     {
                         Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
                         testAction(realm, testStorage);
@@ -62,7 +60,7 @@ namespace osu.Game.Tests.Database
                 {
                     var testStorage = storage.GetStorageForDirectory(caller);
 
-                    using (var realm = new RealmAccess(testStorage, "client"))
+                    using (var realm = new RealmAccess(testStorage, OsuGameBase.CLIENT_DATABASE_FILENAME))
                     {
                         Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
                         await testAction(realm, testStorage);
@@ -114,7 +112,7 @@ namespace osu.Game.Tests.Database
         }
 
         protected static RulesetInfo CreateRuleset() =>
-            new RulesetInfo(0, "osu!", "osu", true);
+            new RulesetInfo("osu", "osu!", string.Empty, 0) { Available = true };
 
         private class RealmTestGame : Framework.Game
         {

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +28,6 @@ namespace osu.Game.Tests.Visual
 
         public new DrawableRuleset DrawableRuleset => base.DrawableRuleset;
 
-        /// <summary>
-        /// Mods from *player* (not OsuScreen).
-        /// </summary>
         public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
 
         public new HUDOverlay HUDOverlay => base.HUDOverlay;
@@ -84,7 +83,7 @@ namespace osu.Game.Tests.Visual
 
             if (autoplayMod != null)
             {
-                DrawableRuleset?.SetReplayScore(autoplayMod.CreateReplayScore(GameplayState.Beatmap, Mods.Value));
+                DrawableRuleset?.SetReplayScore(autoplayMod.CreateScoreFromReplayData(GameplayState.Beatmap, Mods.Value));
                 return;
             }
 

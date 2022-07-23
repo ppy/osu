@@ -1,13 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Localisation;
+using osu.Game.Screens;
 using osu.Game.Screens.Import;
+using osu.Game.Screens.Utility;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
@@ -16,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
         protected override LocalisableString Header => DebugSettingsStrings.GeneralHeader;
 
         [BackgroundDependencyLoader(true)]
-        private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, OsuGame game)
+        private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, IPerformFromScreenRunner performer)
         {
             Children = new Drawable[]
             {
@@ -29,13 +33,18 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 {
                     LabelText = DebugSettingsStrings.BypassFrontToBackPass,
                     Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
+                },
+                new SettingsButton
+                {
+                    Text = DebugSettingsStrings.ImportFiles,
+                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
+                },
+                new SettingsButton
+                {
+                    Text = @"Run latency certifier",
+                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
                 }
             };
-            Add(new SettingsButton
-            {
-                Text = DebugSettingsStrings.ImportFiles,
-                Action = () => game?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
-            });
         }
     }
 }

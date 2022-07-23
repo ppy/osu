@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -42,8 +44,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestCustomDirectory()
         {
-            string customPath = prepareCustomPath();
-
+            using (prepareCustomPath(out string customPath))
             using (var host = new CustomTestHeadlessGameHost())
             {
                 using (var storageConfig = new StorageConfigManager(host.InitialStorage))
@@ -61,7 +62,6 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
-                    cleanupPath(customPath);
                 }
             }
         }
@@ -69,8 +69,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestSubDirectoryLookup()
         {
-            string customPath = prepareCustomPath();
-
+            using (prepareCustomPath(out string customPath))
             using (var host = new CustomTestHeadlessGameHost())
             {
                 using (var storageConfig = new StorageConfigManager(host.InitialStorage))
@@ -95,7 +94,6 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
-                    cleanupPath(customPath);
                 }
             }
         }
@@ -103,8 +101,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigration()
         {
-            string customPath = prepareCustomPath();
-
+            using (prepareCustomPath(out string customPath))
             using (var host = new CustomTestHeadlessGameHost())
             {
                 try
@@ -143,14 +140,14 @@ namespace osu.Game.Tests.NonVisual
                     Assert.That(osuStorage, Is.Not.Null);
 
                     // In the following tests, realm files are ignored as
-                    // - in the case of checking the source, interacting with the pipe files (client.realm.note) may
+                    // - in the case of checking the source, interacting with the pipe files (.realm.note) may
                     //   lead to unexpected behaviour.
                     // - in the case of checking the destination, the files may have already been recreated by the game
                     //   as part of the standard migration flow.
 
                     foreach (string file in osuStorage.IgnoreFiles)
                     {
-                        if (!file.Contains("realm", StringComparison.Ordinal))
+                        if (!file.Contains(".realm", StringComparison.Ordinal))
                         {
                             Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
                             Assert.That(storage.Exists(file), Is.False, () => $"{file} exists in destination when it was expected to be ignored");
@@ -159,7 +156,7 @@ namespace osu.Game.Tests.NonVisual
 
                     foreach (string dir in osuStorage.IgnoreDirectories)
                     {
-                        if (!dir.Contains("realm", StringComparison.Ordinal))
+                        if (!dir.Contains(".realm", StringComparison.Ordinal))
                         {
                             Assert.That(Directory.Exists(Path.Combine(originalDirectory, dir)));
                             Assert.That(storage.Exists(dir), Is.False, () => $"{dir} exists in destination when it was expected to be ignored");
@@ -171,7 +168,6 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
-                    cleanupPath(customPath);
                 }
             }
         }
@@ -179,34 +175,29 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigrationBetweenTwoTargets()
         {
-            string customPath = prepareCustomPath();
-            string customPath2 = prepareCustomPath();
-
+            using (prepareCustomPath(out string customPath))
+            using (prepareCustomPath(out string customPath2))
             using (var host = new CustomTestHeadlessGameHost())
             {
                 try
                 {
                     var osu = LoadOsuIntoHost(host);
 
-                    const string database_filename = "client.realm";
-
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
-                    Assert.That(File.Exists(Path.Combine(customPath, database_filename)));
+                    Assert.That(File.Exists(Path.Combine(customPath, OsuGameBase.CLIENT_DATABASE_FILENAME)));
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath2));
-                    Assert.That(File.Exists(Path.Combine(customPath2, database_filename)));
+                    Assert.That(File.Exists(Path.Combine(customPath2, OsuGameBase.CLIENT_DATABASE_FILENAME)));
 
                     // some files may have been left behind for whatever reason, but that's not what we're testing here.
                     cleanupPath(customPath);
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
-                    Assert.That(File.Exists(Path.Combine(customPath, database_filename)));
+                    Assert.That(File.Exists(Path.Combine(customPath, OsuGameBase.CLIENT_DATABASE_FILENAME)));
                 }
                 finally
                 {
                     host.Exit();
-                    cleanupPath(customPath);
-                    cleanupPath(customPath2);
                 }
             }
         }
@@ -214,8 +205,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigrationToSameTargetFails()
         {
-            string customPath = prepareCustomPath();
-
+            using (prepareCustomPath(out string customPath))
             using (var host = new CustomTestHeadlessGameHost())
             {
                 try
@@ -228,7 +218,43 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
-                    cleanupPath(customPath);
+                }
+            }
+        }
+
+        [Test]
+        public void TestMigrationFailsOnExistingData()
+        {
+            using (prepareCustomPath(out string customPath))
+            using (prepareCustomPath(out string customPath2))
+            using (var host = new CustomTestHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var storage = osu.Dependencies.Get<Storage>();
+                    var osuStorage = storage as OsuStorage;
+
+                    string originalDirectory = storage.GetFullPath(".");
+
+                    Assert.DoesNotThrow(() => osu.Migrate(customPath));
+                    Assert.That(File.Exists(Path.Combine(customPath, OsuGameBase.CLIENT_DATABASE_FILENAME)));
+
+                    Directory.CreateDirectory(customPath2);
+                    File.WriteAllText(Path.Combine(customPath2, OsuGameBase.CLIENT_DATABASE_FILENAME), "I am a text");
+
+                    // Fails because file already exists.
+                    Assert.Throws<ArgumentException>(() => osu.Migrate(customPath2));
+
+                    osuStorage?.ChangeDataPath(customPath2);
+
+                    Assert.That(osuStorage?.CustomStoragePath, Is.EqualTo(customPath2));
+                    Assert.That(new StreamReader(Path.Combine(originalDirectory, "storage.ini")).ReadToEnd().Contains($"FullPath = {customPath2}"));
+                }
+                finally
+                {
+                    host.Exit();
                 }
             }
         }
@@ -236,8 +262,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigrationToNestedTargetFails()
         {
-            string customPath = prepareCustomPath();
-
+            using (prepareCustomPath(out string customPath))
             using (var host = new CustomTestHeadlessGameHost())
             {
                 try
@@ -258,7 +283,6 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
-                    cleanupPath(customPath);
                 }
             }
         }
@@ -266,8 +290,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigrationToSeeminglyNestedTarget()
         {
-            string customPath = prepareCustomPath();
-
+            using (prepareCustomPath(out string customPath))
             using (var host = new CustomTestHeadlessGameHost())
             {
                 try
@@ -288,7 +311,26 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
-                    cleanupPath(customPath);
+                }
+            }
+        }
+
+        [Test]
+        public void TestBackupCreatedOnCorruptRealm()
+        {
+            using (var host = new CustomTestHeadlessGameHost())
+            {
+                try
+                {
+                    File.WriteAllText(host.InitialStorage.GetFullPath(OsuGameBase.CLIENT_DATABASE_FILENAME, true), "i am definitely not a realm file");
+
+                    LoadOsuIntoHost(host);
+
+                    Assert.That(host.InitialStorage.GetFiles(string.Empty, "*_corrupt.realm"), Has.One.Items);
+                }
+                finally
+                {
+                    host.Exit();
                 }
             }
         }
@@ -303,14 +345,17 @@ namespace osu.Game.Tests.NonVisual
             return path;
         }
 
-        private static string prepareCustomPath() => Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, $"custom-path-{Guid.NewGuid()}");
+        private static IDisposable prepareCustomPath(out string path)
+        {
+            path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, $"custom-path-{Guid.NewGuid()}");
+            return new InvokeOnDisposal<string>(path, cleanupPath);
+        }
 
         private static void cleanupPath(string path)
         {
             try
             {
-                if (Directory.Exists(path))
-                    Directory.Delete(path, true);
+                if (Directory.Exists(path)) Directory.Delete(path, true);
             }
             catch
             {
@@ -322,7 +367,7 @@ namespace osu.Game.Tests.NonVisual
             public Storage InitialStorage { get; }
 
             public CustomTestHeadlessGameHost([CallerMemberName] string callingMethodName = @"")
-                : base(callingMethodName: callingMethodName)
+                : base(callingMethodName: callingMethodName, bypassCleanupOnSetup: true)
             {
                 string defaultStorageLocation = getDefaultLocationFor(this);
 

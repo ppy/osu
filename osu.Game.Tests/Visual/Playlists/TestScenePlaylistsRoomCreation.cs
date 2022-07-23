@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -39,7 +41,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
@@ -64,10 +66,9 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Host.Value = API.LocalUser.Value;
                 room.RecentParticipants.Add(room.Host.Value);
                 room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
-                room.Playlist.Add(new PlaylistItem
+                room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
-                    Beatmap = { Value = importedBeatmap.Beatmaps.First() },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 
@@ -89,10 +90,9 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Host.Value = API.LocalUser.Value;
                 room.RecentParticipants.Add(room.Host.Value);
                 room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
-                room.Playlist.Add(new PlaylistItem
+                room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
-                    Beatmap = { Value = importedBeatmap.Beatmaps.First() },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 
@@ -106,10 +106,9 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 room.Name.Value = "my awesome room";
                 room.Host.Value = API.LocalUser.Value;
-                room.Playlist.Add(new PlaylistItem
+                room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
-                    Beatmap = { Value = importedBeatmap.Beatmaps.First() },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 
@@ -158,22 +157,18 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 room.Name.Value = "my awesome room";
                 room.Host.Value = API.LocalUser.Value;
-                room.Playlist.Add(new PlaylistItem
+                room.Playlist.Add(new PlaylistItem(new BeatmapInfo
                 {
-                    Beatmap =
+                    MD5Hash = realHash,
+                    OnlineID = realOnlineId,
+                    Metadata = new BeatmapMetadata(),
+                    BeatmapSet = new BeatmapSetInfo
                     {
-                        Value = new BeatmapInfo
-                        {
-                            MD5Hash = realHash,
-                            OnlineID = realOnlineId,
-                            Metadata = new BeatmapMetadata(),
-                            BeatmapSet = new BeatmapSetInfo
-                            {
-                                OnlineID = realOnlineSetId,
-                            }
-                        }
-                    },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                        OnlineID = realOnlineSetId,
+                    }
+                })
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -36,15 +38,15 @@ namespace osu.Game.IO
         public override string[] IgnoreDirectories => new[]
         {
             "cache",
-            "client.realm.management"
+            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.management",
         };
 
         public override string[] IgnoreFiles => new[]
         {
             "framework.ini",
             "storage.ini",
-            "client.realm.note",
-            "client.realm.lock",
+            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.note",
+            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.lock",
         };
 
         public OsuStorage(GameHost host, Storage defaultStorage)
@@ -64,10 +66,20 @@ namespace osu.Game.IO
         /// </summary>
         public void ResetCustomStoragePath()
         {
-            storageConfig.SetValue(StorageConfig.FullPath, string.Empty);
-            storageConfig.Save();
+            ChangeDataPath(string.Empty);
 
             ChangeTargetStorage(defaultStorage);
+        }
+
+        /// <summary>
+        /// Updates the target data path without immediately switching.
+        /// This does NOT migrate any data.
+        /// The game should immediately be restarted after calling this.
+        /// </summary>
+        public void ChangeDataPath(string newPath)
+        {
+            storageConfig.SetValue(StorageConfig.FullPath, newPath);
+            storageConfig.Save();
         }
 
         /// <summary>
@@ -82,6 +94,8 @@ namespace osu.Game.IO
             error = OsuStorageError.None;
             Storage lastStorage = UnderlyingStorage;
 
+            Logger.Log($"Attempting to use custom storage location {CustomStoragePath}");
+
             try
             {
                 Storage userStorage = host.GetStorage(CustomStoragePath);
@@ -90,12 +104,16 @@ namespace osu.Game.IO
                     error = OsuStorageError.AccessibleButEmpty;
 
                 ChangeTargetStorage(userStorage);
+                Logger.Log($"Storage successfully changed to {CustomStoragePath}.");
             }
             catch
             {
                 error = OsuStorageError.NotAccessible;
                 ChangeTargetStorage(lastStorage);
             }
+
+            if (error != OsuStorageError.None)
+                Logger.Log($"Custom storage location could not be used ({error}).");
 
             return error == OsuStorageError.None;
         }
@@ -113,11 +131,13 @@ namespace osu.Game.IO
             }
         }
 
-        public override void Migrate(Storage newStorage)
+        public override bool Migrate(Storage newStorage)
         {
-            base.Migrate(newStorage);
-            storageConfig.SetValue(StorageConfig.FullPath, newStorage.GetFullPath("."));
-            storageConfig.Save();
+            bool cleanupSucceeded = base.Migrate(newStorage);
+
+            ChangeDataPath(newStorage.GetFullPath("."));
+
+            return cleanupSucceeded;
         }
     }
 

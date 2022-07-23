@@ -1,16 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Overlays.Comments;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Select.Details;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,8 +30,13 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<APIBeatmapSet> beatmapSet = new Bindable<APIBeatmapSet>();
 
-        // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+        /// <remarks>
+        /// Isolates the beatmap set overlay from the game-wide selected mods bindable
+        /// to avoid affecting the beatmap details section (i.e. <see cref="AdvancedStats.StatisticRow"/>).
+        /// </remarks>
+        [Cached]
+        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public BeatmapSetOverlay()
             : base(OverlayColourScheme.Blue)
@@ -69,12 +80,6 @@ namespace osu.Game.Overlays
         {
             base.PopOutComplete();
             beatmapSet.Value = null;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            Hide();
-            return true;
         }
 
         public void FetchAndShowBeatmap(int beatmapId)
