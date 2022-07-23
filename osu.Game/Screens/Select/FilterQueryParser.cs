@@ -129,15 +129,14 @@ namespace osu.Game.Screens.Select
             value = Enum.GetNames(typeof(TEnum)).FirstOrDefault(name => name.StartsWith(value, true, CultureInfo.InvariantCulture));
             return Enum.TryParse(value, true, out result);
         }
-        private static bool tryMatchRegex(string value, string regex, ref GroupCollection result)
+        private static GroupCollection tryMatchRegex(string value, string regex)
         {
             Match matchs = Regex.Match(value, regex);
             if (matchs.Success)
             {
-                result = matchs.Groups;
-                return true;
+                return matchs.Groups;
             }
-            return false;
+            return null;
         }
 
         /// <summary>
@@ -324,23 +323,21 @@ namespace osu.Game.Screens.Select
         private static bool tryUpdateLengthRange(FilterCriteria criteria, Operator op, string val)
         {
             List<string> parts = new List<string>();
-            GroupCollection groups = null;
 
-            if (
-                tryMatchRegex(val, @"^((?<hours>\d+):)?(?<minutes>\d+):(?<seconds>\d+)$", ref groups) ||
-                tryMatchRegex(val, @"^((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$", ref groups) ||
-                tryMatchRegex(val, @"^(?<seconds>\d+(\.\d+)?)$", ref groups)
-            )
-            {
-                if (groups["seconds"].Success)
-                    parts.Add(groups["seconds"].Value + "s");
-                if (groups["minutes"].Success)
-                    parts.Add(groups["minutes"].Value + "m");
-                if (groups["hours"].Success)
-                    parts.Add(groups["hours"].Value + "h");
-            }
-            else
+            GroupCollection match = null;
+            match ??= tryMatchRegex(val, @"^((?<hours>\d+):)?(?<minutes>\d+):(?<seconds>\d+)$");
+            match ??= tryMatchRegex(val, @"^((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
+            match ??= tryMatchRegex(val, @"^(?<seconds>\d+(\.\d+)?)$");
+
+            if (match == null)
                 return false;
+
+            if (match["seconds"].Success)
+                parts.Add(match["seconds"].Value + "s");
+            if (match["minutes"].Success)
+                parts.Add(match["minutes"].Value + "m");
+            if (match["hours"].Success)
+                parts.Add(match["hours"].Value + "h");
 
             double totalLength = 0;
             int minScale = 3600000;
