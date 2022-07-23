@@ -12,8 +12,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class BeatmapIcon : Container
     {
-        private SpriteIcon icon;
-        private BeatmapActionType type;
+        private readonly SpriteIcon icon;
+        private readonly BeatmapActionType type;
 
         public enum BeatmapActionType
         {

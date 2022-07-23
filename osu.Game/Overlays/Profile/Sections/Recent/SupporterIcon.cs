@@ -11,8 +11,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class SupporterIcon : Container
     {
-        private SpriteIcon icon;
-        private SupporterType type;
+        private readonly SpriteIcon icon;
+        private readonly SupporterType type;
 
         public enum SupporterType
         {
