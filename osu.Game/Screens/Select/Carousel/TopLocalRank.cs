@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Threading;
@@ -29,19 +27,19 @@ namespace osu.Game.Screens.Select.Carousel
         private readonly BeatmapInfo beatmapInfo;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        private ScoreManager scoreManager { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
-        private IDisposable scoreSubscription;
-        private CancellationTokenSource scoreOrderCancellationSource;
+        private IDisposable? scoreSubscription;
+        private CancellationTokenSource? scoreOrderCancellationSource;
 
         private readonly UpdateableRank updateable;
 
@@ -78,7 +76,7 @@ namespace osu.Game.Screens.Select.Carousel
                     localScoresChanged);
             }, true);
 
-            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet changes, Exception error)
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, Exception _)
             {
                 // This subscription may fire from changes to linked beatmaps, which we don't care about.
                 // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
