@@ -16,6 +16,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
+using static osu.Game.Overlays.Profile.Sections.Recent.BeatmapIcon;
+using static osu.Game.Overlays.Profile.Sections.Recent.SupporterIcon;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
@@ -117,6 +119,105 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                         RelativeSizeAxes = Axes.X,
                         Width = 0.5f,
                         Height = 18
+                    };
+
+                case RecentActivityType.UserSupportAgain:
+                    return new SupporterIcon(SupporterType.SupportAgain)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
+
+                case RecentActivityType.UserSupportFirst:
+                    return new SupporterIcon(SupporterType.SupportFirst)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
+
+                case RecentActivityType.UserSupportGift:
+                    return new SupporterIcon(SupporterType.SupportGift)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
+
+                case RecentActivityType.BeatmapsetUpload:
+                    return new BeatmapIcon(BeatmapActionType.Submitted)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
+
+                case RecentActivityType.BeatmapsetUpdate:
+                    return new BeatmapIcon(BeatmapActionType.Updated)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
+
+                case RecentActivityType.BeatmapsetRevive:
+                    return new BeatmapIcon(BeatmapActionType.Revived)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
+
+                case RecentActivityType.BeatmapsetDelete:
+                    return new BeatmapIcon(BeatmapActionType.Deleted)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
+
+                case RecentActivityType.BeatmapsetApprove:
+                    return new BeatmapIcon(BeatmapActionType.Qualified)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
+
+                case RecentActivityType.BeatmapPlaycount:
+                    return new BeatmapIcon(BeatmapActionType.PlayedTimes)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
+
+                case RecentActivityType.RankLost:
+                    return new OtherIcon(FontAwesome.Solid.AngleDoubleDown)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
+
+                case RecentActivityType.UsernameChange:
+                    return new OtherIcon(FontAwesome.Solid.Tag)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
                     };
 
                 default:
