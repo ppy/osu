@@ -63,8 +63,9 @@ namespace osu.Game.Database
         /// 17   2022-07-16    Added CountryCode to RealmUser.
         /// 18   2022-07-19    Added OnlineMD5Hash and LastOnlineUpdate to BeatmapInfo.
         /// 19   2022-07-19    Added DateSubmitted and DateRanked to BeatmapSetInfo.
+        /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
         /// </summary>
-        private const int schema_version = 19;
+        private const int schema_version = 20;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -780,6 +781,15 @@ namespace osu.Game.Database
                 case 14:
                     foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
                         beatmap.UserSettings = new BeatmapUserSettings();
+
+                    break;
+
+                case 20:
+                    // As we now have versioned difficulty calculations, let's reset
+                    // all star ratings and have `BackgroundBeatmapProcessor` recalculate them.
+                    foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
+                        beatmap.StarRating = -1;
+
                     break;
             }
         }

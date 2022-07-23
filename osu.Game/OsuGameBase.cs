@@ -280,8 +280,7 @@ namespace osu.Game
             AddInternal(difficultyCache);
 
             // TODO: OsuGame or OsuGameBase?
-            beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage);
-
+            dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage));
             dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
