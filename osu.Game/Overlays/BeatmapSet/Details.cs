@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.BeatmapSet
             ratingBox.Alpha = BeatmapSet?.Status > 0 ? 1 : 0;
         }
 
-        public Details(bool updateWithModSelection = true)
+        public Details()
         {
             Width = BeatmapSetOverlay.RIGHT_WIDTH;
             AutoSizeAxes = Axes.Y;
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
                 new DetailBox
                 {
-                    Child = advanced = new AdvancedStats(updateWithModSelection)
+                    Child = advanced = new AdvancedStats
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
