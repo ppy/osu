@@ -108,13 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
                 double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
 
-                // Reward for % distance slowed down compared to previous, paying attention to not award overlap
-                double nonOverlapVelocityBuff = Math.Abs(prevVelocity - currVelocity)
-                                                // do not award overlap
-                                                * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, Math.Min(osuCurrObj.LazyJumpDistance, osuLastObj.LazyJumpDistance) / 100)), 2);
-
-                // Choose the largest bonus, multiplied by ratio.
-                velocityChangeBonus = Math.Max(overlapVelocityBuff, nonOverlapVelocityBuff) * distRatio;
+                velocityChangeBonus = overlapVelocityBuff * distRatio;
 
                 // Penalize for rhythm changes.
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);

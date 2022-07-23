@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -117,7 +115,7 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual Type[] IncompatibleMods => Array.Empty<Type>();
 
-        private IReadOnlyList<IBindable> settingsBacking;
+        private IReadOnlyList<IBindable>? settingsBacking;
 
         /// <summary>
         /// A list of the all <see cref="IBindable"/> settings within this mod.
@@ -127,6 +125,11 @@ namespace osu.Game.Rulesets.Mods
                                     .Select(p => p.Item2.GetValue(this))
                                     .Cast<IBindable>()
                                     .ToList();
+
+        /// <summary>
+        /// Whether all settings in this mod are set to their default state.
+        /// </summary>
+        protected virtual bool UsesDefaultConfiguration => Settings.All(s => s.IsDefault);
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
@@ -216,8 +219,8 @@ namespace osu.Game.Rulesets.Mods
 
             public bool Equals(IBindable x, IBindable y)
             {
-                object xValue = x?.GetUnderlyingSettingValue();
-                object yValue = y?.GetUnderlyingSettingValue();
+                object xValue = x.GetUnderlyingSettingValue();
+                object yValue = y.GetUnderlyingSettingValue();
 
                 return EqualityComparer<object>.Default.Equals(xValue, yValue);
             }
