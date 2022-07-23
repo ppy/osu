@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +44,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Practice keeping up with the beat of the song.";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles) };
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
+        {
+            typeof(IRequiresApproachCircles),
+            typeof(OsuModRandom),
+            typeof(OsuModSpunOut),
+            typeof(OsuModStrictTracking),
+            typeof(OsuModSuddenDeath)
+        }).ToArray();
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>
@@ -332,7 +341,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new Metronome(drawableRuleset.Beatmap.HitObjects.First().StartTime));
+            drawableRuleset.Overlays.Add(new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
         }
 
         #endregion
@@ -365,7 +374,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             int i = 0;
             double currentTime = timingPoint.Time;
 
-            while (!definitelyBigger(currentTime, mapEndTime) && controlPointInfo.TimingPointAt(currentTime) == timingPoint)
+            while (!definitelyBigger(currentTime, mapEndTime) && ReferenceEquals(controlPointInfo.TimingPointAt(currentTime), timingPoint))
             {
                 beats.Add(Math.Floor(currentTime));
                 i++;

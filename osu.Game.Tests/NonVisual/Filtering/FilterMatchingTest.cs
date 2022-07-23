@@ -16,7 +16,11 @@ namespace osu.Game.Tests.NonVisual.Filtering
     {
         private BeatmapInfo getExampleBeatmap() => new BeatmapInfo
         {
-            Ruleset = new RulesetInfo { OnlineID = 0 },
+            Ruleset = new RulesetInfo
+            {
+                ShortName = "osu",
+                OnlineID = 0
+            },
             StarRating = 4.0d,
             Difficulty = new BeatmapDifficulty
             {
@@ -57,7 +61,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { OnlineID = 6 }
+                Ruleset = new RulesetInfo { ShortName = "catch" }
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -71,6 +75,20 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var criteria = new FilterCriteria
             {
                 Ruleset = new RulesetInfo { OnlineID = 6 },
+                AllowConvertedBeatmaps = true
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.IsFalse(carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaMatchingConvertedBeatmapsForCustomRulesets()
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Ruleset = new RulesetInfo { OnlineID = -1 },
                 AllowConvertedBeatmaps = true
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);

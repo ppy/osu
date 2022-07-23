@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -116,9 +118,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Size = new Vector2(19, 13),
+                                Size = new Vector2(19, 14),
                                 Margin = new MarginPadding { Top = 3 }, // makes spacing look more even
-                                ShowPlaceholderOnNull = false,
+                                ShowPlaceholderOnUnknown = false,
                             },
                         }
                     }
@@ -139,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             set
             {
                 avatar.User = value.User;
-                flag.Country = value.User.Country;
+                flag.CountryCode = value.User.CountryCode;
                 achievedOn.Date = value.Date;
 
                 usernameText.Clear();

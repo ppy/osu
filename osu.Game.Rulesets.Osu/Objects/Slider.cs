@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
@@ -27,6 +29,23 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             get => EndTime - StartTime;
             set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+        }
+
+        public override IList<HitSampleInfo> AuxiliarySamples => CreateSlidingSamples().Concat(TailSamples).ToArray();
+
+        public IList<HitSampleInfo> CreateSlidingSamples()
+        {
+            var slidingSamples = new List<HitSampleInfo>();
+
+            var normalSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            if (normalSample != null)
+                slidingSamples.Add(normalSample.With("sliderslide"));
+
+            var whistleSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_WHISTLE);
+            if (whistleSample != null)
+                slidingSamples.Add(whistleSample.With("sliderwhistle"));
+
+            return slidingSamples;
         }
 
         private readonly Cached<Vector2> endPositionCache = new Cached<Vector2>();
@@ -137,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.CollectionChanged += (_, __) => updateNestedSamples();
+            SamplesBindable.CollectionChanged += (_, _) => UpdateNestedSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 
@@ -210,7 +229,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 }
             }
 
-            updateNestedSamples();
+            UpdateNestedSamples();
         }
 
         private void updateNestedPositions()
@@ -224,7 +243,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 TailCircle.Position = EndPosition;
         }
 
-        private void updateNestedSamples()
+        protected void UpdateNestedSamples()
         {
             var firstSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)
                               ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)

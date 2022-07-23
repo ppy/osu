@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Audio.Track;
@@ -139,7 +141,7 @@ namespace osu.Game.Screens.Edit
                 seekTime = timingPoint.Time + closestBeat * seekAmount;
             }
 
-            if (seekTime < timingPoint.Time && timingPoint != ControlPointInfo.TimingPoints.First())
+            if (seekTime < timingPoint.Time && !ReferenceEquals(timingPoint, ControlPointInfo.TimingPoints.First()))
                 seekTime = timingPoint.Time;
 
             SeekSmoothlyTo(seekTime);

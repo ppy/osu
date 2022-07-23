@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -27,7 +28,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddToggleStep("toggle enabled", toggle =>
             {
                 for (int i = 0; i < 6; i++)
-                    button.Action = toggle ? () => { } : (Action)null;
+                    button.Action = toggle ? () => { } : null;
             });
         }
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
@@ -38,25 +41,29 @@ namespace osu.Game.Tests.Visual.Editing
 
             Composer = playable.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer().With(d => d.Alpha = 0);
 
-            AddRange(new Drawable[]
+            Add(new OsuContextMenuContainer
             {
-                EditorBeatmap,
-                Composer,
-                new FillFlowContainer
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 5),
-                    Children = new Drawable[]
+                    EditorBeatmap,
+                    Composer,
+                    new FillFlowContainer
                     {
-                        new StartStopButton(),
-                        new AudioVisualiser(),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 5),
+                        Children = new Drawable[]
+                        {
+                            new StartStopButton(),
+                            new AudioVisualiser(),
+                        }
+                    },
+                    TimelineArea = new TimelineArea(CreateTestComponent())
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                     }
-                },
-                TimelineArea = new TimelineArea(CreateTestComponent())
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                 }
             });
         }

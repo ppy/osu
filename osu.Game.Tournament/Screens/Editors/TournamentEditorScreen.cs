@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -18,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen, IProvideVideo
+    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen
         where TDrawable : Drawable, IModelBacked<TModel>
         where TModel : class, new()
     {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -53,7 +55,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            SelectedItems.CollectionChanged += (selectedObjects, args) =>
+            SelectedItems.CollectionChanged += (_, args) =>
             {
                 switch (args.Action)
                 {
@@ -73,6 +75,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             SelectionHandler = CreateSelectionHandler();
             SelectionHandler.DeselectAll = deselectAll;
+            SelectionHandler.SelectedItems.BindTo(SelectedItems);
 
             AddRangeInternal(new[]
             {
@@ -485,7 +488,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     Vector2 originalPosition = movementBlueprintOriginalPositions[i];
                     var testPosition = originalPosition + distanceTravelled;
 
-                    var positionalResult = snapProvider.SnapScreenSpacePositionToValidPosition(testPosition);
+                    var positionalResult = snapProvider.FindSnappedPositionAndTime(testPosition, SnapType.NearbyObjects);
 
                     if (positionalResult.ScreenSpacePosition == testPosition) continue;
 
@@ -504,7 +507,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 movePosition = movementBlueprintOriginalPositions.First() + distanceTravelled;
 
             // Retrieve a snapped position.
-            var result = snapProvider?.SnapScreenSpacePositionToValidTime(movePosition);
+            var result = snapProvider?.FindSnappedPositionAndTime(movePosition, ~SnapType.NearbyObjects);
 
             if (result == null)
             {

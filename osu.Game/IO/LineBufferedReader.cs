@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -15,34 +14,31 @@ namespace osu.Game.IO
     public class LineBufferedReader : IDisposable
     {
         private readonly StreamReader streamReader;
-        private readonly Queue<string> lineBuffer;
+
+        private string? peekedLine;
 
         public LineBufferedReader(Stream stream, bool leaveOpen = false)
         {
             streamReader = new StreamReader(stream, Encoding.UTF8, true, 1024, leaveOpen);
-            lineBuffer = new Queue<string>();
         }
 
         /// <summary>
         /// Reads the next line from the stream without consuming it.
         /// Subsequent calls to <see cref="PeekLine"/> without a <see cref="ReadLine"/> will return the same string.
         /// </summary>
-        public string PeekLine()
-        {
-            if (lineBuffer.Count > 0)
-                return lineBuffer.Peek();
-
-            string line = streamReader.ReadLine();
-            if (line != null)
-                lineBuffer.Enqueue(line);
-            return line;
-        }
+        public string? PeekLine() => peekedLine ??= streamReader.ReadLine();
 
         /// <summary>
         /// Reads the next line from the stream and consumes it.
         /// If a line was peeked, that same line will then be consumed and returned.
         /// </summary>
-        public string ReadLine() => lineBuffer.Count > 0 ? lineBuffer.Dequeue() : streamReader.ReadLine();
+        public string? ReadLine()
+        {
+            string? line = peekedLine ?? streamReader.ReadLine();
+
+            peekedLine = null;
+            return line;
+        }
 
         /// <summary>
         /// Reads the stream to its end and returns the text read.
@@ -51,14 +47,13 @@ namespace osu.Game.IO
         public string ReadToEnd()
         {
             string remainingText = streamReader.ReadToEnd();
-            if (lineBuffer.Count == 0)
+            if (peekedLine == null)
                 return remainingText;
 
             var builder = new StringBuilder();
 
             // this might not be completely correct due to varying platform line endings
-            while (lineBuffer.Count > 0)
-                builder.AppendLine(lineBuffer.Dequeue());
+            builder.AppendLine(peekedLine);
             builder.Append(remainingText);
 
             return builder.ToString();
@@ -66,7 +61,7 @@ namespace osu.Game.IO
 
         public void Dispose()
         {
-            streamReader?.Dispose();
+            streamReader.Dispose();
         }
     }
 }

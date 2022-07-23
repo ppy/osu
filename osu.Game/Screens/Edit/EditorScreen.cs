@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -33,17 +35,9 @@ namespace osu.Game.Screens.Edit
             InternalChild = content = new PopoverContainer { RelativeSizeAxes = Axes.Both };
         }
 
-        protected override void PopIn()
-        {
-            this.ScaleTo(1f, 200, Easing.OutQuint)
-                .FadeIn(200, Easing.OutQuint);
-        }
+        protected override void PopIn() => this.FadeIn();
 
-        protected override void PopOut()
-        {
-            this.ScaleTo(0.98f, 200, Easing.OutQuint)
-                .FadeOut(200, Easing.OutQuint);
-        }
+        protected override void PopOut() => this.FadeOut();
 
         #region Clipboard operations
 

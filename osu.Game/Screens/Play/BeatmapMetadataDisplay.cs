@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -14,6 +16,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -106,7 +109,7 @@ namespace osu.Game.Screens.Play
                                 new Sprite
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Texture = beatmap?.Background,
+                                    Texture = beatmap.Background,
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
@@ -126,7 +129,7 @@ namespace osu.Game.Screens.Play
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = beatmap?.BeatmapInfo?.DifficultyName,
+                                    Text = beatmap.BeatmapInfo.DifficultyName,
                                     Font = OsuFont.GetFont(size: 26, italics: true),
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
@@ -158,7 +161,7 @@ namespace osu.Game.Screens.Play
                             {
                                 new Drawable[]
                                 {
-                                    new MetadataLineLabel("Source"),
+                                    new MetadataLineLabel(BeatmapsetsStrings.ShowInfoSource),
                                     new MetadataLineInfo(metadata.Source)
                                 },
                                 new Drawable[]
@@ -194,26 +197,24 @@ namespace osu.Game.Screens.Play
                 starRatingDisplay.Show();
             }
             else
-            {
                 starRatingDisplay.Hide();
 
-                starDifficulty.ValueChanged += d =>
-                {
-                    Debug.Assert(d.NewValue != null);
+            starDifficulty.ValueChanged += d =>
+            {
+                Debug.Assert(d.NewValue != null);
 
-                    starRatingDisplay.Current.Value = d.NewValue.Value;
+                starRatingDisplay.Current.Value = d.NewValue.Value;
 
-                    versionFlow.AutoSizeDuration = 300;
-                    versionFlow.AutoSizeEasing = Easing.OutQuint;
+                versionFlow.AutoSizeDuration = 300;
+                versionFlow.AutoSizeEasing = Easing.OutQuint;
 
-                    starRatingDisplay.FadeIn(300, Easing.InQuint);
-                };
-            }
+                starRatingDisplay.FadeIn(300, Easing.InQuint);
+            };
         }
 
         private class MetadataLineLabel : OsuSpriteText
         {
-            public MetadataLineLabel(string text)
+            public MetadataLineLabel(LocalisableString text)
             {
                 Anchor = Anchor.TopRight;
                 Origin = Anchor.TopRight;

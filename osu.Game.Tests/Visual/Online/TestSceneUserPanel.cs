@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -58,7 +60,7 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         Username = @"flyte",
                         Id = 3103765,
-                        Country = new Country { FlagName = @"JP" },
+                        CountryCode = CountryCode.JP,
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
                         Status = { Value = new UserStatusOnline() }
                     }) { Width = 300 },
@@ -66,7 +68,7 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         Username = @"peppy",
                         Id = 2,
-                        Country = new Country { FlagName = @"AU" },
+                        CountryCode = CountryCode.AU,
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                         IsSupporter = true,
                         SupportLevel = 3,
@@ -75,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         Username = @"Evast",
                         Id = 8195163,
-                        Country = new Country { FlagName = @"BY" },
+                        CountryCode = CountryCode.BY,
                         CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                         IsOnline = false,
                         LastVisit = DateTimeOffset.Now

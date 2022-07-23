@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
@@ -56,6 +54,11 @@ namespace osu.Game.Online.API
         /// The root URL of of the website, excluding the trailing slash.
         /// </summary>
         string WebsiteRootUrl { get; }
+
+        /// <summary>
+        /// The version of the API.
+        /// </summary>
+        int APIVersion { get; }
 
         /// <summary>
         /// The last login error that occurred, if any.

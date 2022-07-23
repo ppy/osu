@@ -4,8 +4,6 @@
 using osu.Framework.Testing;
 using Realms;
 
-#nullable enable
-
 namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]

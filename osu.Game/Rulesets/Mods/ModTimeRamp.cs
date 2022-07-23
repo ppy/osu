@@ -4,9 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
@@ -30,7 +28,9 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public abstract BindableBool AdjustPitch { get; }
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust) };
+        public override bool ValidForMultiplayerAsFreeMod => false;
+
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed) };
 
         public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
 
@@ -44,16 +44,16 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        private ITrack track;
+        private IAdjustableAudioComponent? track;
 
         protected ModTimeRamp()
         {
             // for preview purpose at song select. eventually we'll want to be able to update every frame.
-            FinalRate.BindValueChanged(val => applyRateAdjustment(double.PositiveInfinity), true);
+            FinalRate.BindValueChanged(_ => applyRateAdjustment(double.PositiveInfinity), true);
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
-        public void ApplyToTrack(ITrack track)
+        public void ApplyToTrack(IAdjustableAudioComponent track)
         {
             this.track = track;
 
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.TriggerChange();
         }
 
-        public void ApplyToSample(DrawableSample sample)
+        public void ApplyToSample(IAdjustableAudioComponent sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            applyRateAdjustment(track.CurrentTime);
+            applyRateAdjustment(playfield.Clock.CurrentTime);
         }
 
         /// <summary>

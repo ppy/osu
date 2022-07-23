@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -8,7 +10,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.IO.Archives;
+using osu.Game.Database;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
 
@@ -25,7 +27,7 @@ namespace osu.Game.Tests.Skins
         [BackgroundDependencyLoader]
         private void load()
         {
-            var imported = beatmaps.Import(new ZipArchiveReader(TestResources.OpenResource("Archives/ogg-beatmap.osz"))).GetResultSafely();
+            var imported = beatmaps.Import(new ImportTask(TestResources.OpenResource("Archives/ogg-beatmap.osz"), "ogg-beatmap.osz")).GetResultSafely();
 
             imported?.PerformRead(s =>
             {

@@ -3,7 +3,6 @@
 
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tournament.Models
 {
@@ -12,7 +11,7 @@ namespace osu.Game.Tournament.Models
         public int ID;
 
         [JsonProperty("BeatmapInfo")]
-        public APIBeatmap Beatmap;
+        public TournamentBeatmap? Beatmap;
 
         public long Score;
 

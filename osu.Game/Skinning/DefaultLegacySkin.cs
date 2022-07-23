@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.IO.Stores;
@@ -30,11 +32,9 @@ namespace osu.Game.Skinning
         public DefaultLegacySkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(
                 skin,
-                new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy"),
                 resources,
-                // A default legacy skin may still have a skin.ini if it is modified by the user.
-                // We must specify the stream directly as we are redirecting storage to the osu-resources location for other files.
-                new LegacyDatabasedSkinResourceStore(skin, resources.Files).GetStream("skin.ini")
+                // In the case of the actual default legacy skin (ie. the fallback one, which a user hasn't applied any modifications to) we want to use the game provided resources.
+                skin.Protected ? new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy") : null
             )
         {
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);

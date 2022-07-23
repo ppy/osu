@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             Section section = Section.General;
 
-            string line;
+            string? line;
 
             while ((line = stream.ReadLine()) != null)
             {
@@ -59,7 +59,7 @@ namespace osu.Game.Beatmaps.Formats
                 }
                 catch (Exception e)
                 {
-                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
+                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}");
                 }
             }
         }
@@ -143,7 +143,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected string CleanFilename(string path) => path.Trim('"').ToStandardisedPath();
 
-        protected enum Section
+        public enum Section
         {
             General,
             Editor,
@@ -160,7 +160,7 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         [Obsolete("Do not use unless you're a legacy ruleset and 100% sure.")]
-        public class LegacyDifficultyControlPoint : DifficultyControlPoint
+        public class LegacyDifficultyControlPoint : DifficultyControlPoint, IEquatable<LegacyDifficultyControlPoint>
         {
             /// <summary>
             /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
@@ -186,9 +186,20 @@ namespace osu.Game.Beatmaps.Formats
 
                 BpmMultiplier = ((LegacyDifficultyControlPoint)other).BpmMultiplier;
             }
+
+            public override bool Equals(ControlPoint? other)
+                => other is LegacyDifficultyControlPoint otherLegacyDifficultyControlPoint
+                   && Equals(otherLegacyDifficultyControlPoint);
+
+            public bool Equals(LegacyDifficultyControlPoint? other)
+                => base.Equals(other)
+                   && BpmMultiplier == other.BpmMultiplier;
+
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), BpmMultiplier);
         }
 
-        internal class LegacySampleControlPoint : SampleControlPoint
+        internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
         {
             public int CustomSampleBank;
 
@@ -202,7 +213,7 @@ namespace osu.Game.Beatmaps.Formats
                 return baseInfo;
             }
 
-            public override bool IsRedundant(ControlPoint existing)
+            public override bool IsRedundant(ControlPoint? existing)
                 => base.IsRedundant(existing)
                    && existing is LegacySampleControlPoint existingSample
                    && CustomSampleBank == existingSample.CustomSampleBank;
@@ -213,6 +224,17 @@ namespace osu.Game.Beatmaps.Formats
 
                 CustomSampleBank = ((LegacySampleControlPoint)other).CustomSampleBank;
             }
+
+            public override bool Equals(ControlPoint? other)
+                => other is LegacySampleControlPoint otherLegacySampleControlPoint
+                   && Equals(otherLegacySampleControlPoint);
+
+            public bool Equals(LegacySampleControlPoint? other)
+                => base.Equals(other)
+                   && CustomSampleBank == other.CustomSampleBank;
+
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank);
         }
     }
 }

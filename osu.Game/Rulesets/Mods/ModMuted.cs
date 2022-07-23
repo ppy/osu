@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -34,7 +33,7 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<double> mainVolumeAdjust = new BindableDouble(0.5);
         private readonly BindableNumber<double> metronomeVolumeAdjust = new BindableDouble(0.5);
 
-        private BindableNumber<int> currentCombo;
+        private readonly BindableNumber<int> currentCombo = new BindableInt();
 
         [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
         public BindableBool EnableMetronome { get; } = new BindableBool
@@ -71,7 +70,7 @@ namespace osu.Game.Rulesets.Mods
             InverseMuting.BindValueChanged(i => MuteComboCount.MinValue = i.NewValue ? 1 : 0, true);
         }
 
-        public void ApplyToTrack(ITrack track)
+        public void ApplyToTrack(IAdjustableAudioComponent track)
         {
             track.AddAdjustment(AdjustableProperty.Volume, mainVolumeAdjust);
         }
@@ -80,11 +79,11 @@ namespace osu.Game.Rulesets.Mods
         {
             if (EnableMetronome.Value)
             {
-                Metronome metronome;
+                MetronomeBeat metronomeBeat;
 
-                drawableRuleset.Overlays.Add(metronome = new Metronome(drawableRuleset.Beatmap.HitObjects.First().StartTime));
+                drawableRuleset.Overlays.Add(metronomeBeat = new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
 
-                metronome.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
+                metronomeBeat.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
             }
 
             if (AffectsHitSounds.Value)
@@ -93,7 +92,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            currentCombo = scoreProcessor.Combo.GetBoundCopy();
+            currentCombo.BindTo(scoreProcessor.Combo);
             currentCombo.BindValueChanged(combo =>
             {
                 double dimFactor = MuteComboCount.Value == 0 ? 1 : (double)combo.NewValue / MuteComboCount.Value;

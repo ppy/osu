@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Game.Configuration;
@@ -89,18 +91,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for player", () =>
             {
-                // dismiss any notifications that may appear (ie. muted notification).
-                clickMouseInCentre();
+                DismissAnyNotifications();
                 return (player = Game.ScreenStack.CurrentScreen as Player) != null;
             });
 
             AddUntilStep("wait for play time active", () => !player.IsBreakTime.Value);
-        }
-
-        private void clickMouseInCentre()
-        {
-            InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre);
-            InputManager.Click(MouseButton.Left);
         }
     }
 }

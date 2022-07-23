@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
@@ -15,12 +17,12 @@ namespace osu.Game.Screens.OnlinePlay.Components
     {
         public new readonly BindableBool Enabled = new BindableBool();
 
-        private IBindable<BeatmapAvailability> availability;
+        private readonly IBindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>();
 
         [BackgroundDependencyLoader]
         private void load(OnlinePlayBeatmapAvailabilityTracker beatmapTracker)
         {
-            availability = beatmapTracker.Availability.GetBoundCopy();
+            availability.BindTo(beatmapTracker.Availability);
 
             availability.BindValueChanged(_ => updateState());
             Enabled.BindValueChanged(_ => updateState(), true);

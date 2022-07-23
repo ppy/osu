@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -71,7 +73,9 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
                     Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
-                }
+                },
+                PassCount = RNG.Next(0, 999),
+                PlayCount = RNG.Next(1000, 1999),
             };
         }
 

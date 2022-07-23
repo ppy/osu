@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +14,14 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class APIUser : IEquatable<APIUser>, IUser
     {
+        /// <summary>
+        /// A user ID which can be used to represent any system user which is not attached to a user profile.
+        /// </summary>
+        public const int SYSTEM_USER_ID = 0;
+
         [JsonProperty(@"id")]
         public int Id { get; set; } = 1;
 
@@ -26,8 +34,19 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"previous_usernames")]
         public string[] PreviousUsernames;
 
+        private CountryCode? countryCode;
+
+        public CountryCode CountryCode
+        {
+            get => countryCode ??= (Enum.TryParse(country?.Code, out CountryCode result) ? result : default);
+            set => countryCode = value;
+        }
+
+#pragma warning disable 649
+        [CanBeNull]
         [JsonProperty(@"country")]
-        public Country Country;
+        private Country country;
+#pragma warning restore 649
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
@@ -142,6 +161,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"pending_beatmapset_count")]
         public int PendingBeatmapsetCount;
 
+        [JsonProperty(@"guest_beatmapset_count")]
+        public int GuestBeatmapsetCount;
+
         [JsonProperty(@"scores_best_count")]
         public int ScoresBestCount;
 
@@ -150,6 +172,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"scores_recent_count")]
         public int ScoresRecentCount;
+
+        [JsonProperty(@"scores_pinned_count")]
+        public int ScoresPinnedCount;
 
         [JsonProperty(@"beatmap_playcounts_count")]
         public int BeatmapPlayCountsCount;
@@ -234,7 +259,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// </summary>
         public static readonly APIUser SYSTEM_USER = new APIUser
         {
-            Id = 0,
+            Id = SYSTEM_USER_ID,
             Username = "system",
             Colour = @"9c0101",
         };
@@ -242,5 +267,13 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineID => Id;
 
         public bool Equals(APIUser other) => this.MatchesOnlineID(other);
+
+#pragma warning disable 649
+        private class Country
+        {
+            [JsonProperty(@"code")]
+            public string Code;
+        }
+#pragma warning restore 649
     }
 }

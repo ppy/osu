@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -8,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
@@ -46,13 +49,13 @@ namespace osu.Game.Skinning
             this.resources = resources;
         }
 
-        public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
+        public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Textures?.Get(componentName, wrapModeS, wrapModeT);
 
         public override ISample GetSample(ISampleInfo sampleInfo)
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
-                var sample = resources.AudioManager.Samples.Get(lookup);
+                var sample = Samples?.Get(lookup) ?? resources.AudioManager.Samples.Get(lookup);
                 if (sample != null)
                     return sample;
             }
@@ -70,6 +73,14 @@ namespace osu.Game.Skinning
                 case SkinnableTargetComponent target:
                     switch (target.Target)
                     {
+                        case SkinnableTarget.SongSelect:
+                            var songSelectComponents = new SkinnableTargetComponentsContainer(_ =>
+                            {
+                                // do stuff when we need to.
+                            });
+
+                            return songSelectComponents;
+
                         case SkinnableTarget.MainHUDComponents:
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
@@ -102,12 +113,12 @@ namespace osu.Game.Skinning
                                         accuracy.Position = new Vector2(-accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 - horizontal_padding, vertical_offset + 5);
                                         accuracy.Origin = Anchor.TopRight;
                                         accuracy.Anchor = Anchor.TopCentre;
-                                    }
 
-                                    if (combo != null)
-                                    {
-                                        combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
-                                        combo.Anchor = Anchor.TopCentre;
+                                        if (combo != null)
+                                        {
+                                            combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
+                                            combo.Anchor = Anchor.TopCentre;
+                                        }
                                     }
 
                                     var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
@@ -146,8 +157,18 @@ namespace osu.Game.Skinning
                             return skinnableTargetWrapper;
                     }
 
-                    break;
+                    return null;
             }
+
+            switch (component.LookupName)
+            {
+                // Temporary until default skin has a valid hit lighting.
+                case @"lighting":
+                    return Drawable.Empty();
+            }
+
+            if (GetTexture(component.LookupName) is Texture t)
+                return new Sprite { Texture = t };
 
             return null;
         }

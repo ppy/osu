@@ -1,8 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.IO.Network;
-using Humanizer;
+using osu.Game.Extensions;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Comments;
 
@@ -30,7 +32,7 @@ namespace osu.Game.Online.API.Requests
             var req = base.CreateWebRequest();
 
             req.AddParameter("commentable_id", commentableId.ToString());
-            req.AddParameter("commentable_type", type.ToString().Underscore().ToLowerInvariant());
+            req.AddParameter("commentable_type", type.ToString().ToSnakeCase().ToLowerInvariant());
             req.AddParameter("page", page.ToString());
             req.AddParameter("sort", sort.ToString().ToLowerInvariant());
 

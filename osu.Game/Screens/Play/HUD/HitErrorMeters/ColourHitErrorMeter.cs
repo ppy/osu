@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -15,7 +17,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     public class ColourHitErrorMeter : HitErrorMeter
     {
+        internal const int MAX_DISPLAYED_JUDGEMENTS = 20;
+
         private const int animation_duration = 200;
+        private const int drawable_judgement_size = 8;
+        private const int spacing = 2;
 
         private readonly JudgementFlow judgementsFlow;
 
@@ -37,16 +43,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private class JudgementFlow : FillFlowContainer<HitErrorCircle>
         {
-            private const int max_available_judgements = 20;
-            private const int drawable_judgement_size = 8;
-            private const int spacing = 2;
-
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 
             public JudgementFlow()
             {
                 AutoSizeAxes = Axes.X;
-                Height = max_available_judgements * (drawable_judgement_size + spacing) - spacing;
+                Height = MAX_DISPLAYED_JUDGEMENTS * (drawable_judgement_size + spacing) - spacing;
                 Spacing = new Vector2(0, spacing);
                 Direction = FillDirection.Vertical;
                 LayoutDuration = animation_duration;
@@ -57,7 +59,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             {
                 Add(new HitErrorCircle(colour, drawable_judgement_size));
 
-                if (Children.Count > max_available_judgements)
+                if (Children.Count > MAX_DISPLAYED_JUDGEMENTS)
                     Children.FirstOrDefault(c => !c.IsRemoved)?.Remove();
             }
         }

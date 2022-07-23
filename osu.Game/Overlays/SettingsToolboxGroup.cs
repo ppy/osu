@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+#nullable disable
+
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
@@ -11,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -18,10 +21,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class SettingsToolboxGroup : Container
+    public class SettingsToolboxGroup : Container, IExpandable
     {
+        public const int CONTAINER_WIDTH = 270;
+
         private const float transition_duration = 250;
-        private const int container_width = 270;
         private const int border_thickness = 2;
         private const int header_height = 30;
         private const int corner_radius = 5;
@@ -32,45 +36,21 @@ namespace osu.Game.Overlays
         private readonly Cached headerTextVisibilityCache = new Cached();
 
         private readonly FillFlowContainer content;
-        private readonly IconButton button;
 
-        private bool expanded = true;
-
-        public bool Expanded
-        {
-            get => expanded;
-            set
-            {
-                if (expanded == value) return;
-
-                expanded = value;
-
-                content.ClearTransforms();
-
-                if (expanded)
-                    content.AutoSizeAxes = Axes.Y;
-                else
-                {
-                    content.AutoSizeAxes = Axes.None;
-                    content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
-                }
-
-                updateExpanded();
-            }
-        }
-
-        private Color4 expandedColour;
+        public BindableBool Expanded { get; } = new BindableBool(true);
 
         private readonly OsuSpriteText headerText;
+
+        private readonly Container headerContent;
 
         /// <summary>
         /// Create a new instance.
         /// </summary>
         /// <param name="title">The title to be displayed in the header of this group.</param>
-        protected SettingsToolboxGroup(string title)
+        public SettingsToolboxGroup(string title)
         {
             AutoSizeAxes = Axes.Y;
-            Width = container_width;
+            Width = CONTAINER_WIDTH;
             Masking = true;
             CornerRadius = corner_radius;
             BorderColour = Color4.Black;
@@ -91,7 +71,7 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new Container
+                        headerContent = new Container
                         {
                             Name = @"Header",
                             Origin = Anchor.TopCentre,
@@ -108,14 +88,14 @@ namespace osu.Game.Overlays
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Padding = new MarginPadding { Left = 10, Right = 30 },
                                 },
-                                button = new IconButton
+                                new IconButton
                                 {
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.CentreRight,
                                     Position = new Vector2(-15, 0),
                                     Icon = FontAwesome.Solid.Bars,
                                     Scale = new Vector2(0.75f),
-                                    Action = () => Expanded = !Expanded,
+                                    Action = () => Expanded.Toggle(),
                                 },
                             }
                         },
@@ -137,12 +117,25 @@ namespace osu.Game.Overlays
             };
         }
 
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        protected override void LoadComplete()
         {
-            if (invalidation.HasFlagFast(Invalidation.DrawSize))
-                headerTextVisibilityCache.Invalidate();
+            base.LoadComplete();
 
-            return base.OnInvalidate(invalidation, source);
+            Expanded.BindValueChanged(updateExpandedState, true);
+
+            this.Delay(600).Schedule(updateFadeState);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateFadeState();
+            return false;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateFadeState();
+            base.OnHoverLost(e);
         }
 
         protected override void Update()
@@ -155,36 +148,36 @@ namespace osu.Game.Overlays
                 headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
         }
 
-        protected override void LoadComplete()
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            base.LoadComplete();
+            if (invalidation.HasFlagFast(Invalidation.DrawSize))
+                headerTextVisibilityCache.Invalidate();
 
-            this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
-            updateExpanded();
+            return base.OnInvalidate(invalidation, source);
         }
 
-        protected override bool OnHover(HoverEvent e)
+        private void updateExpandedState(ValueChangedEvent<bool> expanded)
         {
-            this.FadeIn(fade_duration, Easing.OutQuint);
-            return false;
+            // clearing transforms is necessary to avoid a previous height transform
+            // potentially continuing to get processed while content has changed to autosize.
+            content.ClearTransforms();
+
+            if (expanded.NewValue)
+                content.AutoSizeAxes = Axes.Y;
+            else
+            {
+                content.AutoSizeAxes = Axes.None;
+                content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+            }
+
+            headerContent.FadeColour(expanded.NewValue ? Color4.White : OsuColour.Gray(0.5f), 200, Easing.OutQuint);
         }
 
-        protected override void OnHoverLost(HoverLostEvent e)
+        private void updateFadeState()
         {
-            this.FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
-            base.OnHoverLost(e);
+            this.FadeTo(IsHovered ? 1 : inactive_alpha, fade_duration, Easing.OutQuint);
         }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            expandedColour = colours.Yellow;
-        }
-
-        private void updateExpanded() => button.FadeColour(expanded ? expandedColour : Color4.White, 200, Easing.InOutQuint);
 
         protected override Container<Drawable> Content => content;
-
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
     }
 }

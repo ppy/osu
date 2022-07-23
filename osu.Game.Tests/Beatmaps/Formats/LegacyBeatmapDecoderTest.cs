@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -60,7 +62,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
                 Assert.AreEqual(164471, metadata.PreviewTime);
                 Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
-                Assert.IsTrue(beatmapInfo.RulesetID == 0);
+                Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);
                 Assert.IsFalse(beatmapInfo.LetterboxInBreaks);
                 Assert.IsFalse(beatmapInfo.SpecialStyle);
                 Assert.IsFalse(beatmapInfo.WidescreenStoryboard);
@@ -792,6 +794,129 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.That(path.ExpectedDistance.Value, Is.EqualTo(2));
                 Assert.That(path.Distance, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestLegacyDefaultsPreserved()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var memoryStream = new MemoryStream())
+            using (var stream = new LineBufferedReader(memoryStream))
+            {
+                var decoded = decoder.Decode(stream);
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(decoded.BeatmapInfo.AudioLeadIn, Is.EqualTo(0));
+                    Assert.That(decoded.BeatmapInfo.StackLeniency, Is.EqualTo(0.7f));
+                    Assert.That(decoded.BeatmapInfo.SpecialStyle, Is.False);
+                    Assert.That(decoded.BeatmapInfo.LetterboxInBreaks, Is.False);
+                    Assert.That(decoded.BeatmapInfo.WidescreenStoryboard, Is.False);
+                    Assert.That(decoded.BeatmapInfo.EpilepsyWarning, Is.False);
+                    Assert.That(decoded.BeatmapInfo.SamplesMatchPlaybackRate, Is.False);
+                    Assert.That(decoded.BeatmapInfo.Countdown, Is.EqualTo(CountdownType.Normal));
+                    Assert.That(decoded.BeatmapInfo.CountdownOffset, Is.EqualTo(0));
+                    Assert.That(decoded.BeatmapInfo.Metadata.PreviewTime, Is.EqualTo(-1));
+                    Assert.That(decoded.BeatmapInfo.Ruleset.OnlineID, Is.EqualTo(0));
+                });
+            }
+        }
+
+        [Test]
+        public void TestUndefinedApproachRateInheritsOverallDifficulty()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("undefined-approach-rate.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                Assert.That(decoded.Difficulty.ApproachRate, Is.EqualTo(1));
+                Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestApproachRateDefinedBeforeOverallDifficulty()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("approach-rate-before-overall-difficulty.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                Assert.That(decoded.Difficulty.ApproachRate, Is.EqualTo(9));
+                Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestApproachRateDefinedAfterOverallDifficulty()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("approach-rate-after-overall-difficulty.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                Assert.That(decoded.Difficulty.ApproachRate, Is.EqualTo(9));
+                Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestLegacyAdjacentImplicitCatmullSegmentsAreMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("adjacent-catmull-segments.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(6));
+                Assert.That(controlPoints.Single(c => c.Type != null).Type, Is.EqualTo(PathType.Catmull));
+            }
+        }
+
+        [Test]
+        public void TestNonLegacyAdjacentImplicitCatmullSegmentsAreNotMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder(LegacyBeatmapEncoder.FIRST_LAZER_VERSION) { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("adjacent-catmull-segments.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(4));
+                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[1].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[2].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[3].Type, Is.Null);
+            }
+        }
+
+        [Test]
+        public void TestLegacyDuplicateInitialCatmullPointIsMerged()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("catmull-duplicate-initial-controlpoint.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
+
+                Assert.That(controlPoints.Count, Is.EqualTo(4));
+                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[0].Position, Is.EqualTo(Vector2.Zero));
+                Assert.That(controlPoints[1].Type, Is.Null);
+                Assert.That(controlPoints[1].Position, Is.Not.EqualTo(Vector2.Zero));
             }
         }
     }

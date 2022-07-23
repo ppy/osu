@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Tests.OnlinePlay
@@ -29,9 +32,9 @@ namespace osu.Game.Tests.OnlinePlay
         {
             var items = new[]
             {
-                new PlaylistItem { ID = 1, BeatmapID = 1001, PlaylistOrder = 1 },
-                new PlaylistItem { ID = 2, BeatmapID = 1002, PlaylistOrder = 2 },
-                new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1001 }) { ID = 1, PlaylistOrder = 1 },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1002 }) { ID = 2, PlaylistOrder = 2 },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1003 }) { ID = 3, PlaylistOrder = 3 },
             };
 
             Assert.Multiple(() =>
@@ -47,9 +50,9 @@ namespace osu.Game.Tests.OnlinePlay
         {
             var items = new[]
             {
-                new PlaylistItem { ID = 2, BeatmapID = 1002, PlaylistOrder = 2 },
-                new PlaylistItem { ID = 1, BeatmapID = 1001, PlaylistOrder = 1 },
-                new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1002 }) { ID = 2, PlaylistOrder = 2 },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1001 }) { ID = 1, PlaylistOrder = 1 },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1003 }) { ID = 3, PlaylistOrder = 3 },
             };
 
             Assert.Multiple(() =>
@@ -65,9 +68,9 @@ namespace osu.Game.Tests.OnlinePlay
         {
             var items = new[]
             {
-                new PlaylistItem { ID = 1, BeatmapID = 1001, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 55, 0, TimeSpan.Zero) },
-                new PlaylistItem { ID = 2, BeatmapID = 1002, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 53, 0, TimeSpan.Zero) },
-                new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1001 }) { ID = 1, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 55, 0, TimeSpan.Zero) },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1002 }) { ID = 2, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 53, 0, TimeSpan.Zero) },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1003 }) { ID = 3, PlaylistOrder = 3 },
             };
 
             Assert.Multiple(() =>
@@ -83,9 +86,9 @@ namespace osu.Game.Tests.OnlinePlay
         {
             var items = new[]
             {
-                new PlaylistItem { ID = 1, BeatmapID = 1001, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 55, 0, TimeSpan.Zero) },
-                new PlaylistItem { ID = 2, BeatmapID = 1002, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 53, 0, TimeSpan.Zero) },
-                new PlaylistItem { ID = 3, BeatmapID = 1002, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 57, 0, TimeSpan.Zero) },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1001 }) { ID = 1, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 55, 0, TimeSpan.Zero) },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1002 }) { ID = 2, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 53, 0, TimeSpan.Zero) },
+                new PlaylistItem(new APIBeatmap { OnlineID = 1002 }) { ID = 3, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 57, 0, TimeSpan.Zero) },
             };
 
             Assert.Multiple(() =>

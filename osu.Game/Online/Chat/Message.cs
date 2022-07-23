@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -59,7 +61,13 @@ namespace osu.Game.Online.Chat
             return Id.Value.CompareTo(other.Id.Value);
         }
 
-        public virtual bool Equals(Message other) => Id.HasValue && Id == other?.Id;
+        public virtual bool Equals(Message other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id.HasValue && Id == other.Id;
+        }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         public override int GetHashCode() => Id.GetHashCode();

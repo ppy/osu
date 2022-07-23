@@ -1,15 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -18,6 +22,9 @@ namespace osu.Game.Screens.Select
         public Action NextRandom { get; set; }
         public Action PreviousRandom { get; set; }
 
+        private Container persistentText;
+        private OsuSpriteText randomSpriteText;
+        private OsuSpriteText rewindSpriteText;
         private bool rewindSearch;
 
         [BackgroundDependencyLoader]
@@ -25,7 +32,32 @@ namespace osu.Game.Screens.Select
         {
             SelectedColour = colours.Green;
             DeselectedColour = SelectedColour.Opacity(0.5f);
-            Text = @"random";
+
+            TextContainer.Add(persistentText = new Container
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                AlwaysPresent = true,
+                AutoSizeAxes = Axes.Both,
+                Children = new[]
+                {
+                    randomSpriteText = new OsuSpriteText
+                    {
+                        AlwaysPresent = true,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = "random",
+                    },
+                    rewindSpriteText = new OsuSpriteText
+                    {
+                        AlwaysPresent = true,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = "rewind",
+                        Alpha = 0f,
+                    }
+                }
+            });
 
             Action = () =>
             {
@@ -33,22 +65,22 @@ namespace osu.Game.Screens.Select
                 {
                     const double fade_time = 500;
 
-                    OsuSpriteText rewindSpriteText;
+                    OsuSpriteText fallingRewind;
 
-                    TextContainer.Add(rewindSpriteText = new OsuSpriteText
+                    TextContainer.Add(fallingRewind = new OsuSpriteText
                     {
                         Alpha = 0,
-                        Text = @"rewind",
+                        Text = rewindSpriteText.Text,
                         AlwaysPresent = true, // make sure the button is sized large enough to always show this
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     });
 
-                    rewindSpriteText.FadeOutFromOne(fade_time, Easing.In);
-                    rewindSpriteText.MoveTo(Vector2.Zero).MoveTo(new Vector2(0, 10), fade_time, Easing.In);
-                    rewindSpriteText.Expire();
+                    fallingRewind.FadeOutFromOne(fade_time, Easing.In);
+                    fallingRewind.MoveTo(Vector2.Zero).MoveTo(new Vector2(0, 10), fade_time, Easing.In);
+                    fallingRewind.Expire();
 
-                    SpriteText.FadeInFromZero(fade_time, Easing.In);
+                    persistentText.FadeInFromZero(fade_time, Easing.In);
 
                     PreviousRandom.Invoke();
                 }
@@ -57,6 +89,44 @@ namespace osu.Game.Screens.Select
                     NextRandom.Invoke();
                 }
             };
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            updateText(e.ShiftPressed);
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            updateText(e.ShiftPressed);
+            base.OnKeyUp(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            try
+            {
+                // this uses OR to handle rewinding when clicks are triggered by other sources (i.e. right button in OnMouseUp).
+                rewindSearch |= e.ShiftPressed;
+                return base.OnClick(e);
+            }
+            finally
+            {
+                rewindSearch = false;
+            }
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            if (e.Button == MouseButton.Right)
+            {
+                rewindSearch = true;
+                TriggerClick();
+                return;
+            }
+
+            base.OnMouseUp(e);
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -78,6 +148,12 @@ namespace osu.Game.Screens.Select
             {
                 rewindSearch = false;
             }
+        }
+
+        private void updateText(bool rewind = false)
+        {
+            randomSpriteText.Alpha = rewind ? 0 : 1;
+            rewindSpriteText.Alpha = rewind ? 1 : 0;
         }
     }
 }
