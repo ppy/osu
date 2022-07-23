@@ -127,7 +127,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (BaseObject is Slider currentSlider)
             {
                 computeSliderCursorPosition(currentSlider);
-                TravelDistance = currentSlider.LazyTravelDistance;
+                // Bonus for repeat sliders until a better per nested object strain system can be achieved.
+                TravelDistance = currentSlider.LazyTravelDistance * (float)Math.Pow(1 + currentSlider.RepeatCount / 2.5, 1.0 / 2.5);
                 TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, min_delta_time);
             }
 

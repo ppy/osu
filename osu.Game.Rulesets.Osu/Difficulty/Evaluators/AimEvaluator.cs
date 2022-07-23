@@ -124,7 +124,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
-                sliderBonus *= (float)Math.Pow(1 + osuSlider.RepeatCount / 2.5, 1.0 / 2.5); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
