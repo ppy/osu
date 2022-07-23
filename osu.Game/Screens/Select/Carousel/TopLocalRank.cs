@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -32,6 +33,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private RealmAccess realm { get; set; }
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -70,14 +74,29 @@ namespace osu.Game.Screens.Select.Carousel
                          .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
                                  + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
                                  + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
-                                 + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName)
-                         .OrderByDescending(s => s.TotalScore),
-                    (items, _, _) =>
-                    {
-                        updateable.Rank = items.FirstOrDefault()?.Rank;
-                        updateable.Alpha = updateable.Rank != null ? 1 : 0;
-                    });
+                                 + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName),
+                    localScoresChanged);
             }, true);
+
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet changes, Exception error)
+            {
+                // This subscription may fire from changes to linked beatmaps, which we don't care about.
+                // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
+                if (changes?.HasCollectionChanges() == false)
+                    return;
+
+                scoreOrderCancellationSource?.Cancel();
+
+                scoreManager.OrderByTotalScoreAsync(sender.Detach().ToArray(), (scoreOrderCancellationSource = new CancellationTokenSource()).Token)
+                            .ContinueWith(ordered => Schedule(() =>
+                            {
+                                if (scoreOrderCancellationSource.IsCancellationRequested)
+                                    return;
+
+                                updateable.Rank = ordered.GetResultSafely().FirstOrDefault()?.Rank;
+                                updateable.Alpha = updateable.Rank != null ? 1 : 0;
+                            }), TaskContinuationOptions.OnlyOnRanToCompletion);
+            }
         }
 
         protected override void Dispose(bool isDisposing)
