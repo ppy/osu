@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -10,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -25,10 +24,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneTopLocalRank : OsuTestScene
     {
-        private RulesetStore rulesets;
-        private BeatmapManager beatmapManager;
-        private ScoreManager scoreManager;
-        private TopLocalRank topLocalRank;
+        private RulesetStore rulesets = null!;
+        private BeatmapManager beatmapManager = null!;
+        private ScoreManager scoreManager = null!;
+        private TopLocalRank topLocalRank = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -64,7 +63,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestBasicImportDelete()
         {
-            ScoreInfo testScoreInfo = null;
+            ScoreInfo? testScoreInfo = null;
 
             AddStep("Add score for current user", () =>
             {
@@ -80,7 +79,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Delete score", () =>
             {
-                scoreManager.Delete(testScoreInfo);
+                scoreManager.Delete(testScoreInfo.AsNonNull());
             });
 
             AddUntilStep("No rank displayed", () => topLocalRank.DisplayedRank == null);
@@ -113,7 +112,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestHigherScoreSet()
         {
-            ScoreInfo testScoreInfo = null;
+            ScoreInfo? testScoreInfo = null;
 
             AddStep("Add score for current user", () =>
             {
@@ -133,7 +132,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 testScoreInfo2.User = API.LocalUser.Value;
                 testScoreInfo2.Rank = ScoreRank.S;
-                testScoreInfo2.TotalScore = testScoreInfo.TotalScore + 1;
+                testScoreInfo2.TotalScore = testScoreInfo.AsNonNull().TotalScore + 1;
                 testScoreInfo2.Statistics = new Dictionary<HitResult, int>
                 {
                     [HitResult.Miss] = 0,
@@ -153,7 +152,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestLegacyScore()
         {
-            ScoreInfo testScoreInfo = null;
+            ScoreInfo? testScoreInfo = null;
 
             AddStep("Add legacy score for current user", () =>
             {
@@ -184,10 +183,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                     [HitResult.SmallBonus] = 50
                 };
 
-                testScoreInfo2.TotalScore = scoreManager.GetTotalScoreAsync(testScoreInfo).GetResultSafely();
+                testScoreInfo2.TotalScore = scoreManager.GetTotalScoreAsync(testScoreInfo.AsNonNull()).GetResultSafely();
 
                 // ensure standardised total score is less than classic, otherwise this test is pointless.
-                Debug.Assert(testScoreInfo2.TotalScore < testScoreInfo.TotalScore);
+                Debug.Assert(testScoreInfo2.TotalScore < testScoreInfo.AsNonNull().TotalScore);
 
                 scoreManager.Import(testScoreInfo2);
             });
