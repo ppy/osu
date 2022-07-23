@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
@@ -25,7 +27,7 @@ namespace osu.Game.Overlays.Mods
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
+        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
         private ModSettingChangeTracker? settingChangeTracker;
 
@@ -35,6 +37,8 @@ namespace osu.Game.Overlays.Mods
 
             Title = preset.Value.Name;
             Description = preset.Value.Description;
+
+            Action = toggleRequestedByUser;
         }
 
         [BackgroundDependencyLoader]
@@ -48,6 +52,17 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             selectedMods.BindValueChanged(_ => selectedModsChanged(), true);
+        }
+
+        private void toggleRequestedByUser()
+        {
+            // if the preset is not active at the point of the user click, then set the mods using the preset directly, discarding any previous selections.
+            // if the preset is active when the user has clicked it, then it means that the set of active mods is exactly equal to the set of mods in the preset
+            // (there are no other active mods than what the preset specifies, and the mod settings match exactly).
+            // therefore it's safe to just clear selected mods, since it will have the effect of toggling the preset off.
+            selectedMods.Value = !Active.Value
+                ? Preset.Value.Mods.ToArray()
+                : Array.Empty<Mod>();
         }
 
         private void selectedModsChanged()
