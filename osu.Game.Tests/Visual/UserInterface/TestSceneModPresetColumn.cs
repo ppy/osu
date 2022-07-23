@@ -15,6 +15,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania.Mods;
@@ -215,6 +216,46 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
             AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
             AddUntilStep("popover closed", () => !this.ChildrenOfType<OsuPopover>().Any());
+        }
+
+        [Test]
+        public void TestDeleteFlow()
+        {
+            ModPresetColumn modPresetColumn = null!;
+
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+            AddStep("right click first panel", () =>
+            {
+                var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddStep("click delete", () =>
+            {
+                var deleteItem = this.ChildrenOfType<DrawableOsuMenuItem>().Single();
+                InputManager.MoveMouseTo(deleteItem);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for dialog", () => dialogOverlay.CurrentDialog is DeleteModPresetDialog);
+            AddStep("hold confirm", () =>
+            {
+                var confirmButton = this.ChildrenOfType<PopupDialogDangerousButton>().Single();
+                InputManager.MoveMouseTo(confirmButton);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddUntilStep("wait for dialog to close", () => dialogOverlay.CurrentDialog == null);
+            AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddUntilStep("preset deletion occurred", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
+            AddAssert("preset soft-deleted", () => Realm.Run(r => r.All<ModPreset>().Count(preset => preset.DeletePending) == 1));
         }
 
         private ICollection<ModPreset> createTestPresets() => new[]
