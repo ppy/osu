@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -13,6 +15,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Tests.Resources;
@@ -54,14 +57,14 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Scale = new Vector2(10),
                 });
             });
+
+            AddAssert("No rank displayed initially", () => topLocalRank.Rank == null);
         }
 
         [Test]
         public void TestBasicImportDelete()
         {
             ScoreInfo testScoreInfo = null;
-
-            AddAssert("Initially not present", () => !topLocalRank.IsPresent);
 
             AddStep("Add score for current user", () =>
             {
@@ -73,15 +76,14 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("Became present", () => topLocalRank.IsPresent);
-            AddAssert("Correct rank", () => topLocalRank.Rank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topLocalRank.Rank == ScoreRank.B);
 
             AddStep("Delete score", () =>
             {
                 scoreManager.Delete(testScoreInfo);
             });
 
-            AddUntilStep("Became not present", () => !topLocalRank.IsPresent);
+            AddUntilStep("No rank displayed", () => topLocalRank.Rank == null);
         }
 
         [Test]
@@ -99,21 +101,19 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("Wait for initial presence", () => topLocalRank.IsPresent);
+            AddUntilStep("Wait for initial display", () => topLocalRank.Rank == ScoreRank.B);
 
             AddStep("Change ruleset", () => Ruleset.Value = rulesets.GetRuleset("fruits"));
-            AddUntilStep("Became not present", () => !topLocalRank.IsPresent);
+            AddUntilStep("No rank displayed", () => topLocalRank.Rank == null);
 
             AddStep("Change ruleset back", () => Ruleset.Value = rulesets.GetRuleset("osu"));
-            AddUntilStep("Became present", () => topLocalRank.IsPresent);
+            AddUntilStep("B rank displayed", () => topLocalRank.Rank == ScoreRank.B);
         }
 
         [Test]
         public void TestHigherScoreSet()
         {
             ScoreInfo testScoreInfo = null;
-
-            AddAssert("Initially not present", () => !topLocalRank.IsPresent);
 
             AddStep("Add score for current user", () =>
             {
@@ -125,8 +125,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("Became present", () => topLocalRank.IsPresent);
-            AddUntilStep("Correct rank", () => topLocalRank.Rank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topLocalRank.Rank == ScoreRank.B);
 
             AddStep("Add higher score for current user", () =>
             {
@@ -135,11 +134,65 @@ namespace osu.Game.Tests.Visual.SongSelect
                 testScoreInfo2.User = API.LocalUser.Value;
                 testScoreInfo2.Rank = ScoreRank.S;
                 testScoreInfo2.TotalScore = testScoreInfo.TotalScore + 1;
+                testScoreInfo2.Statistics = new Dictionary<HitResult, int>
+                {
+                    [HitResult.Miss] = 0,
+                    [HitResult.Perfect] = 970,
+                    [HitResult.SmallTickHit] = 75,
+                    [HitResult.LargeTickHit] = 150,
+                    [HitResult.LargeBonus] = 10,
+                    [HitResult.SmallBonus] = 50
+                };
 
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddUntilStep("Correct rank", () => topLocalRank.Rank == ScoreRank.S);
+            AddUntilStep("S rank displayed", () => topLocalRank.Rank == ScoreRank.S);
+        }
+
+        [Test]
+        public void TestLegacyScore()
+        {
+            ScoreInfo testScoreInfo = null;
+
+            AddStep("Add legacy score for current user", () =>
+            {
+                testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
+
+                testScoreInfo.User = API.LocalUser.Value;
+                testScoreInfo.Rank = ScoreRank.B;
+                testScoreInfo.TotalScore = scoreManager.GetTotalScoreAsync(testScoreInfo, ScoringMode.Classic).GetResultSafely();
+
+                scoreManager.Import(testScoreInfo);
+            });
+
+            AddUntilStep("B rank displayed", () => topLocalRank.Rank == ScoreRank.B);
+
+            AddStep("Add higher score for current user", () =>
+            {
+                var testScoreInfo2 = TestResources.CreateTestScoreInfo(importedBeatmap);
+
+                testScoreInfo2.User = API.LocalUser.Value;
+                testScoreInfo2.Rank = ScoreRank.S;
+                testScoreInfo2.Statistics = new Dictionary<HitResult, int>
+                {
+                    [HitResult.Miss] = 0,
+                    [HitResult.Perfect] = 970,
+                    [HitResult.SmallTickHit] = 75,
+                    [HitResult.LargeTickHit] = 150,
+                    [HitResult.LargeBonus] = 10,
+                    [HitResult.SmallBonus] = 50
+                };
+
+                testScoreInfo2.TotalScore = scoreManager.GetTotalScoreAsync(testScoreInfo).GetResultSafely();
+
+                // ensure standardised total score is less than classic, otherwise this test is pointless.
+                Debug.Assert(testScoreInfo2.TotalScore < testScoreInfo.TotalScore);
+
+                scoreManager.Import(testScoreInfo2);
+            });
+
+            AddUntilStep("S rank displayed", () => topLocalRank.Rank == ScoreRank.S);
         }
     }
 }
