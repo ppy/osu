@@ -105,20 +105,20 @@ namespace osu.Game.Overlays.Mods
                 TopLevelContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    CornerRadius = ModPanel.CORNER_RADIUS,
+                    CornerRadius = ModSelectPanel.CORNER_RADIUS,
                     Masking = true,
                     Children = new Drawable[]
                     {
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = header_height + ModPanel.CORNER_RADIUS,
+                            Height = header_height + ModSelectPanel.CORNER_RADIUS,
                             Children = new Drawable[]
                             {
                                 headerBackground = new Box
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Height = header_height + ModPanel.CORNER_RADIUS
+                                    Height = header_height + ModSelectPanel.CORNER_RADIUS
                                 },
                                 headerText = new OsuTextFlowContainer(t =>
                                 {
@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Mods
                                     Padding = new MarginPadding
                                     {
                                         Horizontal = 17,
-                                        Bottom = ModPanel.CORNER_RADIUS
+                                        Bottom = ModSelectPanel.CORNER_RADIUS
                                     }
                                 }
                             }
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Mods
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Masking = true,
-                                CornerRadius = ModPanel.CORNER_RADIUS,
+                                CornerRadius = ModSelectPanel.CORNER_RADIUS,
                                 BorderThickness = 3,
                                 Children = new Drawable[]
                                 {
