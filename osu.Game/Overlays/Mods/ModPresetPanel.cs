@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -22,6 +24,11 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
+
+        private ModSettingChangeTracker? settingChangeTracker;
+
         public ModPresetPanel(Live<ModPreset> preset)
         {
             Preset = preset;
@@ -34,6 +41,26 @@ namespace osu.Game.Overlays.Mods
         private void load(OsuColour colours)
         {
             AccentColour = colours.Orange1;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            selectedMods.BindValueChanged(_ => selectedModsChanged(), true);
+        }
+
+        private void selectedModsChanged()
+        {
+            settingChangeTracker?.Dispose();
+            settingChangeTracker = new ModSettingChangeTracker(selectedMods.Value);
+            settingChangeTracker.SettingChanged = _ => updateActiveState();
+            updateActiveState();
+        }
+
+        private void updateActiveState()
+        {
+            Active.Value = new HashSet<Mod>(Preset.Value.Mods).SetEquals(selectedMods.Value);
         }
 
         #region IHasCustomTooltip
@@ -51,5 +78,12 @@ namespace osu.Game.Overlays.Mods
         };
 
         #endregion
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            settingChangeTracker?.Dispose();
+        }
     }
 }
