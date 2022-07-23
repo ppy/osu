@@ -5,9 +5,12 @@
 
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -20,7 +23,7 @@ using Realms;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class TopLocalRank : UpdateableRank
+    public class TopLocalRank : CompositeDrawable
     {
         private readonly BeatmapInfo beatmapInfo;
 
@@ -34,13 +37,25 @@ namespace osu.Game.Screens.Select.Carousel
         private IAPIProvider api { get; set; }
 
         private IDisposable scoreSubscription;
+        private CancellationTokenSource scoreOrderCancellationSource;
+
+        private readonly UpdateableRank updateable;
+
+        public ScoreRank? DisplayedRank => updateable.Rank;
 
         public TopLocalRank(BeatmapInfo beatmapInfo)
-            : base(null)
         {
             this.beatmapInfo = beatmapInfo;
 
-            Size = new Vector2(40, 20);
+            AutoSizeAxes = Axes.Both;
+
+            InternalChild = updateable = new UpdateableRank
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(40, 20),
+                Alpha = 0,
+            };
         }
 
         protected override void LoadComplete()
@@ -59,19 +74,17 @@ namespace osu.Game.Screens.Select.Carousel
                          .OrderByDescending(s => s.TotalScore),
                     (items, _, _) =>
                     {
-                        Rank = items.FirstOrDefault()?.Rank;
-                        // Required since presence is changed via IsPresent override
-                        Invalidate(Invalidation.Presence);
+                        updateable.Rank = items.FirstOrDefault()?.Rank;
+                        updateable.Alpha = updateable.Rank != null ? 1 : 0;
                     });
             }, true);
         }
-
-        public override bool IsPresent => base.IsPresent && Rank != null;
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
+            scoreOrderCancellationSource?.Cancel();
             scoreSubscription?.Dispose();
         }
     }

@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 });
             });
 
-            AddAssert("No rank displayed initially", () => topLocalRank.Rank == null);
+            AddAssert("No rank displayed initially", () => topLocalRank.DisplayedRank == null);
         }
 
         [Test]
@@ -76,14 +76,14 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("B rank displayed", () => topLocalRank.Rank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
 
             AddStep("Delete score", () =>
             {
                 scoreManager.Delete(testScoreInfo);
             });
 
-            AddUntilStep("No rank displayed", () => topLocalRank.Rank == null);
+            AddUntilStep("No rank displayed", () => topLocalRank.DisplayedRank == null);
         }
 
         [Test]
@@ -101,13 +101,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("Wait for initial display", () => topLocalRank.Rank == ScoreRank.B);
+            AddUntilStep("Wait for initial display", () => topLocalRank.DisplayedRank == ScoreRank.B);
 
             AddStep("Change ruleset", () => Ruleset.Value = rulesets.GetRuleset("fruits"));
-            AddUntilStep("No rank displayed", () => topLocalRank.Rank == null);
+            AddUntilStep("No rank displayed", () => topLocalRank.DisplayedRank == null);
 
             AddStep("Change ruleset back", () => Ruleset.Value = rulesets.GetRuleset("osu"));
-            AddUntilStep("B rank displayed", () => topLocalRank.Rank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
         }
 
         [Test]
@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("B rank displayed", () => topLocalRank.Rank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
 
             AddStep("Add higher score for current user", () =>
             {
@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddUntilStep("S rank displayed", () => topLocalRank.Rank == ScoreRank.S);
+            AddUntilStep("S rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.S);
         }
 
         [Test]
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("B rank displayed", () => topLocalRank.Rank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
 
             AddStep("Add higher score for current user", () =>
             {
@@ -192,7 +192,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddUntilStep("S rank displayed", () => topLocalRank.Rank == ScoreRank.S);
+            AddUntilStep("S rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.S);
         }
     }
 }
