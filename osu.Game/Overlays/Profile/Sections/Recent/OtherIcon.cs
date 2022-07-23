@@ -18,7 +18,6 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Icon = inputIcon,
-
                 };
             }
         }
