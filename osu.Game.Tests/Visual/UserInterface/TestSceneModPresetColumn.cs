@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
@@ -35,16 +36,27 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
+        [Cached(typeof(IDialogOverlay))]
+        private readonly DialogOverlay dialogOverlay = new DialogOverlay();
+
         [BackgroundDependencyLoader]
         private void load()
         {
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(Realm);
 
-            base.Content.Add(content = new PopoverContainer
+            base.Content.AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding(30),
+                new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = content = new PopoverContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding(30),
+                    }
+                },
+                dialogOverlay
             });
         }
 
