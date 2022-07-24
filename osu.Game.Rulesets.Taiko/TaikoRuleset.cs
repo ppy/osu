@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.Taiko
                     return "drum tick";
 
                 case HitResult.SmallBonus:
-                    return "strong bonus";
+                    return "bonus";
             }
 
             return base.GetDisplayNameForHitResult(result);

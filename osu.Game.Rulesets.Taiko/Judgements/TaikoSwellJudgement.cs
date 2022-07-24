@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
         /// <summary>
         /// The <see cref="HitResult"/> to grant when the player has hit more than half of swell ticks.
         /// </summary>
-        public virtual HitResult OkResult => HitResult.Ok;
+        public virtual HitResult PartialCompletionResult => HitResult.Ok;
 
         protected override double HealthIncreaseFor(HitResult result)
         {

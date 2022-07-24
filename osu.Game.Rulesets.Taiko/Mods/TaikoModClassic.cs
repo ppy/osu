@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             public override HitResult MaxResult => HitResult.LargeBonus;
 
-            public override HitResult OkResult => HitResult.SmallBonus;
+            public override HitResult PartialCompletionResult => HitResult.SmallBonus;
         }
 
         private class ClassicSwell : Swell

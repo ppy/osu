@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(r =>
                 {
                     var swellJudgement = (TaikoSwellJudgement)r.Judgement;
-                    r.Type = numHits > HitObject.RequiredHits / 2 ? swellJudgement.OkResult : swellJudgement.MinResult;
+                    r.Type = numHits > HitObject.RequiredHits / 2 ? swellJudgement.PartialCompletionResult : swellJudgement.MinResult;
                 });
             }
         }
