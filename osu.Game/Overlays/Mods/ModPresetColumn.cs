@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Mods
         private void load(OsuColour colours)
         {
             AccentColour = colours.Orange1;
-            HeaderText = ModPresetColumnStrings.PersonalPresets;
+            HeaderText = ModSelectOverlayStrings.PersonalPresets;
         }
 
         protected override void LoadComplete()
