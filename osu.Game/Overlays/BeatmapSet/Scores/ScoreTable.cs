@@ -162,9 +162,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     ShowPlaceholderOnUnknown = false,
                 },
                 username,
-#pragma warning disable 618
-                new StatisticText(score.MaxCombo, score.BeatmapInfo.MaxCombo, @"0\x"),
-#pragma warning restore 618
+                new StatisticText(score.MaxCombo, scoreManager.GetMaximumAchievableComboAsync(score).GetResultSafely(), @"0\x"),
             };
 
             var availableStatistics = score.GetStatisticsForDisplay().ToDictionary(tuple => tuple.Result);
