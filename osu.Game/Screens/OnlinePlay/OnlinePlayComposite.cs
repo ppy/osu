@@ -94,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay
             base.LoadComplete();
 
             subScreenSelectedItem?.BindValueChanged(_ => UpdateSelectedItem());
-            Playlist.BindCollectionChanged((_, __) => UpdateSelectedItem(), true);
+            Playlist.BindCollectionChanged((_, _) => UpdateSelectedItem(), true);
         }
 
         protected void UpdateSelectedItem()

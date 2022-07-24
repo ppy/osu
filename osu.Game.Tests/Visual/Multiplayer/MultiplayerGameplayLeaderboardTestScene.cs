@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // To emulate `MultiplayerClient.CurrentMatchPlayingUserIds` we need a bindable list of *only IDs*.
             // This tracks the list of users 1:1.
-            MultiplayerUsers.BindCollectionChanged((c, e) =>
+            MultiplayerUsers.BindCollectionChanged((_, e) =>
             {
                 switch (e.Action)
                 {

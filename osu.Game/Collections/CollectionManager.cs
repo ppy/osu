@@ -261,7 +261,7 @@ namespace osu.Game.Collections
         private void backgroundSave()
         {
             int current = Interlocked.Increment(ref lastSave);
-            Task.Delay(100).ContinueWith(task =>
+            Task.Delay(100).ContinueWith(_ =>
             {
                 if (current != lastSave)
                     return;

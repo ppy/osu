@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
 
         public override string Description => @"Play with no approach circles and fading circles/sliders.";
-        public override double ScoreMultiplier => 1.06;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn) };
 
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             switch (drawableObject)
             {
-                case DrawableSliderTail _:
+                case DrawableSliderTail:
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         drawableObject.FadeOut(fadeDuration);
 
@@ -165,14 +165,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 switch (hitObject)
                 {
-                    case Slider _:
+                    case Slider:
                         return (fadeOutStartTime, longFadeDuration);
 
-                    case SliderTick _:
+                    case SliderTick:
                         double tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
                         return (hitObject.StartTime - tickFadeOutDuration, tickFadeOutDuration);
 
-                    case Spinner _:
+                    case Spinner:
                         return (fadeOutStartTime + longFadeDuration, fadeOutDuration);
 
                     default:

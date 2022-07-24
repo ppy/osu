@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -86,10 +87,24 @@ namespace osu.Game.Beatmaps
 
         public string Hash { get; set; } = string.Empty;
 
-        public double StarRating { get; set; }
+        /// <summary>
+        /// Defaults to -1 (meaning not-yet-calculated).
+        /// Will likely be superseded with a better storage considering ruleset/mods.
+        /// </summary>
+        public double StarRating { get; set; } = -1;
 
         [Indexed]
         public string MD5Hash { get; set; } = string.Empty;
+
+        public string OnlineMD5Hash { get; set; } = string.Empty;
+
+        public DateTimeOffset? LastOnlineUpdate { get; set; }
+
+        /// <summary>
+        /// Whether this beatmap matches the online version, based on fetched online metadata.
+        /// Will return <c>true</c> if no online metadata is available.
+        /// </summary>
+        public bool MatchesOnlineVersion => LastOnlineUpdate == null || MD5Hash == OnlineMD5Hash;
 
         [JsonIgnore]
         public bool Hidden { get; set; }
@@ -109,6 +124,11 @@ namespace osu.Game.Beatmaps
         public bool EpilepsyWarning { get; set; }
 
         public bool SamplesMatchPlaybackRate { get; set; } = true;
+
+        /// <summary>
+        /// The time at which this beatmap was last played by the local user.
+        /// </summary>
+        public DateTimeOffset? LastPlayed { get; set; }
 
         /// <summary>
         /// The ratio of distance travelled per time unit.
@@ -151,14 +171,23 @@ namespace osu.Game.Beatmaps
         public bool AudioEquals(BeatmapInfo? other) => other != null
                                                        && BeatmapSet != null
                                                        && other.BeatmapSet != null
-                                                       && BeatmapSet.Hash == other.BeatmapSet.Hash
-                                                       && Metadata.AudioFile == other.Metadata.AudioFile;
+                                                       && compareFiles(this, other, m => m.AudioFile);
 
         public bool BackgroundEquals(BeatmapInfo? other) => other != null
                                                             && BeatmapSet != null
                                                             && other.BeatmapSet != null
-                                                            && BeatmapSet.Hash == other.BeatmapSet.Hash
-                                                            && Metadata.BackgroundFile == other.Metadata.BackgroundFile;
+                                                            && compareFiles(this, other, m => m.BackgroundFile);
+
+        private static bool compareFiles(BeatmapInfo x, BeatmapInfo y, Func<IBeatmapMetadataInfo, string> getFilename)
+        {
+            Debug.Assert(x.BeatmapSet != null);
+            Debug.Assert(y.BeatmapSet != null);
+
+            string? fileHashX = x.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(x.Metadata))?.File.Hash;
+            string? fileHashY = y.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(y.Metadata))?.File.Hash;
+
+            return fileHashX == fileHashY;
+        }
 
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
