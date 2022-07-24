@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public virtual Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
 
-        public double Radius => OBJECT_RADIUS * Scale;
+        public double Radius => (OBJECT_RADIUS * Math.Max(1e-3, Scale)) / (681 * 0.85 / 384);
 
         private HitObjectProperty<float> scale = new HitObjectProperty<float>(1);
 
@@ -152,7 +152,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             // This adjustment is necessary for AR>10, otherwise TimePreempt can become smaller leading to hitcircles not fully fading in.
             TimeFadeIn = 400 * Math.Min(1, TimePreempt / PREEMPT_MIN);
 
-            Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
+            // Circle size scale works differently in droid.
+            Scale = (681 / 480) * (54.42f - difficulty.CircleSize * 4.48f) * 2 /
+                    128 + (0.5f * (11 - 5.2450170716245195f)) / 5;
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
