@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
-            double accuracyValue = computeAccuracyValue(score, osuAttributes);
+            double accuracyValue = computeAccuracyValue(score);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
             double totalValue =
                 Math.Pow(
@@ -179,12 +179,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return speedValue;
         }
 
-        private double computeAccuracyValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeAccuracyValue(ScoreInfo score)
         {
             if (score.Mods.Any(h => h is OsuModRelax))
                 return 0.0;
 
-            double accuracyValue = 800 * Math.Exp(-deviation / 4);
+            double accuracyValue = 4407 * Math.Pow(deviation, -1.818);
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
@@ -210,14 +210,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double clockRate = track.Rate;
 
             double hitWindow300 = 80 - 6 * attributes.OverallDifficulty;
-            double hitWindow100 = (140 - 8 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
             double hitWindow50 = (200 - 10 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
 
             double root2 = Math.Sqrt(2);
 
             int greatCountOnCircles = Math.Max(0, attributes.HitCircleCount - countOk - countMeh - countMiss);
-            int okCountOnCircles = Math.Min(countOk, attributes.HitCircleCount) + 1; // Add one 100 to process SS scores.
-            int mehCountOnCircles = Math.Min(countMeh, attributes.HitCircleCount);
+            int inaccuracies = Math.Min(countOk + countMeh, attributes.HitCircleCount) + 1; // Add one 100 to process SS scores.
             int slidersHit = Math.Max(0, attributes.SliderCount - countMiss);
 
             // Derivative of erf(x)
@@ -229,12 +227,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 double t1 = -hitWindow50 * slidersHit * erfPrime(hitWindow50 / (root2 * u)) / SpecialFunctions.Erf(hitWindow50 / (root2 * u));
                 double t2 = -hitWindow300 * greatCountOnCircles * erfPrime(hitWindow300 / (root2 * u)) / SpecialFunctions.Erf(hitWindow300 / (root2 * u));
-                double t3 = mehCountOnCircles * (-hitWindow100 * erfPrime(hitWindow100 / (root2 * u)) + hitWindow50 * erfPrime(hitWindow50 / (root2 * u))) / (SpecialFunctions.Erfc(hitWindow50 / (root2 * u)) - SpecialFunctions.Erfc(hitWindow100 / (root2 * u)));
-                double t4 = okCountOnCircles * (-hitWindow100 * erfPrime(hitWindow100 / (root2 * u)) + hitWindow300 * erfPrime(hitWindow300 / (root2 * u))) / (SpecialFunctions.Erfc(hitWindow300 / (root2 * u)) - SpecialFunctions.Erfc(hitWindow100 / (root2 * u)));
-                return (t1 + t2 + t3 + t4) / (root2 * u * u);
+                double t4 = inaccuracies * (-hitWindow50 * erfPrime(hitWindow50 / (root2 * u)) + hitWindow300 * erfPrime(hitWindow300 / (root2 * u))) / (SpecialFunctions.Erfc(hitWindow300 / (root2 * u)) - SpecialFunctions.Erfc(hitWindow50 / (root2 * u)));
+                return (t1 + t2 + t4) / (root2 * u * u);
             }
 
-            return Brent.FindRootExpand(logLikelihoodGradient, 4, 20, 1e-6, expandFactor: 2);
+            return Brent.FindRootExpand(logLikelihoodGradient, 3, 20, 1e-6, expandFactor: 2);
         }
 
         private double calculateSpeedDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
@@ -247,7 +244,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double clockRate = track.Rate;
 
             double hitWindow300 = 80 - 6 * attributes.OverallDifficulty;
-            double hitWindow100 = (140 - 8 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
             double hitWindow50 = (200 - 10 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
             double root2 = Math.Sqrt(2);
 
@@ -264,12 +260,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double logLikelihoodGradient(double u)
             {
                 double t1 = -hitWindow300 * relevantCountGreat * erfPrime(hitWindow300 / (root2 * u)) / SpecialFunctions.Erf(hitWindow300 / (root2 * u));
-                double t2 = relevantCountMeh * (-hitWindow100 * erfPrime(hitWindow100 / (root2 * u)) + hitWindow50 * erfPrime(hitWindow50 / (root2 * u))) / (SpecialFunctions.Erfc(hitWindow50 / (root2 * u)) - SpecialFunctions.Erfc(hitWindow100 / (root2 * u)));
-                double t3 = relevantCountOk * (-hitWindow100 * erfPrime(hitWindow100 / (root2 * u)) + hitWindow300 * erfPrime(hitWindow300 / (root2 * u))) / (SpecialFunctions.Erfc(hitWindow300 / (root2 * u)) - SpecialFunctions.Erfc(hitWindow100 / (root2 * u)));
-                return (t1 + t2 + t3) / (root2 * u * u);
+                double t2 = (relevantCountOk + relevantCountMeh) * (-hitWindow50 * erfPrime(hitWindow50 / (root2 * u)) + hitWindow300 * erfPrime(hitWindow300 / (root2 * u))) / (SpecialFunctions.Erfc(hitWindow300 / (root2 * u)) - SpecialFunctions.Erfc(hitWindow50 / (root2 * u)));
+                return (t1 + t2) / (root2 * u * u);
             }
 
-            return Brent.FindRootExpand(logLikelihoodGradient, 4, 20, 1e-6, expandFactor: 2);
+            return Brent.FindRootExpand(logLikelihoodGradient, 3, 20, 1e-6, expandFactor: 2);
         }
 
         private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
