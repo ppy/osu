@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Determines whether this column should accept user input.
         /// </summary>
-        public Bindable<bool> Active = new BindableBool(true);
+        public readonly Bindable<bool> Active = new BindableBool(true);
 
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && Active.Value;
 
