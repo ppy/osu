@@ -24,6 +24,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
+            var playfield = (TaikoPlayfield)drawableRuleset.Playfield;
+            playfield.ClassicHitTargetPosition.Value = true;
+
             drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
             drawableTaikoRuleset.LockPlayfieldAspect.Value = false;
 

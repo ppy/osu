@@ -94,6 +94,8 @@ namespace osu.Game.IO
             error = OsuStorageError.None;
             Storage lastStorage = UnderlyingStorage;
 
+            Logger.Log($"Attempting to use custom storage location {CustomStoragePath}");
+
             try
             {
                 Storage userStorage = host.GetStorage(CustomStoragePath);
@@ -102,12 +104,16 @@ namespace osu.Game.IO
                     error = OsuStorageError.AccessibleButEmpty;
 
                 ChangeTargetStorage(userStorage);
+                Logger.Log($"Storage successfully changed to {CustomStoragePath}.");
             }
             catch
             {
                 error = OsuStorageError.NotAccessible;
                 ChangeTargetStorage(lastStorage);
             }
+
+            if (error != OsuStorageError.None)
+                Logger.Log($"Custom storage location could not be used ({error}).");
 
             return error == OsuStorageError.None;
         }

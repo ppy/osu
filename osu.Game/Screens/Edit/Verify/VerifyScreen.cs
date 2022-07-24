@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load()
         {
-            InterpretedDifficulty.Default = BeatmapDifficultyCache.GetDifficultyRating(EditorBeatmap.BeatmapInfo.StarRating);
+            InterpretedDifficulty.Default = StarDifficulty.GetDifficultyRating(EditorBeatmap.BeatmapInfo.StarRating);
             InterpretedDifficulty.SetDefault();
 
             Child = new Container

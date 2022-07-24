@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -35,6 +33,16 @@ namespace osu.Game.Localisation
         /// "Restart track"
         /// </summary>
         public static LocalisableString RestartTrack => new TranslatableString(getKey(@"restart_track"), @"Restart track");
+
+        /// <summary>
+        /// "Beatmap saved"
+        /// </summary>
+        public static LocalisableString BeatmapSaved => new TranslatableString(getKey(@"beatmap_saved"), @"Beatmap saved");
+
+        /// <summary>
+        /// "Skin saved"
+        /// </summary>
+        public static LocalisableString SkinSaved => new TranslatableString(getKey(@"skin_saved"), @"Skin saved");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

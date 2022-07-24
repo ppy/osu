@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestCreatedWithCorrectMode()
         {
-            AddAssert("room created with correct mode", () => MultiplayerClient.APIRoom?.QueueMode.Value == Mode);
+            AddUntilStep("room created with correct mode", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == Mode);
         }
 
         protected void RunGameplay()

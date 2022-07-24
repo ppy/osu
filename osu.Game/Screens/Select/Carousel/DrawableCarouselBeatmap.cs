@@ -53,7 +53,9 @@ namespace osu.Game.Screens.Select.Carousel
         private Action<BeatmapInfo> hideRequested;
 
         private Triangles triangles;
+
         private StarCounter starCounter;
+        private DifficultyIcon difficultyIcon;
 
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
@@ -113,8 +115,9 @@ namespace osu.Game.Screens.Select.Carousel
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        new DifficultyIcon(beatmapInfo, shouldShowTooltip: false)
+                        difficultyIcon = new DifficultyIcon(beatmapInfo)
                         {
+                            ShowTooltip = false,
                             Scale = new Vector2(1.8f),
                         },
                         new FillFlowContainer
@@ -150,17 +153,12 @@ namespace osu.Game.Screens.Select.Carousel
                                 {
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(4, 0),
+                                    Scale = new Vector2(0.8f),
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new TopLocalRank(beatmapInfo)
-                                        {
-                                            Scale = new Vector2(0.8f),
-                                        },
-                                        starCounter = new StarCounter
-                                        {
-                                            Scale = new Vector2(0.8f),
-                                        }
+                                        new TopLocalRank(beatmapInfo),
+                                        starCounter = new StarCounter()
                                     }
                                 }
                             }
@@ -216,6 +214,8 @@ namespace osu.Game.Screens.Select.Carousel
                 starDifficultyBindable.BindValueChanged(d =>
                 {
                     starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
+                    if (d.NewValue != null)
+                        difficultyIcon.Current.Value = d.NewValue.Value;
                 }, true);
             }
 
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Select.Carousel
 
                 if (collectionManager != null)
                 {
-                    var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
+                    var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmapInfo)).Cast<OsuMenuItem>().ToList();
                     if (manageCollectionsDialog != null)
                         collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
@@ -251,20 +251,6 @@ namespace osu.Game.Screens.Select.Carousel
 
                 return items.ToArray();
             }
-        }
-
-        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
-        {
-            return new ToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
-            {
-                if (s)
-                    collection.BeatmapHashes.Add(beatmapInfo.MD5Hash);
-                else
-                    collection.BeatmapHashes.Remove(beatmapInfo.MD5Hash);
-            })
-            {
-                State = { Value = collection.BeatmapHashes.Contains(beatmapInfo.MD5Hash) }
-            };
         }
 
         protected override void Dispose(bool isDisposing)

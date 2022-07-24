@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 hyperDashCount = 0;
 
                 // this needs to be done within the frame stable context due to how quickly hyperdash state changes occur.
-                Player.DrawableRuleset.FrameStableComponents.OnUpdate += d =>
+                Player.DrawableRuleset.FrameStableComponents.OnUpdate += _ =>
                 {
                     var catcher = Player.ChildrenOfType<Catcher>().FirstOrDefault();
 

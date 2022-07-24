@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Components
         {
             base.Current = new Bindable<string>(string.Empty);
 
-            ((OsuTextBox)Control).OnCommit += (sender, newText) =>
+            ((OsuTextBox)Control).OnCommit += (sender, _) =>
             {
                 try
                 {

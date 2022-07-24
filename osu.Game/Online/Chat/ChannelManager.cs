@@ -133,12 +133,14 @@ namespace osu.Game.Online.Chat
                                    ?? JoinChannel(new Channel(user));
         }
 
-        private void currentChannelChanged(ValueChangedEvent<Channel> e)
+        private void currentChannelChanged(ValueChangedEvent<Channel> channel)
         {
-            bool isSelectorChannel = e.NewValue is ChannelListing.ChannelListingChannel;
+            bool isSelectorChannel = channel.NewValue is ChannelListing.ChannelListingChannel;
 
             if (!isSelectorChannel)
-                JoinChannel(e.NewValue);
+                JoinChannel(channel.NewValue);
+
+            Logger.Log($"Current channel changed to {channel.NewValue}");
         }
 
         /// <summary>
@@ -447,9 +449,17 @@ namespace osu.Game.Online.Chat
                         return channel;
 
                     case ChannelType.PM:
+                        Logger.Log($"Attempting to join PM channel {channel}");
+
                         var createRequest = new CreateChannelRequest(channel);
+                        createRequest.Failure += e =>
+                        {
+                            Logger.Log($"Failed to join PM channel {channel} ({e.Message})");
+                        };
                         createRequest.Success += resChannel =>
                         {
+                            Logger.Log($"Joined PM channel {channel} ({resChannel.ChannelID})");
+
                             if (resChannel.ChannelID.HasValue)
                             {
                                 channel.Id = resChannel.ChannelID.Value;
@@ -463,9 +473,19 @@ namespace osu.Game.Online.Chat
                         break;
 
                     default:
+                        Logger.Log($"Attempting to join public channel {channel}");
+
                         var req = new JoinChannelRequest(channel);
-                        req.Success += () => joinChannel(channel, fetchInitialMessages);
-                        req.Failure += ex => LeaveChannel(channel);
+                        req.Success += () =>
+                        {
+                            Logger.Log($"Joined public channel {channel}");
+                            joinChannel(channel, fetchInitialMessages);
+                        };
+                        req.Failure += e =>
+                        {
+                            Logger.Log($"Failed to join public channel {channel} ({e.Message})");
+                            LeaveChannel(channel);
+                        };
                         api.Queue(req);
                         return channel;
                 }

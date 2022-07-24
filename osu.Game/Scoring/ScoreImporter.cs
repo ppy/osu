@@ -13,6 +13,9 @@ using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using Realms;
 
 namespace osu.Game.Scoring
@@ -26,11 +29,14 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreImporter(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
+        private readonly IAPIProvider api;
+
+        public ScoreImporter(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, IAPIProvider api)
             : base(storage, realm)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
+            this.api = api;
         }
 
         protected override ScoreInfo? CreateModel(ArchiveReader archive)
@@ -67,6 +73,18 @@ namespace osu.Game.Scoring
 
             if (string.IsNullOrEmpty(model.StatisticsJson))
                 model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
+        }
+
+        protected override void PostImport(ScoreInfo model, Realm realm)
+        {
+            base.PostImport(model, realm);
+
+            var userRequest = new GetUserRequest(model.RealmUser.Username);
+
+            api.Perform(userRequest);
+
+            if (userRequest.Response is APIUser user)
+                model.User = user;
         }
     }
 }

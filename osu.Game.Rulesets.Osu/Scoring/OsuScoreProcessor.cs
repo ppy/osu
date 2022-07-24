@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             switch (hitObject)
             {
-                case HitCircle _:
+                case HitCircle:
                     return new OsuHitCircleJudgementResult(hitObject, judgement);
 
                 default:

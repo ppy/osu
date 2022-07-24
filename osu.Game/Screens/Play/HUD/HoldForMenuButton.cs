@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Play.HUD
 
                 overlayCircle.ScaleTo(0, 100)
                              .Then().FadeOut().ScaleTo(1).FadeIn(500)
-                             .OnComplete(a =>
+                             .OnComplete(_ =>
                              {
                                  icon.ScaleTo(1, 100);
                                  circularProgress.FadeOut(100).OnComplete(_ =>

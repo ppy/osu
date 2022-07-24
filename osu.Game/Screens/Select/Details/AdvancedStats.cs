@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Select.Details
             modSettingChangeTracker?.Dispose();
 
             modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
-            modSettingChangeTracker.SettingChanged += m =>
+            modSettingChangeTracker.SettingChanged += _ =>
             {
                 debouncedStatisticsUpdate?.Cancel();
                 debouncedStatisticsUpdate = Scheduler.AddDelayed(updateStatistics, 100);
