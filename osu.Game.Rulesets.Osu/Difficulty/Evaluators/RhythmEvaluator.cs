@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -13,7 +14,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class RhythmEvaluator
     {
         private const int history_time_max = 5000; // 5 seconds of calculatingRhythmBonus max.
-        private const double rhythm_multiplier = 0.75;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -21,7 +21,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         public static double EvaluateDifficultyOf(DifficultyHitObject current, double greatWindow)
         {
             if (current.BaseObject is Spinner)
-                return 0;
+                return 1;
+
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+
+            if (osuCurrObj.IsOverlapping(false))
+            {
+                return 1;
+            }
 
             int previousIslandSize = 0;
 
@@ -33,27 +40,45 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             int historicalNoteCount = Math.Min(current.Index, 32);
 
+            // Exclude overlapping objects that can be tapped at once.
+            var validPrevious = new List<OsuDifficultyHitObject>();
+
+            for (int i = 0; i < historicalNoteCount; i++)
+            {
+                var obj = (OsuDifficultyHitObject)current.Previous(i);
+
+                if (obj == null)
+                {
+                    break;
+                }
+
+                if (!obj.IsOverlapping(false))
+                {
+                    validPrevious.Add(obj);
+                }
+            }
+
             int rhythmStart = 0;
 
-            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - current.Previous(rhythmStart).StartTime < history_time_max)
+            while (rhythmStart < validPrevious.Count - 2 && current.StartTime - validPrevious[rhythmStart].StartTime < history_time_max)
                 rhythmStart++;
 
             for (int i = rhythmStart; i > 0; i--)
             {
-                OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
-                OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous(i);
-                OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)current.Previous(i + 1);
+                var currObj = validPrevious[i - 1];
+                var prevObj = validPrevious[i];
+                var lastObj = validPrevious[i + 1];
 
                 double currHistoricalDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max; // scales note 0 to 1 from history to now
 
-                currHistoricalDecay = Math.Min((double)(historicalNoteCount - i) / historicalNoteCount, currHistoricalDecay); // either we're limited by time or limited by object count.
+                currHistoricalDecay = Math.Min((double)(validPrevious.Count - i) / validPrevious.Count, currHistoricalDecay); // either we're limited by time or limited by object count.
 
                 double currDelta = currObj.StrainTime;
                 double prevDelta = prevObj.StrainTime;
                 double lastDelta = lastObj.StrainTime;
                 double currRatio = 1.0 + 6.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
-                double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - greatWindow * 0.6) / (greatWindow * 0.6));
+                double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - greatWindow * 0.4) / (greatWindow * 0.4));
 
                 windowPenalty = Math.Min(1, windowPenalty);
 
@@ -104,7 +129,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 }
             }
 
-            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
+            return Math.Sqrt(4 + rhythmComplexitySum * calculateRhythmMultiplier(greatWindow)) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
+        }
+
+        private static double calculateRhythmMultiplier(double greatWindow)
+        {
+            double od = (80 - greatWindow) / 6;
+
+            double odScaling = Math.Pow(od, 2) / 400;
+
+            return 0.75 + (od >= 0 ? odScaling : -odScaling);
         }
     }
 }
