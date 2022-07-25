@@ -141,6 +141,19 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("best score not displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 1);
         }
 
+        [Test]
+        public void TestUnprocessedPP()
+        {
+            AddStep("Load scores with unprocessed PP", () =>
+            {
+                var allScores = createScores();
+                allScores.Scores[0].PP = null;
+                allScores.UserScore = createUserBest();
+                allScores.UserScore.Score.PP = null;
+                scoresContainer.Scores = allScores;
+            });
+        }
+
         private int onlineID = 1;
 
         private APIScoresCollection createScores()
@@ -210,7 +223,7 @@ namespace osu.Game.Tests.Visual.Online
                             new APIMod { Acronym = new OsuModHidden().Acronym },
                         },
                         Rank = ScoreRank.B,
-                        PP = null,
+                        PP = 180,
                         MaxCombo = 1234,
                         TotalScore = 12345678,
                         Accuracy = 0.9854,
