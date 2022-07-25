@@ -206,6 +206,11 @@ namespace osu.Game.Online.Spectator
                 if (!IsPlaying)
                     return;
 
+                // Disposal could be processed late, leading to EndPlaying potentially being called after a future BeginPlaying call.
+                // Account for this by ensuring the current score matches the score in the provided GameplayState.
+                if (currentScore != state.Score)
+                    return;
+
                 if (pendingFrames.Count > 0)
                     purgePendingFrames();
 
