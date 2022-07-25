@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// Creates a <see cref="ZoomableScrollContainer"/> with no zoom range.
         /// Functionality will be disabled until zoom is set up via <see cref="SetupZoom"/>.
         /// </summary>
-        public ZoomableScrollContainer()
+        protected ZoomableScrollContainer()
             : base(Direction.Horizontal)
         {
             base.Content.Add(zoomedContent = new Container { RelativeSizeAxes = Axes.Y });
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// <param name="initial">The initial zoom value, applied immediately.</param>
         /// <param name="minimum">The minimum zoom value.</param>
         /// <param name="maximum">The maximum zoom value.</param>
-        public void SetupZoom(float initial, float minimum, float maximum)
+        protected void SetupZoom(float initial, float minimum, float maximum)
         {
             if (minimum < 1)
                 throw new ArgumentException($"{nameof(minimum)} ({minimum}) must be >= 1.", nameof(maximum));
