@@ -87,7 +87,7 @@ namespace osu.Game.Beatmaps
                     existingSetWithSameOnlineID.OnlineID = -1;
 
                     foreach (var b in existingSetWithSameOnlineID.Beatmaps)
-                        b.OnlineID = -1;
+                        b.ResetOnlineInfo();
 
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be disassociated and marked for deletion.");
                 }
@@ -133,7 +133,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineID = -1);
+            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.ResetOnlineInfo());
         }
 
         protected override bool CanSkipImport(BeatmapSetInfo existing, BeatmapSetInfo import)
