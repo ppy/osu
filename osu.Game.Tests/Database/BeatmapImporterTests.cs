@@ -797,7 +797,7 @@ namespace osu.Game.Tests.Database
                 await realm.Realm.WriteAsync(() =>
                 {
                     foreach (var b in imported.Beatmaps)
-                        b.OnlineID = -1;
+                        b.ResetOnlineInfo();
                 });
 
                 deleteBeatmapSet(imported, realm.Realm);
