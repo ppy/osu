@@ -70,6 +70,7 @@ namespace osu.Game.Screens.Play
             {
                 ScoreInfo =
                 {
+                    BeatmapInfo = beatmap.BeatmapInfo,
                     Ruleset = ruleset.RulesetInfo
                 }
             };
