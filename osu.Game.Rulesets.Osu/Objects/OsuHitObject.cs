@@ -67,7 +67,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public virtual Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
 
-        public double Radius => (OBJECT_RADIUS * Math.Max(1e-3, Scale)) / (681 * 0.85 / 384);
+        private const int assumed_height = 681;
+
+        public double Radius => (OBJECT_RADIUS * Math.Max(1e-3, Scale)) / (assumed_height * 0.85 / 384);
 
         private HitObjectProperty<float> scale = new HitObjectProperty<float>(1);
 
@@ -153,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             TimeFadeIn = 400 * Math.Min(1, TimePreempt / PREEMPT_MIN);
 
             // Circle size scale works differently in droid.
-            Scale = (681 / 480) * (54.42f - difficulty.CircleSize * 4.48f) * 2 /
+            Scale = (assumed_height / 480) * (54.42f - difficulty.CircleSize * 4.48f) * 2 /
                     128 + (0.5f * (11 - 5.2450170716245195f)) / 5;
         }
 
