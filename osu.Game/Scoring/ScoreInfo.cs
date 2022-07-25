@@ -303,7 +303,7 @@ namespace osu.Game.Scoring
                 {
                     case HitResult.SmallTickHit:
                     {
-                        int total = value + Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
+                        int total = MaximumScoringValues?.SmallTicksCount ?? (value + Statistics.GetValueOrDefault(HitResult.SmallTickMiss));
                         if (total > 0)
                             yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
 
@@ -312,7 +312,7 @@ namespace osu.Game.Scoring
 
                     case HitResult.LargeTickHit:
                     {
-                        int total = value + Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
+                        int total = MaximumScoringValues?.LargeTicksCount ?? (value + Statistics.GetValueOrDefault(HitResult.LargeTickMiss));
                         if (total > 0)
                             yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
 

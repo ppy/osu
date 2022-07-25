@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             BaseScore = 10000,
                             MaxCombo = 1000,
-                            CountBasicHitObjects = 1000
+                            BasicsCount = 1000,
                         }
                     };
                 }
