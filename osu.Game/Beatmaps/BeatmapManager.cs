@@ -439,12 +439,15 @@ namespace osu.Game.Beatmaps
         {
             if (beatmapInfo != null)
             {
-                // Detached sets don't come with files.
-                // If we seem to be missing files, now is a good time to re-fetch.
-                if (refetch || beatmapInfo.IsManaged || beatmapInfo.BeatmapSet?.Files.Count == 0)
-                {
+                if (refetch)
                     workingBeatmapCache.Invalidate(beatmapInfo);
 
+                // Detached beatmapsets don't come with files as an optimisation (see `RealmObjectExtensions.beatmap_set_mapper`).
+                // If we seem to be missing files, now is a good time to re-fetch.
+                bool missingFiles = beatmapInfo.BeatmapSet?.Files.Count == 0;
+
+                if (refetch || beatmapInfo.IsManaged || missingFiles)
+                {
                     Guid id = beatmapInfo.ID;
                     beatmapInfo = Realm.Run(r => r.Find<BeatmapInfo>(id)?.Detach()) ?? beatmapInfo;
                 }
