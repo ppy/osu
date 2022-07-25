@@ -19,6 +19,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring.Drawables;
 using osu.Game.Utils;
 using osuTK;
 
@@ -245,6 +246,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     }
                 };
             }
+
+            if (Score.Beatmap?.Status.GrantsPerformancePoints() == true)
+                return new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(16), Colour = colourProvider.Highlight1 };
 
             return new OsuSpriteText
             {
