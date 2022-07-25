@@ -42,12 +42,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         CreateDrawableAccuracy(),
                         new Container
                         {
-                            AutoSizeAxes = Axes.Y,
-                            Width = 50,
+                            Size = new Vector2(50, 14),
                             Child = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                Text = $"{Score.PP * weight:0}pp",
+                                Text = Score.PP.HasValue ? $"{Score.PP * weight:0}pp" : string.Empty,
                             },
                         }
                     }

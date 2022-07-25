@@ -904,6 +904,8 @@ namespace osu.Game
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
+            loadComponentSingleFile(new BackgroundBeatmapProcessor(), Add);
+
             chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
             // Multiplayer modes need to increase poll rate temporarily.
             API.Activity.BindValueChanged(_ => updateChatPollRate(), true);
