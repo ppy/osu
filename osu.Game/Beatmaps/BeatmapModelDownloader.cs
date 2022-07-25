@@ -38,6 +38,9 @@ namespace osu.Game.Beatmaps
                     // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).
                     original.DeletePending = true;
 
+                    // Transfer local values which should be persisted across a beatmap update.
+                    updated.DateAdded = original.DateAdded;
+
                     foreach (var beatmap in original.Beatmaps.ToArray())
                     {
                         var updatedBeatmap = updated.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.Hash);
