@@ -3,10 +3,12 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -16,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ExternalLinkButton : CompositeDrawable, IHasTooltip
+    public class ExternalLinkButton : CompositeDrawable, IHasTooltip, IHasContextMenu
     {
         public string Link { get; set; }
 
@@ -40,6 +42,19 @@ namespace osu.Game.Graphics.UserInterface
                 },
                 new HoverClickSounds()
             };
+        }
+        
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>
+                {
+                    new OsuMenuItem("Copy URL", MenuItemType.Standard, () => host.GetClipboard()?.SetText(Link))
+                };
+
+                return items.ToArray();
+            }
         }
 
         [BackgroundDependencyLoader]
