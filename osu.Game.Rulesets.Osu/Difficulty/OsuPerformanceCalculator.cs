@@ -82,10 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double rawAim = attributes.AimDifficulty;
-
-            if (score.Mods.Any(m => m is OsuModTouchDevice))
-                rawAim = Math.Pow(rawAim, 0.8);
+            double rawAim = Math.Pow(attributes.AimDifficulty, 0.8);
 
             double aimValue = Math.Pow(5.0 * Math.Max(1.0, rawAim / 0.0675) - 4.0, 3.0) / 100000.0;
 
@@ -221,10 +218,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!score.Mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
 
-            double rawFlashlight = attributes.FlashlightDifficulty;
-
-            if (score.Mods.Any(m => m is OsuModTouchDevice))
-                rawFlashlight = Math.Pow(rawFlashlight, 0.8);
+            double rawFlashlight = Math.Pow(attributes.FlashlightDifficulty, 0.8);
 
             double flashlightValue = Math.Pow(rawFlashlight, 2.0) * 25.0;
 
