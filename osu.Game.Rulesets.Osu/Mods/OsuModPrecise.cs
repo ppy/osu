@@ -3,18 +3,19 @@
 
 #nullable disable
 
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModPrecise : Mod
+    public class OsuModPrecise : Mod, IApplicableMod
     {
         public override string Name => "Precise";
-
         public override string Acronym => "PR";
-
         public override string Description => "Very precise!";
-
         public override double ScoreMultiplier => 1.06;
+        public override IconUsage? Icon => OsuIcon.ModHardRock;
+        public override ModType Type => ModType.DifficultyIncrease;
     }
 }
