@@ -45,6 +45,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double FlashlightDifficulty { get; set; }
 
         /// <summary>
+        /// The difficulty corresponding to the visual skill.
+        /// </summary>
+        [JsonProperty("visual_difficulty")]
+        public double VisualDifficulty { get; set; }
+
+        /// <summary>
         /// Describes how much of <see cref="AimDifficulty"/> is contributed to by hitcircles or sliders.
         /// A value closer to 1.0 indicates most of <see cref="AimDifficulty"/> is contributed by hitcircles.
         /// A value closer to 0.0 indicates most of <see cref="AimDifficulty"/> is contributed by sliders.
@@ -107,6 +113,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
             yield return (ATTRIB_ID_SPEED_NOTE_COUNT, SpeedNoteCount);
+            yield return (ATTRIB_ID_RHYTHM, RhythmDifficulty);
+            yield return (ATTRIB_ID_VISUAL, VisualDifficulty);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -123,6 +131,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
             SpeedNoteCount = values[ATTRIB_ID_SPEED_NOTE_COUNT];
             RhythmDifficulty = values[ATTRIB_ID_RHYTHM];
+            VisualDifficulty = values[ATTRIB_ID_VISUAL];
 
             DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;

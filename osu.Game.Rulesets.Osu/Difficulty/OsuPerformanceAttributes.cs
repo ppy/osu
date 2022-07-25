@@ -23,6 +23,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("flashlight")]
         public double Flashlight { get; set; }
 
+        [JsonProperty("visual")]
+        public double Visual { get; set; }
+
         [JsonProperty("effective_miss_count")]
         public double EffectiveMissCount { get; set; }
 
@@ -35,6 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return new PerformanceDisplayAttribute(nameof(Tap), "Tap", Tap);
             yield return new PerformanceDisplayAttribute(nameof(Accuracy), "Accuracy", Accuracy);
             yield return new PerformanceDisplayAttribute(nameof(Flashlight), "Flashlight Bonus", Flashlight);
+            yield return new PerformanceDisplayAttribute(nameof(Visual), "Visual", Visual);
         }
     }
 }

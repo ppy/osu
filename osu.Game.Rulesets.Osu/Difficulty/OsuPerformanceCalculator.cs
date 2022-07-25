@@ -61,12 +61,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double tapValue = computeTapValue(score, osuAttributes);
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
+            double visualValue = computeVisualValue(score, osuAttributes);
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
                     Math.Pow(tapValue, 1.1) +
                     Math.Pow(accuracyValue, 1.1) +
-                    Math.Pow(flashlightValue, 1.1), 1.0 / 1.1
+                    Math.Pow(flashlightValue, 1.1) +
+                    Math.Pow(visualValue, 1.1), 1.0 / 1.1
                 ) * multiplier;
 
             return new OsuPerformanceAttributes
@@ -238,6 +240,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             flashlightValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
 
             return flashlightValue;
+        }
+
+        private double computeVisualValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
+            double rawVisual = Math.Pow(attributes.VisualDifficulty, 0.8);
+
+            double visualValue = Math.Pow(rawVisual, 2.0) * 25.0;
+
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            if (effectiveMissCount > 0)
+                visualValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
+
+            visualValue *= getComboScalingFactor(attributes);
+
+            // Scale the visual value with object count to penalize short maps.
+            visualValue *= Math.Min(1, 1.650668 + (0.4845796 - 1.650668) / (1 + Math.Pow(totalHits / 817.9306, 1.147469)));
+
+            // Scale the visual value with accuracy _harshly_.
+            visualValue *= Math.Pow(accuracy, 8.0);
+
+            // It is important to also consider accuracy difficulty when doing that.
+            double odScaling = Math.Pow(attributes.OverallDifficulty, 2) / 2500;
+            visualValue *= 0.98 + (attributes.OverallDifficulty >= 0 ? odScaling : -odScaling);
+
+            return visualValue;
         }
 
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
