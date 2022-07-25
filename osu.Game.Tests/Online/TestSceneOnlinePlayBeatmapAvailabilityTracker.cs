@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Online
 
         internal class TestBeatmapModelDownloader : BeatmapModelDownloader
         {
-            public TestBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> importer, IAPIProvider apiProvider)
+            public TestBeatmapModelDownloader(BeatmapManager importer, IAPIProvider apiProvider)
                 : base(importer, apiProvider)
             {
             }

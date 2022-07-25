@@ -44,7 +44,7 @@ namespace osu.Game.Database
 
         public bool Download(T model, bool minimiseDownloadSize = false) => Download(model, minimiseDownloadSize, null);
 
-        protected bool Download(T model, bool minimiseDownloadSize, Action<Live<TModel>>? onSuccess)
+        protected bool Download(T model, bool minimiseDownloadSize, TModel? originalModel)
         {
             if (!canDownload(model)) return false;
 
@@ -66,12 +66,10 @@ namespace osu.Game.Database
                 Task.Factory.StartNew(async () =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    var imported = await importer.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
+                    var imported = await Import(notification, filename, originalModel).ConfigureAwait(false);
 
                     // for now a failed import will be marked as a failed download for simplicity.
-                    if (imported.Any())
-                        onSuccess?.Invoke(imported.Single());
-                    else
+                    if (!imported.Any())
                         DownloadFailed?.Invoke(request);
 
                     CurrentDownloads.Remove(request);
@@ -105,6 +103,18 @@ namespace osu.Game.Database
                 if (!(error is OperationCanceledException))
                     Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} download failed!");
             }
+        }
+
+        /// <summary>
+        /// Run the post-download import for the model.
+        /// </summary>
+        /// <param name="notification">The notification to update.</param>
+        /// <param name="filename">The path of the temporary downloaded file.</param>
+        /// <param name="originalModel">An optional model for update scenarios, to be used as a reference.</param>
+        /// <returns>The imported model.</returns>
+        protected virtual Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, string filename, TModel? originalModel)
+        {
+            return importer.Import(notification, new ImportTask(filename));
         }
 
         public abstract ArchiveDownloadRequest<T>? GetExistingDownload(T model);
