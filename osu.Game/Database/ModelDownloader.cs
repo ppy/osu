@@ -42,7 +42,9 @@ namespace osu.Game.Database
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model, bool minimiseDownloadSize);
 
-        public bool Download(T model, bool minimiseDownloadSize = false)
+        public bool Download(T model, bool minimiseDownloadSize = false) => Download(model, minimiseDownloadSize, null);
+
+        protected bool Download(T model, bool minimiseDownloadSize, Action<Live<TModel>>? onSuccess)
         {
             if (!canDownload(model)) return false;
 
@@ -67,7 +69,9 @@ namespace osu.Game.Database
                     var imported = await importer.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
 
                     // for now a failed import will be marked as a failed download for simplicity.
-                    if (!imported.Any())
+                    if (imported.Any())
+                        onSuccess?.Invoke(imported.Single());
+                    else
                         DownloadFailed?.Invoke(request);
 
                     CurrentDownloads.Remove(request);
