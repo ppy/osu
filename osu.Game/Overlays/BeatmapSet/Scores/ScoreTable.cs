@@ -23,8 +23,8 @@ using osuTK.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Scoring.Drawables;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -182,7 +182,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (score.PP != null)
                     content.Add(new StatisticText(score.PP, format: @"N0"));
                 else
-                    content.Add(new ProcessingPPIcon());
+                    content.Add(new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(text_size) });
             }
 
             content.Add(new ScoreboardTime(score.Date, text_size)
@@ -245,19 +245,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 if (count == maxCount)
                     Colour = colours.GreenLight;
-            }
-        }
-
-        private class ProcessingPPIcon : SpriteIcon, IHasTooltip
-        {
-            public LocalisableString TooltipText => ScoresStrings.StatusProcessing;
-
-            public ProcessingPPIcon()
-            {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-                Size = new Vector2(text_size);
-                Icon = FontAwesome.Solid.ExclamationTriangle;
             }
         }
     }
