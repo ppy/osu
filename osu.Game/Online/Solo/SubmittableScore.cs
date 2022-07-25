@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -17,7 +16,6 @@ namespace osu.Game.Online.Solo
 {
     /// <summary>
     /// A class specifically for sending scores to the API during score submission.
-    /// This is used instead of <see cref="APIScore"/> due to marginally different serialisation naming requirements.
     /// </summary>
     [Serializable]
     public class SubmittableScore
