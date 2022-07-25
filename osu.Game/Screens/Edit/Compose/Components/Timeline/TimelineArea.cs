@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.Solid.SearchPlus,
-                                                Action = () => changeZoom(1)
+                                                Action = () => Timeline.AdjustZoomRelatively(1)
                                             },
                                             new TimelineButton
                                             {
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.Solid.SearchMinus,
-                                                Action = () => changeZoom(-1)
+                                                Action = () => Timeline.AdjustZoomRelatively(-1)
                                             },
                                         }
                                     }
@@ -153,7 +153,5 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Timeline.ControlPointsVisible.BindTo(controlPointsCheckbox.Current);
             Timeline.TicksVisible.BindTo(ticksCheckbox.Current);
         }
-
-        private void changeZoom(float change) => Timeline.Zoom += change;
     }
 }

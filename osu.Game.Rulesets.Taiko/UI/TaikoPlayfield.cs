@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            inputDrum = new InputDrum(HitObjectContainer)
+            inputDrum = new InputDrum
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
@@ -164,6 +164,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                 },
                 drumRollHitContainer.CreateProxy(),
+                new DrumSamplePlayer(HitObjectContainer),
                 // this is added at the end of the hierarchy to receive input before taiko objects.
                 // but is proxied below everything to not cover visual effects such as hit explosions.
                 inputDrum,
