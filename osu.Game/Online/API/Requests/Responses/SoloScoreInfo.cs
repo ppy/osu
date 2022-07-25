@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -73,6 +74,12 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics { get; set; } = new Dictionary<HitResult, int>();
+
+        [JsonProperty("scoring_values")]
+        public ScoringValues ScoringValues { get; set; }
+
+        [JsonProperty("maximum_scoring_values")]
+        public ScoringValues MaximumScoringValues { get; set; }
 
         #region osu-web API additions (not stored to database).
 
@@ -145,6 +152,8 @@ namespace osu.Game.Online.API.Requests.Responses
             MaxCombo = MaxCombo,
             Rank = Rank,
             Statistics = Statistics,
+            ScoringValues = ScoringValues,
+            MaximumScoringValues = MaximumScoringValues,
             Date = EndedAt,
             Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
             Mods = mods,
@@ -166,6 +175,8 @@ namespace osu.Game.Online.API.Requests.Responses
             Passed = score.Passed,
             Mods = score.APIMods,
             Statistics = score.Statistics,
+            ScoringValues = score.ScoringValues.AsNonNull().Value,
+            MaximumScoringValues = score.MaximumScoringValues.AsNonNull().Value,
         };
 
         public long OnlineID => ID ?? -1;

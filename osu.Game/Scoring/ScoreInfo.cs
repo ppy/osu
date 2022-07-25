@@ -63,6 +63,12 @@ namespace osu.Game.Scoring
         [MapTo("Statistics")]
         public string StatisticsJson { get; set; } = string.Empty;
 
+        [MapTo("ScoringValues")]
+        public string ScoringValuesJson { get; set; } = string.Empty;
+
+        [MapTo("MaximumScoringValues")]
+        public string MaximumScoringValuesJson { get; set; } = string.Empty;
+
         public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
             Ruleset = ruleset ?? new RulesetInfo();
@@ -179,6 +185,50 @@ namespace osu.Game.Scoring
                 return statistics ??= new Dictionary<HitResult, int>();
             }
             set => statistics = value;
+        }
+
+        private ScoringValues? scoringValues;
+
+        [Ignored]
+        public ScoringValues? ScoringValues
+        {
+            get
+            {
+                if (scoringValues != null)
+                    return scoringValues.Value;
+
+                if (!string.IsNullOrEmpty(ScoringValuesJson))
+                    scoringValues = JsonConvert.DeserializeObject<ScoringValues>(ScoringValuesJson);
+
+                return scoringValues;
+            }
+            set
+            {
+                scoringValues = value;
+                ScoringValuesJson = JsonConvert.SerializeObject(value);
+            }
+        }
+
+        private ScoringValues? maximumScoringValues;
+
+        [Ignored]
+        public ScoringValues? MaximumScoringValues
+        {
+            get
+            {
+                if (maximumScoringValues != null)
+                    return maximumScoringValues.Value;
+
+                if (!string.IsNullOrEmpty(MaximumScoringValuesJson))
+                    maximumScoringValues = JsonConvert.DeserializeObject<ScoringValues>(MaximumScoringValuesJson);
+
+                return maximumScoringValues;
+            }
+            set
+            {
+                maximumScoringValues = value;
+                MaximumScoringValuesJson = JsonConvert.SerializeObject(value);
+            }
         }
 
         private Mod[]? mods;

@@ -449,6 +449,9 @@ namespace osu.Game.Rulesets.Scoring
             foreach (var result in HitResultExtensions.ALL_TYPES)
                 score.Statistics[result] = GetStatistic(result);
 
+            score.ScoringValues = currentScoringValues;
+            score.MaximumScoringValues = maximumScoringValues;
+
             // Populate total score after everything else.
             score.TotalScore = (long)Math.Round(ComputeFinalScore(ScoringMode.Standardised, score));
         }

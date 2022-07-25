@@ -64,8 +64,9 @@ namespace osu.Game.Database
         /// 18   2022-07-19    Added OnlineMD5Hash and LastOnlineUpdate to BeatmapInfo.
         /// 19   2022-07-19    Added DateSubmitted and DateRanked to BeatmapSetInfo.
         /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
+        /// 21   2022-07-25    Added ScoringValues and MaximumScoringValues to ScoreInfo.
         /// </summary>
-        private const int schema_version = 20;
+        private const int schema_version = 21;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
