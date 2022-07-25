@@ -41,12 +41,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double tapRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
             double speedNotes = ((Tap)skills[2]).RelevantNoteCount();
-            double flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
+            double rhythmRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
+            double flashlightRating = Math.Sqrt(skills[4].DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             if (mods.Any(h => h is OsuModRelax))
+            {
                 tapRating = 0.0;
+                rhythmRating = 0.0;
+            }
 
             double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
             double baseTapPerformance = Math.Pow(5 * Math.Max(1, tapRating / 0.0675) - 4, 3) / 100000;
@@ -79,6 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimDifficulty = aimRating,
                 TapDifficulty = tapRating,
                 SpeedNoteCount = speedNotes,
+                RhythmDifficulty = rhythmRating,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
@@ -124,6 +129,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 new Aim(mods, true),
                 new Aim(mods, false),
                 new Tap(mods, hitWindowGreat),
+                new Rhythm(mods, hitWindowGreat),
                 new Flashlight(mods)
             };
         }
@@ -135,7 +141,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new OsuModEasy(),
             new OsuModHardRock(),
             new OsuModFlashlight(),
-            new MultiMod(new OsuModFlashlight(), new OsuModHidden())
+            new MultiMod(new OsuModFlashlight(), new OsuModHidden()),
+            new OsuModPrecise()
         };
     }
 }

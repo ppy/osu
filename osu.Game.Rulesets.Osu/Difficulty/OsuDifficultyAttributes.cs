@@ -33,6 +33,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double SpeedNoteCount { get; set; }
 
         /// <summary>
+        /// The difficulty corresponding to the rhythm skill.
+        /// </summary>
+        [JsonProperty("rhythm_difficulty")]
+        public double RhythmDifficulty { get; set; }
+
+        /// <summary>
         /// The difficulty corresponding to the flashlight skill.
         /// </summary>
         [JsonProperty("flashlight_difficulty")]
@@ -108,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             base.FromDatabaseAttributes(values, onlineInfo);
 
             AimDifficulty = values[ATTRIB_ID_AIM];
-            TapDifficulty = values[ATTRIB_ID_SPEED];
+            TapDifficulty = values[ATTRIB_ID_TAP];
             OverallDifficulty = values[ATTRIB_ID_OVERALL_DIFFICULTY];
             ApproachRate = values[ATTRIB_ID_APPROACH_RATE];
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
@@ -116,6 +122,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
             SpeedNoteCount = values[ATTRIB_ID_SPEED_NOTE_COUNT];
+            RhythmDifficulty = values[ATTRIB_ID_RHYTHM];
 
             DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;

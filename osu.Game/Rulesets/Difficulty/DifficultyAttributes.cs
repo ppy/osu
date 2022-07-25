@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Difficulty
     public class DifficultyAttributes
     {
         protected const int ATTRIB_ID_AIM = 1;
-        protected const int ATTRIB_ID_SPEED = 3;
+        protected const int ATTRIB_ID_TAP = 3;
         protected const int ATTRIB_ID_OVERALL_DIFFICULTY = 5;
         protected const int ATTRIB_ID_APPROACH_RATE = 7;
         protected const int ATTRIB_ID_MAX_COMBO = 9;
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_FLASHLIGHT = 17;
         protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
         protected const int ATTRIB_ID_SPEED_NOTE_COUNT = 21;
-        protected const int ATTRIB_ID_TAP = 23;
+        protected const int ATTRIB_ID_RHYTHM = 23;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
