@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     AutoSizeAxes = Axes.Both,
                     Spacing = new Vector2(2f),
                     Direction = FillDirection.Horizontal,
-                    ChildrenEnumerable = Enumerable.Range(0, 15).Select(i => new FillFlowContainer
+                    ChildrenEnumerable = Enumerable.Range(-1, 15).Select(i => new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
