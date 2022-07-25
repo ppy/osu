@@ -127,8 +127,6 @@ namespace osu.Game.Rulesets.Scoring
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
 
-        private Dictionary<HitResult, int>? maximumResultCounts;
-
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
 
@@ -406,10 +404,7 @@ namespace osu.Game.Rulesets.Scoring
             lastHitObject = null;
 
             if (storeResults)
-            {
                 maximumScoringValues = currentScoringValues;
-                maximumResultCounts = new Dictionary<HitResult, int>(scoreResultCounts);
-            }
 
             scoreResultCounts.Clear();
 
@@ -455,22 +450,6 @@ namespace osu.Game.Rulesets.Scoring
 
             score.Passed = false;
             Rank.Value = ScoreRank.F;
-
-            Debug.Assert(maximumResultCounts != null);
-
-            if (maximumResultCounts.TryGetValue(HitResult.LargeTickHit, out int maximumLargeTick))
-                scoreResultCounts[HitResult.LargeTickMiss] = maximumLargeTick - scoreResultCounts.GetValueOrDefault(HitResult.LargeTickHit);
-
-            if (maximumResultCounts.TryGetValue(HitResult.SmallTickHit, out int maximumSmallTick))
-                scoreResultCounts[HitResult.SmallTickMiss] = maximumSmallTick - scoreResultCounts.GetValueOrDefault(HitResult.SmallTickHit);
-
-            int maximumBonusOrIgnore = maximumResultCounts.Where(kvp => kvp.Key.IsBonus() || kvp.Key == HitResult.IgnoreHit).Sum(kvp => kvp.Value);
-            int currentBonusOrIgnore = scoreResultCounts.Where(kvp => kvp.Key.IsBonus() || kvp.Key == HitResult.IgnoreHit).Sum(kvp => kvp.Value);
-            scoreResultCounts[HitResult.IgnoreMiss] = maximumBonusOrIgnore - currentBonusOrIgnore;
-
-            int maximumBasic = maximumResultCounts.SingleOrDefault(kvp => kvp.Key.IsBasic()).Value;
-            int currentBasic = scoreResultCounts.Where(kvp => kvp.Key.IsBasic() && kvp.Key != HitResult.Miss).Sum(kvp => kvp.Value);
-            scoreResultCounts[HitResult.Miss] = maximumBasic - currentBasic;
 
             PopulateScore(score);
         }
