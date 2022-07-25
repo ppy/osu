@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Online.API;
@@ -36,6 +37,23 @@ namespace osu.Game.Beatmaps
                     // Generally the import process will do this for us if the OnlineIDs match,
                     // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).
                     original.DeletePending = true;
+
+                    foreach (var beatmap in original.Beatmaps.ToArray())
+                    {
+                        var updatedBeatmap = updated.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.Hash);
+
+                        if (updatedBeatmap != null)
+                        {
+                            // If the updated beatmap matches an existing one, transfer any user data across..
+                            if (beatmap.Scores.Any())
+                            {
+                                Logger.Log($"Transferring {beatmap.Scores.Count()} scores for unchanged difficulty \"{beatmap}\"", LoggingTarget.Database);
+
+                                foreach (var score in beatmap.Scores)
+                                    score.BeatmapInfo = updatedBeatmap;
+                            }
+                        }
+                    }
                 });
             }
         }
