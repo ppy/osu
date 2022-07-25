@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             OnlineID = hasOnlineId ? online_score_id : 0,
             Ruleset = new OsuRuleset().RulesetInfo,
             BeatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First(),
-            Hash = replayAvailable ? "hash" : string.Empty,
+            Hash = replayAvailable ? "online" : string.Empty,
             User = new APIUser
             {
                 Id = 39828,
