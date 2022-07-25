@@ -764,13 +764,14 @@ namespace osu.Game.Tests.Database
                     // Second import matches first but contains one extra .osu file.
                     var secondImport = (await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOriginal), firstImport.Value)).FirstOrDefault();
                     Assert.That(secondImport, Is.Not.Null);
+                    Debug.Assert(secondImport != null);
 
                     Assert.That(realm.Realm.All<BeatmapInfo>(), Has.Count.EqualTo(12));
                     Assert.That(realm.Realm.All<BeatmapMetadata>(), Has.Count.EqualTo(12));
                     Assert.That(realm.Realm.All<BeatmapSetInfo>(), Has.Count.EqualTo(1));
 
                     // check the newly "imported" beatmap is not the original.
-                    Assert.That(firstImport?.ID, Is.Not.EqualTo(secondImport?.ID));
+                    Assert.That(firstImport.ID, Is.Not.EqualTo(secondImport.ID));
                 }
                 finally
                 {
