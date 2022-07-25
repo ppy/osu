@@ -159,6 +159,9 @@ namespace osu.Game.Scoring
         /// <returns>The maximum achievable combo. A <see langword="null"/> return value indicates the difficulty cache has failed to retrieve the combo.</returns>
         public async Task<int?> GetMaximumAchievableComboAsync([NotNull] ScoreInfo score, CancellationToken cancellationToken = default)
         {
+            if (score.MaximumScoringValues is ScoringValues maximum)
+                return maximum.MaxCombo;
+
             if (score.IsLegacyScore)
             {
                 // This score is guaranteed to be an osu!stable score.
