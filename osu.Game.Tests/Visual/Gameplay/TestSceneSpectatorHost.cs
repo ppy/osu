@@ -5,6 +5,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
@@ -41,6 +42,21 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddUntilStep("spectator client sending frames", () => spectatorClient.WatchedUserStates.ContainsKey(dummy_user_id));
             AddAssert("spectator client sent correct ruleset", () => spectatorClient.WatchedUserStates[dummy_user_id].RulesetID == Ruleset.Value.OnlineID);
+        }
+
+        [Test]
+        public void TestRestart()
+        {
+            AddAssert("spectator client sees playing state", () => spectatorClient.WatchedUserStates[dummy_user_id].State == SpectatedUserState.Playing);
+
+            AddStep("exit player", () => Player.Exit());
+            AddStep("reload player", LoadPlayer);
+            AddUntilStep("wait for player load", () => Player.IsLoaded && Player.Alpha == 1);
+
+            AddAssert("spectator client sees playing state", () => spectatorClient.WatchedUserStates[dummy_user_id].State == SpectatedUserState.Playing);
+
+            AddWaitStep("wait", 5);
+            AddUntilStep("spectator client still sees playing state", () => spectatorClient.WatchedUserStates[dummy_user_id].State == SpectatedUserState.Playing);
         }
 
         public override void TearDownSteps()
