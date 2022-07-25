@@ -49,9 +49,11 @@ namespace osu.Game.Beatmaps
 
             imported.First().PerformWrite(updated =>
             {
-                Logger.Log($"Beatmap \"{updated}\"update completed successfully", LoggingTarget.Database);
+                var realm = updated.Realm;
 
-                original = updated.Realm.Find<BeatmapSetInfo>(original.ID);
+                Logger.Log($"Beatmap \"{updated}\" update completed successfully", LoggingTarget.Database);
+
+                original = realm.Find<BeatmapSetInfo>(original.ID);
 
                 // Generally the import process will do this for us if the OnlineIDs match,
                 // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).
@@ -80,6 +82,9 @@ namespace osu.Game.Beatmaps
                         // interactions, like restoring the outdated beatmap then updating a second time
                         // (causing user data to be wiped).
                         original.Beatmaps.Remove(beatmap);
+
+                        realm.Remove(beatmap.Metadata);
+                        realm.Remove(beatmap);
                     }
                     else
                     {
@@ -89,6 +94,10 @@ namespace osu.Game.Beatmaps
                         beatmap.ResetOnlineInfo();
                     }
                 }
+
+                // If the original has no beatmaps left, delete the set as well.
+                if (!original.Beatmaps.Any())
+                    realm.Remove(original);
             });
 
             return imported;
