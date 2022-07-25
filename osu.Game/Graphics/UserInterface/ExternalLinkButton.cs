@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.UserInterface
                 new HoverClickSounds()
             };
         }
-        
+
         public MenuItem[] ContextMenuItems
         {
             get
