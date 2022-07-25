@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
@@ -18,9 +19,21 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModMirror)).ToArray();
 
+        public override void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        {
+            float currentCircleSize = difficulty.CircleSize;
+
+            base.ApplyToDifficulty(difficulty);
+
+            // Undo CS change.
+            difficulty.CircleSize = currentCircleSize;
+        }
+
         public void ApplyToHitObject(HitObject hitObject)
         {
             var osuObject = (OsuHitObject)hitObject;
+
+            osuObject.Scale -= 0.125f;
 
             OsuHitObjectGenerationUtils.ReflectVertically(osuObject);
         }
