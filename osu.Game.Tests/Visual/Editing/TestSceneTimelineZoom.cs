@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {
+    [Ignore("Timeline initialisation is kinda broken.")] // Initial work to rectify this was done in https://github.com/ppy/osu/pull/19297, but needs more massaging to work.
     public class TestSceneTimelineZoom : TimelineTestScene
     {
         public override Drawable CreateTestComponent() => Empty();
