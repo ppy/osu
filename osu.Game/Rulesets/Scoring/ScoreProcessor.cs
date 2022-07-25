@@ -285,32 +285,10 @@ namespace osu.Game.Rulesets.Scoring
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
-            ExtractScoringValues(scoreInfo, out var current, out var maximum);
+            if (scoreInfo.ScoringValues is not ScoringValues current || scoreInfo.MaximumScoringValues is not ScoringValues maximum)
+                ExtractScoringValues(scoreInfo, out current, out maximum);
 
             return ComputeScore(mode, current, maximum);
-        }
-
-        /// <summary>
-        /// Computes the total score of a partially-completed <see cref="ScoreInfo"/>. This should be used when it is unknown whether a score is complete.
-        /// </summary>
-        /// <remarks>
-        /// Requires <see cref="JudgementProcessor.ApplyBeatmap"/> to have been called before use.
-        /// </remarks>
-        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
-        /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
-        /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
-        [Pure]
-        public double ComputePartialScore(ScoringMode mode, ScoreInfo scoreInfo)
-        {
-            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
-                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
-
-            if (!beatmapApplied)
-                throw new InvalidOperationException($"Cannot compute partial score without calling {nameof(ApplyBeatmap)}.");
-
-            ExtractScoringValues(scoreInfo, out var current, out _);
-
-            return ComputeScore(mode, current, MaximumScoringValues);
         }
 
         /// <summary>
@@ -333,7 +311,8 @@ namespace osu.Game.Rulesets.Scoring
             double accuracyRatio = scoreInfo.Accuracy;
             double comboRatio = maxAchievableCombo > 0 ? (double)scoreInfo.MaxCombo / maxAchievableCombo : 1;
 
-            ExtractScoringValues(scoreInfo, out var current, out var maximum);
+            if (scoreInfo.ScoringValues is not ScoringValues current || scoreInfo.MaximumScoringValues is not ScoringValues maximum)
+                ExtractScoringValues(scoreInfo, out current, out maximum);
 
             // For legacy osu!mania scores, a full-GREAT score has 100% accuracy. If combined with a full-combo, the score becomes indistinguishable from a full-PERFECT score.
             // To get around this, the accuracy ratio is always recalculated based on the hit statistics rather than trusting the score.
