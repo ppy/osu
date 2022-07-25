@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
-         private const int wiggle_duration = 100; // (ms) Higher = fewer wiggles
+        private const int wiggle_duration = 100; // (ms) Higher = fewer wiggles
 
         [SettingSource("Strength", "Multiplier applied to the wiggling strength.")]
         public BindableDouble WiggleStrength { get; } = new BindableDouble(1)
