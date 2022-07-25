@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             foreach (double strain in strains)
                 difficulty += Math.Pow(strain, 1 / Math.Log(StarsPerDouble, 2));
 
-            return difficulty;
+            return Math.Pow(difficulty, Math.Log(StarsPerDouble, 2));
         }
     }
 }
