@@ -118,6 +118,54 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
         }
 
+        /// <summary>
+        /// Determines whether this <see cref="OsuDifficultyHitObject"/> is considered overlapping with the
+        /// <see cref="OsuDifficultyHitObject"/> before it.
+        /// </summary>
+        /// <remarks>
+        /// Keep in mind that "overlapping" in this case is overlapping to the point where both
+        /// <see cref="OsuDifficultyHitObject"/>s can be hit with just a single tap in osu!droid.
+        /// </remarks>
+        /// <param name="considerDistance">Whether to consider the distance between both <see cref="OsuDifficultyHitObject"/>s.</param>
+        /// <returns>Whether this <see cref="OsuDifficultyHitObject"/> is considered overlapping.</returns>
+        public bool IsOverlapping(bool considerDistance)
+        {
+            if (BaseObject is Spinner)
+                return false;
+
+            var previous = Previous(0);
+
+            if (previous == null || previous.BaseObject is Spinner)
+                return false;
+
+            if (DeltaTime >= 5)
+                return false;
+
+            if (considerDistance)
+            {
+                float distanceFromPrevious;
+
+                if (previous.BaseObject is Slider slider)
+                {
+                    distanceFromPrevious =
+                        Math.Min
+                        (
+                            (slider.StackedEndPosition - BaseObject.StackedPosition).Length,
+                            ((slider.LazyEndPosition ?? slider.StackedEndPosition) - BaseObject.StackedPosition).Length
+                        );
+                }
+                else
+                {
+                    var osuObject = (OsuHitObject)previous.BaseObject;
+                    distanceFromPrevious = (osuObject.StackedEndPosition - BaseObject.StackedPosition).Length;
+                }
+
+                return distanceFromPrevious <= 2 * BaseObject.Radius;
+            }
+
+            return true;
+        }
+
         private void setDistances(double clockRate)
         {
             if (BaseObject is Slider currentSlider)
@@ -134,9 +182,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = normalised_radius / (float)BaseObject.Radius;
 
-            if (BaseObject.Radius < 30)
+            if (BaseObject.Radius < 52.5)
             {
-                float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
+                float smallCircleBonus = Math.Min(52.5f - (float)BaseObject.Radius, 20) / 40;
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
@@ -195,6 +243,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             if (slider.LazyEndPosition != null)
                 return;
+
+            // Droid doesn't have a legacy slider tail.
+            slider.TailCircle.StartTime += slider.LegacyLastTickOffset ?? 36;
 
             slider.LazyTravelTime = slider.NestedHitObjects[^1].StartTime - slider.StartTime;
 
