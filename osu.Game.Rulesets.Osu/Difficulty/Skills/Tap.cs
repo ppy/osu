@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
     /// </summary>
-    public class Speed : OsuStrainSkill
+    public class Tap : OsuStrainSkill
     {
         private double skillMultiplier => 1375;
         private double strainDecayBase => 0.3;
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> objectStrains = new List<double>();
 
-        public Speed(Mod[] mods, double hitWindowGreat)
+        public Tap(Mod[] mods, double hitWindowGreat)
             : base(mods)
         {
             greatWindow = hitWindowGreat;
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
-            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current, greatWindow) * skillMultiplier;
+            currentStrain += TapEvaluator.EvaluateDifficultyOf(current, greatWindow) * skillMultiplier;
 
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current, greatWindow);
 

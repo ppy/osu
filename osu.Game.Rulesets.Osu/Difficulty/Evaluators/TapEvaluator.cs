@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
-    public static class SpeedEvaluator
+    public static class TapEvaluator
     {
         private const double single_spacing_threshold = 125;
         private const double min_speed_bonus = 75; // ~200BPM
@@ -34,6 +34,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
             var osuNextObj = (OsuDifficultyHitObject)current.Next(0);
 
+            if (osuCurrObj.IsOverlapping(false))
+                return 0;
+
             double strainTime = osuCurrObj.StrainTime;
             double greatWindowFull = greatWindow * 2;
             double doubletapness = 1;
@@ -50,8 +53,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Cap deltatime to the OD 300 hitwindow.
-            // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
-            strainTime /= Math.Clamp((strainTime / greatWindowFull) / 0.93, 0.92, 1);
+            // 0.58 is derived from making sure 260 BPM 1/4 OD5 streams aren't nerfed harshly, whilst 0.91 limits the effect of the cap.
+            strainTime /= Math.Clamp((strainTime / greatWindowFull) / 0.58, 0.91, 1);
 
             // derive speedBonus for calculation
             double speedBonus = 1.0;
@@ -59,10 +62,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (strainTime < min_speed_bonus)
                 speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
-            double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
-
-            return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness / strainTime;
+            return speedBonus * doubletapness / strainTime;
         }
     }
 }

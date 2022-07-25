@@ -39,17 +39,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
-            double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
-            double speedNotes = ((Speed)skills[2]).RelevantNoteCount();
+            double tapRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
+            double speedNotes = ((Tap)skills[2]).RelevantNoteCount();
             double flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             if (mods.Any(h => h is OsuModRelax))
-                speedRating = 0.0;
+                tapRating = 0.0;
 
             double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
-            double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating / 0.0675) - 4, 3) / 100000;
+            double baseTapPerformance = Math.Pow(5 * Math.Max(1, tapRating / 0.0675) - 4, 3) / 100000;
             double baseFlashlightPerformance = 0.0;
 
             if (mods.Any(h => h is OsuModFlashlight))
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double basePerformance =
                 Math.Pow(
                     Math.Pow(baseAimPerformance, 1.1) +
-                    Math.Pow(baseSpeedPerformance, 1.1) +
+                    Math.Pow(baseTapPerformance, 1.1) +
                     Math.Pow(baseFlashlightPerformance, 1.1), 1.0 / 1.1
                 );
 
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 StarRating = starRating,
                 Mods = mods,
                 AimDifficulty = aimRating,
-                SpeedDifficulty = speedRating,
+                TapDifficulty = tapRating,
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 new Aim(mods, true),
                 new Aim(mods, false),
-                new Speed(mods, hitWindowGreat),
+                new Tap(mods, hitWindowGreat),
                 new Flashlight(mods)
             };
         }

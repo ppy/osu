@@ -20,14 +20,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double AimDifficulty { get; set; }
 
         /// <summary>
-        /// The difficulty corresponding to the speed skill.
+        /// The difficulty corresponding to the tap skill.
         /// </summary>
-        [JsonProperty("speed_difficulty")]
-        public double SpeedDifficulty { get; set; }
+        [JsonProperty("tap_difficulty")]
+        public double TapDifficulty { get; set; }
 
         /// <summary>
         /// The number of clickable objects weighted by difficulty.
-        /// Related to <see cref="SpeedDifficulty"/>
+        /// Related to <see cref="TapDifficulty"/>
         /// </summary>
         [JsonProperty("speed_note_count")]
         public double SpeedNoteCount { get; set; }
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 yield return v;
 
             yield return (ATTRIB_ID_AIM, AimDifficulty);
-            yield return (ATTRIB_ID_SPEED, SpeedDifficulty);
+            yield return (ATTRIB_ID_TAP, TapDifficulty);
             yield return (ATTRIB_ID_OVERALL_DIFFICULTY, OverallDifficulty);
             yield return (ATTRIB_ID_APPROACH_RATE, ApproachRate);
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             base.FromDatabaseAttributes(values, onlineInfo);
 
             AimDifficulty = values[ATTRIB_ID_AIM];
-            SpeedDifficulty = values[ATTRIB_ID_SPEED];
+            TapDifficulty = values[ATTRIB_ID_SPEED];
             OverallDifficulty = values[ATTRIB_ID_OVERALL_DIFFICULTY];
             ApproachRate = values[ATTRIB_ID_APPROACH_RATE];
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
