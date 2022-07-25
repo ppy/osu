@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 2.0;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.75;
+        private const double min_speed_bonus = 150;
+        private const double single_spacing_threshold = 175;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -28,7 +30,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliders)
         {
-            if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
+            if (current.BaseObject is Spinner)
+                return 0;
+
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+
+            if (osuCurrObj.IsOverlapping(true))
+                return 0;
+
+            return aimStrainOf(current, withSliders) + movementStrainOf(current);
+        }
+
+        private static double aimStrainOf(DifficultyHitObject current, bool withSliders)
+        {
+            if (current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
@@ -39,23 +54,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
-            if (osuLastObj.BaseObject is Slider && withSliders)
+            if (osuLastObj.BaseObject is Slider lastSlider && withSliders)
             {
-                double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
-                double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
+                bool canGrantBonus =
+                    lastSlider.NestedHitObjects.Count > 2 && lastSlider.NestedHitObjects[1] is SliderTick;
 
-                currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
+                if (canGrantBonus)
+                {
+                    double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
+                    double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
+
+                    currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
+                }
             }
 
             // As above, do the same for the previous hitobject.
             double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
 
-            if (osuLastLastObj.BaseObject is Slider && withSliders)
+            if (osuLastLastObj.BaseObject is Slider lastLastSlider && withSliders)
             {
-                double travelVelocity = osuLastLastObj.TravelDistance / osuLastLastObj.TravelTime;
-                double movementVelocity = osuLastObj.MinimumJumpDistance / osuLastObj.MinimumJumpTime;
+                bool canGrantBonus =
+                    lastLastSlider.NestedHitObjects.Count > 2 && lastLastSlider.NestedHitObjects[1] is SliderTick;
 
-                prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
+                if (canGrantBonus)
+                {
+                    double travelVelocity = osuLastLastObj.TravelDistance / osuLastLastObj.TravelTime;
+                    double movementVelocity = osuLastObj.MinimumJumpDistance / osuLastObj.MinimumJumpTime;
+
+                    prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
+                }
             }
 
             double wideAngleBonus = 0;
@@ -128,6 +155,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 aimStrain += sliderBonus * slider_multiplier;
 
             return aimStrain;
+        }
+
+        private static double movementStrainOf(DifficultyHitObject current)
+        {
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
+
+            double speedBonus = 1;
+
+            if (osuCurrObj.StrainTime < min_speed_bonus) {
+                speedBonus +=
+                    0.75 *
+                    Math.Pow((min_speed_bonus - osuCurrObj.StrainTime) / 45, 2);
+            }
+
+            double travelDistance = osuLastObj?.TravelDistance ?? 0;
+            double distance = Math.Min(
+                single_spacing_threshold,
+                travelDistance + osuCurrObj.MinimumJumpDistance
+            );
+
+            return 50 * speedBonus * Math.Pow(distance / single_spacing_threshold, 5) / osuCurrObj.StrainTime;
         }
 
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
