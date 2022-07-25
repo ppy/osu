@@ -45,6 +45,9 @@ namespace osu.Game.Beatmaps
         {
             var imported = await Import(notification, importTask);
 
+            if (!imported.Any())
+                return imported;
+
             Debug.Assert(imported.Count() == 1);
 
             imported.First().PerformWrite(updated =>
