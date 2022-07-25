@@ -6,7 +6,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -24,6 +23,7 @@ using osuTK.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
@@ -179,8 +179,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             if (showPerformancePoints)
             {
-                Debug.Assert(score.PP != null);
-                content.Add(new StatisticText(score.PP.Value, format: @"N0"));
+                if (score.PP != null)
+                    content.Add(new StatisticText(score.PP, format: @"N0"));
+                else
+                    content.Add(new ProcessingPPIcon());
             }
 
             content.Add(new ScoreboardTime(score.Date, text_size)
@@ -222,19 +224,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private class StatisticText : OsuSpriteText, IHasTooltip
         {
-            private readonly double count;
+            private readonly double? count;
             private readonly double? maxCount;
             private readonly bool showTooltip;
 
             public LocalisableString TooltipText => maxCount == null || !showTooltip ? string.Empty : $"{count}/{maxCount}";
 
-            public StatisticText(double count, double? maxCount = null, string format = null, bool showTooltip = true)
+            public StatisticText(double? count, double? maxCount = null, string format = null, bool showTooltip = true)
             {
                 this.count = count;
                 this.maxCount = maxCount;
                 this.showTooltip = showTooltip;
 
-                Text = count.ToLocalisableString(format);
+                Text = count?.ToLocalisableString(format) ?? default;
                 Font = OsuFont.GetFont(size: text_size);
             }
 
@@ -243,6 +245,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 if (count == maxCount)
                     Colour = colours.GreenLight;
+            }
+        }
+
+        private class ProcessingPPIcon : SpriteIcon, IHasTooltip
+        {
+            public LocalisableString TooltipText => ScoresStrings.StatusProcessing;
+
+            public ProcessingPPIcon()
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                Size = new Vector2(text_size);
+                Icon = FontAwesome.Solid.ExclamationTriangle;
             }
         }
     }

@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.Online
                             new APIMod { Acronym = new OsuModHidden().Acronym },
                         },
                         Rank = ScoreRank.B,
-                        PP = 180,
+                        PP = null,
                         MaxCombo = 1234,
                         TotalScore = 12345678,
                         Accuracy = 0.9854,
