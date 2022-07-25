@@ -108,7 +108,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            HitWindows hitWindows = new OsuHitWindows();
+            HitWindows hitWindows;
+
+            if (mods.Any(m => m is OsuModPrecise))
+                hitWindows = new OsuPreciseHitWindows();
+            else
+                hitWindows = new OsuHitWindows();
+
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
