@@ -130,7 +130,8 @@ namespace osu.Game.Overlays.BeatmapSet
                                                 {
                                                     Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true)
                                                 },
-                                                externalLink = new ExternalLinkButton {
+                                                externalLink = new ExternalLinkButton
+                                                {
                                                     Anchor = Anchor.BottomLeft,
                                                     Origin = Anchor.BottomLeft,
                                                     Margin = new MarginPadding { Left = 5, Bottom = 4 }, // To better lineup with the font
