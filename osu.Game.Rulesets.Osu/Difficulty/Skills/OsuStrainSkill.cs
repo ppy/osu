@@ -15,12 +15,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public abstract class OsuStrainSkill : StrainSkill
     {
         /// <summary>
-        /// The default multiplier applied by <see cref="OsuStrainSkill"/> to the final difficulty value after all other calculations.
-        /// May be overridden via <see cref="DifficultyMultiplier"/>.
-        /// </summary>
-        public const double DEFAULT_DIFFICULTY_MULTIPLIER = 1.06;
-
-        /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
         /// </summary>
@@ -32,9 +26,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected virtual double ReducedStrainBaseline => 0.75;
 
         /// <summary>
-        /// The final multiplier to be applied to <see cref="DifficultyValue"/> after all other calculations.
+        /// The bonus multiplier that is given for a sequence of notes of equal difficulty.
         /// </summary>
-        protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
+        protected virtual double StarsPerDouble => 1.05;
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
@@ -44,30 +38,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override double DifficultyValue()
         {
             double difficulty = 0;
-            double weight = 1;
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
 
-            List<double> strains = peaks.OrderByDescending(d => d).ToList();
+            List<double> strains = peaks.ToList();
 
-            // We are reducing the highest strains first to account for extreme difficulty spikes
-            for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)
+            if (ReducedSectionCount > 0)
             {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / ReducedSectionCount, 0, 1)));
-                strains[i] *= Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale);
+                strains = strains.OrderByDescending(d => d).ToList();
+
+                // We are reducing the highest strains first to account for extreme difficulty spikes
+                for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)
+                {
+                    double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / ReducedSectionCount, 0, 1)));
+                    strains[i] *= Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale);
+                }
             }
 
-            // Difficulty is the weighted sum of the highest strains from every section.
-            // We're sorting from highest to lowest strain.
-            foreach (double strain in strains.OrderByDescending(d => d))
-            {
-                difficulty += strain * weight;
-                weight *= DecayWeight;
-            }
+            // Math here preserves the property that two notes of equal difficulty x, we have their summed difficulty = x * starsPerDouble.
+            // This also applies to two sets of notes with equal difficulty.
+            foreach (double strain in strains)
+                difficulty += Math.Pow(strain, 1 / Math.Log(StarsPerDouble, 2));
 
-            return difficulty * DifficultyMultiplier;
+            return difficulty;
         }
     }
 }
