@@ -52,6 +52,19 @@ namespace osu.Game.Beatmaps
                                 foreach (var score in beatmap.Scores)
                                     score.BeatmapInfo = updatedBeatmap;
                             }
+
+                            // ..then nuke the old beatmap completely.
+                            // this is done instead of a soft deletion to avoid a user potentially creating weird
+                            // interactions, like restoring the outdated beatmap then updating a second time
+                            // (causing user data to be wiped).
+                            original.Beatmaps.Remove(beatmap);
+                        }
+                        else
+                        {
+                            // If the beatmap differs in the original, leave it in a soft-deleted state but reset online info.
+                            // This caters to the case where a user has made modifications they potentially want to restore,
+                            // but after restoring we want to ensure it can't be used to trigger an update of the beatmap.
+                            beatmap.ResetOnlineInfo();
                         }
                     }
                 });
