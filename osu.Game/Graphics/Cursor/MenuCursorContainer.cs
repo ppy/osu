@@ -3,16 +3,20 @@
 
 #nullable disable
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.Input.StateChanges;
+using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Cursor
 {
     /// <summary>
-    /// A container which provides a <see cref="MenuCursor"/> which can be overridden by hovered <see cref="Drawable"/>s.
+    /// A container which provides a <see cref="MenuCursor"/>.
+    /// It also handles cases where a more localised cursor is provided by another component (via <see cref="IProvideCursor"/>).
     /// </summary>
     public class MenuCursorContainer : Container, IProvideCursor
     {
@@ -36,12 +40,19 @@ namespace osu.Game.Graphics.Cursor
             });
         }
 
+        private Bindable<bool> showDuringTouch;
+
         private InputManager inputManager;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             inputManager = GetContainingInputManager();
+
+            showDuringTouch = config.GetBindable<bool>(OsuSetting.GameplayCursorDuringTouch);
         }
 
         private IProvideCursor currentTarget;
@@ -51,7 +62,7 @@ namespace osu.Game.Graphics.Cursor
             base.Update();
 
             var lastMouseSource = inputManager.CurrentState.Mouse.LastSource;
-            bool hasValidInput = lastMouseSource != null && !(lastMouseSource is ISourcedFromTouch);
+            bool hasValidInput = lastMouseSource != null && (showDuringTouch.Value || lastMouseSource is not ISourcedFromTouch);
 
             if (!hasValidInput || !CanShowCursor)
             {
