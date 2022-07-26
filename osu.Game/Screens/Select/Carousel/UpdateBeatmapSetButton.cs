@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             Action = () =>
             {
-                beatmapDownloader.Update(beatmapSetInfo);
+                beatmapDownloader.DownloadAsUpdate(beatmapSetInfo);
                 attachExistingDownload();
             };
         }

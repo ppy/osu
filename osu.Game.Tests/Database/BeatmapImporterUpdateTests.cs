@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Database
                     Assert.That(realm.Realm.All<BeatmapSetInfo>().First(s => !s.DeletePending).Beatmaps, Has.Count.EqualTo(11));
 
                     // Second import matches first but contains one extra .osu file.
-                    var secondImport = (await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOriginal), firstImport.Value)).FirstOrDefault();
+                    var secondImport = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOriginal), firstImport.Value);
                     Assert.That(secondImport, Is.Not.Null);
                     Debug.Assert(secondImport != null);
 
