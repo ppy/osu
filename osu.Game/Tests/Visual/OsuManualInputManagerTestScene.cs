@@ -38,11 +38,11 @@ namespace osu.Game.Tests.Visual
 
         protected OsuManualInputManagerTestScene()
         {
-            MenuCursorContainer cursorContainer;
+            GlobalCursorDisplay cursorDisplay;
 
-            CompositeDrawable mainContent = cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
+            CompositeDrawable mainContent = cursorDisplay = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both };
 
-            cursorContainer.Child = content = new OsuTooltipContainer(cursorContainer.Cursor)
+            cursorDisplay.Child = content = new OsuTooltipContainer(cursorDisplay.MenuCursor)
             {
                 RelativeSizeAxes = Axes.Both
             };

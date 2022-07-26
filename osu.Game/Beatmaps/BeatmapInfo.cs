@@ -87,7 +87,11 @@ namespace osu.Game.Beatmaps
 
         public string Hash { get; set; } = string.Empty;
 
-        public double StarRating { get; set; }
+        /// <summary>
+        /// Defaults to -1 (meaning not-yet-calculated).
+        /// Will likely be superseded with a better storage considering ruleset/mods.
+        /// </summary>
+        public double StarRating { get; set; } = -1;
 
         [Indexed]
         public string MD5Hash { get; set; } = string.Empty;
