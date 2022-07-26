@@ -175,8 +175,8 @@ namespace osu.Game.Online.API.Requests.Responses
             Passed = score.Passed,
             Mods = score.APIMods,
             Statistics = score.Statistics,
-            ScoringValues = score.ScoringValues.AsNonNull().Value,
-            MaximumScoringValues = score.MaximumScoringValues.AsNonNull().Value,
+            ScoringValues = score.ScoringValues ?? new ScoringValues(),
+            MaximumScoringValues = score.MaximumScoringValues ?? new ScoringValues(),
         };
 
         public long OnlineID => ID ?? -1;
