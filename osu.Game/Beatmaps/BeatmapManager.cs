@@ -164,8 +164,7 @@ namespace osu.Game.Beatmaps
             // clear the hash, as that's what is used to match .osu files with their corresponding realm beatmaps.
             newBeatmapInfo.Hash = string.Empty;
             // clear online properties.
-            newBeatmapInfo.OnlineID = -1;
-            newBeatmapInfo.Status = BeatmapOnlineStatus.None;
+            newBeatmapInfo.ResetOnlineInfo();
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
         }
@@ -408,6 +407,9 @@ namespace osu.Game.Beatmaps
         {
             Realm.Run(r => Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
+
+        public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
+            beatmapImporter.ImportAsUpdate(notification, importTask, original);
 
         #region Implementation of ICanAcceptFiles
 
