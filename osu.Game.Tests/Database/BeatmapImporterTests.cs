@@ -310,6 +310,7 @@ namespace osu.Game.Tests.Database
                 }
                 finally
                 {
+                    File.Delete(temp);
                     Directory.Delete(extractedFolder, true);
                 }
             });
