@@ -124,14 +124,11 @@ namespace osu.Game.Tests.Gameplay
 
             Assert.That(score.Rank, Is.EqualTo(ScoreRank.F));
             Assert.That(score.Passed, Is.False);
-            Assert.That(score.Statistics.Count(kvp => kvp.Value > 0), Is.EqualTo(7));
+            Assert.That(score.Statistics.Count(kvp => kvp.Value > 0), Is.EqualTo(4));
             Assert.That(score.Statistics[HitResult.Ok], Is.EqualTo(1));
-            Assert.That(score.Statistics[HitResult.Miss], Is.EqualTo(1));
             Assert.That(score.Statistics[HitResult.LargeTickHit], Is.EqualTo(1));
-            Assert.That(score.Statistics[HitResult.LargeTickMiss], Is.EqualTo(1));
-            Assert.That(score.Statistics[HitResult.SmallTickMiss], Is.EqualTo(2));
+            Assert.That(score.Statistics[HitResult.SmallTickMiss], Is.EqualTo(1));
             Assert.That(score.Statistics[HitResult.SmallBonus], Is.EqualTo(1));
-            Assert.That(score.Statistics[HitResult.IgnoreMiss], Is.EqualTo(1));
         }
 
         private class TestJudgement : Judgement
