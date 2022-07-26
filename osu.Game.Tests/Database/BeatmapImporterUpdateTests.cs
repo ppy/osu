@@ -72,6 +72,58 @@ namespace osu.Game.Tests.Database
             });
         }
 
+        /// <summary>
+        /// Regression test covering https://github.com/ppy/osu/issues/19369 (import potentially duplicating if original has no <see cref="BeatmapInfo.OnlineID"/>).
+        /// </summary>
+        [Test]
+        public void TestNewDifficultyAddedNoOnlineID()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var rulesets = new RealmRulesetStore(realm, storage);
+
+                using var __ = getBeatmapArchive(out string pathOriginal);
+                using var _ = getBeatmapArchiveWithModifications(out string pathMissingOneBeatmap, directory =>
+                {
+                    // remove one difficulty before first import
+                    directory.GetFiles("*.osu").First().Delete();
+                });
+
+                var importBeforeUpdate = await importer.Import(new ImportTask(pathMissingOneBeatmap));
+
+                Assert.That(importBeforeUpdate, Is.Not.Null);
+                Debug.Assert(importBeforeUpdate != null);
+
+                // This test is the same as TestNewDifficultyAdded except for this block.
+                importBeforeUpdate.PerformWrite(s =>
+                {
+                    s.OnlineID = -1;
+                    foreach (var beatmap in s.Beatmaps)
+                        beatmap.ResetOnlineInfo();
+                });
+
+                checkCount<BeatmapSetInfo>(realm, 1, s => !s.DeletePending);
+                Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps - 1));
+
+                // Second import matches first but contains one extra .osu file.
+                var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOriginal), importBeforeUpdate.Value);
+
+                Assert.That(importAfterUpdate, Is.Not.Null);
+                Debug.Assert(importAfterUpdate != null);
+
+                checkCount<BeatmapInfo>(realm, count_beatmaps);
+                checkCount<BeatmapMetadata>(realm, count_beatmaps);
+                checkCount<BeatmapSetInfo>(realm, 1);
+
+                // check the newly "imported" beatmap is not the original.
+                Assert.That(importBeforeUpdate.ID, Is.Not.EqualTo(importAfterUpdate.ID));
+
+                // Previous beatmap set has no beatmaps so will be completely purged on the spot.
+                Assert.That(importBeforeUpdate.Value.IsValid, Is.False);
+            });
+        }
+
         [Test]
         public void TestExistingDifficultyModified()
         {
