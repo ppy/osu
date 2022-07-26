@@ -138,7 +138,7 @@ namespace osu.Game
 
         protected RealmKeyBindingStore KeyBindingStore { get; private set; }
 
-        protected MenuCursorContainer MenuCursorContainer { get; private set; }
+        protected GlobalCursorDisplay GlobalCursorDisplay { get; private set; }
 
         protected MusicController MusicController { get; private set; }
 
@@ -280,8 +280,7 @@ namespace osu.Game
             AddInternal(difficultyCache);
 
             // TODO: OsuGame or OsuGameBase?
-            beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage);
-
+            dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage));
             dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
@@ -341,10 +340,10 @@ namespace osu.Game
                 RelativeSizeAxes = Axes.Both,
                 Child = CreateScalingContainer().WithChildren(new Drawable[]
                 {
-                    (MenuCursorContainer = new MenuCursorContainer
+                    (GlobalCursorDisplay = new GlobalCursorDisplay
                     {
                         RelativeSizeAxes = Axes.Both
-                    }).WithChild(content = new OsuTooltipContainer(MenuCursorContainer.Cursor)
+                    }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
                     {
                         RelativeSizeAxes = Axes.Both
                     }),

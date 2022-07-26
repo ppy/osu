@@ -41,6 +41,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private EditorClock editorClock { get; set; }
 
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; }
+
         /// <summary>
         /// The timeline's scroll position in the last frame.
         /// </summary>
@@ -68,8 +71,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         private float defaultTimelineZoom;
 
-        private readonly Bindable<double> timelineZoomScale = new BindableDouble(1.0);
-
         public Timeline(Drawable userContent)
         {
             this.userContent = userContent;
@@ -93,7 +94,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<float> waveformOpacity;
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, EditorBeatmap editorBeatmap, OsuColour colours, OsuConfigManager config)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
         {
             CentreMarker centreMarker;
 
@@ -145,21 +146,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 waveform.Waveform = b.NewValue.Waveform;
                 track = b.NewValue.Track;
 
-                // todo: i don't think this is safe, the track may not be loaded yet.
-                if (track.Length > 0)
-                {
-                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
-                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                    defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
-                }
+                setupTimelineZoom();
             }, true);
 
-            timelineZoomScale.Value = editorBeatmap.BeatmapInfo.TimelineZoom;
-            timelineZoomScale.BindValueChanged(scale =>
-            {
-                Zoom = (float)(defaultTimelineZoom * scale.NewValue);
-                editorBeatmap.BeatmapInfo.TimelineZoom = scale.NewValue;
-            }, true);
+            Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
         }
 
         protected override void LoadComplete()
@@ -209,6 +199,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 scrollToTrackTime();
         }
 
+        private void setupTimelineZoom()
+        {
+            if (!track.IsLoaded)
+            {
+                Scheduler.AddOnce(setupTimelineZoom);
+                return;
+            }
+
+            defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
+
+            float initialZoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
+            SetupZoom(initialZoom, getZoomLevelForVisibleMilliseconds(10000), getZoomLevelForVisibleMilliseconds(500));
+        }
+
         protected override bool OnScroll(ScrollEvent e)
         {
             // if this is not a precision scroll event, let the editor handle the seek itself (for snapping support)
@@ -221,7 +225,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override void OnZoomChanged()
         {
             base.OnZoomChanged();
-            timelineZoomScale.Value = Zoom / defaultTimelineZoom;
+            editorBeatmap.BeatmapInfo.TimelineZoom = Zoom / defaultTimelineZoom;
         }
 
         protected override void UpdateAfterChildren()

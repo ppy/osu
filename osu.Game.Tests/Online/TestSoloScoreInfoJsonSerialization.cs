@@ -6,7 +6,7 @@
 using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Game.IO.Serialization;
-using osu.Game.Online.Solo;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Online
@@ -15,12 +15,12 @@ namespace osu.Game.Tests.Online
     /// Basic testing to ensure our attribute-based naming is correctly working.
     /// </summary>
     [TestFixture]
-    public class TestSubmittableScoreJsonSerialization
+    public class TestSoloScoreInfoJsonSerialization
     {
         [Test]
         public void TestScoreSerialisationViaExtensionMethod()
         {
-            var score = new SubmittableScore(TestResources.CreateTestScoreInfo());
+            var score = SoloScoreInfo.ForSubmission(TestResources.CreateTestScoreInfo());
 
             string serialised = score.Serialize();
 
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestScoreSerialisationWithoutSettings()
         {
-            var score = new SubmittableScore(TestResources.CreateTestScoreInfo());
+            var score = SoloScoreInfo.ForSubmission(TestResources.CreateTestScoreInfo());
 
             string serialised = JsonConvert.SerializeObject(score);
 

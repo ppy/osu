@@ -32,20 +32,28 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Container zoomedContent;
         protected override Container<Drawable> Content => zoomedContent;
-        private float currentZoom = 1;
 
         /// <summary>
-        /// The current zoom level of <see cref="ZoomableScrollContainer" />.
-        /// It may differ from <see cref="Zoom" /> during transitions.
+        /// The current zoom level of <see cref="ZoomableScrollContainer"/>.
+        /// It may differ from <see cref="Zoom"/> during transitions.
         /// </summary>
-        public float CurrentZoom => currentZoom;
+        public float CurrentZoom { get; private set; } = 1;
+
+        private bool isZoomSetUp;
 
         [Resolved(canBeNull: true)]
         private IFrameBasedClock editorClock { get; set; }
 
         private readonly LayoutValue zoomedContentWidthCache = new LayoutValue(Invalidation.DrawSize);
 
-        public ZoomableScrollContainer()
+        private float minZoom;
+        private float maxZoom;
+
+        /// <summary>
+        /// Creates a <see cref="ZoomableScrollContainer"/> with no zoom range.
+        /// Functionality will be disabled until zoom is set up via <see cref="SetupZoom"/>.
+        /// </summary>
+        protected ZoomableScrollContainer()
             : base(Direction.Horizontal)
         {
             base.Content.Add(zoomedContent = new Container { RelativeSizeAxes = Axes.Y });
@@ -53,46 +61,36 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             AddLayout(zoomedContentWidthCache);
         }
 
-        private float minZoom = 1;
-
         /// <summary>
-        /// The minimum zoom level allowed.
+        /// Creates a <see cref="ZoomableScrollContainer"/> with a defined zoom range.
         /// </summary>
-        public float MinZoom
+        public ZoomableScrollContainer(float minimum, float maximum, float initial)
+            : this()
         {
-            get => minZoom;
-            set
-            {
-                if (value < 1)
-                    throw new ArgumentException($"{nameof(MinZoom)} must be >= 1.", nameof(value));
-
-                minZoom = value;
-
-                // ensure zoom range is in valid state before updating zoom.
-                if (MinZoom < MaxZoom)
-                    updateZoom();
-            }
+            SetupZoom(initial, minimum, maximum);
         }
 
-        private float maxZoom = 60;
-
         /// <summary>
-        /// The maximum zoom level allowed.
+        /// Sets up the minimum and maximum range of this zoomable scroll container, along with the initial zoom value.
         /// </summary>
-        public float MaxZoom
+        /// <param name="initial">The initial zoom value, applied immediately.</param>
+        /// <param name="minimum">The minimum zoom value.</param>
+        /// <param name="maximum">The maximum zoom value.</param>
+        protected void SetupZoom(float initial, float minimum, float maximum)
         {
-            get => maxZoom;
-            set
-            {
-                if (value < 1)
-                    throw new ArgumentException($"{nameof(MaxZoom)} must be >= 1.", nameof(value));
+            if (minimum < 1)
+                throw new ArgumentException($"{nameof(minimum)} ({minimum}) must be >= 1.", nameof(maximum));
 
-                maxZoom = value;
+            if (maximum < 1)
+                throw new ArgumentException($"{nameof(maximum)} ({maximum}) must be >= 1.", nameof(maximum));
 
-                // ensure zoom range is in valid state before updating zoom.
-                if (MaxZoom > MinZoom)
-                    updateZoom();
-            }
+            if (minimum > maximum)
+                throw new ArgumentException($"{nameof(minimum)} ({minimum}) must be less than {nameof(maximum)} ({maximum})");
+
+            minZoom = minimum;
+            maxZoom = maximum;
+            CurrentZoom = zoomTarget = initial;
+            isZoomSetUp = true;
         }
 
         /// <summary>
@@ -104,14 +102,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             set => updateZoom(value);
         }
 
-        private void updateZoom(float? value = null)
+        private void updateZoom(float value)
         {
-            float newZoom = Math.Clamp(value ?? Zoom, MinZoom, MaxZoom);
+            if (!isZoomSetUp)
+                return;
+
+            float newZoom = Math.Clamp(value, minZoom, maxZoom);
 
             if (IsLoaded)
                 setZoomTarget(newZoom, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
             else
-                currentZoom = zoomTarget = newZoom;
+                CurrentZoom = zoomTarget = newZoom;
         }
 
         protected override void Update()
@@ -127,7 +128,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (e.AltPressed)
             {
                 // zoom when holding alt.
-                setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+                AdjustZoomRelatively(e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
                 return true;
             }
 
@@ -141,16 +142,28 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateZoomedContentWidth()
         {
-            zoomedContent.Width = DrawWidth * currentZoom;
+            zoomedContent.Width = DrawWidth * CurrentZoom;
             zoomedContentWidthCache.Validate();
+        }
+
+        public void AdjustZoomRelatively(float change, float? focusPoint = null)
+        {
+            if (!isZoomSetUp)
+                return;
+
+            const float zoom_change_sensitivity = 0.02f;
+
+            setZoomTarget(zoomTarget + change * (maxZoom - minZoom) * zoom_change_sensitivity, focusPoint);
         }
 
         private float zoomTarget = 1;
 
-        private void setZoomTarget(float newZoom, float focusPoint)
+        private void setZoomTarget(float newZoom, float? focusPoint = null)
         {
-            zoomTarget = Math.Clamp(newZoom, MinZoom, MaxZoom);
-            transformZoomTo(zoomTarget, focusPoint, ZoomDuration, ZoomEasing);
+            zoomTarget = Math.Clamp(newZoom, minZoom, maxZoom);
+            focusPoint ??= zoomedContent.ToLocalSpace(ToScreenSpace(new Vector2(DrawWidth / 2, 0))).X;
+
+            transformZoomTo(zoomTarget, focusPoint.Value, ZoomDuration, ZoomEasing);
 
             OnZoomChanged();
         }
@@ -183,7 +196,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private readonly float scrollOffset;
 
             /// <summary>
-            /// Transforms <see cref="ZoomableScrollContainer.currentZoom"/> to a new value.
+            /// Transforms <see cref="ZoomableScrollContainer.CurrentZoom"/> to a new value.
             /// </summary>
             /// <param name="focusPoint">The focus point in absolute coordinates local to the content.</param>
             /// <param name="contentSize">The size of the content.</param>
@@ -195,7 +208,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 this.scrollOffset = scrollOffset;
             }
 
-            public override string TargetMember => nameof(currentZoom);
+            public override string TargetMember => nameof(CurrentZoom);
 
             private float valueAt(double time)
             {
@@ -213,7 +226,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 float expectedWidth = d.DrawWidth * newZoom;
                 float targetOffset = expectedWidth * (focusPoint / contentSize) - focusOffset;
 
-                d.currentZoom = newZoom;
+                d.CurrentZoom = newZoom;
                 d.updateZoomedContentWidth();
 
                 // Temporarily here to make sure ScrollTo gets the correct DrawSize for scrollable area.
@@ -222,7 +235,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 d.ScrollTo(targetOffset, false);
             }
 
-            protected override void ReadIntoStartValue(ZoomableScrollContainer d) => StartValue = d.currentZoom;
+            protected override void ReadIntoStartValue(ZoomableScrollContainer d) => StartValue = d.CurrentZoom;
         }
     }
 }
