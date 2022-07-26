@@ -24,7 +24,8 @@ namespace osu.Game.Screens.Select.Carousel
         private ulong currentItemID;
 
         private Comparer<CarouselItem>? criteriaComparer;
-        private Comparer<CarouselItem>? itemIDComparer;
+
+        private static readonly Comparer<CarouselItem> item_id_comparer = Comparer<CarouselItem>.Create((x, y) => x.ItemID.CompareTo(y.ItemID));
 
         private FilterCriteria? lastCriteria;
 
@@ -91,8 +92,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             // IEnumerable<T>.OrderBy() is used instead of List<T>.Sort() to ensure sorting stability
             criteriaComparer = Comparer<CarouselItem>.Create((x, y) => x.CompareTo(criteria, y));
-            itemIDComparer = Comparer<CarouselItem>.Create((x, y) => x.ItemID.CompareTo(y.ItemID));
-            items = items.OrderBy(c => c, criteriaComparer).ThenBy(c => c, itemIDComparer).ToList();
+            items = items.OrderBy(c => c, criteriaComparer).ThenBy(c => c, item_id_comparer).ToList();
 
             lastCriteria = criteria;
         }
