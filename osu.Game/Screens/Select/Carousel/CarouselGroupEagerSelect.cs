@@ -10,7 +10,7 @@ using System.Linq;
 namespace osu.Game.Screens.Select.Carousel
 {
     /// <summary>
-    /// A group which ensures at least one child is selected (if the group itself is selected).
+    /// A group which ensures at least one item is selected (if the group itself is selected).
     /// </summary>
     public class CarouselGroupEagerSelect : CarouselGroup
     {
@@ -35,16 +35,16 @@ namespace osu.Game.Screens.Select.Carousel
 
         /// <summary>
         /// To avoid overhead during filter operations, we don't attempt any selections until after all
-        /// children have been filtered. This bool will be true during the base <see cref="Filter(FilterCriteria)"/>
+        /// items have been filtered. This bool will be true during the base <see cref="Filter(FilterCriteria)"/>
         /// operation.
         /// </summary>
-        private bool filteringChildren;
+        private bool filteringItems;
 
         public override void Filter(FilterCriteria criteria)
         {
-            filteringChildren = true;
+            filteringItems = true;
             base.Filter(criteria);
-            filteringChildren = false;
+            filteringItems = false;
 
             attemptSelection();
         }
@@ -97,12 +97,12 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void attemptSelection()
         {
-            if (filteringChildren) return;
+            if (filteringItems) return;
 
             // we only perform eager selection if we are a currently selected group.
             if (State.Value != CarouselItemState.Selected) return;
 
-            // we only perform eager selection if none of our children are in a selected state already.
+            // we only perform eager selection if none of our items are in a selected state already.
             if (Items.Any(i => i.State.Value == CarouselItemState.Selected)) return;
 
             PerformSelection();
