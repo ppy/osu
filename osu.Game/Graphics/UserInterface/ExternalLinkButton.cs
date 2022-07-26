@@ -13,8 +13,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
 using osuTK;
 using osuTK.Graphics;
 
@@ -23,9 +21,6 @@ namespace osu.Game.Graphics.UserInterface
     public class ExternalLinkButton : CompositeDrawable, IHasTooltip, IHasContextMenu
     {
         public string Link { get; set; }
-
-        [Resolved]
-        private INotificationOverlay notificationOverlay { get; set; }
 
         private Color4 hoverColour;
 
@@ -49,15 +44,6 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        private void copyUrl()
-        {
-            host.GetClipboard()?.SetText(Link);
-            notificationOverlay.Post(new SimpleNotification
-            {
-                Text = "Copied URL!"
-            });
-        }
-
         public MenuItem[] ContextMenuItems
         {
             get
@@ -67,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (Link != null)
                 {
                     items.Add(new OsuMenuItem("Open", MenuItemType.Standard, () => host.OpenUrlExternally(Link)));
-                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () => copyUrl()));
+                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () => host.GetClipboard()?.SetText(Link)));
                 }
 
                 return items.ToArray();
