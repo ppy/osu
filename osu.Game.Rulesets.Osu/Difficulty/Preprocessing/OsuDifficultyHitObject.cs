@@ -182,9 +182,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = normalised_radius / (float)BaseObject.Radius;
 
-            if (BaseObject.Radius < 52.5)
+            if (BaseObject.Radius < 70)
             {
-                float smallCircleBonus = Math.Min(52.5f - (float)BaseObject.Radius, 20) / 40;
+                float smallCircleBonus = (float)Math.Pow((70 - BaseObject.Radius) / 50, 2);
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
@@ -300,7 +300,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     slider.LazyEndPosition = currCursorPosition;
             }
 
-            slider.LazyTravelDistance *= (float)Math.Pow(1 + slider.RepeatCount / 2.5, 1.0 / 2.5); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
+            slider.LazyTravelDistance *= (float)Math.Pow(1 + slider.RepeatCount / 4.0, 1.0 / 4.0); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
         }
 
         private Vector2 getEndCursorPosition(OsuHitObject hitObject)
