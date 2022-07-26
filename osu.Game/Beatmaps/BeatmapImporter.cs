@@ -52,6 +52,10 @@ namespace osu.Game.Beatmaps
 
             var first = imported.First();
 
+            // If there were no changes, ensure we don't accidentally nuke ourselves.
+            if (first.ID == original.ID)
+                return first;
+
             first.PerformWrite(updated =>
             {
                 var realm = updated.Realm;
