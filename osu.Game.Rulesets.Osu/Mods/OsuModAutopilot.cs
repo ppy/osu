@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.StateChanges;
 using osu.Game.Graphics;
