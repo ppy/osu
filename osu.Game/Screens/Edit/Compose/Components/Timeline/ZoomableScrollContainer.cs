@@ -156,13 +156,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             setZoomTarget(zoomTarget + change * (maxZoom - minZoom) * zoom_change_sensitivity, focusPoint);
         }
 
-        protected void SetZoomImmediately(float value, float min, float max)
-        {
-            maxZoom = max;
-            minZoom = min;
-            CurrentZoom = zoomTarget = value;
-        }
-
         private float zoomTarget = 1;
 
         private void setZoomTarget(float newZoom, float? focusPoint = null)
