@@ -43,17 +43,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             for (int i = 0; i < positionInfos.Count; i++)
             {
-                bool invertFlow = false;
-
                 if (i == 0 ||
                     (positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 && positionInfos[i - 1].HitObject.NewCombo && rng.NextDouble() < 0.6) ||
                     OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject, true) ||
-                    (OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject) && rng.NextDouble() < 0.25))
+                    (OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject) && rng.NextDouble() < 0.3))
                 {
-                    sequenceOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.0015f);
-
-                    if (rng.NextDouble() < 0.6)
-                        invertFlow = true;
+                    sequenceOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.0012f);
+                    flowDirection = !flowDirection;
                 }
 
                 if (i == 0)
@@ -64,18 +60,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                 else
                 {
                     float flowChangeOffset = 0;
-                    float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.0015f);
+                    float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.002f);
 
                     if (positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 && positionInfos[i - 1].HitObject.NewCombo && rng.NextDouble() < 0.6)
                     {
                         flowChangeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.002f);
-
-                        if (rng.NextDouble() < 0.8)
-                            invertFlow = true;
-                    }
-
-                    if (invertFlow)
                         flowDirection = !flowDirection;
+                    }
 
                     positionInfos[i].RelativeAngle = getRelativeTargetAngle(
                         positionInfos[i].DistanceFromPrevious,
@@ -94,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="flowDirection">Whether the relative angle should be positive or negative.</param>
         private static float getRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
         {
-            float angle = (float)(3 / (1 + 200 * Math.Exp(0.016 * (targetDistance - 466))) + 0.45 + offset);
+            float angle = (float)(2.16 / (1 + 200 * Math.Exp(0.036 * (targetDistance - 320))) + 0.5 + offset);
             float relativeAngle = (float)Math.PI - angle;
             return flowDirection ? -relativeAngle : relativeAngle;
         }
