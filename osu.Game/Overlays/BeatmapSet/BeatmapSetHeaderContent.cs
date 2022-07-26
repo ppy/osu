@@ -93,7 +93,8 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                     new OsuContextMenuContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
                         Child = new Container
                         {
                             RelativeSizeAxes = Axes.X,
