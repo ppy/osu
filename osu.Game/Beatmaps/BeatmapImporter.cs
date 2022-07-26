@@ -41,16 +41,18 @@ namespace osu.Game.Beatmaps
         {
         }
 
-        public async Task<IEnumerable<Live<BeatmapSetInfo>>> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original)
+        public override async Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original)
         {
             var imported = await Import(notification, importTask);
 
             if (!imported.Any())
-                return imported;
+                return null;
 
             Debug.Assert(imported.Count() == 1);
 
-            imported.First().PerformWrite(updated =>
+            var first = imported.First();
+
+            first.PerformWrite(updated =>
             {
                 var realm = updated.Realm;
 
@@ -103,7 +105,7 @@ namespace osu.Game.Beatmaps
                     realm.Remove(original);
             });
 
-            return imported;
+            return first;
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == ".osz";
