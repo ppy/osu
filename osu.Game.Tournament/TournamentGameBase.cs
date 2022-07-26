@@ -70,10 +70,10 @@ namespace osu.Game.Tournament
 
         protected override void LoadComplete()
         {
-            MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
+            GlobalCursorDisplay.MenuCursor.AlwaysPresent = true; // required for tooltip display
 
             // we don't want to show the menu cursor as it would appear on stream output.
-            MenuCursorContainer.Cursor.Alpha = 0;
+            GlobalCursorDisplay.MenuCursor.Alpha = 0;
 
             base.LoadComplete();
 

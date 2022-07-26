@@ -142,7 +142,6 @@ namespace osu.Game.Tests.Database
                 {
                     Task.Run(async () =>
                     {
-                        // ReSharper disable once AccessToDisposedClosure
                         var beatmapSet = await importer.Import(new ImportTask(TestResources.GetTestBeatmapStream(), "renatus.osz"));
 
                         Assert.NotNull(beatmapSet);
@@ -311,6 +310,7 @@ namespace osu.Game.Tests.Database
                 }
                 finally
                 {
+                    File.Delete(temp);
                     Directory.Delete(extractedFolder, true);
                 }
             });
