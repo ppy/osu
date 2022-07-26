@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Database;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -108,7 +109,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         private class BundledBeatmapModelDownloader : BeatmapModelDownloader
         {
-            public BundledBeatmapModelDownloader(BeatmapManager beatmapImporter, IAPIProvider api)
+            public BundledBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> beatmapImporter, IAPIProvider api)
                 : base(beatmapImporter, api)
             {
             }
