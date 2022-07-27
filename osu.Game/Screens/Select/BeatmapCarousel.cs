@@ -283,18 +283,21 @@ namespace osu.Game.Screens.Select
 
                         foreach (var beatmapInfo in beatmapSetInfo.Beatmaps)
                         {
-                            // Best effort matching. We can't use ID because in the update flow a new version will get its own GUID.
-                            bool selectionMatches =
-                                ((IBeatmapMetadataInfo)beatmapInfo.Metadata).Equals(SelectedBeatmapInfo.Metadata)
-                                && beatmapInfo.DifficultyName == SelectedBeatmapInfo.DifficultyName;
+                            if (!((IBeatmapMetadataInfo)beatmapInfo.Metadata).Equals(SelectedBeatmapInfo.Metadata))
+                                continue;
 
-                            if (selectionMatches)
+                            // Best effort matching. We can't use ID because in the update flow a new version will get its own GUID.
+                            if (beatmapInfo.DifficultyName == SelectedBeatmapInfo.DifficultyName)
                             {
                                 SelectBeatmap(beatmapInfo);
-                                break;
+                                return;
                             }
                         }
                     }
+
+                    // If a direct selection couldn't be made, it's feasible that the difficulty name (or beatmap metadata) changed.
+                    // Let's attempt to follow set-level selection anyway.
+                    SelectBeatmap(sender[changes.NewModifiedIndices.First()].Beatmaps.First());
                 }
             }
         }
