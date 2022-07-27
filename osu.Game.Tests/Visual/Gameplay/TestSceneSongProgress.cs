@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneSongProgress : OsuTestScene
     {
-        private SongProgress progress;
+        private DefaultSongProgress progress;
         private TestSongProgressGraph graph;
         private readonly Container progressContainer;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     progress = null;
                 }
 
-                progressContainer.Add(progress = new SongProgress
+                progressContainer.Add(progress = new DefaultSongProgress
                 {
                     RelativeSizeAxes = Axes.X,
                     Anchor = Anchor.BottomLeft,

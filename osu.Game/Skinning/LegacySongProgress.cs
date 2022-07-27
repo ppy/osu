@@ -3,38 +3,20 @@
 
 #nullable disable
 
-using System;
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySongProgress : CompositeDrawable, ISkinnableDrawable
+    public class LegacySongProgress : SongProgress
     {
-        public bool UsesFixedAnchor { get; set; }
-
-        [Resolved]
-        private GameplayClock gameplayClock { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private DrawableRuleset drawableRuleset { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-
-        private double lastHitTime;
-        private double firstHitTime;
-        private double firstEventTime;
         private CircularProgress pie;
 
         [BackgroundDependencyLoader]
@@ -76,36 +58,35 @@ namespace osu.Game.Skinning
                     Size = new Vector2(3),
                 }
             };
-
-            firstEventTime = beatmap?.Value.Storyboard.EarliestEventTime ?? 0;
-
-            if (drawableRuleset != null)
-            {
-                firstHitTime = drawableRuleset.Objects.First().StartTime;
-                //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-                lastHitTime = drawableRuleset.Objects.Last().GetEndTime() + 1;
-            }
         }
 
-        protected override void Update()
+        protected override void PopIn()
         {
-            base.Update();
+        }
 
-            double gameplayTime = gameplayClock?.CurrentTime ?? Time.Current;
+        protected override void PopOut()
+        {
+        }
 
-            if (gameplayTime < firstHitTime)
+        protected override void UpdateObjects(IEnumerable<HitObject> objects)
+        {
+        }
+
+        protected override void UpdateProgress(double progress, double time, bool isIntro)
+        {
+            if (isIntro)
             {
                 pie.Scale = new Vector2(-1, 1);
                 pie.Anchor = Anchor.TopRight;
                 pie.Colour = new Colour4(199, 255, 47, 153);
-                pie.Current.Value = 1 - Math.Clamp((gameplayTime - firstEventTime) / (firstHitTime - firstEventTime), 0, 1);
+                pie.Current.Value = 1 - progress;
             }
             else
             {
                 pie.Scale = new Vector2(1);
                 pie.Anchor = Anchor.TopLeft;
                 pie.Colour = new Colour4(255, 255, 255, 153);
-                pie.Current.Value = Math.Clamp((gameplayTime - firstHitTime) / (lastHitTime - firstHitTime), 0, 1);
+                pie.Current.Value = progress;
             }
         }
     }
