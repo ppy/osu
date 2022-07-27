@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Select
                 // Check if the current selection was potentially deleted by re-querying its validity.
                 bool selectedSetMarkedDeleted = realm.Run(r => r.Find<BeatmapSetInfo>(SelectedBeatmapSet.ID))?.DeletePending != false;
 
-                if (selectedSetMarkedDeleted)
+                if (selectedSetMarkedDeleted && changes.NewModifiedIndices.Any())
                 {
                     // If it is no longer valid, make the bold assumption that an updated version will be available in the modified indices.
                     // This relies on the full update operation being in a single transaction, so please don't change that.
