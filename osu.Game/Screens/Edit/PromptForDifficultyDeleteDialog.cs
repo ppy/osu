@@ -13,13 +13,13 @@ namespace osu.Game.Screens.Edit
         {
             HeaderText = "Are you sure you want to delete this difficulty?";
 
-            Icon = FontAwesome.Regular.Save;
+            Icon = FontAwesome.Regular.TrashAlt;
 
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogDangerousButton
                 {
-                    Text = @"Yes delete this difficulty!",
+                    Text = @"Yes, delete this difficulty!",
                     Action = delete
                 },
                 new PopupDialogCancelButton
