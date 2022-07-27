@@ -46,9 +46,6 @@ namespace osu.Game.Collections
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private CollectionManager collectionManager { get; set; }
-
         public CollectionFilterDropdown()
         {
             ItemSource = filters;
@@ -59,8 +56,7 @@ namespace osu.Game.Collections
         {
             base.LoadComplete();
 
-            if (collectionManager != null)
-                collections.BindTo(collectionManager.Collections);
+            // TODO: bind to realm data
 
             // Dropdown has logic which triggers a change on the bindable with every change to the contained items.
             // This is not desirable here, as it leads to multiple filter operations running even though nothing has changed.

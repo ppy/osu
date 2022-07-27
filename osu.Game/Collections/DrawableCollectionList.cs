@@ -7,28 +7,31 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Collections
 {
     /// <summary>
-    /// Visualises a list of <see cref="BeatmapCollection"/>s.
+    /// Visualises a list of <see cref="RealmBeatmapCollection"/>s.
     /// </summary>
-    public class DrawableCollectionList : OsuRearrangeableListContainer<BeatmapCollection>
+    public class DrawableCollectionList : OsuRearrangeableListContainer<RealmBeatmapCollection>
     {
         private Scroll scroll;
 
         protected override ScrollContainer<Drawable> CreateScrollContainer() => scroll = new Scroll();
 
-        protected override FillFlowContainer<RearrangeableListItem<BeatmapCollection>> CreateListFillFlowContainer() => new Flow
+        protected override FillFlowContainer<RearrangeableListItem<RealmBeatmapCollection>> CreateListFillFlowContainer() => new Flow
         {
             DragActive = { BindTarget = DragActive }
         };
 
-        protected override OsuRearrangeableListItem<BeatmapCollection> CreateOsuDrawable(BeatmapCollection item)
+        // TODO: source from realm
+
+        protected override OsuRearrangeableListItem<RealmBeatmapCollection> CreateOsuDrawable(RealmBeatmapCollection item)
         {
-            if (item == scroll.PlaceholderItem.Model)
+            if (item.ID == scroll.PlaceholderItem.Model.ID)
                 return scroll.ReplacePlaceholder();
 
             return new DrawableCollectionListItem(item, true);
@@ -95,7 +98,7 @@ namespace osu.Game.Collections
                 var previous = PlaceholderItem;
 
                 placeholderContainer.Clear(false);
-                placeholderContainer.Add(PlaceholderItem = new DrawableCollectionListItem(new BeatmapCollection(), false));
+                placeholderContainer.Add(PlaceholderItem = new DrawableCollectionListItem(new RealmBeatmapCollection(), false));
 
                 return previous;
             }
@@ -104,7 +107,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The flow of <see cref="DrawableCollectionListItem"/>. Disables layout easing unless a drag is in progress.
         /// </summary>
-        private class Flow : FillFlowContainer<RearrangeableListItem<BeatmapCollection>>
+        private class Flow : FillFlowContainer<RearrangeableListItem<RealmBeatmapCollection>>
         {
             public readonly IBindable<bool> DragActive = new Bindable<bool>();
 

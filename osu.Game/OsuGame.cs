@@ -858,11 +858,6 @@ namespace osu.Game
                 d.Origin = Anchor.TopRight;
             }), rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new CollectionManager
-            {
-                PostNotification = n => Notifications.Post(n),
-            }, Add, true);
-
             loadComponentSingleFile(legacyImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);

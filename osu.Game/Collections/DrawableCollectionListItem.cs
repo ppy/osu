@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -22,15 +24,15 @@ using osuTK.Graphics;
 namespace osu.Game.Collections
 {
     /// <summary>
-    /// Visualises a <see cref="BeatmapCollection"/> inside a <see cref="DrawableCollectionList"/>.
+    /// Visualises a <see cref="RealmBeatmapCollection"/> inside a <see cref="DrawableCollectionList"/>.
     /// </summary>
-    public class DrawableCollectionListItem : OsuRearrangeableListItem<BeatmapCollection>
+    public class DrawableCollectionListItem : OsuRearrangeableListItem<RealmBeatmapCollection>
     {
         private const float item_height = 35;
         private const float button_width = item_height * 0.75f;
 
         /// <summary>
-        /// Whether the <see cref="BeatmapCollection"/> currently exists inside the <see cref="CollectionManager"/>.
+        /// Whether the <see cref="RealmBeatmapCollection"/> currently exists inside realm.
         /// </summary>
         public IBindable<bool> IsCreated => isCreated;
 
@@ -39,9 +41,9 @@ namespace osu.Game.Collections
         /// <summary>
         /// Creates a new <see cref="DrawableCollectionListItem"/>.
         /// </summary>
-        /// <param name="item">The <see cref="BeatmapCollection"/>.</param>
-        /// <param name="isCreated">Whether <paramref name="item"/> currently exists inside the <see cref="CollectionManager"/>.</param>
-        public DrawableCollectionListItem(BeatmapCollection item, bool isCreated)
+        /// <param name="item">The <see cref="RealmBeatmapCollection"/>.</param>
+        /// <param name="isCreated">Whether <paramref name="item"/> currently exists inside realm.</param>
+        public DrawableCollectionListItem(RealmBeatmapCollection item, bool isCreated)
             : base(item)
         {
             this.isCreated.Value = isCreated;
@@ -61,24 +63,18 @@ namespace osu.Game.Collections
         {
             public readonly Bindable<bool> IsCreated = new Bindable<bool>();
 
-            private readonly IBindable<string> collectionName;
-            private readonly BeatmapCollection collection;
-
-            [Resolved(CanBeNull = true)]
-            private CollectionManager collectionManager { get; set; }
+            private readonly RealmBeatmapCollection collection;
 
             private Container textBoxPaddingContainer;
             private ItemTextBox textBox;
 
-            public ItemContent(BeatmapCollection collection)
+            public ItemContent(RealmBeatmapCollection collection)
             {
                 this.collection = collection;
 
                 RelativeSizeAxes = Axes.X;
                 Height = item_height;
                 Masking = true;
-
-                collectionName = collection.Name.GetBoundCopy();
             }
 
             [BackgroundDependencyLoader]
@@ -111,14 +107,17 @@ namespace osu.Game.Collections
                 };
             }
 
+            [Resolved]
+            private RealmAccess realm { get; set; }
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
                 // Bind late, as the collection name may change externally while still loading.
-                textBox.Current = collection.Name;
+                textBox.Current.Value = collection.Name;
+                textBox.Current.BindValueChanged(_ => createNewCollection(), true);
 
-                collectionName.BindValueChanged(_ => createNewCollection(), true);
                 IsCreated.BindValueChanged(created => textBoxPaddingContainer.Padding = new MarginPadding { Right = created.NewValue ? button_width : 0 }, true);
             }
 
@@ -127,11 +126,11 @@ namespace osu.Game.Collections
                 if (IsCreated.Value)
                     return;
 
-                if (string.IsNullOrEmpty(collectionName.Value))
+                if (string.IsNullOrEmpty(textBox.Current.Value))
                     return;
 
                 // Add the new collection and disable our placeholder. If all text is removed, the placeholder should not show back again.
-                collectionManager?.Collections.Add(collection);
+                realm.Write(r => r.Add(collection));
                 textBox.PlaceholderText = string.Empty;
 
                 // When this item changes from placeholder to non-placeholder (via changing containers), its textbox will lose focus, so it needs to be re-focused.
@@ -162,15 +161,15 @@ namespace osu.Game.Collections
             [Resolved(CanBeNull = true)]
             private IDialogOverlay dialogOverlay { get; set; }
 
-            [Resolved(CanBeNull = true)]
-            private CollectionManager collectionManager { get; set; }
+            [Resolved]
+            private RealmAccess realmAccess { get; set; }
 
-            private readonly BeatmapCollection collection;
+            private readonly RealmBeatmapCollection collection;
 
             private Drawable fadeContainer;
             private Drawable background;
 
-            public DeleteButton(BeatmapCollection collection)
+            public DeleteButton(RealmBeatmapCollection collection)
             {
                 this.collection = collection;
                 RelativeSizeAxes = Axes.Y;
@@ -227,7 +226,7 @@ namespace osu.Game.Collections
             {
                 background.FlashColour(Color4.White, 150);
 
-                if (collection.BeatmapHashes.Count == 0)
+                if (collection.BeatmapMD5Hashes.Count == 0)
                     deleteCollection();
                 else
                     dialogOverlay?.Push(new DeleteCollectionDialog(collection, deleteCollection));
@@ -235,7 +234,7 @@ namespace osu.Game.Collections
                 return true;
             }
 
-            private void deleteCollection() => collectionManager?.Collections.Remove(collection);
+            private void deleteCollection() => realmAccess.Write(r => r.Remove(collection));
         }
     }
 }
