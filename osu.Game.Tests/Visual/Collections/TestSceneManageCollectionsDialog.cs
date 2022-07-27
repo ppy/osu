@@ -109,10 +109,15 @@ namespace osu.Game.Tests.Visual.Collections
                 InputManager.Click(MouseButton.Left);
             });
 
-            // Done directly via the collection since InputManager methods cannot add text to textbox...
-            AddStep("change collection name", () => placeholderItem.Model.PerformWrite(c => c.Name = "a"));
+            assertCollectionCount(0);
+
+            AddStep("change collection name", () =>
+            {
+                placeholderItem.ChildrenOfType<TextBox>().First().Text = "test text";
+                InputManager.Key(Key.Enter);
+            });
+
             assertCollectionCount(1);
-            AddAssert("collection now exists", () => placeholderItem.Model.IsManaged);
 
             AddAssert("last item is placeholder", () => !dialog.ChildrenOfType<DrawableCollectionListItem>().Last().Model.IsManaged);
         }
@@ -257,6 +262,7 @@ namespace osu.Game.Tests.Visual.Collections
         public void TestCollectionRenamedOnTextChange()
         {
             BeatmapCollection first = null!;
+            DrawableCollectionListItem firstItem = null!;
 
             AddStep("add two collections", () =>
             {
@@ -272,12 +278,23 @@ namespace osu.Game.Tests.Visual.Collections
 
             assertCollectionCount(2);
 
-            AddStep("change first collection name", () => dialog.ChildrenOfType<TextBox>().First().Text = "First");
+            AddStep("focus first collection", () =>
+            {
+                InputManager.MoveMouseTo(firstItem = dialog.ChildrenOfType<DrawableCollectionListItem>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("change first collection name", () =>
+            {
+                firstItem.ChildrenOfType<TextBox>().First().Text = "First";
+                InputManager.Key(Key.Enter);
+            });
+
             AddUntilStep("collection has new name", () => first.Name == "First");
         }
 
         private void assertCollectionCount(int count)
-            => AddUntilStep($"{count} collections shown", () => dialog.ChildrenOfType<DrawableCollectionListItem>().Count(i => i.IsCreated.Value) == count);
+            => AddUntilStep($"{count} collections shown", () => dialog.ChildrenOfType<DrawableCollectionListItem>().Count() == count + 1); // +1 for placeholder
 
         private void assertCollectionName(int index, string name)
             => AddUntilStep($"item {index + 1} has correct name", () => dialog.ChildrenOfType<DrawableCollectionListItem>().ElementAt(index).ChildrenOfType<TextBox>().First().Text == name);
