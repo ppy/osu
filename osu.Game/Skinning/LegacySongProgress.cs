@@ -44,10 +44,16 @@ namespace osu.Game.Skinning
 
             InternalChildren = new Drawable[]
             {
-                pie = new CircularProgress
+                new Container
                 {
+                    Size = new Vector2(0.95f),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.5f,
+                    Child = pie = new CircularProgress
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 },
                 new CircularContainer
                 {
@@ -91,14 +97,14 @@ namespace osu.Game.Skinning
             {
                 pie.Scale = new Vector2(-1, 1);
                 pie.Anchor = Anchor.TopRight;
-                pie.Colour = Colour4.LimeGreen;
+                pie.Colour = new Colour4(199, 255, 47, 153);
                 pie.Current.Value = 1 - Math.Clamp((gameplayTime - firstEventTime) / (firstHitTime - firstEventTime), 0, 1);
             }
             else
             {
                 pie.Scale = new Vector2(1);
                 pie.Anchor = Anchor.TopLeft;
-                pie.Colour = Colour4.White;
+                pie.Colour = new Colour4(255, 255, 255, 153);
                 pie.Current.Value = Math.Clamp((gameplayTime - firstHitTime) / (lastHitTime - firstHitTime), 0, 1);
             }
         }
