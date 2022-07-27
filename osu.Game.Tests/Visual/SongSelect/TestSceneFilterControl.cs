@@ -176,6 +176,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestManageCollectionsFilterIsNotSelected()
         {
+            bool received = false;
+
             addExpandHeaderStep();
 
             AddStep("add collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "1", new List<string> { "abc" }))));
@@ -187,6 +189,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             addExpandHeaderStep();
 
+            AddStep("watch for filter requests", () =>
+            {
+                received = false;
+                control.ChildrenOfType<CollectionDropdown>().First().RequestFilter = () => received = true;
+            });
+
             AddStep("click manage collections filter", () =>
             {
                 InputManager.MoveMouseTo(getCollectionDropdownItems().Last());
@@ -194,6 +202,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddAssert("collection filter still selected", () => control.CreateCriteria().CollectionBeatmapMD5Hashes.Any());
+
+            AddAssert("filter request not fired", () => !received);
         }
 
         private BeatmapCollection getFirstCollection() => Realm.Run(r => r.All<BeatmapCollection>().First());
