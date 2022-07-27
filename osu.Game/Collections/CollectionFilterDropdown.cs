@@ -30,15 +30,8 @@ namespace osu.Game.Collections
         /// </summary>
         protected virtual bool ShowManageCollectionsItem => true;
 
-        private readonly BindableWithCurrent<CollectionFilterMenuItem> current = new BindableWithCurrent<CollectionFilterMenuItem>();
+        public Action? RequestFilter { private get; set; }
 
-        public new Bindable<CollectionFilterMenuItem> Current
-        {
-            get => current.Current;
-            set => current.Current = value;
-        }
-
-        private readonly IBindableList<string> beatmaps = new BindableList<string>();
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
         [Resolved]
@@ -50,6 +43,7 @@ namespace osu.Game.Collections
         public CollectionFilterDropdown()
         {
             ItemSource = filters;
+
             Current.Value = new AllBeatmapsCollectionFilterMenuItem();
         }
 
@@ -59,17 +53,9 @@ namespace osu.Game.Collections
 
             realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), collectionsChanged);
 
-            // Dropdown has logic which triggers a change on the bindable with every change to the contained items.
-            // This is not desirable here, as it leads to multiple filter operations running even though nothing has changed.
-            // An extra bindable is enough to subvert this behaviour.
-            base.Current = Current;
-
-            Current.BindValueChanged(currentChanged, true);
+            Current.BindValueChanged(currentChanged);
         }
 
-        /// <summary>
-        /// Occurs when a collection has been added or removed.
-        /// </summary>
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
         {
             var selectedItem = SelectedItem?.Value?.Collection;
@@ -83,38 +69,41 @@ namespace osu.Game.Collections
 
             Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection.ID == selectedItem?.ID) ?? filters[0];
 
-            // Trigger a re-filter if the current item was in the changeset.
+            // Trigger a re-filter if the current item was in the change set.
             if (selectedItem != null && changes != null)
             {
                 foreach (int index in changes.ModifiedIndices)
                 {
                     if (collections[index].ID == selectedItem.ID)
-                    {
-                        // The filtered beatmaps have changed, without the filter having changed itself. So a change in filter must be notified.
-                        // Note that this does NOT propagate to bound bindables, so the FilterControl must bind directly to the value change event of this bindable.
-                        Current.TriggerChange();
-                    }
+                        RequestFilter?.Invoke();
                 }
             }
         }
 
         private void currentChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)
         {
+            // May be null during .Clear().
+            if (filter.NewValue == null)
+                return;
+
             // Never select the manage collection filter - rollback to the previous filter.
             // This is done after the above since it is important that bindable is unbound from OldValue, which is lost after forcing it back to the old value.
             if (filter.NewValue is ManageCollectionsFilterMenuItem)
             {
                 Current.Value = filter.OldValue;
                 manageCollectionsDialog?.Show();
+                return;
             }
+
+            // This dropdown be weird.
+            // We only care about filtering if the actual collection has changed.
+            if (filter.OldValue?.Collection != null || filter.NewValue?.Collection != null)
+                RequestFilter?.Invoke();
         }
 
         protected override LocalisableString GenerateItemText(CollectionFilterMenuItem item) => item.CollectionName;
 
-        protected sealed override DropdownHeader CreateHeader() => CreateCollectionHeader().With(d =>
-        {
-            d.SelectedItem.BindTarget = Current;
-        });
+        protected sealed override DropdownHeader CreateHeader() => CreateCollectionHeader().With(d => d.SelectedItem.BindTarget = Current);
 
         protected sealed override DropdownMenu CreateMenu() => CreateCollectionMenu();
 
