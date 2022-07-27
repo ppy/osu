@@ -849,6 +849,20 @@ namespace osu.Game.Screens.Edit
             new LegacyBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
         }
 
+        private void deleteDifficulty()
+        {
+            dialogOverlay?.Push(new PromptForDifficultyDeleteDialog(confirmDifficultyDelete, () => { }));
+        }
+
+        private void confirmDifficultyDelete()
+        {
+            var current = playableBeatmap.BeatmapInfo;
+            if (current is null) return;
+
+            beatmapManager.Hide(current);
+            this.Exit();
+        }
+
         private void updateLastSavedHash()
         {
             lastSavedHash = changeHandler?.CurrentStateHash;
@@ -868,6 +882,10 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(createDifficultyCreationMenu());
             fileMenuItems.Add(createDifficultySwitchMenu());
+
+            fileMenuItems.Add(new EditorMenuItemSpacer());
+
+            fileMenuItems.Add(new EditorMenuItem("Delete difficulty", MenuItemType.Standard, deleteDifficulty));
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
