@@ -337,7 +337,6 @@ namespace osu.Game.Skinning
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
-                                var combo = container.OfType<LegacyComboCounter>().FirstOrDefault();
 
                                 if (score != null && accuracy != null)
                                 {
