@@ -5,12 +5,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
@@ -18,9 +15,9 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
-    public class SongProgress : OverlayContainer, ISkinnableDrawable
+    public class DefaultSongProgress : SongProgress
     {
         public const float MAX_HEIGHT = info_height + bottom_bar_height + graph_height + handle_height;
 
@@ -52,41 +49,13 @@ namespace osu.Game.Screens.Play
 
         protected override bool BlockScrollInput => false;
 
-        private double firstHitTime => objects.First().StartTime;
-
-        //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-        private double lastHitTime => objects.Last().GetEndTime() + 1;
-
-        private IEnumerable<HitObject> objects;
-
-        public IEnumerable<HitObject> Objects
-        {
-            set
-            {
-                graph.Objects = objects = value;
-
-                info.StartTime = firstHitTime;
-                info.EndTime = lastHitTime;
-
-                bar.StartTime = firstHitTime;
-                bar.EndTime = lastHitTime;
-            }
-        }
-
         [Resolved(canBeNull: true)]
         private Player player { get; set; }
-
-        [Resolved]
-        private GameplayClock gameplayClock { get; set; }
 
         [Resolved(canBeNull: true)]
         private DrawableRuleset drawableRuleset { get; set; }
 
-        private IClock referenceClock;
-
-        public bool UsesFixedAnchor { get; set; }
-
-        public SongProgress()
+        public DefaultSongProgress()
         {
             RelativeSizeAxes = Axes.X;
             Anchor = Anchor.BottomRight;
@@ -127,9 +96,6 @@ namespace osu.Game.Screens.Play
             {
                 if (player?.Configuration.AllowUserInteraction == true)
                     ((IBindable<bool>)AllowSeeking).BindTo(drawableRuleset.HasReplayLoaded);
-
-                referenceClock = drawableRuleset.FrameStableClock;
-                Objects = drawableRuleset.Objects;
             }
 
             graph.FillColour = bar.FillColour = colours.BlueLighter;
@@ -203,21 +169,24 @@ namespace osu.Game.Screens.Play
             this.FadeOut(100);
         }
 
+        protected override void UpdateObjects(IEnumerable<HitObject> objects)
+        {
+            graph.Objects = objects;
+            info.StartTime = FirstHitTime;
+            info.EndTime = LastHitTime;
+            bar.StartTime = FirstHitTime;
+            bar.EndTime = LastHitTime;
+        }
+
+        protected override void UpdateProgress(double progress, double time, bool isIntro)
+        {
+            bar.CurrentTime = time;
+            graph.Progress = (int)(graph.ColumnCount * progress);
+        }
+
         protected override void Update()
         {
             base.Update();
-
-            if (objects == null)
-                return;
-
-            double gameplayTime = gameplayClock?.CurrentTime ?? Time.Current;
-            double frameStableTime = referenceClock?.CurrentTime ?? gameplayTime;
-
-            double progress = Math.Min(1, (frameStableTime - firstHitTime) / (lastHitTime - firstHitTime));
-
-            bar.CurrentTime = gameplayTime;
-            graph.Progress = (int)(graph.ColumnCount * progress);
-
             Height = bottom_bar_height + graph_height + handle_size.Y + info_height - graph.Y;
         }
 

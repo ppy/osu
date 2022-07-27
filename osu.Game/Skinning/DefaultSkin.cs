@@ -147,7 +147,7 @@ namespace osu.Game.Skinning
                                     new DefaultScoreCounter(),
                                     new DefaultAccuracyCounter(),
                                     new DefaultHealthDisplay(),
-                                    new SongProgress(),
+                                    new DefaultSongProgress(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new PerformancePointsCounter()
