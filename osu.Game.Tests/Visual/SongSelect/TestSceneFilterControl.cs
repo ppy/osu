@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             base.Content.AddRange(new Drawable[]
             {
-                collectionManager = new CollectionManager(LocalStorage),
+                collectionManager = new CollectionManager(),
                 Content
             });
 

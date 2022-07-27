@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Collections
 
             base.Content.AddRange(new Drawable[]
             {
-                manager = new CollectionManager(LocalStorage),
+                manager = new CollectionManager(),
                 Content,
                 dialogOverlay = new DialogOverlay(),
             });

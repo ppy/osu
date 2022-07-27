@@ -72,7 +72,7 @@ namespace osu.Game.Database
                     return await new LegacySkinImporter(skins).GetAvailableCount(stableStorage);
 
                 case StableContent.Collections:
-                    return await collections.GetAvailableCount(stableStorage);
+                    return await new LegacyCollectionImporter(collections).GetAvailableCount(stableStorage);
 
                 case StableContent.Scores:
                     return await new LegacyScoreImporter(scores).GetAvailableCount(stableStorage);
@@ -109,7 +109,7 @@ namespace osu.Game.Database
                 importTasks.Add(new LegacySkinImporter(skins).ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Collections))
-                importTasks.Add(beatmapImportTask.ContinueWith(_ => collections.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
+                importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyCollectionImporter(collections).ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
 
             if (content.HasFlagFast(StableContent.Scores))
                 importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyScoreImporter(scores).ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));

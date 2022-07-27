@@ -63,7 +63,7 @@ namespace osu.Game.Tests
                 if (withBeatmap)
                     BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).WaitSafely();
 
-                AddInternal(CollectionManager = new CollectionManager(Storage));
+                AddInternal(CollectionManager = new CollectionManager());
             }
         }
     }
