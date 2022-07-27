@@ -72,9 +72,13 @@ namespace osu.Game.Skinning
             };
 
             firstEventTime = beatmap?.Value.Storyboard.EarliestEventTime ?? 0;
-            firstHitTime = drawableRuleset.Objects.First().StartTime;
-            //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-            lastHitTime = drawableRuleset.Objects.Last().GetEndTime() + 1;
+
+            if (drawableRuleset != null)
+            {
+                firstHitTime = drawableRuleset.Objects.First().StartTime;
+                //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
+                lastHitTime = drawableRuleset.Objects.Last().GetEndTime() + 1;
+            }
         }
 
         protected override void Update()
