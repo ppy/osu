@@ -15,11 +15,6 @@ namespace osu.Game.Collections
     public class BeatmapCollection
     {
         /// <summary>
-        /// Invoked whenever any change occurs on this <see cref="BeatmapCollection"/>.
-        /// </summary>
-        public event Action Changed;
-
-        /// <summary>
         /// The collection's name.
         /// </summary>
         public readonly Bindable<string> Name = new Bindable<string>();
@@ -33,17 +28,5 @@ namespace osu.Game.Collections
         /// The date when this collection was last modified.
         /// </summary>
         public DateTimeOffset LastModifyDate { get; private set; } = DateTimeOffset.UtcNow;
-
-        public BeatmapCollection()
-        {
-            BeatmapHashes.CollectionChanged += (_, _) => onChange();
-            Name.ValueChanged += _ => onChange();
-        }
-
-        private void onChange()
-        {
-            LastModifyDate = DateTimeOffset.Now;
-            Changed?.Invoke();
-        }
     }
 }
