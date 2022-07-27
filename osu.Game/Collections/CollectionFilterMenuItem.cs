@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
 using osu.Game.Database;
 
 namespace osu.Game.Collections
@@ -21,19 +20,22 @@ namespace osu.Game.Collections
         /// <summary>
         /// The name of the collection.
         /// </summary>
-        public readonly Bindable<string> CollectionName;
+        public string CollectionName { get; }
 
         /// <summary>
         /// Creates a new <see cref="CollectionFilterMenuItem"/>.
         /// </summary>
         /// <param name="collection">The collection to filter beatmaps from.</param>
-        public CollectionFilterMenuItem(Live<BeatmapCollection>? collection)
+        public CollectionFilterMenuItem(Live<BeatmapCollection> collection)
+            : this(collection.PerformRead(c => c.Name))
         {
             Collection = collection;
-            CollectionName = new Bindable<string>(collection?.PerformRead(c => c.Name) ?? "All beatmaps");
         }
 
-        // TODO: track name changes i guess?
+        protected CollectionFilterMenuItem(string name)
+        {
+            CollectionName = name;
+        }
 
         public bool Equals(CollectionFilterMenuItem? other)
         {
@@ -47,16 +49,16 @@ namespace osu.Game.Collections
 
             // fallback to name-based comparison.
             // this is required for special dropdown items which don't have a collection (all beatmaps / manage collections items below).
-            return CollectionName.Value == other.CollectionName.Value;
+            return CollectionName == other.CollectionName;
         }
 
-        public override int GetHashCode() => CollectionName.Value.GetHashCode();
+        public override int GetHashCode() => CollectionName.GetHashCode();
     }
 
     public class AllBeatmapsCollectionFilterMenuItem : CollectionFilterMenuItem
     {
         public AllBeatmapsCollectionFilterMenuItem()
-            : base(null)
+            : base("All beatmaps")
         {
         }
     }
@@ -64,9 +66,8 @@ namespace osu.Game.Collections
     public class ManageCollectionsFilterMenuItem : CollectionFilterMenuItem
     {
         public ManageCollectionsFilterMenuItem()
-            : base(null)
+            : base("Manage collections...")
         {
-            CollectionName.Value = "Manage collections...";
         }
     }
 }

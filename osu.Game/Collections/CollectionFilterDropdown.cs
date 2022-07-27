@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -17,6 +16,7 @@ using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
+using Realms;
 
 namespace osu.Game.Collections
 {
@@ -38,12 +38,14 @@ namespace osu.Game.Collections
             set => current.Current = value;
         }
 
-        private readonly IBindableList<Live<BeatmapCollection>> collections = new BindableList<Live<BeatmapCollection>>();
         private readonly IBindableList<string> beatmaps = new BindableList<string>();
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
         [Resolved]
         private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         public CollectionFilterDropdown()
         {
@@ -55,51 +57,49 @@ namespace osu.Game.Collections
         {
             base.LoadComplete();
 
-            // TODO: bind to realm data
+            realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), collectionsChanged);
 
             // Dropdown has logic which triggers a change on the bindable with every change to the contained items.
             // This is not desirable here, as it leads to multiple filter operations running even though nothing has changed.
             // An extra bindable is enough to subvert this behaviour.
             base.Current = Current;
 
-            collections.BindCollectionChanged((_, _) => collectionsChanged(), true);
-            Current.BindValueChanged(filterChanged, true);
+            Current.BindValueChanged(currentChanged, true);
         }
 
         /// <summary>
         /// Occurs when a collection has been added or removed.
         /// </summary>
-        private void collectionsChanged()
+        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
         {
             var selectedItem = SelectedItem?.Value?.Collection;
 
             filters.Clear();
             filters.Add(new AllBeatmapsCollectionFilterMenuItem());
-            filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c)));
+            filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
 
             if (ShowManageCollectionsItem)
                 filters.Add(new ManageCollectionsFilterMenuItem());
 
             Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection.ID == selectedItem?.ID) ?? filters[0];
+
+            // Trigger a re-filter if the current item was in the changeset.
+            if (selectedItem != null && changes != null)
+            {
+                foreach (int index in changes.ModifiedIndices)
+                {
+                    if (collections[index].ID == selectedItem.ID)
+                    {
+                        // The filtered beatmaps have changed, without the filter having changed itself. So a change in filter must be notified.
+                        // Note that this does NOT propagate to bound bindables, so the FilterControl must bind directly to the value change event of this bindable.
+                        Current.TriggerChange();
+                    }
+                }
+            }
         }
 
-        /// <summary>
-        /// Occurs when the <see cref="CollectionFilterMenuItem"/> selection has changed.
-        /// </summary>
-        private void filterChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)
+        private void currentChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)
         {
-            // Binding the beatmaps will trigger a collection change event, which results in an infinite-loop. This is rebound later, when it's safe to do so.
-            beatmaps.CollectionChanged -= filterBeatmapsChanged;
-
-            // TODO: binding with realm
-            // if (filter.OldValue?.Collection != null)
-            //     beatmaps.UnbindFrom(filter.OldValue.Collection.BeatmapMD5Hashes);
-            //
-            // if (filter.NewValue?.Collection != null)
-            //     beatmaps.BindTo(filter.NewValue.Collection.BeatmapMD5Hashes);
-
-            beatmaps.CollectionChanged += filterBeatmapsChanged;
-
             // Never select the manage collection filter - rollback to the previous filter.
             // This is done after the above since it is important that bindable is unbound from OldValue, which is lost after forcing it back to the old value.
             if (filter.NewValue is ManageCollectionsFilterMenuItem)
@@ -109,18 +109,7 @@ namespace osu.Game.Collections
             }
         }
 
-        /// <summary>
-        /// Occurs when the beatmaps contained by a <see cref="BeatmapCollection"/> have changed.
-        /// </summary>
-        private void filterBeatmapsChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            // TODO: fuck this shit right off
-            // The filtered beatmaps have changed, without the filter having changed itself. So a change in filter must be notified.
-            // Note that this does NOT propagate to bound bindables, so the FilterControl must bind directly to the value change event of this bindable.
-            Current.TriggerChange();
-        }
-
-        protected override LocalisableString GenerateItemText(CollectionFilterMenuItem item) => item.CollectionName.Value;
+        protected override LocalisableString GenerateItemText(CollectionFilterMenuItem item) => item.CollectionName;
 
         protected sealed override DropdownHeader CreateHeader() => CreateCollectionHeader().With(d =>
         {
@@ -136,13 +125,6 @@ namespace osu.Game.Collections
         public class CollectionDropdownHeader : OsuDropdownHeader
         {
             public readonly Bindable<CollectionFilterMenuItem> SelectedItem = new Bindable<CollectionFilterMenuItem>();
-            private readonly Bindable<string> collectionName = new Bindable<string>();
-
-            protected override LocalisableString Label
-            {
-                get => base.Label;
-                set { } // See updateText().
-            }
 
             public CollectionDropdownHeader()
             {
@@ -150,26 +132,6 @@ namespace osu.Game.Collections
                 Icon.Size = new Vector2(16);
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
             }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                SelectedItem.BindValueChanged(_ => updateBindable(), true);
-            }
-
-            private void updateBindable()
-            {
-                collectionName.UnbindAll();
-
-                if (SelectedItem.Value != null)
-                    collectionName.BindTo(SelectedItem.Value.CollectionName);
-
-                collectionName.BindValueChanged(_ => updateText(), true);
-            }
-
-            // Dropdowns don't bind to value changes, so the real name is copied directly from the selected item here.
-            private void updateText() => base.Label = collectionName.Value;
         }
 
         protected class CollectionDropdownMenu : OsuDropdownMenu
@@ -190,23 +152,16 @@ namespace osu.Game.Collections
         {
             protected new CollectionFilterMenuItem Item => ((DropdownMenuItem<CollectionFilterMenuItem>)base.Item).Value;
 
-            [Resolved]
-            private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
-
-            private readonly Bindable<string> collectionName;
-
             private IconButton addOrRemoveButton = null!;
-            private Content content = null!;
+
             private bool beatmapInCollection;
 
-            private IDisposable? realmSubscription;
-
-            private Live<BeatmapCollection>? collection => Item.Collection;
+            [Resolved]
+            private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
             public CollectionDropdownMenuItem(MenuItem item)
                 : base(item)
             {
-                collectionName = Item.CollectionName.GetBoundCopy();
             }
 
             [BackgroundDependencyLoader]
@@ -222,22 +177,25 @@ namespace osu.Game.Collections
                 });
             }
 
-            [Resolved]
-            private RealmAccess realm { get; set; } = null!;
-
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
                 if (Item.Collection != null)
                 {
-                    realmSubscription = realm.SubscribeToPropertyChanged(r => r.Find<BeatmapCollection>(Item.Collection.ID), c => c.BeatmapMD5Hashes, _ => hashesChanged());
-                    beatmap.BindValueChanged(_ => hashesChanged(), true);
-                }
+                    beatmap.BindValueChanged(_ =>
+                    {
+                        Debug.Assert(Item.Collection != null);
 
-                // Although the DrawableMenuItem binds to value changes of the item's text, the item is an internal implementation detail of Dropdown that has no knowledge
-                // of the underlying CollectionFilter value and its accompanying name, so the real name has to be copied here. Without this, the collection name wouldn't update when changed.
-                collectionName.BindValueChanged(name => content.Text = name.NewValue, true);
+                        beatmapInCollection = Item.Collection.PerformRead(c => c.BeatmapMD5Hashes.Contains(beatmap.Value.BeatmapInfo.MD5Hash));
+
+                        addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
+                        addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
+                        addOrRemoveButton.TooltipText = beatmapInCollection ? "Remove selected beatmap" : "Add selected beatmap";
+
+                        updateButtonVisibility();
+                    }, true);
+                }
 
                 updateButtonVisibility();
             }
@@ -254,19 +212,6 @@ namespace osu.Game.Collections
                 base.OnHoverLost(e);
             }
 
-            private void hashesChanged()
-            {
-                Debug.Assert(collection != null);
-
-                beatmapInCollection = collection.PerformRead(c => c.BeatmapMD5Hashes.Contains(beatmap.Value.BeatmapInfo.MD5Hash));
-
-                addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
-                addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
-                addOrRemoveButton.TooltipText = beatmapInCollection ? "Remove selected beatmap" : "Add selected beatmap";
-
-                updateButtonVisibility();
-            }
-
             protected override void OnSelectChange()
             {
                 base.OnSelectChange();
@@ -275,7 +220,7 @@ namespace osu.Game.Collections
 
             private void updateButtonVisibility()
             {
-                if (collection == null)
+                if (Item.Collection == null)
                     addOrRemoveButton.Alpha = 0;
                 else
                     addOrRemoveButton.Alpha = IsHovered || IsPreSelected || beatmapInCollection ? 1 : 0;
@@ -283,22 +228,16 @@ namespace osu.Game.Collections
 
             private void addOrRemove()
             {
-                Debug.Assert(collection != null);
+                Debug.Assert(Item.Collection != null);
 
-                collection.PerformWrite(c =>
+                Item.Collection.PerformWrite(c =>
                 {
                     if (!c.BeatmapMD5Hashes.Remove(beatmap.Value.BeatmapInfo.MD5Hash))
                         c.BeatmapMD5Hashes.Add(beatmap.Value.BeatmapInfo.MD5Hash);
                 });
             }
 
-            protected override Drawable CreateContent() => content = (Content)base.CreateContent();
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-                realmSubscription?.Dispose();
-            }
+            protected override Drawable CreateContent() => (Content)base.CreateContent();
         }
     }
 }
