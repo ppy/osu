@@ -109,6 +109,17 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public bool Hidden { get; set; }
 
+        /// <summary>
+        /// Reset any fetched online linking information (and history).
+        /// </summary>
+        public void ResetOnlineInfo()
+        {
+            OnlineID = -1;
+            LastOnlineUpdate = null;
+            OnlineMD5Hash = string.Empty;
+            Status = BeatmapOnlineStatus.None;
+        }
+
         #region Properties we may not want persisted (but also maybe no harm?)
 
         public double AudioLeadIn { get; set; }

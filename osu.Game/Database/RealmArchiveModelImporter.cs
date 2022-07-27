@@ -174,6 +174,8 @@ namespace osu.Game.Database
             return imported;
         }
 
+        public virtual Task<Live<TModel>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, TModel original) => throw new NotImplementedException();
+
         /// <summary>
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
         /// Note that this bypasses the UI flow and should only be used for special cases or testing.

@@ -142,7 +142,6 @@ namespace osu.Game.Tests.Database
                 {
                     Task.Run(async () =>
                     {
-                        // ReSharper disable once AccessToDisposedClosure
                         var beatmapSet = await importer.Import(new ImportTask(TestResources.GetTestBeatmapStream(), "renatus.osz"));
 
                         Assert.NotNull(beatmapSet);
@@ -311,6 +310,7 @@ namespace osu.Game.Tests.Database
                 }
                 finally
                 {
+                    File.Delete(temp);
                     Directory.Delete(extractedFolder, true);
                 }
             });
@@ -671,6 +671,61 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestImportThenReimportWithNewDifficulty()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var store = new RealmRulesetStore(realm, storage);
+
+                string? pathOriginal = TestResources.GetTestBeatmapForImport();
+
+                string pathMissingOneBeatmap = pathOriginal.Replace(".osz", "_missing_difficulty.osz");
+
+                string extractedFolder = $"{pathOriginal}_extracted";
+                Directory.CreateDirectory(extractedFolder);
+
+                try
+                {
+                    using (var zip = ZipArchive.Open(pathOriginal))
+                        zip.WriteToDirectory(extractedFolder);
+
+                    // remove one difficulty before first import
+                    new FileInfo(Directory.GetFiles(extractedFolder, "*.osu").First()).Delete();
+
+                    using (var zip = ZipArchive.Create())
+                    {
+                        zip.AddAllFromDirectory(extractedFolder);
+                        zip.SaveTo(pathMissingOneBeatmap, new ZipWriterOptions(CompressionType.Deflate));
+                    }
+
+                    var firstImport = await importer.Import(new ImportTask(pathMissingOneBeatmap));
+                    Assert.That(firstImport, Is.Not.Null);
+
+                    Assert.That(realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), Has.Count.EqualTo(1));
+                    Assert.That(realm.Realm.All<BeatmapSetInfo>().First(s => !s.DeletePending).Beatmaps, Has.Count.EqualTo(11));
+
+                    // Second import matches first but contains one extra .osu file.
+                    var secondImport = await importer.Import(new ImportTask(pathOriginal));
+                    Assert.That(secondImport, Is.Not.Null);
+
+                    Assert.That(realm.Realm.All<BeatmapInfo>(), Has.Count.EqualTo(23));
+                    Assert.That(realm.Realm.All<BeatmapSetInfo>(), Has.Count.EqualTo(2));
+
+                    Assert.That(realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), Has.Count.EqualTo(1));
+                    Assert.That(realm.Realm.All<BeatmapSetInfo>().First(s => !s.DeletePending).Beatmaps, Has.Count.EqualTo(12));
+
+                    // check the newly "imported" beatmap is not the original.
+                    Assert.That(firstImport?.ID, Is.Not.EqualTo(secondImport?.ID));
+                }
+                finally
+                {
+                    Directory.Delete(extractedFolder, true);
+                }
+            });
+        }
+
+        [Test]
         public void TestImportThenReimportAfterMissingFiles()
         {
             RunTestWithRealmAsync(async (realmFactory, storage) =>
@@ -742,7 +797,7 @@ namespace osu.Game.Tests.Database
                 await realm.Realm.WriteAsync(() =>
                 {
                     foreach (var b in imported.Beatmaps)
-                        b.OnlineID = -1;
+                        b.ResetOnlineInfo();
                 });
 
                 deleteBeatmapSet(imported, realm.Realm);

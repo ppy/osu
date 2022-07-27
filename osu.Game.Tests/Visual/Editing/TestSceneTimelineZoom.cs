@@ -8,25 +8,16 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    [Ignore("Timeline initialisation is kinda broken.")] // Initial work to rectify this was done in https://github.com/ppy/osu/pull/19297, but needs more massaging to work.
     public class TestSceneTimelineZoom : TimelineTestScene
     {
         public override Drawable CreateTestComponent() => Empty();
 
         [Test]
-        [FlakyTest]
-        /*
-         * Fail rate around 0.3%
-         *
-         * TearDown : osu.Framework.Testing.Drawables.Steps.AssertButton+TracedException : range halved
-         *   --TearDown
-         *      at osu.Framework.Threading.ScheduledDelegate.RunTaskInternal()
-         *      at osu.Framework.Threading.Scheduler.Update()
-         *      at osu.Framework.Graphics.Drawable.UpdateSubTree()
-         */
         public void TestVisibleRangeUpdatesOnZoomChange()
         {
             double initialVisibleRange = 0;
+
+            AddUntilStep("wait for load", () => MusicController.TrackLoaded);
 
             AddStep("reset zoom", () => TimelineArea.Timeline.Zoom = 100);
             AddStep("get initial range", () => initialVisibleRange = TimelineArea.Timeline.VisibleRange);
@@ -44,6 +35,8 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestVisibleRangeConstantOnSizeChange()
         {
             double initialVisibleRange = 0;
+
+            AddUntilStep("wait for load", () => MusicController.TrackLoaded);
 
             AddStep("reset timeline size", () => TimelineArea.Timeline.Width = 1);
             AddStep("get initial range", () => initialVisibleRange = TimelineArea.Timeline.VisibleRange);
