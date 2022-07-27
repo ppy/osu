@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select
                 Sort = sortMode.Value,
                 AllowConvertedBeatmaps = showConverted.Value,
                 Ruleset = ruleset.Value,
-                Collection = collectionDropdown?.Current.Value?.Collection
+                CollectionBeatmapMD5Hashes = collectionDropdown?.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes)
             };
 
             if (!minimumStars.IsDefault)

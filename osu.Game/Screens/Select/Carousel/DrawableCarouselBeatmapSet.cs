@@ -254,24 +254,29 @@ namespace osu.Game.Screens.Select.Carousel
             else
                 state = TernaryState.False;
 
+            var liveCollection = collection.ToLive(realm);
+
             return new TernaryStateToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
             {
-                foreach (var b in beatmapSet.Beatmaps)
+                liveCollection.PerformWrite(c =>
                 {
-                    switch (s)
+                    foreach (var b in beatmapSet.Beatmaps)
                     {
-                        case TernaryState.True:
-                            if (collection.BeatmapMD5Hashes.Contains(b.MD5Hash))
-                                continue;
+                        switch (s)
+                        {
+                            case TernaryState.True:
+                                if (c.BeatmapMD5Hashes.Contains(b.MD5Hash))
+                                    continue;
 
-                            collection.BeatmapMD5Hashes.Add(b.MD5Hash);
-                            break;
+                                c.BeatmapMD5Hashes.Add(b.MD5Hash);
+                                break;
 
-                        case TernaryState.False:
-                            collection.BeatmapMD5Hashes.Remove(b.MD5Hash);
-                            break;
+                            case TernaryState.False:
+                                c.BeatmapMD5Hashes.Remove(b.MD5Hash);
+                                break;
+                        }
                     }
-                }
+                });
             })
             {
                 State = { Value = state }

@@ -5,6 +5,7 @@
 
 using JetBrains.Annotations;
 using osu.Game.Collections;
+using osu.Game.Database;
 
 namespace osu.Game.Overlays.Music
 {
@@ -19,6 +20,6 @@ namespace osu.Game.Overlays.Music
         /// The collection to filter beatmaps from.
         /// </summary>
         [CanBeNull]
-        public BeatmapCollection Collection;
+        public Live<BeatmapCollection> Collection;
     }
 }

@@ -147,10 +147,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("add collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "1"))));
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
 
-            AddStep("add beatmap to collection", () => getFirstCollection().BeatmapMD5Hashes.Add(Beatmap.Value.BeatmapInfo.MD5Hash));
+            AddStep("add beatmap to collection", () => Realm.Write(r => getFirstCollection().BeatmapMD5Hashes.Add(Beatmap.Value.BeatmapInfo.MD5Hash)));
             AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
 
-            AddStep("remove beatmap from collection", () => getFirstCollection().BeatmapMD5Hashes.Clear());
+            AddStep("remove beatmap from collection", () => Realm.Write(r => getFirstCollection().BeatmapMD5Hashes.Clear()));
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
         }
 
@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             addExpandHeaderStep();
 
-            AddStep("add collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "1"))));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "1", new List<string> { "abc" }))));
             AddStep("select collection", () =>
             {
                 InputManager.MoveMouseTo(getCollectionDropdownItems().ElementAt(1));
@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("collection filter still selected", () => control.CreateCriteria().Collection?.Name == "1");
+            AddAssert("collection filter still selected", () => control.CreateCriteria().CollectionBeatmapMD5Hashes.Any());
         }
 
         private BeatmapCollection getFirstCollection() => Realm.Run(r => r.All<BeatmapCollection>().First());

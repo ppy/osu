@@ -38,7 +38,7 @@ namespace osu.Game.Collections
             set => current.Current = value;
         }
 
-        private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
+        private readonly IBindableList<Live<BeatmapCollection>> collections = new BindableList<Live<BeatmapCollection>>();
         private readonly IBindableList<string> beatmaps = new BindableList<string>();
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
@@ -114,6 +114,7 @@ namespace osu.Game.Collections
         /// </summary>
         private void filterBeatmapsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            // TODO: fuck this shit right off
             // The filtered beatmaps have changed, without the filter having changed itself. So a change in filter must be notified.
             // Note that this does NOT propagate to bound bindables, so the FilterControl must bind directly to the value change event of this bindable.
             Current.TriggerChange();
@@ -200,7 +201,7 @@ namespace osu.Game.Collections
 
             private IDisposable? realmSubscription;
 
-            private BeatmapCollection? collection => Item.Collection;
+            private Live<BeatmapCollection>? collection => Item.Collection;
 
             public CollectionDropdownMenuItem(MenuItem item)
                 : base(item)
@@ -257,7 +258,7 @@ namespace osu.Game.Collections
             {
                 Debug.Assert(collection != null);
 
-                beatmapInCollection = collection.BeatmapMD5Hashes.Contains(beatmap.Value.BeatmapInfo.MD5Hash);
+                beatmapInCollection = collection.PerformRead(c => c.BeatmapMD5Hashes.Contains(beatmap.Value.BeatmapInfo.MD5Hash));
 
                 addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
                 addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
@@ -284,10 +285,10 @@ namespace osu.Game.Collections
             {
                 Debug.Assert(collection != null);
 
-                realm.Write(r =>
+                collection.PerformWrite(c =>
                 {
-                    if (!collection.BeatmapMD5Hashes.Remove(beatmap.Value.BeatmapInfo.MD5Hash))
-                        collection.BeatmapMD5Hashes.Add(beatmap.Value.BeatmapInfo.MD5Hash);
+                    if (!c.BeatmapMD5Hashes.Remove(beatmap.Value.BeatmapInfo.MD5Hash))
+                        c.BeatmapMD5Hashes.Add(beatmap.Value.BeatmapInfo.MD5Hash);
                 });
             }
 
