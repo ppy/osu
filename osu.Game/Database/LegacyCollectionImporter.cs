@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.IO;
 using osu.Game.IO.Legacy;
 using osu.Game.Overlays.Notifications;
@@ -75,7 +75,7 @@ namespace osu.Game.Database
             notification.State = ProgressNotificationState.Completed;
         }
 
-        private Task importCollections(List<RealmBeatmapCollection> newCollections)
+        private Task importCollections(List<BeatmapCollection> newCollections)
         {
             var tcs = new TaskCompletionSource<bool>();
 
@@ -85,7 +85,7 @@ namespace osu.Game.Database
                 {
                     foreach (var collection in newCollections)
                     {
-                        var existing = r.All<RealmBeatmapCollection>().FirstOrDefault(c => c.Name == collection.Name);
+                        var existing = r.All<BeatmapCollection>().FirstOrDefault(c => c.Name == collection.Name);
 
                         if (existing != null)
                         {
@@ -111,7 +111,7 @@ namespace osu.Game.Database
             return tcs.Task;
         }
 
-        private List<RealmBeatmapCollection> readCollections(Stream stream, ProgressNotification? notification = null)
+        private List<BeatmapCollection> readCollections(Stream stream, ProgressNotification? notification = null)
         {
             if (notification != null)
             {
@@ -119,7 +119,7 @@ namespace osu.Game.Database
                 notification.Progress = 0;
             }
 
-            var result = new List<RealmBeatmapCollection>();
+            var result = new List<BeatmapCollection>();
 
             try
             {
@@ -135,7 +135,7 @@ namespace osu.Game.Database
                         if (notification?.CancellationToken.IsCancellationRequested == true)
                             return result;
 
-                        var collection = new RealmBeatmapCollection(sr.ReadString());
+                        var collection = new BeatmapCollection(sr.ReadString());
                         int mapCount = sr.ReadInt32();
 
                         for (int j = 0; j < mapCount; j++)

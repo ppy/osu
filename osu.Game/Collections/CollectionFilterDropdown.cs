@@ -1,12 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,6 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -43,8 +42,8 @@ namespace osu.Game.Collections
         private readonly IBindableList<string> beatmaps = new BindableList<string>();
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
-        [Resolved(CanBeNull = true)]
-        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+        [Resolved]
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
         public CollectionFilterDropdown()
         {
@@ -81,7 +80,7 @@ namespace osu.Game.Collections
             if (ShowManageCollectionsItem)
                 filters.Add(new ManageCollectionsFilterMenuItem());
 
-            Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection == selectedItem) ?? filters[0];
+            Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection.ID == selectedItem?.ID) ?? filters[0];
         }
 
         /// <summary>
@@ -92,11 +91,12 @@ namespace osu.Game.Collections
             // Binding the beatmaps will trigger a collection change event, which results in an infinite-loop. This is rebound later, when it's safe to do so.
             beatmaps.CollectionChanged -= filterBeatmapsChanged;
 
-            if (filter.OldValue?.Collection != null)
-                beatmaps.UnbindFrom(filter.OldValue.Collection.BeatmapHashes);
-
-            if (filter.NewValue?.Collection != null)
-                beatmaps.BindTo(filter.NewValue.Collection.BeatmapHashes);
+            // TODO: binding with realm
+            // if (filter.OldValue?.Collection != null)
+            //     beatmaps.UnbindFrom(filter.OldValue.Collection.BeatmapMD5Hashes);
+            //
+            // if (filter.NewValue?.Collection != null)
+            //     beatmaps.BindTo(filter.NewValue.Collection.BeatmapMD5Hashes);
 
             beatmaps.CollectionChanged += filterBeatmapsChanged;
 
@@ -187,26 +187,24 @@ namespace osu.Game.Collections
 
         protected class CollectionDropdownMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
         {
-            [NotNull]
             protected new CollectionFilterMenuItem Item => ((DropdownMenuItem<CollectionFilterMenuItem>)base.Item).Value;
 
             [Resolved]
-            private IBindable<WorkingBeatmap> beatmap { get; set; }
+            private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-            [CanBeNull]
-            private readonly BindableList<string> collectionBeatmaps;
-
-            [NotNull]
             private readonly Bindable<string> collectionName;
 
-            private IconButton addOrRemoveButton;
-            private Content content;
+            private IconButton addOrRemoveButton = null!;
+            private Content content = null!;
             private bool beatmapInCollection;
+
+            private IDisposable? realmSubscription;
+
+            private BeatmapCollection? collection => Item.Collection;
 
             public CollectionDropdownMenuItem(MenuItem item)
                 : base(item)
             {
-                collectionBeatmaps = Item.Collection?.BeatmapHashes.GetBoundCopy();
                 collectionName = Item.CollectionName.GetBoundCopy();
             }
 
@@ -223,14 +221,17 @@ namespace osu.Game.Collections
                 });
             }
 
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                if (collectionBeatmaps != null)
+                if (Item.Collection != null)
                 {
-                    collectionBeatmaps.CollectionChanged += (_, _) => collectionChanged();
-                    beatmap.BindValueChanged(_ => collectionChanged(), true);
+                    realmSubscription = realm.SubscribeToPropertyChanged(r => r.Find<BeatmapCollection>(Item.Collection.ID), c => c.BeatmapMD5Hashes, _ => hashesChanged());
+                    beatmap.BindValueChanged(_ => hashesChanged(), true);
                 }
 
                 // Although the DrawableMenuItem binds to value changes of the item's text, the item is an internal implementation detail of Dropdown that has no knowledge
@@ -252,11 +253,11 @@ namespace osu.Game.Collections
                 base.OnHoverLost(e);
             }
 
-            private void collectionChanged()
+            private void hashesChanged()
             {
-                Debug.Assert(collectionBeatmaps != null);
+                Debug.Assert(collection != null);
 
-                beatmapInCollection = collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo.MD5Hash);
+                beatmapInCollection = collection.BeatmapMD5Hashes.Contains(beatmap.Value.BeatmapInfo.MD5Hash);
 
                 addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
                 addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
@@ -273,7 +274,7 @@ namespace osu.Game.Collections
 
             private void updateButtonVisibility()
             {
-                if (collectionBeatmaps == null)
+                if (collection == null)
                     addOrRemoveButton.Alpha = 0;
                 else
                     addOrRemoveButton.Alpha = IsHovered || IsPreSelected || beatmapInCollection ? 1 : 0;
@@ -281,13 +282,22 @@ namespace osu.Game.Collections
 
             private void addOrRemove()
             {
-                Debug.Assert(collectionBeatmaps != null);
+                Debug.Assert(collection != null);
 
-                if (!collectionBeatmaps.Remove(beatmap.Value.BeatmapInfo.MD5Hash))
-                    collectionBeatmaps.Add(beatmap.Value.BeatmapInfo.MD5Hash);
+                realm.Write(r =>
+                {
+                    if (!collection.BeatmapMD5Hashes.Remove(beatmap.Value.BeatmapInfo.MD5Hash))
+                        collection.BeatmapMD5Hashes.Add(beatmap.Value.BeatmapInfo.MD5Hash);
+                });
             }
 
             protected override Drawable CreateContent() => content = (Content)base.CreateContent();
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                realmSubscription?.Dispose();
+            }
         }
     }
 }

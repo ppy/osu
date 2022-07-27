@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Collections
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Realm.Write(r => r.RemoveAll<RealmBeatmapCollection>());
+            Realm.Write(r => r.RemoveAll<BeatmapCollection>());
             Child = dialog = new ManageCollectionsDialog();
         });
 
@@ -77,11 +77,11 @@ namespace osu.Game.Tests.Visual.Collections
         [Test]
         public void TestAddCollectionExternal()
         {
-            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "First collection"))));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "First collection"))));
             assertCollectionCount(1);
             assertCollectionName(0, "First collection");
 
-            AddStep("add another collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "Second collection"))));
+            AddStep("add another collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "Second collection"))));
             assertCollectionCount(2);
             assertCollectionName(1, "Second collection");
         }
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.Collections
             });
 
             // Done directly via the collection since InputManager methods cannot add text to textbox...
-            AddStep("change collection name", () => placeholderItem.Model.Name = "a");
+            AddStep("change collection name", () => placeholderItem.Model.PerformWrite(c => c.Name = "a"));
             assertCollectionCount(1);
             AddAssert("collection now exists", () => placeholderItem.Model.IsManaged);
 
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Collections
         [Test]
         public void TestRemoveCollectionExternal()
         {
-            RealmBeatmapCollection first = null!;
+            BeatmapCollection first = null!;
 
             AddStep("add two collections", () =>
             {
@@ -128,13 +128,13 @@ namespace osu.Game.Tests.Visual.Collections
                 {
                     r.Add(new[]
                     {
-                        first = new RealmBeatmapCollection(name: "1"),
-                        new RealmBeatmapCollection(name: "2"),
+                        first = new BeatmapCollection(name: "1"),
+                        new BeatmapCollection(name: "2"),
                     });
                 });
             });
 
-            AddStep("change first collection name", () => Realm.Write(r => r.Remove(first)));
+            AddStep("remove first collection", () => Realm.Write(r => r.Remove(first)));
             assertCollectionCount(1);
             assertCollectionName(0, "2");
         }
@@ -154,8 +154,8 @@ namespace osu.Game.Tests.Visual.Collections
             });
             AddStep("add two collections with same name", () => Realm.Write(r => r.Add(new[]
             {
-                new RealmBeatmapCollection(name: "1"),
-                new RealmBeatmapCollection(name: "1")
+                new BeatmapCollection(name: "1"),
+                new BeatmapCollection(name: "1")
                 {
                     BeatmapMD5Hashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash }
                 },
@@ -167,8 +167,8 @@ namespace osu.Game.Tests.Visual.Collections
         {
             AddStep("add two collections", () => Realm.Write(r => r.Add(new[]
             {
-                new RealmBeatmapCollection(name: "1"),
-                new RealmBeatmapCollection(name: "2")
+                new BeatmapCollection(name: "1"),
+                new BeatmapCollection(name: "2")
                 {
                     BeatmapMD5Hashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash }
                 },
@@ -207,7 +207,7 @@ namespace osu.Game.Tests.Visual.Collections
         {
             AddStep("add collection", () => Realm.Write(r => r.Add(new[]
             {
-                new RealmBeatmapCollection(name: "1")
+                new BeatmapCollection(name: "1")
                 {
                     BeatmapMD5Hashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash }
                 },
@@ -234,7 +234,7 @@ namespace osu.Game.Tests.Visual.Collections
         [Test]
         public void TestCollectionRenamedExternal()
         {
-            RealmBeatmapCollection first = null!;
+            BeatmapCollection first = null!;
 
             AddStep("add two collections", () =>
             {
@@ -242,8 +242,8 @@ namespace osu.Game.Tests.Visual.Collections
                 {
                     r.Add(new[]
                     {
-                        first = new RealmBeatmapCollection(name: "1"),
-                        new RealmBeatmapCollection(name: "2"),
+                        first = new BeatmapCollection(name: "1"),
+                        new BeatmapCollection(name: "2"),
                     });
                 });
             });
@@ -256,7 +256,7 @@ namespace osu.Game.Tests.Visual.Collections
         [Test]
         public void TestCollectionRenamedOnTextChange()
         {
-            RealmBeatmapCollection first = null!;
+            BeatmapCollection first = null!;
 
             AddStep("add two collections", () =>
             {
@@ -264,8 +264,8 @@ namespace osu.Game.Tests.Visual.Collections
                 {
                     r.Add(new[]
                     {
-                        first = new RealmBeatmapCollection(name: "1"),
-                        new RealmBeatmapCollection(name: "2"),
+                        first = new BeatmapCollection(name: "1"),
+                        new BeatmapCollection(name: "2"),
                     });
                 });
             });

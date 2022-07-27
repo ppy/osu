@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmapSet.OnlineID > 0 && viewDetails != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID)));
 
-                var collectionItems = realm.Realm.All<RealmBeatmapCollection>().AsEnumerable().Select(createCollectionMenuItem).ToList();
+                var collectionItems = realm.Realm.All<BeatmapCollection>().AsEnumerable().Select(createCollectionMenuItem).ToList();
                 if (manageCollectionsDialog != null)
                     collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
-        private MenuItem createCollectionMenuItem(RealmBeatmapCollection collection)
+        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
         {
             Debug.Assert(beatmapSet != null);
 
