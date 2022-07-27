@@ -98,10 +98,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private ControlPointInfo? controlPointInfo;
 
-        private List<OsuHitObject>? originalHitObjects;
-
-        private Random? rng;
-
         #endregion
 
         #region Sudden Death (IApplicableFailOverride)
@@ -171,16 +167,16 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
             Seed.Value ??= RNG.Next();
-            rng = new Random(Seed.Value.Value);
+            var rng = new Random(Seed.Value.Value);
 
             var osuBeatmap = (OsuBeatmap)beatmap;
 
             if (osuBeatmap.HitObjects.Count == 0) return;
 
             controlPointInfo = osuBeatmap.ControlPointInfo;
-            originalHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
 
-            var hitObjects = generateBeats(osuBeatmap)
+            var originalHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
+            var hitObjects = generateBeats(osuBeatmap, originalHitObjects)
                              .Select(beat =>
                              {
                                  var newCircle = new HitCircle();
@@ -189,21 +185,19 @@ namespace osu.Game.Rulesets.Osu.Mods
                                  return (OsuHitObject)newCircle;
                              }).ToList();
 
-            addHitSamples(hitObjects);
+            addHitSamples(originalHitObjects, hitObjects);
 
-            fixComboInfo(hitObjects);
+            fixComboInfo(originalHitObjects, hitObjects);
 
-            randomizeCirclePos(hitObjects);
+            randomizeCirclePos(rng, hitObjects);
 
             osuBeatmap.HitObjects = hitObjects;
 
             base.ApplyToBeatmap(beatmap);
         }
 
-        private IEnumerable<double> generateBeats(IBeatmap beatmap)
+        private IEnumerable<double> generateBeats(IBeatmap beatmap, IReadOnlyCollection<OsuHitObject> originalHitObjects)
         {
-            Debug.Assert(originalHitObjects != null);
-
             double startTime = originalHitObjects.First().StartTime;
             double endTime = originalHitObjects.Last().GetEndTime();
 
@@ -215,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                                // Remove beats before startTime
                                .Where(beat => almostBigger(beat, startTime))
                                // Remove beats during breaks
-                               .Where(beat => !isInsideBreakPeriod(beatmap.Breaks, beat))
+                               .Where(beat => !isInsideBreakPeriod(originalHitObjects, beatmap.Breaks, beat))
                                .ToList();
 
             // Remove beats that are too close to the next one (e.g. due to timing point changes)
@@ -230,10 +224,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             return beats;
         }
 
-        private void addHitSamples(IEnumerable<OsuHitObject> hitObjects)
+        private void addHitSamples(List<OsuHitObject> originalHitObjects, IEnumerable<OsuHitObject> hitObjects)
         {
-            Debug.Assert(originalHitObjects != null);
-
             foreach (var obj in hitObjects)
             {
                 var samples = getSamplesAtTime(originalHitObjects, obj.StartTime);
@@ -244,10 +236,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private void fixComboInfo(List<OsuHitObject> hitObjects)
+        private void fixComboInfo(List<OsuHitObject> originalHitObjects, List<OsuHitObject> hitObjects)
         {
-            Debug.Assert(originalHitObjects != null);
-
             // Copy combo indices from an original object at the same time or from the closest preceding object
             // (Objects lying between two combos are assumed to belong to the preceding combo)
             hitObjects.ForEach(newObj =>
@@ -280,7 +270,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private void randomizeCirclePos(IReadOnlyList<OsuHitObject> hitObjects)
+        private void randomizeCirclePos(Random rng, IReadOnlyList<OsuHitObject> hitObjects)
         {
             if (hitObjects.Count == 0) return;
 
@@ -361,12 +351,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// The given time is also considered to be inside a break if it is earlier than the
         /// start time of the first original hit object after the break.
         /// </remarks>
+        /// <param name="originalHitObjects">Hit objects order by time.</param>
         /// <param name="breaks">The breaks of the beatmap.</param>
         /// <param name="time">The time to be checked.</param>=
-        private bool isInsideBreakPeriod(IEnumerable<BreakPeriod> breaks, double time)
+        private bool isInsideBreakPeriod(IReadOnlyCollection<OsuHitObject> originalHitObjects, IEnumerable<BreakPeriod> breaks, double time)
         {
-            Debug.Assert(originalHitObjects != null);
-
             return breaks.Any(breakPeriod =>
             {
                 var firstObjAfterBreak = originalHitObjects.First(obj => almostBigger(obj.StartTime, breakPeriod.EndTime));
