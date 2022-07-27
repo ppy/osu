@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Game.Database;
 
 namespace osu.Game.Collections
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Collections
         /// The collection to filter beatmaps from.
         /// May be null to not filter by collection (include all beatmaps).
         /// </summary>
-        public readonly BeatmapCollection? Collection;
+        public readonly Live<BeatmapCollection>? Collection;
 
         /// <summary>
         /// The name of the collection.
@@ -26,10 +27,10 @@ namespace osu.Game.Collections
         /// Creates a new <see cref="CollectionFilterMenuItem"/>.
         /// </summary>
         /// <param name="collection">The collection to filter beatmaps from.</param>
-        public CollectionFilterMenuItem(BeatmapCollection? collection)
+        public CollectionFilterMenuItem(Live<BeatmapCollection>? collection)
         {
             Collection = collection;
-            CollectionName = new Bindable<string>(collection?.Name ?? "All beatmaps");
+            CollectionName = new Bindable<string>(collection?.PerformRead(c => c.Name) ?? "All beatmaps");
         }
 
         // TODO: track name changes i guess?
