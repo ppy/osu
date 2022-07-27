@@ -88,7 +88,7 @@ namespace osu.Game.Beatmaps
                 if (req.CompletionState == APIRequestCompletionState.Failed)
                 {
                     logForModel(set, $"Online retrieval failed for {beatmapInfo}");
-                    beatmapInfo.OnlineID = -1;
+                    beatmapInfo.ResetOnlineInfo();
                     return;
                 }
 
@@ -118,7 +118,7 @@ namespace osu.Game.Beatmaps
             catch (Exception e)
             {
                 logForModel(set, $"Online retrieval failed for {beatmapInfo} ({e.Message})");
-                beatmapInfo.OnlineID = -1;
+                beatmapInfo.ResetOnlineInfo();
             }
         }
 

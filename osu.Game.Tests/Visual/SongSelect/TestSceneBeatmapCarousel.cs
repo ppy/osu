@@ -522,15 +522,15 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             var sets = new List<BeatmapSetInfo>();
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 10; i++)
             {
                 var set = TestResources.CreateTestBeatmapSetInfo();
 
                 // only need to set the first as they are a shared reference.
                 var beatmap = set.Beatmaps.First();
 
-                beatmap.Metadata.Artist = "same artist";
-                beatmap.Metadata.Title = "same title";
+                beatmap.Metadata.Artist = $"artist {i / 2}";
+                beatmap.Metadata.Title = $"title {9 - i}";
 
                 sets.Add(set);
             }
@@ -540,10 +540,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             loadBeatmaps(sets);
 
             AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == index + idOffset).All(b => b));
+            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + index).All(b => b));
 
             AddStep("Sort by title", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false));
-            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == index + idOffset).All(b => b));
+            AddAssert("Items are in reverse order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + sets.Count - index - 1).All(b => b));
+
+            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
+            AddAssert("Items reset to original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + index).All(b => b));
         }
 
         [Test]
