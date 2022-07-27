@@ -7,8 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Collections;
-using osu.Game.IO;
 using osu.Game.IO.Legacy;
 using osu.Game.Overlays.Notifications;
 
@@ -27,14 +27,14 @@ namespace osu.Game.Database
             this.realm = realm;
         }
 
-        public Task<int> GetAvailableCount(StableStorage stableStorage)
+        public Task<int> GetAvailableCount(Storage storage)
         {
-            if (!stableStorage.Exists(database_name))
+            if (!storage.Exists(database_name))
                 return Task.FromResult(0);
 
             return Task.Run(() =>
             {
-                using (var stream = stableStorage.GetStream(database_name))
+                using (var stream = storage.GetStream(database_name))
                     return readCollections(stream).Count;
             });
         }
@@ -42,9 +42,9 @@ namespace osu.Game.Database
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public Task ImportFromStableAsync(StableStorage stableStorage)
+        public Task ImportFromStorage(Storage storage)
         {
-            if (!stableStorage.Exists(database_name))
+            if (!storage.Exists(database_name))
             {
                 // This handles situations like when the user does not have a collections.db file
                 Logger.Log($"No {database_name} available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
@@ -53,7 +53,7 @@ namespace osu.Game.Database
 
             return Task.Run(async () =>
             {
-                using (var stream = stableStorage.GetStream(database_name))
+                using (var stream = storage.GetStream(database_name))
                     await Import(stream).ConfigureAwait(false);
             });
         }

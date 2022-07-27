@@ -108,7 +108,7 @@ namespace osu.Game.Database
                 importTasks.Add(new LegacySkinImporter(skins).ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Collections))
-                importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyCollectionImporter(realmAccess).ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
+                importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyCollectionImporter(realmAccess).ImportFromStorage(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
 
             if (content.HasFlagFast(StableContent.Scores))
                 importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyScoreImporter(scores).ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
