@@ -53,21 +53,27 @@ namespace osu.Game.Collections
 
             realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), collectionsChanged);
 
-            Current.BindValueChanged(currentChanged);
+            Current.BindValueChanged(selectionChanged);
         }
 
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
         {
             var selectedItem = SelectedItem?.Value?.Collection;
 
+            var allBeatmaps = new AllBeatmapsCollectionFilterMenuItem();
+
             filters.Clear();
-            filters.Add(new AllBeatmapsCollectionFilterMenuItem());
+            filters.Add(allBeatmaps);
             filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
 
             if (ShowManageCollectionsItem)
                 filters.Add(new ManageCollectionsFilterMenuItem());
 
-            Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection.ID == selectedItem?.ID) ?? filters[0];
+            // This current update and schedule is required to work around dropdown headers not updating text even when the selected item
+            // changes. It's not great but honestly the whole dropdown menu structure isn't great. This needs to be fixed, but I'll issue
+            // a warning that it's going to be a frustrating journey.
+            Current.Value = allBeatmaps;
+            Schedule(() => Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection.ID == selectedItem?.ID) ?? filters[0]);
 
             // Trigger a re-filter if the current item was in the change set.
             if (selectedItem != null && changes != null)
@@ -80,7 +86,9 @@ namespace osu.Game.Collections
             }
         }
 
-        private void currentChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)
+        private Live<BeatmapCollection>? lastFiltered;
+
+        private void selectionChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)
         {
             // May be null during .Clear().
             if (filter.NewValue == null)
@@ -95,15 +103,20 @@ namespace osu.Game.Collections
                 return;
             }
 
+            var newCollection = filter.NewValue?.Collection;
+
             // This dropdown be weird.
             // We only care about filtering if the actual collection has changed.
-            if (filter.OldValue?.Collection != null || filter.NewValue?.Collection != null)
+            if (newCollection != lastFiltered)
+            {
                 RequestFilter?.Invoke();
+                lastFiltered = newCollection;
+            }
         }
 
         protected override LocalisableString GenerateItemText(CollectionFilterMenuItem item) => item.CollectionName;
 
-        protected sealed override DropdownHeader CreateHeader() => CreateCollectionHeader().With(d => d.SelectedItem.BindTarget = Current);
+        protected sealed override DropdownHeader CreateHeader() => CreateCollectionHeader();
 
         protected sealed override DropdownMenu CreateMenu() => CreateCollectionMenu();
 
@@ -113,8 +126,6 @@ namespace osu.Game.Collections
 
         public class CollectionDropdownHeader : OsuDropdownHeader
         {
-            public readonly Bindable<CollectionFilterMenuItem> SelectedItem = new Bindable<CollectionFilterMenuItem>();
-
             public CollectionDropdownHeader()
             {
                 Height = 25;
@@ -130,14 +141,14 @@ namespace osu.Game.Collections
                 MaxHeight = 200;
             }
 
-            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new CollectionDropdownMenuItem(item)
+            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new CollectionDropdownDrawableMenuItem(item)
             {
                 BackgroundColourHover = HoverColour,
                 BackgroundColourSelected = SelectionColour
             };
         }
 
-        protected class CollectionDropdownMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
+        protected class CollectionDropdownDrawableMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
         {
             protected new CollectionFilterMenuItem Item => ((DropdownMenuItem<CollectionFilterMenuItem>)base.Item).Value;
 
@@ -148,7 +159,7 @@ namespace osu.Game.Collections
             [Resolved]
             private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-            public CollectionDropdownMenuItem(MenuItem item)
+            public CollectionDropdownDrawableMenuItem(MenuItem item)
                 : base(item)
             {
             }

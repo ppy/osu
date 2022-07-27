@@ -4,16 +4,17 @@
 using System;
 using Humanizer;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Database;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Collections
 {
     public class DeleteCollectionDialog : PopupDialog
     {
-        public DeleteCollectionDialog(BeatmapCollection collection, Action deleteAction)
+        public DeleteCollectionDialog(Live<BeatmapCollection> collection, Action deleteAction)
         {
             HeaderText = "Confirm deletion of";
-            BodyText = $"{collection.Name} ({"beatmap".ToQuantity(collection.BeatmapMD5Hashes.Count)})";
+            BodyText = collection.PerformRead(c => $"{c.Name} ({"beatmap".ToQuantity(c.BeatmapMD5Hashes.Count)})");
 
             Icon = FontAwesome.Regular.TrashAlt;
 
