@@ -44,6 +44,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString SkinSaved => new TranslatableString(getKey(@"skin_saved"), @"Skin saved");
 
+        /// <summary>
+        /// "Copied URL"
+        /// </summary>
+        public static LocalisableString CopiedUrl => new TranslatableString(getKey(@"copied_url"), @"Copied URL");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
