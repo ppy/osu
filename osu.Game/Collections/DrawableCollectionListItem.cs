@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -24,15 +21,15 @@ using osuTK.Graphics;
 namespace osu.Game.Collections
 {
     /// <summary>
-    /// Visualises a <see cref="RealmBeatmapCollection"/> inside a <see cref="DrawableCollectionList"/>.
+    /// Visualises a <see cref="BeatmapCollection"/> inside a <see cref="DrawableCollectionList"/>.
     /// </summary>
-    public class DrawableCollectionListItem : OsuRearrangeableListItem<RealmBeatmapCollection>
+    public class DrawableCollectionListItem : OsuRearrangeableListItem<BeatmapCollection>
     {
         private const float item_height = 35;
         private const float button_width = item_height * 0.75f;
 
         /// <summary>
-        /// Whether the <see cref="RealmBeatmapCollection"/> currently exists inside realm.
+        /// Whether the <see cref="BeatmapCollection"/> currently exists inside realm.
         /// </summary>
         public IBindable<bool> IsCreated => isCreated;
 
@@ -41,9 +38,9 @@ namespace osu.Game.Collections
         /// <summary>
         /// Creates a new <see cref="DrawableCollectionListItem"/>.
         /// </summary>
-        /// <param name="item">The <see cref="RealmBeatmapCollection"/>.</param>
+        /// <param name="item">The <see cref="BeatmapCollection"/>.</param>
         /// <param name="isCreated">Whether <paramref name="item"/> currently exists inside realm.</param>
-        public DrawableCollectionListItem(RealmBeatmapCollection item, bool isCreated)
+        public DrawableCollectionListItem(BeatmapCollection item, bool isCreated)
             : base(item)
         {
             this.isCreated.Value = isCreated;
@@ -63,12 +60,15 @@ namespace osu.Game.Collections
         {
             public readonly Bindable<bool> IsCreated = new Bindable<bool>();
 
-            private readonly RealmBeatmapCollection collection;
+            private readonly BeatmapCollection collection;
 
-            private Container textBoxPaddingContainer;
-            private ItemTextBox textBox;
+            private Container textBoxPaddingContainer = null!;
+            private ItemTextBox textBox = null!;
 
-            public ItemContent(RealmBeatmapCollection collection)
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
+
+            public ItemContent(BeatmapCollection collection)
             {
                 this.collection = collection;
 
@@ -106,9 +106,6 @@ namespace osu.Game.Collections
                     },
                 };
             }
-
-            [Resolved]
-            private RealmAccess realm { get; set; }
 
             protected override void LoadComplete()
             {
@@ -156,20 +153,20 @@ namespace osu.Game.Collections
         {
             public readonly IBindable<bool> IsCreated = new Bindable<bool>();
 
-            public Func<Vector2, bool> IsTextBoxHovered;
-
-            [Resolved(CanBeNull = true)]
-            private IDialogOverlay dialogOverlay { get; set; }
+            public Func<Vector2, bool> IsTextBoxHovered = null!;
 
             [Resolved]
-            private RealmAccess realmAccess { get; set; }
+            private IDialogOverlay? dialogOverlay { get; set; }
 
-            private readonly RealmBeatmapCollection collection;
+            [Resolved]
+            private RealmAccess realmAccess { get; set; } = null!;
 
-            private Drawable fadeContainer;
-            private Drawable background;
+            private readonly BeatmapCollection collection;
 
-            public DeleteButton(RealmBeatmapCollection collection)
+            private Drawable fadeContainer = null!;
+            private Drawable background = null!;
+
+            public DeleteButton(BeatmapCollection collection)
             {
                 this.collection = collection;
                 RelativeSizeAxes = Axes.Y;

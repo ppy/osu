@@ -12,7 +12,7 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Tests.Resources;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Collections.IO
 
                     osu.Realm.Run(realm =>
                     {
-                        var collections = realm.All<RealmBeatmapCollection>().ToList();
+                        var collections = realm.All<BeatmapCollection>().ToList();
                         Assert.That(collections.Count, Is.Zero);
                     });
                 }
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Collections.IO
 
                     osu.Realm.Run(realm =>
                     {
-                        var collections = realm.All<RealmBeatmapCollection>().ToList();
+                        var collections = realm.All<BeatmapCollection>().ToList();
                         Assert.That(collections.Count, Is.EqualTo(2));
 
                         // Even with no beatmaps imported, collections are tracking the hashes and will continue to.
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Collections.IO
 
                     osu.Realm.Run(realm =>
                     {
-                        var collections = realm.All<RealmBeatmapCollection>().ToList();
+                        var collections = realm.All<BeatmapCollection>().ToList();
 
                         Assert.That(collections.Count, Is.EqualTo(2));
 
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Collections.IO
                     Assert.That(exceptionThrown, Is.False);
                     osu.Realm.Run(realm =>
                     {
-                        var collections = realm.All<RealmBeatmapCollection>().ToList();
+                        var collections = realm.All<BeatmapCollection>().ToList();
                         Assert.That(collections.Count, Is.EqualTo(0));
                     });
                 }
@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Collections.IO
                     // ReSharper disable once MethodHasAsyncOverload
                     osu.Realm.Write(realm =>
                     {
-                        var collections = realm.All<RealmBeatmapCollection>().ToList();
+                        var collections = realm.All<BeatmapCollection>().ToList();
 
                         // Move first beatmap from second collection into the first.
                         collections[0].BeatmapMD5Hashes.Add(collections[1].BeatmapMD5Hashes[0]);
@@ -196,7 +196,7 @@ namespace osu.Game.Tests.Collections.IO
 
                     osu.Realm.Run(realm =>
                     {
-                        var collections = realm.All<RealmBeatmapCollection>().ToList();
+                        var collections = realm.All<BeatmapCollection>().ToList();
                         Assert.That(collections.Count, Is.EqualTo(2));
 
                         Assert.That(collections[0].Name, Is.EqualTo("First"));

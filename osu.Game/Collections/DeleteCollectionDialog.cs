@@ -1,19 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using Humanizer;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Collections
 {
     public class DeleteCollectionDialog : PopupDialog
     {
-        public DeleteCollectionDialog(RealmBeatmapCollection collection, Action deleteAction)
+        public DeleteCollectionDialog(BeatmapCollection collection, Action deleteAction)
         {
             HeaderText = "Confirm deletion of";
             BodyText = $"{collection.Name} ({"beatmap".ToQuantity(collection.BeatmapMD5Hashes.Count)})";

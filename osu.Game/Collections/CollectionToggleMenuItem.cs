@@ -8,7 +8,7 @@ namespace osu.Game.Collections
 {
     public class CollectionToggleMenuItem : ToggleMenuItem
     {
-        public CollectionToggleMenuItem(RealmBeatmapCollection collection, IBeatmapInfo beatmap)
+        public CollectionToggleMenuItem(BeatmapCollection collection, IBeatmapInfo beatmap)
             : base(collection.Name, MenuItemType.Standard, state =>
             {
                 if (state)

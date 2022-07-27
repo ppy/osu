@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Music
                 else
                 {
                     item.InSelectedCollection = item.Model.Value.Beatmaps.Select(b => b.MD5Hash)
-                                                    .Any(criteria.Collection.BeatmapHashes.Contains);
+                                                    .Any(criteria.Collection.BeatmapMD5Hashes.Contains);
                 }
             }
 
