@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Edit
 {
     public class PromptForDifficultyDeleteDialog : PopupDialog
     {
-        public PromptForDifficultyDeleteDialog(Action delete, Action cancel)
+        public PromptForDifficultyDeleteDialog(Action hide, Action delete, Action cancel)
         {
             HeaderText = "Are you sure you want to delete this difficulty?";
 
@@ -17,9 +17,14 @@ namespace osu.Game.Screens.Edit
 
             Buttons = new PopupDialogButton[]
             {
+                new PopupDialogOkButton
+                {
+                    Text = @"Hide this difficulty instead (recommended)",
+                    Action = hide
+                },
                 new PopupDialogDangerousButton
                 {
-                    Text = @"Yes, delete this difficulty!",
+                    Text = @"Yes, DELETE this difficulty!",
                     Action = delete
                 },
                 new PopupDialogCancelButton

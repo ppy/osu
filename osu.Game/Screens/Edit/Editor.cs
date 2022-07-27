@@ -851,7 +851,16 @@ namespace osu.Game.Screens.Edit
 
         private void deleteDifficulty()
         {
-            dialogOverlay?.Push(new PromptForDifficultyDeleteDialog(confirmDifficultyDelete, () => { }));
+            dialogOverlay?.Push(new PromptForDifficultyDeleteDialog(confirmDifficultyHide, confirmDifficultyDelete, () => { }));
+        }
+
+        private void confirmDifficultyHide()
+        {
+            var current = playableBeatmap.BeatmapInfo;
+            if (current is null) return;
+
+            beatmapManager.Hide(current);
+            switchBeatmapOrExit(current.BeatmapSet);
         }
 
         private void confirmDifficultyDelete()
@@ -859,8 +868,19 @@ namespace osu.Game.Screens.Edit
             var current = playableBeatmap.BeatmapInfo;
             if (current is null) return;
 
-            beatmapManager.Hide(current);
-            this.Exit();
+            beatmapManager.DeleteLocal(current);
+            switchBeatmapOrExit(current.BeatmapSet);
+        }
+
+        private void switchBeatmapOrExit([CanBeNull] BeatmapSetInfo setInfo)
+        {
+            if (setInfo is null || setInfo.Beatmaps.Count() <= 1)
+                this.Exit();
+            var nextBeatmap = setInfo!.Beatmaps.First();
+
+            // Force a refresh of the beatmap (and beatmap set) so the `Change difficulty` list is also updated.
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(nextBeatmap, true);
+            SwitchToDifficulty(Beatmap.Value.BeatmapInfo);
         }
 
         private void updateLastSavedHash()

@@ -359,6 +359,31 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
+        /// Hard-Delete a beatmap difficulty locally.
+        /// </summary>
+        /// <remarks><see cref="Hide"/> is generally preferred as it keeps the local beatmap set in sync with the server.</remarks>
+        /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
+        public void DeleteLocal(BeatmapInfo beatmapInfo)
+        {
+            Realm.Run(r =>
+            {
+                using (var transaction = r.BeginWrite())
+                {
+                    if (!beatmapInfo.IsManaged)
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+
+                    var setInfo = beatmapInfo.BeatmapSet!;
+                    DeleteFile(setInfo, beatmapInfo.File!);
+                    setInfo.Beatmaps.Remove(beatmapInfo);
+
+                    var liveSetInfo = r.Find<BeatmapSetInfo>(setInfo.ID);
+                    setInfo.CopyChangesToRealm(liveSetInfo);
+                    transaction.Commit();
+                }
+            });
+        }
+
+        /// <summary>
         /// Delete videos from a list of beatmaps.
         /// This will post notifications tracking progress.
         /// </summary>
