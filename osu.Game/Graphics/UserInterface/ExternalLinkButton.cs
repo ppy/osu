@@ -12,7 +12,10 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Overlays;
+using osu.Game.Overlays.OSD;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,6 +29,9 @@ namespace osu.Game.Graphics.UserInterface
 
         [Resolved]
         private GameHost host { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private OnScreenDisplay onScreenDisplay { get; set; }
 
         private readonly SpriteIcon linkIcon;
 
@@ -44,6 +50,23 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
+        private class CopyUrlToast : Toast
+        {
+            public CopyUrlToast(LocalisableString value)
+                : base(UserInterfaceStrings.GeneralHeader, value, "")
+            {
+            }
+        }
+
+        private void copyUrl()
+        {
+            if (Link != null)
+            {
+                host.GetClipboard()?.SetText(Link);
+                onScreenDisplay?.Display(new CopyUrlToast(ToastStrings.CopiedUrl));
+            }
+        }
+
         public MenuItem[] ContextMenuItems
         {
             get
@@ -53,7 +76,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (Link != null)
                 {
                     items.Add(new OsuMenuItem("Open", MenuItemType.Standard, () => host.OpenUrlExternally(Link)));
-                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () => host.GetClipboard()?.SetText(Link)));
+                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () => copyUrl()));
                 }
 
                 return items.ToArray();
