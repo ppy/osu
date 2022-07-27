@@ -58,7 +58,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// </summary>
             private Box blackBoxLeft = null!, blackBoxRight = null!;
 
-            private Drawable panelLeft = null!, panelRight = null!, bgPanelLeft = null!, bgPanelRight = null!;
+            private Drawable panelLeft = null!;
+            private Drawable panelRight = null!;
+            private Drawable bgPanelLeft = null!;
+            private Drawable bgPanelRight = null!;
 
             private readonly Beatmap<OsuHitObject> beatmap;
 
