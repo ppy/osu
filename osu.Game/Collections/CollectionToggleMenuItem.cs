@@ -8,16 +8,16 @@ namespace osu.Game.Collections
 {
     public class CollectionToggleMenuItem : ToggleMenuItem
     {
-        public CollectionToggleMenuItem(BeatmapCollection collection, IBeatmapInfo beatmap)
-            : base(collection.Name.Value, MenuItemType.Standard, state =>
+        public CollectionToggleMenuItem(RealmBeatmapCollection collection, IBeatmapInfo beatmap)
+            : base(collection.Name, MenuItemType.Standard, state =>
             {
                 if (state)
-                    collection.BeatmapHashes.Add(beatmap.MD5Hash);
+                    collection.BeatmapMD5Hashes.Add(beatmap.MD5Hash);
                 else
-                    collection.BeatmapHashes.Remove(beatmap.MD5Hash);
+                    collection.BeatmapMD5Hashes.Remove(beatmap.MD5Hash);
             })
         {
-            State.Value = collection.BeatmapHashes.Contains(beatmap.MD5Hash);
+            State.Value = collection.BeatmapMD5Hashes.Contains(beatmap.MD5Hash);
         }
     }
 }

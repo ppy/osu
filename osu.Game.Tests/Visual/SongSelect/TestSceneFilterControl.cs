@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -28,12 +26,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        private CollectionManager collectionManager;
-
-        private RulesetStore rulesets;
-        private BeatmapManager beatmapManager;
-
-        private FilterControl control;
+        private RulesetStore rulesets = null!;
+        private BeatmapManager beatmapManager = null!;
+        private FilterControl control = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
@@ -46,17 +41,14 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             base.Content.AddRange(new Drawable[]
             {
-                collectionManager = new CollectionManager(),
                 Content
             });
-
-            Dependencies.Cache(collectionManager);
         }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            collectionManager.Collections.Clear();
+            Realm.Write(r => r.RemoveAll<RealmBeatmapCollection>());
 
             Child = control = new FilterControl
             {
@@ -77,8 +69,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestCollectionAddedToDropdown()
         {
-            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
-            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "2" } }));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "1"))));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "2"))));
             assertCollectionDropdownContains("1");
             assertCollectionDropdownContains("2");
         }
@@ -86,9 +78,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestCollectionRemovedFromDropdown()
         {
-            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
-            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "2" } }));
-            AddStep("remove collection", () => collectionManager.Collections.RemoveAt(0));
+            var first = new RealmBeatmapCollection(name: "1");
+
+            AddStep("add collection", () => Realm.Write(r => r.Add(first)));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "2"))));
+            AddStep("remove collection", () => Realm.Write(r => r.Remove(first)));
 
             assertCollectionDropdownContains("1", false);
             assertCollectionDropdownContains("2");
@@ -97,7 +91,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestCollectionRenamed()
         {
-            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "1"))));
             AddStep("select collection", () =>
             {
                 var dropdown = control.ChildrenOfType<CollectionFilterDropdown>().Single();
@@ -106,7 +100,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             addExpandHeaderStep();
 
-            AddStep("change name", () => collectionManager.Collections[0].Name.Value = "First");
+            AddStep("change name", () => Realm.Write(_ => getFirstCollection().Name = "First"));
 
             assertCollectionDropdownContains("First");
             assertCollectionHeaderDisplays("First");
@@ -124,7 +118,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestCollectionFilterHasAddButton()
         {
             addExpandHeaderStep();
-            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "1"))));
             AddStep("hover collection", () => InputManager.MoveMouseTo(getAddOrRemoveButton(1)));
             AddAssert("collection has add button", () => getAddOrRemoveButton(1).IsPresent);
         }
@@ -134,7 +128,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             addExpandHeaderStep();
 
-            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "1"))));
 
             AddStep("select available beatmap", () => Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0]));
             AddAssert("button enabled", () => getAddOrRemoveButton(1).Enabled.Value);
@@ -150,13 +144,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select available beatmap", () => Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0]));
 
-            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "1"))));
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
 
-            AddStep("add beatmap to collection", () => collectionManager.Collections[0].BeatmapHashes.Add(Beatmap.Value.BeatmapInfo.MD5Hash));
+            AddStep("add beatmap to collection", () => getFirstCollection().BeatmapMD5Hashes.Add(Beatmap.Value.BeatmapInfo.MD5Hash));
             AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
 
-            AddStep("remove beatmap from collection", () => collectionManager.Collections[0].BeatmapHashes.Clear());
+            AddStep("remove beatmap from collection", () => getFirstCollection().BeatmapMD5Hashes.Clear());
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
         }
 
@@ -167,15 +161,15 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select available beatmap", () => Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0]));
 
-            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "1"))));
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
 
             addClickAddOrRemoveButtonStep(1);
-            AddAssert("collection contains beatmap", () => collectionManager.Collections[0].BeatmapHashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
+            AddAssert("collection contains beatmap", () => getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
 
             addClickAddOrRemoveButtonStep(1);
-            AddAssert("collection does not contain beatmap", () => !collectionManager.Collections[0].BeatmapHashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
+            AddAssert("collection does not contain beatmap", () => !getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
         }
 
@@ -184,7 +178,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             addExpandHeaderStep();
 
-            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "1"))));
             AddStep("select collection", () =>
             {
                 InputManager.MoveMouseTo(getCollectionDropdownItems().ElementAt(1));
@@ -201,6 +195,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("collection filter still selected", () => control.CreateCriteria().Collection?.Name.Value == "1");
         }
+
+        private RealmBeatmapCollection getFirstCollection() => Realm.Run(r => r.All<RealmBeatmapCollection>().First());
 
         private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
             => AddAssert($"collection dropdown header displays '{collectionName}'",

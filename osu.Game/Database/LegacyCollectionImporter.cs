@@ -1,14 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Logging;
-using osu.Game.Collections;
+using osu.Game.Beatmaps;
 using osu.Game.IO;
 using osu.Game.IO.Legacy;
 using osu.Game.Overlays.Notifications;
@@ -17,16 +16,16 @@ namespace osu.Game.Database
 {
     public class LegacyCollectionImporter
     {
-        private readonly CollectionManager collections;
+        public Action<Notification>? PostNotification { protected get; set; }
 
-        public LegacyCollectionImporter(CollectionManager collections)
-        {
-            this.collections = collections;
-        }
-
-        public Action<Notification> PostNotification { protected get; set; }
+        private readonly RealmAccess realm;
 
         private const string database_name = "collection.db";
+
+        public LegacyCollectionImporter(RealmAccess realm)
+        {
+            this.realm = realm;
+        }
 
         public Task<int> GetAvailableCount(StableStorage stableStorage)
         {
@@ -76,26 +75,30 @@ namespace osu.Game.Database
             notification.State = ProgressNotificationState.Completed;
         }
 
-        private Task importCollections(List<BeatmapCollection> newCollections)
+        private Task importCollections(List<RealmBeatmapCollection> newCollections)
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            // Schedule(() =>
-            // {
             try
             {
-                foreach (var newCol in newCollections)
+                realm.Write(r =>
                 {
-                    var existing = collections.Collections.FirstOrDefault(c => c.Name.Value == newCol.Name.Value);
-                    if (existing == null)
-                        collections.Collections.Add(existing = new BeatmapCollection { Name = { Value = newCol.Name.Value } });
-
-                    foreach (string newBeatmap in newCol.BeatmapHashes)
+                    foreach (var collection in newCollections)
                     {
-                        if (!existing.BeatmapHashes.Contains(newBeatmap))
-                            existing.BeatmapHashes.Add(newBeatmap);
+                        var existing = r.All<RealmBeatmapCollection>().FirstOrDefault(c => c.Name == collection.Name);
+
+                        if (existing != null)
+                        {
+                            foreach (string newBeatmap in existing.BeatmapMD5Hashes)
+                            {
+                                if (!existing.BeatmapMD5Hashes.Contains(newBeatmap))
+                                    existing.BeatmapMD5Hashes.Add(newBeatmap);
+                            }
+                        }
+                        else
+                            r.Add(collection);
                     }
-                }
+                });
 
                 tcs.SetResult(true);
             }
@@ -104,12 +107,11 @@ namespace osu.Game.Database
                 Logger.Error(e, "Failed to import collection.");
                 tcs.SetException(e);
             }
-            // });
 
             return tcs.Task;
         }
 
-        private List<BeatmapCollection> readCollections(Stream stream, ProgressNotification notification = null)
+        private List<RealmBeatmapCollection> readCollections(Stream stream, ProgressNotification? notification = null)
         {
             if (notification != null)
             {
@@ -117,7 +119,7 @@ namespace osu.Game.Database
                 notification.Progress = 0;
             }
 
-            var result = new List<BeatmapCollection>();
+            var result = new List<RealmBeatmapCollection>();
 
             try
             {
@@ -133,7 +135,7 @@ namespace osu.Game.Database
                         if (notification?.CancellationToken.IsCancellationRequested == true)
                             return result;
 
-                        var collection = new BeatmapCollection { Name = { Value = sr.ReadString() } };
+                        var collection = new RealmBeatmapCollection(sr.ReadString());
                         int mapCount = sr.ReadInt32();
 
                         for (int j = 0; j < mapCount; j++)
@@ -143,7 +145,7 @@ namespace osu.Game.Database
 
                             string checksum = sr.ReadString();
 
-                            collection.BeatmapHashes.Add(checksum);
+                            collection.BeatmapMD5Hashes.Add(checksum);
                         }
 
                         if (notification != null)

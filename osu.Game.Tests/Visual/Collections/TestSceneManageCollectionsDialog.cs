@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -27,13 +25,10 @@ namespace osu.Game.Tests.Visual.Collections
     {
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        private DialogOverlay dialogOverlay;
-        private CollectionManager manager;
-
-        private RulesetStore rulesets;
-        private BeatmapManager beatmapManager;
-
-        private ManageCollectionsDialog dialog;
+        private DialogOverlay dialogOverlay = null!;
+        private RulesetStore rulesets = null!;
+        private BeatmapManager beatmapManager = null!;
+        private ManageCollectionsDialog dialog = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
@@ -46,19 +41,17 @@ namespace osu.Game.Tests.Visual.Collections
 
             base.Content.AddRange(new Drawable[]
             {
-                manager = new CollectionManager(),
                 Content,
                 dialogOverlay = new DialogOverlay(),
             });
 
-            Dependencies.Cache(manager);
             Dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
         }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            manager.Collections.Clear();
+            Realm.Write(r => r.RemoveAll<RealmBeatmapCollection>());
             Child = dialog = new ManageCollectionsDialog();
         });
 
@@ -78,17 +71,17 @@ namespace osu.Game.Tests.Visual.Collections
         [Test]
         public void TestLastItemIsPlaceholder()
         {
-            AddAssert("last item is placeholder", () => !manager.Collections.Contains(dialog.ChildrenOfType<DrawableCollectionListItem>().Last().Model));
+            AddAssert("last item is placeholder", () => !dialog.ChildrenOfType<DrawableCollectionListItem>().Last().Model.IsManaged);
         }
 
         [Test]
         public void TestAddCollectionExternal()
         {
-            AddStep("add collection", () => manager.Collections.Add(new BeatmapCollection { Name = { Value = "First collection" } }));
+            AddStep("add collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "First collection"))));
             assertCollectionCount(1);
             assertCollectionName(0, "First collection");
 
-            AddStep("add another collection", () => manager.Collections.Add(new BeatmapCollection { Name = { Value = "Second collection" } }));
+            AddStep("add another collection", () => Realm.Write(r => r.Add(new RealmBeatmapCollection(name: "Second collection"))));
             assertCollectionCount(2);
             assertCollectionName(1, "Second collection");
         }
@@ -108,7 +101,7 @@ namespace osu.Game.Tests.Visual.Collections
         [Test]
         public void TestAddCollectionViaPlaceholder()
         {
-            DrawableCollectionListItem placeholderItem = null;
+            DrawableCollectionListItem placeholderItem = null!;
 
             AddStep("focus placeholder", () =>
             {
@@ -117,23 +110,31 @@ namespace osu.Game.Tests.Visual.Collections
             });
 
             // Done directly via the collection since InputManager methods cannot add text to textbox...
-            AddStep("change collection name", () => placeholderItem.Model.Name.Value = "a");
+            AddStep("change collection name", () => placeholderItem.Model.Name = "a");
             assertCollectionCount(1);
-            AddAssert("collection now exists", () => manager.Collections.Contains(placeholderItem.Model));
+            AddAssert("collection now exists", () => placeholderItem.Model.IsManaged);
 
-            AddAssert("last item is placeholder", () => !manager.Collections.Contains(dialog.ChildrenOfType<DrawableCollectionListItem>().Last().Model));
+            AddAssert("last item is placeholder", () => !dialog.ChildrenOfType<DrawableCollectionListItem>().Last().Model.IsManaged);
         }
 
         [Test]
         public void TestRemoveCollectionExternal()
         {
-            AddStep("add two collections", () => manager.Collections.AddRange(new[]
-            {
-                new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "2" } },
-            }));
+            RealmBeatmapCollection first = null!;
 
-            AddStep("remove first collection", () => manager.Collections.RemoveAt(0));
+            AddStep("add two collections", () =>
+            {
+                Realm.Write(r =>
+                {
+                    r.Add(new[]
+                    {
+                        first = new RealmBeatmapCollection(name: "1"),
+                        new RealmBeatmapCollection(name: "2"),
+                    });
+                });
+            });
+
+            AddStep("change first collection name", () => Realm.Write(r => r.Remove(first)));
             assertCollectionCount(1);
             assertCollectionName(0, "2");
         }
@@ -151,21 +152,27 @@ namespace osu.Game.Tests.Visual.Collections
                     Width = 0.4f,
                 });
             });
-            AddStep("add two collections with same name", () => manager.Collections.AddRange(new[]
+            AddStep("add two collections with same name", () => Realm.Write(r => r.Add(new[]
             {
-                new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "1" }, BeatmapHashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash } },
-            }));
+                new RealmBeatmapCollection(name: "1"),
+                new RealmBeatmapCollection(name: "1")
+                {
+                    BeatmapMD5Hashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash }
+                },
+            })));
         }
 
         [Test]
         public void TestRemoveCollectionViaButton()
         {
-            AddStep("add two collections", () => manager.Collections.AddRange(new[]
+            AddStep("add two collections", () => Realm.Write(r => r.Add(new[]
             {
-                new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "2" }, BeatmapHashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash } },
-            }));
+                new RealmBeatmapCollection(name: "1"),
+                new RealmBeatmapCollection(name: "2")
+                {
+                    BeatmapMD5Hashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash }
+                },
+            })));
 
             assertCollectionCount(2);
 
@@ -198,10 +205,13 @@ namespace osu.Game.Tests.Visual.Collections
         [Test]
         public void TestCollectionNotRemovedWhenDialogCancelled()
         {
-            AddStep("add two collections", () => manager.Collections.AddRange(new[]
+            AddStep("add collection", () => Realm.Write(r => r.Add(new[]
             {
-                new BeatmapCollection { Name = { Value = "1" }, BeatmapHashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash } },
-            }));
+                new RealmBeatmapCollection(name: "1")
+                {
+                    BeatmapMD5Hashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash }
+                },
+            })));
 
             assertCollectionCount(1);
 
@@ -224,13 +234,21 @@ namespace osu.Game.Tests.Visual.Collections
         [Test]
         public void TestCollectionRenamedExternal()
         {
-            AddStep("add two collections", () => manager.Collections.AddRange(new[]
-            {
-                new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "2" } },
-            }));
+            RealmBeatmapCollection first = null!;
 
-            AddStep("change first collection name", () => manager.Collections[0].Name.Value = "First");
+            AddStep("add two collections", () =>
+            {
+                Realm.Write(r =>
+                {
+                    r.Add(new[]
+                    {
+                        first = new RealmBeatmapCollection(name: "1"),
+                        new RealmBeatmapCollection(name: "2"),
+                    });
+                });
+            });
+
+            AddStep("change first collection name", () => Realm.Write(_ => first.Name = "First"));
 
             assertCollectionName(0, "First");
         }
@@ -238,16 +256,24 @@ namespace osu.Game.Tests.Visual.Collections
         [Test]
         public void TestCollectionRenamedOnTextChange()
         {
-            AddStep("add two collections", () => manager.Collections.AddRange(new[]
+            RealmBeatmapCollection first = null!;
+
+            AddStep("add two collections", () =>
             {
-                new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "2" } },
-            }));
+                Realm.Write(r =>
+                {
+                    r.Add(new[]
+                    {
+                        first = new RealmBeatmapCollection(name: "1"),
+                        new RealmBeatmapCollection(name: "2"),
+                    });
+                });
+            });
 
             assertCollectionCount(2);
 
             AddStep("change first collection name", () => dialog.ChildrenOfType<TextBox>().First().Text = "First");
-            AddAssert("collection has new name", () => manager.Collections[0].Name.Value == "First");
+            AddUntilStep("collection has new name", () => first.Name == "First");
         }
 
         private void assertCollectionCount(int count)

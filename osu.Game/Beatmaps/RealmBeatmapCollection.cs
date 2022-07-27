@@ -16,14 +16,14 @@ namespace osu.Game.Beatmaps
 
         public string Name { get; set; } = string.Empty;
 
-        public List<string> BeatmapMD5Hashes { get; set; } = null!;
+        public IList<string> BeatmapMD5Hashes { get; } = null!;
 
         /// <summary>
         /// The date when this collection was last modified.
         /// </summary>
         public DateTimeOffset LastModified { get; set; }
 
-        public RealmBeatmapCollection(string? name, List<string>? beatmapMD5Hashes)
+        public RealmBeatmapCollection(string? name = null, IList<string>? beatmapMD5Hashes = null)
         {
             ID = Guid.NewGuid();
             Name = name ?? string.Empty;
