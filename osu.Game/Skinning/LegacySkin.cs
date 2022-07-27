@@ -16,12 +16,13 @@ using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -344,7 +345,15 @@ namespace osu.Game.Skinning
                                     accuracy.Y = container.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight).Y;
                                 }
 
-                                var songProgress = container.OfType<SongProgress>().FirstOrDefault();
+                                var songProgress = container.OfType<LegacySongProgress>().FirstOrDefault();
+
+                                if (songProgress != null && accuracy != null)
+                                {
+                                    songProgress.Anchor = Anchor.TopRight;
+                                    songProgress.Origin = Anchor.CentreRight;
+                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 10;
+                                    songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
+                                }
 
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
 
@@ -354,12 +363,6 @@ namespace osu.Game.Skinning
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
                                 }
-
-                                if (songProgress != null)
-                                {
-                                    if (hitError != null) hitError.Y -= SongProgress.MAX_HEIGHT;
-                                    if (combo != null) combo.Y -= SongProgress.MAX_HEIGHT;
-                                }
                             })
                             {
                                 Children = new Drawable[]
@@ -368,7 +371,7 @@ namespace osu.Game.Skinning
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
                                     new LegacyHealthDisplay(),
-                                    new SongProgress(),
+                                    new LegacySongProgress(),
                                     new BarHitErrorMeter(),
                                 }
                             };
