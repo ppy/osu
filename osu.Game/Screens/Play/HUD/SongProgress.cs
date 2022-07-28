@@ -1,16 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -21,20 +16,14 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private GameplayClock gameplayClock { get; set; }
+        [Resolved]
+        private GameplayClockContainer? gameplayClockContainer { get; set; }
 
         [Resolved(canBeNull: true)]
-        private GameplayClockContainer gameplayClockContainer { get; set; }
+        private DrawableRuleset? drawableRuleset { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private DrawableRuleset drawableRuleset { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-
-        private IClock referenceClock;
-        private IEnumerable<HitObject> objects;
+        private IClock? referenceClock;
+        private IEnumerable<HitObject>? objects;
 
         public IEnumerable<HitObject> Objects
         {
@@ -46,9 +35,7 @@ namespace osu.Game.Screens.Play.HUD
         //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
         protected double LastHitTime => objects.LastOrDefault()?.GetEndTime() ?? 0;
 
-        protected double FirstEventTime { get; private set; }
-
-        protected abstract void UpdateProgress(double progress, double time, bool isIntro);
+        protected abstract void UpdateProgress(double progress, bool isIntro);
         protected abstract void UpdateObjects(IEnumerable<HitObject> objects);
 
         [BackgroundDependencyLoader]
@@ -59,11 +46,6 @@ namespace osu.Game.Screens.Play.HUD
                 Objects = drawableRuleset.Objects;
                 referenceClock = drawableRuleset.FrameStableClock;
             }
-
-            if (beatmap != null)
-            {
-                FirstEventTime = beatmap.Value.Storyboard.EarliestEventTime ?? 0;
-            }
         }
 
         protected override void Update()
@@ -73,17 +55,22 @@ namespace osu.Game.Screens.Play.HUD
             if (objects == null)
                 return;
 
-            double gameplayTime = gameplayClockContainer?.GameplayClock.CurrentTime ?? gameplayClock?.CurrentTime ?? Time.Current;
-            double frameStableTime = referenceClock?.CurrentTime ?? gameplayTime;
+            // The reference clock is used to accurately tell the playfield's time. This is obtained from the drawable ruleset.
+            // However, if no drawable ruleset is available (i.e. used in tests), we fall back to either the gameplay clock container or this drawable's own clock.
+            double gameplayTime = referenceClock?.CurrentTime ?? gameplayClockContainer?.GameplayClock.CurrentTime ?? Time.Current;
 
-            if (frameStableTime < FirstHitTime)
+            if (gameplayTime < FirstHitTime)
             {
-                double earliest = Math.Min(FirstEventTime, gameplayClockContainer?.StartTime ?? 0);
-                UpdateProgress((frameStableTime - earliest) / (FirstHitTime - earliest), gameplayTime, true);
+                double earliest = gameplayClockContainer?.StartTime ?? 0;
+                double introDuration = FirstHitTime - earliest;
+                double currentIntroTime = gameplayTime - earliest;
+                UpdateProgress(currentIntroTime / introDuration, true);
             }
             else
             {
-                UpdateProgress((frameStableTime - FirstHitTime) / (LastHitTime - FirstHitTime), gameplayTime, false);
+                double duration = LastHitTime - FirstHitTime;
+                double currentTime = gameplayTime - FirstHitTime;
+                UpdateProgress(currentTime / duration, false);
             }
         }
     }

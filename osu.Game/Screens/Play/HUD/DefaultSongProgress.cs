@@ -50,6 +50,9 @@ namespace osu.Game.Screens.Play.HUD
         protected override bool BlockScrollInput => false;
 
         [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
+
+        [Resolved(canBeNull: true)]
         private Player player { get; set; }
 
         [Resolved(canBeNull: true)]
@@ -178,10 +181,12 @@ namespace osu.Game.Screens.Play.HUD
             bar.EndTime = LastHitTime;
         }
 
-        protected override void UpdateProgress(double progress, double time, bool isIntro)
+        protected override void UpdateProgress(double progress, bool isIntro)
         {
-            bar.CurrentTime = time;
-            graph.Progress = (int)(graph.ColumnCount * progress);
+            bar.CurrentTime = gameplayClock?.CurrentTime ?? Time.Current;
+
+            if (!isIntro)
+                graph.Progress = (int)(graph.ColumnCount * progress);
         }
 
         protected override void Update()
