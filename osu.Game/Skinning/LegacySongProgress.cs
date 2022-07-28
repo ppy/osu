@@ -13,22 +13,22 @@ namespace osu.Game.Skinning
 {
     public class LegacySongProgress : SongProgress
     {
-        private CircularProgress pie = null!;
+        private CircularProgress circularProgress = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Size = new Vector2(35);
+            Size = new Vector2(33);
 
             InternalChildren = new Drawable[]
             {
                 new Container
                 {
-                    Size = new Vector2(0.95f),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Child = pie = new CircularProgress
+                    Size = new Vector2(0.92f),
+                    Child = circularProgress = new CircularProgress
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -51,7 +51,7 @@ namespace osu.Game.Skinning
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Colour = Colour4.White,
-                    Size = new Vector2(3),
+                    Size = new Vector2(4),
                 }
             };
         }
@@ -70,17 +70,17 @@ namespace osu.Game.Skinning
         {
             if (isIntro)
             {
-                pie.Scale = new Vector2(-1, 1);
-                pie.Anchor = Anchor.TopRight;
-                pie.Colour = new Colour4(199, 255, 47, 153);
-                pie.Current.Value = 1 - progress;
+                circularProgress.Scale = new Vector2(-1, 1);
+                circularProgress.Anchor = Anchor.TopRight;
+                circularProgress.Colour = new Colour4(199, 255, 47, 153);
+                circularProgress.Current.Value = 1 - progress;
             }
             else
             {
-                pie.Scale = new Vector2(1);
-                pie.Anchor = Anchor.TopLeft;
-                pie.Colour = new Colour4(255, 255, 255, 153);
-                pie.Current.Value = progress;
+                circularProgress.Scale = new Vector2(1);
+                circularProgress.Anchor = Anchor.TopLeft;
+                circularProgress.Colour = new Colour4(255, 255, 255, 153);
+                circularProgress.Current.Value = progress;
             }
         }
     }
