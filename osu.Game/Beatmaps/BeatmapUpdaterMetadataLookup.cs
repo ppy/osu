@@ -48,15 +48,15 @@ namespace osu.Game.Beatmaps
                 prepareLocalCache();
         }
 
-        public void Update(BeatmapSetInfo beatmapSet)
+        public void Update(BeatmapSetInfo beatmapSet, bool forceOnlineFetch)
         {
             foreach (var b in beatmapSet.Beatmaps)
-                lookup(beatmapSet, b);
+                lookup(beatmapSet, b, forceOnlineFetch);
         }
 
-        private void lookup(BeatmapSetInfo set, BeatmapInfo beatmapInfo)
+        private void lookup(BeatmapSetInfo set, BeatmapInfo beatmapInfo, bool forceOnlineFetch)
         {
-            if (checkLocalCache(set, beatmapInfo))
+            if (!forceOnlineFetch && checkLocalCache(set, beatmapInfo))
                 return;
 
             if (api?.State.Value != APIState.Online)
