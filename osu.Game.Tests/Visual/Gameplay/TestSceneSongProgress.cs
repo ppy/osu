@@ -27,7 +27,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void load()
         {
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-            Beatmap.Value.LoadTrack();
 
             Add(gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time));
 
