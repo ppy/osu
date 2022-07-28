@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("reset clock", () => gameplayClockContainer.Reset(false));
+            AddStep("reset clock", () => gameplayClockContainer.Reset());
             AddStep("set hit objects", setHitObjects);
         }
 

@@ -66,7 +66,7 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected override void UpdateObjects(IEnumerable<HitObject> objects)
+        protected override void UpdateObjects(IEnumerable<HitObject>? objects)
         {
         }
 
