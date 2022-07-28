@@ -26,6 +26,13 @@ namespace osu.Game.Collections
         /// <summary>
         /// The <see cref="BeatmapInfo.MD5Hash"/>es of beatmaps contained by the collection.
         /// </summary>
+        /// <remarks>
+        /// We store as hashes rather than references to <see cref="BeatmapInfo"/>s to allow collections to maintain
+        /// references to beatmaps even if they are removed. This helps with cases like importing collections before
+        /// importing the beatmaps they contain, or when sharing collections between users.
+        ///
+        /// This can probably change in the future as we build the system up.
+        /// </remarks>
         public IList<string> BeatmapMD5Hashes { get; } = null!;
 
         /// <summary>
