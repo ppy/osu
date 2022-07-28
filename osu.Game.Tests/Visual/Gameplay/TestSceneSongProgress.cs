@@ -38,12 +38,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void SetupSteps()
         {
             AddStep("reset clock", () => gameplayClockContainer.Reset(false));
+            AddStep("set hit objects", setHitObjects);
         }
 
         [Test]
         public void TestDisplay()
         {
-            AddStep("display max values", displayMaxValues);
             AddStep("seek to intro", () => gameplayClockContainer.Seek(gameplay_start_time));
             AddStep("start", gameplayClockContainer.Start);
             AddStep("stop", gameplayClockContainer.Stop);
@@ -59,17 +59,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("show graph", () => progress.ShowGraph.Value = true);
         }
 
-        private void displayMaxValues()
+        private void setHitObjects()
         {
             var objects = new List<HitObject>();
             for (double i = 0; i < 5000; i++)
                 objects.Add(new HitObject { StartTime = i });
 
-            setObjects(objects);
-        }
-
-        private void setObjects(List<HitObject> objects)
-        {
             this.ChildrenOfType<SongProgress>().ForEach(progress => progress.Objects = objects);
         }
 
