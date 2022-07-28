@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("add collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "1"))));
             AddStep("select collection", () =>
             {
-                var dropdown = control.ChildrenOfType<CollectionFilterDropdown>().Single();
+                var dropdown = control.ChildrenOfType<CollectionDropdown>().Single();
                 dropdown.Current.Value = dropdown.ItemSource.ElementAt(1);
             });
 
@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
             => AddAssert($"collection dropdown header displays '{collectionName}'",
-                () => shouldDisplay == (control.ChildrenOfType<CollectionFilterDropdown.CollectionDropdownHeader>().Single().ChildrenOfType<SpriteText>().First().Text == collectionName));
+                () => shouldDisplay == (control.ChildrenOfType<CollectionDropdown.CollectionDropdownHeader>().Single().ChildrenOfType<SpriteText>().First().Text == collectionName));
 
         private void assertCollectionDropdownContains(string collectionName, bool shouldContain = true) =>
             AddAssert($"collection dropdown {(shouldContain ? "contains" : "does not contain")} '{collectionName}'",
@@ -222,7 +222,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void addExpandHeaderStep() => AddStep("expand header", () =>
         {
-            InputManager.MoveMouseTo(control.ChildrenOfType<CollectionFilterDropdown.CollectionDropdownHeader>().Single());
+            InputManager.MoveMouseTo(control.ChildrenOfType<CollectionDropdown.CollectionDropdownHeader>().Single());
             InputManager.Click(MouseButton.Left);
         });
 
@@ -233,6 +233,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         });
 
         private IEnumerable<Dropdown<CollectionFilterMenuItem>.DropdownMenu.DrawableDropdownMenuItem> getCollectionDropdownItems()
-            => control.ChildrenOfType<CollectionFilterDropdown>().Single().ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownMenu.DrawableDropdownMenuItem>();
+            => control.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownMenu.DrawableDropdownMenuItem>();
     }
 }
