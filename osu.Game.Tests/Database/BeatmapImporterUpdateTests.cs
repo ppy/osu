@@ -279,12 +279,16 @@ namespace osu.Game.Tests.Database
             {
                 var importer = new BeatmapImporter(storage, realm);
                 using var rulesets = new RealmRulesetStore(realm, storage);
+                string removedFilename = null!;
 
                 using var __ = getBeatmapArchive(out string pathOriginal);
                 using var _ = getBeatmapArchiveWithModifications(out string pathMissingOneBeatmap, directory =>
                 {
                     // arbitrary beatmap removal
-                    directory.GetFiles("*.osu").First().Delete();
+                    var fileToRemove = directory.GetFiles("*.osu").First();
+
+                    removedFilename = fileToRemove.Name;
+                    fileToRemove.Delete();
                 });
 
                 var importBeforeUpdate = await importer.Import(new ImportTask(pathOriginal));
@@ -296,7 +300,9 @@ namespace osu.Game.Tests.Database
 
                 importBeforeUpdate.PerformWrite(s =>
                 {
-                    var beatmapInfo = s.Beatmaps.Last();
+                    // make sure not to add scores to the same beatmap that is removed in the update.
+                    var beatmapInfo = s.Beatmaps.First(b => b.File?.Filename != removedFilename);
+
                     scoreTargetBeatmapHash = beatmapInfo.Hash;
                     s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
                 });
