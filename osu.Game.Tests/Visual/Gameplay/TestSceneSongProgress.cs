@@ -19,7 +19,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneSongProgress : SkinnableHUDComponentTestScene
     {
-        private DefaultSongProgress progress;
+        private DefaultSongProgress defaultProgress;
+
         private readonly List<SongProgress> progresses = new List<SongProgress>();
 
         private readonly StopwatchClock clock;
@@ -45,12 +46,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("display max values", displayMaxValues);
             AddStep("start", clock.Start);
-            AddStep("allow seeking", () => progress.AllowSeeking.Value = true);
-            AddStep("hide graph", () => progress.ShowGraph.Value = false);
-            AddStep("disallow seeking", () => progress.AllowSeeking.Value = false);
-            AddStep("allow seeking", () => progress.AllowSeeking.Value = true);
-            AddStep("show graph", () => progress.ShowGraph.Value = true);
             AddStep("stop", clock.Stop);
+        }
+
+        [Test]
+        public void TestToggleSeeking()
+        {
+            AddStep("allow seeking", () => defaultProgress.AllowSeeking.Value = true);
+            AddStep("hide graph", () => defaultProgress.ShowGraph.Value = false);
+            AddStep("disallow seeking", () => defaultProgress.AllowSeeking.Value = false);
+            AddStep("allow seeking", () => defaultProgress.AllowSeeking.Value = true);
+            AddStep("show graph", () => defaultProgress.ShowGraph.Value = true);
         }
 
         private void displayMaxValues()
@@ -64,11 +70,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void replaceObjects(List<HitObject> objects)
         {
-            progress.RequestSeek = pos => clock.Seek(pos);
+            defaultProgress.RequestSeek = pos => clock.Seek(pos);
 
-            foreach (var progress in progresses)
+            foreach (var p in progresses)
             {
-                progress.Objects = objects;
+                p.Objects = objects;
             }
         }
 
@@ -80,15 +86,15 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Drawable CreateDefaultImplementation()
         {
-            progress = new DefaultSongProgress
+            defaultProgress = new DefaultSongProgress
             {
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
             };
 
-            progresses.Add(progress);
-            return progress;
+            progresses.Add(defaultProgress);
+            return defaultProgress;
         }
 
         protected override Drawable CreateLegacyImplementation()
