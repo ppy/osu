@@ -185,7 +185,9 @@ namespace osu.Game.Screens.Play.HUD
         {
             bar.CurrentTime = gameplayClock?.CurrentTime ?? Time.Current;
 
-            if (!isIntro)
+            if (isIntro)
+                graph.Progress = 0;
+            else
                 graph.Progress = (int)(graph.ColumnCount * progress);
         }
 
