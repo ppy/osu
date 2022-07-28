@@ -48,28 +48,6 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        private void copyUrl()
-        {
-            host.GetClipboard()?.SetText(Link);
-            onScreenDisplay?.Display(new CopyUrlToast(ToastStrings.UrlCopied));
-        }
-
-        public MenuItem[] ContextMenuItems
-        {
-            get
-            {
-                List<MenuItem> items = new List<MenuItem>();
-
-                if (Link != null)
-                {
-                    items.Add(new OsuMenuItem("Open", MenuItemType.Standard, () => host.OpenUrlExternally(Link)));
-                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, copyUrl));
-                }
-
-                return items.ToArray();
-            }
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -96,6 +74,28 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         public LocalisableString TooltipText => "view in browser";
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (Link != null)
+                {
+                    items.Add(new OsuMenuItem("Open", MenuItemType.Standard, () => host.OpenUrlExternally(Link)));
+                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, copyUrl));
+                }
+
+                return items.ToArray();
+            }
+        }
+
+        private void copyUrl()
+        {
+            host.GetClipboard()?.SetText(Link);
+            onScreenDisplay?.Display(new CopyUrlToast(ToastStrings.UrlCopied));
+        }
 
         private class CopyUrlToast : Toast
         {
