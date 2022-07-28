@@ -104,8 +104,6 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void LoadComplete()
         {
-            Show();
-
             AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
 

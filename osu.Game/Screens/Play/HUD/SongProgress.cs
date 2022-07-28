@@ -36,13 +36,20 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Show();
+        }
+
         protected double FirstHitTime { get; private set; }
 
         //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
         protected double LastHitTime { get; private set; }
 
         protected abstract void UpdateProgress(double progress, bool isIntro);
-        protected abstract void UpdateObjects(IEnumerable<HitObject>? objects);
+        protected virtual void UpdateObjects(IEnumerable<HitObject>? objects) { }
 
         [BackgroundDependencyLoader]
         private void load()
