@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -20,8 +21,11 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private GameplayClock gameplayClock { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private GameplayClockContainer gameplayClockContainer { get; set; }
 
         [Resolved(canBeNull: true)]
         private DrawableRuleset drawableRuleset { get; set; }
@@ -69,12 +73,13 @@ namespace osu.Game.Screens.Play.HUD
             if (objects == null)
                 return;
 
-            double gameplayTime = gameplayClock?.CurrentTime ?? Time.Current;
+            double gameplayTime = gameplayClockContainer?.GameplayClock.CurrentTime ?? gameplayClock?.CurrentTime ?? Time.Current;
             double frameStableTime = referenceClock?.CurrentTime ?? gameplayTime;
 
             if (frameStableTime < FirstHitTime)
             {
-                UpdateProgress((frameStableTime - FirstEventTime) / (FirstHitTime - FirstEventTime), gameplayTime, true);
+                double earliest = Math.Min(FirstEventTime, gameplayClockContainer?.StartTime ?? 0);
+                UpdateProgress((frameStableTime - earliest) / (FirstHitTime - earliest), gameplayTime, true);
             }
             else
             {
