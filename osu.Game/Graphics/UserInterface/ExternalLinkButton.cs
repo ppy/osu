@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -23,19 +21,19 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class ExternalLinkButton : CompositeDrawable, IHasTooltip, IHasContextMenu
     {
-        public string Link { get; set; }
+        public string? Link { get; set; }
 
         private Color4 hoverColour;
 
         [Resolved]
-        private GameHost host { get; set; }
+        private GameHost host { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private OnScreenDisplay onScreenDisplay { get; set; }
+        [Resolved]
+        private OnScreenDisplay? onScreenDisplay { get; set; }
 
         private readonly SpriteIcon linkIcon;
 
-        public ExternalLinkButton(string link = null)
+        public ExternalLinkButton(string? link = null)
         {
             Link = link;
             Size = new Vector2(12);
