@@ -19,8 +19,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class DefaultSongProgress : SongProgress
     {
-        public const float MAX_HEIGHT = info_height + bottom_bar_height + graph_height + handle_height;
-
         private const float info_height = 20;
         private const float bottom_bar_height = 5;
         private const float graph_height = SquareGraph.Column.WIDTH * 6;
