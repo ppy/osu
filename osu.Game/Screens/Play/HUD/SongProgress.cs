@@ -30,8 +30,9 @@ namespace osu.Game.Screens.Play.HUD
             set
             {
                 objects = value;
-                FirstHitTime = objects?.FirstOrDefault()?.StartTime ?? 0;
-                LastHitTime = objects?.LastOrDefault()?.GetEndTime() ?? 0;
+                FirstHitTime = objects.FirstOrDefault()?.StartTime ?? 0;
+                //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
+                LastHitTime = objects.LastOrDefault()?.GetEndTime() ?? 0;
                 UpdateObjects(objects);
             }
         }
@@ -45,11 +46,10 @@ namespace osu.Game.Screens.Play.HUD
 
         protected double FirstHitTime { get; private set; }
 
-        //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
         protected double LastHitTime { get; private set; }
 
         protected abstract void UpdateProgress(double progress, bool isIntro);
-        protected virtual void UpdateObjects(IEnumerable<HitObject>? objects) { }
+        protected virtual void UpdateObjects(IEnumerable<HitObject> objects) { }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -70,20 +70,25 @@ namespace osu.Game.Screens.Play.HUD
 
             // The reference clock is used to accurately tell the playfield's time. This is obtained from the drawable ruleset.
             // However, if no drawable ruleset is available (i.e. used in tests), we fall back to either the gameplay clock container or this drawable's own clock.
-            double gameplayTime = referenceClock?.CurrentTime ?? gameplayClockContainer?.GameplayClock.CurrentTime ?? Time.Current;
+            double currentTime = referenceClock?.CurrentTime ?? gameplayClockContainer?.GameplayClock.CurrentTime ?? Time.Current;
 
-            if (gameplayTime < FirstHitTime)
+            bool isInIntro = currentTime < FirstHitTime;
+
+            if (isInIntro)
             {
-                double earliest = gameplayClockContainer?.StartTime ?? 0;
-                double introDuration = FirstHitTime - earliest;
-                double currentIntroTime = gameplayTime - earliest;
-                UpdateProgress(currentIntroTime / introDuration, true);
+                double introStartTime = gameplayClockContainer?.StartTime ?? 0;
+
+                double introOffsetCurrent = currentTime - introStartTime;
+                double introDuration = FirstHitTime - introStartTime;
+
+                UpdateProgress(introOffsetCurrent / introDuration, true);
             }
             else
             {
-                double duration = LastHitTime - FirstHitTime;
-                double currentTime = gameplayTime - FirstHitTime;
-                UpdateProgress(currentTime / duration, false);
+                double objectOffsetCurrent = currentTime - FirstHitTime;
+
+                double objectDuration = LastHitTime - FirstHitTime;
+                UpdateProgress(objectOffsetCurrent / objectDuration, false);
             }
         }
     }

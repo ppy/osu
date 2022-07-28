@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -32,8 +29,6 @@ namespace osu.Game.Screens.Play.HUD
         private readonly SongProgressGraph graph;
         private readonly SongProgressInfo info;
 
-        public Action<double> RequestSeek;
-
         /// <summary>
         /// Whether seeking is allowed and the progress bar should be shown.
         /// </summary>
@@ -47,14 +42,20 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool BlockScrollInput => false;
 
-        [Resolved(canBeNull: true)]
-        private GameplayClock gameplayClock { get; set; }
+        [Resolved]
+        private GameplayClock? gameplayClock { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private Player player { get; set; }
+        [Resolved]
+        private Player? player { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private DrawableRuleset drawableRuleset { get; set; }
+        [Resolved]
+        private DrawableRuleset? drawableRuleset { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
+        [Resolved]
+        private SkinManager skinManager { get; set; } = null!;
 
         public DefaultSongProgress()
         {
@@ -110,12 +111,6 @@ namespace osu.Game.Screens.Play.HUD
             migrateSettingFromConfig();
         }
 
-        [Resolved]
-        private OsuConfigManager config { get; set; }
-
-        [Resolved]
-        private SkinManager skinManager { get; set; }
-
         /// <summary>
         /// This setting has been migrated to a per-component level.
         /// Only take the value from the config if it is in a non-default state (then reset it to default so it only applies once).
@@ -131,29 +126,26 @@ namespace osu.Game.Screens.Play.HUD
                 ShowGraph.Value = configShowGraph.Value;
 
                 // This is pretty ugly, but the only way to make this stick...
-                if (skinManager != null)
+                var skinnableTarget = this.FindClosestParent<ISkinnableTarget>();
+
+                if (skinnableTarget != null)
                 {
-                    var skinnableTarget = this.FindClosestParent<ISkinnableTarget>();
+                    // If the skin is not mutable, a mutable instance will be created, causing this migration logic to run again on the correct skin.
+                    // Therefore we want to avoid resetting the config value on this invocation.
+                    if (skinManager.EnsureMutableSkin())
+                        return;
 
-                    if (skinnableTarget != null)
+                    // If `EnsureMutableSkin` actually changed the skin, default layout may take a frame to apply.
+                    // See `SkinnableTargetComponentsContainer`'s use of ScheduleAfterChildren.
+                    ScheduleAfterChildren(() =>
                     {
-                        // If the skin is not mutable, a mutable instance will be created, causing this migration logic to run again on the correct skin.
-                        // Therefore we want to avoid resetting the config value on this invocation.
-                        if (skinManager.EnsureMutableSkin())
-                            return;
+                        var skin = skinManager.CurrentSkin.Value;
+                        skin.UpdateDrawableTarget(skinnableTarget);
 
-                        // If `EnsureMutableSkin` actually changed the skin, default layout may take a frame to apply.
-                        // See `SkinnableTargetComponentsContainer`'s use of ScheduleAfterChildren.
-                        ScheduleAfterChildren(() =>
-                        {
-                            var skin = skinManager.CurrentSkin.Value;
-                            skin.UpdateDrawableTarget(skinnableTarget);
+                        skinManager.Save(skin);
+                    });
 
-                            skinManager.Save(skin);
-                        });
-
-                        configShowGraph.SetDefault();
-                    }
+                    configShowGraph.SetDefault();
                 }
             }
         }
@@ -170,8 +162,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void UpdateObjects(IEnumerable<HitObject> objects)
         {
-            if (objects != null)
-                graph.Objects = objects;
+            graph.Objects = objects;
 
             info.StartTime = FirstHitTime;
             info.EndTime = LastHitTime;
