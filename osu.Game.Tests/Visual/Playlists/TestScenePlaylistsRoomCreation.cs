@@ -32,7 +32,6 @@ namespace osu.Game.Tests.Visual.Playlists
     public class TestScenePlaylistsRoomCreation : OnlinePlayTestScene
     {
         private BeatmapManager manager;
-        private RulesetStore rulesets;
 
         private TestPlaylistsRoomSubScreen match;
 
@@ -41,8 +40,8 @@ namespace osu.Game.Tests.Visual.Playlists
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
 
