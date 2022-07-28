@@ -444,6 +444,8 @@ namespace osu.Game.Tests.Database
 
                 importAfterUpdate.PerformRead(updated =>
                 {
+                    updated.Realm.Refresh();
+
                     string[] hashes = updated.Realm.All<BeatmapCollection>().Single().BeatmapMD5Hashes.ToArray();
 
                     if (allOriginalBeatmapsInCollection)
@@ -506,6 +508,8 @@ namespace osu.Game.Tests.Database
 
                 importAfterUpdate.PerformRead(updated =>
                 {
+                    updated.Realm.Refresh();
+
                     string[] hashes = updated.Realm.All<BeatmapCollection>().Single().BeatmapMD5Hashes.ToArray();
                     string updatedHash = updated.Beatmaps.Single(b => b.DifficultyName == "Hard").MD5Hash;
 
