@@ -26,15 +26,14 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;
         private FilterControl control = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesets, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
             beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
@@ -78,9 +77,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestCollectionRemovedFromDropdown()
         {
-            var first = new BeatmapCollection(name: "1");
+            BeatmapCollection first = null!;
 
-            AddStep("add collection", () => Realm.Write(r => r.Add(first)));
+            AddStep("add collection", () => Realm.Write(r => r.Add(first = new BeatmapCollection(name: "1"))));
             AddStep("add collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "2"))));
             AddStep("remove collection", () => Realm.Write(r => r.Remove(first)));
 

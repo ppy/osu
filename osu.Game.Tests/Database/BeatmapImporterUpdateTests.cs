@@ -52,6 +52,8 @@ namespace osu.Game.Tests.Database
                 Assert.That(importBeforeUpdate, Is.Not.Null);
                 Debug.Assert(importBeforeUpdate != null);
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapSetInfo>(realm, 1, s => !s.DeletePending);
                 Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps - 1));
 
@@ -60,6 +62,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
@@ -104,6 +108,8 @@ namespace osu.Game.Tests.Database
                         beatmap.ResetOnlineInfo();
                 });
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapSetInfo>(realm, 1, s => !s.DeletePending);
                 Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps - 1));
 
@@ -112,6 +118,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
@@ -149,6 +157,8 @@ namespace osu.Game.Tests.Database
                 Assert.That(importBeforeUpdate, Is.Not.Null);
                 Debug.Assert(importBeforeUpdate != null);
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapSetInfo>(realm, 1, s => !s.DeletePending);
                 Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps));
 
@@ -161,6 +171,8 @@ namespace osu.Game.Tests.Database
                 // should only contain the modified beatmap (others purged).
                 Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(1));
                 Assert.That(importAfterUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps));
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps + 1);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps + 1);
@@ -199,6 +211,8 @@ namespace osu.Game.Tests.Database
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
                 checkCount<BeatmapSetInfo>(realm, 2);
@@ -235,6 +249,8 @@ namespace osu.Game.Tests.Database
                 var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathEmpty), importBeforeUpdate.Value);
                 Assert.That(importAfterUpdate, Is.Null);
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapSetInfo>(realm, 1);
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
@@ -264,6 +280,8 @@ namespace osu.Game.Tests.Database
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapSetInfo>(realm, 1);
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
@@ -280,12 +298,16 @@ namespace osu.Game.Tests.Database
             {
                 var importer = new BeatmapImporter(storage, realm);
                 using var rulesets = new RealmRulesetStore(realm, storage);
+                string removedFilename = null!;
 
                 using var __ = getBeatmapArchive(out string pathOriginal);
                 using var _ = getBeatmapArchiveWithModifications(out string pathMissingOneBeatmap, directory =>
                 {
                     // arbitrary beatmap removal
-                    directory.GetFiles("*.osu").First().Delete();
+                    var fileToRemove = directory.GetFiles("*.osu").First();
+
+                    removedFilename = fileToRemove.Name;
+                    fileToRemove.Delete();
                 });
 
                 var importBeforeUpdate = await importer.Import(new ImportTask(pathOriginal));
@@ -297,10 +319,14 @@ namespace osu.Game.Tests.Database
 
                 importBeforeUpdate.PerformWrite(s =>
                 {
-                    var beatmapInfo = s.Beatmaps.Last();
+                    // make sure not to add scores to the same beatmap that is removed in the update.
+                    var beatmapInfo = s.Beatmaps.First(b => b.File?.Filename != removedFilename);
+
                     scoreTargetBeatmapHash = beatmapInfo.Hash;
                     s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
                 });
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<ScoreInfo>(realm, 1);
 
@@ -308,6 +334,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
@@ -343,6 +371,8 @@ namespace osu.Game.Tests.Database
                     s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
                 });
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<ScoreInfo>(realm, 1);
 
                 using var _ = getBeatmapArchiveWithModifications(out string pathModified, directory =>
@@ -359,6 +389,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps + 1);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps + 1);
