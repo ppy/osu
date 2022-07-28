@@ -167,6 +167,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
             Seed.Value ??= RNG.Next();
+
             var rng = new Random(Seed.Value.Value);
 
             var osuBeatmap = (OsuBeatmap)beatmap;
@@ -185,11 +186,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                                  return (OsuHitObject)newCircle;
                              }).ToList();
 
-            addHitSamples(originalHitObjects, hitObjects);
+            addHitSamples(hitObjects, originalHitObjects);
 
-            fixComboInfo(originalHitObjects, hitObjects);
+            fixComboInfo(hitObjects, originalHitObjects);
 
-            randomizeCirclePos(rng, hitObjects);
+            randomizeCirclePos(hitObjects, rng);
 
             osuBeatmap.HitObjects = hitObjects;
 
@@ -224,7 +225,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             return beats;
         }
 
-        private void addHitSamples(List<OsuHitObject> originalHitObjects, IEnumerable<OsuHitObject> hitObjects)
+        private void addHitSamples(IEnumerable<OsuHitObject> hitObjects, List<OsuHitObject> originalHitObjects)
         {
             foreach (var obj in hitObjects)
             {
@@ -236,7 +237,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private void fixComboInfo(List<OsuHitObject> originalHitObjects, List<OsuHitObject> hitObjects)
+        private void fixComboInfo(List<OsuHitObject> hitObjects, List<OsuHitObject> originalHitObjects)
         {
             // Copy combo indices from an original object at the same time or from the closest preceding object
             // (Objects lying between two combos are assumed to belong to the preceding combo)
@@ -270,7 +271,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private void randomizeCirclePos(Random rng, IReadOnlyList<OsuHitObject> hitObjects)
+        private void randomizeCirclePos(IReadOnlyList<OsuHitObject> hitObjects, Random rng)
         {
             if (hitObjects.Count == 0) return;
 
