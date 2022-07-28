@@ -500,7 +500,7 @@ namespace osu.Game.Tests.Database
                     beatmapCollection.BeatmapMD5Hashes.Add(originalHash);
                 });
 
-                // Second import matches first but contains one extra .osu file.
+                // Second import matches first but contains a modified .osu file.
                 var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathModified), importBeforeUpdate.Value);
 
                 Assert.That(importAfterUpdate, Is.Not.Null);
