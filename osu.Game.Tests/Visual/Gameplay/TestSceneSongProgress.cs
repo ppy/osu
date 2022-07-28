@@ -4,11 +4,12 @@
 #nullable disable
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
@@ -19,44 +20,43 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneSongProgress : SkinnableHUDComponentTestScene
     {
-        private DefaultSongProgress defaultProgress;
+        private DefaultSongProgress progress => this.ChildrenOfType<DefaultSongProgress>().Single();
+        private GameplayClockContainer gameplayClockContainer;
+        private const double gameplay_start_time = -2000;
 
-        private readonly List<SongProgress> progresses = new List<SongProgress>();
-
-        private readonly StopwatchClock clock;
-        private readonly FramedClock framedClock;
-
-        [Cached]
-        private readonly GameplayClock gameplayClock;
-
-        public TestSceneSongProgress()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            clock = new StopwatchClock();
-            gameplayClock = new GameplayClock(framedClock = new FramedClock(clock));
+            var working = CreateWorkingBeatmap(Ruleset.Value);
+            working.LoadTrack();
+            Add(gameplayClockContainer = new MasterGameplayClockContainer(working, gameplay_start_time));
+            Dependencies.CacheAs(gameplayClockContainer);
+            Dependencies.CacheAs(gameplayClockContainer.GameplayClock);
         }
 
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("reset clock", clock.Reset);
+            AddStep("reset clock", () => gameplayClockContainer.Reset(false));
         }
 
         [Test]
         public void TestDisplay()
         {
             AddStep("display max values", displayMaxValues);
-            AddStep("start", clock.Start);
-            AddStep("stop", clock.Stop);
+            AddStep("seek to intro", () => gameplayClockContainer.Seek(gameplay_start_time));
+            AddStep("start", gameplayClockContainer.Start);
+            AddStep("stop", gameplayClockContainer.Stop);
         }
 
         [Test]
         public void TestToggleSeeking()
         {
-            AddStep("allow seeking", () => defaultProgress.AllowSeeking.Value = true);
-            AddStep("hide graph", () => defaultProgress.ShowGraph.Value = false);
-            AddStep("disallow seeking", () => defaultProgress.AllowSeeking.Value = false);
-            AddStep("allow seeking", () => defaultProgress.AllowSeeking.Value = true);
-            AddStep("show graph", () => defaultProgress.ShowGraph.Value = true);
+            AddStep("allow seeking", () => progress.AllowSeeking.Value = true);
+            AddStep("hide graph", () => progress.ShowGraph.Value = false);
+            AddStep("disallow seeking", () => progress.AllowSeeking.Value = false);
+            AddStep("allow seeking", () => progress.AllowSeeking.Value = true);
+            AddStep("show graph", () => progress.ShowGraph.Value = true);
         }
 
         private void displayMaxValues()
@@ -65,48 +65,25 @@ namespace osu.Game.Tests.Visual.Gameplay
             for (double i = 0; i < 5000; i++)
                 objects.Add(new HitObject { StartTime = i });
 
-            replaceObjects(objects);
+            setObjects(objects);
         }
 
-        private void replaceObjects(List<HitObject> objects)
+        private void setObjects(List<HitObject> objects)
         {
-            defaultProgress.RequestSeek = pos => clock.Seek(pos);
-
-            foreach (var p in progresses)
-            {
-                p.Objects = objects;
-            }
+            this.ChildrenOfType<SongProgress>().ForEach(progress => progress.Objects = objects);
         }
 
-        protected override void Update()
+        protected override Drawable CreateDefaultImplementation() => new DefaultSongProgress
         {
-            base.Update();
-            framedClock.ProcessFrame();
-        }
+            RelativeSizeAxes = Axes.X,
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+        };
 
-        protected override Drawable CreateDefaultImplementation()
+        protected override Drawable CreateLegacyImplementation() => new LegacySongProgress
         {
-            defaultProgress = new DefaultSongProgress
-            {
-                RelativeSizeAxes = Axes.X,
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-            };
-
-            progresses.Add(defaultProgress);
-            return defaultProgress;
-        }
-
-        protected override Drawable CreateLegacyImplementation()
-        {
-            var progress = new LegacySongProgress
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            };
-
-            progresses.Add(progress);
-            return progress;
-        }
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+        };
     }
 }
