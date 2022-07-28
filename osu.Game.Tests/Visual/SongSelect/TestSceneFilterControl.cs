@@ -78,9 +78,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestCollectionRemovedFromDropdown()
         {
-            var first = new BeatmapCollection(name: "1");
+            BeatmapCollection first = null!;
 
-            AddStep("add collection", () => Realm.Write(r => r.Add(first)));
+            AddStep("add collection", () => Realm.Write(r => r.Add(first = new BeatmapCollection(name: "1"))));
             AddStep("add collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "2"))));
             AddStep("remove collection", () => Realm.Write(r => r.Remove(first)));
 
