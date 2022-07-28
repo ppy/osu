@@ -41,8 +41,6 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                working.LoadTrack();
-
                 Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
             });
 
@@ -58,8 +56,6 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                working.LoadTrack();
-
                 Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
             });
 
@@ -102,8 +98,6 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 working = new ClockBackedTestWorkingBeatmap(new OsuRuleset().RulesetInfo, new FramedClock(new ManualClock()), Audio);
-                working.LoadTrack();
-
                 Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
 
                 gameplayClockContainer.Reset(startClock: !whileStopped);
