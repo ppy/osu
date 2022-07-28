@@ -14,6 +14,9 @@ using Realms;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A realm model containing metadata for a beatmap set (containing multiple <see cref="Beatmaps"/>).
+    /// </summary>
     [ExcludeFromDynamicCompile]
     [MapTo("BeatmapSet")]
     public class BeatmapSetInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
