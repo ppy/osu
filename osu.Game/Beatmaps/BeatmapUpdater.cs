@@ -41,23 +41,21 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Queue a beatmap for background processing.
         /// </summary>
-        public void Queue(Live<BeatmapSetInfo> beatmap)
+        public void Queue(Live<BeatmapSetInfo> beatmap, bool forceOnlineFetch = false)
         {
             Logger.Log($"Queueing change for local beatmap {beatmap}");
-            Task.Factory.StartNew(() => beatmap.PerformRead(b => Process(b)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+            Task.Factory.StartNew(() => beatmap.PerformRead(b => Process(b, forceOnlineFetch)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
         /// <summary>
         /// Run all processing on a beatmap immediately.
         /// </summary>
-        public void Process(BeatmapSetInfo beatmapSet) => beatmapSet.Realm.Write(r =>
+        public void Process(BeatmapSetInfo beatmapSet, bool forceOnlineFetch = false) => beatmapSet.Realm.Write(r =>
         {
             // Before we use below, we want to invalidate.
             workingBeatmapCache.Invalidate(beatmapSet);
 
-            // TODO: this call currently uses the local `online.db` lookup.
-            // We probably don't want this to happen after initial import (as the data may be stale).
-            metadataLookup.Update(beatmapSet);
+            metadataLookup.Update(beatmapSet, forceOnlineFetch);
 
             foreach (var beatmap in beatmapSet.Beatmaps)
             {

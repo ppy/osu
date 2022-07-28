@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        public Action<BeatmapSetInfo>? ProcessBeatmap { private get; set; }
+        public Action<BeatmapSetInfo, bool>? ProcessBeatmap { private get; set; }
 
         public BeatmapImporter(Storage storage, RealmAccess realm)
             : base(storage, realm)
@@ -168,11 +168,11 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected override void PostImport(BeatmapSetInfo model, Realm realm)
+        protected override void PostImport(BeatmapSetInfo model, Realm realm, bool batchImport)
         {
-            base.PostImport(model, realm);
+            base.PostImport(model, realm, batchImport);
 
-            ProcessBeatmap?.Invoke(model);
+            ProcessBeatmap?.Invoke(model, batchImport);
         }
 
         private void validateOnlineIds(BeatmapSetInfo beatmapSet, Realm realm)

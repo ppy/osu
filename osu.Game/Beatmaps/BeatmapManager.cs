@@ -42,7 +42,7 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
-        public Action<BeatmapSetInfo>? ProcessBeatmap { private get; set; }
+        public Action<BeatmapSetInfo, bool>? ProcessBeatmap { private get; set; }
 
         public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
-            beatmapImporter.ProcessBeatmap = obj => ProcessBeatmap?.Invoke(obj);
+            beatmapImporter.ProcessBeatmap = (obj, isBatch) => ProcessBeatmap?.Invoke(obj, isBatch);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -323,7 +323,7 @@ namespace osu.Game.Beatmaps
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
 
-                    ProcessBeatmap?.Invoke(liveBeatmapSet);
+                    ProcessBeatmap?.Invoke(liveBeatmapSet, false);
                 });
             }
 

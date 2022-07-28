@@ -287,7 +287,7 @@ namespace osu.Game
 
             AddInternal(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
-            BeatmapManager.ProcessBeatmap = set => beatmapUpdater.Process(set);
+            BeatmapManager.ProcessBeatmap = (set, isBatch) => beatmapUpdater.Process(set, forceOnlineFetch: !isBatch);
 
             dependencies.Cache(userCache = new UserLookupCache());
             AddInternal(userCache);
