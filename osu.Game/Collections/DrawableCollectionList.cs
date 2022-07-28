@@ -20,12 +20,14 @@ namespace osu.Game.Collections
     /// </summary>
     public class DrawableCollectionList : OsuRearrangeableListContainer<Live<BeatmapCollection>>
     {
-        private Scroll scroll = null!;
-
         protected override ScrollContainer<Drawable> CreateScrollContainer() => scroll = new Scroll();
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        private Scroll scroll = null!;
+
+        private IDisposable? realmSubscription;
 
         protected override FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>> CreateListFillFlowContainer() => new Flow
         {
@@ -36,7 +38,7 @@ namespace osu.Game.Collections
         {
             base.LoadComplete();
 
-            realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), collectionsChanged);
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), collectionsChanged);
         }
 
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
@@ -51,6 +53,12 @@ namespace osu.Game.Collections
                 return scroll.ReplacePlaceholder();
 
             return new DrawableCollectionListItem(item, true);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            realmSubscription?.Dispose();
         }
 
         /// <summary>
