@@ -15,7 +15,7 @@ namespace osu.Game.Skinning
 {
     public class LegacySongProgress : SongProgress
     {
-        private CircularProgress? pie;
+        private CircularProgress pie = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -72,9 +72,6 @@ namespace osu.Game.Skinning
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
-            if (pie == null)
-                return;
-
             if (isIntro)
             {
                 pie.Scale = new Vector2(-1, 1);
