@@ -253,9 +253,14 @@ namespace osu.Game.Tests.Visual.Collections
                 });
             });
 
+            assertCollectionName(0, "1");
+            assertCollectionName(1, "1");
+
             AddStep("change first collection name", () => Realm.Write(_ => first.Name = "First"));
 
-            assertCollectionName(0, "First");
+            // Item will have moved due to alphabetical sorting.
+            assertCollectionName(0, "2");
+            assertCollectionName(1, "First");
         }
 
         [Test]
