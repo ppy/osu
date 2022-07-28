@@ -30,7 +30,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private CollectionManager collectionManager;
 
-        private RulesetStore rulesets;
         private BeatmapManager beatmapManager;
 
         private FilterControl control;
@@ -38,8 +37,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesets, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
             beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
