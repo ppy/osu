@@ -254,7 +254,7 @@ namespace osu.Game.Tests.Visual.Collections
             });
 
             assertCollectionName(0, "1");
-            assertCollectionName(1, "1");
+            assertCollectionName(1, "2");
 
             AddStep("change first collection name", () => Realm.Write(_ => first.Name = "First"));
 
