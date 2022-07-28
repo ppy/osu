@@ -12,6 +12,17 @@ using Realms;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A realm model containing metadata for a beatmap.
+    /// </summary>
+    /// <remarks>
+    /// This is currently stored against each beatmap difficulty, even when it is duplicated.
+    /// It is also provided via <see cref="BeatmapSetInfo"/> for convenience and historical purposes.
+    /// A future effort could see this converted to an <see cref="EmbeddedObject"/> or potentially de-duped
+    /// and shared across multiple difficulties in the same set, if required.
+    ///
+    /// Note that difficulty name is not stored in this metadata but in <see cref="BeatmapInfo"/>.
+    /// </remarks>
     [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("BeatmapMetadata")]
