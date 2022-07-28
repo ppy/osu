@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Objects;
@@ -20,15 +21,21 @@ namespace osu.Game.Beatmaps
     public class BeatmapUpdater : IDisposable
     {
         private readonly IWorkingBeatmapCache workingBeatmapCache;
-        private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
+
         private readonly BeatmapDifficultyCache difficultyCache;
+
+        private readonly BeatmapUpdaterMetadataLookup metadataLookup;
+
+        private const int update_queue_request_concurrency = 4;
+
+        private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapUpdaterMetadataLookup));
 
         public BeatmapUpdater(IWorkingBeatmapCache workingBeatmapCache, BeatmapDifficultyCache difficultyCache, IAPIProvider api, Storage storage)
         {
             this.workingBeatmapCache = workingBeatmapCache;
             this.difficultyCache = difficultyCache;
 
-            onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+            metadataLookup = new BeatmapUpdaterMetadataLookup(api, storage);
         }
 
         /// <summary>
@@ -37,7 +44,7 @@ namespace osu.Game.Beatmaps
         public void Queue(Live<BeatmapSetInfo> beatmap)
         {
             Logger.Log($"Queueing change for local beatmap {beatmap}");
-            Task.Factory.StartNew(() => beatmap.PerformRead(Process));
+            Task.Factory.StartNew(() => beatmap.PerformRead(b => Process(b)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
         /// <summary>
@@ -50,7 +57,7 @@ namespace osu.Game.Beatmaps
 
             // TODO: this call currently uses the local `online.db` lookup.
             // We probably don't want this to happen after initial import (as the data may be stale).
-            onlineLookupQueue.Update(beatmapSet);
+            metadataLookup.Update(beatmapSet);
 
             foreach (var beatmap in beatmapSet.Beatmaps)
             {
@@ -90,8 +97,11 @@ namespace osu.Game.Beatmaps
 
         public void Dispose()
         {
-            if (onlineLookupQueue.IsNotNull())
-                onlineLookupQueue.Dispose();
+            if (metadataLookup.IsNotNull())
+                metadataLookup.Dispose();
+
+            if (updateScheduler.IsNotNull())
+                updateScheduler.Dispose();
         }
 
         #endregion
