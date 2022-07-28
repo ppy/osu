@@ -50,21 +50,10 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        private class CopyUrlToast : Toast
-        {
-            public CopyUrlToast(LocalisableString value)
-                : base(UserInterfaceStrings.GeneralHeader, value, "")
-            {
-            }
-        }
-
         private void copyUrl()
         {
-            if (Link != null)
-            {
-                host.GetClipboard()?.SetText(Link);
-                onScreenDisplay?.Display(new CopyUrlToast(ToastStrings.CopiedUrl));
-            }
+            host.GetClipboard()?.SetText(Link);
+            onScreenDisplay?.Display(new CopyUrlToast(ToastStrings.UrlCopied));
         }
 
         public MenuItem[] ContextMenuItems
@@ -109,5 +98,13 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         public LocalisableString TooltipText => "view in browser";
+
+        private class CopyUrlToast : Toast
+        {
+            public CopyUrlToast(LocalisableString value)
+                : base(UserInterfaceStrings.GeneralHeader, value, "")
+            {
+            }
+        }
     }
 }
