@@ -27,13 +27,19 @@ namespace osu.Game.Screens.Play.HUD
 
         public IEnumerable<HitObject> Objects
         {
-            set => UpdateObjects(objects = value);
+            set
+            {
+                objects = value;
+                FirstHitTime = objects.FirstOrDefault()?.StartTime ?? 0;
+                LastHitTime = objects.LastOrDefault()?.GetEndTime() ?? 0;
+                UpdateObjects(objects);
+            }
         }
 
-        protected double FirstHitTime => objects.FirstOrDefault()?.StartTime ?? 0;
+        protected double FirstHitTime { get; private set; }
 
         //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-        protected double LastHitTime => objects.LastOrDefault()?.GetEndTime() ?? 0;
+        protected double LastHitTime { get; private set; }
 
         protected abstract void UpdateProgress(double progress, bool isIntro);
         protected abstract void UpdateObjects(IEnumerable<HitObject> objects);
