@@ -30,8 +30,8 @@ namespace osu.Game.Screens.Play.HUD
             set
             {
                 objects = value;
-                FirstHitTime = objects.FirstOrDefault()?.StartTime ?? 0;
-                LastHitTime = objects.LastOrDefault()?.GetEndTime() ?? 0;
+                FirstHitTime = objects?.FirstOrDefault()?.StartTime ?? 0;
+                LastHitTime = objects?.LastOrDefault()?.GetEndTime() ?? 0;
                 UpdateObjects(objects);
             }
         }
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play.HUD
         protected double LastHitTime { get; private set; }
 
         protected abstract void UpdateProgress(double progress, bool isIntro);
-        protected abstract void UpdateObjects(IEnumerable<HitObject> objects);
+        protected abstract void UpdateObjects(IEnumerable<HitObject>? objects);
 
         [BackgroundDependencyLoader]
         private void load()

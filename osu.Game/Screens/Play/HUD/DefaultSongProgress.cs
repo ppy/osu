@@ -174,7 +174,9 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void UpdateObjects(IEnumerable<HitObject> objects)
         {
-            graph.Objects = objects;
+            if (objects != null)
+                graph.Objects = objects;
+
             info.StartTime = FirstHitTime;
             info.EndTime = LastHitTime;
             bar.StartTime = FirstHitTime;
