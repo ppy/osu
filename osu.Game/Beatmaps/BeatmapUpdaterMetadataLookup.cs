@@ -48,18 +48,27 @@ namespace osu.Game.Beatmaps
                 prepareLocalCache();
         }
 
-        public void Update(BeatmapSetInfo beatmapSet, bool forceOnlineFetch)
+        /// <summary>
+        /// Queue an update for a beatmap set.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap set to update. Updates will be applied directly (so a transaction should be started if this instance is managed).</param>
+        /// <param name="preferOnlineFetch">Whether metadata from an online source should be preferred. If <c>true</c>, the local cache will be skipped to ensure the freshest data state possible.</param>
+        public void Update(BeatmapSetInfo beatmapSet, bool preferOnlineFetch)
         {
             foreach (var b in beatmapSet.Beatmaps)
-                lookup(beatmapSet, b, forceOnlineFetch);
+                lookup(beatmapSet, b, preferOnlineFetch);
         }
 
-        private void lookup(BeatmapSetInfo set, BeatmapInfo beatmapInfo, bool forceOnlineFetch)
+        private void lookup(BeatmapSetInfo set, BeatmapInfo beatmapInfo, bool preferOnlineFetch)
         {
-            if (!forceOnlineFetch && checkLocalCache(set, beatmapInfo))
+            bool apiAvailable = api?.State.Value == APIState.Online;
+
+            bool useLocalCache = !apiAvailable || !preferOnlineFetch;
+
+            if (useLocalCache && checkLocalCache(set, beatmapInfo))
                 return;
 
-            if (api?.State.Value != APIState.Online)
+            if (!apiAvailable)
                 return;
 
             var req = new GetBeatmapRequest(beatmapInfo);

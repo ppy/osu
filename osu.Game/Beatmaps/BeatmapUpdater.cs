@@ -41,21 +41,25 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Queue a beatmap for background processing.
         /// </summary>
-        public void Queue(Live<BeatmapSetInfo> beatmap, bool forceOnlineFetch = false)
+        /// <param name="beatmapSet">The managed beatmap set to update. A transaction will be opened to apply changes.</param>
+        /// <param name="preferOnlineFetch">Whether metadata from an online source should be preferred. If <c>true</c>, the local cache will be skipped to ensure the freshest data state possible.</param>
+        public void Queue(Live<BeatmapSetInfo> beatmapSet, bool preferOnlineFetch = false)
         {
-            Logger.Log($"Queueing change for local beatmap {beatmap}");
-            Task.Factory.StartNew(() => beatmap.PerformRead(b => Process(b, forceOnlineFetch)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+            Logger.Log($"Queueing change for local beatmap {beatmapSet}");
+            Task.Factory.StartNew(() => beatmapSet.PerformRead(b => Process(b, preferOnlineFetch)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
         /// <summary>
         /// Run all processing on a beatmap immediately.
         /// </summary>
-        public void Process(BeatmapSetInfo beatmapSet, bool forceOnlineFetch = false) => beatmapSet.Realm.Write(r =>
+        /// <param name="beatmapSet">The managed beatmap set to update. A transaction will be opened to apply changes.</param>
+        /// <param name="preferOnlineFetch">Whether metadata from an online source should be preferred. If <c>true</c>, the local cache will be skipped to ensure the freshest data state possible.</param>
+        public void Process(BeatmapSetInfo beatmapSet, bool preferOnlineFetch = false) => beatmapSet.Realm.Write(r =>
         {
             // Before we use below, we want to invalidate.
             workingBeatmapCache.Invalidate(beatmapSet);
 
-            metadataLookup.Update(beatmapSet, forceOnlineFetch);
+            metadataLookup.Update(beatmapSet, preferOnlineFetch);
 
             foreach (var beatmap in beatmapSet.Beatmaps)
             {
