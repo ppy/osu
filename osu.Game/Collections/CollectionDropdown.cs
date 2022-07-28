@@ -21,9 +21,9 @@ using Realms;
 namespace osu.Game.Collections
 {
     /// <summary>
-    /// A dropdown to select the <see cref="CollectionFilterMenuItem"/> to filter beatmaps using.
+    /// A dropdown to select the collection to be used to filter results.
     /// </summary>
-    public class CollectionFilterDropdown : OsuDropdown<CollectionFilterMenuItem>
+    public class CollectionDropdown : OsuDropdown<CollectionFilterMenuItem>
     {
         /// <summary>
         /// Whether to show the "manage collections..." menu item in the dropdown.
@@ -40,7 +40,9 @@ namespace osu.Game.Collections
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        public CollectionFilterDropdown()
+        private IDisposable? realmSubscription;
+
+        public CollectionDropdown()
         {
             ItemSource = filters;
 
@@ -51,7 +53,7 @@ namespace osu.Game.Collections
         {
             base.LoadComplete();
 
-            realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), collectionsChanged);
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), collectionsChanged);
 
             Current.BindValueChanged(selectionChanged);
         }
@@ -114,6 +116,12 @@ namespace osu.Game.Collections
             }
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            realmSubscription?.Dispose();
+        }
+
         protected override LocalisableString GenerateItemText(CollectionFilterMenuItem item) => item.CollectionName;
 
         protected sealed override DropdownHeader CreateHeader() => CreateCollectionHeader();
@@ -150,11 +158,11 @@ namespace osu.Game.Collections
 
         protected class CollectionDropdownDrawableMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
         {
-            protected new CollectionFilterMenuItem Item => ((DropdownMenuItem<CollectionFilterMenuItem>)base.Item).Value;
-
             private IconButton addOrRemoveButton = null!;
 
             private bool beatmapInCollection;
+
+            private readonly Live<BeatmapCollection>? collection;
 
             [Resolved]
             private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
@@ -162,6 +170,7 @@ namespace osu.Game.Collections
             public CollectionDropdownDrawableMenuItem(MenuItem item)
                 : base(item)
             {
+                collection = ((DropdownMenuItem<CollectionFilterMenuItem>)item).Value.Collection;
             }
 
             [BackgroundDependencyLoader]
@@ -181,13 +190,11 @@ namespace osu.Game.Collections
             {
                 base.LoadComplete();
 
-                if (Item.Collection != null)
+                if (collection != null)
                 {
                     beatmap.BindValueChanged(_ =>
                     {
-                        Debug.Assert(Item.Collection != null);
-
-                        beatmapInCollection = Item.Collection.PerformRead(c => c.BeatmapMD5Hashes.Contains(beatmap.Value.BeatmapInfo.MD5Hash));
+                        beatmapInCollection = collection.PerformRead(c => c.BeatmapMD5Hashes.Contains(beatmap.Value.BeatmapInfo.MD5Hash));
 
                         addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
                         addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
@@ -220,7 +227,7 @@ namespace osu.Game.Collections
 
             private void updateButtonVisibility()
             {
-                if (Item.Collection == null)
+                if (collection == null)
                     addOrRemoveButton.Alpha = 0;
                 else
                     addOrRemoveButton.Alpha = IsHovered || IsPreSelected || beatmapInCollection ? 1 : 0;
@@ -228,9 +235,9 @@ namespace osu.Game.Collections
 
             private void addOrRemove()
             {
-                Debug.Assert(Item.Collection != null);
+                Debug.Assert(collection != null);
 
-                Item.Collection.PerformWrite(c =>
+                collection.PerformWrite(c =>
                 {
                     if (!c.BeatmapMD5Hashes.Remove(beatmap.Value.BeatmapInfo.MD5Hash))
                         c.BeatmapMD5Hashes.Add(beatmap.Value.BeatmapInfo.MD5Hash);

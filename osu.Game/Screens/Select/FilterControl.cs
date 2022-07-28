@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Select
 
         private SeekLimitedSearchTextBox searchTextBox;
 
-        private CollectionFilterDropdown collectionDropdown;
+        private CollectionDropdown collectionDropdown;
 
         public FilterCriteria CreateCriteria()
         {
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Select
                                         RelativeSizeAxes = Axes.Both,
                                         Width = 0.48f,
                                     },
-                                    collectionDropdown = new CollectionFilterDropdown
+                                    collectionDropdown = new CollectionDropdown
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
