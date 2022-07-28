@@ -6,8 +6,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using osu.Framework.Development;
@@ -15,7 +13,6 @@ using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -32,20 +29,16 @@ namespace osu.Game.Beatmaps
     /// This will always be checked before doing a second online query to get required metadata.
     /// </remarks>
     [ExcludeFromDynamicCompile]
-    public class BeatmapOnlineLookupQueue : IDisposable
+    public class BeatmapUpdaterMetadataLookup : IDisposable
     {
         private readonly IAPIProvider api;
         private readonly Storage storage;
-
-        private const int update_queue_request_concurrency = 4;
-
-        private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapOnlineLookupQueue));
 
         private FileWebRequest cacheDownloadRequest;
 
         private const string cache_database_name = "online.db";
 
-        public BeatmapOnlineLookupQueue(IAPIProvider api, Storage storage)
+        public BeatmapUpdaterMetadataLookup(IAPIProvider api, Storage storage)
         {
             this.api = api;
             this.storage = storage;
@@ -60,15 +53,6 @@ namespace osu.Game.Beatmaps
             foreach (var b in beatmapSet.Beatmaps)
                 lookup(beatmapSet, b);
         }
-
-        public Task UpdateAsync(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
-        {
-            return Task.WhenAll(beatmapSet.Beatmaps.Select(b => UpdateAsync(beatmapSet, b, cancellationToken)).ToArray());
-        }
-
-        // todo: expose this when we need to do individual difficulty lookups.
-        protected Task UpdateAsync(BeatmapSetInfo beatmapSet, BeatmapInfo beatmapInfo, CancellationToken cancellationToken)
-            => Task.Factory.StartNew(() => lookup(beatmapSet, beatmapInfo), cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
 
         private void lookup(BeatmapSetInfo set, BeatmapInfo beatmapInfo)
         {
@@ -134,7 +118,7 @@ namespace osu.Game.Beatmaps
                 File.Delete(compressedCacheFilePath);
                 File.Delete(cacheFilePath);
 
-                Logger.Log($"{nameof(BeatmapOnlineLookupQueue)}'s online cache download failed: {ex}", LoggingTarget.Database);
+                Logger.Log($"{nameof(BeatmapUpdaterMetadataLookup)}'s online cache download failed: {ex}", LoggingTarget.Database);
             };
 
             cacheDownloadRequest.Finished += () =>
@@ -151,7 +135,7 @@ namespace osu.Game.Beatmaps
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log($"{nameof(BeatmapOnlineLookupQueue)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
+                    Logger.Log($"{nameof(BeatmapUpdaterMetadataLookup)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
                     File.Delete(cacheFilePath);
                 }
                 finally
@@ -238,12 +222,11 @@ namespace osu.Game.Beatmaps
         }
 
         private void logForModel(BeatmapSetInfo set, string message) =>
-            RealmArchiveModelImporter<BeatmapSetInfo>.LogForModel(set, $"[{nameof(BeatmapOnlineLookupQueue)}] {message}");
+            RealmArchiveModelImporter<BeatmapSetInfo>.LogForModel(set, $"[{nameof(BeatmapUpdaterMetadataLookup)}] {message}");
 
         public void Dispose()
         {
             cacheDownloadRequest?.Dispose();
-            updateScheduler?.Dispose();
         }
     }
 }
