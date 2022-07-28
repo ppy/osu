@@ -74,14 +74,14 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("set filter again", () => songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value = "test");
             AddStep("open collections dropdown", () =>
             {
-                InputManager.MoveMouseTo(songSelect.ChildrenOfType<CollectionFilterDropdown>().Single());
+                InputManager.MoveMouseTo(songSelect.ChildrenOfType<CollectionDropdown>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 
             AddStep("press back once", () => InputManager.Click(MouseButton.Button1));
             AddAssert("still at song select", () => Game.ScreenStack.CurrentScreen == songSelect);
             AddAssert("collections dropdown closed", () => songSelect
-                                                           .ChildrenOfType<CollectionFilterDropdown>().Single()
+                                                           .ChildrenOfType<CollectionDropdown>().Single()
                                                            .ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownMenu>().Single().State == MenuState.Closed);
 
             AddStep("press back a second time", () => InputManager.Click(MouseButton.Button1));
