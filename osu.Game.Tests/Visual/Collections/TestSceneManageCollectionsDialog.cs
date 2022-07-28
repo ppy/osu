@@ -26,15 +26,14 @@ namespace osu.Game.Tests.Visual.Collections
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         private DialogOverlay dialogOverlay = null!;
-        private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;
         private ManageCollectionsDialog dialog = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesets, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
             beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
@@ -253,9 +252,14 @@ namespace osu.Game.Tests.Visual.Collections
                 });
             });
 
+            assertCollectionName(0, "1");
+            assertCollectionName(1, "2");
+
             AddStep("change first collection name", () => Realm.Write(_ => first.Name = "First"));
 
-            assertCollectionName(0, "First");
+            // Item will have moved due to alphabetical sorting.
+            assertCollectionName(0, "2");
+            assertCollectionName(1, "First");
         }
 
         [Test]
