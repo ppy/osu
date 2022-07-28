@@ -26,15 +26,14 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;
         private FilterControl control = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesets, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
             beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();

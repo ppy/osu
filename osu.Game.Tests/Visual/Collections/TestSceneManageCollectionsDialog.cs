@@ -26,15 +26,14 @@ namespace osu.Game.Tests.Visual.Collections
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         private DialogOverlay dialogOverlay = null!;
-        private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;
         private ManageCollectionsDialog dialog = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesets, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
             beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
