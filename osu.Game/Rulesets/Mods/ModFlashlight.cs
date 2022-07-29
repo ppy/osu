@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -235,9 +236,9 @@ namespace osu.Game.Rulesets.Mods
                     flashlightDim = Source.FlashlightDim;
                 }
 
-                public override void Draw(Action<TexturedVertex2D> vertexAction)
+                public override void Draw(IRenderer renderer)
                 {
-                    base.Draw(vertexAction);
+                    base.Draw(renderer);
 
                     shader.Bind();
 

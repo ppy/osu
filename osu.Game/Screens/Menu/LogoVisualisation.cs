@@ -22,6 +22,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Rendering;
 
 namespace osu.Game.Screens.Menu
 {
@@ -198,9 +199,9 @@ namespace osu.Game.Screens.Menu
                 Source.frequencyAmplitudes.AsSpan().CopyTo(audioData);
             }
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            public override void Draw(IRenderer renderer)
             {
-                base.Draw(vertexAction);
+                base.Draw(renderer);
 
                 shader.Bind();
 
