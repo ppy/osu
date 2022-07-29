@@ -25,23 +25,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private RoomsContainer container;
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            Child = new PopoverContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 0.5f,
+            base.SetUpSteps();
 
-                Child = container = new RoomsContainer
+            AddStep("create container", () =>
+            {
+                Child = new PopoverContainer
                 {
-                    SelectedRoom = { BindTarget = SelectedRoom }
-                }
-            };
-        });
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 0.5f,
+
+                    Child = container = new RoomsContainer
+                    {
+                        SelectedRoom = { BindTarget = SelectedRoom }
+                    }
+                };
+            });
+        }
 
         [Test]
         public void TestBasicListChanges()
