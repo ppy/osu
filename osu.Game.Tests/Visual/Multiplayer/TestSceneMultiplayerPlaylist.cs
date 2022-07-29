@@ -42,21 +42,22 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(Realm);
         }
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            Child = list = new MultiplayerPlaylist
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Size = new Vector2(0.4f, 0.8f)
-            };
-        });
-
         [SetUpSteps]
-        public new void SetUpSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
+            AddStep("create list", () =>
+            {
+                Child = list = new MultiplayerPlaylist
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.4f, 0.8f)
+                };
+            });
+
             AddStep("import beatmap", () =>
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
