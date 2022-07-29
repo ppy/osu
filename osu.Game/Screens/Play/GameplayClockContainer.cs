@@ -16,7 +16,6 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> via DI for gameplay components to use.
     /// </summary>
-    [Cached]
     public abstract class GameplayClockContainer : Container, IAdjustableClock
     {
         /// <summary>

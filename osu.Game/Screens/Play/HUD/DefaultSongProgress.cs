@@ -43,9 +43,6 @@ namespace osu.Game.Screens.Play.HUD
         protected override bool BlockScrollInput => false;
 
         [Resolved]
-        private GameplayClock? gameplayClock { get; set; }
-
-        [Resolved]
         private Player? player { get; set; }
 
         [Resolved]
@@ -172,7 +169,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
-            bar.CurrentTime = gameplayClock?.CurrentTime ?? Time.Current;
+            bar.CurrentTime = GameplayClock.CurrentTime;
 
             if (isIntro)
                 graph.Progress = 0;
