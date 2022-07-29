@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Buffers;
 using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Lists;
 
 namespace osu.Game.Graphics.Backgrounds
@@ -270,9 +271,9 @@ namespace osu.Game.Graphics.Backgrounds
                 parts.AddRange(Source.parts);
             }
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            public override void Draw(IRenderer renderer)
             {
-                base.Draw(vertexAction);
+                base.Draw(renderer);
 
                 if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
                 {
