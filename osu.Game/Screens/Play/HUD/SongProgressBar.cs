@@ -13,7 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Framework.Threading;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
     public class SongProgressBar : SliderBar<double>
     {
