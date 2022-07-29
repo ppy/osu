@@ -28,6 +28,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 
@@ -280,13 +281,30 @@ namespace osu.Game.Screens.OnlinePlay.Match
             };
         }
 
+        [Resolved(canBeNull: true)]
+        private IDialogOverlay dialogOverlay { get; set; }
+
         public override bool OnBackButton()
         {
             if (Room.RoomID.Value == null)
             {
-                // room has not been created yet; exit immediately.
-                settingsOverlay.Hide();
-                return base.OnBackButton();
+                if (dialogOverlay == null || Room.Playlist.Count == 0)
+                {
+                    settingsOverlay.Hide();
+                    return base.OnBackButton();
+                }
+
+                // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
+                if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog)
+                    return true;
+
+                dialogOverlay?.Push(new ConfirmDiscardChangesDialog(() =>
+                {
+                    settingsOverlay.Hide();
+                    this.Exit();
+                }));
+
+                return true;
             }
 
             if (UserModsSelectOverlay.State.Value == Visibility.Visible)
