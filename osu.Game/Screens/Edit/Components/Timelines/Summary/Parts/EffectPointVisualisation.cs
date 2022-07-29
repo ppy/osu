@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -19,13 +16,13 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     public class EffectPointVisualisation : CompositeDrawable, IControlPointVisualisation
     {
         private readonly EffectControlPoint effect;
-        private Bindable<bool> kiai;
+        private Bindable<bool> kiai = null!;
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         public EffectPointVisualisation(EffectControlPoint point)
         {
@@ -42,8 +39,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             kiai.BindValueChanged(_ => refreshDisplay(), true);
         }
 
-        [CanBeNull]
-        private EffectControlPoint nextControlPoint;
+        private EffectControlPoint? nextControlPoint;
 
         protected override void LoadComplete()
         {
