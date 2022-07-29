@@ -59,16 +59,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             importedSet = beatmaps.GetAllUsableBeatmapSets().First();
         }
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            SelectedRoom.Value = new Room { Name = { Value = "Test Room" } };
-        });
-
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("load match", () => LoadScreen(screen = new MultiplayerMatchSubScreen(SelectedRoom.Value)));
+            AddStep("load match", () =>
+            {
+                SelectedRoom.Value = new Room { Name = { Value = "Test Room" } };
+                LoadScreen(screen = new MultiplayerMatchSubScreen(SelectedRoom.Value));
+            });
+
             AddUntilStep("wait for load", () => screen.IsCurrentScreen());
         }
 

@@ -4,8 +4,6 @@
 #nullable disable
 
 using System.Collections.Generic;
-using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -19,59 +17,62 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchLeaderboard : OnlinePlayTestScene
     {
-        [BackgroundDependencyLoader]
-        private void load()
+        public override void SetUpSteps()
         {
-            ((DummyAPIAccess)API).HandleRequest = r =>
+            base.SetUpSteps();
+
+            AddStep("setup API", () =>
             {
-                switch (r)
+                ((DummyAPIAccess)API).HandleRequest = r =>
                 {
-                    case GetRoomLeaderboardRequest leaderboardRequest:
-                        leaderboardRequest.TriggerSuccess(new APILeaderboard
-                        {
-                            Leaderboard = new List<APIUserScoreAggregate>
+                    switch (r)
+                    {
+                        case GetRoomLeaderboardRequest leaderboardRequest:
+                            leaderboardRequest.TriggerSuccess(new APILeaderboard
                             {
-                                new APIUserScoreAggregate
+                                Leaderboard = new List<APIUserScoreAggregate>
                                 {
-                                    UserID = 2,
-                                    User = new APIUser { Id = 2, Username = "peppy" },
-                                    TotalScore = 995533,
-                                    RoomID = 3,
-                                    CompletedBeatmaps = 1,
-                                    TotalAttempts = 6,
-                                    Accuracy = 0.9851
-                                },
-                                new APIUserScoreAggregate
-                                {
-                                    UserID = 1040328,
-                                    User = new APIUser { Id = 1040328, Username = "smoogipoo" },
-                                    TotalScore = 981100,
-                                    RoomID = 3,
-                                    CompletedBeatmaps = 1,
-                                    TotalAttempts = 9,
-                                    Accuracy = 0.937
+                                    new APIUserScoreAggregate
+                                    {
+                                        UserID = 2,
+                                        User = new APIUser { Id = 2, Username = "peppy" },
+                                        TotalScore = 995533,
+                                        RoomID = 3,
+                                        CompletedBeatmaps = 1,
+                                        TotalAttempts = 6,
+                                        Accuracy = 0.9851
+                                    },
+                                    new APIUserScoreAggregate
+                                    {
+                                        UserID = 1040328,
+                                        User = new APIUser { Id = 1040328, Username = "smoogipoo" },
+                                        TotalScore = 981100,
+                                        RoomID = 3,
+                                        CompletedBeatmaps = 1,
+                                        TotalAttempts = 9,
+                                        Accuracy = 0.937
+                                    }
                                 }
-                            }
-                        });
-                        return true;
-                }
+                            });
+                            return true;
+                    }
 
-                return false;
-            };
-        }
+                    return false;
+                };
+            });
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            SelectedRoom.Value = new Room { RoomID = { Value = 3 } };
-
-            Child = new MatchLeaderboard
+            AddStep("create leaderboard", () =>
             {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Size = new Vector2(550f, 450f),
-                Scope = MatchLeaderboardScope.Overall,
-            };
-        });
+                SelectedRoom.Value = new Room { RoomID = { Value = 3 } };
+
+                Child = new MatchLeaderboard
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Size = new Vector2(550f, 450f),
+                    Scope = MatchLeaderboardScope.Overall,
+                };
+            });
+        }
     }
 }
