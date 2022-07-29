@@ -69,17 +69,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             this.ChildrenOfType<SongProgress>().ForEach(progress => progress.Objects = objects);
         }
 
-        protected override Drawable CreateDefaultImplementation() => new DefaultSongProgress
-        {
-            RelativeSizeAxes = Axes.X,
-            Anchor = Anchor.BottomLeft,
-            Origin = Anchor.BottomLeft,
-        };
+        protected override Drawable CreateDefaultImplementation() => new DefaultSongProgress();
 
-        protected override Drawable CreateLegacyImplementation() => new LegacySongProgress
-        {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-        };
+        protected override Drawable CreateLegacyImplementation() => new LegacySongProgress();
     }
 }
