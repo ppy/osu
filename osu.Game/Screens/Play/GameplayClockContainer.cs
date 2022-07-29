@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public event Action OnSeek;
 
+        private double? startTime;
+
         /// <summary>
         /// The time from which the clock should start. Will be seeked to on calling <see cref="Reset"/>.
         /// </summary>
@@ -51,7 +53,17 @@ namespace osu.Game.Screens.Play
         /// If not set, a value of zero will be used.
         /// Importantly, the value will be inferred from the current ruleset in <see cref="MasterGameplayClockContainer"/> unless specified.
         /// </remarks>
-        public double? StartTime { get; set; }
+        public double? StartTime
+        {
+            get => startTime;
+            set
+            {
+                startTime = value;
+
+                if (GameplayClock != null)
+                    GameplayClock.StartTime = value;
+            }
+        }
 
         /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
@@ -72,6 +84,8 @@ namespace osu.Game.Screens.Play
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             dependencies.CacheAs(GameplayClock = CreateGameplayClock(AdjustableSource));
+
+            GameplayClock.StartTime = StartTime;
             GameplayClock.IsPaused.BindTo(IsPaused);
 
             return dependencies;
