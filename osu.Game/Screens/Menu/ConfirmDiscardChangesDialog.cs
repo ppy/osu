@@ -7,30 +7,30 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Menu
 {
-    public class ConfirmExitDialog : PopupDialog
+    public class ConfirmDiscardChangesDialog : PopupDialog
     {
         /// <summary>
-        /// Construct a new exit confirmation dialog.
+        /// Construct a new discard changes confirmation dialog.
         /// </summary>
         /// <param name="onConfirm">An action to perform on confirmation.</param>
         /// <param name="onCancel">An optional action to perform on cancel.</param>
-        public ConfirmExitDialog(Action onConfirm, Action? onCancel = null)
+        public ConfirmDiscardChangesDialog(Action onConfirm, Action? onCancel = null)
         {
-            HeaderText = "Are you sure you want to exit osu!?";
-            BodyText = "Last chance to turn back";
+            HeaderText = "Are you sure you want to go back?";
+            BodyText = "This will discard any unsaved changes";
 
             Icon = FontAwesome.Solid.ExclamationTriangle;
 
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                new PopupDialogDangerousButton
                 {
-                    Text = @"Let me out!",
+                    Text = @"Yes",
                     Action = onConfirm
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"Just a little more...",
+                    Text = @"No I didn't mean to",
                     Action = onCancel
                 },
             };
