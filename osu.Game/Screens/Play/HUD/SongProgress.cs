@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.HUD
         public bool UsesFixedAnchor { get; set; }
 
         [Resolved]
-        private GameplayClockContainer? gameplayClockContainer { get; set; }
+        protected GameplayClock GameplayClock { get; private set; } = null!;
 
         [Resolved(canBeNull: true)]
         private DrawableRuleset? drawableRuleset { get; set; }
@@ -69,14 +69,14 @@ namespace osu.Game.Screens.Play.HUD
                 return;
 
             // The reference clock is used to accurately tell the playfield's time. This is obtained from the drawable ruleset.
-            // However, if no drawable ruleset is available (i.e. used in tests), we fall back to either the gameplay clock container or this drawable's own clock.
-            double currentTime = referenceClock?.CurrentTime ?? gameplayClockContainer?.GameplayClock.CurrentTime ?? Time.Current;
+            // However, if no drawable ruleset is available (i.e. used in tests), we fall back to the gameplay clock.
+            double currentTime = referenceClock?.CurrentTime ?? GameplayClock.CurrentTime;
 
             bool isInIntro = currentTime < FirstHitTime;
 
             if (isInIntro)
             {
-                double introStartTime = gameplayClockContainer?.StartTime ?? 0;
+                double introStartTime = GameplayClock.StartTime ?? 0;
 
                 double introOffsetCurrent = currentTime - introStartTime;
                 double introDuration = FirstHitTime - introStartTime;
