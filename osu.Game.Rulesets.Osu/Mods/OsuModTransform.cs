@@ -4,9 +4,11 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -75,26 +77,49 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
 
                 case MoveType.Emit:
-                    var osuObject = (OsuHitObject)drawable.HitObject;
-                    var h = (OsuHitObject)drawable.HitObject;
-                    Vector2 origin = drawable.Position;
-
-                    if (osuObject is SliderRepeat || osuObject is SliderTailCircle)
-                        return;
-
-                    void emit()
+                    switch (drawable)
                     {
-                        drawable.ScaleTo(.8f).Then().ScaleTo(1, h.TimePreempt - h.TimePreempt / 3);
-                        drawable.MoveTo(OsuPlayfield.BASE_SIZE / 2).Then().MoveTo(origin, (h.TimePreempt - h.TimePreempt / 2), Easing.Out);
-                    }
+                        case DrawableSliderTick:
+                        case DrawableSliderRepeat:
+                            return;
 
-                    for (int i = 0; i < 1; i++)
-                    {
-                        using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-                            emit();
-                    }
+                        default:
+                            var osuObject = (OsuHitObject)drawable.HitObject;
+                            var h = (OsuHitObject)drawable.HitObject;
+                            Vector2 origin = drawable.Position;
 
-                    return;
+                            if (osuObject is SliderRepeat || osuObject is SliderTailCircle)
+                                return;
+
+                            void emit()
+                            {
+                                drawable.ScaleTo(.6f).Then().ScaleTo(1, h.TimePreempt - h.TimePreempt / 2, Easing.Out);
+                                drawable.MoveTo(OsuPlayfield.BASE_SIZE / 2).Then().MoveTo(origin, (h.TimePreempt - h.TimePreempt / 3), Easing.Out);
+                            }
+
+                            for (int i = 0; i < 1; i++)
+                            {
+                                using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+                                    emit();
+                            }
+
+                            return;
+                    }
+            }
+        }
+
+        public override void ApplyToBeatmap(IBeatmap beatmap)
+        {
+            base.ApplyToBeatmap(beatmap);
+
+            foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
+                applyFadeInAdjustment(obj);
+
+            static void applyFadeInAdjustment(OsuHitObject osuObject)
+            {
+                osuObject.TimeFadeIn = osuObject.TimePreempt * .2;
+                foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
+                    applyFadeInAdjustment(nested);
             }
         }
     }
