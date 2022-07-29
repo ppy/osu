@@ -159,6 +159,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
             AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
 
             AddStep("bind on update", () =>
             {
