@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -38,37 +39,62 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         private void load()
         {
             kiai = effect.KiaiModeBindable.GetBoundCopy();
-            kiai.BindValueChanged(_ =>
+            kiai.BindValueChanged(_ => refreshDisplay(), true);
+        }
+
+        [CanBeNull]
+        private EffectControlPoint nextControlPoint;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Due to the limitations of ControlPointInfo, it's impossible to know via event flow when the next kiai point has changed.
+            // This is due to the fact that an EffectPoint can be added to an existing group. We would need to bind to ItemAdded on *every*
+            // future group to track this.
+            //
+            // I foresee this being a potential performance issue on beatmaps with many control points, so let's limit how often we check
+            // for changes. ControlPointInfo needs a refactor to make this flow better, but it should do for now.
+            Scheduler.AddDelayed(() =>
             {
-                ClearInternal();
+                var next = beatmap.ControlPointInfo.EffectPoints.FirstOrDefault(c => c.Time > effect.Time);
 
-                AddInternal(new ControlPointVisualisation(effect));
-
-                if (!kiai.Value)
-                    return;
-
-                var endControlPoint = beatmap.ControlPointInfo.EffectPoints.FirstOrDefault(c => c.Time > effect.Time && !c.KiaiMode);
-
-                // handle kiai duration
-                // eventually this will be simpler when we have control points with durations.
-                if (endControlPoint != null)
+                if (!ReferenceEquals(nextControlPoint, next))
                 {
-                    RelativeSizeAxes = Axes.Both;
-                    Origin = Anchor.TopLeft;
-
-                    Width = (float)(endControlPoint.Time - effect.Time);
-
-                    AddInternal(new PointVisualisation
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Origin = Anchor.TopLeft,
-                        Width = 1,
-                        Height = 0.25f,
-                        Depth = float.MaxValue,
-                        Colour = effect.GetRepresentingColour(colours).Darken(0.5f),
-                    });
+                    nextControlPoint = next;
+                    refreshDisplay();
                 }
-            }, true);
+            }, 100, true);
+        }
+
+        private void refreshDisplay()
+        {
+            ClearInternal();
+
+            AddInternal(new ControlPointVisualisation(effect));
+
+            if (!kiai.Value)
+                return;
+
+            // handle kiai duration
+            // eventually this will be simpler when we have control points with durations.
+            if (nextControlPoint != null)
+            {
+                RelativeSizeAxes = Axes.Both;
+                Origin = Anchor.TopLeft;
+
+                Width = (float)(nextControlPoint.Time - effect.Time);
+
+                AddInternal(new PointVisualisation
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.TopLeft,
+                    Width = 1,
+                    Height = 0.25f,
+                    Depth = float.MaxValue,
+                    Colour = effect.GetRepresentingColour(colours).Darken(0.5f),
+                });
+            }
         }
 
         // kiai sections display duration, so are required to be visualised.
