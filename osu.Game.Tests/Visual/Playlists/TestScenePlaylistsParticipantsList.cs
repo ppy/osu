@@ -15,21 +15,25 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public class TestScenePlaylistsParticipantsList : OnlinePlayTestScene
     {
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            SelectedRoom.Value = new Room { RoomID = { Value = 7 } };
+            base.SetUpSteps();
 
-            for (int i = 0; i < 50; i++)
+            AddStep("create list", () =>
             {
-                SelectedRoom.Value.RecentParticipants.Add(new APIUser
+                SelectedRoom.Value = new Room { RoomID = { Value = 7 } };
+
+                for (int i = 0; i < 50; i++)
                 {
-                    Username = "peppy",
-                    Statistics = new UserStatistics { GlobalRank = 1234 },
-                    Id = 2
-                });
-            }
-        });
+                    SelectedRoom.Value.RecentParticipants.Add(new APIUser
+                    {
+                        Username = "peppy",
+                        Statistics = new UserStatistics { GlobalRank = 1234 },
+                        Id = 2
+                    });
+                }
+            });
+        }
 
         [Test]
         public void TestHorizontalLayout()
