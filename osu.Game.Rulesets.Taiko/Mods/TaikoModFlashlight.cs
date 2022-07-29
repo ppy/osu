@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private class TaikoFlashlight : Flashlight
         {
-            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
+            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize | Invalidation.DrawInfo);
             private readonly TaikoPlayfield taikoPlayfield;
 
             public TaikoFlashlight(TaikoModFlashlight modFlashlight, TaikoPlayfield taikoPlayfield)
