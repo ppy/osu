@@ -304,7 +304,7 @@ namespace osu.Game.Online.Spectator
 
             SendFramesInternal(bundle).ContinueWith(t =>
             {
-                // Handle exception outside of `Schedule` to ensure it doesn't go unovserved.
+                // Handle exception outside of `Schedule` to ensure it doesn't go unobserved.
                 bool wasSuccessful = t.Exception == null;
 
                 return Schedule(() =>
