@@ -97,6 +97,7 @@ namespace osu.Game.Beatmaps
                     beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
                     beatmapInfo.BeatmapSet.DateRanked = res.BeatmapSet?.Ranked;
                     beatmapInfo.BeatmapSet.DateSubmitted = res.BeatmapSet?.Submitted;
+                    beatmapInfo.BeatmapSet.OnlineDownloadDisabled = res.BeatmapSet?.Availability.DownloadDisabled;
 
                     beatmapInfo.OnlineMD5Hash = res.MD5Hash;
                     beatmapInfo.LastOnlineUpdate = res.LastUpdated;

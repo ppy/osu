@@ -39,6 +39,8 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public DateTimeOffset? DateRanked { get; set; }
 
+        public bool? OnlineDownloadDisabled { get; set; }
+
         [JsonIgnore]
         public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
 

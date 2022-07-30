@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select.Carousel
                         Spacing = new Vector2(5),
                         Children = new[]
                         {
-                            beatmapSet.AllBeatmapsUpToDate
+                            beatmapSet.AllBeatmapsUpToDate || beatmapSet.OnlineDownloadDisabled == true
                                 ? Empty()
                                 : new Container
                                 {

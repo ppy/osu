@@ -66,8 +66,9 @@ namespace osu.Game.Database
         /// 19   2022-07-19    Added DateSubmitted and DateRanked to BeatmapSetInfo.
         /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
         /// 21   2022-07-27    Migrate collections to realm (BeatmapCollection).
+        /// 22   2022-07-31    Added OnlineDownloadDisabled to BeatmapSetInfo.
         /// </summary>
-        private const int schema_version = 21;
+        private const int schema_version = 22;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -810,6 +811,14 @@ namespace osu.Game.Database
                     {
                         // can be removed 20221027 (just for initial safety).
                         Logger.Error(e, "Collections could not be migrated to realm. Please provide your \"collection.db\" to the dev team.");
+                    }
+
+                    break;
+
+                case 22:
+                    foreach (var beatmapSet in migration.NewRealm.All<BeatmapSetInfo>())
+                    {
+                        beatmapSet.OnlineDownloadDisabled = null;
                     }
 
                     break;

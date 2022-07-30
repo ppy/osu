@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -34,6 +35,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -87,6 +91,29 @@ namespace osu.Game.Screens.Select.Carousel
                     }
                 },
             });
+
+            beatmapDownloader.DownloadFailed += _ =>
+            {
+                Hide();
+
+                // Download might have failed because BeatmapSetOnlineAvailability is DownloadDisabled
+                // We want to check that so reset online info for now, background processing will update the info
+                realm.Run(r =>
+                {
+                    using (var transaction = r.BeginWrite())
+                    {
+                        var matchingSet = r.Find<BeatmapSetInfo>(beatmapSetInfo.ID);
+
+                        foreach (BeatmapInfo beatmap in matchingSet.Beatmaps)
+                        {
+                            // Background processing checks LastOnlineUpdate, that's the only field we need to null
+                            beatmap.LastOnlineUpdate = null;
+                        }
+
+                        transaction.Commit();
+                    }
+                });
+            };
 
             Action = () =>
             {
