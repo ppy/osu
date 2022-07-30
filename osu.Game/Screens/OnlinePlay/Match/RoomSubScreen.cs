@@ -288,23 +288,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             if (Room.RoomID.Value == null)
             {
-                if (dialogOverlay == null || Room.Playlist.Count == 0)
-                {
-                    settingsOverlay.Hide();
-                    return base.OnBackButton();
-                }
-
-                // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
-                if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog)
+                if (!ensureExitConfirmed())
                     return true;
 
-                dialogOverlay?.Push(new ConfirmDiscardChangesDialog(() =>
-                {
-                    settingsOverlay.Hide();
-                    this.Exit();
-                }));
-
-                return true;
+                settingsOverlay.Hide();
+                return base.OnBackButton();
             }
 
             if (UserModsSelectOverlay.State.Value == Visibility.Visible)
@@ -348,14 +336,41 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Scheduler.AddOnce(updateRuleset);
         }
 
+        private bool exitConfirmed;
+
         public override bool OnExiting(ScreenExitEvent e)
         {
+            if (!ensureExitConfirmed())
+                return true;
+
             RoomManager?.PartRoom();
             Mods.Value = Array.Empty<Mod>();
 
             onLeaving();
 
             return base.OnExiting(e);
+        }
+
+        private bool ensureExitConfirmed()
+        {
+            if (exitConfirmed)
+                return true;
+
+            if (dialogOverlay == null || Room.RoomID.Value != null || Room.Playlist.Count == 0)
+                return true;
+
+            // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
+            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog)
+                return false;
+
+            dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
+            {
+                exitConfirmed = true;
+                settingsOverlay.Hide();
+                this.Exit();
+            }));
+
+            return false;
         }
 
         protected void StartPlay()
