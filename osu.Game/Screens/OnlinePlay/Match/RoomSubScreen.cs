@@ -336,7 +336,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Scheduler.AddOnce(updateRuleset);
         }
 
-        private bool exitConfirmed;
+        protected bool ExitConfirmed { get; private set; }
 
         public override bool OnExiting(ScreenExitEvent e)
         {
@@ -353,7 +353,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private bool ensureExitConfirmed()
         {
-            if (exitConfirmed)
+            if (ExitConfirmed)
                 return true;
 
             if (dialogOverlay == null || Room.RoomID.Value != null || Room.Playlist.Count == 0)
@@ -365,7 +365,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
             {
-                exitConfirmed = true;
+                ExitConfirmed = true;
                 settingsOverlay.Hide();
                 this.Exit();
             }));
