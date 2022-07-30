@@ -43,9 +43,9 @@ namespace osu.iOS
 
         private class IOSBatteryInfo : BatteryInfo
         {
-            public override double ChargeLevel => Battery.ChargeLevel;
+            public override double? ChargeLevel => Battery.ChargeLevel;
 
-            public override bool IsCharging => Battery.PowerSource != BatteryPowerSource.Battery;
+            public override bool OnBattery => Battery.PowerSource == BatteryPowerSource.Battery;
         }
     }
 }
