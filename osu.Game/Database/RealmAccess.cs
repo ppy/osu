@@ -794,22 +794,23 @@ namespace osu.Game.Database
                     break;
 
                 case 21:
-                    try
-                    {
-                        // Migrate collections from external file to inside realm.
-                        // We use the "legacy" importer because that is how things were actually being saved out until now.
-                        var legacyCollectionImporter = new LegacyCollectionImporter(this);
+                    // Migrate collections from external file to inside realm.
+                    // We use the "legacy" importer because that is how things were actually being saved out until now.
+                    var legacyCollectionImporter = new LegacyCollectionImporter(this);
 
-                        if (legacyCollectionImporter.GetAvailableCount(storage).GetResultSafely() > 0)
-                        {
-                            legacyCollectionImporter.ImportFromStorage(storage).WaitSafely();
-                            storage.Move("collection.db", "collection.db.migrated");
-                        }
-                    }
-                    catch (Exception e)
+                    if (legacyCollectionImporter.GetAvailableCount(storage).GetResultSafely() > 0)
                     {
-                        // can be removed 20221027 (just for initial safety).
-                        Logger.Error(e, "Collections could not be migrated to realm. Please provide your \"collection.db\" to the dev team.");
+                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(task =>
+                        {
+                            if (task.Exception != null)
+                            {
+                                // can be removed 20221027 (just for initial safety).
+                                Logger.Error(task.Exception.InnerException, "Collections could not be migrated to realm. Please provide your \"collection.db\" to the dev team.");
+                                return;
+                            }
+
+                            storage.Move("collection.db", "collection.db.migrated");
+                        });
                     }
 
                     break;
