@@ -100,17 +100,20 @@ namespace osu.Game.Screens.Select.Carousel
                 // We want to check that so reset online info for now, background processing will update the info
                 realm.Run(r =>
                 {
-                    using (var transaction = r.BeginWrite())
+                    var matchingSet = r.Find<BeatmapSetInfo>(beatmapSetInfo.ID);
+
+                    if (matchingSet != null)
                     {
-                        var matchingSet = r.Find<BeatmapSetInfo>(beatmapSetInfo.ID);
-
-                        foreach (BeatmapInfo beatmap in matchingSet.Beatmaps)
+                        using (var transaction = r.BeginWrite())
                         {
-                            // Background processing checks LastOnlineUpdate, that's the only field we need to null
-                            beatmap.LastOnlineUpdate = null;
-                        }
+                            foreach (BeatmapInfo beatmap in matchingSet.Beatmaps)
+                            {
+                                // Background processing checks LastOnlineUpdate, that's the only field we need to null
+                                beatmap.LastOnlineUpdate = null;
+                            }
 
-                        transaction.Commit();
+                            transaction.Commit();
+                        }
                     }
                 });
             };
