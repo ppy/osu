@@ -173,9 +173,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     foreach (string name in base.LookupNames)
                         yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
-
-                    foreach (string name in base.LookupNames)
-                        yield return name;
                 }
             }
         }
