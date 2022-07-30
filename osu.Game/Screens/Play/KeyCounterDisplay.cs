@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Graphics;
 
@@ -65,6 +66,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            KeysPerSecondCounter.Reset();
             config.BindWith(OsuSetting.KeyOverlay, configVisibility);
         }
 
