@@ -802,8 +802,8 @@ namespace osu.Game.Database
 
                         if (legacyCollectionImporter.GetAvailableCount(storage).GetResultSafely() > 0)
                         {
-                            legacyCollectionImporter.ImportFromStorage(storage);
                             storage.Delete("collection.db");
+                            legacyCollectionImporter.ImportFromStorage(storage).WaitSafely();
                         }
                     }
                     catch (Exception e)
