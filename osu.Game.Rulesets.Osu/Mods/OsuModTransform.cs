@@ -85,22 +85,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         default:
                             var osuObject = (OsuHitObject)drawable.HitObject;
-                            var h = (OsuHitObject)drawable.HitObject;
+                            var hitObject = (OsuHitObject)drawable.HitObject;
                             Vector2 origin = drawable.Position;
 
                             if (osuObject is SliderRepeat || osuObject is SliderTailCircle)
                                 return;
 
-                            void emit()
+                            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
                             {
-                                drawable.ScaleTo(.6f).Then().ScaleTo(1, h.TimePreempt - h.TimePreempt / 2, Easing.Out);
-                                drawable.MoveTo(OsuPlayfield.BASE_SIZE / 2).Then().MoveTo(origin, (h.TimePreempt - h.TimePreempt / 3), Easing.Out);
-                            }
-
-                            for (int i = 0; i < 1; i++)
-                            {
-                                using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-                                    emit();
+                                drawable.ScaleTo(.6f).Then().ScaleTo(1, hitObject.TimePreempt / 2, Easing.OutSine);
+                                drawable.MoveTo(OsuPlayfield.BASE_SIZE / 2).Then().MoveTo(origin, (hitObject.TimePreempt / 2), Easing.Out);
                             }
 
                             return;
