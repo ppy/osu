@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "TR";
         public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
         public override ModType Type => ModType.Fun;
-        public override string Description => "Everything rotates. EVERYTHING.";
+        public override string Description => "Everything moves. EVERYTHING.";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModWiggle), typeof(OsuModMagnetised), typeof(OsuModRepel) };
 
@@ -84,11 +84,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                             return;
 
                         default:
-                            var osuObject = (OsuHitObject)drawable.HitObject;
+
                             var hitObject = (OsuHitObject)drawable.HitObject;
                             Vector2 origin = drawable.Position;
 
-                            if (osuObject is SliderRepeat || osuObject is SliderTailCircle)
+                            if (hitObject is SliderRepeat || hitObject is SliderTailCircle)
                                 return;
 
                             using (drawable.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
