@@ -308,17 +308,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        [TestCase(false, 1.0, false)] // not charging, above cutoff --> no warning
-        [TestCase(true, 0.1, false)] // charging, below cutoff --> no warning
-        [TestCase(false, 0.25, true)] // not charging, at cutoff --> warning
-        public void TestLowBatteryNotification(bool isCharging, double chargeLevel, bool shouldWarn)
+        [TestCase(true, 1.0, false)] // on battery, above cutoff --> no warning
+        [TestCase(false, 0.1, false)] // not on battery, below cutoff --> no warning
+        [TestCase(true, 0.25, true)] // on battery, at cutoff --> warning
+        [TestCase(true, null, false)] // on battery, level unknown --> no warning
+        public void TestLowBatteryNotification(bool onBattery, double? chargeLevel, bool shouldWarn)
         {
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).Value = false);
 
             // set charge status and level
             AddStep("load player", () => resetPlayer(false, () =>
             {
-                batteryInfo.SetCharging(isCharging);
+                batteryInfo.SetOnBattery(onBattery);
                 batteryInfo.SetChargeLevel(chargeLevel);
             }));
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
@@ -408,19 +409,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <inheritdoc/>
         private class LocalBatteryInfo : BatteryInfo
         {
-            private bool isCharging = true;
-            private double chargeLevel = 1;
+            private bool onBattery;
+            private double? chargeLevel;
 
-            public override bool IsCharging => isCharging;
+            public override bool OnBattery => onBattery;
 
-            public override double ChargeLevel => chargeLevel;
+            public override double? ChargeLevel => chargeLevel;
 
-            public void SetCharging(bool value)
+            public void SetOnBattery(bool value)
             {
-                isCharging = value;
+                onBattery = value;
             }
 
-            public void SetChargeLevel(double value)
+            public void SetChargeLevel(double? value)
             {
                 chargeLevel = value;
             }
