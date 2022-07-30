@@ -31,11 +31,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles) };
 
-        public const double FADE_IN_DURATION_MULTIPLIER = 0.4;
-        public const double FADE_OUT_DURATION_MULTIPLIER = 0.3;
+        /// <summary>
+        /// Fade multipliers from Hidden Mod ported over to match player expectations of fade.
+        /// </summary>
+        private const double fade_in_duration_multiplier = 0.4;
+
+        private const double fade_out_duration_multiplier = 0.3;
 
         [SettingSource("Fade out effect", "Hidden for approach circles!")]
-        public Bindable<bool> FadeOutEffect { get; } = new BindableBool(false);
+        public Bindable<bool> FadeOutEffect { get; } = new BindableBool();
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
@@ -44,11 +48,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            applyTraceableState(hitObject, state);
+            applyTraceableState(hitObject);
             applyFadeOutState(hitObject, true);
         }
 
-        private void applyTraceableState(DrawableHitObject drawable, ArmedState state)
+        private void applyTraceableState(DrawableHitObject drawable)
         {
             if (!(drawable is DrawableOsuHitObject))
                 return;
@@ -100,31 +104,29 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             static void applyFadeInAdjustment(OsuHitObject osuObject)
             {
-                osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
+                osuObject.TimeFadeIn = osuObject.TimePreempt * fade_in_duration_multiplier;
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                     applyFadeInAdjustment(nested);
             }
         }
 
+        /// <summary>
+        /// Code for Applying fade out for the "Fade out effect" mod setting.
+        /// </summary>
         private void applyFadeOutState(DrawableHitObject drawableObject, bool increaseVisibility)
         {
             if (!FadeOutEffect.Value) return;
             if (drawableObject is not DrawableOsuHitObject drawableOsuObject)
                 return;
 
-            OsuHitObject hitObject = drawableOsuObject.HitObject;
-
             (double fadeStartTime, double fadeDuration) = getFadeOutParameters(drawableOsuObject);
 
             if (increaseVisibility)
             {
-                if (drawableObject is not DrawableHitCircle circle)
+                if (drawableObject is DrawableSpinner spinner)
                 {
-                    if (drawableObject is DrawableSpinner spinner)
-                    {
-                        spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
-                        hideSpinnerApproachCircle(spinner);
-                    }
+                    spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
+                    hideSpinnerApproachCircle(spinner);
                 }
             }
 
@@ -200,7 +202,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             static (double fadeStartTime, double fadeDuration) getParameters(OsuHitObject hitObject)
             {
                 double fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt + hitObject.TimeFadeIn;
-                double fadeOutDuration = hitObject.TimePreempt * FADE_OUT_DURATION_MULTIPLIER;
+                double fadeOutDuration = hitObject.TimePreempt * fade_out_duration_multiplier;
 
                 // new duration from completed fade in to end (before fading out)
                 double longFadeDuration = hitObject.GetEndTime() - fadeOutStartTime;
@@ -225,6 +227,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void hideSpinnerApproachCircle(DrawableSpinner spinner)
         {
+            if (!FadeOutEffect.Value) return;
+
             var approachCircle = (spinner.Body.Drawable as IHasApproachCircle)?.ApproachCircle;
             if (approachCircle == null)
                 return;
