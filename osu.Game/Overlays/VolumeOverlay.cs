@@ -36,10 +36,12 @@ namespace osu.Game.Overlays
 
         public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
 
+        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+
         private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(AudioManager audio, OsuColour colours, OsuGame osuGame)
         {
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
@@ -87,6 +89,9 @@ namespace osu.Game.Overlays
                 else
                     audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
             });
+
+            if (osuGame != null)
+                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
         }
 
         protected override void LoadComplete()
@@ -97,6 +102,12 @@ namespace osu.Game.Overlays
                 volumeMeter.Bindable.ValueChanged += _ => Show();
 
             muteButton.Current.ValueChanged += _ => Show();
+
+            OverlayActivationMode.BindValueChanged(val =>
+            {
+                if (val.NewValue == OverlayActivation.Disabled)
+                    Hide();
+            });
         }
 
         public bool Adjust(GlobalAction action, float amount = 1, bool isPrecise = false)
