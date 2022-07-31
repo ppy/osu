@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject, state);
 
-        [SettingSource("Movement type", "Alter how circles move into place", 1)]
+        [SettingSource("Movement type", "Alter how circles move into place")]
         public Bindable<MoveType> Move { get; } = new Bindable<MoveType>();
 
         private void applyTransform(DrawableHitObject drawable, ArmedState state)
@@ -43,62 +43,73 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (Move.Value)
             {
                 case MoveType.Rotate:
-                    switch (drawable)
-                    {
-                        case DrawableSliderHead:
-                        case DrawableSliderTail:
-                        case DrawableSliderTick:
-                        case DrawableSliderRepeat:
-                            return;
-
-                        default:
-                            var hitObject = (OsuHitObject)drawable.HitObject;
-
-                            float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn) / 2;
-
-                            Vector2 originalPosition = drawable.Position;
-                            Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
-
-                            // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
-                            double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
-                            double moveDuration = hitObject.TimePreempt + 1;
-
-                            using (drawable.BeginAbsoluteSequence(appearTime))
-                            {
-                                drawable
-                                    .MoveToOffset(appearOffset)
-                                    .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
-                            }
-
-                            theta += (float)hitObject.TimeFadeIn / 1000;
-                            break;
-                    }
+                    applyRotateState(drawable);
 
                     break;
 
                 case MoveType.Emit:
-                    switch (drawable)
+                    applyEmitState(drawable);
+                    return;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void applyRotateState(DrawableHitObject drawable)
+        {
+            switch (drawable)
+            {
+                case DrawableSliderHead:
+                case DrawableSliderTail:
+                case DrawableSliderTick:
+                case DrawableSliderRepeat:
+                    return;
+
+                default:
+                    var h = (OsuHitObject)drawable.HitObject;
+                    float appearDistance = (float)(h.TimePreempt - h.TimeFadeIn) / 2;
+
+                    Vector2 originalPosition = drawable.Position;
+                    Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
+
+                    // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
+                    double appearTime = h.StartTime - h.TimePreempt - 1;
+                    double moveDuration = h.TimePreempt + 1;
+
+                    using (drawable.BeginAbsoluteSequence(appearTime))
                     {
-                        case DrawableSliderTick:
-                        case DrawableSliderRepeat:
-                            return;
-
-                        default:
-
-                            var hitObject = (OsuHitObject)drawable.HitObject;
-                            Vector2 origin = drawable.Position;
-
-                            if (hitObject is SliderRepeat || hitObject is SliderTailCircle)
-                                return;
-
-                            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-                            {
-                                drawable.ScaleTo(.6f).Then().ScaleTo(1, hitObject.TimePreempt / 2, Easing.OutSine);
-                                drawable.MoveTo(OsuPlayfield.BASE_SIZE / 2).Then().MoveTo(origin, (hitObject.TimePreempt / 2), Easing.Out);
-                            }
-
-                            return;
+                        drawable
+                            .MoveToOffset(appearOffset)
+                            .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
                     }
+
+                    theta += (float)h.TimeFadeIn / 1000;
+                    break;
+            }
+        }
+
+        private void applyEmitState(DrawableHitObject drawable)
+        {
+            switch (drawable)
+            {
+                case DrawableSliderHead:
+                case DrawableSliderTail:
+                case DrawableSliderTick:
+                case DrawableSliderRepeat:
+                    return;
+
+                default:
+                    var h = (OsuHitObject)drawable.HitObject;
+                    Vector2 origin = drawable.Position;
+
+                    using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+                    {
+                        drawable.ScaleTo(.6f).Then().ScaleTo(1, h.TimePreempt / 2, Easing.OutSine);
+                        drawable.MoveTo(OsuPlayfield.BASE_SIZE / 2).Then().MoveTo(origin, (h.TimePreempt / 2), Easing.Out);
+                    }
+
+                    break;
             }
         }
 
