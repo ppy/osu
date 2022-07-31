@@ -204,7 +204,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (!allowSelection) return false;
+            if (!allowSelection) 
+                return false;
+            
             switch (e.Action)
             {
                 case GlobalAction.SelectNext:
