@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.StateChanges;
@@ -29,20 +28,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public bool RestartOnFail => false;
 
-        private OsuInputManager? inputManager;
+        private OsuInputManager inputManager = null!;
 
-        private IFrameStableClock? gameplayClock;
+        private IFrameStableClock gameplayClock = null!;
 
-        private List<OsuReplayFrame>? replayFrames;
+        private List<OsuReplayFrame> replayFrames = null!;
 
         private int currentFrame;
 
         public void Update(Playfield playfield)
         {
-            Debug.Assert(inputManager != null);
-            Debug.Assert(gameplayClock != null);
-            Debug.Assert(replayFrames != null);
-
             if (currentFrame == replayFrames.Count - 1) return;
 
             double time = gameplayClock.CurrentTime;

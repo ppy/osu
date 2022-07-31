@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax), typeof(OsuModRepel) };
 
-        private IFrameStableClock? gameplayClock;
+        private IFrameStableClock gameplayClock = null!;
 
         [SettingSource("Attraction strength", "How strong the pull is.", 0)]
         public BindableFloat AttractionStrength { get; } = new BindableFloat(0.5f)
@@ -74,8 +73,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private void easeTo(DrawableHitObject hitObject, Vector2 destination)
         {
             double dampLength = Interpolation.Lerp(3000, 40, AttractionStrength.Value);
-
-            Debug.Assert(gameplayClock != null);
 
             float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, gameplayClock.ElapsedFrameTime);
             float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, gameplayClock.ElapsedFrameTime);

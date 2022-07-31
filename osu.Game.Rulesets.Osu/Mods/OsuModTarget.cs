@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -96,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         #region Private Fields
 
-        private ControlPointInfo? controlPointInfo;
+        private ControlPointInfo controlPointInfo = null!;
 
         #endregion
 
@@ -156,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 circle.ApproachCircle.Hide();
             }
 
-            using (circle.BeginAbsoluteSequence(startTime - controlPointInfo.AsNonNull().TimingPointAt(startTime).BeatLength - undim_duration))
+            using (circle.BeginAbsoluteSequence(startTime - controlPointInfo.TimingPointAt(startTime).BeatLength - undim_duration))
                 circle.FadeColour(Color4.White, undim_duration);
         }
 
@@ -371,8 +370,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             var beats = new List<double>();
             int i = 0;
             double currentTime = timingPoint.Time;
-
-            Debug.Assert(controlPointInfo != null);
 
             while (!definitelyBigger(currentTime, mapEndTime) && ReferenceEquals(controlPointInfo.TimingPointAt(currentTime), timingPoint))
             {
