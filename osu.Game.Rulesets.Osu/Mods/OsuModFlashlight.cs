@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
@@ -52,14 +51,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override float DefaultFlashlightSize => 180;
 
-        private OsuFlashlight? flashlight;
+        private OsuFlashlight flashlight = null!;
 
         protected override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(this);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             if (drawable is DrawableSlider s)
-                s.Tracking.ValueChanged += flashlight.AsNonNull().OnSliderTrackingChange;
+                s.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
         }
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
