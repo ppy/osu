@@ -100,6 +100,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private MusicController musicController { get; set; }
 
+        [Resolved]
+        private VolumeOverlay volumeOverlay { get; set; }
+
         public GameplayState GameplayState { get; private set; }
 
         private Ruleset ruleset;
@@ -365,6 +368,12 @@ namespace osu.Game.Screens.Play
 
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
+
+            LocalUserPlaying.BindValueChanged(val =>
+            {
+                if (val.NewValue)
+                    volumeOverlay.Hide();
+            });
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
