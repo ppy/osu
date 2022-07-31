@@ -100,7 +100,6 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private MusicController musicController { get; set; }
 
-
         public GameplayState GameplayState { get; private set; }
 
         private Ruleset ruleset;
