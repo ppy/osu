@@ -24,7 +24,7 @@ namespace osu.Game.Audio
         /// </summary>
         public event Action? Started;
 
-        protected Track Track { get; private set; }
+        protected Track? Track { get; private set; }
 
         private bool hasStarted;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Audio
         /// </summary>
         public bool IsRunning => Track?.IsRunning ?? false;
 
-        private ScheduledDelegate startDelegate;
+        private ScheduledDelegate? startDelegate;
 
         /// <summary>
         /// Starts playing this <see cref="PreviewTrack"/>.
@@ -104,6 +104,6 @@ namespace osu.Game.Audio
         /// <summary>
         /// Retrieves the audio track.
         /// </summary>
-        protected abstract Track GetTrack();
+        protected abstract Track? GetTrack();
     }
 }
