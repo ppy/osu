@@ -20,6 +20,7 @@ using osu.Game.Overlays.Volume;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
+using JetBrains.Annotations;
 
 namespace osu.Game.Overlays
 {
@@ -36,12 +37,13 @@ namespace osu.Game.Overlays
 
         public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
 
+        [CanBeNull]
         protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours, OsuGame osuGame)
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio, OsuColour colours, [CanBeNull] OsuGame osuGame)
         {
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
@@ -103,7 +105,7 @@ namespace osu.Game.Overlays
 
             muteButton.Current.ValueChanged += _ => Show();
 
-            OverlayActivationMode.BindValueChanged(val =>
+            OverlayActivationMode?.BindValueChanged(val =>
             {
                 if (val.NewValue == OverlayActivation.Disabled)
                     Hide();
