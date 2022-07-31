@@ -37,7 +37,6 @@ namespace osu.Game.Overlays
 
         public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
 
-        [CanBeNull]
         protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters;
@@ -104,12 +103,6 @@ namespace osu.Game.Overlays
                 volumeMeter.Bindable.ValueChanged += _ => Show();
 
             muteButton.Current.ValueChanged += _ => Show();
-
-            OverlayActivationMode?.BindValueChanged(val =>
-            {
-                if (val.NewValue == OverlayActivation.Disabled)
-                    Hide();
-            });
         }
 
         public bool Adjust(GlobalAction action, float amount = 1, bool isPrecise = false)
@@ -194,6 +187,9 @@ namespace osu.Game.Overlays
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (OverlayActivationMode.Value == OverlayActivation.Disabled)
+                return false;
+
             switch (e.Key)
             {
                 case Key.Left:
