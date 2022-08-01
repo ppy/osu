@@ -39,6 +39,10 @@ namespace osu.Game.Screens.Select
 
         private Bindable<GroupMode> groupMode;
 
+        private SeekLimitedSearchTextBox searchTextBox;
+
+        private CollectionDropdown collectionDropdown;
+
         public FilterCriteria CreateCriteria()
         {
             string query = searchTextBox.Text;
@@ -49,7 +53,7 @@ namespace osu.Game.Screens.Select
                 Sort = sortMode.Value,
                 AllowConvertedBeatmaps = showConverted.Value,
                 Ruleset = ruleset.Value,
-                Collection = collectionDropdown?.Current.Value?.Collection
+                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes)
             };
 
             if (!minimumStars.IsDefault)
@@ -63,10 +67,6 @@ namespace osu.Game.Screens.Select
             FilterQueryParser.ApplyQueries(criteria, query);
             return criteria;
         }
-
-        private SeekLimitedSearchTextBox searchTextBox;
-
-        private CollectionFilterDropdown collectionDropdown;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             base.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
@@ -179,10 +179,11 @@ namespace osu.Game.Screens.Select
                                         RelativeSizeAxes = Axes.Both,
                                         Width = 0.48f,
                                     },
-                                    collectionDropdown = new CollectionFilterDropdown
+                                    collectionDropdown = new CollectionDropdown
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
+                                        RequestFilter = updateCriteria,
                                         RelativeSizeAxes = Axes.X,
                                         Y = 4,
                                         Width = 0.5f,
@@ -208,15 +209,6 @@ namespace osu.Game.Screens.Select
 
             groupMode.BindValueChanged(_ => updateCriteria());
             sortMode.BindValueChanged(_ => updateCriteria());
-
-            collectionDropdown.Current.ValueChanged += val =>
-            {
-                if (val.NewValue == null)
-                    // may be null briefly while menu is repopulated.
-                    return;
-
-                updateCriteria();
-            };
 
             searchTextBox.Current.ValueChanged += _ => updateCriteria();
 

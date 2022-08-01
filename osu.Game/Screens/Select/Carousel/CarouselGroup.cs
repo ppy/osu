@@ -7,7 +7,7 @@ using System.Linq;
 namespace osu.Game.Screens.Select.Carousel
 {
     /// <summary>
-    /// A group which ensures only one child is selected.
+    /// A group which ensures only one item is selected.
     /// </summary>
     public class CarouselGroup : CarouselItem
     {
@@ -18,12 +18,14 @@ namespace osu.Game.Screens.Select.Carousel
         private List<CarouselItem> items = new List<CarouselItem>();
 
         /// <summary>
-        /// Used to assign a monotonically increasing ID to children as they are added. This member is
-        /// incremented whenever a child is added.
+        /// Used to assign a monotonically increasing ID to items as they are added. This member is
+        /// incremented whenever an item is added.
         /// </summary>
-        private ulong currentChildID;
+        private ulong currentItemID;
 
         private Comparer<CarouselItem>? criteriaComparer;
+
+        private static readonly Comparer<CarouselItem> item_id_comparer = Comparer<CarouselItem>.Create((x, y) => x.ItemID.CompareTo(y.ItemID));
 
         private FilterCriteria? lastCriteria;
 
@@ -41,7 +43,7 @@ namespace osu.Game.Screens.Select.Carousel
         public virtual void AddItem(CarouselItem i)
         {
             i.State.ValueChanged += state => ChildItemStateChanged(i, state.NewValue);
-            i.ChildID = ++currentChildID;
+            i.ItemID = ++currentItemID;
 
             if (lastCriteria != null)
             {
@@ -90,7 +92,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             // IEnumerable<T>.OrderBy() is used instead of List<T>.Sort() to ensure sorting stability
             criteriaComparer = Comparer<CarouselItem>.Create((x, y) => x.CompareTo(criteria, y));
-            items = items.OrderBy(c => c, criteriaComparer).ToList();
+            items = items.OrderBy(c => c, criteriaComparer).ThenBy(c => c, item_id_comparer).ToList();
 
             lastCriteria = criteria;
         }

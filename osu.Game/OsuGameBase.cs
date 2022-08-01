@@ -138,7 +138,7 @@ namespace osu.Game
 
         protected RealmKeyBindingStore KeyBindingStore { get; private set; }
 
-        protected MenuCursorContainer MenuCursorContainer { get; private set; }
+        protected GlobalCursorDisplay GlobalCursorDisplay { get; private set; }
 
         protected MusicController MusicController { get; private set; }
 
@@ -212,6 +212,10 @@ namespace osu.Game
         {
             Name = @"osu!";
 
+#if DEBUG
+            Name += " (development)";
+#endif
+
             allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
 
@@ -271,7 +275,7 @@ namespace osu.Game
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, API, difficultyCache, LocalConfig));
 
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
@@ -287,7 +291,7 @@ namespace osu.Game
 
             AddInternal(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
-            BeatmapManager.ProcessBeatmap = set => beatmapUpdater.Process(set);
+            BeatmapManager.ProcessBeatmap = args => beatmapUpdater.Process(args.beatmapSet, !args.isBatch);
 
             dependencies.Cache(userCache = new UserLookupCache());
             AddInternal(userCache);
@@ -340,10 +344,10 @@ namespace osu.Game
                 RelativeSizeAxes = Axes.Both,
                 Child = CreateScalingContainer().WithChildren(new Drawable[]
                 {
-                    (MenuCursorContainer = new MenuCursorContainer
+                    (GlobalCursorDisplay = new GlobalCursorDisplay
                     {
                         RelativeSizeAxes = Axes.Both
-                    }).WithChild(content = new OsuTooltipContainer(MenuCursorContainer.Cursor)
+                    }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
                     {
                         RelativeSizeAxes = Axes.Both
                     }),
