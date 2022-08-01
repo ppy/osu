@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Audio.Sample;
@@ -12,6 +13,7 @@ using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
 
@@ -28,6 +30,39 @@ namespace osu.Game.Tests.Skins
     [TestFixture]
     public class SkinDeserialisationTest
     {
+        private static readonly string[] available_skins =
+        {
+            // Covers song progress before namespace changes, and most other components.
+            "Archives/modified-default-20220723.osk",
+            "Archives/modified-classic-20220723.osk"
+        };
+
+        /// <summary>
+        /// If this test fails, new test resources should be added to include new components.
+        /// </summary>
+        [Test]
+        public void TestSkinnableComponentsCoveredByDeserialisationTests()
+        {
+            HashSet<Type> instantiatedTypes = new HashSet<Type>();
+
+            foreach (string oskFile in available_skins)
+            {
+                using (var stream = TestResources.OpenResource(oskFile))
+                using (var storage = new ZipArchiveReader(stream))
+                {
+                    var skin = new TestSkin(new SkinInfo(), null, storage);
+
+                    foreach (var target in skin.DrawableComponentInfo)
+                    {
+                        foreach (var info in target.Value)
+                            instantiatedTypes.Add(info.Type);
+                    }
+                }
+            }
+
+            Assert.That(SkinnableInfo.GetAllAvailableDrawables(), Is.EquivalentTo(instantiatedTypes));
+        }
+
         [Test]
         public void TestDeserialiseModifiedDefault()
         {
