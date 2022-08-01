@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             protected override MultipleSelectionFilterTabItem CreateTabItem(ScoreRank value) => new RankItem(value);
 
-            protected override IEnumerable<ScoreRank> GetValues() => base.GetValues().Reverse();
+            protected override IEnumerable<ScoreRank> GetValues() => base.GetValues().Where(r => r > ScoreRank.F).Reverse();
         }
 
         private class RankItem : MultipleSelectionFilterTabItem
