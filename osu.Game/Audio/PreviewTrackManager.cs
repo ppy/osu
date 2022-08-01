@@ -87,7 +87,7 @@ namespace osu.Game.Audio
 
         public class TrackManagerPreviewTrack : PreviewTrack
         {
-            [Resolved(canBeNull: true)]
+            [Resolved]
             public IPreviewTrackOwner? Owner { get; private set; }
 
             private readonly IBeatmapSetInfo beatmapSetInfo;
