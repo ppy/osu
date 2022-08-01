@@ -26,7 +26,6 @@ using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
-using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -100,9 +99,6 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private MusicController musicController { get; set; }
-
-        [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
 
         public GameplayState GameplayState { get; private set; }
 
@@ -1030,11 +1026,6 @@ namespace osu.Game.Screens.Play
                 // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
                 if (prepareScoreForDisplayTask == null)
                     ScoreProcessor.FailScore(Score.ScoreInfo);
-
-                // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
-                // To resolve test failures, forcefully end playing synchronously when this screen exits.
-                // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
-                spectatorClient.EndPlaying(GameplayState);
             }
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.

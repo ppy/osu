@@ -146,13 +146,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 waveform.Waveform = b.NewValue.Waveform;
                 track = b.NewValue.Track;
 
-                // todo: i don't think this is safe, the track may not be loaded yet.
-                if (track.Length > 0)
-                {
-                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
-                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                    defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
-                }
+                setupTimelineZoom();
             }, true);
 
             Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
@@ -203,6 +197,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // This needs to happen after transforms are updated, but before the scroll position is updated in base.UpdateAfterChildren
             if (editorClock.IsRunning)
                 scrollToTrackTime();
+        }
+
+        private void setupTimelineZoom()
+        {
+            if (!track.IsLoaded)
+            {
+                Scheduler.AddOnce(setupTimelineZoom);
+                return;
+            }
+
+            defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
+
+            float initialZoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
+            SetupZoom(initialZoom, getZoomLevelForVisibleMilliseconds(10000), getZoomLevelForVisibleMilliseconds(500));
         }
 
         protected override bool OnScroll(ScrollEvent e)

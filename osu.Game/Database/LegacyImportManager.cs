@@ -13,7 +13,6 @@ using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.IO;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
@@ -36,14 +35,14 @@ namespace osu.Game.Database
         [Resolved]
         private ScoreManager scores { get; set; }
 
-        [Resolved]
-        private CollectionManager collections { get; set; }
-
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
         [Resolved]
         private IDialogOverlay dialogOverlay { get; set; }
+
+        [Resolved]
+        private RealmAccess realmAccess { get; set; }
 
         [Resolved(canBeNull: true)]
         private DesktopGameHost desktopGameHost { get; set; }
@@ -72,7 +71,7 @@ namespace osu.Game.Database
                     return await new LegacySkinImporter(skins).GetAvailableCount(stableStorage);
 
                 case StableContent.Collections:
-                    return await collections.GetAvailableCount(stableStorage);
+                    return await new LegacyCollectionImporter(realmAccess).GetAvailableCount(stableStorage);
 
                 case StableContent.Scores:
                     return await new LegacyScoreImporter(scores).GetAvailableCount(stableStorage);
@@ -109,7 +108,7 @@ namespace osu.Game.Database
                 importTasks.Add(new LegacySkinImporter(skins).ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Collections))
-                importTasks.Add(beatmapImportTask.ContinueWith(_ => collections.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
+                importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyCollectionImporter(realmAccess).ImportFromStorage(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
 
             if (content.HasFlagFast(StableContent.Scores))
                 importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyScoreImporter(scores).ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));

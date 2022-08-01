@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -17,6 +18,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -24,6 +27,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
@@ -40,7 +44,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private MultiplayerMatchSubScreen screen;
 
         private BeatmapManager beatmaps;
-        private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
 
         public TestSceneMultiplayerMatchSubScreen()
@@ -51,8 +54,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
@@ -60,16 +63,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             importedSet = beatmaps.GetAllUsableBeatmapSets().First();
         }
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            SelectedRoom.Value = new Room { Name = { Value = "Test Room" } };
-        });
-
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("load match", () => LoadScreen(screen = new MultiplayerMatchSubScreen(SelectedRoom.Value)));
+            AddStep("load match", () =>
+            {
+                SelectedRoom.Value = new Room { Name = { Value = "Test Room" } };
+                LoadScreen(screen = new TestMultiplayerMatchSubScreen(SelectedRoom.Value));
+            });
+
             AddUntilStep("wait for load", () => screen.IsCurrentScreen());
         }
 
@@ -282,6 +284,30 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.ServerAPIRoom?.Playlist.Last().ID);
                 return lastItem.IsSelectedItem;
             });
+        }
+
+        private class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
+        {
+            [Resolved(canBeNull: true)]
+            [CanBeNull]
+            private IDialogOverlay dialogOverlay { get; set; }
+
+            public TestMultiplayerMatchSubScreen(Room room)
+                : base(room)
+            {
+            }
+
+            public override bool OnExiting(ScreenExitEvent e)
+            {
+                // For testing purposes allow the screen to exit without confirming on second attempt.
+                if (!ExitConfirmed && dialogOverlay?.CurrentDialog is ConfirmDiscardChangesDialog confirmDialog)
+                {
+                    confirmDialog.PerformAction<PopupDialogDangerousButton>();
+                    return true;
+                }
+
+                return base.OnExiting(e);
+            }
         }
     }
 }

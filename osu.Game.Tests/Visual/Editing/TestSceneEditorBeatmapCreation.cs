@@ -136,6 +136,20 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("track is not virtual", () => Beatmap.Value.Track is not TrackVirtual);
             AddAssert("track length changed", () => Beatmap.Value.Track.Length > 60000);
+
+            AddStep("test play", () => Editor.TestGameplay());
+
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog != null);
+            AddStep("confirm save", () => InputManager.Key(Key.Number1));
+
+            AddUntilStep("wait for return to editor", () => Editor.IsCurrentScreen());
+
+            AddAssert("track is still not virtual", () => Beatmap.Value.Track is not TrackVirtual);
+            AddAssert("track length correct", () => Beatmap.Value.Track.Length > 60000);
+
+            AddUntilStep("track not playing", () => !EditorClock.IsRunning);
+            AddStep("play track", () => InputManager.Key(Key.Space));
+            AddUntilStep("wait for track playing", () => EditorClock.IsRunning);
         }
 
         [Test]
