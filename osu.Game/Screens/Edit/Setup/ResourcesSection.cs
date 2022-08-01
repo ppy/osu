@@ -118,8 +118,6 @@ namespace osu.Game.Screens.Edit.Setup
             working.Value.Metadata.AudioFile = destination.Name;
 
             music.ReloadCurrentTrack();
-
-            editor?.UpdateClockSource();
             return true;
         }
 
