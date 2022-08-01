@@ -151,7 +151,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             displayedStars.BindValueChanged(s =>
             {
-                starsText.Text = s.NewValue.ToLocalisableString("0.00");
+                starsText.Text = s.NewValue < 0 ? "-" : s.NewValue.ToLocalisableString("0.00");
 
                 background.Colour = colours.ForStarDifficulty(s.NewValue);
 

@@ -95,6 +95,9 @@ namespace osu.Game.Screens.OnlinePlay
         private FillFlowContainer mainFillFlow;
 
         [Resolved]
+        private RealmAccess realm { get; set; }
+
+        [Resolved]
         private RulesetStore rulesets { get; set; }
 
         [Resolved]
@@ -111,9 +114,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private CollectionManager collectionManager { get; set; }
 
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
@@ -495,11 +495,11 @@ namespace osu.Game.Screens.OnlinePlay
                 if (beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
 
-                if (collectionManager != null && beatmap != null)
+                if (beatmap != null)
                 {
                     if (beatmaps.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID) is BeatmapInfo local && !local.BeatmapSet.AsNonNull().DeletePending)
                     {
-                        var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
+                        var collectionItems = realm.Realm.All<BeatmapCollection>().AsEnumerable().Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
                         if (manageCollectionsDialog != null)
                             collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 

@@ -81,6 +81,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"max_combo")]
         public int? MaxCombo { get; set; }
 
+        [JsonProperty(@"last_updated")]
+        public DateTimeOffset LastUpdated { get; set; }
+
         public double BPM { get; set; }
 
         #region Implementation of IBeatmapInfo
