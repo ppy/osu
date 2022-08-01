@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -63,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Child = new MetadataSection(MetadataType.Description),
                             },
                         },
-                        new OsuScrollContainer
+                        new Container
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -71,6 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Width = metadata_width,
                             Padding = new MarginPadding { Horizontal = 10 },
                             Margin = new MarginPadding { Right = BeatmapSetOverlay.RIGHT_WIDTH + spacing },
+                            Masking = true,
                             Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
