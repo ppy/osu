@@ -329,6 +329,9 @@ namespace osu.Game.Screens.Edit
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
         }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -336,12 +339,18 @@ namespace osu.Game.Screens.Edit
 
             Mode.Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
             Mode.BindValueChanged(onModeChanged, true);
+
+            musicController.TrackChanged += onTrackChanged;
         }
 
-        /// <summary>
-        /// If the beatmap's track has changed, this method must be called to keep the editor in a valid state.
-        /// </summary>
-        public void UpdateClockSource() => clock.ChangeSource(Beatmap.Value.Track);
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            musicController.TrackChanged -= onTrackChanged;
+        }
+
+        private void onTrackChanged(WorkingBeatmap working, TrackChangeDirection direction) => clock.ChangeSource(working.Track);
 
         /// <summary>
         /// Creates an <see cref="EditorState"/> instance representing the current state of the editor.
