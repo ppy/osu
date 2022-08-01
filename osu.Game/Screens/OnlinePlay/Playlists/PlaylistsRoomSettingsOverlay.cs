@@ -78,6 +78,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             [Resolved]
             private IAPIProvider api { get; set; }
 
+            private IBindable<APIUser> localUser;
+
             private readonly Room room;
 
             public MatchSettings(Room room)
@@ -304,7 +306,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
-                api.LocalUser.BindValueChanged(populateDurations, true);
+                localUser = api.LocalUser.GetBoundCopy();
+                localUser.BindValueChanged(populateDurations, true);
 
                 playlist.Items.BindTo(Playlist);
                 Playlist.BindCollectionChanged(onPlaylistChanged, true);
