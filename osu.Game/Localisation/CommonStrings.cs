@@ -55,11 +55,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Downloading => new TranslatableString(getKey(@"downloading"), @"Downloading...");
 
         /// <summary>
-        /// "You have downloaded too many {0}s! Please try again later."
-        /// </summary>
-        public static LocalisableString TooManyDownloaded(string humanisedModelName) => new TranslatableString(getKey(@"too_many_downloaded"), @"You have downloaded too many {0}s! Please try again later.", humanisedModelName);
-
-        /// <summary>
         /// "Importing..."
         /// </summary>
         public static LocalisableString Importing => new TranslatableString(getKey(@"importing"), @"Importing...");

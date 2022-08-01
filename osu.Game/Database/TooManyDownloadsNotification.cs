@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Database
@@ -13,7 +12,7 @@ namespace osu.Game.Database
     {
         public TooManyDownloadsNotification(string humanisedModelName)
         {
-            Text = CommonStrings.TooManyDownloaded(humanisedModelName);
+            Text = $"You have downloaded too many {humanisedModelName}s! Please try again later.";
             Icon = FontAwesome.Solid.ExclamationCircle;
         }
 
