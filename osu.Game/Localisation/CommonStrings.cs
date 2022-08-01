@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Localisation;
@@ -53,6 +53,11 @@ namespace osu.Game.Localisation
         /// "Downloading..."
         /// </summary>
         public static LocalisableString Downloading => new TranslatableString(getKey(@"downloading"), @"Downloading...");
+
+        /// <summary>
+        /// "You have downloaded too many {0}s! Please try again later."
+        /// </summary>
+        public static LocalisableString TooManyDownloaded(string humanisedModelName) => new TranslatableString(getKey(@"too_many_downloaded"), @"You have downloaded too many {0}s! Please try again later.", humanisedModelName);
 
         /// <summary>
         /// "Importing..."

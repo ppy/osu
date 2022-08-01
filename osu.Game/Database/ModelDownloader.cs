@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Logging;
@@ -107,7 +108,15 @@ namespace osu.Game.Database
                 notification.State = ProgressNotificationState.Cancelled;
 
                 if (!(error is OperationCanceledException))
-                    Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} download failed!");
+                {
+                    if (error is WebException webException && webException.Message == @"TooManyRequests")
+                    {
+                        notification.Close();
+                        PostNotification?.Invoke(new TooManyDownloadsNotification(importer.HumanisedModelName));
+                    }
+                    else
+                        Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} download failed!");
+                }
             }
         }
 
