@@ -212,6 +212,10 @@ namespace osu.Game
         {
             Name = @"osu!";
 
+#if DEBUG
+            Name += " (development)";
+#endif
+
             allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
 
