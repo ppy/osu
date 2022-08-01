@@ -96,12 +96,22 @@ namespace osu.Game.IO
             if (!destination.Exists)
                 Directory.CreateDirectory(destination.FullName);
 
-            foreach (System.IO.FileInfo fi in source.GetFiles())
+            foreach (System.IO.FileInfo fileInfo in source.GetFiles())
             {
-                if (topLevelExcludes && IgnoreFiles.Contains(fi.Name))
+                if (topLevelExcludes && IgnoreFiles.Contains(fileInfo.Name))
                     continue;
 
-                AttemptOperation(() => fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true));
+                AttemptOperation(() =>
+                {
+                    fileInfo.Refresh();
+
+                    // A temporary file may have been deleted since the initial GetFiles operation.
+                    // We don't want the whole migration process to fail in such a case.
+                    if (!fileInfo.Exists)
+                        return;
+
+                    fileInfo.CopyTo(Path.Combine(destination.FullName, fileInfo.Name), true);
+                });
             }
 
             foreach (DirectoryInfo dir in source.GetDirectories())
