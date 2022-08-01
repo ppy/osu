@@ -66,10 +66,10 @@ namespace osu.Game.Online.Spectator
 
                     await connector.Reconnect();
                     await BeginPlayingInternal(state);
-                    return;
                 }
 
-                throw;
+                // Exceptions can occur if, for instance, the locally played beatmap doesn't have a server-side counterpart.
+                // For now, let's ignore these so they don't cause unobserved exceptions to appear to the user (and sentry).
             }
         }
 
@@ -80,7 +80,7 @@ namespace osu.Game.Online.Spectator
 
             Debug.Assert(connection != null);
 
-            return connection.InvokeAsync(nameof(ISpectatorServer.SendFrameData), bundle);
+            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), bundle);
         }
 
         protected override Task EndPlayingInternal(SpectatorState state)

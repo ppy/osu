@@ -1,16 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
@@ -18,12 +12,10 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
-    public class SongProgress : OverlayContainer, ISkinnableDrawable
+    public class DefaultSongProgress : SongProgress
     {
-        public const float MAX_HEIGHT = info_height + bottom_bar_height + graph_height + handle_height;
-
         private const float info_height = 20;
         private const float bottom_bar_height = 5;
         private const float graph_height = SquareGraph.Column.WIDTH * 6;
@@ -36,8 +28,6 @@ namespace osu.Game.Screens.Play
         private readonly SongProgressBar bar;
         private readonly SongProgressGraph graph;
         private readonly SongProgressInfo info;
-
-        public Action<double> RequestSeek;
 
         /// <summary>
         /// Whether seeking is allowed and the progress bar should be shown.
@@ -52,41 +42,19 @@ namespace osu.Game.Screens.Play
 
         protected override bool BlockScrollInput => false;
 
-        private double firstHitTime => objects.First().StartTime;
-
-        //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-        private double lastHitTime => objects.Last().GetEndTime() + 1;
-
-        private IEnumerable<HitObject> objects;
-
-        public IEnumerable<HitObject> Objects
-        {
-            set
-            {
-                graph.Objects = objects = value;
-
-                info.StartTime = firstHitTime;
-                info.EndTime = lastHitTime;
-
-                bar.StartTime = firstHitTime;
-                bar.EndTime = lastHitTime;
-            }
-        }
-
-        [Resolved(canBeNull: true)]
-        private Player player { get; set; }
+        [Resolved]
+        private Player? player { get; set; }
 
         [Resolved]
-        private GameplayClock gameplayClock { get; set; }
+        private DrawableRuleset? drawableRuleset { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private DrawableRuleset drawableRuleset { get; set; }
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
-        private IClock referenceClock;
+        [Resolved]
+        private SkinManager skinManager { get; set; } = null!;
 
-        public bool UsesFixedAnchor { get; set; }
-
-        public SongProgress()
+        public DefaultSongProgress()
         {
             RelativeSizeAxes = Axes.X;
             Anchor = Anchor.BottomRight;
@@ -127,9 +95,6 @@ namespace osu.Game.Screens.Play
             {
                 if (player?.Configuration.AllowUserInteraction == true)
                     ((IBindable<bool>)AllowSeeking).BindTo(drawableRuleset.HasReplayLoaded);
-
-                referenceClock = drawableRuleset.FrameStableClock;
-                Objects = drawableRuleset.Objects;
             }
 
             graph.FillColour = bar.FillColour = colours.BlueLighter;
@@ -137,19 +102,11 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadComplete()
         {
-            Show();
-
             AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
 
             migrateSettingFromConfig();
         }
-
-        [Resolved]
-        private OsuConfigManager config { get; set; }
-
-        [Resolved]
-        private SkinManager skinManager { get; set; }
 
         /// <summary>
         /// This setting has been migrated to a per-component level.
@@ -166,29 +123,26 @@ namespace osu.Game.Screens.Play
                 ShowGraph.Value = configShowGraph.Value;
 
                 // This is pretty ugly, but the only way to make this stick...
-                if (skinManager != null)
+                var skinnableTarget = this.FindClosestParent<ISkinnableTarget>();
+
+                if (skinnableTarget != null)
                 {
-                    var skinnableTarget = this.FindClosestParent<ISkinnableTarget>();
+                    // If the skin is not mutable, a mutable instance will be created, causing this migration logic to run again on the correct skin.
+                    // Therefore we want to avoid resetting the config value on this invocation.
+                    if (skinManager.EnsureMutableSkin())
+                        return;
 
-                    if (skinnableTarget != null)
+                    // If `EnsureMutableSkin` actually changed the skin, default layout may take a frame to apply.
+                    // See `SkinnableTargetComponentsContainer`'s use of ScheduleAfterChildren.
+                    ScheduleAfterChildren(() =>
                     {
-                        // If the skin is not mutable, a mutable instance will be created, causing this migration logic to run again on the correct skin.
-                        // Therefore we want to avoid resetting the config value on this invocation.
-                        if (skinManager.EnsureMutableSkin())
-                            return;
+                        var skin = skinManager.CurrentSkin.Value;
+                        skin.UpdateDrawableTarget(skinnableTarget);
 
-                        // If `EnsureMutableSkin` actually changed the skin, default layout may take a frame to apply.
-                        // See `SkinnableTargetComponentsContainer`'s use of ScheduleAfterChildren.
-                        ScheduleAfterChildren(() =>
-                        {
-                            var skin = skinManager.CurrentSkin.Value;
-                            skin.UpdateDrawableTarget(skinnableTarget);
+                        skinManager.Save(skin);
+                    });
 
-                            skinManager.Save(skin);
-                        });
-
-                        configShowGraph.SetDefault();
-                    }
+                    configShowGraph.SetDefault();
                 }
             }
         }
@@ -203,21 +157,29 @@ namespace osu.Game.Screens.Play
             this.FadeOut(100);
         }
 
+        protected override void UpdateObjects(IEnumerable<HitObject> objects)
+        {
+            graph.Objects = objects;
+
+            info.StartTime = FirstHitTime;
+            info.EndTime = LastHitTime;
+            bar.StartTime = FirstHitTime;
+            bar.EndTime = LastHitTime;
+        }
+
+        protected override void UpdateProgress(double progress, bool isIntro)
+        {
+            bar.CurrentTime = GameplayClock.CurrentTime;
+
+            if (isIntro)
+                graph.Progress = 0;
+            else
+                graph.Progress = (int)(graph.ColumnCount * progress);
+        }
+
         protected override void Update()
         {
             base.Update();
-
-            if (objects == null)
-                return;
-
-            double gameplayTime = gameplayClock?.CurrentTime ?? Time.Current;
-            double frameStableTime = referenceClock?.CurrentTime ?? gameplayTime;
-
-            double progress = Math.Min(1, (frameStableTime - firstHitTime) / (lastHitTime - firstHitTime));
-
-            bar.CurrentTime = gameplayTime;
-            graph.Progress = (int)(graph.ColumnCount * progress);
-
             Height = bottom_bar_height + graph_height + handle_size.Y + info_height - graph.Y;
         }
 

@@ -151,6 +151,23 @@ namespace osu.Game.Online.API.Requests.Responses
             PP = PP,
         };
 
+        /// <summary>
+        /// Creates a <see cref="SoloScoreInfo"/> from a local score for score submission.
+        /// </summary>
+        /// <param name="score">The local score.</param>
+        public static SoloScoreInfo ForSubmission(ScoreInfo score) => new SoloScoreInfo
+        {
+            Rank = score.Rank,
+            TotalScore = (int)score.TotalScore,
+            Accuracy = score.Accuracy,
+            PP = score.PP,
+            MaxCombo = score.MaxCombo,
+            RulesetID = score.RulesetID,
+            Passed = score.Passed,
+            Mods = score.APIMods,
+            Statistics = score.Statistics,
+        };
+
         public long OnlineID => ID ?? -1;
     }
 }
