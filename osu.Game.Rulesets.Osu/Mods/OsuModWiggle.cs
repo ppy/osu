@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const int wiggle_duration = 100; // (ms) Higher = fewer wiggles
 
         [SettingSource("Strength", "Multiplier applied to the wiggling strength.")]
-        public BindableDouble WiggleStrength { get; } = new BindableDouble(1)
+        public BindableDouble Strength { get; } = new BindableDouble(1)
         {
             MinValue = 0.1f,
             MaxValue = 2f,
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             void wiggle()
             {
                 float nextAngle = (float)(objRand.NextDouble() * 2 * Math.PI);
-                float nextDist = (float)(objRand.NextDouble() * WiggleStrength.Value * 7);
+                float nextDist = (float)(objRand.NextDouble() * Strength.Value * 7);
                 drawable.MoveTo(new Vector2((float)(nextDist * Math.Cos(nextAngle) + origin.X), (float)(nextDist * Math.Sin(nextAngle) + origin.Y)), wiggle_duration);
             }
 
