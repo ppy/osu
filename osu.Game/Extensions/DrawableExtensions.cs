@@ -8,6 +8,7 @@ using osu.Game.Configuration;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
+using System;
 
 namespace osu.Game.Extensions
 {
@@ -79,5 +80,24 @@ namespace osu.Game.Extensions
                     container.Add(child.CreateInstance());
             }
         }
+
+        /// <summary>
+        /// Keeps the drawable upright no matter the Rotation of its parents.
+        /// </summary>
+        /// <param name="drawable">The drawable.</param>
+        public static void KeepUpright(this Drawable drawable)
+        {
+            var result = drawable.Parent.DrawInfo;
+            var scale = result.Matrix.ExtractScale();
+            var rotation = new Matrix3(
+            result.Matrix.Row0 / scale.X,
+            result.Matrix.Row1 / scale.Y,
+            new Vector3(0.0f, 0.0f, 1.0f)
+            );
+            float angle = MathF.Atan2(rotation.M12, rotation.M11);
+            angle *= (360 / (2 * MathF.PI));
+            drawable.Rotation = -angle;
+        }
+
     }
 }
