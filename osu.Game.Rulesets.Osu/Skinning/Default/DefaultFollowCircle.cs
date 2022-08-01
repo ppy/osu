@@ -59,11 +59,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         protected override void OnSliderTick()
         {
-            // TODO: Follow circle should bounce on each slider tick.
-
-            // TEMP DUMMY ANIMS
-            this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 1.1f)
-                .ScaleTo(DrawableSliderBall.FOLLOW_AREA, 175f);
+            this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 1.08f, 40, Easing.OutQuint)
+                .Then()
+                .ScaleTo(DrawableSliderBall.FOLLOW_AREA, 200f, Easing.OutQuint);
         }
 
         protected override void OnSliderBreak()
