@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
@@ -274,7 +273,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (hitObjects.Count == 0) return;
 
-            float nextSingle(float max = 1f) => (float)(rng.AsNonNull().NextDouble() * max);
+            float nextSingle(float max = 1f) => (float)(rng.NextDouble() * max);
 
             const float two_pi = MathF.PI * 2;
 
