@@ -147,9 +147,14 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            var subScreen = screenStack.CurrentScreen as Drawable;
-            if (subScreen?.IsLoaded == true && screenStack.CurrentScreen.OnExiting(e))
-                return true;
+            while (screenStack.CurrentScreen is not LoungeSubScreen)
+            {
+                var lastSubScreen = screenStack.CurrentScreen;
+                if (((Drawable)lastSubScreen)?.IsLoaded == true)
+                    screenStack.Exit();
+
+                if (lastSubScreen == screenStack.CurrentScreen) return true;
+            }
 
             RoomManager.PartRoom();
 
