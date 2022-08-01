@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -15,7 +14,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         public IReadOnlyList<CarouselItem> Items => items;
 
-        private List<CarouselItem> items = new List<CarouselItem>();
+        private readonly List<CarouselItem> items = new List<CarouselItem>();
 
         /// <summary>
         /// Used to assign a monotonically increasing ID to items as they are added. This member is
@@ -24,9 +23,6 @@ namespace osu.Game.Screens.Select.Carousel
         private ulong currentItemID;
 
         private Comparer<CarouselItem>? criteriaComparer;
-
-        private static readonly Comparer<CarouselItem> item_id_comparer = Comparer<CarouselItem>.Create((x, y) => x.ItemID.CompareTo(y.ItemID));
-
         private FilterCriteria? lastCriteria;
 
         protected int GetIndexOfItem(CarouselItem lastSelected) => items.IndexOf(lastSelected);
@@ -90,9 +86,16 @@ namespace osu.Game.Screens.Select.Carousel
 
             items.ForEach(c => c.Filter(criteria));
 
-            // IEnumerable<T>.OrderBy() is used instead of List<T>.Sort() to ensure sorting stability
-            criteriaComparer = Comparer<CarouselItem>.Create((x, y) => x.CompareTo(criteria, y));
-            items = items.OrderBy(c => c, criteriaComparer).ThenBy(c => c, item_id_comparer).ToList();
+            criteriaComparer = Comparer<CarouselItem>.Create((x, y) =>
+            {
+                int comparison = x.CompareTo(criteria, y);
+                if (comparison != 0)
+                    return comparison;
+
+                return x.ItemID.CompareTo(y.ItemID);
+            });
+
+            items.Sort(criteriaComparer);
 
             lastCriteria = criteria;
         }
