@@ -94,6 +94,7 @@ namespace osu.Game.Beatmaps
 
             var beatmapSet = new BeatmapSetInfo
             {
+                DateAdded = DateTimeOffset.UtcNow,
                 Beatmaps =
                 {
                     new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata)
