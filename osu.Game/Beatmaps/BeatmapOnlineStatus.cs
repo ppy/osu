@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.ComponentModel;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
@@ -10,6 +11,9 @@ namespace osu.Game.Beatmaps
 {
     public enum BeatmapOnlineStatus
     {
+        [Description("Local")]
+        LocallyModified = -4,
+
         None = -3,
 
         [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowStatusGraveyard))]

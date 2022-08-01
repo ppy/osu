@@ -89,7 +89,16 @@ namespace osu.Game.Beatmaps
 
                 if (res != null)
                 {
-                    beatmapInfo.Status = res.Status;
+                    beatmapInfo.OnlineID = res.OnlineID;
+                    beatmapInfo.OnlineMD5Hash = res.MD5Hash;
+                    beatmapInfo.LastOnlineUpdate = res.LastUpdated;
+                    beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
+
+                    // In the case local changes have been applied, don't reset the status.
+                    if (beatmapInfo.MatchesOnlineVersion || beatmapInfo.Status != BeatmapOnlineStatus.LocallyModified)
+                    {
+                        beatmapInfo.Status = res.Status;
+                    }
 
                     Debug.Assert(beatmapInfo.BeatmapSet != null);
 
@@ -97,13 +106,6 @@ namespace osu.Game.Beatmaps
                     beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
                     beatmapInfo.BeatmapSet.DateRanked = res.BeatmapSet?.Ranked;
                     beatmapInfo.BeatmapSet.DateSubmitted = res.BeatmapSet?.Submitted;
-
-                    beatmapInfo.OnlineMD5Hash = res.MD5Hash;
-                    beatmapInfo.LastOnlineUpdate = res.LastUpdated;
-
-                    beatmapInfo.OnlineID = res.OnlineID;
-
-                    beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
 
                     logForModel(set, $"Online retrieval mapped {beatmapInfo} to {res.OnlineBeatmapSetID} / {res.OnlineID}.");
                 }
