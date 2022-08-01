@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,11 +28,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public bool RestartOnFail => false;
 
-        private OsuInputManager inputManager;
+        private OsuInputManager inputManager = null!;
 
-        private IFrameStableClock gameplayClock;
+        private IFrameStableClock gameplayClock = null!;
 
-        private List<OsuReplayFrame> replayFrames;
+        private List<OsuReplayFrame> replayFrames = null!;
 
         private int currentFrame;
 
