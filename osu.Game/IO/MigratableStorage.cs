@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 
 namespace osu.Game.IO
@@ -16,6 +17,12 @@ namespace osu.Game.IO
     /// </summary>
     public abstract class MigratableStorage : WrappedStorage
     {
+        /// <summary>
+        /// The number of file copy failures before actually bailing on migration.
+        /// This allows some lenience to cover things like temporary files which could not be copied but are also not too important.
+        /// </summary>
+        private const int allowed_failures = 10;
+
         /// <summary>
         /// A relative list of directory paths which should not be migrated.
         /// </summary>
@@ -73,7 +80,7 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IgnoreFiles.Contains(fi.Name))
                     continue;
 
-                allFilesDeleted &= AttemptOperation(() => fi.Delete(), throwOnFailure: false);
+                allFilesDeleted &= AttemptOperation(() => fi.Delete());
             }
 
             foreach (DirectoryInfo dir in target.GetDirectories())
@@ -81,16 +88,16 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IgnoreDirectories.Contains(dir.Name))
                     continue;
 
-                allFilesDeleted &= AttemptOperation(() => dir.Delete(true), throwOnFailure: false);
+                allFilesDeleted &= AttemptOperation(() => dir.Delete(true));
             }
 
             if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
-                allFilesDeleted &= AttemptOperation(target.Delete, throwOnFailure: false);
+                allFilesDeleted &= AttemptOperation(target.Delete);
 
             return allFilesDeleted;
         }
 
-        protected void CopyRecursive(DirectoryInfo source, DirectoryInfo destination, bool topLevelExcludes = true)
+        protected void CopyRecursive(DirectoryInfo source, DirectoryInfo destination, bool topLevelExcludes = true, int totalFailedOperations = 0)
         {
             // based off example code https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo
             if (!destination.Exists)
@@ -101,7 +108,14 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IgnoreFiles.Contains(fi.Name))
                     continue;
 
-                AttemptOperation(() => fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true));
+                if (!AttemptOperation(() => fi.CopyTo(Path.Combine(destination.FullName, fi.Name), false)))
+                {
+                    Logger.Log($"Failed to copy file {fi.Name} during folder migration");
+                    totalFailedOperations++;
+
+                    if (totalFailedOperations > allowed_failures)
+                        throw new Exception("Aborting due to too many file copy failures during data migration");
+                }
             }
 
             foreach (DirectoryInfo dir in source.GetDirectories())
@@ -109,7 +123,7 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IgnoreDirectories.Contains(dir.Name))
                     continue;
 
-                CopyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);
+                CopyRecursive(dir, destination.CreateSubdirectory(dir.Name), false, totalFailedOperations);
             }
         }
 
@@ -118,8 +132,7 @@ namespace osu.Game.IO
         /// </summary>
         /// <param name="action">The action to perform.</param>
         /// <param name="attempts">The number of attempts (250ms wait between each).</param>
-        /// <param name="throwOnFailure">Whether to throw an exception on failure. If <c>false</c>, will silently fail.</param>
-        protected static bool AttemptOperation(Action action, int attempts = 10, bool throwOnFailure = true)
+        protected static bool AttemptOperation(Action action, int attempts = 10)
         {
             while (true)
             {
@@ -131,12 +144,7 @@ namespace osu.Game.IO
                 catch (Exception)
                 {
                     if (attempts-- == 0)
-                    {
-                        if (throwOnFailure)
-                            throw;
-
                         return false;
-                    }
                 }
 
                 Thread.Sleep(250);
