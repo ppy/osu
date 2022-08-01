@@ -257,8 +257,8 @@ namespace osu.Game.Tournament.Screens.Schedule
             }
 
             protected override string Format() => Date < DateTimeOffset.Now
-                ? $"已在 {base.Format()}"
-                : $"将在 {base.Format()}";
+                ? $"已在 {base.Format()} 开始"
+                : $"将在 {base.Format()} 开始";
         }
 
         public class ScheduleContainer : Container
