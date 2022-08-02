@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -19,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override string Description => @"Use the mouse to control the catcher.";
 
-        private DrawableRuleset<CatchHitObject>? drawableRuleset;
+        private DrawableRuleset<CatchHitObject> drawableRuleset = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
@@ -28,8 +27,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToPlayer(Player player)
         {
-            Debug.Assert(drawableRuleset != null);
-
             if (!drawableRuleset.HasReplayLoaded.Value)
                 drawableRuleset.Cursor.Add(new MouseInputHelper((CatchPlayfield)drawableRuleset.Playfield));
         }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         /// </summary>
         private const float fade_out_duration = 0.375f;
 
-        private DrawableTaikoRuleset? drawableRuleset;
+        private DrawableTaikoRuleset drawableRuleset = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
@@ -45,8 +44,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            Debug.Assert(drawableRuleset != null);
-
             switch (hitObject)
             {
                 case DrawableDrumRollTick:
