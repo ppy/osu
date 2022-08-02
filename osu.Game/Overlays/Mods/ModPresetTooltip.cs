@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Mods
 
         public void SetContent(ModPreset preset)
         {
-            if (preset == lastPreset)
+            if (ReferenceEquals(preset, lastPreset))
                 return;
 
             lastPreset = preset;

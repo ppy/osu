@@ -380,7 +380,7 @@ namespace osu.Game.Rulesets.UI
         // only show the cursor when within the playfield, by default.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Playfield.ReceivePositionalInputAt(screenSpacePos);
 
-        CursorContainer IProvideCursor.Cursor => Playfield.Cursor;
+        CursorContainer IProvideCursor.MenuCursor => Playfield.Cursor;
 
         public override GameplayCursorContainer Cursor => Playfield.Cursor;
 
