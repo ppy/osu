@@ -44,15 +44,26 @@ namespace osu.Game.Online.Spectator
         [Key(4)]
         public DateTimeOffset ReceivedTime { get; set; }
 
+        [Key(5)]
+        public double? BaseScore { get; set; }
+
+        [Key(6)]
+        public double? BonusScore { get; set; }
+
+        [Key(7)]
+        public ScoringValues? Maximum { get; set; }
+
         /// <summary>
         /// Construct header summary information from a point-in-time reference to a score which is actively being played.
         /// </summary>
         /// <param name="score">The score for reference.</param>
         public FrameHeader(ScoreInfo score)
         {
+            BaseScore = score.BaseScore;
+            BonusScore = score.BonusScore;
+            Accuracy = score.Accuracy;
             Combo = score.Combo;
             MaxCombo = score.MaxCombo;
-            Accuracy = score.Accuracy;
 
             // copy for safety
             Statistics = new Dictionary<HitResult, int>(score.Statistics);
@@ -60,11 +71,23 @@ namespace osu.Game.Online.Spectator
 
         [JsonConstructor]
         [SerializationConstructor]
-        public FrameHeader(double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
+        public FrameHeader(int baseScore, int bonusScore, double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
         {
+            BaseScore = baseScore;
+            BonusScore = bonusScore;
+            Accuracy = accuracy;
             Combo = combo;
             MaxCombo = maxCombo;
+            Statistics = statistics;
+            ReceivedTime = receivedTime;
+        }
+
+        // this is supposed to be for messagepack as a fallback constructor when baseScore and bonusScore is not supplied, but I don't know if this works.
+        public FrameHeader(double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
+        {
             Accuracy = accuracy;
+            Combo = combo;
+            MaxCombo = maxCombo;
             Statistics = statistics;
             ReceivedTime = receivedTime;
         }

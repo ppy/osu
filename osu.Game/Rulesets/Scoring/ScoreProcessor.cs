@@ -433,6 +433,7 @@ namespace osu.Game.Rulesets.Scoring
 
             score.BaseScore = currentScoringValues.BaseScore;
             score.BonusScore = currentScoringValues.BonusScore;
+
             score.MaximumScoringValues = maximumScoringValues;
 
             // Populate total score after everything else.
@@ -460,11 +461,7 @@ namespace osu.Game.Rulesets.Scoring
             if (frame.Header == null)
                 return;
 
-            extractScoringValues(frame.Header.Statistics, out var current, out var maximum);
-            currentScoringValues.BaseScore = current.BaseScore;
-            currentScoringValues.MaxCombo = frame.Header.MaxCombo;
-            currentMaximumScoringValues.BaseScore = maximum.BaseScore;
-            currentMaximumScoringValues.MaxCombo = maximum.MaxCombo;
+            extractScoringValues(frame.Header.Statistics, out currentScoringValues, out currentMaximumScoringValues);
 
             Combo.Value = frame.Header.Combo;
             HighestCombo.Value = frame.Header.MaxCombo;
@@ -538,6 +535,19 @@ namespace osu.Game.Rulesets.Scoring
         [Pure]
         internal void ExtractScoringValues(FrameHeader header, out ScoringValues current, out ScoringValues maximum)
         {
+            if (header.BaseScore != null && header.BonusScore != null && header.Maximum != null)
+            {
+                current = new ScoringValues
+                {
+                    BaseScore = header.BaseScore.Value,
+                    BonusScore = header.BonusScore.Value,
+                    MaxCombo = header.MaxCombo,
+                };
+
+                maximum = header.Maximum.Value;
+                return;
+            }
+
             extractScoringValues(header.Statistics, out current, out maximum);
             current.MaxCombo = header.MaxCombo;
         }
@@ -557,6 +567,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="statistics">The hit statistics to extract scoring values from.</param>
         /// <param name="current">The "current" scoring values, representing the hit statistics as they appear.</param>
         /// <param name="maximum">The "maximum" scoring values, representing the hit statistics as if the maximum hit result was attained each time.</param>
+        // todo: we won't need this anymore, ScoreInfo/SoloScoreInfo/FrameHeader will have the current and maximum scoring values populated.
         [Pure]
         private void extractScoringValues(IReadOnlyDictionary<HitResult, int> statistics, out ScoringValues current, out ScoringValues maximum)
         {
