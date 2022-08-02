@@ -200,7 +200,7 @@ namespace osu.Game.Scoring
                     return maximumScoringValues.Value;
 
                 if (!string.IsNullOrEmpty(MaximumScoringValuesJson))
-                    maximumScoringValues = JsonConvert.DeserializeObject<ScoringValues>(MaximumScoringValuesJson);
+                    maximumScoringValues = JsonConvert.DeserializeObject<ScoringValues?>(MaximumScoringValuesJson);
 
                 return maximumScoringValues;
             }
