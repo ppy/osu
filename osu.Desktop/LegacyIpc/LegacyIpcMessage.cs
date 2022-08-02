@@ -47,7 +47,7 @@ namespace osu.Desktop.LegacyIpc
         public class Data
         {
             public string MessageType { get; set; } = string.Empty;
-            public object MessageData { get; set; }
+            public object MessageData { get; set; } = default!;
         }
     }
 }
