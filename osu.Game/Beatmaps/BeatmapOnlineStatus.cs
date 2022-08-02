@@ -5,6 +5,7 @@
 
 using System.ComponentModel;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps
@@ -16,6 +17,7 @@ namespace osu.Game.Beatmaps
         /// Once in this state, online status changes should be ignored unless the beatmap is reverted or submitted.
         /// </summary>
         [Description("Local")]
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.LocallyModified))]
         LocallyModified = -4,
 
         None = -3,
