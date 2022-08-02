@@ -51,6 +51,9 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Queue an update for a beatmap set.
         /// </summary>
+        /// <remarks>
+        /// This may happen during initial import, or at a later stage in response to a user action or server event.
+        /// </remarks>
         /// <param name="beatmapSet">The beatmap set to update. Updates will be applied directly (so a transaction should be started if this instance is managed).</param>
         /// <param name="preferOnlineFetch">Whether metadata from an online source should be preferred. If <c>true</c>, the local cache will be skipped to ensure the freshest data state possible.</param>
         public void Update(BeatmapSetInfo beatmapSet, bool preferOnlineFetch)
@@ -94,15 +97,15 @@ namespace osu.Game.Beatmaps
                     beatmapInfo.LastOnlineUpdate = res.LastUpdated;
                     beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
 
+                    Debug.Assert(beatmapInfo.BeatmapSet != null);
+
                     // In the case local changes have been applied, don't reset the status.
                     if (beatmapInfo.MatchesOnlineVersion || beatmapInfo.Status != BeatmapOnlineStatus.LocallyModified)
                     {
                         beatmapInfo.Status = res.Status;
+                        beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapOnlineStatus.None;
                     }
 
-                    Debug.Assert(beatmapInfo.BeatmapSet != null);
-
-                    beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapOnlineStatus.None;
                     beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
                     beatmapInfo.BeatmapSet.DateRanked = res.BeatmapSet?.Ranked;
                     beatmapInfo.BeatmapSet.DateSubmitted = res.BeatmapSet?.Submitted;
