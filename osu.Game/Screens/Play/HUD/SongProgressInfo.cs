@@ -46,6 +46,7 @@ namespace osu.Game.Screens.Play.HUD
             if (clock != null)
                 gameplayClock = clock;
 
+            AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
                 new Container
@@ -138,9 +139,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private void keepTextSpritesUpright()
         {
-            timeCurrent.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUpright(timeCurrent); };
-            progress.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUpright(timeCurrent); };
-            timeLeft.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUpright(timeCurrent); };
+            timeCurrent.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUprightAndUnstretched(timeCurrent); };
+            progress.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUprightAndUnstretched(timeCurrent); };
+            timeLeft.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUprightAndUnstretched(timeCurrent); };
         }
 
     }
