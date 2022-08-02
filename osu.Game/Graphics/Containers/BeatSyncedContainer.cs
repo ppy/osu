@@ -26,8 +26,10 @@ namespace osu.Game.Graphics.Containers
     {
         private int lastBeat;
 
-        protected TimingControlPoint? LastTimingPoint { get; private set; }
-        protected EffectControlPoint? LastEffectPoint { get; private set; }
+        private TimingControlPoint? lastTimingPoint { get; set; }
+        private EffectControlPoint? lastEffectPoint { get; set; }
+
+        public bool IsKiaiTime { get; private set; }
 
         /// <summary>
         /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes)"/>.
@@ -125,7 +127,7 @@ namespace osu.Game.Graphics.Containers
 
             TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
 
-            if (ReferenceEquals(timingPoint, LastTimingPoint) && beatIndex == lastBeat)
+            if (ReferenceEquals(timingPoint, lastTimingPoint) && beatIndex == lastBeat)
                 return;
 
             // as this event is sometimes used for sound triggers where `BeginDelayedSequence` has no effect, avoid firing it if too far away from the beat.
@@ -137,8 +139,10 @@ namespace osu.Game.Graphics.Containers
             }
 
             lastBeat = beatIndex;
-            LastTimingPoint = timingPoint;
-            LastEffectPoint = effectPoint;
+            lastTimingPoint = timingPoint;
+            lastEffectPoint = effectPoint;
+
+            IsKiaiTime = lastEffectPoint?.KiaiMode ?? false;
         }
     }
 }
