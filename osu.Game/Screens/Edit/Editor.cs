@@ -863,6 +863,12 @@ namespace osu.Game.Screens.Edit
             lastSavedHash = changeHandler?.CurrentStateHash;
         }
 
+        private void editBeatmapUsingExternalTool()
+        {
+            Save();
+            new TemporaryBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
+        }
+
         private List<MenuItem> createFileMenuItems()
         {
             var fileMenuItems = new List<MenuItem>
@@ -872,6 +878,7 @@ namespace osu.Game.Screens.Edit
 
             if (RuntimeInfo.IsDesktop)
                 fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
+                fileMenuItems.Add(new EditorMenuItem("Edit beatmap using external tool (Under Construction)", MenuItemType.Standard, editBeatmapUsingExternalTool));
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
