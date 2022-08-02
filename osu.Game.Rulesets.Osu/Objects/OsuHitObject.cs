@@ -155,8 +155,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             TimeFadeIn = 400 * Math.Min(1, TimePreempt / PREEMPT_MIN);
 
             // Circle size scale works differently in droid.
-            Scale = (assumed_height / 480) * (54.42f - difficulty.CircleSize * 4.48f) * 2 /
-                    128 + (0.5f * (11 - 5.2450170716245195f)) / 5;
+            Scale = (assumed_height / 480f) * ((54.42f - difficulty.CircleSize * 4.48f) * 2f) /
+                    128 + (0.5f * (11 - 5.2450170716245195f)) / 5f;
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
