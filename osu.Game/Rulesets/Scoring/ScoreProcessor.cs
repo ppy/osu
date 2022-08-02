@@ -293,8 +293,7 @@ namespace osu.Game.Rulesets.Scoring
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
 
-            if (scoreInfo.ScoringValues is not ScoringValues current || scoreInfo.MaximumScoringValues is not ScoringValues maximum)
-                ExtractScoringValues(scoreInfo, out current, out maximum);
+            ExtractScoringValues(scoreInfo, out var current, out var maximum);
 
             return ComputeScore(mode, current, maximum);
         }
@@ -319,8 +318,7 @@ namespace osu.Game.Rulesets.Scoring
             double accuracyRatio = scoreInfo.Accuracy;
             double comboRatio = maxAchievableCombo > 0 ? (double)scoreInfo.MaxCombo / maxAchievableCombo : 1;
 
-            if (scoreInfo.ScoringValues is not ScoringValues current || scoreInfo.MaximumScoringValues is not ScoringValues maximum)
-                ExtractScoringValues(scoreInfo, out current, out maximum);
+            ExtractScoringValues(scoreInfo, out var current, out var maximum);
 
             // For legacy osu!mania scores, a full-GREAT score has 100% accuracy. If combined with a full-combo, the score becomes indistinguishable from a full-PERFECT score.
             // To get around this, the accuracy ratio is always recalculated based on the hit statistics rather than trusting the score.
@@ -433,7 +431,8 @@ namespace osu.Game.Rulesets.Scoring
             foreach (var result in HitResultExtensions.ALL_TYPES)
                 score.Statistics[result] = GetStatistic(result);
 
-            score.ScoringValues = currentScoringValues;
+            score.BaseScore = currentScoringValues.BaseScore;
+            score.BonusScore = currentScoringValues.BonusScore;
             score.MaximumScoringValues = maximumScoringValues;
 
             // Populate total score after everything else.
@@ -501,6 +500,19 @@ namespace osu.Game.Rulesets.Scoring
         [Pure]
         internal void ExtractScoringValues(ScoreInfo scoreInfo, out ScoringValues current, out ScoringValues maximum)
         {
+            if (scoreInfo.BaseScore != null && scoreInfo.BonusScore != null && scoreInfo.MaximumScoringValues != null)
+            {
+                current = new ScoringValues
+                {
+                    BaseScore = scoreInfo.BaseScore.Value,
+                    BonusScore = scoreInfo.BonusScore.Value,
+                    MaxCombo = scoreInfo.MaxCombo,
+                };
+
+                maximum = scoreInfo.MaximumScoringValues.Value;
+                return;
+            }
+
             extractScoringValues(scoreInfo.Statistics, out current, out maximum);
             current.MaxCombo = scoreInfo.MaxCombo;
         }

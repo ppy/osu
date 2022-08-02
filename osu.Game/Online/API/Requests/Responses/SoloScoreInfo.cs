@@ -34,7 +34,14 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool Passed { get; set; }
 
         [JsonProperty("total_score")]
+        // todo: rename this to "LegacyTotalScore" and/or remove this in favour of BaseScore and BonusScore.
         public int TotalScore { get; set; }
+
+        [JsonProperty("base_score")]
+        public double BaseScore { get; set; }
+
+        [JsonProperty("bonus_score")]
+        public double BonusScore { get; set; }
 
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
@@ -73,9 +80,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics { get; set; } = new Dictionary<HitResult, int>();
-
-        [JsonProperty("scoring_values")]
-        public ScoringValues ScoringValues { get; set; }
 
         [JsonProperty("maximum_scoring_values")]
         public ScoringValues MaximumScoringValues { get; set; }
@@ -146,12 +150,13 @@ namespace osu.Game.Online.API.Requests.Responses
             BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
             Ruleset = new RulesetInfo { OnlineID = RulesetID },
             Passed = Passed,
+            BaseScore = BaseScore,
+            BonusScore = BonusScore,
             TotalScore = TotalScore,
             Accuracy = Accuracy,
             MaxCombo = MaxCombo,
             Rank = Rank,
             Statistics = Statistics,
-            ScoringValues = ScoringValues,
             MaximumScoringValues = MaximumScoringValues,
             Date = EndedAt,
             Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
@@ -174,7 +179,8 @@ namespace osu.Game.Online.API.Requests.Responses
             Passed = score.Passed,
             Mods = score.APIMods,
             Statistics = score.Statistics,
-            ScoringValues = score.ScoringValues ?? new ScoringValues(),
+            BaseScore = score.BaseScore ?? 0,
+            BonusScore = score.BonusScore ?? 0,
             MaximumScoringValues = score.MaximumScoringValues ?? new ScoringValues(),
         };
 

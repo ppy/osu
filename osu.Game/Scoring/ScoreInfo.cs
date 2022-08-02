@@ -39,7 +39,12 @@ namespace osu.Game.Scoring
 
         public bool DeletePending { get; set; }
 
+        // todo: rename this to "LegacyTotalScore" and/or remove this in favour of BaseScore and BonusScore.
         public long TotalScore { get; set; }
+
+        public double? BaseScore { get; set; }
+
+        public double? BonusScore { get; set; }
 
         public int MaxCombo { get; set; }
 
@@ -62,9 +67,6 @@ namespace osu.Game.Scoring
 
         [MapTo("Statistics")]
         public string StatisticsJson { get; set; } = string.Empty;
-
-        [MapTo("ScoringValues")]
-        public string ScoringValuesJson { get; set; } = string.Empty;
 
         [MapTo("MaximumScoringValues")]
         public string MaximumScoringValuesJson { get; set; } = string.Empty;
@@ -185,28 +187,6 @@ namespace osu.Game.Scoring
                 return statistics ??= new Dictionary<HitResult, int>();
             }
             set => statistics = value;
-        }
-
-        private ScoringValues? scoringValues;
-
-        [Ignored]
-        public ScoringValues? ScoringValues
-        {
-            get
-            {
-                if (scoringValues != null)
-                    return scoringValues.Value;
-
-                if (!string.IsNullOrEmpty(ScoringValuesJson))
-                    scoringValues = JsonConvert.DeserializeObject<ScoringValues>(ScoringValuesJson);
-
-                return scoringValues;
-            }
-            set
-            {
-                scoringValues = value;
-                ScoringValuesJson = JsonConvert.SerializeObject(value);
-            }
         }
 
         private ScoringValues? maximumScoringValues;
