@@ -25,6 +25,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneCursorTrail : OsuTestScene
     {
+        [Resolved]
+        private IRenderer renderer { get; set; }
+
         [Test]
         public void TestSmoothCursorTrail()
         {
@@ -44,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             createTest(() =>
             {
-                var skinContainer = new LegacySkinContainer(false);
+                var skinContainer = new LegacySkinContainer(renderer, false);
                 var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
 
                 skinContainer.Child = legacyCursorTrail;
@@ -58,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             createTest(() =>
             {
-                var skinContainer = new LegacySkinContainer(true);
+                var skinContainer = new LegacySkinContainer(renderer, true);
                 var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
 
                 skinContainer.Child = legacyCursorTrail;
@@ -82,13 +85,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Cached(typeof(ISkinSource))]
         private class LegacySkinContainer : Container, ISkinSource
         {
-            [Resolved]
-            private IRenderer renderer { get; set; }
-
+            private readonly IRenderer renderer;
             private readonly bool disjoint;
 
-            public LegacySkinContainer(bool disjoint)
+            public LegacySkinContainer(IRenderer renderer, bool disjoint)
             {
+                this.renderer = renderer;
                 this.disjoint = disjoint;
 
                 RelativeSizeAxes = Axes.Both;

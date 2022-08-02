@@ -43,10 +43,19 @@ namespace osu.Game.Tests.Visual.Background
             "Backgrounds/bg3"
         };
 
-        [BackgroundDependencyLoader]
-        private void load(IRenderer renderer, LargeTextureStore wrappedStore)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            textureStore = new LookupLoggingTextureStore(renderer);
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            textureStore = new LookupLoggingTextureStore(dependencies.Get<IRenderer>());
+            dependencies.CacheAs(typeof(LargeTextureStore), textureStore);
+
+            return dependencies;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(LargeTextureStore wrappedStore)
+        {
             textureStore.AddStore(wrappedStore);
 
             Child = new DependencyProvidingContainer

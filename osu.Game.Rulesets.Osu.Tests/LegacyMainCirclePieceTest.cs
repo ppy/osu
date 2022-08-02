@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Child = piece = new TestLegacyMainCirclePiece(priorityLookup),
                 };
 
-                var sprites = this.ChildrenOfType<Sprite>().DistinctBy(s => s.Texture.AssetName).ToArray();
+                var sprites = this.ChildrenOfType<Sprite>().Where(s => !string.IsNullOrEmpty(s.Texture.AssetName)).DistinctBy(s => s.Texture.AssetName).ToArray();
                 Debug.Assert(sprites.Length <= 2);
             });
 
