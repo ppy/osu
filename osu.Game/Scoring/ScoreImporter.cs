@@ -75,16 +75,16 @@ namespace osu.Game.Scoring
                 model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
         }
 
-        protected override void PostImport(ScoreInfo model, Realm realm)
+        protected override void PostImport(ScoreInfo model, Realm realm, bool batchImport)
         {
-            base.PostImport(model, realm);
+            base.PostImport(model, realm, batchImport);
 
             var userRequest = new GetUserRequest(model.RealmUser.Username);
 
             api.Perform(userRequest);
 
             if (userRequest.Response is APIUser user)
-                model.RealmUser.OnlineID = user.Id;
+                model.User = user;
         }
     }
 }

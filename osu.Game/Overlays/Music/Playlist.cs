@@ -31,14 +31,16 @@ namespace osu.Game.Overlays.Music
         {
             var items = (SearchContainer<RearrangeableListItem<Live<BeatmapSetInfo>>>)ListContainer;
 
+            string[] currentCollectionHashes = criteria.Collection?.PerformRead(c => c.BeatmapMD5Hashes.ToArray());
+
             foreach (var item in items.OfType<PlaylistItem>())
             {
-                if (criteria.Collection == null)
+                if (currentCollectionHashes == null)
                     item.InSelectedCollection = true;
                 else
                 {
                     item.InSelectedCollection = item.Model.Value.Beatmaps.Select(b => b.MD5Hash)
-                                                    .Any(criteria.Collection.BeatmapHashes.Contains);
+                                                    .Any(currentCollectionHashes.Contains);
                 }
             }
 

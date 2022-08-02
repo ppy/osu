@@ -222,6 +222,8 @@ namespace osu.Game.Overlays.Mods
             globalAvailableMods.BindTo(game.AvailableMods);
         }
 
+        private ModSettingChangeTracker? modSettingChangeTracker;
+
         protected override void LoadComplete()
         {
             // this is called before base call so that the mod state is populated early, and the transition in `PopIn()` can play out properly.
@@ -238,9 +240,17 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.BindValueChanged(val =>
             {
+                modSettingChangeTracker?.Dispose();
+
                 updateMultiplier();
                 updateCustomisation(val);
                 updateFromExternalSelection();
+
+                if (AllowCustomisation)
+                {
+                    modSettingChangeTracker = new ModSettingChangeTracker(val.NewValue);
+                    modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
+                }
             }, true);
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
