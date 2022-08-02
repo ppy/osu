@@ -100,23 +100,18 @@ namespace osu.Game.Screens.Menu
 
         private void updateAmplitudes()
         {
-            bool isKiaiTime = false;
-
             for (int i = 0; i < temporalAmplitudes.Length; i++)
                 temporalAmplitudes[i] = 0;
 
             if (beatSyncProvider.Clock != null)
-            {
-                isKiaiTime = beatSyncProvider.ControlPoints?.EffectPointAt(beatSyncProvider.Clock.CurrentTime).KiaiMode ?? false;
                 addAmplitudesFromSource(beatSyncProvider);
-            }
 
             foreach (var source in amplitudeSources)
                 addAmplitudesFromSource(source);
 
             for (int i = 0; i < bars_per_visualiser; i++)
             {
-                float targetAmplitude = (temporalAmplitudes[(i + indexOffset) % bars_per_visualiser]) * (isKiaiTime ? 1 : 0.5f);
+                float targetAmplitude = (temporalAmplitudes[(i + indexOffset) % bars_per_visualiser]) * (beatSyncProvider.IsKiaiTime ? 1 : 0.5f);
                 if (targetAmplitude > frequencyAmplitudes[i])
                     frequencyAmplitudes[i] = targetAmplitude;
             }

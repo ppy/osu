@@ -22,6 +22,11 @@ namespace osu.Game.Beatmaps
         public bool BeatSyncAvailable => Clock != null;
 
         /// <summary>
+        /// Whether the beat sync provider is currently in a kiai section. Should make everything more epic.
+        /// </summary>
+        public bool IsKiaiTime => Clock != null && (ControlPoints?.EffectPointAt(Clock.CurrentTime).KiaiMode ?? false);
+
+        /// <summary>
         /// Access any available control points from a beatmap providing beat sync. If <c>null</c>, no current provider is available.
         /// </summary>
         ControlPointInfo? ControlPoints { get; }
