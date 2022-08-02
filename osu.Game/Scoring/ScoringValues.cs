@@ -43,8 +43,8 @@ namespace osu.Game.Scoring
         /// </summary>
         /// <seealso cref="HitResultExtensions.IsBasic"/>
         [Key(3)]
-        [JsonProperty("basics_count")]
-        public int BasicsCount;
+        [JsonProperty("basic_objects_count")]
+        public int BasicObjectsCount;
 
         /// <summary>
         /// The count of <see cref="HitObject"/>s awarding "large tick" hit results.

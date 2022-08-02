@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Scoring
                 scoringValues.BaseScore += result.IsHit() ? Judgement.ToNumericResult(result) : 0;
 
             if (result.IsBasic())
-                scoringValues.BasicsCount++;
+                scoringValues.BasicObjectsCount++;
 
             if (result == HitResult.LargeTickHit || result == HitResult.LargeTickMiss)
                 scoringValues.LargeTicksCount++;
@@ -264,7 +264,7 @@ namespace osu.Game.Rulesets.Scoring
                 scoringValues.BaseScore -= result.IsHit() ? Judgement.ToNumericResult(result) : 0;
 
             if (result.IsBasic())
-                scoringValues.BasicsCount--;
+                scoringValues.BasicObjectsCount--;
 
             if (result == HitResult.LargeTickHit || result == HitResult.LargeTickMiss)
                 scoringValues.LargeTicksCount--;
@@ -328,7 +328,7 @@ namespace osu.Game.Rulesets.Scoring
             if (scoreInfo.IsLegacyScore && scoreInfo.Ruleset.OnlineID == 3 && maximum.BaseScore > 0)
                 accuracyRatio = current.BaseScore / maximum.BaseScore;
 
-            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.BasicsCount);
+            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.BasicObjectsCount);
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             double accuracyRatio = maximum.BaseScore > 0 ? current.BaseScore / maximum.BaseScore : 1;
             double comboRatio = maximum.MaxCombo > 0 ? (double)current.MaxCombo / maximum.MaxCombo : 1;
-            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.BasicsCount);
+            return ComputeScore(mode, accuracyRatio, comboRatio, current.BonusScore, maximum.BasicObjectsCount);
         }
 
         /// <summary>
@@ -487,11 +487,11 @@ namespace osu.Game.Rulesets.Scoring
         /// This method is useful in a variety of situations, with a few drawbacks that need to be considered:
         /// <list type="bullet">
         ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
-        ///     <item>The current and maximum <see cref="ScoringValues.BasicsCount"/> will always be the same value.</item>
+        ///     <item>The current and maximum <see cref="ScoringValues.BasicObjectsCount"/> will always be the same value.</item>
         /// </list>
         /// Consumers are expected to more accurately fill in the above values through external means.
         /// <para>
-        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.BasicsCount"/> for use in
+        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.BasicObjectsCount"/> for use in
         /// <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoringValues,osu.Game.Scoring.ScoringValues)"/>.
         /// </para>
         /// </remarks>
@@ -512,11 +512,11 @@ namespace osu.Game.Rulesets.Scoring
         /// This method is useful in a variety of situations, with a few drawbacks that need to be considered:
         /// <list type="bullet">
         ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
-        ///     <item>The current and maximum <see cref="ScoringValues.BasicsCount"/> will always be the same value.</item>
+        ///     <item>The current and maximum <see cref="ScoringValues.BasicObjectsCount"/> will always be the same value.</item>
         /// </list>
         /// Consumers are expected to more accurately fill in the above values through external means.
         /// <para>
-        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.BasicsCount"/> for use in
+        /// <b>Ensure</b> to fill in the maximum <see cref="ScoringValues.BasicObjectsCount"/> for use in
         /// <see cref="ComputeScore(osu.Game.Rulesets.Scoring.ScoringMode,osu.Game.Scoring.ScoringValues,osu.Game.Scoring.ScoringValues)"/>.
         /// </para>
         /// </remarks>
@@ -538,7 +538,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <list type="bullet">
         ///     <item>The current <see cref="ScoringValues.MaxCombo"/> will always be 0.</item>
         ///     <item>The maximum <see cref="ScoringValues.BonusScore"/> will always be 0.</item>
-        ///     <item>The current and maximum <see cref="ScoringValues.BasicsCount"/> will always be the same value.</item>
+        ///     <item>The current and maximum <see cref="ScoringValues.BasicObjectsCount"/> will always be the same value.</item>
         /// </list>
         /// Consumers are expected to more accurately fill in the above values (especially the current <see cref="ScoringValues.MaxCombo"/>) via external means (e.g. <see cref="ScoreInfo"/>).
         /// </remarks>
@@ -583,8 +583,8 @@ namespace osu.Game.Rulesets.Scoring
                         default:
                             if (result.IsBasic())
                             {
-                                current.BasicsCount += count;
-                                maximum.BasicsCount += count;
+                                current.BasicObjectsCount += count;
+                                maximum.BasicObjectsCount += count;
                             }
 
                             maxResult = maxBasicResult ??= ruleset.GetHitResults().OrderByDescending(kvp => Judgement.ToNumericResult(kvp.result)).First().result;
