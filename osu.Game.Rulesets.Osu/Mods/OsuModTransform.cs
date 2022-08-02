@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject, state);
 
-        [SettingSource("Movement type", "Alter how circles move into place")]
+        [SettingSource("Movement type", "Alter from where the circles move into place")]
         public Bindable<TransformMovementType> Move { get; } = new Bindable<TransformMovementType>();
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
@@ -62,8 +62,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     break;
 
-                case TransformMovementType.Emit:
-                    applyEmitState(drawable);
+                case TransformMovementType.Radiate:
+                    applyRadiateState(drawable);
                     return;
 
                 default:
@@ -90,13 +90,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
                     double appearTime = h.StartTime - h.TimePreempt - 1;
-                    double moveDuration = h.TimePreempt + 1;
+                    double moveDuration = h.TimePreempt / 2 + 1;
 
                     using (drawable.BeginAbsoluteSequence(appearTime))
                     {
                         drawable
                             .MoveToOffset(appearOffset)
-                            .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
+                            .MoveTo(originalPosition, moveDuration, Easing.Out);
                     }
 
                     theta += (float)h.TimeFadeIn / 1000;
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private void applyEmitState(DrawableHitObject drawable)
+        private void applyRadiateState(DrawableHitObject drawable)
         {
             switch (drawable)
             {
@@ -118,10 +118,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                     var h = (OsuHitObject)drawable.HitObject;
                     Vector2 origin = drawable.Position;
 
-                    using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+                    // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
+                    double appearTime = h.StartTime - h.TimePreempt - 1;
+                    double moveDuration = h.TimePreempt / 2 + 1;
+                    Vector2 playfieldCenter = OsuPlayfield.BASE_SIZE / 2;
+
+                    using (drawable.BeginAbsoluteSequence(appearTime))
                     {
-                        drawable.ScaleTo(.6f).Then().ScaleTo(1, h.TimePreempt / 2, Easing.OutSine);
-                        drawable.MoveTo(OsuPlayfield.BASE_SIZE / 2).Then().MoveTo(origin, (h.TimePreempt / 2), Easing.Out);
+                        drawable.ScaleTo(.6f).Then().ScaleTo(1, moveDuration / 2, Easing.OutSine);
+                        drawable.MoveTo(playfieldCenter).Then().MoveTo(origin, moveDuration, Easing.Out);
                     }
 
                     break;
@@ -132,6 +137,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     public enum TransformMovementType
     {
         Rotate,
-        Emit
+        Radiate
     }
 }
