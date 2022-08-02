@@ -77,11 +77,10 @@ namespace osu.Game.Screens.Menu
         private readonly float[] frequencyAmplitudes = new float[256];
 
         private IShader shader;
-        private readonly Texture texture;
+        private Texture texture;
 
         public LogoVisualisation()
         {
-            texture = Texture.WhitePixel;
             Blending = BlendingParameters.Additive;
         }
 
@@ -93,9 +92,10 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap)
+        private void load(IRenderer renderer, ShaderManager shaders, IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
+            texture = renderer.WhitePixel;
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Menu
                                 Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                             );
 
-                            DrawQuad(
+                            renderer.DrawQuad(
                                 texture,
                                 rectangle,
                                 colourInfo,

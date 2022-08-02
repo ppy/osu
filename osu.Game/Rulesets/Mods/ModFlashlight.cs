@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -250,7 +249,7 @@ namespace osu.Game.Rulesets.Mods
                     shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
                     shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
 
-                    DrawQuad(Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: addAction);
+                    renderer.DrawQuad(renderer.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: addAction);
 
                     shader.Unbind();
                 }

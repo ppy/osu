@@ -68,8 +68,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(IRenderer renderer, ShaderManager shaders)
         {
+            texture ??= renderer.WhitePixel;
             shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
         }
 
@@ -79,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             resetTime();
         }
 
-        private Texture texture = Texture.WhitePixel;
+        private Texture texture;
 
         public Texture Texture
         {
@@ -264,7 +265,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
                 shader.GetUniform<float>("g_FadeExponent").UpdateValue(ref fadeExponent);
 
-                texture.TextureGL.Bind();
+                texture.Bind();
 
                 RectangleF textureRect = texture.GetTextureRect();
 

@@ -87,7 +87,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private Random stableRandom;
         private IShader shader;
-        private readonly Texture texture;
+        private Texture texture;
 
         /// <summary>
         /// Construct a new triangle visualisation.
@@ -97,13 +97,12 @@ namespace osu.Game.Graphics.Backgrounds
         {
             if (seed != null)
                 stableRandom = new Random(seed.Value);
-
-            texture = Texture.WhitePixel;
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(IRenderer renderer, ShaderManager shaders)
         {
+            texture = renderer.WhitePixel;
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
@@ -296,7 +295,7 @@ namespace osu.Game.Graphics.Backgrounds
                     ColourInfo colourInfo = DrawColourInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
-                    DrawTriangle(
+                    renderer.DrawTriangle(
                         texture,
                         triangle,
                         colourInfo,
