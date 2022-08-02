@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Tap = tapValue,
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
+                Visual = visualValue,
                 EffectiveMissCount = effectiveMissCount,
                 Total = totalValue
             };
