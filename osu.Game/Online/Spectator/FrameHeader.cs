@@ -67,11 +67,12 @@ namespace osu.Game.Online.Spectator
 
             // copy for safety
             Statistics = new Dictionary<HitResult, int>(score.Statistics);
+            Maximum = score.MaximumScoringValues;
         }
 
         [JsonConstructor]
         [SerializationConstructor]
-        public FrameHeader(int baseScore, int bonusScore, double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
+        public FrameHeader(double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime, double? baseScore, double? bonusScore, ScoringValues? maximum)
         {
             BaseScore = baseScore;
             BonusScore = bonusScore;
@@ -79,16 +80,7 @@ namespace osu.Game.Online.Spectator
             Combo = combo;
             MaxCombo = maxCombo;
             Statistics = statistics;
-            ReceivedTime = receivedTime;
-        }
-
-        // this is supposed to be for messagepack as a fallback constructor when baseScore and bonusScore is not supplied, but I don't know if this works.
-        public FrameHeader(double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
-        {
-            Accuracy = accuracy;
-            Combo = combo;
-            MaxCombo = maxCombo;
-            Statistics = statistics;
+            Maximum = maximum;
             ReceivedTime = receivedTime;
         }
     }

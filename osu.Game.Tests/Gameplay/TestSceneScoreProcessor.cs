@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Gameplay
             // Reset with a miss instead.
             scoreProcessor.ResetFromReplayFrame(new OsuReplayFrame
             {
-                Header = new FrameHeader(0, 0, 0, 0, 0, new Dictionary<HitResult, int> { { HitResult.Miss, 1 } }, DateTimeOffset.Now)
+                Header = new FrameHeader(0, 0, 0, new Dictionary<HitResult, int> { { HitResult.Miss, 1 } }, DateTimeOffset.Now, 0, 0, null)
             });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.Zero);
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Gameplay
             // Reset with no judged hit.
             scoreProcessor.ResetFromReplayFrame(new OsuReplayFrame
             {
-                Header = new FrameHeader(0, 0, 0, 0, 0, new Dictionary<HitResult, int>(), DateTimeOffset.Now)
+                Header = new FrameHeader(0, 0, 0, new Dictionary<HitResult, int>(), DateTimeOffset.Now, 0, 0, null)
             });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.Zero);
