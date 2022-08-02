@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
@@ -222,7 +222,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private Vector2 size;
             private Vector2 originPosition;
 
-            private readonly QuadBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites, 1);
+            private IVertexBatch<TexturedTrailVertex> vertexBatch;
 
             public TrailDrawNode(CursorTrail source)
                 : base(source)
@@ -254,9 +254,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Source.parts.CopyTo(parts, 0);
             }
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            public override void Draw(IRenderer renderer)
             {
-                base.Draw(vertexAction);
+                base.Draw(renderer);
+
+                vertexBatch ??= renderer.CreateQuadBatch<TexturedTrailVertex>(max_sprites, 1);
 
                 shader.Bind();
                 shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
@@ -319,7 +321,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch.Dispose();
+                vertexBatch?.Dispose();
             }
         }
 

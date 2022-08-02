@@ -6,7 +6,6 @@
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
@@ -22,6 +21,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Rendering;
 
 namespace osu.Game.Screens.Menu
 {
@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Menu
 
             private readonly float[] audioData = new float[256];
 
-            private readonly QuadBatch<TexturedVertex2D> vertexBatch = new QuadBatch<TexturedVertex2D>(100, 10);
+            private IVertexBatch<TexturedVertex2D> vertexBatch;
 
             public VisualisationDrawNode(LogoVisualisation source)
                 : base(source)
@@ -198,9 +198,11 @@ namespace osu.Game.Screens.Menu
                 Source.frequencyAmplitudes.AsSpan().CopyTo(audioData);
             }
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            public override void Draw(IRenderer renderer)
             {
-                base.Draw(vertexAction);
+                base.Draw(renderer);
+
+                vertexBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(100, 10);
 
                 shader.Bind();
 
@@ -256,7 +258,7 @@ namespace osu.Game.Screens.Menu
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch.Dispose();
+                vertexBatch?.Dispose();
             }
         }
     }
