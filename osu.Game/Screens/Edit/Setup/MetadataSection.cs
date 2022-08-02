@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Edit.Setup
                 target.Current.Value = value;
 
             updateReadOnlyState();
-            updateMetadata();
+            Scheduler.AddOnce(updateMetadata);
         }
 
         private void updateReadOnlyState()
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // for now, update on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
-            updateMetadata();
+            Scheduler.AddOnce(updateMetadata);
         }
 
         private void updateMetadata()
