@@ -38,10 +38,10 @@ namespace osu.Game.Online.API.Requests.Responses
         public int TotalScore { get; set; }
 
         [JsonProperty("base_score")]
-        public double BaseScore { get; set; }
+        public double? BaseScore { get; set; }
 
         [JsonProperty("bonus_score")]
-        public double BonusScore { get; set; }
+        public double? BonusScore { get; set; }
 
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
@@ -82,7 +82,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public Dictionary<HitResult, int> Statistics { get; set; } = new Dictionary<HitResult, int>();
 
         [JsonProperty("maximum_scoring_values")]
-        public ScoringValues MaximumScoringValues { get; set; }
+        public ScoringValues? MaximumScoringValues { get; set; }
 
         #region osu-web API additions (not stored to database).
 
@@ -179,9 +179,9 @@ namespace osu.Game.Online.API.Requests.Responses
             Passed = score.Passed,
             Mods = score.APIMods,
             Statistics = score.Statistics,
-            BaseScore = score.BaseScore ?? 0,
-            BonusScore = score.BonusScore ?? 0,
-            MaximumScoringValues = score.MaximumScoringValues ?? new ScoringValues(),
+            BaseScore = score.BaseScore,
+            BonusScore = score.BonusScore,
+            MaximumScoringValues = score.MaximumScoringValues,
         };
 
         public long OnlineID => ID ?? -1;
