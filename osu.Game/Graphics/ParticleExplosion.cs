@@ -112,7 +112,7 @@ namespace osu.Game.Graphics
                         Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
                     );
 
-                    DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha),
+                    renderer.DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha),
                         inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
                         textureCoords: TextureCoords);
                 }

@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -76,7 +75,7 @@ namespace osu.Game.Skinning
                     samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
 
                 Samples = samples;
-                Textures = new TextureStore(resources.CreateTextureLoaderStore(storage));
+                Textures = new TextureStore(resources.Renderer, resources.CreateTextureLoaderStore(storage));
             }
             else
             {

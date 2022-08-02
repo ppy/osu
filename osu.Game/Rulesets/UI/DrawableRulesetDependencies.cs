@@ -12,7 +12,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
@@ -58,8 +57,8 @@ namespace osu.Game.Rulesets.UI
             {
                 var host = parent.Get<GameHost>();
 
-                TextureStore = new TextureStore(parent.Get<GameHost>().CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
-                CacheAs(TextureStore = new FallbackTextureStore(TextureStore, parent.Get<TextureStore>()));
+                TextureStore = new TextureStore(host.Renderer, parent.Get<GameHost>().CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
+                CacheAs(TextureStore = new FallbackTextureStore(host.Renderer, TextureStore, parent.Get<TextureStore>()));
 
                 SampleStore = parent.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
                 SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
@@ -173,7 +172,8 @@ namespace osu.Game.Rulesets.UI
             private readonly TextureStore primary;
             private readonly TextureStore fallback;
 
-            public FallbackTextureStore(TextureStore primary, TextureStore fallback)
+            public FallbackTextureStore(IRenderer renderer, TextureStore primary, TextureStore fallback)
+                : base(renderer)
             {
                 this.primary = primary;
                 this.fallback = fallback;

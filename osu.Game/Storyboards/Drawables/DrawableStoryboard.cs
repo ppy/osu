@@ -90,7 +90,7 @@ namespace osu.Game.Storyboards.Drawables
             if (clock != null)
                 Clock = clock;
 
-            dependencies.Cache(new TextureStore(host.CreateTextureLoaderStore(new RealmFileStore(realm, host.Storage).Store), false, scaleAdjust: 1));
+            dependencies.Cache(new TextureStore(host.Renderer, host.CreateTextureLoaderStore(new RealmFileStore(realm, host.Storage).Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
             {
