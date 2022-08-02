@@ -95,20 +95,21 @@ namespace osu.Game.Beatmaps
                     beatmapInfo.OnlineID = res.OnlineID;
                     beatmapInfo.OnlineMD5Hash = res.MD5Hash;
                     beatmapInfo.LastOnlineUpdate = res.LastUpdated;
-                    beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
 
                     Debug.Assert(beatmapInfo.BeatmapSet != null);
+                    beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
 
-                    // In the case local changes have been applied, don't reset the status.
+                    // Some metadata should only be applied if there's no local changes.
                     if (beatmapInfo.MatchesOnlineVersion || beatmapInfo.Status != BeatmapOnlineStatus.LocallyModified)
                     {
                         beatmapInfo.Status = res.Status;
-                        beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapOnlineStatus.None;
-                    }
 
-                    beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
-                    beatmapInfo.BeatmapSet.DateRanked = res.BeatmapSet?.Ranked;
-                    beatmapInfo.BeatmapSet.DateSubmitted = res.BeatmapSet?.Submitted;
+                        beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
+
+                        beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapOnlineStatus.None;
+                        beatmapInfo.BeatmapSet.DateRanked = res.BeatmapSet?.Ranked;
+                        beatmapInfo.BeatmapSet.DateSubmitted = res.BeatmapSet?.Submitted;
+                    }
 
                     logForModel(set, $"Online retrieval mapped {beatmapInfo} to {res.OnlineBeatmapSetID} / {res.OnlineID}.");
                 }
@@ -209,16 +210,20 @@ namespace osu.Game.Beatmaps
 
                                 beatmapInfo.Status = status;
 
-                                Debug.Assert(beatmapInfo.BeatmapSet != null);
-
-                                beatmapInfo.BeatmapSet.Status = status;
-                                beatmapInfo.BeatmapSet.OnlineID = reader.GetInt32(0);
                                 // TODO: DateSubmitted and DateRanked are not provided by local cache.
                                 beatmapInfo.OnlineID = reader.GetInt32(1);
-                                beatmapInfo.Metadata.Author.OnlineID = reader.GetInt32(3);
-
                                 beatmapInfo.OnlineMD5Hash = reader.GetString(4);
                                 beatmapInfo.LastOnlineUpdate = reader.GetDateTimeOffset(5);
+
+                                Debug.Assert(beatmapInfo.BeatmapSet != null);
+                                beatmapInfo.BeatmapSet.OnlineID = reader.GetInt32(0);
+
+                                // Some metadata should only be applied if there's no local changes.
+                                if (beatmapInfo.MatchesOnlineVersion || beatmapInfo.Status != BeatmapOnlineStatus.LocallyModified)
+                                {
+                                    beatmapInfo.BeatmapSet.Status = status;
+                                    beatmapInfo.Metadata.Author.OnlineID = reader.GetInt32(3);
+                                }
 
                                 logForModel(set, $"Cached local retrieval for {beatmapInfo}.");
                                 return true;
