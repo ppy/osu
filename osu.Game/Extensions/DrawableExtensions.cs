@@ -82,11 +82,12 @@ namespace osu.Game.Extensions
         }
 
         /// <summary>
-        /// Keeps the drawable upright no matter the Rotation of its parents.
+        /// Keeps the drawable upright and prevents it from being scaled or flipped with its Parent.
         /// </summary>
         /// <param name="drawable">The drawable.</param>
-        public static void KeepUpright(this Drawable drawable)
+        public static void KeepUprightAndUnstretched(this Drawable drawable)
         {
+            // Fix the rotation
             var result = drawable.Parent.DrawInfo;
             var scale = result.Matrix.ExtractScale();
             var rotation = new Matrix3(
@@ -94,9 +95,30 @@ namespace osu.Game.Extensions
             result.Matrix.Row1 / scale.Y,
             new Vector3(0.0f, 0.0f, 1.0f)
             );
-            float angle = MathF.Atan2(rotation.M12, rotation.M11);
+            rotation.Invert();
+            float angle = MathF.Atan(rotation.M12 / rotation.M11);
             angle *= (360 / (2 * MathF.PI));
-            drawable.Rotation = -angle;
+            drawable.Rotation = angle;
+
+            // Fix the scale (includes flip)
+            var containerOriginToSpaceOrigin = new Matrix3(
+                new Vector3(1.0f, 0.0f, 0.0f),
+                new Vector3(0.0f, 1.0f, 0.0f),
+                new Vector3(drawable.DrawSize.X / 2, drawable.DrawSize.Y / 2, 1.0f)
+                );
+            var containerOriginToSpaceOriginInverse = containerOriginToSpaceOrigin;
+            containerOriginToSpaceOriginInverse.Invert();
+            Matrix3 rotatedBack = (containerOriginToSpaceOriginInverse * (rotation * (containerOriginToSpaceOrigin * result.Matrix)));
+
+            bool xFliped = rotation.M11 < 0;
+            bool yFliped = rotation.M22 < 0;
+
+            var rotatedBackScale = rotatedBack.ExtractScale();
+
+            drawable.Scale = new Vector2(
+                (xFliped ? -1 : 1) / rotatedBackScale.X,
+                (yFliped ? -1 : 1) / rotatedBackScale.Y
+            );
         }
 
     }
