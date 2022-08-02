@@ -581,12 +581,8 @@ namespace osu.Game.Rulesets.Scoring
                             break;
 
                         default:
-                            if (result.IsBasic())
-                            {
-                                current.BasicObjectsCount += count;
-                                maximum.BasicObjectsCount += count;
-                            }
-
+                            current.BasicObjectsCount += count;
+                            maximum.BasicObjectsCount += count;
                             maxResult = maxBasicResult ??= ruleset.GetHitResults().OrderByDescending(kvp => Judgement.ToNumericResult(kvp.result)).First().result;
                             break;
                     }
