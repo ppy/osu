@@ -18,7 +18,12 @@ using osu.Game.Storyboards;
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// Provides access to the multiple resources offered by a beatmap model (textures, skins, playable beatmaps etc.)
+    /// A more expensive representation of a beatmap which allows access to various associated resources.
+    /// - Access textures and other resources via <see cref="GetStream"/>.
+    /// - Access the storyboard via <see cref="Storyboard"/>.
+    /// - Access a local skin via <see cref="Skin"/>.
+    /// - Access the track via <see cref="LoadTrack"/> (and then <see cref="Track"/> for subsequent accesses).
+    /// - Create a playable <see cref="Beatmap"/> via <see cref="GetPlayableBeatmap(osu.Game.Rulesets.IRulesetInfo,System.Collections.Generic.IReadOnlyList{osu.Game.Rulesets.Mods.Mod})"/>.
     /// </summary>
     public interface IWorkingBeatmap
     {

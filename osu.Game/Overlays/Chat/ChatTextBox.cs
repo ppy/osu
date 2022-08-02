@@ -13,6 +13,8 @@ namespace osu.Game.Overlays.Chat
 
         public override bool HandleLeftRightArrows => !ShowSearch.Value;
 
+        protected override bool ClearTextOnBackKey => false;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();

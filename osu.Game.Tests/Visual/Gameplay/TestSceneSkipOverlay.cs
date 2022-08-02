@@ -33,7 +33,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             increment = skip_time;
 
             var working = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
-            working.LoadTrack();
 
             Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0)
             {

@@ -42,7 +42,11 @@ namespace osu.Game.Database
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model, bool minimiseDownloadSize);
 
-        public bool Download(T model, bool minimiseDownloadSize = false)
+        public bool Download(T model, bool minimiseDownloadSize = false) => Download(model, minimiseDownloadSize, null);
+
+        public void DownloadAsUpdate(TModel originalModel) => Download(originalModel, false, originalModel);
+
+        protected bool Download(T model, bool minimiseDownloadSize, TModel? originalModel)
         {
             if (!canDownload(model)) return false;
 
@@ -63,11 +67,15 @@ namespace osu.Game.Database
             {
                 Task.Factory.StartNew(async () =>
                 {
-                    // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    var imported = await importer.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
+                    bool importSuccessful;
+
+                    if (originalModel != null)
+                        importSuccessful = (await importer.ImportAsUpdate(notification, new ImportTask(filename), originalModel)) != null;
+                    else
+                        importSuccessful = (await importer.Import(notification, new ImportTask(filename))).Any();
 
                     // for now a failed import will be marked as a failed download for simplicity.
-                    if (!imported.Any())
+                    if (!importSuccessful)
                         DownloadFailed?.Invoke(request);
 
                     CurrentDownloads.Remove(request);

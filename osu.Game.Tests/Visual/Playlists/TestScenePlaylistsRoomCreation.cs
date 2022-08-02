@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -16,9 +17,12 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -32,7 +36,6 @@ namespace osu.Game.Tests.Visual.Playlists
     public class TestScenePlaylistsRoomCreation : OnlinePlayTestScene
     {
         private BeatmapManager manager;
-        private RulesetStore rulesets;
 
         private TestPlaylistsRoomSubScreen match;
 
@@ -41,8 +44,8 @@ namespace osu.Game.Tests.Visual.Playlists
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
 
@@ -222,9 +225,25 @@ namespace osu.Game.Tests.Visual.Playlists
 
             public new Bindable<WorkingBeatmap> Beatmap => base.Beatmap;
 
+            [Resolved(canBeNull: true)]
+            [CanBeNull]
+            private IDialogOverlay dialogOverlay { get; set; }
+
             public TestPlaylistsRoomSubScreen(Room room)
                 : base(room)
             {
+            }
+
+            public override bool OnExiting(ScreenExitEvent e)
+            {
+                // For testing purposes allow the screen to exit without confirming on second attempt.
+                if (!ExitConfirmed && dialogOverlay?.CurrentDialog is ConfirmDiscardChangesDialog confirmDialog)
+                {
+                    confirmDialog.PerformAction<PopupDialogDangerousButton>();
+                    return true;
+                }
+
+                return base.OnExiting(e);
             }
         }
     }

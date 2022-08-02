@@ -42,9 +42,9 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
-        public Action<BeatmapSetInfo>? ProcessBeatmap { private get; set; }
+        public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
 
-        public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
+        public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
                               WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
             : base(storage, realm)
         {
@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
-            beatmapImporter.ProcessBeatmap = obj => ProcessBeatmap?.Invoke(obj);
+            beatmapImporter.ProcessBeatmap = args => ProcessBeatmap?.Invoke(args);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -164,8 +164,7 @@ namespace osu.Game.Beatmaps
             // clear the hash, as that's what is used to match .osu files with their corresponding realm beatmaps.
             newBeatmapInfo.Hash = string.Empty;
             // clear online properties.
-            newBeatmapInfo.OnlineID = -1;
-            newBeatmapInfo.Status = BeatmapOnlineStatus.None;
+            newBeatmapInfo.ResetOnlineInfo();
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
         }
@@ -324,7 +323,7 @@ namespace osu.Game.Beatmaps
 
                     setInfo.CopyChangesToRealm(liveBeatmapSet);
 
-                    ProcessBeatmap?.Invoke(liveBeatmapSet);
+                    ProcessBeatmap?.Invoke((liveBeatmapSet, false));
                 });
             }
 
@@ -408,6 +407,9 @@ namespace osu.Game.Beatmaps
         {
             Realm.Run(r => Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
+
+        public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
+            beatmapImporter.ImportAsUpdate(notification, importTask, original);
 
         #region Implementation of ICanAcceptFiles
 
