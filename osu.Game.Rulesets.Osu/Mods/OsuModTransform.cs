@@ -36,18 +36,33 @@ namespace osu.Game.Rulesets.Osu.Mods
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject, state);
 
         [SettingSource("Movement type", "Alter how circles move into place")]
-        public Bindable<MoveType> Move { get; } = new Bindable<MoveType>();
+        public Bindable<TransformMovementType> Move { get; } = new Bindable<TransformMovementType>();
+
+        public override void ApplyToBeatmap(IBeatmap beatmap)
+        {
+            base.ApplyToBeatmap(beatmap);
+
+            foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
+                applyFadeInAdjustment(obj);
+
+            static void applyFadeInAdjustment(OsuHitObject osuObject)
+            {
+                osuObject.TimeFadeIn = osuObject.TimePreempt * .2;
+                foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
+                    applyFadeInAdjustment(nested);
+            }
+        }
 
         private void applyTransform(DrawableHitObject drawable, ArmedState state)
         {
             switch (Move.Value)
             {
-                case MoveType.Rotate:
+                case TransformMovementType.Rotate:
                     applyRotateState(drawable);
 
                     break;
 
-                case MoveType.Emit:
+                case TransformMovementType.Emit:
                     applyEmitState(drawable);
                     return;
 
@@ -112,24 +127,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
             }
         }
-
-        public override void ApplyToBeatmap(IBeatmap beatmap)
-        {
-            base.ApplyToBeatmap(beatmap);
-
-            foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
-                applyFadeInAdjustment(obj);
-
-            static void applyFadeInAdjustment(OsuHitObject osuObject)
-            {
-                osuObject.TimeFadeIn = osuObject.TimePreempt * .2;
-                foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
-                    applyFadeInAdjustment(nested);
-            }
-        }
     }
 
-    public enum MoveType
+    public enum TransformMovementType
     {
         Rotate,
         Emit
