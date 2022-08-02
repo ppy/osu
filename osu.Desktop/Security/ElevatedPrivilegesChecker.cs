@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Security.Principal;
 using osu.Framework;
@@ -21,7 +19,7 @@ namespace osu.Desktop.Security
     public class ElevatedPrivilegesChecker : Component
     {
         [Resolved]
-        private INotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; } = null!;
 
         private bool elevated;
 
