@@ -46,38 +46,68 @@ namespace osu.Game.Screens.Play.HUD
             if (clock != null)
                 gameplayClock = clock;
 
+            AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                timeCurrent = new OsuSpriteText
+                new Container
                 {
-                    Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                    Colour = colours.BlueLighter,
-                    Font = OsuFont.Numeric,
-                    Margin = new MarginPadding
+                    Origin = Anchor.BottomLeft,
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Left = margin,
-                    },
+                        timeCurrent = new OsuSpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Colour = colours.BlueLighter,
+                            Font = OsuFont.Numeric,
+                        }
+                    }
                 },
-                progress = new OsuSpriteText
+                new Container
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
-                    Colour = colours.BlueLighter,
-                    Font = OsuFont.Numeric,
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        progress = new OsuSpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Colour = colours.BlueLighter,
+                            Font = OsuFont.Numeric,
+                        }
+                    }
                 },
-                timeLeft = new OsuSpriteText
+                new Container
                 {
                     Origin = Anchor.BottomRight,
                     Anchor = Anchor.BottomRight,
-                    Colour = colours.BlueLighter,
-                    Font = OsuFont.Numeric,
-                    Margin = new MarginPadding
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Right = margin,
-                    },
+                        timeLeft = new OsuSpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Colour = colours.BlueLighter,
+                            Font = OsuFont.Numeric,
+                            Margin = new MarginPadding
+                            {
+                                Right = margin,
+                            },
+                        }
+                    }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            keepTextSpritesUpright();
         }
 
         protected override void Update()
@@ -106,5 +136,13 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
+
+        private void keepTextSpritesUpright()
+        {
+            timeCurrent.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUprightAndUnstretched(timeCurrent); };
+            progress.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUprightAndUnstretched(timeCurrent); };
+            timeLeft.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUprightAndUnstretched(timeCurrent); };
+        }
+
     }
 }
