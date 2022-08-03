@@ -5,14 +5,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Database
 {
     public class TooManyDownloadsNotification : SimpleNotification
     {
-        public TooManyDownloadsNotification(string humanisedModelName)
+        public TooManyDownloadsNotification()
         {
-            Text = $"You have downloaded too many {humanisedModelName}s! Please try again later.";
+            Text = BeatmapsetsStrings.DownloadLimitExceeded;
             Icon = FontAwesome.Solid.ExclamationCircle;
         }
 

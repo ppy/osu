@@ -112,7 +112,7 @@ namespace osu.Game.Database
                     if (error is WebException webException && webException.Message == @"TooManyRequests")
                     {
                         notification.Close();
-                        PostNotification?.Invoke(new TooManyDownloadsNotification(importer.HumanisedModelName));
+                        PostNotification?.Invoke(new TooManyDownloadsNotification());
                     }
                     else
                         Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} download failed!");
