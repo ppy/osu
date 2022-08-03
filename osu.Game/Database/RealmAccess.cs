@@ -67,7 +67,7 @@ namespace osu.Game.Database
         /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
         /// 21   2022-07-27    Migrate collections to realm (BeatmapCollection).
         /// 22   2022-07-31    Added ModPreset.
-        /// 23   2022-08-02    Added ScoringValues and MaximumScoringValues to ScoreInfo.
+        /// 23   2022-08-02    Added BaseScore, BonusScore, and MaximumScoringValues to ScoreInfo.
         /// </summary>
         private const int schema_version = 23;
 
