@@ -37,17 +37,19 @@ namespace osu.Desktop.LegacyIpc
         public new object Value
         {
             get => base.Value;
-            set => base.Value = new Data
-            {
-                MessageType = value.GetType().Name,
-                MessageData = value
-            };
+            set => base.Value = new Data(value.GetType().Name, value);
         }
 
         public class Data
         {
-            public string MessageType { get; set; } = string.Empty;
-            public object MessageData { get; set; } = default!;
+            public Data(string messageType, object messageData)
+            {
+                MessageType = messageType;
+                MessageData = messageData;
+            }
+
+            public string MessageType { get; set; }
+            public object MessageData { get; set; }
         }
     }
 }
