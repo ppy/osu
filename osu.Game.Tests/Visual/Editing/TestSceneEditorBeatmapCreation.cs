@@ -294,7 +294,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("approach rate correctly copied", () => EditorBeatmap.Difficulty.ApproachRate == 4);
             AddAssert("combo colours correctly copied", () => EditorBeatmap.BeatmapSkin.AsNonNull().ComboColours.Count == 2);
 
-            AddAssert("status not copied", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.None);
+            AddAssert("status is modified", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.LocallyModified);
             AddAssert("online ID not copied", () => EditorBeatmap.BeatmapInfo.OnlineID == -1);
 
             AddStep("save beatmap", () => Editor.Save());
