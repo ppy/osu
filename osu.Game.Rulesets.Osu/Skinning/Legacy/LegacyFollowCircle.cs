@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
@@ -21,35 +20,38 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             InternalChild = animationContent;
         }
 
-        protected override void OnTrackingChanged(ValueChangedEvent<bool> tracking)
+        protected override void OnSliderPress()
         {
             Debug.Assert(ParentObject != null);
-
-            if (ParentObject.Judged)
-                return;
 
             double remainingTime = Math.Max(0, ParentObject.HitStateUpdateTime - Time.Current);
 
             // Note that the scale adjust here is 2 instead of DrawableSliderBall.FOLLOW_AREA to match legacy behaviour.
             // This means the actual tracking area for gameplay purposes is larger than the sprite (but skins may be accounting for this).
-            if (tracking.NewValue)
-            {
-                // TODO: Follow circle should bounce on each slider tick.
-                this.ScaleTo(0.5f).ScaleTo(2f, Math.Min(180f, remainingTime), Easing.Out)
-                    .FadeTo(0).FadeTo(1f, Math.Min(60f, remainingTime));
-            }
-            else
-            {
-                // TODO: Should animate only at the next slider tick if we want to match stable perfectly.
-                this.ScaleTo(4f, 100)
-                    .FadeTo(0f, 100);
-            }
+            this.ScaleTo(0.5f).ScaleTo(2f, Math.Min(180f, remainingTime), Easing.Out)
+                .FadeTo(0).FadeTo(1f, Math.Min(60f, remainingTime));
+        }
+
+        protected override void OnSliderRelease()
+        {
         }
 
         protected override void OnSliderEnd()
         {
             this.ScaleTo(1.6f, 200, Easing.Out)
                 .FadeOut(200, Easing.In);
+        }
+
+        protected override void OnSliderTick()
+        {
+            this.ScaleTo(2.2f)
+                .ScaleTo(2f, 200);
+        }
+
+        protected override void OnSliderBreak()
+        {
+            this.ScaleTo(4f, 100)
+                .FadeTo(0f, 100);
         }
     }
 }

@@ -10,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -280,6 +281,28 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("return", () => songSelect.MakeCurrent());
             AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
             AddAssert("filter count is 2", () => songSelect.FilterCount == 2);
+        }
+
+        [Test]
+        public void TestCarouselSelectionUpdatesOnResume()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+
+            AddStep("update beatmap", () =>
+            {
+                var selectedBeatmap = Beatmap.Value.BeatmapInfo;
+                var anotherBeatmap = Beatmap.Value.BeatmapSetInfo.Beatmaps.Except(selectedBeatmap.Yield()).First();
+                Beatmap.Value = manager.GetWorkingBeatmap(anotherBeatmap);
+            });
+
+            AddStep("return", () => songSelect.MakeCurrent());
+            AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
+            AddAssert("carousel updated", () => songSelect.Carousel.SelectedBeatmapInfo.Equals(Beatmap.Value.BeatmapInfo));
         }
 
         [Test]
