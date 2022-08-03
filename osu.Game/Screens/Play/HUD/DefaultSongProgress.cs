@@ -40,8 +40,6 @@ namespace osu.Game.Screens.Play.HUD
         public override bool HandleNonPositionalInput => AllowSeeking.Value;
         public override bool HandlePositionalInput => AllowSeeking.Value;
 
-        protected override bool BlockScrollInput => false;
-
         [Resolved]
         private Player? player { get; set; }
 
