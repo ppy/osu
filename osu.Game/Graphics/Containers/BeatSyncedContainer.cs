@@ -27,7 +27,6 @@ namespace osu.Game.Graphics.Containers
         private int lastBeat;
 
         private TimingControlPoint? lastTimingPoint { get; set; }
-        private EffectControlPoint? lastEffectPoint { get; set; }
 
         protected bool IsKiaiTime { get; private set; }
 
@@ -87,7 +86,7 @@ namespace osu.Game.Graphics.Containers
             TimingControlPoint timingPoint;
             EffectControlPoint effectPoint;
 
-            IsBeatSyncedWithTrack = BeatSyncSource.BeatSyncAvailable && BeatSyncSource.Clock?.IsRunning == true;
+            IsBeatSyncedWithTrack = BeatSyncSource.CheckBeatSyncAvailable() && BeatSyncSource.Clock?.IsRunning == true;
 
             double currentTrackTime;
 
@@ -140,9 +139,8 @@ namespace osu.Game.Graphics.Containers
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;
-            lastEffectPoint = effectPoint;
 
-            IsKiaiTime = effectPoint?.KiaiMode ?? false;
+            IsKiaiTime = effectPoint.KiaiMode;
         }
     }
 }
