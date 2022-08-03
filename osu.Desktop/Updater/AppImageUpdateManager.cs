@@ -5,15 +5,19 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
-using osu.Desktop.Linux;
+using AppImage.Update;
+using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Game;
-using osu.Game.Online.API;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using UpdateManager = AppImage.Update.Updater;
+using State = AppImage.Update.Native.Updater.State;
+using LogLevel = AppImage.Update.LogLevel;
 
 namespace osu.Desktop.Updater
 {
@@ -24,23 +28,34 @@ namespace osu.Desktop.Updater
     [SupportedOSPlatform("linux")]
     public class AppImageUpdateManager : osu.Game.Updater.UpdateManager
     {
+#if DEBUG
+        private readonly string appPath = $"{RuntimeInfo.StartupDirectory}osu.AppImage";
+#else
+        private readonly string appPath = UpdateManager.AppImageLocation;
+#endif
+
+        private UpdateManager updateManager;
         private INotificationOverlay notificationOverlay;
 
-        /// <summary>
-        /// Implements appimageupdatetool functionality via cli
-        /// </summary>
-        private readonly AppImageUpdateTool appimageupdatetool;
+        private static readonly Logger logger = Logger.GetLogger("updater");
 
-        private string version;
+        [Resolved]
+        private GameHost host { get; set; }
+
+        /// <summary>
+        /// Whether an update has been downloaded but not yet applied.
+        /// </summary>
+        private bool updatePending;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, INotificationOverlay notifications)
+        private void load(INotificationOverlay notifications)
         {
             notificationOverlay = notifications;
-            version = game.Version;
         }
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
+
+        private bool? hasUpdate;
 
         private async Task<bool> checkForUpdateAsync(UpdateProgressNotification notification = null)
         {
@@ -49,56 +64,81 @@ namespace osu.Desktop.Updater
 
             try
             {
-                var releases = new OsuJsonWebRequest<osu.Game.Updater.GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
-
-                await releases.PerformAsync().ConfigureAwait(false);
-
-                var latest = releases.ResponseObject;
-
-                // avoid any discrepancies due to build suffixes for now.
-                // eventually we will want to support release streams and consider these.
-                string latestTagName = latest.TagName.Split('-').First();
-
-                if (latestTagName != version)
+                updateManager ??= new UpdateManager(new UpdaterOptions
                 {
-                    if (appimageupdatetool.State == AppImageUpdateTool.States.Completed)
+                    AppPath = appPath
+                })
+                {
+                    Logger = new AppImageLogger(),
+                    RawUpdateInformation = "gh-releases-zsync|ppy|osu|2022.709.1|osu.AppImage.zsync"
+                };
+
+                hasUpdate ??= await Task.Run(() => updateManager.HasUpdates()).ConfigureAwait(false);
+                hasUpdate ??= false;
+
+                if (hasUpdate.Value)
+                {
+                    if (updatePending)
                     {
                         // the user may have dismissed the completion notice, so show it again.
                         notificationOverlay.Post(new ProgressCompleteNotification(this));
                         return true;
                     }
 
-                    if (appimageupdatetool.HasUpdates())
+                    if (notification == null)
                     {
-                        if (notification == null)
+                        notification = new UpdateProgressNotification(this)
                         {
-                            notification = new UpdateProgressNotification(this)
-                            {
-                                Text = @"Downloading update...",
-                                State = ProgressNotificationState.Active
-                            };
-                            Schedule(() => notificationOverlay.Post(notification));
-                        }
+                            Text = @"Downloading update...",
+                            State = ProgressNotificationState.Active
+                        };
+                        Schedule(() => notificationOverlay.Post(notification));
+                    }
 
-                        await appimageupdatetool.ApplyUpdateAsync((progress, state) =>
+                    if (updateManager.Download(p => notification.Progress = Convert.ToSingle(p))
+                                     .GetAwaiter().GetResult() != State.SUCCESS)
+                    {
+                        notification.State = ProgressNotificationState.Cancelled;
+                        notification.Close();
+                        return false;
+                    }
+
+                    notification.Progress = 0;
+                    notification.Text = @"Installing update...";
+
+                    bool? success = updateManager.Validate(true);
+
+                    if (success.HasValue && success.Value)
+                    {
+                        notification.Progress = 1;
+                        notification.State = ProgressNotificationState.Completed;
+                        updatePending = true;
+                    }
+                    else
+                    {
+                        notification.Text = @"Validation failed.";
+                        notification.State = ProgressNotificationState.Cancelled;
+
+                        notificationOverlay.Post(new SimpleNotification
                         {
-                            notification.Progress = progress;
-
-                            switch (state)
+                            Text = "Validation failed.\n\n"
+                                   + "Click here to see logs",
+                            Icon = FontAwesome.Solid.Upload,
+                            Activated = () =>
                             {
-                                case AppImageUpdateTool.States.Verifying:
-                                    notification.Text = @"Installing update...";
-                                    break;
+                                bool opened() => host.Storage.OpenFileExternally($"logs/{logger.Filename}");
 
-                                case AppImageUpdateTool.States.Completed:
-                                    notification.State = ProgressNotificationState.Completed;
-                                    break;
+                                if (opened())
+                                {
+                                    // Second time for focus
+                                    return opened();
+                                }
 
-                                case AppImageUpdateTool.States.Canceled:
-                                    notification.State = ProgressNotificationState.Cancelled;
-                                    break;
+                                return true;
                             }
-                        }).ConfigureAwait((false));
+                        });
+
+                        notification.Close();
                     }
 
                     return true;
@@ -127,31 +167,44 @@ namespace osu.Desktop.Updater
 
         private bool preparedToRestart;
 
-        public AppImageUpdateManager(AppImageUpdateTool appimageupdatetool)
-        {
-            this.appimageupdatetool = appimageupdatetool;
-        }
-
         public override Task PrepareUpdateAsync() =>
             Task.Run(() =>
             {
-                if (!preparedToRestart)
+                if (preparedToRestart) return;
+
+                AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
                 {
-                    AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+                    using Process process = new Process();
+
+                    process.StartInfo = new ProcessStartInfo
                     {
-                        using (Process process = new Process())
-                        {
-                            process.StartInfo = new ProcessStartInfo
-                            {
-                                FileName = AppImageUpdateTool.AppImagePath,
-                                UseShellExecute = false
-                            };
-                            // NOTE: throws an Exception if the debugged AppImage is not made executable
-                            process.Start();
-                        }
+                        FileName = appPath,
+                        UseShellExecute = false
                     };
-                    preparedToRestart = true;
-                }
+                    // NOTE: throws an Exception if the debugged AppImage is not made executable
+                    process.Start();
+                };
+                preparedToRestart = true;
             });
+
+        private class AppImageLogger : ILogger
+        {
+#if DEBUG
+            public LogLevel Level { get; set; } = LogLevel.Debug;
+#else
+            public LogLevel Level { get; set; } = LogLevel.Info;
+#endif
+
+            public void Write(string message, LogLevel logLevel)
+            {
+                logger.Add(message);
+            }
+
+            public void Dispose()
+            {
+            }
+        }
+
+        public static bool Available => UpdateManager.IsAppImage;
     }
 }
