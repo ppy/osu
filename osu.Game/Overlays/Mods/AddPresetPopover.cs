@@ -84,6 +84,13 @@ namespace osu.Game.Overlays.Mods
             createButton.TextColour = colourProvider.Background6;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(nameTextBox));
+        }
+
         private void tryCreatePreset()
         {
             if (string.IsNullOrWhiteSpace(nameTextBox.Current.Value))
