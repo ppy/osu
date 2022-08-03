@@ -42,14 +42,15 @@ namespace osu.Desktop.LegacyIpc
 
         public class Data
         {
+            public string MessageType { get; }
+
+            public object MessageData { get; }
+
             public Data(string messageType, object messageData)
             {
                 MessageType = messageType;
                 MessageData = messageData;
             }
-
-            public string MessageType { get; set; }
-            public object MessageData { get; set; }
         }
     }
 }
