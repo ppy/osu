@@ -14,6 +14,12 @@ namespace osu.Game.Screens.Play.HUD
 {
     public abstract class SongProgress : OverlayContainer, ISkinnableDrawable
     {
+        // Some implementations of this element allow seeking during gameplay playback.
+        // Set a sane default of never handling input to override the behaviour provided by OverlayContainer.
+        public override bool HandleNonPositionalInput => false;
+        public override bool HandlePositionalInput => false;
+        protected override bool BlockScrollInput => false;
+
         public bool UsesFixedAnchor { get; set; }
 
         [Resolved]
