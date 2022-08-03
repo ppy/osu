@@ -227,7 +227,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             => AddUntilStep($"collection dropdown header displays '{collectionName}'",
                 () => shouldDisplay == (control.ChildrenOfType<CollectionDropdown.CollectionDropdownHeader>().Single().ChildrenOfType<SpriteText>().First().Text == collectionName));
 
-        private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.ToString()}", () => getAddOrRemoveButton(1).Icon.Equals(icon));
+        private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.Icon.ToString()}", () => getAddOrRemoveButton(1).Icon.Equals(icon));
 
         private void assertCollectionDropdownContains(string collectionName, bool shouldContain = true) =>
             AddUntilStep($"collection dropdown {(shouldContain ? "contains" : "does not contain")} '{collectionName}'",
