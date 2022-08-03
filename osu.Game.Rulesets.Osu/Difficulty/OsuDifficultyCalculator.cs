@@ -49,14 +49,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModRelax))
             {
+                aimRating *= 0.9;
                 tapRating = 0.0;
                 rhythmRating = 0.0;
+                flashlightRating *= 0.7;
+                visualRating = 0.0;
             }
 
             double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
             double baseTapPerformance = Math.Pow(5 * Math.Max(1, tapRating / 0.0675) - 4, 3) / 100000;
             double baseFlashlightPerformance = 0.0;
-            double baseVisualPerformance = Math.Pow(visualRating, 2.0) * 25.0;
+            double baseVisualPerformance = Math.Pow(visualRating, 2.0) * 22.5;
 
             if (mods.Any(h => h is OsuModFlashlight))
                 baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
