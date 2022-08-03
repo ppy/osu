@@ -41,9 +41,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= strainDecay(current.DeltaTime);
             currentStrain += VisualEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * skillMultiplier;
 
-            double rhythmMultiplier = RhythmEvaluator.EvaluateDifficultyOf(current, greatWindow);
+            currentStrain *= 1 + (RhythmEvaluator.EvaluateDifficultyOf(current, greatWindow) - 1) / 5;
 
-            return currentStrain * (1 + (rhythmMultiplier - 1) / 5);
+            return currentStrain;
         }
     }
 }
