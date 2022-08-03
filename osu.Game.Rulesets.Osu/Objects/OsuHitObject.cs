@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private const int assumed_height = 681;
 
-        public double Radius => (OBJECT_RADIUS * Math.Max(1e-3, Scale)) / (assumed_height * 0.85 / 384);
+        public double Radius => OBJECT_RADIUS * Scale;
 
         private HitObjectProperty<float> scale = new HitObjectProperty<float>(1);
 
@@ -157,6 +157,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             // Circle size scale works differently in droid.
             Scale = (assumed_height / 480f) * ((54.42f - difficulty.CircleSize * 4.48f) * 2f) /
                     128 + (0.5f * (11 - 5.2450170716245195f)) / 5f;
+
+            Scale = (float)Math.Max(1e-3, Scale) / (assumed_height * 0.85f / 384);
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
