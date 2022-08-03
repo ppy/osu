@@ -51,7 +51,7 @@ namespace osu.Game.Online.Spectator
         public double? BonusScore { get; set; }
 
         [Key(7)]
-        public ScoringValues? Maximum { get; set; }
+        public ScoringValues? MaximumScoringValues { get; set; }
 
         /// <summary>
         /// Construct header summary information from a point-in-time reference to a score which is actively being played.
@@ -67,12 +67,12 @@ namespace osu.Game.Online.Spectator
 
             // copy for safety
             Statistics = new Dictionary<HitResult, int>(score.Statistics);
-            Maximum = score.MaximumScoringValues;
+            MaximumScoringValues = score.MaximumScoringValues;
         }
 
         [JsonConstructor]
         [SerializationConstructor]
-        public FrameHeader(double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime, double? baseScore, double? bonusScore, ScoringValues? maximum)
+        public FrameHeader(double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime, double? baseScore, double? bonusScore, ScoringValues? maximumScoringValues)
         {
             BaseScore = baseScore;
             BonusScore = bonusScore;
@@ -80,7 +80,7 @@ namespace osu.Game.Online.Spectator
             Combo = combo;
             MaxCombo = maxCombo;
             Statistics = statistics;
-            Maximum = maximum;
+            MaximumScoringValues = maximumScoringValues;
             ReceivedTime = receivedTime;
         }
     }

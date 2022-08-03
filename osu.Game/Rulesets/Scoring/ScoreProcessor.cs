@@ -535,7 +535,7 @@ namespace osu.Game.Rulesets.Scoring
         [Pure]
         internal void ExtractScoringValues(FrameHeader header, out ScoringValues current, out ScoringValues maximum)
         {
-            if (header.BaseScore != null && header.BonusScore != null && header.Maximum != null)
+            if (header.BaseScore != null && header.BonusScore != null && header.MaximumScoringValues != null)
             {
                 current = new ScoringValues
                 {
@@ -544,7 +544,7 @@ namespace osu.Game.Rulesets.Scoring
                     MaxCombo = header.MaxCombo,
                 };
 
-                maximum = header.Maximum.Value;
+                maximum = header.MaximumScoringValues.Value;
                 return;
             }
 
