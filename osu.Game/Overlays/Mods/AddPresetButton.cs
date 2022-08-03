@@ -42,10 +42,10 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            selectedMods.BindValueChanged(val => Enabled.Value = val.NewValue.Any(), true);
-            Enabled.BindValueChanged(val =>
+            selectedMods.BindValueChanged(mods => Enabled.Value = mods.NewValue.Any(), true);
+            Enabled.BindValueChanged(enabled =>
             {
-                if (!val.NewValue)
+                if (!enabled.NewValue)
                     Active.Value = false;
             });
         }
