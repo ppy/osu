@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.Containers
         private TimingControlPoint? lastTimingPoint { get; set; }
         private EffectControlPoint? lastEffectPoint { get; set; }
 
-        public bool IsKiaiTime { get; private set; }
+        protected bool IsKiaiTime { get; private set; }
 
         /// <summary>
         /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes)"/>.
@@ -142,7 +142,7 @@ namespace osu.Game.Graphics.Containers
             lastTimingPoint = timingPoint;
             lastEffectPoint = effectPoint;
 
-            IsKiaiTime = lastEffectPoint?.KiaiMode ?? false;
+            IsKiaiTime = effectPoint?.KiaiMode ?? false;
         }
     }
 }
