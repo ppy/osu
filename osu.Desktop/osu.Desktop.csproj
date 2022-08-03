@@ -14,7 +14,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>osu.Desktop.Program</StartupObject>
-    <RestoreSources>Linux;$(RestoreSources);</RestoreSources>
+    <RestoreSources>Linux;$(RestoreSources);https://api.nuget.org/v3/index.json</RestoreSources>
   </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game.Tournament\osu.Game.Tournament.csproj" />
