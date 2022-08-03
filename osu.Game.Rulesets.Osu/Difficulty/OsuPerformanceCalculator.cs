@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             tapValue *= (0.95 + (attributes.OverallDifficulty >= 0 ? odScaling : -odScaling)) * Math.Pow((accuracy + relevantAccuracy) / 2.0, (14 - Math.Max(attributes.OverallDifficulty, 2.5)) / 2);
 
             // Scale the tap value with # of 50s to punish doubletapping.
-            tapValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
+            tapValue *= Math.Pow(0.99, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
 
             return tapValue;
         }
@@ -180,8 +180,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
-            else if (score.Mods.Any(m => m is OsuModHidden))
-                accuracyValue *= 1.08;
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
@@ -220,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double rawVisual = Math.Pow(attributes.VisualDifficulty, 0.8);
 
-            double visualValue = Math.Pow(rawVisual, 2.0) * 25.0;
+            double visualValue = Math.Pow(rawVisual, 2.0) * 22.5;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
