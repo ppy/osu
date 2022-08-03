@@ -38,16 +38,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Evaluate note density and overlapping factor.
             double noteDensity = 1;
             double overlappingFactor = 0;
+            var nextObj = (OsuDifficultyHitObject)current.Next(0);
 
-            for (int i = 0; i < current.Index; i++)
+            for (int i = 0; nextObj != null; nextObj = (OsuDifficultyHitObject)current.Next(++i))
             {
-                var obj = (OsuDifficultyHitObject)current.Previous(i);
-                var currObj = (OsuHitObject)obj.BaseObject;
+                var osuNextObj = (OsuHitObject)nextObj.BaseObject;
 
-                if (obj.BaseObject is Spinner)
+                if (osuNextObj is Spinner)
                     continue;
 
-                double actualDeltaTime = obj.StartTime - current.EndTime;
+                double actualDeltaTime = Math.Max(0, nextObj.StartTime - current.EndTime);
 
                 if (actualDeltaTime > osuObj.TimePreempt)
                     break;
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Penalize objects that are too close to the object in both distance
                 // and delta time to prevent stream maps from being overweighted.
-                overlappingFactor += Math.Max(0, 1 - (osuObj.StackedPosition - currObj.StackedEndPosition).Length) / (3 * osuObj.Radius)
+                overlappingFactor += Math.Max(0, 1 - (osuObj.StackedPosition - osuNextObj.StackedEndPosition).Length / (3 * osuObj.Radius))
                                     * 7.5 / (1 + Math.Exp(0.15 * (Math.Max(actualDeltaTime, 25) - 75)));
             }
 
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 strain = Math.Min(20, Math.Pow(noteDensity, 2));
 
             // Bonus based on how visible the object is.
-            for (int i = 0; i < Math.Min(current.Index, 10); ++i)
+            for (int i = 0; i < Math.Min(current.Index, 10); i++)
             {
                 var previous = (OsuDifficultyHitObject)current.Previous(i);
 
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (previous.BaseObject is Spinner || previous.IsOverlapping(true))
                     continue;
 
-                double actualDeltaTime = previous.StartTime - current.EndTime;
+                double actualDeltaTime = current.StartTime - previous.EndTime;
 
                 // Do not consider objects that don't fall under time preempt.
                 if (actualDeltaTime > osuObj.TimePreempt)
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 strain += Math.Pow(400 - osuObj.TimePreempt, 1.3) / 100;
             }
 
-            if (osuCurrObj.BaseObject is Slider slider)
+            if (current.BaseObject is Slider slider)
             {
                 double scalingFactor = 50 / slider.Radius;
 
