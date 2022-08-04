@@ -150,7 +150,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new OsuModHardRock(),
             new OsuModFlashlight(),
             new MultiMod(new OsuModFlashlight(), new OsuModHidden()),
-            new OsuModPrecise()
+            new OsuModPrecise(),
+            new OsuModHidden()
         };
     }
 }
