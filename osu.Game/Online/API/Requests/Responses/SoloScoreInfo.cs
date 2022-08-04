@@ -102,6 +102,14 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("pp")]
         public double? PP { get; set; }
 
+        public bool ShouldSerializeID() => false;
+        public bool ShouldSerializeUser() => false;
+        public bool ShouldSerializeBeatmap() => false;
+        public bool ShouldSerializeBeatmapSet() => false;
+        public bool ShouldSerializePP() => false;
+        public bool ShouldSerializeOnlineID() => false;
+        public bool ShouldSerializeHasReplay() => false;
+
         #endregion
 
         public override string ToString() => $"score_id: {ID} user_id: {UserID}";
