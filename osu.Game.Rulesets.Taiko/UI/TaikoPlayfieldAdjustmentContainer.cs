@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,17 +14,26 @@ namespace osu.Game.Rulesets.Taiko.UI
         public const float default_aspect = 16f / 9f;
 
         public readonly IBindable<bool> LockPlayfieldAspect = new BindableBool(true);
+        public Bindable<float?> ShrinkToAspectRatio = new Bindable<float?>(null);
 
         protected override void Update()
         {
             base.Update();
 
             float height = default_relative_height;
+            float parentAspectRatio = Parent.ChildSize.X / Parent.ChildSize.Y;
 
             if (LockPlayfieldAspect.Value)
-                height *= Math.Clamp(Parent.ChildSize.X / Parent.ChildSize.Y, 0.4f, 4) / default_aspect;
+                height *= Math.Clamp(parentAspectRatio, 0.4f, 4) / default_aspect;
 
             Height = height;
+
+            if (ShrinkToAspectRatio.Value != null)
+            {
+                // For some reason the null check doesn't work here, we need to cast this explicitly
+                // TODO: See if there's a better way of doing this.
+                Width = parentAspectRatio > ShrinkToAspectRatio.Value ? (float)ShrinkToAspectRatio.Value / parentAspectRatio : 1;
+            }
 
             // Position the taiko playfield exactly one playfield from the top of the screen.
             RelativePositionAxes = Axes.Y;

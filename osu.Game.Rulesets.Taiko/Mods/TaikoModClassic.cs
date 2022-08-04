@@ -55,8 +55,14 @@ namespace osu.Game.Rulesets.Taiko.Mods
             float ratio = drawableTaikoRuleset.DrawHeight / 480;
 
             double timeRange = (playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
+
+            if (enabledMods.HasFlagFast(LegacyMods.Hidden))
+            {
+                drawableTaikoRuleset.ShrinkToAspectRatio.Value = 4f / 3f;
+            }
             if (enabledMods.HasFlagFast(LegacyMods.HardRock))
             {
+                drawableTaikoRuleset.ShrinkToAspectRatio.Value = null;
                 timeRange = Math.Min(timeRange, classicMaxTimeRange);
             }
             drawableTaikoRuleset.TimeRange.Value = timeRange;
@@ -83,9 +89,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
                             TaikoPlayfield playfield = (TaikoPlayfield)drawableTaikoRuleset.Playfield;
                             if (drawableTaikoRuleset.TimeRange.Value > classicMaxTimeRange)
                             {
+                                o.Alpha = 0;
                                 double preempt = drawableTaikoRuleset.TimeRange.Value / drawableTaikoRuleset.ControlPointAt(o.HitObject.StartTime).Multiplier;
                                 double fadeInEnd = o.HitObject.StartTime - preempt * classicMaxTimeRange / drawableTaikoRuleset.TimeRange.Value;
-                                double fadeInStart = fadeInEnd - 500 / drawableTaikoRuleset.ControlPointAt(o.HitObject.StartTime).Multiplier;
+                                double fadeInStart = fadeInEnd - 2000 / drawableTaikoRuleset.ControlPointAt(o.HitObject.StartTime).Multiplier;
 
                                 using (o.BeginAbsoluteSequence(fadeInStart))
                                 {
