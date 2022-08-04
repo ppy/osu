@@ -31,6 +31,10 @@ namespace osu.Game.Overlays.Mods
         {
             AccentColour = colours.Orange1;
             HeaderText = ModSelectOverlayStrings.PersonalPresets;
+
+            AddPresetButton addPresetButton;
+            ItemsFlow.Add(addPresetButton = new AddPresetButton());
+            ItemsFlow.SetLayoutPosition(addPresetButton, float.PositiveInfinity);
         }
 
         protected override void LoadComplete()
@@ -64,7 +68,7 @@ namespace osu.Game.Overlays.Mods
 
             if (!presets.Any())
             {
-                ItemsFlow.Clear();
+                ItemsFlow.RemoveAll(panel => panel is ModPresetPanel);
                 return;
             }
 
@@ -77,7 +81,8 @@ namespace osu.Game.Overlays.Mods
 
             latestLoadTask = loadTask = LoadComponentsAsync(panels, loaded =>
             {
-                ItemsFlow.ChildrenEnumerable = loaded;
+                ItemsFlow.RemoveAll(panel => panel is ModPresetPanel);
+                ItemsFlow.AddRange(loaded);
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
             loadTask.ContinueWith(_ =>
             {
