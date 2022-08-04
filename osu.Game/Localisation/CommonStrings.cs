@@ -89,6 +89,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Collections");
 
+        /// <summary>
+        /// "Name"
+        /// </summary>
+        public static LocalisableString Name => new TranslatableString(getKey(@"name"), @"Name");
+
+        /// <summary>
+        /// "Description"
+        /// </summary>
+        public static LocalisableString Description => new TranslatableString(getKey(@"description"), @"Description");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
