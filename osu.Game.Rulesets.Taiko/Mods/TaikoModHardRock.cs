@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void ApplyToTaikoModClassic(TaikoModClassic taikoModClassic)
         {
-            taikoModClassic.enableLegacyMods(LegacyMods.HardRock);
+            taikoModClassic.EnableLegacyMods(LegacyMods.HardRock);
         }
     }
 }

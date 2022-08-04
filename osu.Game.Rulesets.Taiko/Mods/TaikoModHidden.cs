@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void ApplyToTaikoModClassic(TaikoModClassic taikoModClassic)
         {
-            taikoModClassic.enableLegacyMods(LegacyMods.Hidden);
+            taikoModClassic.EnableLegacyMods(LegacyMods.Hidden);
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)

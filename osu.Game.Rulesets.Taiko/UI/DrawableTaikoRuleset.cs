@@ -31,11 +31,11 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
     {
-        public const double default_time_range = 7000;
+        public const double DEFAULT_TIME_RANGE = 7000;
 
         public new BindableDouble TimeRange => base.TimeRange;
 
-        public Bindable<float> AspectRatioLimit = new Bindable<float>(TaikoPlayfieldAdjustmentContainer.default_aspect);
+        public Bindable<float> AspectRatioLimit = new Bindable<float>(TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT);
 
         public Bindable<AspectRatioAdjustmentMethod> AdjustmentMethod = new Bindable<AspectRatioAdjustmentMethod>(AspectRatioAdjustmentMethod.Scale);
 
@@ -49,12 +49,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
-            TimeRange.Value = default_time_range;
+            TimeRange.Value = DEFAULT_TIME_RANGE;
         }
 
         public static double aspectRatioToTimeRange(double aspectRatio)
         {
-            return aspectRatio / TaikoPlayfieldAdjustmentContainer.default_aspect * default_time_range;
+            return aspectRatio / TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT * DEFAULT_TIME_RANGE;
         }
 
         [BackgroundDependencyLoader]

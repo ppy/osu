@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets.Taiko.UI
     public class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
-        public const float default_aspect = 16f / 9f;
+        public const float DEFAULT_ASPECT = 16f / 9f;
 
-        public Bindable<float> AspectRatioLimit = new Bindable<float>(default_aspect);
+        public Bindable<float> AspectRatioLimit = new Bindable<float>(DEFAULT_ASPECT);
         public Bindable<AspectRatioAdjustmentMethod> AdjustmentMethod = new Bindable<AspectRatioAdjustmentMethod>(AspectRatioAdjustmentMethod.Scale);
 
         protected override void Update()
@@ -42,11 +42,13 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             float height = default_relative_height;
             float parentAspectRatio = Parent.ChildSize.X / Parent.ChildSize.Y;
+
             switch (AdjustmentMethod.Value)
             {
                 case AspectRatioAdjustmentMethod.Scale:
                     height *= Math.Clamp(parentAspectRatio, 0.4f, 4) / AspectRatioLimit.Value;
                     break;
+
                 case AspectRatioAdjustmentMethod.Trim:
                     Width = AspectRatioLimit.Value / parentAspectRatio;
                     break;

@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private double classicMaxTimeRange;
 
-        public void enableLegacyMods(LegacyMods legacyMods)
+        public void EnableLegacyMods(LegacyMods legacyMods)
         {
             this.enabledMods = this.enabledMods | legacyMods;
         }
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             var playfield = (TaikoPlayfield)drawableRuleset.Playfield;
             playfield.ClassicHitTargetPosition.Value = true;
 
-            classicMaxTimeRange = aspectRatioToTimeRange(classic_max_aspect_ratio);
+            classicMaxTimeRange = AspectRatioToTimeRange(classic_max_aspect_ratio);
         }
 
         public void Update(Playfield playfield)
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             else if (enabledMods.HasFlagFast(LegacyMods.Hidden))
             {
 
-                timeRange *= TaikoPlayfieldAdjustmentContainer.default_aspect / classic_hidden_aspect_ratio;
+                timeRange *= TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT / classic_hidden_aspect_ratio;
                 drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.Trim;
                 drawableTaikoRuleset.AspectRatioLimit.Value = classic_hidden_aspect_ratio;
             }
@@ -78,9 +78,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
             drawableTaikoRuleset.TimeRange.Value = timeRange;
         }
 
-        private double aspectRatioToTimeRange(double aspectRatio)
+        private double AspectRatioToTimeRange(double aspectRatio)
         {
-            return aspectRatio / TaikoPlayfieldAdjustmentContainer.default_aspect * DrawableTaikoRuleset.default_time_range;
+            return aspectRatio / TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT * DrawableTaikoRuleset.DEFAULT_TIME_RANGE;
         }
 
         void IApplicableToDrawableHitObject.ApplyToDrawableHitObject(DrawableHitObject hitObject)
