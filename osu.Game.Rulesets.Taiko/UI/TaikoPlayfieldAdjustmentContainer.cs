@@ -8,13 +8,33 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
+    /// <summary>
+    /// Methods of which <see cref="TaikoPlayfieldAdjustmentContainer"/> adjusts the aspect ratio visually. This does not
+    /// affect time range directly.
+    /// </summary>
+    public enum AspectRatioAdjustmentMethod
+    {
+        /// <summary>
+        /// Do not adjust the aspect ratio of the playfield visually.
+        /// </summary>
+        None,
+        /// <summary>
+        /// Adjust the playfield's size proportionally keeping the aspect ratio, This is the default lazer behaviour.
+        /// </summary>
+        Scale,
+        /// <summary>
+        /// Trim the playfield to fit the aspect ratio.
+        /// </summary>
+        Trim,
+    }
+
     public class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
         public const float default_aspect = 16f / 9f;
 
-        public readonly IBindable<bool> LockPlayfieldAspect = new BindableBool(true);
-        public Bindable<float?> ShrinkToAspectRatio = new Bindable<float?>(null);
+        public Bindable<float> AspectRatioLimit = new Bindable<float>(default_aspect);
+        public Bindable<AspectRatioAdjustmentMethod> AdjustmentMethod = new Bindable<AspectRatioAdjustmentMethod>(AspectRatioAdjustmentMethod.Scale);
 
         protected override void Update()
         {
@@ -22,18 +42,17 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             float height = default_relative_height;
             float parentAspectRatio = Parent.ChildSize.X / Parent.ChildSize.Y;
-
-            if (LockPlayfieldAspect.Value)
-                height *= Math.Clamp(parentAspectRatio, 0.4f, 4) / default_aspect;
+            switch (AdjustmentMethod.Value)
+            {
+                case AspectRatioAdjustmentMethod.Scale:
+                    height *= Math.Clamp(parentAspectRatio, 0.4f, 4) / AspectRatioLimit.Value;
+                    break;
+                case AspectRatioAdjustmentMethod.Trim:
+                    Width = AspectRatioLimit.Value / parentAspectRatio;
+                    break;
+            }
 
             Height = height;
-
-            if (ShrinkToAspectRatio.Value != null)
-            {
-                // For some reason the null check doesn't work here, we need to cast this explicitly
-                // TODO: See if there's a better way of doing this.
-                Width = parentAspectRatio > ShrinkToAspectRatio.Value ? (float)ShrinkToAspectRatio.Value / parentAspectRatio : 1;
-            }
 
             // Position the taiko playfield exactly one playfield from the top of the screen.
             RelativePositionAxes = Axes.Y;

@@ -22,6 +22,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
         /// </summary>
         private const float classic_max_aspect_ratio = 2.0f / 1.0f;
 
+        /// <summary>
+        /// The classic hidden aspect ratio. Note that time rate is also stretched to this from the default aspect ratio.
+        /// </summary>
+        private const float classic_hidden_aspect_ratio = 4.0f / 3.0f;
+
         private LegacyMods enabledMods = LegacyMods.None;
 
         private DrawableTaikoRuleset? drawableTaikoRuleset;
@@ -36,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
-            drawableTaikoRuleset.LockPlayfieldAspect.Value = false;
+            drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.None;
 
             var playfield = (TaikoPlayfield)drawableRuleset.Playfield;
             playfield.ClassicHitTargetPosition.Value = true;
@@ -56,15 +61,20 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             double timeRange = (playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
 
-            if (enabledMods.HasFlagFast(LegacyMods.Hidden))
-            {
-                drawableTaikoRuleset.ShrinkToAspectRatio.Value = 4f / 3f;
-            }
             if (enabledMods.HasFlagFast(LegacyMods.HardRock))
             {
-                drawableTaikoRuleset.ShrinkToAspectRatio.Value = null;
+                // Hidden aspect adjustment is overriden by hardrock in the case of hdhr
+                drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.None;
                 timeRange = Math.Min(timeRange, classicMaxTimeRange);
             }
+            else if (enabledMods.HasFlagFast(LegacyMods.Hidden))
+            {
+
+                timeRange *= TaikoPlayfieldAdjustmentContainer.default_aspect / classic_hidden_aspect_ratio;
+                drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.Trim;
+                drawableTaikoRuleset.AspectRatioLimit.Value = classic_hidden_aspect_ratio;
+            }
+
             drawableTaikoRuleset.TimeRange.Value = timeRange;
         }
 
@@ -75,17 +85,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         void IApplicableToDrawableHitObject.ApplyToDrawableHitObject(DrawableHitObject hitObject)
         {
-            if (enabledMods == LegacyMods.None)
+            switch (hitObject)
             {
-                switch (hitObject)
-                {
-                    case DrawableDrumRoll:
-                    case DrawableDrumRollTick:
-                    case DrawableHit:
-                        hitObject.ApplyCustomUpdateState += (o, state) =>
-                        {
-                            Debug.Assert(drawableTaikoRuleset != null);
+                case DrawableDrumRoll:
+                case DrawableDrumRollTick:
+                case DrawableHit:
+                    hitObject.ApplyCustomUpdateState += (o, state) =>
+                    {
+                        Debug.Assert(drawableTaikoRuleset != null);
 
+                        if (enabledMods == LegacyMods.None)
+                        {
                             TaikoPlayfield playfield = (TaikoPlayfield)drawableTaikoRuleset.Playfield;
                             if (drawableTaikoRuleset.TimeRange.Value > classicMaxTimeRange)
                             {
@@ -99,10 +109,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
                                     o.FadeIn(fadeInEnd - fadeInStart);
                                 }
                             }
-                        };
-                        break;
-                }
+                        }
+                        else if (enabledMods.HasFlagFast(LegacyMods.Hidden | LegacyMods.HardRock))
+                        {
+                            // Decrease the initial alpha of the hitobject for hdhr
+                            o.Alpha = 0.25f;
+                        }
+
+                    };
+                    break;
             }
         }
     }
 }
+

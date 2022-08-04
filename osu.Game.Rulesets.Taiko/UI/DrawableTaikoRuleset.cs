@@ -35,9 +35,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public new BindableDouble TimeRange => base.TimeRange;
 
-        public readonly BindableBool LockPlayfieldAspect = new BindableBool(true);
+        public Bindable<float> AspectRatioLimit = new Bindable<float>(TaikoPlayfieldAdjustmentContainer.default_aspect);
 
-        public Bindable<float?> ShrinkToAspectRatio = new Bindable<float?>(null);
+        public Bindable<AspectRatioAdjustmentMethod> AdjustmentMethod = new Bindable<AspectRatioAdjustmentMethod>(AspectRatioAdjustmentMethod.Scale);
 
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
@@ -90,8 +90,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
         {
-            LockPlayfieldAspect = { BindTarget = LockPlayfieldAspect },
-            ShrinkToAspectRatio = { BindTarget = ShrinkToAspectRatio }
+            AdjustmentMethod = { BindTarget = AdjustmentMethod },
+            AspectRatioLimit = { BindTarget = AspectRatioLimit }
         };
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
