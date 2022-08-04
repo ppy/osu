@@ -40,6 +40,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         public Bindable<bool> ClassicHitTargetPosition = new BindableBool();
 
+        /// <summary>
+        /// The maximum aspect ratio with classic mode enabled.
+        /// </summary>
+        public Bindable<float> ClassicMaxAspectRatio = new BindableFloat(16f / 9f);
+
         private Container<HitExplosion> hitExplosionContainer;
         private Container<KiaiHitExplosion> kiaiExplosionContainer;
         private JudgementContainer<DrawableTaikoJudgement> judgementContainer;

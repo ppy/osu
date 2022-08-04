@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
     {
+        public const double default_time_range = 7000;
+
         public new BindableDouble TimeRange => base.TimeRange;
 
         public readonly BindableBool LockPlayfieldAspect = new BindableBool(true);
@@ -43,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
-            TimeRange.Value = 7000;
+            TimeRange.Value = default_time_range;
         }
 
         [BackgroundDependencyLoader]
