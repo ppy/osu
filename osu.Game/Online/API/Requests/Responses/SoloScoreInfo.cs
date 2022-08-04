@@ -173,7 +173,7 @@ namespace osu.Game.Online.API.Requests.Responses
             RulesetID = score.RulesetID,
             Passed = score.Passed,
             Mods = score.APIMods,
-            Statistics = score.Statistics,
+            Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
         };
 
         public long OnlineID => ID ?? -1;
