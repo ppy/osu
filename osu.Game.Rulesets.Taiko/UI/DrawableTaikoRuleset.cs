@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             TimeRange.Value = DEFAULT_TIME_RANGE;
         }
 
-        public static double aspectRatioToTimeRange(double aspectRatio)
+        public static double AspectRatioToTimeRange(double aspectRatio)
         {
             return aspectRatio / TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT * DEFAULT_TIME_RANGE;
         }
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             });
 
             KeyBindingInputManager.Add(new DrumTouchInputArea());
-            this.applyClassicMods(Mods);
+            applyClassicMods(Mods);
         }
 
         protected override void UpdateAfterChildren()
@@ -113,6 +113,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 {
                     mod.ApplyToTaikoModClassic(classic);
                 }
+
                 return;
             }
         }

@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void EnableLegacyMods(LegacyMods legacyMods)
         {
-            this.enabledMods = this.enabledMods | legacyMods;
+            enabledMods = enabledMods | legacyMods;
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             var playfield = (TaikoPlayfield)drawableRuleset.Playfield;
             playfield.ClassicHitTargetPosition.Value = true;
 
-            classicMaxTimeRange = AspectRatioToTimeRange(classic_max_aspect_ratio);
+            classicMaxTimeRange = DrawableTaikoRuleset.AspectRatioToTimeRange(classic_max_aspect_ratio);
         }
 
         public void Update(Playfield playfield)
@@ -69,18 +69,12 @@ namespace osu.Game.Rulesets.Taiko.Mods
             }
             else if (enabledMods.HasFlagFast(LegacyMods.Hidden))
             {
-
                 timeRange *= TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT / classic_hidden_aspect_ratio;
                 drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.Trim;
                 drawableTaikoRuleset.AspectRatioLimit.Value = classic_hidden_aspect_ratio;
             }
 
             drawableTaikoRuleset.TimeRange.Value = timeRange;
-        }
-
-        private double AspectRatioToTimeRange(double aspectRatio)
-        {
-            return aspectRatio / TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT * DrawableTaikoRuleset.DEFAULT_TIME_RANGE;
         }
 
         void IApplicableToDrawableHitObject.ApplyToDrawableHitObject(DrawableHitObject hitObject)
@@ -96,10 +90,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                         if (enabledMods == LegacyMods.None)
                         {
-                            TaikoPlayfield playfield = (TaikoPlayfield)drawableTaikoRuleset.Playfield;
                             if (drawableTaikoRuleset.TimeRange.Value > classicMaxTimeRange)
                             {
                                 o.Alpha = 0;
+
                                 double preempt = drawableTaikoRuleset.TimeRange.Value / drawableTaikoRuleset.ControlPointAt(o.HitObject.StartTime).Multiplier;
                                 double fadeInEnd = o.HitObject.StartTime - preempt * classicMaxTimeRange / drawableTaikoRuleset.TimeRange.Value;
                                 double fadeInStart = fadeInEnd - 2000 / drawableTaikoRuleset.ControlPointAt(o.HitObject.StartTime).Multiplier;
@@ -115,11 +109,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
                             // Decrease the initial alpha of the hitobject for hdhr
                             o.Alpha = 0.25f;
                         }
-
                     };
                     break;
             }
         }
     }
 }
-

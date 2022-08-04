@@ -18,10 +18,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// Do not adjust the aspect ratio of the playfield visually.
         /// </summary>
         None,
+
         /// <summary>
         /// Adjust the playfield's size proportionally keeping the aspect ratio, This is the default lazer behaviour.
         /// </summary>
         Scale,
+
         /// <summary>
         /// Trim the playfield to fit the aspect ratio.
         /// </summary>
