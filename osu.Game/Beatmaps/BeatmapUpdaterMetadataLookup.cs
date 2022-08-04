@@ -101,13 +101,13 @@ namespace osu.Game.Beatmaps
                     beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
 
                     // Some metadata should only be applied if there's no local changes.
-                    if (beatmapInfo.MatchesOnlineVersion || beatmapInfo.Status != BeatmapOnlineStatus.LocallyModified)
+                    if (shouldSaveOnlineMetadata(beatmapInfo))
                     {
                         beatmapInfo.Status = res.Status;
                         beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
                     }
 
-                    if (beatmapInfo.BeatmapSet.Beatmaps.All(b => b.MatchesOnlineVersion || b.Status != BeatmapOnlineStatus.LocallyModified))
+                    if (beatmapInfo.BeatmapSet.Beatmaps.All(shouldSaveOnlineMetadata))
                     {
                         beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapOnlineStatus.None;
                         beatmapInfo.BeatmapSet.DateRanked = res.BeatmapSet?.Ranked;
@@ -212,7 +212,7 @@ namespace osu.Game.Beatmaps
                                 var status = (BeatmapOnlineStatus)reader.GetByte(2);
 
                                 // Some metadata should only be applied if there's no local changes.
-                                if (beatmapInfo.MatchesOnlineVersion || beatmapInfo.Status != BeatmapOnlineStatus.LocallyModified)
+                                if (shouldSaveOnlineMetadata(beatmapInfo))
                                 {
                                     beatmapInfo.Status = status;
                                     beatmapInfo.Metadata.Author.OnlineID = reader.GetInt32(3);
@@ -226,7 +226,7 @@ namespace osu.Game.Beatmaps
                                 Debug.Assert(beatmapInfo.BeatmapSet != null);
                                 beatmapInfo.BeatmapSet.OnlineID = reader.GetInt32(0);
 
-                                if (beatmapInfo.BeatmapSet.Beatmaps.All(b => b.MatchesOnlineVersion || b.Status != BeatmapOnlineStatus.LocallyModified))
+                                if (beatmapInfo.BeatmapSet.Beatmaps.All(shouldSaveOnlineMetadata))
                                 {
                                     beatmapInfo.BeatmapSet.Status = status;
                                 }
@@ -248,6 +248,12 @@ namespace osu.Game.Beatmaps
 
         private void logForModel(BeatmapSetInfo set, string message) =>
             RealmArchiveModelImporter<BeatmapSetInfo>.LogForModel(set, $"[{nameof(BeatmapUpdaterMetadataLookup)}] {message}");
+
+        /// <summary>
+        /// Check whether the provided beatmap is in a state where online "ranked" status metadata should be saved against it.
+        /// Handles the case where a user may have locally modified a beatmap in the editor and expects the local status to stick.
+        /// </summary>
+        private static bool shouldSaveOnlineMetadata(BeatmapInfo beatmapInfo) => beatmapInfo.MatchesOnlineVersion || beatmapInfo.Status != BeatmapOnlineStatus.LocallyModified;
 
         public void Dispose()
         {
