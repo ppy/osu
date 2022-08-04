@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     public class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
-        private const float default_aspect = 16f / 9f;
+        public const float default_aspect = 16f / 9f;
 
         public readonly IBindable<bool> LockPlayfieldAspect = new BindableBool(true);
 

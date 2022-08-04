@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -14,7 +15,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>
+    public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>, IApplicableToTaikoClassic
     {
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
@@ -36,6 +37,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             this.drawableRuleset = (DrawableTaikoRuleset)drawableRuleset;
+        }
+
+        public void ApplyToTaikoModClassic(TaikoModClassic taikoModClassic)
+        {
+            taikoModClassic.enableLegacyMods(LegacyMods.Hidden);
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
