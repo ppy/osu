@@ -34,6 +34,11 @@ namespace osu.Game.Rulesets.Difficulty
         private readonly IRulesetInfo ruleset;
         private readonly IWorkingBeatmap beatmap;
 
+        /// <summary>
+        /// A yymmdd version which is used to discern when reprocessing is required.
+        /// </summary>
+        public virtual int Version => 0;
+
         protected DifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
         {
             this.ruleset = ruleset;

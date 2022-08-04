@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Select.Carousel
                 switch (State.Value)
                 {
                     case CarouselItemState.Selected:
-                        return DrawableCarouselBeatmapSet.HEIGHT + Children.Count(c => c.Visible) * DrawableCarouselBeatmap.HEIGHT;
+                        return DrawableCarouselBeatmapSet.HEIGHT + Items.Count(c => c.Visible) * DrawableCarouselBeatmap.HEIGHT;
 
                     default:
                         return DrawableCarouselBeatmapSet.HEIGHT;
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
-        public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
+        public IEnumerable<CarouselBeatmap> Beatmaps => Items.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
 
@@ -44,15 +44,15 @@ namespace osu.Game.Screens.Select.Carousel
                       .OrderBy(b => b.Ruleset)
                       .ThenBy(b => b.StarRating)
                       .Select(b => new CarouselBeatmap(b))
-                      .ForEach(AddChild);
+                      .ForEach(AddItem);
         }
 
         protected override CarouselItem GetNextToSelect()
         {
             if (LastSelected == null || LastSelected.Filtered.Value)
             {
-                if (GetRecommendedBeatmap?.Invoke(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.BeatmapInfo)) is BeatmapInfo recommended)
-                    return Children.OfType<CarouselBeatmap>().First(b => b.BeatmapInfo.Equals(recommended));
+                if (GetRecommendedBeatmap?.Invoke(Items.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.BeatmapInfo)) is BeatmapInfo recommended)
+                    return Items.OfType<CarouselBeatmap>().First(b => b.BeatmapInfo.Equals(recommended));
             }
 
             return base.GetNextToSelect();
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Select.Carousel
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
-            Filtered.Value = InternalChildren.All(i => i.Filtered.Value);
+            Filtered.Value = Items.All(i => i.Filtered.Value);
         }
 
         public override string ToString() => BeatmapSet.ToString();
