@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -63,8 +64,11 @@ namespace osu.Game.Database
         /// 17   2022-07-16    Added CountryCode to RealmUser.
         /// 18   2022-07-19    Added OnlineMD5Hash and LastOnlineUpdate to BeatmapInfo.
         /// 19   2022-07-19    Added DateSubmitted and DateRanked to BeatmapSetInfo.
+        /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
+        /// 21   2022-07-27    Migrate collections to realm (BeatmapCollection).
+        /// 22   2022-07-31    Added ModPreset.
         /// </summary>
-        private const int schema_version = 19;
+        private const int schema_version = 22;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -277,7 +281,6 @@ namespace osu.Game.Database
                             realm.Remove(score);
 
                         realm.Remove(beatmap.Metadata);
-
                         realm.Remove(beatmap);
                     }
 
@@ -780,6 +783,37 @@ namespace osu.Game.Database
                 case 14:
                     foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
                         beatmap.UserSettings = new BeatmapUserSettings();
+
+                    break;
+
+                case 20:
+                    // As we now have versioned difficulty calculations, let's reset
+                    // all star ratings and have `BackgroundBeatmapProcessor` recalculate them.
+                    foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
+                        beatmap.StarRating = -1;
+
+                    break;
+
+                case 21:
+                    // Migrate collections from external file to inside realm.
+                    // We use the "legacy" importer because that is how things were actually being saved out until now.
+                    var legacyCollectionImporter = new LegacyCollectionImporter(this);
+
+                    if (legacyCollectionImporter.GetAvailableCount(storage).GetResultSafely() > 0)
+                    {
+                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(task =>
+                        {
+                            if (task.Exception != null)
+                            {
+                                // can be removed 20221027 (just for initial safety).
+                                Logger.Error(task.Exception.InnerException, "Collections could not be migrated to realm. Please provide your \"collection.db\" to the dev team.");
+                                return;
+                            }
+
+                            storage.Move("collection.db", "collection.db.migrated");
+                        });
+                    }
+
                     break;
             }
         }

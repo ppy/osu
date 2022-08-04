@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public TestScenePause()
         {
-            base.Content.Add(content = new MenuCursorContainer { RelativeSizeAxes = Axes.Both });
+            base.Content.Add(content = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both });
         }
 
         [SetUpSteps]

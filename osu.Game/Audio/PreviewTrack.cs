@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -18,15 +16,15 @@ namespace osu.Game.Audio
         /// Invoked when this <see cref="PreviewTrack"/> has stopped playing.
         /// Not invoked in a thread-safe context.
         /// </summary>
-        public event Action Stopped;
+        public event Action? Stopped;
 
         /// <summary>
         /// Invoked when this <see cref="PreviewTrack"/> has started playing.
         /// Not invoked in a thread-safe context.
         /// </summary>
-        public event Action Started;
+        public event Action? Started;
 
-        protected Track Track { get; private set; }
+        protected Track? Track { get; private set; }
 
         private bool hasStarted;
 
@@ -58,7 +56,7 @@ namespace osu.Game.Audio
         /// </summary>
         public bool IsRunning => Track?.IsRunning ?? false;
 
-        private ScheduledDelegate startDelegate;
+        private ScheduledDelegate? startDelegate;
 
         /// <summary>
         /// Starts playing this <see cref="PreviewTrack"/>.
@@ -106,6 +104,6 @@ namespace osu.Game.Audio
         /// <summary>
         /// Retrieves the audio track.
         /// </summary>
-        protected abstract Track GetTrack();
+        protected abstract Track? GetTrack();
     }
 }

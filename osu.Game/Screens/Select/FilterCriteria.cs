@@ -68,10 +68,10 @@ namespace osu.Game.Screens.Select
         }
 
         /// <summary>
-        /// The collection to filter beatmaps from.
+        /// Hashes from the <see cref="BeatmapCollection"/> to filter to.
         /// </summary>
         [CanBeNull]
-        public BeatmapCollection Collection;
+        public IEnumerable<string> CollectionBeatmapMD5Hashes { get; set; }
 
         [CanBeNull]
         public IRulesetFilterCriteria RulesetCriteria { get; set; }

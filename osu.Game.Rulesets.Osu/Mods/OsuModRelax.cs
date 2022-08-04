@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,9 +29,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         private bool isDownState;
         private bool wasLeft;
 
-        private OsuInputManager osuInputManager;
+        private OsuInputManager osuInputManager = null!;
 
-        private ReplayState<OsuAction> state;
+        private ReplayState<OsuAction> state = null!;
         private double lastStateChangeTime;
 
         private bool hasReplay;
@@ -134,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     wasLeft = !wasLeft;
                 }
 
-                state?.Apply(osuInputManager.CurrentState, osuInputManager);
+                state.Apply(osuInputManager.CurrentState, osuInputManager);
             }
         }
     }

@@ -13,21 +13,26 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Overlays.OSD;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 
 namespace osu.Game.Skinning.Editor
 {
     [Cached(typeof(SkinEditor))]
-    public class SkinEditor : VisibilityContainer, ICanAcceptFiles
+    public class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>
     {
         public const double TRANSITION_DURATION = 500;
 
@@ -67,6 +72,9 @@ namespace osu.Game.Skinning.Editor
 
         private EditorSidebar componentsSidebar;
         private EditorSidebar settingsSidebar;
+
+        [Resolved(canBeNull: true)]
+        private OnScreenDisplay onScreenDisplay { get; set; }
 
         public SkinEditor()
         {
@@ -199,6 +207,25 @@ namespace osu.Game.Skinning.Editor
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
         }
 
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+        {
+            switch (e.Action)
+            {
+                case PlatformAction.Save:
+                    if (e.Repeat)
+                        return false;
+
+                    Save();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
+        {
+        }
+
         public void UpdateTargetScreen(Drawable targetScreen)
         {
             this.targetScreen = targetScreen;
@@ -316,6 +343,7 @@ namespace osu.Game.Skinning.Editor
                 currentSkin.Value.UpdateDrawableTarget(t);
 
             skins.Save(skins.CurrentSkin.Value);
+            onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString()));
         }
 
         protected override bool OnHover(HoverEvent e) => true;
@@ -394,6 +422,14 @@ namespace osu.Game.Skinning.Editor
             base.Dispose(isDisposing);
 
             game?.UnregisterImportHandler(this);
+        }
+
+        private class SkinEditorToast : Toast
+        {
+            public SkinEditorToast(LocalisableString value, string skinDisplayName)
+                : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)
+            {
+            }
         }
     }
 }
