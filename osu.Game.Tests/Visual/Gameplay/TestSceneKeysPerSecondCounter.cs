@@ -3,9 +3,15 @@
 
 #nullable disable
 
+using System.Linq;
+using AutoMapper.Internal;
 using NUnit.Framework;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD.KPSCounter;
 using osuTK;
@@ -13,63 +19,75 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneKeysPerSecondCounter : OsuManualInputManagerTestScene
+    public class TestSceneKeysPerSecondCounter : PlayerTestScene
     {
+        protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
+        protected override bool HasCustomSteps => false;
+        protected override bool Autoplay => false;
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(true, false);
+
+        private GameplayClock gameplayClock;
+        private DrawableRuleset drawableRuleset;
+
         private KeysPerSecondCounter counter;
 
-        [SetUpSteps]
-        public void Setup()
+        private void createCounter()
+        {
+            AddStep("Create counter", () =>
+            {
+                gameplayClock = Player.GameplayClockContainer.GameplayClock;
+                drawableRuleset = Player.DrawableRuleset;
+
+                Player.HUDOverlay.Add(counter = new KeysPerSecondCounter
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(5),
+                });
+                counter.SmoothingTime.Value = 0;
+            });
+            AddUntilStep("Counter created", () => Player.HUDOverlay.Contains(counter));
+        }
+
+        [Test]
+        public void TestBasic()
         {
             createCounter();
-        }
 
-        private void createCounter() => AddStep("Create counter", () =>
-        {
-            Child = counter = new KeysPerSecondCounter
+            AddStep("press 1 key", () => InputManager.Key(Key.D));
+            AddAssert("KPS = 1", () => counter.Current.Value == 1);
+            AddUntilStep("Wait for KPS cooldown", () => counter.Current.Value <= 0);
+            AddStep("press 4 keys", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scale = new Vector2(5)
-            };
-        });
-
-        [Test]
-        public void TestManualTrigger()
-        {
-            AddAssert("Counter = 0", () => counter.Current.Value == 0);
-            AddRepeatStep("manual trigger", KeysPerSecondCalculator.AddInput, 20);
-            AddAssert("Counter is not 0", () => counter.Current.Value > 0);
-        }
-
-        [Test]
-        public void TestKpsAsideKeyCounter()
-        {
-            AddStep("Create key counter display", () =>
-                Add(new KeyCounterDisplay
+                InputManager.Key(Key.D);
+                InputManager.Key(Key.F);
+                InputManager.Key(Key.J);
+                InputManager.Key(Key.K);
+            });
+            AddAssert("KPS = 4", () => counter.Current.Value == 4);
+            AddStep("Pause player", () => Player.Pause());
+            AddAssert("KPS = 4", () => counter.Current.Value == 4);
+            AddStep("Resume player", () => Player.Resume());
+            AddStep("press 4 keys", () =>
+            {
+                InputManager.Key(Key.D);
+                InputManager.Key(Key.F);
+                InputManager.Key(Key.J);
+                InputManager.Key(Key.K);
+            });
+            AddAssert("KPS = 8", () => counter.Current.Value == 8);
+            AddUntilStep("Wait for KPS cooldown", () => counter.Current.Value <= 0);
+            AddStep("Add DT", () =>
+            {
+                var dt = new ManiaModDoubleTime
                 {
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    Y = 100,
-                    Children = new KeyCounter[]
+                    SpeedChange =
                     {
-                        new KeyCounterKeyboard(Key.W),
-                        new KeyCounterKeyboard(Key.X),
-                        new KeyCounterKeyboard(Key.C),
-                        new KeyCounterKeyboard(Key.V)
+                        Value = 2
                     }
-                })
-            );
-            AddAssert("Counter = 0", () => counter.Current.Value == 0);
-            addPressKeyStep(Key.W);
-            addPressKeyStep(Key.X);
-            addPressKeyStep(Key.C);
-            addPressKeyStep(Key.V);
-            AddAssert("Counter = 4", () => counter.Current.Value == 4);
-        }
-
-        private void addPressKeyStep(Key key)
-        {
-            AddStep($"Press {key} key", () => InputManager.Key(key));
+                };
+                Player.Mods.Value.Concat((dt.Yield()).ToArray());
+            });
         }
     }
 }
