@@ -5,15 +5,22 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System;
+
 
 namespace osu.Game.Screens.Play.HUD
 {
     public class SongProgressInfo : Container
     {
+        private GrowToFitContainer timeCurrentContainer;
+        private GrowToFitContainer timeLeftContainer;
+        private GrowToFitContainer progressContainer;
+
         private OsuSpriteText timeCurrent;
         private OsuSpriteText timeLeft;
         private OsuSpriteText progress;
@@ -51,12 +58,14 @@ namespace osu.Game.Screens.Play.HUD
             {
                 new Container
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                     AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Child = timeCurrentContainer = new GrowToFitContainer
                     {
-                        timeCurrent = new OsuSpriteText
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Child = timeCurrent = new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
@@ -67,37 +76,37 @@ namespace osu.Game.Screens.Play.HUD
                 },
                 new Container
                 {
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Child = timeLeftContainer = new GrowToFitContainer
                     {
-                        progress = new OsuSpriteText
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Child = progress = new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                             Colour = colours.BlueLighter,
                             Font = OsuFont.Numeric,
-                        }
+                         }
                     }
                 },
                 new Container
                 {
-                    Origin = Anchor.BottomRight,
-                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.CentreRight,
+                    Anchor = Anchor.CentreRight,
                     AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Child = progressContainer = new GrowToFitContainer
                     {
-                        timeLeft = new OsuSpriteText
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Child = timeLeft = new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                             Colour = colours.BlueLighter,
                             Font = OsuFont.Numeric,
-                            Margin = new MarginPadding
-                            {
-                                Right = margin,
-                            },
                         }
                     }
                 }
@@ -139,9 +148,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private void keepTextSpritesUpright()
         {
-            timeCurrent.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUprightAndUnstretched(timeCurrent); };
-            progress.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUprightAndUnstretched(timeCurrent); };
-            timeLeft.OnUpdate += (timeCurrent) => { Extensions.DrawableExtensions.KeepUprightAndUnstretched(timeCurrent); };
+            timeCurrentContainer.OnUpdate += (timeCurrentContainer) => { Extensions.DrawableExtensions.KeepUprightAndUnscaled(timeCurrentContainer); };
+            progressContainer.OnUpdate += (progressContainer) => { Extensions.DrawableExtensions.KeepUprightAndUnscaled(progressContainer); };
+            timeLeftContainer.OnUpdate += (timeLeftContainer) => { Extensions.DrawableExtensions.KeepUprightAndUnscaled(timeLeftContainer); };
         }
 
     }
