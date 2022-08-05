@@ -313,9 +313,12 @@ namespace osu.Game.Beatmaps
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
+                beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
                 setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
+                setInfo.Status = BeatmapOnlineStatus.LocallyModified;
 
                 Realm.Write(r =>
                 {
