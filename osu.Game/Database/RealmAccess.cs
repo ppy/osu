@@ -235,24 +235,27 @@ namespace osu.Game.Database
             // Check for a previous version we can use as a base database to migrate from...
             for (int i = schema_version - 1; i >= 0; i--)
             {
-                string iFilename = getVersionedFilename(i);
+                string previousFilename = getVersionedFilename(i);
 
-                if (storage.Exists(iFilename))
+                if (storage.Exists(previousFilename))
                 {
-                    using (var previous = storage.GetStream(iFilename))
-                    using (var current = storage.CreateFileSafely(filename))
-                    {
-                        Logger.Log(@$"Using previous realm database {iFilename} to migrate new schema version {schema_version}");
-                        previous.CopyTo(current);
-                    }
+                    copyPreviousVersion(previousFilename, filename);
+                    return;
                 }
             }
 
             // Finally, check for  a non-versioned file exists (aka before this method was added)...
             if (storage.Exists(originalFilename))
+                copyPreviousVersion(originalFilename, filename);
+
+            void copyPreviousVersion(string previousFilename, string newFilename)
             {
-                Logger.Log(@$"Moving non-versioned realm file {filename} to {filename}");
-                storage.Move(filename, filename);
+                using (var previous = storage.GetStream(previousFilename))
+                using (var current = storage.CreateFileSafely(newFilename))
+                {
+                    Logger.Log(@$"Copying previous realm database {previousFilename} to {newFilename} for migration to schema version {schema_version}");
+                    previous.CopyTo(current);
+                }
             }
 
             string getVersionedFilename(int version) => originalFilename.Replace(realm_extension, $"_{version}{realm_extension}");
