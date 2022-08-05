@@ -173,7 +173,7 @@ namespace osu.Game.Database
                 Filename += realm_extension;
 
 #if DEBUG
-            Filename = applyFilenameSchemaSuffix(Filename);
+            applyFilenameSchemaSuffix(ref Filename);
 #endif
 
             string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
@@ -221,24 +221,17 @@ namespace osu.Game.Database
         /// To get around this, store development databases against their realm version.
         /// Note that this means changes made on newer realm versions will disappear.
         /// </summary>
-        private string applyFilenameSchemaSuffix(string filename)
+        private void applyFilenameSchemaSuffix(ref string filename)
         {
-            string proposedFilename = getVersionedFilename(schema_version);
+            string originalFilename = filename;
+
+            filename = getVersionedFilename(schema_version);
 
             // First check if the current realm version already exists...
-            if (storage.Exists(proposedFilename))
-                return proposedFilename;
-
-            // If a non-versioned file exists (aka before this method was added), move it to the new versioned
-            // format.
             if (storage.Exists(filename))
-            {
-                Logger.Log(@$"Moving non-versioned realm file {filename} to {proposedFilename}");
-                storage.Move(filename, proposedFilename);
-                return proposedFilename;
-            }
+                return;
 
-            // If it doesn't, check for a previous version we can use as a base database to migrate from...
+            // Check for a previous version we can use as a base database to migrate from...
             for (int i = schema_version - 1; i >= 0; i--)
             {
                 string iFilename = getVersionedFilename(i);
@@ -246,7 +239,7 @@ namespace osu.Game.Database
                 if (storage.Exists(iFilename))
                 {
                     using (var previous = storage.GetStream(iFilename))
-                    using (var current = storage.CreateFileSafely(proposedFilename))
+                    using (var current = storage.CreateFileSafely(filename))
                     {
                         Logger.Log(@$"Using previous realm database {iFilename} to migrate new schema version {schema_version}");
                         previous.CopyTo(current);
@@ -254,9 +247,14 @@ namespace osu.Game.Database
                 }
             }
 
-            return proposedFilename;
+            // Finally, check for  a non-versioned file exists (aka before this method was added)...
+            if (storage.Exists(originalFilename))
+            {
+                Logger.Log(@$"Moving non-versioned realm file {filename} to {filename}");
+                storage.Move(filename, filename);
+            }
 
-            string getVersionedFilename(int version) => filename.Replace(realm_extension, $"_{version}{realm_extension}");
+            string getVersionedFilename(int version) => originalFilename.Replace(realm_extension, $"_{version}{realm_extension}");
         }
 
         private void attemptRecoverFromFile(string recoveryFilename)
