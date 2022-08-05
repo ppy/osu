@@ -118,9 +118,9 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
 
-            RegisterPool<HitCircle, DrawableHitCircle>(10, 100);
             var osuBeatmap = (OsuBeatmap)beatmap;
 
+            RegisterPool<HitCircle, DrawableHitCircle>(20, 100);
 
             var sliders = osuBeatmap.HitObjects.OfType<Slider>();
 
@@ -138,8 +138,8 @@ namespace osu.Game.Rulesets.Osu.UI
             }
 
             RegisterPool<Spinner, DrawableSpinner>(2, 20);
-            RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
-            RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 100);
+            RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 200);
+            RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 200);
         }
 
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
@@ -186,7 +186,7 @@ namespace osu.Game.Rulesets.Osu.UI
             private readonly Action<DrawableOsuJudgement> onLoaded;
 
             public DrawableJudgementPool(HitResult result, Action<DrawableOsuJudgement> onLoaded)
-                : base(10)
+                : base(20)
             {
                 this.result = result;
                 this.onLoaded = onLoaded;
