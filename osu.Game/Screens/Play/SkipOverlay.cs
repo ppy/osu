@@ -8,6 +8,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -39,6 +40,8 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         private bool isClickable;
+
+        public BindableBool IsSkippable = new()!;
 
         [Resolved]
         private GameplayClock gameplayClock { get; set; }
@@ -134,6 +137,7 @@ namespace osu.Game.Screens.Play
             remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
             isClickable = progress > 0;
+            IsSkippable.Value = isClickable;
             button.Enabled.Value = isClickable;
             buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
         }
