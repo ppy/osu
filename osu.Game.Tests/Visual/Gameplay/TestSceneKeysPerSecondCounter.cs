@@ -3,14 +3,10 @@
 
 #nullable disable
 
-using System.Linq;
-using AutoMapper.Internal;
 using NUnit.Framework;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
-using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD.KPSCounter;
@@ -76,18 +72,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.Key(Key.K);
             });
             AddAssert("KPS = 8", () => counter.Current.Value == 8);
-            AddUntilStep("Wait for KPS cooldown", () => counter.Current.Value <= 0);
-            AddStep("Add DT", () =>
-            {
-                var dt = new ManiaModDoubleTime
-                {
-                    SpeedChange =
-                    {
-                        Value = 2
-                    }
-                };
-                Player.Mods.Value.Concat((dt.Yield()).ToArray());
-            });
         }
     }
 }
