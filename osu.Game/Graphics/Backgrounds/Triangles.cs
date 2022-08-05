@@ -14,8 +14,8 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
-using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Lists;
 
 namespace osu.Game.Graphics.Backgrounds
