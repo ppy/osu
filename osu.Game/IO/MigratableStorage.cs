@@ -26,6 +26,11 @@ namespace osu.Game.IO
         /// </summary>
         public virtual string[] IgnoreFiles => Array.Empty<string>();
 
+        /// <summary>
+        /// A list of file/directory suffixes which should not be migrated.
+        /// </summary>
+        public virtual string[] IgnoreSuffixes => Array.Empty<string>();
+
         protected MigratableStorage(Storage storage, string subPath = null)
             : base(storage, subPath)
         {
@@ -73,12 +78,18 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IgnoreFiles.Contains(fi.Name))
                     continue;
 
+                if (IgnoreSuffixes.Any(suffix => fi.Name.EndsWith(suffix, StringComparison.Ordinal)))
+                    continue;
+
                 allFilesDeleted &= AttemptOperation(() => fi.Delete(), throwOnFailure: false);
             }
 
             foreach (DirectoryInfo dir in target.GetDirectories())
             {
                 if (topLevelExcludes && IgnoreDirectories.Contains(dir.Name))
+                    continue;
+
+                if (IgnoreSuffixes.Any(suffix => dir.Name.EndsWith(suffix, StringComparison.Ordinal)))
                     continue;
 
                 allFilesDeleted &= AttemptOperation(() => dir.Delete(true), throwOnFailure: false);
@@ -101,6 +112,9 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IgnoreFiles.Contains(fileInfo.Name))
                     continue;
 
+                if (IgnoreSuffixes.Any(suffix => fileInfo.Name.EndsWith(suffix, StringComparison.Ordinal)))
+                    continue;
+
                 AttemptOperation(() =>
                 {
                     fileInfo.Refresh();
@@ -117,6 +131,9 @@ namespace osu.Game.IO
             foreach (DirectoryInfo dir in source.GetDirectories())
             {
                 if (topLevelExcludes && IgnoreDirectories.Contains(dir.Name))
+                    continue;
+
+                if (IgnoreSuffixes.Any(suffix => dir.Name.EndsWith(suffix, StringComparison.Ordinal)))
                     continue;
 
                 CopyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);
