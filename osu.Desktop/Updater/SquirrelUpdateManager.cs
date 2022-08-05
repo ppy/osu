@@ -16,7 +16,7 @@ using Squirrel.SimpleSplat;
 namespace osu.Desktop.Updater
 {
     [SupportedOSPlatform("windows")]
-    public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
+    public class SquirrelUpdateManager : AbstractUpdateManager
     {
         private UpdateManager updateManager;
         private INotificationOverlay notificationOverlay;
@@ -60,7 +60,7 @@ namespace osu.Desktop.Updater
                     if (updatePending)
                     {
                         // the user may have dismissed the completion notice, so show it again.
-                        notificationOverlay.Post(new ProgressCompleteNotification(this));
+                        notificationOverlay.Post(new UpdateCompleteNotification(this));
                         return true;
                     }
 

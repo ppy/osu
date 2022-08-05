@@ -26,7 +26,7 @@ namespace osu.Desktop.Updater
     /// Updates the AppImage and backups the previous version with a .zs-old suffix.
     /// </summary>
     [SupportedOSPlatform("linux")]
-    public class AppImageUpdateManager : osu.Game.Updater.UpdateManager
+    public class AppImageUpdateManager : AbstractUpdateManager
     {
 #if DEBUG
         private readonly string appPath = $"{RuntimeInfo.StartupDirectory}osu.AppImage";
@@ -70,7 +70,7 @@ namespace osu.Desktop.Updater
                 })
                 {
                     Logger = new AppImageLogger(),
-                    RawUpdateInformation = "gh-releases-zsync|ppy|osu|2022.709.1|osu.AppImage.zsync"
+                    //RawUpdateInformation = "gh-releases-zsync|ppy|osu|2022.709.1|osu.AppImage.zsync"
                 };
 
                 hasUpdate ??= await Task.Run(() => updateManager.HasUpdates()).ConfigureAwait(false) ?? false;
@@ -80,7 +80,7 @@ namespace osu.Desktop.Updater
                     if (updatePending)
                     {
                         // the user may have dismissed the completion notice, so show it again.
-                        notificationOverlay.Post(new ProgressCompleteNotification(this));
+                        notificationOverlay.Post(new UpdateCompleteNotification(this));
                         return true;
                     }
 

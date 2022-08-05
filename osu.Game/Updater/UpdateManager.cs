@@ -5,17 +5,12 @@
 
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Updater
 {
@@ -90,11 +85,6 @@ namespace osu.Game.Updater
         /// <returns>Whether any update is waiting. May return true if an error occured (there is potentially an update available).</returns>
         protected virtual Task<bool> PerformUpdateCheck() => Task.FromResult(false);
 
-        public virtual Task PrepareUpdateAsync() => Task.Run(() => { });
-
-        /// <summary>
-        /// Shows a notification when osu was launched with a new version.
-        /// </summary>
         private class UpdateCompleteNotification : SimpleNotification
         {
             private readonly string version;
@@ -117,76 +107,6 @@ namespace osu.Game.Updater
                     changelog.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
                     return true;
                 };
-            }
-        }
-
-        /// <summary>
-        /// Shows a notification when the updated process has finished and the game is ready to be restarted.
-        /// </summary>
-        protected class ProgressCompleteNotification : ProgressCompletionNotification
-        {
-            [Resolved]
-            private OsuGame game { get; set; }
-
-            public ProgressCompleteNotification(UpdateManager updateManager)
-            {
-                Text = @"Update ready to install. Click to restart!";
-
-                Activated = () =>
-                {
-                    updateManager.PrepareUpdateAsync()
-                                 .ContinueWith(_ => updateManager.Schedule(() => game?.AttemptExit()));
-                    return true;
-                };
-            }
-        }
-
-        protected class UpdateProgressNotification : ProgressNotification
-        {
-            private readonly UpdateManager updateManager;
-
-            public UpdateProgressNotification(UpdateManager updateManager)
-            {
-                this.updateManager = updateManager;
-            }
-
-            protected override Notification CreateCompletionNotification()
-            {
-                return new ProgressCompleteNotification(updateManager);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                IconContent.AddRange(new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
-                    },
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.Upload,
-                        Colour = Color4.White,
-                        Size = new Vector2(20),
-                    }
-                });
-            }
-
-            public override void Close()
-            {
-                // cancelling updates is not currently supported by the underlying updater.
-                // only allow dismissing for now.
-
-                switch (State)
-                {
-                    case ProgressNotificationState.Cancelled:
-                        base.Close();
-                        break;
-                }
             }
         }
     }
