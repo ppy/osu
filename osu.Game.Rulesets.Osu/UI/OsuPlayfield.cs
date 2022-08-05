@@ -11,9 +11,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -112,17 +114,28 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuRulesetConfigManager config)
+        private void load(OsuRulesetConfigManager config, IBeatmap beatmap)
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
 
             RegisterPool<HitCircle, DrawableHitCircle>(10, 100);
+            var osuBeatmap = (OsuBeatmap)beatmap;
 
-            RegisterPool<Slider, DrawableSlider>(10, 100);
-            RegisterPool<SliderHeadCircle, DrawableSliderHead>(10, 100);
-            RegisterPool<SliderTailCircle, DrawableSliderTail>(10, 100);
-            RegisterPool<SliderTick, DrawableSliderTick>(10, 100);
-            RegisterPool<SliderRepeat, DrawableSliderRepeat>(5, 50);
+
+            var sliders = osuBeatmap.HitObjects.OfType<Slider>();
+
+            if (sliders.Any())
+            {
+                // handle edge cases where a beatmap has a slider with many repeats.
+                int maxRepeatsOnOneSlider = osuBeatmap.HitObjects.OfType<Slider>().Max(s => s.RepeatCount);
+                int maxTicksOnOneSlider = osuBeatmap.HitObjects.OfType<Slider>().Max(s => s.NestedHitObjects.OfType<SliderTick>().Count());
+
+                RegisterPool<Slider, DrawableSlider>(20, 100);
+                RegisterPool<SliderHeadCircle, DrawableSliderHead>(20, 100);
+                RegisterPool<SliderTailCircle, DrawableSliderTail>(20, 100);
+                RegisterPool<SliderTick, DrawableSliderTick>(Math.Max(maxTicksOnOneSlider, 20), Math.Max(maxTicksOnOneSlider, 200));
+                RegisterPool<SliderRepeat, DrawableSliderRepeat>(Math.Max(maxRepeatsOnOneSlider, 20), Math.Max(maxRepeatsOnOneSlider, 200));
+            }
 
             RegisterPool<Spinner, DrawableSpinner>(2, 20);
             RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
