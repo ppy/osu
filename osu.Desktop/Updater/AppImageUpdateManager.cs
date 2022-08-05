@@ -73,8 +73,7 @@ namespace osu.Desktop.Updater
                     RawUpdateInformation = "gh-releases-zsync|ppy|osu|2022.709.1|osu.AppImage.zsync"
                 };
 
-                hasUpdate ??= await Task.Run(() => updateManager.HasUpdates()).ConfigureAwait(false);
-                hasUpdate ??= false;
+                hasUpdate ??= await Task.Run(() => updateManager.HasUpdates()).ConfigureAwait(false) ?? false;
 
                 if (hasUpdate.Value)
                 {
@@ -126,7 +125,7 @@ namespace osu.Desktop.Updater
                             Icon = FontAwesome.Solid.Upload,
                             Activated = () =>
                             {
-                                bool opened() => host.Storage.OpenFileExternally($"logs/{logger.Filename}");
+                                bool opened() => host.Storage.GetStorageForDirectory("logs").OpenFileExternally(logger.Filename);
 
                                 if (opened())
                                 {
