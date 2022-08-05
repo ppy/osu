@@ -18,5 +18,4 @@ namespace osu.Game.Graphics.Containers
             Width = Math.Max(Child.Width, Width);
         }
     }
-
 }

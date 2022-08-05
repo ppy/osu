@@ -81,7 +81,6 @@ namespace osu.Game.Extensions
             }
         }
 
-
         /// <summary>
         /// Keeps the drawable upright and prevents it from being scaled or flipped with its Parent.
         /// </summary>
@@ -90,7 +89,7 @@ namespace osu.Game.Extensions
         {
             var parentMatrix = drawable.Parent.DrawInfo.Matrix;
             float angle = MathF.Atan(parentMatrix.M12 / parentMatrix.M11);
-            angle *= (360 / (2 * MathF.PI));
+            angle = MathHelper.RadiansToDegrees(angle);
 
             parentMatrix.Transpose();
             parentMatrix.M13 = 0.0f;
@@ -117,7 +116,6 @@ namespace osu.Game.Extensions
 
             drawable.Scale = new Vector2(sx, sy);
             drawable.Shear = new Vector2(-alpha, -beta);
-
         }
     }
 }

@@ -5,7 +5,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -148,10 +147,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private void keepTextSpritesUpright()
         {
-            timeCurrentContainer.OnUpdate += (timeCurrentContainer) => { Extensions.DrawableExtensions.KeepUprightAndUnscaled(timeCurrentContainer); };
-            progressContainer.OnUpdate += (progressContainer) => { Extensions.DrawableExtensions.KeepUprightAndUnscaled(progressContainer); };
-            timeLeftContainer.OnUpdate += (timeLeftContainer) => { Extensions.DrawableExtensions.KeepUprightAndUnscaled(timeLeftContainer); };
+            timeCurrentContainer.OnUpdate += Extensions.DrawableExtensions.KeepUprightAndUnscaled;
+            progressContainer.OnUpdate += Extensions.DrawableExtensions.KeepUprightAndUnscaled;
+            timeLeftContainer.OnUpdate += Extensions.DrawableExtensions.KeepUprightAndUnscaled;
         }
-
     }
 }
