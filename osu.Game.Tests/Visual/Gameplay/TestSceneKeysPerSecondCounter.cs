@@ -7,7 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.KPSCounter;
 using osuTK;
 using osuTK.Input;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestManualTrigger()
         {
             AddAssert("Counter = 0", () => counter.Current.Value == 0);
-            AddRepeatStep("manual trigger", KeysPerSecondCounter.AddTimestamp, 20);
+            AddRepeatStep("manual trigger", KeysPerSecondCalculator.AddInput, 20);
             AddAssert("Counter is not 0", () => counter.Current.Value > 0);
         }
 
