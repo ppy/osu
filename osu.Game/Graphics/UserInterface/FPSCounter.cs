@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
-using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -44,8 +43,6 @@ namespace osu.Game.Graphics.UserInterface
 
         private bool isDisplayed;
 
-        private ScheduledDelegate? fadeOutDelegate;
-
         private double aimDrawFPS;
         private double aimUpdateFPS;
 
@@ -53,6 +50,11 @@ namespace osu.Game.Graphics.UserInterface
         private ThrottledFrameClock drawClock = null!;
         private ThrottledFrameClock updateClock = null!;
         private ThrottledFrameClock inputClock = null!;
+
+        /// <summary>
+        /// The last time value where the display was required (due to a significant change or hovering).
+        /// </summary>
+        private double lastDisplayRequiredTime;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -131,13 +133,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            displayTemporarily();
+            requestDisplay();
 
             showFpsDisplay.BindValueChanged(showFps =>
             {
                 State.Value = showFps.NewValue ? Visibility.Visible : Visibility.Hidden;
                 if (showFps.NewValue)
-                    displayTemporarily();
+                    requestDisplay();
             }, true);
 
             State.BindValueChanged(state => showFpsDisplay.Value = state.NewValue == Visibility.Visible);
@@ -150,36 +152,15 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             background.FadeTo(1, 200);
-            displayTemporarily();
+            requestDisplay();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             background.FadeTo(idle_background_alpha, 200);
-            displayTemporarily();
+            requestDisplay();
             base.OnHoverLost(e);
-        }
-
-        private void displayTemporarily()
-        {
-            if (!isDisplayed)
-            {
-                mainContent.FadeTo(1, 300, Easing.OutQuint);
-                isDisplayed = true;
-            }
-
-            fadeOutDelegate?.Cancel();
-            fadeOutDelegate = null;
-
-            if (!IsHovered)
-            {
-                fadeOutDelegate = Scheduler.AddDelayed(() =>
-                {
-                    mainContent.FadeTo(0, 300, Easing.OutQuint);
-                    isDisplayed = false;
-                }, 2000);
-            }
         }
 
         protected override void Update()
@@ -221,7 +202,23 @@ namespace osu.Game.Graphics.UserInterface
                                          || 1000 / displayedFrameTime < aimUpdateFPS * 0.8;
 
             if (hasSignificantChanges)
-                displayTemporarily();
+                requestDisplay();
+            else if (isDisplayed && Time.Current - lastDisplayRequiredTime > 2000)
+            {
+                mainContent.FadeTo(0, 300, Easing.OutQuint);
+                isDisplayed = false;
+            }
+        }
+
+        private void requestDisplay()
+        {
+            lastDisplayRequiredTime = Time.Current;
+
+            if (!isDisplayed)
+            {
+                mainContent.FadeTo(1, 300, Easing.OutQuint);
+                isDisplayed = true;
+            }
         }
 
         private void updateFpsDisplay()

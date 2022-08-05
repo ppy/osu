@@ -30,7 +30,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneTeamVersus : ScreenTestScene
     {
         private BeatmapManager beatmaps;
-        private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
 
         private TestMultiplayerComponents multiplayerComponents;
@@ -40,8 +39,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
 

@@ -32,6 +32,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = SkinSettingsStrings.AutoCursorSize,
                     Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = SkinSettingsStrings.GameplayCursorDuringTouch,
+                    Current = config.GetBindable<bool>(OsuSetting.GameplayCursorDuringTouch)
+                },
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
