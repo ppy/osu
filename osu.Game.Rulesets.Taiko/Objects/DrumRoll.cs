@@ -4,8 +4,6 @@
 #nullable disable
 
 using osu.Game.Rulesets.Objects.Types;
-using System;
-using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -44,22 +42,10 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public int TickRate = 1;
 
         /// <summary>
-        /// Number of drum roll ticks required for a "Good" hit.
-        /// </summary>
-        public double RequiredGoodHits { get; protected set; }
-
-        /// <summary>
-        /// Number of drum roll ticks required for a "Great" hit.
-        /// </summary>
-        public double RequiredGreatHits { get; protected set; }
-
-        /// <summary>
         /// The length (in milliseconds) between ticks of this drumroll.
         /// <para>Half of this value is the hit window of the ticks.</para>
         /// </summary>
         private double tickSpacing = 100;
-
-        private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
@@ -71,28 +57,19 @@ namespace osu.Game.Rulesets.Taiko.Objects
             Velocity = scoringDistance / timingPoint.BeatLength;
 
             tickSpacing = timingPoint.BeatLength / TickRate;
-            overallDifficulty = difficulty.OverallDifficulty;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            foreach (TaikoHitObject tick in CreateTicks(cancellationToken))
-            {
-                AddNested(tick);
-            }
-
-            RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
-            RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
+            createTicks(cancellationToken);
 
             base.CreateNestedHitObjects(cancellationToken);
         }
 
-        protected virtual List<TaikoHitObject> CreateTicks(CancellationToken cancellationToken)
+        private void createTicks(CancellationToken cancellationToken)
         {
-            List<TaikoHitObject> ticks = new List<TaikoHitObject>();
-
             if (tickSpacing == 0)
-                return ticks;
+                return;
 
             bool first = true;
 
@@ -100,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                ticks.Add(new DrumRollTick
+                AddNested(new DrumRollTick
                 {
                     FirstTick = first,
                     TickSpacing = tickSpacing,
@@ -110,8 +87,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
                 first = false;
             }
-
-            return ticks;
         }
 
         public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
