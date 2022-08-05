@@ -122,20 +122,23 @@ namespace osu.Game.Rulesets.Osu.UI
 
             RegisterPool<HitCircle, DrawableHitCircle>(20, 100);
 
-            var sliders = osuBeatmap.HitObjects.OfType<Slider>();
+            int maxRepeatsOnOneSlider = 0;
+            int maxTicksOnOneSlider = 0;
 
-            if (sliders.Any())
+            var sliders = osuBeatmap?.HitObjects.OfType<Slider>();
+
+            if (sliders?.Any() == true)
             {
                 // handle edge cases where a beatmap has a slider with many repeats.
-                int maxRepeatsOnOneSlider = osuBeatmap.HitObjects.OfType<Slider>().Max(s => s.RepeatCount);
-                int maxTicksOnOneSlider = osuBeatmap.HitObjects.OfType<Slider>().Max(s => s.NestedHitObjects.OfType<SliderTick>().Count());
-
-                RegisterPool<Slider, DrawableSlider>(20, 100);
-                RegisterPool<SliderHeadCircle, DrawableSliderHead>(20, 100);
-                RegisterPool<SliderTailCircle, DrawableSliderTail>(20, 100);
-                RegisterPool<SliderTick, DrawableSliderTick>(Math.Max(maxTicksOnOneSlider, 20), Math.Max(maxTicksOnOneSlider, 200));
-                RegisterPool<SliderRepeat, DrawableSliderRepeat>(Math.Max(maxRepeatsOnOneSlider, 20), Math.Max(maxRepeatsOnOneSlider, 200));
+                maxRepeatsOnOneSlider = sliders?.Max(s => s.RepeatCount) ?? 0;
+                maxTicksOnOneSlider = sliders?.Max(s => s.NestedHitObjects.OfType<SliderTick>().Count()) ?? 0;
             }
+
+            RegisterPool<Slider, DrawableSlider>(20, 100);
+            RegisterPool<SliderHeadCircle, DrawableSliderHead>(20, 100);
+            RegisterPool<SliderTailCircle, DrawableSliderTail>(20, 100);
+            RegisterPool<SliderTick, DrawableSliderTick>(Math.Max(maxTicksOnOneSlider, 20), Math.Max(maxTicksOnOneSlider, 200));
+            RegisterPool<SliderRepeat, DrawableSliderRepeat>(Math.Max(maxRepeatsOnOneSlider, 20), Math.Max(maxRepeatsOnOneSlider, 200));
 
             RegisterPool<Spinner, DrawableSpinner>(2, 20);
             RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 200);
