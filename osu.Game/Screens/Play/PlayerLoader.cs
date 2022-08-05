@@ -549,6 +549,8 @@ namespace osu.Game.Screens.Play
 
         #region Low battery warning
 
+        private const double low_battery_threshold = 0.25;
+
         private Bindable<bool> batteryWarningShownOnce = null!;
 
         private void showBatteryWarningIfNeeded()
@@ -557,7 +559,7 @@ namespace osu.Game.Screens.Play
 
             if (!batteryWarningShownOnce.Value)
             {
-                if (!batteryInfo.IsCharging && batteryInfo.ChargeLevel <= 0.25)
+                if (batteryInfo.OnBattery && batteryInfo.ChargeLevel <= low_battery_threshold)
                 {
                     notificationOverlay?.Post(new BatteryWarningNotification());
                     batteryWarningShownOnce.Value = true;

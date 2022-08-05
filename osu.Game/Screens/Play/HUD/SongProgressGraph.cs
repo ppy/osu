@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Game.Rulesets.Objects;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
     public class SongProgressGraph : SquareGraph
     {
