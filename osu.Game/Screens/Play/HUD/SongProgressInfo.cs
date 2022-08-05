@@ -11,7 +11,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System;
 
-
 namespace osu.Game.Screens.Play.HUD
 {
     public class SongProgressInfo : Container
