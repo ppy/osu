@@ -81,45 +81,43 @@ namespace osu.Game.Extensions
             }
         }
 
+
         /// <summary>
         /// Keeps the drawable upright and prevents it from being scaled or flipped with its Parent.
         /// </summary>
         /// <param name="drawable">The drawable.</param>
-        public static void KeepUprightAndUnstretched(this Drawable drawable)
+        public static void KeepUprightAndUnscaled(this Drawable drawable)
         {
-            // Fix the rotation
-            var result = drawable.Parent.DrawInfo;
-            var scale = result.Matrix.ExtractScale();
-            var rotation = new Matrix3(
-            result.Matrix.Row0 / scale.X,
-            result.Matrix.Row1 / scale.Y,
-            new Vector3(0.0f, 0.0f, 1.0f)
-            );
-            rotation.Invert();
-            float angle = MathF.Atan(rotation.M12 / rotation.M11);
+            var parentMatrix = drawable.Parent.DrawInfo.Matrix;
+            float angle = MathF.Atan(parentMatrix.M12 / parentMatrix.M11);
             angle *= (360 / (2 * MathF.PI));
-            drawable.Rotation = angle;
 
-            // Fix the scale (includes flip)
-            var containerOriginToSpaceOrigin = new Matrix3(
-                new Vector3(1.0f, 0.0f, 0.0f),
-                new Vector3(0.0f, 1.0f, 0.0f),
-                new Vector3(drawable.DrawSize.X / 2, drawable.DrawSize.Y / 2, 1.0f)
-                );
-            var containerOriginToSpaceOriginInverse = containerOriginToSpaceOrigin;
-            containerOriginToSpaceOriginInverse.Invert();
-            Matrix3 rotatedBack = (containerOriginToSpaceOriginInverse * (rotation * (containerOriginToSpaceOrigin * result.Matrix)));
+            parentMatrix.Transpose();
+            parentMatrix.M13 = 0.0f;
+            parentMatrix.M23 = 0.0f;
 
-            bool xFliped = rotation.M11 < 0;
-            bool yFliped = rotation.M22 < 0;
+            if ((Math.Abs(Math.Abs(angle) - 90.0)) < 2.0f)
+            {
+                Matrix3 m = Matrix3.CreateRotationZ(MathHelper.DegreesToRadians(40.0f));
+                m.Transpose();
+                parentMatrix *= m;
+                drawable.Rotation = 40.0f;
+            }
+            else
+                drawable.Rotation = 0.0f;
 
-            var rotatedBackScale = rotatedBack.ExtractScale();
+            Matrix3 C = parentMatrix.Inverted();
 
-            drawable.Scale = new Vector2(
-                (xFliped ? -1 : 1) / rotatedBackScale.X,
-                (yFliped ? -1 : 1) / rotatedBackScale.Y
-            );
+            float alpha, beta, sx, sy;
+            sy = C.M22;
+            alpha = C.M12 / C.M22;
+
+            beta = (C.M21 == 0.0f) ? 0.0f : 1 / ((C.M11 / C.M21) - alpha);
+            sx = (beta == 0.0f) ? C.M11 : C.M21 / beta;
+
+            drawable.Scale = new Vector2(sx, sy);
+            drawable.Shear = new Vector2(-alpha, -beta);
+
         }
-
     }
 }
