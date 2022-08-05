@@ -69,7 +69,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
             }
             else if (enabledMods.HasFlagFast(LegacyMods.Hidden))
             {
-                timeRange *= TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT / classic_hidden_aspect_ratio;
                 drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.Trim;
                 drawableTaikoRuleset.AspectRatioLimit.Value = classic_hidden_aspect_ratio;
             }

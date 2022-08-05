@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override ReplayRecorder CreateReplayRecorder(Score score) => new TaikoReplayRecorder(score);
 
-        // TODO: Review this - this introduces a circular dependency between TaikoPlayfield and TaikoModClassic
+        // TODO: Review this - this introduces a circular dependency between DrawableTaikoRuleset and TaikoModClassic
         private void applyClassicMods(IReadOnlyList<Mod> mods)
         {
             foreach (TaikoModClassic classic in mods.OfType<TaikoModClassic>())
@@ -114,6 +114,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     mod.ApplyToTaikoModClassic(classic);
                 }
 
+                // Return early since there shouldn't be more than one TaikoModClassic.
                 return;
             }
         }
