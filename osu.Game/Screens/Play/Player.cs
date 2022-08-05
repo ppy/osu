@@ -365,6 +365,12 @@ namespace osu.Game.Screens.Play
 
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
+
+            skipIntroOverlay.IsSkippable.ValueChanged += (e) =>
+            {
+                if (RestartCount > 0 && e.NewValue)
+                    skipIntroOverlay.RequestSkip.Invoke();
+            };
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
@@ -439,12 +445,6 @@ namespace osu.Game.Screens.Play
                         OnQuit = () => PerformExit(true),
                     },
                 },
-            };
-
-            skipIntroOverlay.IsSkippable.ValueChanged += (e) =>
-            {
-                if (RestartCount > 0 && e.NewValue)
-                    skipIntroOverlay.RequestSkip.Invoke();
             };
 
             if (!Configuration.AllowSkipping || !DrawableRuleset.AllowGameplayOverlays)
