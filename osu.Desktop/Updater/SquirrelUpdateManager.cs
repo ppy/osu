@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -18,8 +16,8 @@ namespace osu.Desktop.Updater
     [SupportedOSPlatform("windows")]
     public class SquirrelUpdateManager : AbstractUpdateManager
     {
-        private UpdateManager updateManager;
-        private INotificationOverlay notificationOverlay;
+        private UpdateManager? updateManager;
+        private INotificationOverlay notificationOverlay = null!;
 
         public override Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
@@ -42,12 +40,12 @@ namespace osu.Desktop.Updater
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
 
-        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
+        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification? notification = null)
         {
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
 
-            const string github_token = null; // TODO: populate.
+            const string? github_token = null; // TODO: populate.
 
             try
             {

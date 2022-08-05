@@ -3,8 +3,8 @@
 
 #nullable disable
 
-using Humanizer;
 using Newtonsoft.Json.Serialization;
+using osu.Game.Extensions;
 
 namespace osu.Game.IO.Serialization
 {
@@ -12,7 +12,7 @@ namespace osu.Game.IO.Serialization
     {
         protected override string ResolvePropertyName(string propertyName)
         {
-            return propertyName.Underscore();
+            return propertyName.ToSnakeCase();
         }
     }
 }
