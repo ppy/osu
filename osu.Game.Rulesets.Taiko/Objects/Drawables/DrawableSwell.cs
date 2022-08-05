@@ -16,7 +16,7 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Taiko.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
+
+        public override bool DisplayResult => false;
 
         public DrawableSwell()
             : this(null)
@@ -222,11 +224,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(r =>
-                {
-                    var swellJudgement = (TaikoSwellJudgement)r.Judgement;
-                    r.Type = numHits > HitObject.RequiredHits / 2 ? swellJudgement.PartialCompletionResult : swellJudgement.MinResult;
-                });
+                ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.SmallBonus : r.Judgement.MinResult);
             }
         }
 
