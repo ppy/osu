@@ -441,6 +441,12 @@ namespace osu.Game.Screens.Play
                 },
             };
 
+            skipIntroOverlay.IsSkippable.ValueChanged += (e) =>
+            {
+                if (RestartCount > 0 && e.NewValue)
+                    skipIntroOverlay.RequestSkip.Invoke();
+            };
+
             if (!Configuration.AllowSkipping || !DrawableRuleset.AllowGameplayOverlays)
             {
                 skipIntroOverlay.Expire();
