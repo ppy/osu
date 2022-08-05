@@ -1046,7 +1046,7 @@ namespace osu.Game.Screens.Play
 
             fadeOut();
 
-            KeysPerSecondCalculator.GetInstance().Dispose();
+            KeysPerSecondCalculator.GetInstance()?.Dispose();
 
             return base.OnExiting(e);
         }

@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
 
         public static void AddInput()
         {
-            instance?.onNewInput.Invoke();
+            instance?.onNewInput?.Invoke();
         }
 
         public static KeysPerSecondCalculator GetInstance(GameplayClock gameplayClock = null, DrawableRuleset drawableRuleset = null)
@@ -41,9 +41,9 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
 
         private event Action onNewInput;
 
-        private IClock workingClock => (IClock)drawableRuleset.FrameStableClock ?? gameplayClock;
+        private IClock workingClock => (IClock)drawableRuleset?.FrameStableClock ?? gameplayClock;
 
-        // Having the rate from mods is preffered to using GameplayClock.TrueGameplayRate()
+        // Having the rate from mods is preferred to using GameplayClock.TrueGameplayRate()
         // as it returns 0 when paused in replays, not useful for players who want to "analyze" a replay.
         private double rate => (drawableRuleset.Mods.FirstOrDefault(m => m is ModRateAdjust) as ModRateAdjust)?.SpeedChange.Value
                                ?? 1;
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
 
         private void addTimestamp()
         {
-            if (workingClock != null && workingClock.CurrentTime >= maxTime && gameplayClock.TrueGameplayRate > 0)
+            if (Ready && workingClock.CurrentTime >= maxTime && gameplayClock.TrueGameplayRate > 0)
             {
                 timestamps.Add(workingClock.CurrentTime);
                 maxTime = workingClock.CurrentTime;
