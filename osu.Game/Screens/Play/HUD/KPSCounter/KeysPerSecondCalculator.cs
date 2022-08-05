@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
 
         private void addTimestamp()
         {
-            if (workingClock != null && workingClock.CurrentTime >= maxTime)
+            if (workingClock != null && workingClock.CurrentTime >= maxTime && gameplayClock.TrueGameplayRate > 0)
             {
                 timestamps.Add(workingClock.CurrentTime);
                 maxTime = workingClock.CurrentTime;
