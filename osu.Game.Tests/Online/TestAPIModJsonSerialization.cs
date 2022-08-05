@@ -12,7 +12,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -110,30 +109,30 @@ namespace osu.Game.Tests.Online
         }
 
         [Test]
-        public void TestDeserialiseSubmittableScoreWithEmptyMods()
+        public void TestDeserialiseSoloScoreWithEmptyMods()
         {
-            var score = new SubmittableScore(new ScoreInfo
+            var score = SoloScoreInfo.ForSubmission(new ScoreInfo
             {
                 User = new APIUser(),
                 Ruleset = new OsuRuleset().RulesetInfo,
             });
 
-            var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
+            var deserialised = JsonConvert.DeserializeObject<SoloScoreInfo>(JsonConvert.SerializeObject(score));
 
             Assert.That(deserialised?.Mods.Length, Is.Zero);
         }
 
         [Test]
-        public void TestDeserialiseSubmittableScoreWithCustomModSetting()
+        public void TestDeserialiseSoloScoreWithCustomModSetting()
         {
-            var score = new SubmittableScore(new ScoreInfo
+            var score = SoloScoreInfo.ForSubmission(new ScoreInfo
             {
                 Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } },
                 User = new APIUser(),
                 Ruleset = new OsuRuleset().RulesetInfo,
             });
 
-            var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
+            var deserialised = JsonConvert.DeserializeObject<SoloScoreInfo>(JsonConvert.SerializeObject(score));
 
             Assert.That((deserialised?.Mods[0])?.Settings["speed_change"], Is.EqualTo(2));
         }
