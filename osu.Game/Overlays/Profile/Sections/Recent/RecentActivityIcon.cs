@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
@@ -14,11 +16,11 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
     public class RecentActivityIcon : Container
     {
         private readonly SpriteIcon icon;
-        private readonly RecentActivityType type;
+        private readonly APIRecentActivity activity;
 
-        public RecentActivityIcon(RecentActivityType type)
+        public RecentActivityIcon(APIRecentActivity activity)
         {
-            this.type = type;
+            this.activity = activity;
             Child = icon = new SpriteIcon
             {
                 RelativeSizeAxes = Axes.Both,
@@ -27,13 +29,16 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             };
         }
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             // references:
             // https://github.com/ppy/osu-web/blob/659b371dcadf25b4f601a4c9895a813078301084/resources/assets/lib/profile-page/parse-event.tsx
             // https://github.com/ppy/osu-web/blob/master/resources/assets/less/bem/profile-extra-entries.less#L98-L128
-            switch (type)
+            switch (activity.Type)
             {
                 case RecentActivityType.BeatmapPlaycount:
                     icon.Icon = FontAwesome.Solid.Play;
@@ -42,7 +47,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
                 case RecentActivityType.BeatmapsetApprove:
                     icon.Icon = FontAwesome.Solid.ArrowUp;
-                    icon.Colour = colours.Blue1;
+                    icon.Colour = getColorForApprovalType(activity.Approval);
                     break;
 
                 case RecentActivityType.BeatmapsetDelete:
@@ -89,6 +94,25 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     icon.Icon = FontAwesome.Solid.Gift;
                     icon.Colour = colours.Pink;
                     break;
+            }
+        }
+
+        private Color4 getColorForApprovalType(BeatmapApproval approvalType)
+        {
+            switch (approvalType)
+            {
+                case BeatmapApproval.Approved:
+                case BeatmapApproval.Ranked:
+                    return colours.Lime1;
+
+                case BeatmapApproval.Loved:
+                    return colours.Pink1;
+
+                case BeatmapApproval.Qualified:
+                    return colours.Blue1;
+
+                default:
+                    throw new ArgumentOutOfRangeException($"Unsupported {nameof(BeatmapApproval)} type", approvalType, nameof(approvalType));
             }
         }
     }
