@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     };
 
                 default:
-                    return new RecentActivityIcon(activity.Type)
+                    return new RecentActivityIcon(activity)
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 11,
