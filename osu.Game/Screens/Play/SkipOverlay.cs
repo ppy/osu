@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play
 
         private bool isClickable;
 
-        public BindableBool IsSkippable = new()!;
+        public BindableBool IsSkippable = new BindableBool()!;
 
         [Resolved]
         private GameplayClock gameplayClock { get; set; }
