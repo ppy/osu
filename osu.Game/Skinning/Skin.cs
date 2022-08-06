@@ -69,11 +69,13 @@ namespace osu.Game.Skinning
 
                 storage ??= realmBackedStorage = new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess);
 
-                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
-
                 var samples = resources.AudioManager?.GetSampleStore(storage);
                 if (samples != null)
                     samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+
+                // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
+                // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
+                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
 
                 Samples = samples;
                 Textures = new TextureStore(resources.CreateTextureLoaderStore(storage));
@@ -108,6 +110,13 @@ namespace osu.Game.Skinning
                 try
                 {
                     string jsonContent = Encoding.UTF8.GetString(bytes);
+
+                    // handle namespace changes...
+
+                    // can be removed 2023-01-31
+                    jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
+                    jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
+
                     var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
 
                     if (deserializedContent == null)

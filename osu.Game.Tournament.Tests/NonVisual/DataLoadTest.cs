@@ -6,6 +6,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -27,7 +28,6 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 {
                     var osu = new TestTournament(runOnLoadComplete: () =>
                     {
-                        // ReSharper disable once AccessToDisposedClosure
                         var storage = host.Storage.GetStorageForDirectory(Path.Combine("tournaments", "default"));
 
                         using (var stream = storage.CreateFileSafely("bracket.json"))
@@ -85,7 +85,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
             public new Task BracketLoadTask => base.BracketLoadTask;
 
-            public TestTournament(bool resetRuleset = false, Action runOnLoadComplete = null)
+            public TestTournament(bool resetRuleset = false, [InstantHandle] Action runOnLoadComplete = null)
             {
                 this.resetRuleset = resetRuleset;
                 this.runOnLoadComplete = runOnLoadComplete;
