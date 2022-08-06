@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     break;
 
                 case RecentActivityType.BeatmapsetApprove:
-                    icon.Icon = FontAwesome.Solid.ArrowUp;
+                    icon.Icon = FontAwesome.Solid.Check;
                     icon.Colour = getColorForApprovalType(activity.Approval);
                     break;
 
