@@ -62,12 +62,12 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
                 case RecentActivityType.BeatmapsetUpdate:
                     icon.Icon = FontAwesome.Solid.SyncAlt;
-                    icon.Colour = colours.Lime1;
+                    icon.Colour = colours.Green1;
                     break;
 
                 case RecentActivityType.BeatmapsetUpload:
                     icon.Icon = FontAwesome.Solid.ArrowUp;
-                    icon.Colour = colours.Yellow;
+                    icon.Colour = colours.Orange1;
                     break;
 
                 case RecentActivityType.RankLost:
