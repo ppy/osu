@@ -30,6 +30,9 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            // references:
+            // https://github.com/ppy/osu-web/blob/659b371dcadf25b4f601a4c9895a813078301084/resources/assets/lib/profile-page/parse-event.tsx
+            // https://github.com/ppy/osu-web/blob/master/resources/assets/less/bem/profile-extra-entries.less#L98-L128
             switch (type)
             {
                 case RecentActivityType.BeatmapPlaycount:
