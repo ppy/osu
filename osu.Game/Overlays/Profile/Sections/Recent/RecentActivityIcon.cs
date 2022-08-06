@@ -75,11 +75,6 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     icon.Colour = Color4.White;
                     break;
 
-                case RecentActivityType.UsernameChange:
-                    icon.Icon = FontAwesome.Solid.Tag;
-                    icon.Colour = Color4.White;
-                    break;
-
                 case RecentActivityType.UserSupportAgain:
                     icon.Icon = FontAwesome.Solid.Heart;
                     icon.Colour = colours.Pink;
@@ -93,6 +88,11 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 case RecentActivityType.UserSupportGift:
                     icon.Icon = FontAwesome.Solid.Gift;
                     icon.Colour = colours.Pink;
+                    break;
+
+                case RecentActivityType.UsernameChange:
+                    icon.Icon = FontAwesome.Solid.Tag;
+                    icon.Colour = Color4.White;
                     break;
             }
         }
