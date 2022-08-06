@@ -91,9 +91,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 timeRange = Math.Clamp(timeRange, DrawableTaikoRuleset.AspectRatioToTimeRange(1.6f), classic_max_time_range);
 
                 // Scale hidden parameter to match the adjusted time range. This only affects hdhr.
-                float hiddenRatio = Math.Max((float)timeRange / (float)DrawableTaikoRuleset.DEFAULT_TIME_RANGE, 1.0f);
-                hiddenInitialAlpha.Value = 0.3f * hiddenRatio;
-                hiddenFadeOutDuration.Value = 0.2f * hiddenRatio;
+                float hiddenRatio = 1.0f - Math.Min((float)timeRange / (float)DrawableTaikoRuleset.DEFAULT_TIME_RANGE, 1.0f);
+                float fadeOutDuration = Math.Max(0.24f - hiddenRatio, 0.1f);
+                hiddenInitialAlpha.Value = 0.3f * fadeOutDuration / 0.2f;
+                hiddenFadeOutDuration.Value = fadeOutDuration;
             }
             else if (enabledMods.HasFlagFast(LegacyMods.Hidden))
             {
