@@ -1,15 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -24,21 +21,24 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
         private const float alpha_when_invalid = 0.3f;
 
         private readonly Bindable<bool> valid = new Bindable<bool>();
-        private GameplayClock gameplayClock;
+
+        private static readonly KeysPerSecondCalculator calculator = new KeysPerSecondCalculator();
+
+        [Resolved]
+        private GameplayClock? gameplayClock
+        {
+            get => calculator.GameplayClock;
+            set => calculator.GameplayClock = value;
+        }
 
         [Resolved(canBeNull: true)]
-        private DrawableRuleset drawableRuleset { get; set; }
-
-        private KeysPerSecondCalculator calculator => KeysPerSecondCalculator.GetInstance(gameplayClock, drawableRuleset);
-
-        [SettingSource("Smoothing time", "How smooth the counter should change\nThe more it is smooth, the less it's accurate.")]
-        public BindableNumber<double> SmoothingTime { get; } = new BindableNumber<double>(350)
+        private DrawableRuleset? drawableRuleset
         {
-            MaxValue = 1000,
-            MinValue = 0
-        };
+            get => calculator.DrawableRuleset;
+            set => calculator.DrawableRuleset = value;
+        }
 
-        protected override double RollingDuration => SmoothingTime.Value;
+        protected override double RollingDuration => 350;
 
         public bool UsesFixedAnchor { get; set; }
 
@@ -48,9 +48,8 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, GameplayClock clock, DrawableRuleset ruleset)
+        private void load(OsuColour colours)
         {
-            gameplayClock = clock;
             Colour = colours.BlueLighter;
             valid.BindValueChanged(e =>
                 DrawableCount.FadeTo(e.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
@@ -61,7 +60,7 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
             base.Update();
 
             valid.Value = calculator.Ready;
-            Current.Value = calculator.Value;
+            Current.Value = calculator.Ready ? calculator.Value : 0;
         }
 
         protected override IHasText CreateText() => new TextComponent

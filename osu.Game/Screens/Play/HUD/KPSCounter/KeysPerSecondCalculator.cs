@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,59 +10,93 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD.KPSCounter
 {
-    public class KeysPerSecondCalculator : IDisposable
+    public class KeysPerSecondCalculator
     {
-        private static KeysPerSecondCalculator instance;
-
         public static void AddInput()
         {
-            instance?.onNewInput?.Invoke();
-        }
-
-        public static KeysPerSecondCalculator GetInstance(GameplayClock gameplayClock = null, DrawableRuleset drawableRuleset = null)
-        {
-            if (instance != null) return instance;
-
-            try
-            {
-                return new KeysPerSecondCalculator(gameplayClock, drawableRuleset);
-            }
-            catch (ArgumentNullException)
-            {
-                return null;
-            }
+            onNewInput?.Invoke();
         }
 
         private readonly List<double> timestamps;
-        private readonly GameplayClock gameplayClock;
-        private readonly DrawableRuleset drawableRuleset;
+        private GameplayClock? gameplayClock;
+        private DrawableRuleset? drawableRuleset;
 
-        private event Action onNewInput;
+        public GameplayClock? GameplayClock
+        {
+            get => gameplayClock;
+            set
+            {
+                onResetRequested?.Invoke();
 
-        private IClock workingClock => (IClock)drawableRuleset?.FrameStableClock ?? gameplayClock;
+                if (value != null)
+                {
+                    gameplayClock = value;
+                }
+            }
+        }
 
-        // Having the rate from mods is preferred to using GameplayClock.TrueGameplayRate()
-        // as it returns 0 when paused in replays, not useful for players who want to "analyze" a replay.
-        private double rate => (drawableRuleset.Mods.FirstOrDefault(m => m is ModRateAdjust) as ModRateAdjust)?.SpeedChange.Value
+        public DrawableRuleset? DrawableRuleset
+        {
+            get => drawableRuleset;
+            set
+            {
+                onResetRequested?.Invoke();
+
+                if (value != null)
+                {
+                    drawableRuleset = value;
+                    baseRate = (drawableRuleset.Mods.FirstOrDefault(m => m is ModRateAdjust) as ModRateAdjust)?.SpeedChange.Value
                                ?? 1;
+                }
+            }
+        }
+
+        private static event Action? onNewInput;
+        private static event Action? onResetRequested;
+
+        private IClock? workingClock => drawableRuleset?.FrameStableClock;
+
+        private double baseRate;
+
+        private double rate
+        {
+            get
+            {
+                if (gameplayClock != null)
+                {
+                    if (gameplayClock.TrueGameplayRate > 0)
+                    {
+                        baseRate = gameplayClock.TrueGameplayRate;
+                    }
+                }
+
+                return baseRate;
+            }
+        }
 
         private double maxTime = double.NegativeInfinity;
 
         public bool Ready => workingClock != null && gameplayClock != null;
         public int Value => timestamps.Count(isTimestampWithinSpan);
 
-        private KeysPerSecondCalculator(GameplayClock gameplayClock, DrawableRuleset drawableRuleset)
+        public KeysPerSecondCalculator()
         {
-            instance = this;
             timestamps = new List<double>();
-            this.gameplayClock = gameplayClock ?? throw new ArgumentNullException(nameof(gameplayClock));
-            this.drawableRuleset = drawableRuleset;
             onNewInput += addTimestamp;
+            onResetRequested += cleanUp;
+        }
+
+        private void cleanUp()
+        {
+            timestamps.Clear();
+            maxTime = double.NegativeInfinity;
         }
 
         private void addTimestamp()
         {
-            if (Ready && workingClock.CurrentTime >= maxTime && gameplayClock.TrueGameplayRate > 0)
+            if (workingClock == null) return;
+
+            if (workingClock.CurrentTime >= maxTime)
             {
                 timestamps.Add(workingClock.CurrentTime);
                 maxTime = workingClock.CurrentTime;
@@ -73,19 +105,11 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
 
         private bool isTimestampWithinSpan(double timestamp)
         {
-            if (!Ready)
-                return false;
+            if (workingClock == null) return false;
 
             double span = 1000 * rate;
             double relativeTime = workingClock.CurrentTime - timestamp;
             return relativeTime >= 0 && relativeTime <= span;
         }
-
-        public void Dispose()
-        {
-            instance = null;
-        }
-
-        ~KeysPerSecondCalculator() => Dispose();
     }
 }
