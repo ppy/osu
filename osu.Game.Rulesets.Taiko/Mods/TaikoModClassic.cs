@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Graphics;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Mods;
@@ -23,6 +24,12 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private const float classic_max_aspect_ratio = 2.0f / 1.0f;
 
         /// <summary>
+        /// The maximum time range with classic mod enabled. This will be enforced in different ways depending on the
+        /// <see cref="LegacyMods"/> enabled.
+        /// </summary>
+        private static readonly double classic_max_time_range = DrawableTaikoRuleset.AspectRatioToTimeRange(classic_max_aspect_ratio);
+
+        /// <summary>
         /// The classic hidden aspect ratio. Note that time rate is also stretched to this from the default aspect ratio.
         /// </summary>
         private const float classic_hidden_aspect_ratio = 4.0f / 3.0f;
@@ -31,11 +38,28 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private DrawableTaikoRuleset? drawableTaikoRuleset;
 
-        private double classicMaxTimeRange;
+        private readonly Bindable<float> hiddenFadeOutDuration = new Bindable<float>(0.4f);
 
+        private readonly Bindable<float> hiddenInitialAlpha = new Bindable<float>(0.65f);
+
+        /// <summary>
+        /// Mark a legacy mod as enabled. This class will then apply those mod's appropriate classic adjustments to the
+        /// ruleset. These adjustments are aimed to match stable's behaviour.
+        /// </summary>
         public void EnableLegacyMods(LegacyMods legacyMods)
         {
             enabledMods = enabledMods | legacyMods;
+        }
+
+        /// <summary>
+        /// Binds hidden parameter, which will be udpated by this class.
+        /// </summary>
+        public void BindHiddenParameters(Bindable<float> hiddenFadeOutDuration, Bindable<float> hiddenInitialAlpha)
+        {
+            this.hiddenFadeOutDuration.BindTo(hiddenFadeOutDuration);
+            this.hiddenInitialAlpha.BindTo(hiddenInitialAlpha);
+            this.hiddenFadeOutDuration.Value = 0.4f;
+            this.hiddenInitialAlpha.Value = 0.65f;
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
@@ -45,8 +69,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             var playfield = (TaikoPlayfield)drawableRuleset.Playfield;
             playfield.ClassicHitTargetPosition.Value = true;
-
-            classicMaxTimeRange = DrawableTaikoRuleset.AspectRatioToTimeRange(classic_max_aspect_ratio);
         }
 
         public void Update(Playfield playfield)
@@ -63,19 +85,22 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             if (enabledMods.HasFlagFast(LegacyMods.HardRock))
             {
-                // For hardrock, the playfield time range is locked to classicMaxTimeRange, but the display aspect ratio
-                // is kept at a minimum of classic_max_aspect_ratio. If the display aspect ratio is less than that, the
-                // play field will be extended beyond the display, and time range will effectively be cut short.
-                drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.MaintainMinimum;
-                drawableTaikoRuleset.AspectRatioLimit.Value = classic_max_aspect_ratio;
-                timeRange = classicMaxTimeRange;
+                // For hardrock, the playfield time range is clamped to within classicMaxTimeRange and the equivalent
+                // time range for a 16:10 aspect ratio.
+                drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.None;
+                timeRange = Math.Clamp(timeRange, DrawableTaikoRuleset.AspectRatioToTimeRange(1.6f), classic_max_time_range);
+
+                // Scale hidden parameter to match the adjusted time range. This only affects hdhr.
+                float hiddenRatio = Math.Max((float)timeRange / (float)DrawableTaikoRuleset.DEFAULT_TIME_RANGE, 1.0f);
+                hiddenInitialAlpha.Value = 0.3f * hiddenRatio;
+                hiddenFadeOutDuration.Value = 0.2f * hiddenRatio;
             }
             else if (enabledMods.HasFlagFast(LegacyMods.Hidden))
             {
                 // Hidden aspect adjustment is overriden by hardrock in the case of hdhr, hence these are applied only
                 // if hardrock is not enabled.
                 drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.Trim;
-                drawableTaikoRuleset.AspectRatioLimit.Value = classic_hidden_aspect_ratio;
+                drawableTaikoRuleset.TargetAspectRatio.Value = classic_hidden_aspect_ratio;
             }
 
             drawableTaikoRuleset.TimeRange.Value = timeRange;
@@ -92,14 +117,15 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     {
                         Debug.Assert(drawableTaikoRuleset != null);
 
+                        // For classic nomod, the effective aspect ratio will be limited to 2:1 by fading the notes in.
                         if (enabledMods == LegacyMods.None)
                         {
-                            if (drawableTaikoRuleset.TimeRange.Value > classicMaxTimeRange)
+                            if (drawableTaikoRuleset.TimeRange.Value > classic_max_time_range)
                             {
                                 o.Alpha = 0;
 
                                 double preempt = drawableTaikoRuleset.TimeRange.Value / drawableTaikoRuleset.ControlPointAt(o.HitObject.StartTime).Multiplier;
-                                double fadeInEnd = o.HitObject.StartTime - preempt * classicMaxTimeRange / drawableTaikoRuleset.TimeRange.Value;
+                                double fadeInEnd = o.HitObject.StartTime - preempt * classic_max_time_range / drawableTaikoRuleset.TimeRange.Value;
                                 double fadeInStart = fadeInEnd - 2000 / drawableTaikoRuleset.ControlPointAt(o.HitObject.StartTime).Multiplier;
 
                                 using (o.BeginAbsoluteSequence(fadeInStart))
@@ -107,11 +133,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
                                     o.FadeIn(fadeInEnd - fadeInStart);
                                 }
                             }
-                        }
-                        else if (enabledMods.HasFlagFast(LegacyMods.Hidden | LegacyMods.HardRock))
-                        {
-                            // Decrease the initial alpha of the hitobject for hdhr
-                            o.Alpha = 0.25f;
                         }
                     };
                     break;

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -29,7 +30,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
         /// How long hitobjects take to fade out, in terms of the scrolling length.
         /// Range: [0, 1]
         /// </summary>
-        private const float fade_out_duration = 0.375f;
+        private readonly Bindable<float> fadeOutDuration = new Bindable<float>(0.375f);
+
+        /// <summary>
+        /// The initial alpha of hitobjects when they appear.
+        /// Range: [0, 1]
+        /// </summary>
+        private readonly Bindable<float> initialAlpha = new Bindable<float>(1f);
 
         private DrawableTaikoRuleset drawableRuleset = null!;
 
@@ -41,6 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToTaikoModClassic(TaikoModClassic taikoModClassic)
         {
             taikoModClassic.EnableLegacyMods(LegacyMods.Hidden);
+            taikoModClassic.BindHiddenParameters(fadeOutDuration, initialAlpha);
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
@@ -56,7 +64,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 case DrawableHit:
                     double preempt = drawableRuleset.TimeRange.Value / drawableRuleset.ControlPointAt(hitObject.HitObject.StartTime).Multiplier;
                     double start = hitObject.HitObject.StartTime - preempt * fade_out_start_time;
-                    double duration = preempt * fade_out_duration;
+                    double duration = preempt * fadeOutDuration.Value;
+                    hitObject.Alpha = initialAlpha.Value;
 
                     using (hitObject.BeginAbsoluteSequence(start))
                     {

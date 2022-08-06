@@ -15,7 +15,9 @@ namespace osu.Game.Rulesets.Taiko.UI
     public enum AspectRatioAdjustmentMethod
     {
         /// <summary>
-        /// Do not adjust the aspect ratio of the playfield visually.
+        /// Do not adjust the aspect ratio of the playfield visually. Relative height will be kept at the default of
+        /// <see cref="TaikoPlayfieldAdjustmentContainer.default_relative_height"/>, and width will always expanded to
+        /// fill parent fully.
         /// </summary>
         None,
 
@@ -28,14 +30,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// Trim the playfield to fit the aspect ratio. If the display aspect ratio is narrower than the designated aspect
         /// ratio, the playfield will extend beyond the display area, and thus be cropped.
         /// </summary>
-        Trim,
-
-        /// <summary>
-        /// Maintain a minimum aspect ratio. If the display aspect ratio is narrower than the designated aspect ratio,
-        /// this will behave like <see cref="AspectRatioAdjustmentMethod.Trim"/>. Otherwise, this will behave like
-        /// <see cref="AspectRatioAdjustmentMethod.None"/>.
-        /// </summary>
-        MaintainMinimum
+        Trim
     }
 
     public class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
@@ -43,7 +38,16 @@ namespace osu.Game.Rulesets.Taiko.UI
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
         public const float DEFAULT_ASPECT = 16f / 9f;
 
-        public Bindable<float> AspectRatioLimit = new Bindable<float>(DEFAULT_ASPECT);
+        /// <summary>
+        /// The target aspect ratio for the playfield. This only affects display directly and not the time range, except
+        /// in the case of <see cref="AspectRatioAdjustmentMethod.None"/>, where the time range is scaled to have a
+        /// constant scroll rate.
+        /// </summary>
+        public Bindable<float> TargetAspectRatio = new Bindable<float>(DEFAULT_ASPECT);
+
+        /// <summary>
+        /// See <see cref="AspectRatioAdjustmentMethod"/>
+        /// </summary>
         public Bindable<AspectRatioAdjustmentMethod> AdjustmentMethod = new Bindable<AspectRatioAdjustmentMethod>(AspectRatioAdjustmentMethod.Scale);
 
         protected override void Update()
@@ -56,17 +60,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             switch (AdjustmentMethod.Value)
             {
                 case AspectRatioAdjustmentMethod.Scale:
-                    height *= Math.Clamp(parentAspectRatio, 0.4f, 4) / AspectRatioLimit.Value;
+                    height *= Math.Clamp(parentAspectRatio, 0.4f, 4) / TargetAspectRatio.Value;
                     break;
 
                 case AspectRatioAdjustmentMethod.Trim:
-                    Width = AspectRatioLimit.Value / parentAspectRatio;
+                    Width = TargetAspectRatio.Value / parentAspectRatio;
                     break;
-
-                case AspectRatioAdjustmentMethod.MaintainMinimum:
-                    Width = Math.Max(AspectRatioLimit.Value / parentAspectRatio, 1);
-                    break;
-
             }
 
             Height = height;

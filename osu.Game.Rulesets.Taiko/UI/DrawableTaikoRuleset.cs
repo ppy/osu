@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public new BindableDouble TimeRange => base.TimeRange;
 
-        public Bindable<float> AspectRatioLimit = new Bindable<float>(TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT);
+        public Bindable<float> TargetAspectRatio = new Bindable<float>(TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT);
 
         public Bindable<AspectRatioAdjustmentMethod> AdjustmentMethod = new Bindable<AspectRatioAdjustmentMethod>(AspectRatioAdjustmentMethod.Scale);
 
@@ -52,7 +52,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             TimeRange.Value = DEFAULT_TIME_RANGE;
         }
 
-        public static double AspectRatioToTimeRange(double aspectRatio)
+        /// <summary>
+        /// Convert the given aspect ratio to time range by scaling it relative to <see cref="TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT" />.
+        /// </summary>
+        public static double AspectRatioToTimeRange(float aspectRatio)
         {
             return aspectRatio / TaikoPlayfieldAdjustmentContainer.DEFAULT_ASPECT * DEFAULT_TIME_RANGE;
         }
@@ -91,7 +94,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
         {
             AdjustmentMethod = { BindTarget = AdjustmentMethod },
-            AspectRatioLimit = { BindTarget = AspectRatioLimit }
+            TargetAspectRatio = { BindTarget = TargetAspectRatio }
         };
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);

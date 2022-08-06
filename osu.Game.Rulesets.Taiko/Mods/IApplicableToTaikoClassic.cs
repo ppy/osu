@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Mods;
 namespace osu.Game.Rulesets.Taiko.Mods
 {
     /// <summary>
-    /// An interface for <see cref="Mod"/>s that can be applied to <see cref="TaikoModClassic"/>.
+    /// An interface for <see cref="Mod"/>s that is affected by and can be applied to <see cref="TaikoModClassic"/>.
     /// </summary>
     public interface IApplicableToTaikoClassic : IApplicableMod
     {
