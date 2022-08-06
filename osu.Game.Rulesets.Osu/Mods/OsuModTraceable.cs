@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void applyTraceableState(DrawableHitObject drawable)
         {
-            if (!(drawable is DrawableOsuHitObject))
+            if (drawable is not DrawableOsuHitObject)
                 return;
 
             //todo: expose and hide spinner background somehow
@@ -97,8 +97,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
-            base.ApplyToBeatmap(beatmap);
-
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
                 applyFadeInAdjustment(obj);
 
@@ -146,14 +144,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
 
                 case DrawableHitCircle circle:
-                    Drawable fadeTarget = circle;
-
-                    if (increaseVisibility)
-                    {
-                        // only fade the circle piece (not the approach circle) for the increased visibility object.
-                        fadeTarget = circle.ApproachCircle;
-                    }
-
+                    Drawable fadeTarget = circle.ApproachCircle;
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         fadeTarget.FadeOut(fadeDuration);
                     break;
@@ -185,11 +176,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             switch (drawableObject)
             {
-                case DrawableSliderTail tail:
-                    // Use the same fade sequence as the slider head.
-                    Debug.Assert(tail.Slider != null);
-                    return getParameters(tail.Slider.HeadCircle);
-
                 case DrawableSliderRepeat repeat:
                     // Use the same fade sequence as the slider head.
                     Debug.Assert(repeat.Slider != null);
@@ -229,12 +215,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (!FadeOutEffect.Value) return;
 
-            var approachCircle = (spinner.Body.Drawable as IHasApproachCircle)?.ApproachCircle;
-            if (approachCircle == null)
+            var spinnerBody = ((IHasApproachCircle)spinner.Body.Drawable)?.ApproachCircle;
+            if (spinnerBody == null)
                 return;
 
             using (spinner.BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt))
-                approachCircle.Hide();
+                spinnerBody.Hide();
         }
     }
 }
