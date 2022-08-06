@@ -25,9 +25,17 @@ namespace osu.Game.Rulesets.Taiko.UI
         Scale,
 
         /// <summary>
-        /// Trim the playfield to fit the aspect ratio.
+        /// Trim the playfield to fit the aspect ratio. If the display aspect ratio is narrower than the designated aspect
+        /// ratio, the playfield will extend beyond the display area, and thus be cropped.
         /// </summary>
         Trim,
+
+        /// <summary>
+        /// Maintain a minimum aspect ratio. If the display aspect ratio is narrower than the designated aspect ratio,
+        /// this will behave like <see cref="AspectRatioAdjustmentMethod.Trim"/>. Otherwise, this will behave like
+        /// <see cref="AspectRatioAdjustmentMethod.None"/>.
+        /// </summary>
+        MaintainMinimum
     }
 
     public class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
@@ -54,6 +62,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case AspectRatioAdjustmentMethod.Trim:
                     Width = AspectRatioLimit.Value / parentAspectRatio;
                     break;
+
+                case AspectRatioAdjustmentMethod.MaintainMinimum:
+                    Width = Math.Max(AspectRatioLimit.Value / parentAspectRatio, 1);
+                    break;
+
             }
 
             Height = height;

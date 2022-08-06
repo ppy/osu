@@ -63,12 +63,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             if (enabledMods.HasFlagFast(LegacyMods.HardRock))
             {
-                // Hidden aspect adjustment is overriden by hardrock in the case of hdhr
-                drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.None;
-                timeRange = Math.Min(timeRange, classicMaxTimeRange);
+                // For hardrock, the playfield time range is locked to classicMaxTimeRange, but the display aspect ratio
+                // is kept at a minimum of classic_max_aspect_ratio. If the display aspect ratio is less than that, the
+                // play field will be extended beyond the display, and time range will effectively be cut short.
+                drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.MaintainMinimum;
+                drawableTaikoRuleset.AspectRatioLimit.Value = classic_max_aspect_ratio;
+                timeRange = classicMaxTimeRange;
             }
             else if (enabledMods.HasFlagFast(LegacyMods.Hidden))
             {
+                // Hidden aspect adjustment is overriden by hardrock in the case of hdhr, hence these are applied only
+                // if hardrock is not enabled.
                 drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.Trim;
                 drawableTaikoRuleset.AspectRatioLimit.Value = classic_hidden_aspect_ratio;
             }
