@@ -22,8 +22,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private MultiSpectatorLeaderboard leaderboard;
 
         [SetUpSteps]
-        public new void SetUpSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
             AddStep("reset", () =>
             {
                 leaderboard?.RemoveAndDisposeImmediately();
