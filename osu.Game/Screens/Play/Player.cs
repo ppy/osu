@@ -371,7 +371,7 @@ namespace osu.Game.Screens.Play
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
 
-            skipIntroOverlay.IsSkippable.ValueChanged += (e) =>
+            skipIntroOverlay.IsSkippable.ValueChanged += e =>
             {
                 if (RestartedViaHotkey && e.NewValue && RestartCount > 0)
                     skipIntroOverlay.RequestSkip.Invoke();
