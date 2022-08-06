@@ -123,6 +123,8 @@ namespace osu.Game.Screens.Play
 
         private EpilepsyWarning? epilepsyWarning;
 
+        private bool isHotKeyRestart;
+
         [Resolved(CanBeNull = true)]
         private INotificationOverlay? notificationOverlay { get; set; }
 
@@ -363,9 +365,20 @@ namespace osu.Game.Screens.Play
             CurrentPlayer = createPlayer();
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
+            CurrentPlayer.IsRestartingFromHotkey.ValueChanged += e =>
+            {
+                if (e.NewValue)
+                    isHotKeyRestart = true;
+            };
 
             LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
             {
+                if (isHotKeyRestart)
+                {
+                    CurrentPlayer.RestartedViaHotkey = true;
+                    isHotKeyRestart = false;
+                }
+
                 MetadataInfo.Loading = false;
                 OnPlayerLoaded();
             });
