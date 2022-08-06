@@ -384,10 +384,9 @@ namespace osu.Game.Screens.Play
         private void contentIn()
         {
             MetadataInfo.Loading = true;
-            int scaleContentTime = restartCount > 0 ? 65 : 650;
 
             content.FadeInFromZero(400);
-            content.ScaleTo(1, scaleContentTime, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
+            content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
             lowPassFilter.CutoffTo(1000, 650, Easing.OutQuint);
             highPassFilter.CutoffTo(300).Then().CutoffTo(0, 1250); // 1250 is to line up with the appearance of MetadataInfo (750 delay + 500 fade-in)
 
@@ -469,7 +468,7 @@ namespace osu.Game.Screens.Play
                     else
                         this.Exit();
                 });
-            }, CurrentPlayer?.RestartCount > 0 ? 50 : 500);
+            }, 500);
         }
 
         private void cancelLoad()
