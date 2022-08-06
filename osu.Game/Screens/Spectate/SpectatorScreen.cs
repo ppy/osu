@@ -115,13 +115,13 @@ namespace osu.Game.Screens.Spectate
             {
                 case NotifyDictionaryChangedAction.Add:
                 case NotifyDictionaryChangedAction.Replace:
-                    foreach ((int userId, var state) in e.NewItems.AsNonNull())
+                    foreach ((int userId, SpectatorState state) in e.NewItems.AsNonNull())
                         onUserStateChanged(userId, state);
                     break;
 
                 case NotifyDictionaryChangedAction.Remove:
                     foreach ((int userId, SpectatorState state) in e.OldItems.AsNonNull())
-                        onUserStateRemoved(userId, state);
+                        onUserStateChanged(userId, state);
                     break;
             }
         }
@@ -136,31 +136,17 @@ namespace osu.Game.Screens.Spectate
 
             switch (newState.State)
             {
-                case SpectatedUserState.Passed:
-                    // Make sure that gameplay completes to the end.
-                    if (gameplayStates.TryGetValue(userId, out var gameplayState))
-                        gameplayState.Score.Replay.HasReceivedAllFrames = true;
-                    break;
-
                 case SpectatedUserState.Playing:
                     Schedule(() => OnNewPlayingUserState(userId, newState));
                     startGameplay(userId);
                     break;
+
+                case SpectatedUserState.Passed:
+                case SpectatedUserState.Failed:
+                case SpectatedUserState.Quit:
+                    endGameplay(userId, newState);
+                    break;
             }
-        }
-
-        private void onUserStateRemoved(int userId, SpectatorState state)
-        {
-            if (!userMap.ContainsKey(userId))
-                return;
-
-            if (!gameplayStates.TryGetValue(userId, out var gameplayState))
-                return;
-
-            gameplayState.Score.Replay.HasReceivedAllFrames = true;
-
-            gameplayStates.Remove(userId);
-            Schedule(() => EndGameplay(userId, state));
         }
 
         private void startGameplay(int userId)
@@ -196,6 +182,20 @@ namespace osu.Game.Screens.Spectate
             Schedule(() => StartGameplay(userId, gameplayState));
         }
 
+        private void endGameplay(int userId, SpectatorState state)
+        {
+            if (!userMap.ContainsKey(userId))
+                return;
+
+            if (!gameplayStates.TryGetValue(userId, out var gameplayState))
+                return;
+
+            gameplayState.Score.Replay.HasReceivedAllFrames = true;
+
+            gameplayStates.Remove(userId);
+            Schedule(() => EndGameplay(userId, state));
+        }
+
         /// <summary>
         /// Invoked when a spectated user's state has changed to a new state indicating the player is currently playing.
         /// </summary>
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Spectate
             if (!userStates.TryGetValue(userId, out var state))
                 return;
 
-            onUserStateRemoved(userId, state);
+            endGameplay(userId, state);
 
             users.Remove(userId);
             userMap.Remove(userId);
