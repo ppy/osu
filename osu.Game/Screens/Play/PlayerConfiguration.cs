@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public bool AllowSkipping { get; set; } = true;
 
+        /// <summary>
+        /// Whether the intro should be skipped by default.
+        /// </summary>
         public bool AutomaticallySkipIntro { get; set; }
     }
 }
