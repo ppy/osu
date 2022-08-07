@@ -3,6 +3,9 @@
 
 #nullable disable
 
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
+
 namespace osu.Game.Configuration
 {
     public enum SeasonalBackgroundMode
@@ -10,16 +13,19 @@ namespace osu.Game.Configuration
         /// <summary>
         /// Seasonal backgrounds are shown regardless of season, if at all available.
         /// </summary>
+        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Always))]
         Always,
 
         /// <summary>
         /// Seasonal backgrounds are shown only during their corresponding season.
         /// </summary>
+        [LocalisableDescription(typeof(SeasonalBackgroundModeStrings), nameof(SeasonalBackgroundModeStrings.Sometimes))]
         Sometimes,
 
         /// <summary>
         /// Seasonal backgrounds are never shown.
         /// </summary>
+        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Never))]
         Never
     }
 }

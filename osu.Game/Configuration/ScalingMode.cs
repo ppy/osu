@@ -3,17 +3,23 @@
 
 #nullable disable
 
-using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Configuration
 {
     public enum ScalingMode
     {
+        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Off))]
         Off,
+
+        [LocalisableDescription(typeof(ScalingModeStrings), nameof(ScalingModeStrings.Everything))]
         Everything,
 
-        [Description("Excluding overlays")]
+        [LocalisableDescription(typeof(ScalingModeStrings), nameof(ScalingModeStrings.ExcludingOverlays))]
         ExcludeOverlays,
+
+        [LocalisableDescription(typeof(ScalingModeStrings), nameof(ScalingModeStrings.Gameplay))]
         Gameplay,
     }
 }

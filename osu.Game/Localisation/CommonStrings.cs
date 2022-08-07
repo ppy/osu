@@ -99,6 +99,31 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Description => new TranslatableString(getKey(@"description"), @"Description");
 
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString Always => new TranslatableString(getKey(@"always"), @"Always");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString Never => new TranslatableString(getKey(@"never"), @"Never");
+
+        /// <summary>
+        /// "None"
+        /// </summary>
+        public static LocalisableString None => new TranslatableString(getKey(@"none"), @"None");
+
+        /// <summary>
+        /// "Full"
+        /// </summary>
+        public static LocalisableString Full => new TranslatableString(getKey(@"full"), @"Full");
+
+        /// <summary>
+        /// "Off"
+        /// </summary>
+        public static LocalisableString Off => new TranslatableString(getKey(@"off"), @"Off");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

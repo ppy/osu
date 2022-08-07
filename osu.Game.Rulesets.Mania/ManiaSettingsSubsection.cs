@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.UI;
@@ -31,18 +32,18 @@ namespace osu.Game.Rulesets.Mania
             {
                 new SettingsEnumDropdown<ManiaScrollingDirection>
                 {
-                    LabelText = "Scrolling direction",
+                    LabelText = ManiaSettingsSubsectionStrings.ScrollingDirection,
                     Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
                 },
                 new SettingsSlider<double, TimeSlider>
                 {
-                    LabelText = "Scroll speed",
+                    LabelText = ManiaSettingsSubsectionStrings.ScrollSpeed,
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
                     KeyboardStep = 5
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Timing-based note colouring",
+                    LabelText = ManiaSettingsSubsectionStrings.TimingBasedNoteColouring,
                     Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
                 }
             };

@@ -3,17 +3,20 @@
 
 #nullable disable
 
-using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Configuration
 {
     public enum DiscordRichPresenceMode
     {
+        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Off))]
         Off,
 
-        [Description("Hide identifiable information")]
+        [LocalisableDescription(typeof(DiscordRichPresenceModeStrings), nameof(DiscordRichPresenceModeStrings.HideIdentifiableInformation))]
         Limited,
 
+        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Full))]
         Full
     }
 }

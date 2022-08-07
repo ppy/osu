@@ -9,6 +9,7 @@ using osu.Framework.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
+using osu.Game.Localisation;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -30,23 +31,23 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Snaking in sliders",
+                    LabelText = OsuSettingsSubsectionStrings.SnakingInSliders,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingInSliders)
                 },
                 new SettingsCheckbox
                 {
                     ClassicDefault = false,
-                    LabelText = "Snaking out sliders",
+                    LabelText = OsuSettingsSubsectionStrings.SnakingOutSliders,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Cursor trail",
+                    LabelText = OsuSettingsSubsectionStrings.CursorTrail,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
                 new SettingsEnumDropdown<PlayfieldBorderStyle>
                 {
-                    LabelText = "Playfield border style",
+                    LabelText = OsuSettingsSubsectionStrings.PlayfieldBorderStyle,
                     Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
                 },
             };

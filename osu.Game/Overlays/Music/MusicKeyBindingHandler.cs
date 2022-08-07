@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Music
                                 break;
 
                             case PreviousTrackResult.Previous:
-                                onScreenDisplay?.Display(new MusicActionToast(GlobalActionKeyBindingStrings.MusicPrev, e.Action));
+                                onScreenDisplay?.Display(new MusicActionToast("Test", e.Action));
                                 break;
                         }
                     });
