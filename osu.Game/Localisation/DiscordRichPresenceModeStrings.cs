@@ -14,6 +14,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString HideIdentifiableInformation => new TranslatableString(getKey(@"hide_identifiable_information"), @"Hide identifiable information");
 
+        /// <summary>
+        /// "Full"
+        /// </summary>
+        public static LocalisableString Full => new TranslatableString(getKey(@"rich_presence.full"), @"Full");
+
+        /// <summary>
+        /// "Off"
+        /// </summary>
+        public static LocalisableString Off => new TranslatableString(getKey(@"rich_presence.off"), @"Off");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

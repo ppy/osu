@@ -14,6 +14,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Corners => new TranslatableString(getKey(@"corners"), @"Corners");
 
+        /// <summary>
+        /// "Full"
+        /// </summary>
+        public static LocalisableString Full => new TranslatableString(getKey(@"play_field_border_style.full"), @"Full");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

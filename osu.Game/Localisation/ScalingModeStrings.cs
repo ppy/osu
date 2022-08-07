@@ -24,6 +24,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Gameplay => new TranslatableString(getKey(@"gameplay"), @"Gameplay");
 
+        /// <summary>
+        /// "Off"
+        /// </summary>
+        public static LocalisableString Off => new TranslatableString(getKey(@"scaling_mode.off"), @"Off");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

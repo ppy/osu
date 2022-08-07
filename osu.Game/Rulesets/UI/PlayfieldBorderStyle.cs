@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.UI
         [LocalisableDescription(typeof(PlayfieldBorderStyleStrings), nameof(PlayfieldBorderStyleStrings.Corners))]
         Corners,
 
-        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Full))]
+        [LocalisableDescription(typeof(PlayfieldBorderStyleStrings), nameof(PlayfieldBorderStyleStrings.Full))]
         Full
     }
 }

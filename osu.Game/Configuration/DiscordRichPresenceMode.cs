@@ -10,13 +10,13 @@ namespace osu.Game.Configuration
 {
     public enum DiscordRichPresenceMode
     {
-        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Off))]
+        [LocalisableDescription(typeof(DiscordRichPresenceModeStrings), nameof(DiscordRichPresenceModeStrings.Off))]
         Off,
 
         [LocalisableDescription(typeof(DiscordRichPresenceModeStrings), nameof(DiscordRichPresenceModeStrings.HideIdentifiableInformation))]
         Limited,
 
-        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Full))]
+        [LocalisableDescription(typeof(DiscordRichPresenceModeStrings), nameof(DiscordRichPresenceModeStrings.Full))]
         Full
     }
 }

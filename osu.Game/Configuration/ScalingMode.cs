@@ -10,7 +10,7 @@ namespace osu.Game.Configuration
 {
     public enum ScalingMode
     {
-        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Off))]
+        [LocalisableDescription(typeof(ScalingModeStrings), nameof(ScalingModeStrings.Off))]
         Off,
 
         [LocalisableDescription(typeof(ScalingModeStrings), nameof(ScalingModeStrings.Everything))]
