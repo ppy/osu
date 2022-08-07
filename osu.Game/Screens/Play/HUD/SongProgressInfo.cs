@@ -15,10 +15,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class SongProgressInfo : Container
     {
-        private GrowToFitContainer timeCurrentContainer;
-        private GrowToFitContainer timeLeftContainer;
-        private GrowToFitContainer progressContainer;
-
         private OsuSpriteText timeCurrent;
         private OsuSpriteText timeLeft;
         private OsuSpriteText progress;
@@ -59,16 +55,22 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     AutoSizeAxes = Axes.Both,
-                    Child = timeCurrentContainer = new GrowToFitContainer
+                    Child = new UprightUnscaledContainer
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Child = timeCurrent = new OsuSpriteText
+                        AutoSizeAxes = Axes.Both,
+                        Child = new GrowToFitContainer
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Colour = colours.BlueLighter,
-                            Font = OsuFont.Numeric,
+                            Child = timeCurrent = new OsuSpriteText
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                Colour = colours.BlueLighter,
+                                Font = OsuFont.Numeric,
+                            }
                         }
                     }
                 },
@@ -77,17 +79,23 @@ namespace osu.Game.Screens.Play.HUD
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Child = timeLeftContainer = new GrowToFitContainer
+                    Child = new UprightUnscaledContainer
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Child = progress = new OsuSpriteText
+                        AutoSizeAxes = Axes.Both,
+                        Child = new GrowToFitContainer
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Colour = colours.BlueLighter,
-                            Font = OsuFont.Numeric,
-                         }
+                            Child = progress = new OsuSpriteText
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                Colour = colours.BlueLighter,
+                                Font = OsuFont.Numeric,
+                             }
+                        }
                     }
                 },
                 new Container
@@ -95,26 +103,26 @@ namespace osu.Game.Screens.Play.HUD
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     AutoSizeAxes = Axes.Both,
-                    Child = progressContainer = new GrowToFitContainer
+                    Child = new UprightUnscaledContainer
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Child = timeLeft = new OsuSpriteText
+                        AutoSizeAxes = Axes.Both,
+                        Child = new GrowToFitContainer
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Colour = colours.BlueLighter,
-                            Font = OsuFont.Numeric,
+                            Child = timeLeft = new OsuSpriteText
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                Colour = colours.BlueLighter,
+                                Font = OsuFont.Numeric,
+                            }
                         }
                     }
                 }
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            keepTextSpritesUpright();
         }
 
         protected override void Update()
@@ -143,12 +151,5 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
-
-        private void keepTextSpritesUpright()
-        {
-            timeCurrentContainer.OnUpdate += Extensions.DrawableExtensions.KeepUprightAndUnscaled;
-            progressContainer.OnUpdate += Extensions.DrawableExtensions.KeepUprightAndUnscaled;
-            timeLeftContainer.OnUpdate += Extensions.DrawableExtensions.KeepUprightAndUnscaled;
-        }
     }
 }
