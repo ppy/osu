@@ -365,17 +365,12 @@ namespace osu.Game.Screens.Play
             CurrentPlayer = createPlayer();
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
-            CurrentPlayer.IsRestartingFromHotkey.ValueChanged += e =>
-            {
-                if (e.NewValue)
-                    isHotKeyRestart = true;
-            };
 
             LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
             {
                 if (isHotKeyRestart)
                 {
-                    CurrentPlayer.RestartedViaHotkey = true;
+                    CurrentPlayer.Configuration.AutomaticallySkipIntro = true;
                     isHotKeyRestart = false;
                 }
 
@@ -390,6 +385,11 @@ namespace osu.Game.Screens.Play
 
         private void restartRequested()
         {
+            if (CurrentPlayer != null)
+            {
+                isHotKeyRestart = CurrentPlayer.Configuration.AutomaticallySkipIntro;
+            }
+
             hideOverlays = true;
             ValidForResume = true;
         }
