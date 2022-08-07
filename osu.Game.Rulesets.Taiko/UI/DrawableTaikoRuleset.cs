@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,7 +18,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
-using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -72,7 +70,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             });
 
             KeyBindingInputManager.Add(new DrumTouchInputArea());
-            applyClassicMods(Mods);
         }
 
         protected override void UpdateAfterChildren()
@@ -106,20 +103,5 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
 
         protected override ReplayRecorder CreateReplayRecorder(Score score) => new TaikoReplayRecorder(score);
-
-        // TODO: Review this - this introduces a circular dependency between DrawableTaikoRuleset and TaikoModClassic
-        private void applyClassicMods(IReadOnlyList<Mod> mods)
-        {
-            foreach (TaikoModClassic classic in mods.OfType<TaikoModClassic>())
-            {
-                foreach (IApplicableToTaikoClassic mod in mods.OfType<IApplicableToTaikoClassic>())
-                {
-                    mod.ApplyToTaikoModClassic(classic);
-                }
-
-                // Return early since there shouldn't be more than one TaikoModClassic.
-                return;
-            }
-        }
     }
 }

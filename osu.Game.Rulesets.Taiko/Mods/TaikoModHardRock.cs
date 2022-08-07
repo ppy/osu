@@ -2,12 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModHardRock : ModHardRock, IApplicableToTaikoClassic
+    public class TaikoModHardRock : ModHardRock
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
@@ -25,11 +24,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             base.ApplyToDifficulty(difficulty);
             difficulty.SliderMultiplier *= slider_multiplier;
-        }
-
-        public void ApplyToTaikoModClassic(TaikoModClassic taikoModClassic)
-        {
-            taikoModClassic.EnableLegacyMods(LegacyMods.HardRock);
         }
     }
 }

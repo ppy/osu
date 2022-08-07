@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -15,7 +14,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>, IApplicableToTaikoClassic
+    public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>
     {
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
@@ -30,25 +29,19 @@ namespace osu.Game.Rulesets.Taiko.Mods
         /// How long hitobjects take to fade out, in terms of the scrolling length.
         /// Range: [0, 1]
         /// </summary>
-        private readonly Bindable<float> fadeOutDuration = new Bindable<float>(0.375f);
+        public readonly Bindable<float> FadeOutDuration = new Bindable<float>(0.375f);
 
         /// <summary>
         /// The initial alpha of hitobjects when they appear.
         /// Range: [0, 1]
         /// </summary>
-        private readonly Bindable<float> initialAlpha = new Bindable<float>(1f);
+        public readonly Bindable<float> InitialAlpha = new Bindable<float>(1f);
 
         private DrawableTaikoRuleset drawableRuleset = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             this.drawableRuleset = (DrawableTaikoRuleset)drawableRuleset;
-        }
-
-        public void ApplyToTaikoModClassic(TaikoModClassic taikoModClassic)
-        {
-            taikoModClassic.EnableLegacyMods(LegacyMods.Hidden);
-            taikoModClassic.BindHiddenParameters(fadeOutDuration, initialAlpha);
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
@@ -64,8 +57,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 case DrawableHit:
                     double preempt = drawableRuleset.TimeRange.Value / drawableRuleset.ControlPointAt(hitObject.HitObject.StartTime).Multiplier;
                     double start = hitObject.HitObject.StartTime - preempt * fade_out_start_time;
-                    double duration = preempt * fadeOutDuration.Value;
-                    hitObject.Alpha = initialAlpha.Value;
+                    double duration = preempt * FadeOutDuration.Value;
+                    hitObject.Alpha = InitialAlpha.Value;
 
                     using (hitObject.BeginAbsoluteSequence(start))
                     {
