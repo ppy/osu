@@ -24,6 +24,16 @@ namespace osu.Game.Database
         Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks);
 
         /// <summary>
+        /// Process a single import as an update for an existing model.
+        /// This will still run a full import, but perform any post-processing required to make it feel like an update to the user.
+        /// </summary>
+        /// <param name="notification">The notification to update.</param>
+        /// <param name="task">The import task.</param>
+        /// <param name="original">The original model which is being updated.</param>
+        /// <returns>The imported model.</returns>
+        Task<Live<TModel>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, TModel original);
+
+        /// <summary>
         /// A user displayable name for the model type associated with this manager.
         /// </summary>
         string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLowerInvariant()}";

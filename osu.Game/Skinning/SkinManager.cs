@@ -272,6 +272,8 @@ namespace osu.Game.Skinning
 
         public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => skinImporter.Import(notification, tasks);
 
+        public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) => skinImporter.ImportAsUpdate(notification, task, original);
+
         public Task<Live<SkinInfo>> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => skinImporter.Import(task, batchImport, cancellationToken);
 
         #endregion
