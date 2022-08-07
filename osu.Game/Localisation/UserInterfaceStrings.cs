@@ -114,6 +114,46 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NoLimit => new TranslatableString(getKey(@"no_limit"), @"no limit");
 
+        /// <summary>
+        /// "Beatmap (with storyboard / video)"
+        /// </summary>
+        public static LocalisableString BeatmapWithStoryboard => new TranslatableString(getKey(@"beatmap_with_storyboard"), @"Beatmap (with storyboard / video)");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString Always => new TranslatableString(getKey(@"always"), @"Always");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString Never => new TranslatableString(getKey(@"never"), @"Never");
+
+        /// <summary>
+        /// "Sometimes"
+        /// </summary>
+        public static LocalisableString Sometimes => new TranslatableString(getKey(@"sometimes"), @"Sometimes");
+
+        /// <summary>
+        /// "Sequential"
+        /// </summary>
+        public static LocalisableString Sequential => new TranslatableString(getKey(@"sequential"), @"Sequential");
+
+        /// <summary>
+        /// "Classic"
+        /// </summary>
+        public static LocalisableString Classic => new TranslatableString(getKey(@"classic"), @"Classic");
+
+        /// <summary>
+        /// "Never repeat"
+        /// </summary>
+        public static LocalisableString NeverRepeat => new TranslatableString(getKey(@"never_repeat"), @"Never repeat");
+
+        /// <summary>
+        /// "True Random"
+        /// </summary>
+        public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True Random");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

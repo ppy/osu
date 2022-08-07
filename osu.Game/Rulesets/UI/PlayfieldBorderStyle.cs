@@ -3,12 +3,20 @@
 
 #nullable disable
 
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
+
 namespace osu.Game.Rulesets.UI
 {
     public enum PlayfieldBorderStyle
     {
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.None))]
         None,
+
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.Corners))]
         Corners,
+
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.Full))]
         Full
     }
 }

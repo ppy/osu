@@ -29,6 +29,26 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString FullscreenMacOSNote => new TranslatableString(getKey(@"fullscreen_macos_note"), @"Using fullscreen on macOS makes interacting with the menu bar and spaces no longer work, and may lead to freezes if a system dialog is presented. Using borderless is recommended.");
 
+        /// <summary>
+        /// "Excluding overlays"
+        /// </summary>
+        public static LocalisableString ExcludingOverlays => new TranslatableString(getKey(@"excluding_overlays"), @"Excluding overlays");
+
+        /// <summary>
+        /// "Everything"
+        /// </summary>
+        public static LocalisableString Everything => new TranslatableString(getKey(@"everything"), @"Everything");
+
+        /// <summary>
+        /// "Gameplay"
+        /// </summary>
+        public static LocalisableString Gameplay => new TranslatableString(getKey(@"gameplay"), @"Gameplay");
+
+        /// <summary>
+        /// "Off"
+        /// </summary>
+        public static LocalisableString Off => new TranslatableString(getKey(@"scaling_mode.off"), @"Off");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

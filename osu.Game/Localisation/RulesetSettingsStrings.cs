@@ -14,6 +14,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Rulesets => new TranslatableString(getKey(@"rulesets"), @"Rulesets");
 
+        /// <summary>
+        /// "None"
+        /// </summary>
+        public static LocalisableString None => new TranslatableString(getKey(@"none"), @"None");
+
+        /// <summary>
+        /// "Corners"
+        /// </summary>
+        public static LocalisableString Corners => new TranslatableString(getKey(@"corners"), @"Corners");
+
+        /// <summary>
+        /// "Full"
+        /// </summary>
+        public static LocalisableString Full => new TranslatableString(getKey(@"full"), @"Full");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
