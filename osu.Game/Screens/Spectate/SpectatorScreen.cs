@@ -142,9 +142,11 @@ namespace osu.Game.Screens.Spectate
                     break;
 
                 case SpectatedUserState.Passed:
-                case SpectatedUserState.Failed:
+                    markReceivedAllFrames(userId);
+                    break;
+
                 case SpectatedUserState.Quit:
-                    endGameplay(userId, newState);
+                    quitGameplay(userId);
                     break;
             }
         }
@@ -182,18 +184,27 @@ namespace osu.Game.Screens.Spectate
             Schedule(() => StartGameplay(userId, gameplayState));
         }
 
-        private void endGameplay(int userId, SpectatorState state)
+        /// <summary>
+        /// Marks an existing gameplay session as received all frames.
+        /// </summary>
+        private void markReceivedAllFrames(int userId)
+        {
+            if (gameplayStates.TryGetValue(userId, out var gameplayState))
+                gameplayState.Score.Replay.HasReceivedAllFrames = true;
+        }
+
+        private void quitGameplay(int userId)
         {
             if (!userMap.ContainsKey(userId))
                 return;
 
-            if (!gameplayStates.TryGetValue(userId, out var gameplayState))
+            if (!gameplayStates.ContainsKey(userId))
                 return;
 
-            gameplayState.Score.Replay.HasReceivedAllFrames = true;
+            markReceivedAllFrames(userId);
 
             gameplayStates.Remove(userId);
-            Schedule(() => EndGameplay(userId, state));
+            Schedule(() => QuitGameplay(userId));
         }
 
         /// <summary>
@@ -211,11 +222,10 @@ namespace osu.Game.Screens.Spectate
         protected abstract void StartGameplay(int userId, [NotNull] SpectatorGameplayState spectatorGameplayState);
 
         /// <summary>
-        /// Ends gameplay for a user.
+        /// Quits gameplay for a user.
         /// </summary>
-        /// <param name="userId">The user to end gameplay for.</param>
-        /// <param name="state">The final user state.</param>
-        protected abstract void EndGameplay(int userId, SpectatorState state);
+        /// <param name="userId">The user to quit gameplay for.</param>
+        protected abstract void QuitGameplay(int userId);
 
         /// <summary>
         /// Stops spectating a user.
@@ -223,10 +233,10 @@ namespace osu.Game.Screens.Spectate
         /// <param name="userId">The user to stop spectating.</param>
         protected void RemoveUser(int userId)
         {
-            if (!userStates.TryGetValue(userId, out var state))
+            if (!userStates.ContainsKey(userId))
                 return;
 
-            endGameplay(userId, state);
+            quitGameplay(userId);
 
             users.Remove(userId);
             userMap.Remove(userId);
