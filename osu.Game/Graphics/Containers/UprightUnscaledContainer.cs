@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.Containers
             AddLayout(layout);
         }
 
-        private LayoutValue layout = new LayoutValue(Invalidation.DrawInfo);
+        private LayoutValue layout = new LayoutValue(Invalidation.DrawInfo, InvalidationSource.Parent);
 
         protected override void Update()
         {
