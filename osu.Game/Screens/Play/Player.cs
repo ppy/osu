@@ -81,10 +81,6 @@ namespace osu.Game.Screens.Play
 
         private bool isRestarting;
 
-        public bool RestartedViaHotkey;
-
-        public Bindable<bool> IsRestartingFromHotkey = new Bindable<bool>();
-
         private Bindable<bool> mouseWheelDisabled;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
@@ -291,7 +287,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        IsRestartingFromHotkey.Value = true;
+                        Configuration.AutomaticallySkipIntro = true;
                         fadeOut(true);
                         Restart();
                     },
@@ -373,8 +369,11 @@ namespace osu.Game.Screens.Play
 
             skipIntroOverlay.IsSkippable.ValueChanged += e =>
             {
-                if (RestartedViaHotkey && e.NewValue && RestartCount > 0)
+                if (Configuration.AutomaticallySkipIntro && e.NewValue && RestartCount > 0)
+                {
+                    Configuration.AutomaticallySkipIntro = false;
                     skipIntroOverlay.RequestSkip.Invoke();
+                }
             };
         }
 
