@@ -3,16 +3,17 @@
 
 #nullable disable
 
-using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Configuration
 {
     public enum ScreenshotFormat
     {
-        [Description("JPG (web-friendly)")]
+        [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.JPG))]
         Jpg = 1,
 
-        [Description("PNG (lossless)")]
+        [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.PNG))]
         Png = 2
     }
 }

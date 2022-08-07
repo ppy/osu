@@ -64,6 +64,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ShowExplicitContent => new TranslatableString(getKey(@"show_explicit_content"), @"Show explicit content in search results");
 
+        /// <summary>
+        /// "Hide identifiable information"
+        /// </summary>
+        public static LocalisableString HideIdentifiableInformation => new TranslatableString(getKey(@"hide_identifiable_information"), @"Hide identifiable information");
+
+        /// <summary>
+        /// "Full"
+        /// </summary>
+        public static LocalisableString Full => new TranslatableString(getKey(@"full"), @"Full");
+
+        /// <summary>
+        /// "Off"
+        /// </summary>
+        public static LocalisableString Off => new TranslatableString(getKey(@"off"), @"Off");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

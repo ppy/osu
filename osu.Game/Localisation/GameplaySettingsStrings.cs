@@ -104,6 +104,31 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"Increase visibility of first object when visual impairment mods are enabled");
 
+        /// <summary>
+        /// "Hide during gameplay"
+        /// </summary>
+        public static LocalisableString HideDuringGameplay => new TranslatableString(getKey(@"hide_during_gameplay"), @"Hide during gameplay");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString Always => new TranslatableString(getKey(@"always"), @"Always");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString Never => new TranslatableString(getKey(@"never"), @"Never");
+
+        /// <summary>
+        /// "Standardised"
+        /// </summary>
+        public static LocalisableString Standardised => new TranslatableString(getKey(@"standardised"), @"Standardised");
+
+        /// <summary>
+        /// "Classic"
+        /// </summary>
+        public static LocalisableString Classic => new TranslatableString(getKey(@"classic"), @"Classic");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
