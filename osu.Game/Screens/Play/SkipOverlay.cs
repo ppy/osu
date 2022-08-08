@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play
 
         private bool isClickable;
 
-        public BindableBool IsSkippable = new BindableBool()!;
+        public IBindable<bool> IsSkippable = new Bindable<bool>();
 
         [Resolved]
         private GameplayClock gameplayClock { get; set; }
@@ -92,6 +92,8 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+
+            IsSkippable.BindTo(button.Enabled);
         }
 
         private const double fade_time = 300;
@@ -137,7 +139,6 @@ namespace osu.Game.Screens.Play
             remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
             isClickable = progress > 0;
-            IsSkippable.Value = isClickable;
             button.Enabled.Value = isClickable;
             buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
         }
