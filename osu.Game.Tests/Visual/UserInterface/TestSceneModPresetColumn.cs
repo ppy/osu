@@ -134,6 +134,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestSoftDeleteSupport()
         {
             AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
             AddStep("create content", () => Child = new ModPresetColumn
             {
                 Anchor = Anchor.Centre,
@@ -153,9 +154,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 foreach (var preset in r.All<ModPreset>())
                     preset.DeletePending = true;
             }));
-            AddUntilStep("no panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 0);
+            AddUntilStep("no panels visible", () => !this.ChildrenOfType<ModPresetPanel>().Any());
 
-            AddStep("undelete preset", () => Realm.Write(r =>
+            AddStep("select mods from first preset", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHardRock() });
+
+            AddStep("undelete presets", () => Realm.Write(r =>
             {
                 foreach (var preset in r.All<ModPreset>())
                     preset.DeletePending = false;
