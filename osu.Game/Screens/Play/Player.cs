@@ -372,7 +372,7 @@ namespace osu.Game.Screens.Play
                 if (Configuration.AutomaticallySkipIntro && e.NewValue && RestartCount > 0)
                 {
                     Configuration.AutomaticallySkipIntro = false;
-                    skipIntroOverlay.RequestSkip.Invoke();
+                    performUserRequestedSkip();
                 }
             };
         }
