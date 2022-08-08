@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,19 +49,18 @@ namespace osu.Game.Overlays.Mods
         {
             presetSubscription?.Dispose();
             presetSubscription = realm.RegisterForNotifications(r =>
-                    r.All<ModPreset>()
-                     .Filter($"{nameof(ModPreset.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $0"
-                             + $" && {nameof(ModPreset.DeletePending)} == false", ruleset.Value.ShortName)
-                     .OrderBy(preset => preset.Name),
-                (presets, _, _) => asyncLoadPanels(presets));
+                r.All<ModPreset>()
+                 .Filter($"{nameof(ModPreset.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $0"
+                         + $" && {nameof(ModPreset.DeletePending)} == false", ruleset.Value.ShortName)
+                 .OrderBy(preset => preset.Name), asyncLoadPanels);
         }
 
         private CancellationTokenSource? cancellationTokenSource;
 
         private Task? latestLoadTask;
-        internal bool ItemsLoaded => latestLoadTask == null;
+        internal bool ItemsLoaded => latestLoadTask?.IsCompleted ?? false;
 
-        private void asyncLoadPanels(IReadOnlyList<ModPreset> presets)
+        private void asyncLoadPanels(IRealmCollection<ModPreset> presets, ChangeSet changes, Exception error)
         {
             cancellationTokenSource?.Cancel();
 
@@ -72,23 +70,14 @@ namespace osu.Game.Overlays.Mods
                 return;
             }
 
-            var panels = presets.Select(preset => new ModPresetPanel(preset.ToLive(realm))
+            latestLoadTask = LoadComponentsAsync(presets.Select(p => new ModPresetPanel(p.ToLive(realm))
             {
                 Shear = Vector2.Zero
-            });
-
-            Task? loadTask;
-
-            latestLoadTask = loadTask = LoadComponentsAsync(panels, loaded =>
+            }), loaded =>
             {
                 ItemsFlow.RemoveAll(panel => panel is ModPresetPanel);
                 ItemsFlow.AddRange(loaded);
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
-            loadTask.ContinueWith(_ =>
-            {
-                if (loadTask == latestLoadTask)
-                    latestLoadTask = null;
-            });
         }
 
         protected override void Dispose(bool isDisposing)
