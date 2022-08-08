@@ -4,55 +4,36 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Timing;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD.KPSCounter
 {
-    public class KeysPerSecondCalculator
+    public class KeysPerSecondCalculator : Component
     {
-        public static void AddInput()
-        {
-            onNewInput?.Invoke();
-        }
-
         private readonly List<double> timestamps;
-        private GameplayClock? gameplayClock;
-        private DrawableRuleset? drawableRuleset;
 
-        public GameplayClock? GameplayClock
+        private InputListener? listener;
+
+        [Resolved]
+        private GameplayClock? gameplayClock { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private DrawableRuleset? drawableRuleset { get; set; }
+
+        public InputListener Listener
         {
-            get => gameplayClock;
             set
             {
                 onResetRequested?.Invoke();
-
-                if (value != null)
-                {
-                    gameplayClock = value;
-                }
+                listener = value;
+                listener.OnNewInput += addTimestamp;
             }
         }
 
-        public DrawableRuleset? DrawableRuleset
-        {
-            get => drawableRuleset;
-            set
-            {
-                onResetRequested?.Invoke();
-
-                if (value != null)
-                {
-                    drawableRuleset = value;
-                    baseRate = (drawableRuleset.Mods.FirstOrDefault(m => m is ModRateAdjust) as ModRateAdjust)?.SpeedChange.Value
-                               ?? 1;
-                }
-            }
-        }
-
-        private static event Action? onNewInput;
-        private static event Action? onResetRequested;
+        private event Action? onResetRequested;
 
         private IClock? workingClock => drawableRuleset?.FrameStableClock;
 
@@ -81,8 +62,8 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
 
         public KeysPerSecondCalculator()
         {
+            RelativeSizeAxes = Axes.Both;
             timestamps = new List<double>();
-            onNewInput += addTimestamp;
             onResetRequested += cleanUp;
         }
 
@@ -90,6 +71,9 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
         {
             timestamps.Clear();
             maxTime = double.NegativeInfinity;
+
+            if (listener != null)
+                listener.OnNewInput -= addTimestamp;
         }
 
         private void addTimestamp()
@@ -110,6 +94,22 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
             double span = 1000 * rate;
             double relativeTime = workingClock.CurrentTime - timestamp;
             return relativeTime >= 0 && relativeTime <= span;
+        }
+
+        ~KeysPerSecondCalculator()
+        {
+            cleanUp();
+        }
+
+        public abstract class InputListener : Component
+        {
+            protected InputListener()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Depth = float.MinValue;
+            }
+
+            public abstract event Action? OnNewInput;
         }
     }
 }

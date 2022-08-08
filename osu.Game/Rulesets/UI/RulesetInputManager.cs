@@ -20,11 +20,12 @@ using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD.KPSCounter;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler, ICanAttachKpsCalculator
         where T : struct
     {
         public readonly KeyBindingContainer<T> KeyBindingContainer;
@@ -186,6 +187,35 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
+        #region KPS Counter Attachment
+
+        public void Attach(KeysPerSecondCalculator kps)
+        {
+            var listener = new ActionListener();
+
+            KeyBindingContainer.Add(listener);
+
+            kps.Listener = listener;
+        }
+
+        public class ActionListener : KeysPerSecondCalculator.InputListener, IKeyBindingHandler<T>
+        {
+            public override event Action OnNewInput;
+
+            public bool OnPressed(KeyBindingPressEvent<T> e)
+            {
+                OnNewInput?.Invoke();
+
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<T> e)
+            {
+            }
+        }
+
+        #endregion
+
         protected virtual KeyBindingContainer<T> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new RulesetKeyBindingContainer(ruleset, variant, unique);
 
@@ -227,6 +257,11 @@ namespace osu.Game.Rulesets.UI
     public interface ICanAttachKeyCounter
     {
         void Attach(KeyCounterDisplay keyCounter);
+    }
+
+    public interface ICanAttachKpsCalculator
+    {
+        void Attach(KeysPerSecondCalculator keysPerSecondCalculator);
     }
 
     public class RulesetInputManagerInputState<T> : InputState

@@ -30,6 +30,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD.KPSCounter;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.UI
     /// Displays an interactive ruleset gameplay instance.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
-    public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
+    public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter, ICanAttachKpsCalculator
         where TObject : HitObject
     {
         public override event Action<JudgementResult> NewResult;
@@ -339,6 +340,8 @@ namespace osu.Game.Rulesets.UI
 
         public void Attach(KeyCounterDisplay keyCounter) =>
             (KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(keyCounter);
+
+        public void Attach(KeysPerSecondCalculator kps) => (KeyBindingInputManager as ICanAttachKpsCalculator)?.Attach(kps);
 
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.

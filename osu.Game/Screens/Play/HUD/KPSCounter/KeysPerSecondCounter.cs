@@ -22,21 +22,15 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
 
         private readonly Bindable<bool> valid = new Bindable<bool>();
 
-        private static readonly KeysPerSecondCalculator calculator = new KeysPerSecondCalculator();
-
         [Resolved]
-        private GameplayClock? gameplayClock
-        {
-            get => calculator.GameplayClock;
-            set => calculator.GameplayClock = value;
-        }
+        private KeysPerSecondCalculator? calculator { get; set; }
+
+        // This is to force the skin editor to show the component only in a Gameplay context
+        [Resolved]
+        private GameplayClock? gameplayClock { get; set; }
 
         [Resolved(canBeNull: true)]
-        private DrawableRuleset? drawableRuleset
-        {
-            get => calculator.DrawableRuleset;
-            set => calculator.DrawableRuleset = value;
-        }
+        private DrawableRuleset? drawableRuleset { get; set; }
 
         protected override double RollingDuration => 350;
 
@@ -59,8 +53,8 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
         {
             base.Update();
 
-            valid.Value = calculator.Ready;
-            Current.Value = calculator.Ready ? calculator.Value : 0;
+            valid.Value = calculator != null && calculator.Ready;
+            Current.Value = calculator != null ? calculator.Ready ? calculator.Value : 0 : 0;
         }
 
         protected override IHasText CreateText() => new TextComponent
