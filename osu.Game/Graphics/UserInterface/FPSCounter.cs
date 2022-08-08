@@ -177,15 +177,15 @@ namespace osu.Game.Graphics.UserInterface
             // use elapsed frame time rather then FramesPerSecond to better catch stutter frames.
             bool hasDrawSpike = displayedFpsCount > (1000 / spike_time_ms) && drawClock.ElapsedFrameTime > spike_time_ms;
 
-            // note that we use an elapsed time here of 1 intentionally.
-            // this weights all updates equally. if we passed in the elapsed time, longer frames would be weighted incorrectly lower.
-            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, updateClock.ElapsedFrameTime, hasUpdateSpike ? 0 : 100, 1);
+            const float damp_time = 100;
+
+            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, updateClock.ElapsedFrameTime, hasUpdateSpike ? 0 : damp_time, updateClock.ElapsedFrameTime);
 
             if (hasDrawSpike)
                 // show spike time using raw elapsed value, to account for `FramesPerSecond` being so averaged spike frames don't show.
                 displayedFpsCount = 1000 / drawClock.ElapsedFrameTime;
             else
-                displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, drawClock.FramesPerSecond, 100, Time.Elapsed);
+                displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, drawClock.FramesPerSecond, damp_time, Time.Elapsed);
 
             if (Time.Current - lastUpdate > min_time_between_updates)
             {
