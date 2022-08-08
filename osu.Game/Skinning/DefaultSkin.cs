@@ -53,7 +53,7 @@ namespace osu.Game.Skinning
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
-                var sample = Samples?.Get(lookup) ?? resources.AudioManager.Samples.Get(lookup);
+                var sample = Samples?.Get(lookup) ?? resources.AudioManager?.Samples.Get(lookup);
                 if (sample != null)
                     return sample;
             }
