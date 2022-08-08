@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Play.HUD.KPSCounter;
 using osuTK;
 using osuTK.Graphics;
 
@@ -56,7 +55,6 @@ namespace osu.Game.Screens.Play
 
         public void Increment()
         {
-            KeysPerSecondCalculator.AddInput();
             if (!IsCounting)
                 return;
 
