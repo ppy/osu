@@ -190,7 +190,7 @@ namespace osu.Game.Tests.Visual.Components
             AddAssert("track stopped", () => !track.IsRunning);
         }
 
-        private TestPreviewTrackManager.TestPreviewTrack getTrack() => (TestPreviewTrackManager.TestPreviewTrack)trackManager.Get(null);
+        private TestPreviewTrackManager.TestPreviewTrack getTrack() => (TestPreviewTrackManager.TestPreviewTrack)trackManager.Get(CreateAPIBeatmapSet());
 
         private TestPreviewTrackManager.TestPreviewTrack getOwnedTrack()
         {
