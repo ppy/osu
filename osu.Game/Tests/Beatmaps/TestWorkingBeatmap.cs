@@ -31,8 +31,6 @@ namespace osu.Game.Tests.Beatmaps
             this.storyboard = storyboard;
         }
 
-        public override bool TrackLoaded => true;
-
         public override bool BeatmapLoaded => true;
 
         protected override IBeatmap GetBeatmap() => beatmap;

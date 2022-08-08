@@ -137,6 +137,9 @@ namespace osu.Game.Graphics
         {
             switch (status)
             {
+                case BeatmapOnlineStatus.LocallyModified:
+                    return Color4.OrangeRed;
+
                 case BeatmapOnlineStatus.Ranked:
                 case BeatmapOnlineStatus.Approved:
                     return Color4Extensions.FromHex(@"b3ff66");

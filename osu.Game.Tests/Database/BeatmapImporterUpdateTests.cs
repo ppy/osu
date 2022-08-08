@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
@@ -51,6 +52,8 @@ namespace osu.Game.Tests.Database
                 Assert.That(importBeforeUpdate, Is.Not.Null);
                 Debug.Assert(importBeforeUpdate != null);
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapSetInfo>(realm, 1, s => !s.DeletePending);
                 Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps - 1));
 
@@ -59,6 +62,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
@@ -103,6 +108,8 @@ namespace osu.Game.Tests.Database
                         beatmap.ResetOnlineInfo();
                 });
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapSetInfo>(realm, 1, s => !s.DeletePending);
                 Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps - 1));
 
@@ -111,6 +118,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
@@ -148,6 +157,8 @@ namespace osu.Game.Tests.Database
                 Assert.That(importBeforeUpdate, Is.Not.Null);
                 Debug.Assert(importBeforeUpdate != null);
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapSetInfo>(realm, 1, s => !s.DeletePending);
                 Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps));
 
@@ -160,6 +171,8 @@ namespace osu.Game.Tests.Database
                 // should only contain the modified beatmap (others purged).
                 Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(1));
                 Assert.That(importAfterUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps));
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps + 1);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps + 1);
@@ -198,6 +211,8 @@ namespace osu.Game.Tests.Database
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
                 checkCount<BeatmapSetInfo>(realm, 2);
@@ -234,6 +249,8 @@ namespace osu.Game.Tests.Database
                 var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathEmpty), importBeforeUpdate.Value);
                 Assert.That(importAfterUpdate, Is.Null);
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapSetInfo>(realm, 1);
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
@@ -263,6 +280,8 @@ namespace osu.Game.Tests.Database
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<BeatmapSetInfo>(realm, 1);
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
@@ -279,12 +298,16 @@ namespace osu.Game.Tests.Database
             {
                 var importer = new BeatmapImporter(storage, realm);
                 using var rulesets = new RealmRulesetStore(realm, storage);
+                string removedFilename = null!;
 
                 using var __ = getBeatmapArchive(out string pathOriginal);
                 using var _ = getBeatmapArchiveWithModifications(out string pathMissingOneBeatmap, directory =>
                 {
                     // arbitrary beatmap removal
-                    directory.GetFiles("*.osu").First().Delete();
+                    var fileToRemove = directory.GetFiles("*.osu").First();
+
+                    removedFilename = fileToRemove.Name;
+                    fileToRemove.Delete();
                 });
 
                 var importBeforeUpdate = await importer.Import(new ImportTask(pathOriginal));
@@ -296,10 +319,14 @@ namespace osu.Game.Tests.Database
 
                 importBeforeUpdate.PerformWrite(s =>
                 {
-                    var beatmapInfo = s.Beatmaps.Last();
+                    // make sure not to add scores to the same beatmap that is removed in the update.
+                    var beatmapInfo = s.Beatmaps.First(b => b.File?.Filename != removedFilename);
+
                     scoreTargetBeatmapHash = beatmapInfo.Hash;
                     s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
                 });
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<ScoreInfo>(realm, 1);
 
@@ -307,6 +334,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
@@ -342,6 +371,8 @@ namespace osu.Game.Tests.Database
                     s.Realm.Add(new ScoreInfo(beatmapInfo, s.Realm.All<RulesetInfo>().First(), new RealmUser()));
                 });
 
+                realm.Run(r => r.Refresh());
+
                 checkCount<ScoreInfo>(realm, 1);
 
                 using var _ = getBeatmapArchiveWithModifications(out string pathModified, directory =>
@@ -358,6 +389,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
+
+                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps + 1);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps + 1);
@@ -397,6 +430,126 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(importBeforeUpdate.ID, Is.Not.EqualTo(importAfterUpdate.ID));
                 Assert.That(importBeforeUpdate.Value.DateAdded, Is.EqualTo(importAfterUpdate.Value.DateAdded));
+            });
+        }
+
+        /// <summary>
+        /// If all difficulties in the original beatmap set are in a collection, presume the user also wants new difficulties added.
+        /// </summary>
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestCollectionTransferNewBeatmap(bool allOriginalBeatmapsInCollection)
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var rulesets = new RealmRulesetStore(realm, storage);
+
+                using var __ = getBeatmapArchive(out string pathOriginal);
+                using var _ = getBeatmapArchiveWithModifications(out string pathMissingOneBeatmap, directory =>
+                {
+                    // remove one difficulty before first import
+                    directory.GetFiles("*.osu").First().Delete();
+                });
+
+                var importBeforeUpdate = await importer.Import(new ImportTask(pathMissingOneBeatmap));
+
+                Assert.That(importBeforeUpdate, Is.Not.Null);
+                Debug.Assert(importBeforeUpdate != null);
+
+                int beatmapsToAddToCollection = 0;
+
+                importBeforeUpdate.PerformWrite(s =>
+                {
+                    var beatmapCollection = s.Realm.Add(new BeatmapCollection("test collection"));
+                    beatmapsToAddToCollection = s.Beatmaps.Count - (allOriginalBeatmapsInCollection ? 0 : 1);
+
+                    for (int i = 0; i < beatmapsToAddToCollection; i++)
+                        beatmapCollection.BeatmapMD5Hashes.Add(s.Beatmaps[i].MD5Hash);
+                });
+
+                // Second import matches first but contains one extra .osu file.
+                var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOriginal), importBeforeUpdate.Value);
+
+                Assert.That(importAfterUpdate, Is.Not.Null);
+                Debug.Assert(importAfterUpdate != null);
+
+                importAfterUpdate.PerformRead(updated =>
+                {
+                    updated.Realm.Refresh();
+
+                    string[] hashes = updated.Realm.All<BeatmapCollection>().Single().BeatmapMD5Hashes.ToArray();
+
+                    if (allOriginalBeatmapsInCollection)
+                    {
+                        Assert.That(updated.Beatmaps.Count, Is.EqualTo(beatmapsToAddToCollection + 1));
+                        Assert.That(hashes, Has.Length.EqualTo(updated.Beatmaps.Count));
+                    }
+                    else
+                    {
+                        // Collection contains one less than the original beatmap, and two less after update (new difficulty included).
+                        Assert.That(updated.Beatmaps.Count, Is.EqualTo(beatmapsToAddToCollection + 2));
+                        Assert.That(hashes, Has.Length.EqualTo(beatmapsToAddToCollection));
+                    }
+                });
+            });
+        }
+
+        /// <summary>
+        /// If a difficulty in the original beatmap set is modified, the updated version should remain in any collections it was in.
+        /// </summary>
+        [Test]
+        public void TestCollectionTransferModifiedBeatmap()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var rulesets = new RealmRulesetStore(realm, storage);
+
+                using var __ = getBeatmapArchive(out string pathOriginal);
+                using var _ = getBeatmapArchiveWithModifications(out string pathModified, directory =>
+                {
+                    // Modify one .osu file with different content.
+                    var firstOsuFile = directory.GetFiles("*[Hard]*.osu").First();
+
+                    string existingContent = File.ReadAllText(firstOsuFile.FullName);
+
+                    File.WriteAllText(firstOsuFile.FullName, existingContent + "\n# I am new content");
+                });
+
+                var importBeforeUpdate = await importer.Import(new ImportTask(pathOriginal));
+
+                Assert.That(importBeforeUpdate, Is.Not.Null);
+                Debug.Assert(importBeforeUpdate != null);
+
+                string originalHash = string.Empty;
+
+                importBeforeUpdate.PerformWrite(s =>
+                {
+                    var beatmapCollection = s.Realm.Add(new BeatmapCollection("test collection"));
+                    originalHash = s.Beatmaps.Single(b => b.DifficultyName == "Hard").MD5Hash;
+
+                    beatmapCollection.BeatmapMD5Hashes.Add(originalHash);
+                });
+
+                // Second import matches first but contains a modified .osu file.
+                var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathModified), importBeforeUpdate.Value);
+
+                Assert.That(importAfterUpdate, Is.Not.Null);
+                Debug.Assert(importAfterUpdate != null);
+
+                importAfterUpdate.PerformRead(updated =>
+                {
+                    updated.Realm.Refresh();
+
+                    string[] hashes = updated.Realm.All<BeatmapCollection>().Single().BeatmapMD5Hashes.ToArray();
+                    string updatedHash = updated.Beatmaps.Single(b => b.DifficultyName == "Hard").MD5Hash;
+
+                    Assert.That(hashes, Has.Length.EqualTo(1));
+                    Assert.That(hashes.First(), Is.EqualTo(updatedHash));
+
+                    Assert.That(updatedHash, Is.Not.EqualTo(originalHash));
+                });
             });
         }
 

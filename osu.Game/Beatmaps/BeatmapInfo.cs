@@ -20,8 +20,12 @@ using Realms;
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// A single beatmap difficulty.
+    /// A realm model containing metadata for a single beatmap difficulty.
+    /// This should generally include anything which is required to be filtered on at song select, or anything pertaining to storage of beatmaps in the client.
     /// </summary>
+    /// <remarks>
+    /// There are some legacy fields in this model which are not persisted to realm. These are isolated in a code region within the class and should eventually be migrated to `Beatmap`.
+    /// </remarks>
     [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("Beatmap")]
@@ -117,7 +121,8 @@ namespace osu.Game.Beatmaps
             OnlineID = -1;
             LastOnlineUpdate = null;
             OnlineMD5Hash = string.Empty;
-            Status = BeatmapOnlineStatus.None;
+            if (Status != BeatmapOnlineStatus.LocallyModified)
+                Status = BeatmapOnlineStatus.None;
         }
 
         #region Properties we may not want persisted (but also maybe no harm?)

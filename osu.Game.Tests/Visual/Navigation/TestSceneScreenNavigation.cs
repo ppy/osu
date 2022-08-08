@@ -26,6 +26,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Lounge;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
@@ -44,6 +45,57 @@ namespace osu.Game.Tests.Visual.Navigation
         private Vector2 backButtonPosition => Game.ToScreenSpace(new Vector2(click_padding, Game.LayoutRectangle.Bottom - click_padding));
 
         private Vector2 optionsButtonPosition => Game.ToScreenSpace(new Vector2(click_padding, click_padding));
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestConfirmationRequiredToDiscardPlaylist(bool withPlaylistItemAdded)
+        {
+            Screens.OnlinePlay.Playlists.Playlists playlistScreen = null;
+
+            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+
+            PushAndConfirm(() => playlistScreen = new Screens.OnlinePlay.Playlists.Playlists());
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            AddStep("open create screen", () =>
+            {
+                InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<CreatePlaylistsRoomButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            if (withPlaylistItemAdded)
+            {
+                AddUntilStep("wait for settings displayed",
+                    () => (playlistScreen.CurrentSubScreen as PlaylistsRoomSubScreen)?.ChildrenOfType<PlaylistsRoomSettingsOverlay>().SingleOrDefault()?.State.Value == Visibility.Visible);
+
+                AddStep("edit playlist", () => InputManager.Key(Key.Enter));
+
+                AddUntilStep("wait for song select", () => (playlistScreen.CurrentSubScreen as PlaylistsSongSelect)?.BeatmapSetsLoaded == true);
+
+                AddUntilStep("wait for selection", () => !Game.Beatmap.IsDefault);
+
+                AddStep("add item", () => InputManager.Key(Key.Enter));
+
+                AddUntilStep("wait for return to playlist screen", () => playlistScreen.CurrentSubScreen is PlaylistsRoomSubScreen);
+
+                pushEscape();
+                AddAssert("confirmation dialog shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is not null);
+
+                AddStep("confirm exit", () => InputManager.Key(Key.Enter));
+
+                AddAssert("dialog dismissed", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog == null);
+
+                exitViaEscapeAndConfirm();
+            }
+            else
+            {
+                pushEscape();
+                AddAssert("confirmation dialog not shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog == null);
+
+                exitViaEscapeAndConfirm();
+            }
+        }
 
         [Test]
         public void TestExitSongSelectWithEscape()
@@ -74,14 +126,14 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("set filter again", () => songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value = "test");
             AddStep("open collections dropdown", () =>
             {
-                InputManager.MoveMouseTo(songSelect.ChildrenOfType<CollectionFilterDropdown>().Single());
+                InputManager.MoveMouseTo(songSelect.ChildrenOfType<CollectionDropdown>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 
             AddStep("press back once", () => InputManager.Click(MouseButton.Button1));
             AddAssert("still at song select", () => Game.ScreenStack.CurrentScreen == songSelect);
             AddAssert("collections dropdown closed", () => songSelect
-                                                           .ChildrenOfType<CollectionFilterDropdown>().Single()
+                                                           .ChildrenOfType<CollectionDropdown>().Single()
                                                            .ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownMenu>().Single().State == MenuState.Closed);
 
             AddStep("press back a second time", () => InputManager.Click(MouseButton.Button1));
