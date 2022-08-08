@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play
         private bool isRestarting;
 
         /// <summary>
-        /// Is set to true when pressed the via the quick retry hotkey.
+        /// Is set to true when the quick retry hotkey has been pressed.
         /// </summary>
         public Bindable<bool> IsQuickRestart = new Bindable<bool>();
 
