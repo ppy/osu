@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
@@ -21,7 +19,7 @@ namespace osu.Game.IO
         /// <summary>
         /// Retrieve the game-wide audio manager.
         /// </summary>
-        AudioManager AudioManager { get; }
+        AudioManager? AudioManager { get; }
 
         /// <summary>
         /// Access game-wide user files.
