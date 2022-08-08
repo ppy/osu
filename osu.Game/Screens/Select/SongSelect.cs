@@ -313,7 +313,7 @@ namespace osu.Game.Screens.Select
             (new FooterButtonOptions(), BeatmapOptions)
         };
 
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay();
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {
@@ -926,6 +926,11 @@ namespace osu.Game.Screens.Select
                 onHoverAction?.Invoke();
                 return base.OnHover(e);
             }
+        }
+
+        private class SoloModSelectOverlay : UserModSelectOverlay
+        {
+            protected override bool ShowPresets => true;
         }
     }
 }
