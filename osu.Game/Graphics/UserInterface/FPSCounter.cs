@@ -203,7 +203,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (hasSignificantChanges)
                 requestDisplay();
-            else if (isDisplayed && Time.Current - lastDisplayRequiredTime > 2000)
+            else if (isDisplayed && Time.Current - lastDisplayRequiredTime > 2000 && !IsHovered)
             {
                 mainContent.FadeTo(0, 300, Easing.OutQuint);
                 isDisplayed = false;
