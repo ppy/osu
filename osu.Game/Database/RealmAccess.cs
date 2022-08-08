@@ -25,6 +25,7 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using Realms;
@@ -290,6 +291,11 @@ namespace osu.Game.Database
                 var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
 
                 foreach (var s in pendingDeleteSkins)
+                    realm.Remove(s);
+
+                var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
+
+                foreach (var s in pendingDeletePresets)
                     realm.Remove(s);
 
                 transaction.Commit();

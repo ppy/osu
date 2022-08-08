@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -146,6 +147,16 @@ namespace osu.Game.Tests.Online
             mod.SpeedChange.Value = 1.5;
 
             Assert.That(apiMod.Settings["speed_change"], Is.EqualTo(1.01d));
+        }
+
+        [Test]
+        public void TestSerialisedModSettingPresence()
+        {
+            var mod = new TestMod();
+
+            mod.TestSetting.Value = mod.TestSetting.Default;
+            JObject serialised = JObject.Parse(JsonConvert.SerializeObject(new APIMod(mod)));
+            Assert.False(serialised.ContainsKey("settings"));
         }
 
         private class TestRuleset : Ruleset
