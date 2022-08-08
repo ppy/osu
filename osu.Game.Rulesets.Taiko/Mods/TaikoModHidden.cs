@@ -27,15 +27,21 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         /// <summary>
         /// How long hitobjects take to fade out, in terms of the scrolling length.
-        /// Range: [0, 1]
         /// </summary>
-        public readonly Bindable<float> FadeOutDuration = new Bindable<float>(0.375f);
+        public readonly BindableFloat FadeOutDuration = new BindableFloat(0.375f)
+        {
+            MinValue = 0f,
+            MaxValue = 1f
+        };
 
         /// <summary>
         /// The initial alpha of hitobjects when they appear.
-        /// Range: [0, 1]
         /// </summary>
-        public readonly Bindable<float> InitialAlpha = new Bindable<float>(1f);
+        public readonly BindableFloat InitialAlpha = new BindableFloat(1f)
+        {
+            MinValue = 0f,
+            MaxValue = 1f
+        };
 
         private DrawableTaikoRuleset drawableRuleset = null!;
 

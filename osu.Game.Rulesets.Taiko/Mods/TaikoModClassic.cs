@@ -36,22 +36,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private DrawableTaikoRuleset? drawableTaikoRuleset;
 
-        private readonly Bindable<float> hiddenFadeOutDuration = new Bindable<float>(0.4f);
+        private readonly BindableFloat hiddenFadeOutDuration = new BindableFloat(0.4f);
 
-        private readonly Bindable<float> hiddenInitialAlpha = new Bindable<float>(0.65f);
+        private readonly BindableFloat hiddenInitialAlpha = new BindableFloat(0.65f);
 
         private IReadOnlyList<Mod>? mods;
-
-        /// <summary>
-        /// Binds hidden parameter, which will be udpated by this class.
-        /// </summary>
-        public void BindHiddenParameters(Bindable<float> hiddenFadeOutDuration, Bindable<float> hiddenInitialAlpha)
-        {
-            this.hiddenFadeOutDuration.BindTo(hiddenFadeOutDuration);
-            this.hiddenInitialAlpha.BindTo(hiddenInitialAlpha);
-            this.hiddenFadeOutDuration.Value = 0.4f;
-            this.hiddenInitialAlpha.Value = 0.65f;
-        }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
