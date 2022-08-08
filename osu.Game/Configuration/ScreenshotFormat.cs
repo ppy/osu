@@ -10,10 +10,10 @@ namespace osu.Game.Configuration
 {
     public enum ScreenshotFormat
     {
-        [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.JPG))]
+        [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.Jpg))]
         Jpg = 1,
 
-        [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.PNG))]
+        [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.Png))]
         Png = 2
     }
 }
