@@ -81,6 +81,11 @@ namespace osu.Game.Screens.Play
 
         private bool isRestarting;
 
+        /// <summary>
+        /// Is set to true when pressed the via the quick retry hotkey.
+        /// </summary>
+        public Bindable<bool> IsQuickRestart = new Bindable<bool>();
+
         private Bindable<bool> mouseWheelDisabled;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
@@ -287,7 +292,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        Configuration.AutomaticallySkipIntro = true;
+                        IsQuickRestart.Value = true;
                         fadeOut(true);
                         Restart();
                     },
@@ -370,10 +375,7 @@ namespace osu.Game.Screens.Play
             skipIntroOverlay.IsSkippable.ValueChanged += e =>
             {
                 if (Configuration.AutomaticallySkipIntro && e.NewValue && RestartCount > 0)
-                {
-                    Configuration.AutomaticallySkipIntro = false;
                     performUserRequestedSkip();
-                }
             };
         }
 

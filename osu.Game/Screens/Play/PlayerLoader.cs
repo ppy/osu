@@ -386,9 +386,7 @@ namespace osu.Game.Screens.Play
         private void restartRequested()
         {
             if (CurrentPlayer != null)
-            {
-                isHotKeyRestart = CurrentPlayer.Configuration.AutomaticallySkipIntro;
-            }
+                isHotKeyRestart = CurrentPlayer.IsQuickRestart.Value;
 
             hideOverlays = true;
             ValidForResume = true;
