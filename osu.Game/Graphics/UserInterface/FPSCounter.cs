@@ -167,6 +167,11 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
+            // If the game goes into a suspended state (ie. debugger attached or backgrounded on a mobile device)
+            // we want to ignore really long periods of no processing.
+            if (updateClock.ElapsedFrameTime > 10000)
+                return;
+
             mainContent.Width = Math.Max(mainContent.Width, counters.DrawWidth);
 
             // Handle the case where the window has become inactive or the user changed the
