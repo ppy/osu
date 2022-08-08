@@ -353,6 +353,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
         }
 
+        [Test]
+        public void TestQuickRetry()
+        {
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+            AddUntilStep("wait for current", () => player.IsCurrentScreen());
+
+            AddStep("Restart map normally", () => player.Restart());
+            AddUntilStep("wait for current", () => player.IsCurrentScreen());
+
+            AddStep("Restart map with quick retry hotkey", () =>
+            {
+                InputManager.UseParentInput = true;
+                InputManager.PressKey(Key.Tilde);
+            });
+        }
+
         private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();
 
         private class TestPlayerLoader : PlayerLoader
