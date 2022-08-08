@@ -30,8 +30,8 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private IBindable<WorkingBeatmap> working { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private Editor editor { get; set; }
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; }
 
         [Resolved]
         private SetupScreenHeader header { get; set; }
@@ -88,6 +88,8 @@ namespace osu.Game.Screens.Edit.Setup
                 beatmaps.AddFile(set, stream, destination.Name);
             }
 
+            editorBeatmap.SaveState();
+
             working.Value.Metadata.BackgroundFile = destination.Name;
             header.Background.UpdateBackground();
 
@@ -117,9 +119,9 @@ namespace osu.Game.Screens.Edit.Setup
 
             working.Value.Metadata.AudioFile = destination.Name;
 
+            editorBeatmap.SaveState();
             music.ReloadCurrentTrack();
 
-            editor?.UpdateClockSource();
             return true;
         }
 
