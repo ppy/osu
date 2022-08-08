@@ -82,16 +82,8 @@ namespace osu.Game.Overlays.Mods
 
             void removeAndDisposePresetPanels()
             {
-                int i = 0;
-
-                while (i < ItemsFlow.Count)
-                {
-                    var item = ItemsFlow[i];
-                    if (item is ModPresetPanel)
-                        item.RemoveAndDisposeImmediately();
-                    else
-                        i++;
-                }
+                foreach (var panel in ItemsFlow.OfType<ModPresetPanel>().ToArray())
+                    panel.RemoveAndDisposeImmediately();
             }
         }
 
