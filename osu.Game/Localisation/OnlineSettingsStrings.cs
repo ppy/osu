@@ -72,12 +72,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Full"
         /// </summary>
-        public static LocalisableString Full => new TranslatableString(getKey(@"full"), @"Full");
+        public static LocalisableString DiscordPresenceFull => new TranslatableString(getKey(@"full"), @"Full");
 
         /// <summary>
         /// "Off"
         /// </summary>
-        public static LocalisableString Off => new TranslatableString(getKey(@"off"), @"Off");
+        public static LocalisableString DiscordPresenceOff => new TranslatableString(getKey(@"off"), @"Off");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

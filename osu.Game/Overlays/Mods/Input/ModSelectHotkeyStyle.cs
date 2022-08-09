@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Mods.Input
         /// Individual letters in a row trigger the mods in a sequential fashion.
         /// Uses <see cref="SequentialModHotkeyHandler"/>.
         /// </summary>
-        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.Sequential))]
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.SequentialHotkeyStyle))]
         Sequential,
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Mods.Input
         /// One keybinding can toggle between what used to be <see cref="MultiMod"/>s on stable,
         /// and some mods in a column may not have any hotkeys at all.
         /// </summary>
-        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.Classic))]
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.ClassicHotkeyStyle))]
         Classic
     }
 }

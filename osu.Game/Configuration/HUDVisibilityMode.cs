@@ -10,13 +10,13 @@ namespace osu.Game.Configuration
 {
     public enum HUDVisibilityMode
     {
-        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.Never))]
+        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.NeverShowHUD))]
         Never,
 
         [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.HideDuringGameplay))]
         HideDuringGameplay,
 
-        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.Always))]
+        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.AlwaysShowHUD))]
         Always
     }
 }

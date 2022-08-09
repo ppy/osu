@@ -37,17 +37,17 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Everything"
         /// </summary>
-        public static LocalisableString Everything => new TranslatableString(getKey(@"everything"), @"Everything");
+        public static LocalisableString ScaleEverything => new TranslatableString(getKey(@"everything"), @"Everything");
 
         /// <summary>
         /// "Gameplay"
         /// </summary>
-        public static LocalisableString Gameplay => new TranslatableString(getKey(@"gameplay"), @"Gameplay");
+        public static LocalisableString ScaleGameplay => new TranslatableString(getKey(@"gameplay"), @"Gameplay");
 
         /// <summary>
         /// "Off"
         /// </summary>
-        public static LocalisableString Off => new TranslatableString(getKey(@"scaling_mode.off"), @"Off");
+        public static LocalisableString ScalingOff => new TranslatableString(getKey(@"off"), @"Off");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -10,13 +10,13 @@ namespace osu.Game.Rulesets.UI
 {
     public enum PlayfieldBorderStyle
     {
-        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.None))]
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.BorderNone))]
         None,
 
-        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.Corners))]
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.BorderCorners))]
         Corners,
 
-        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.Full))]
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.BorderFull))]
         Full
     }
 }

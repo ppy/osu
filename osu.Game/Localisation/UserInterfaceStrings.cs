@@ -122,27 +122,27 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Always"
         /// </summary>
-        public static LocalisableString Always => new TranslatableString(getKey(@"always"), @"Always");
+        public static LocalisableString AlwaysSeasonalBackground => new TranslatableString(getKey(@"always"), @"Always");
 
         /// <summary>
         /// "Never"
         /// </summary>
-        public static LocalisableString Never => new TranslatableString(getKey(@"never"), @"Never");
+        public static LocalisableString NeverSeasonalBackground => new TranslatableString(getKey(@"never"), @"Never");
 
         /// <summary>
         /// "Sometimes"
         /// </summary>
-        public static LocalisableString Sometimes => new TranslatableString(getKey(@"sometimes"), @"Sometimes");
+        public static LocalisableString SometimesSeasonalBackground => new TranslatableString(getKey(@"sometimes"), @"Sometimes");
 
         /// <summary>
         /// "Sequential"
         /// </summary>
-        public static LocalisableString Sequential => new TranslatableString(getKey(@"sequential"), @"Sequential");
+        public static LocalisableString SequentialHotkeyStyle => new TranslatableString(getKey(@"sequential"), @"Sequential");
 
         /// <summary>
         /// "Classic"
         /// </summary>
-        public static LocalisableString Classic => new TranslatableString(getKey(@"classic"), @"Classic");
+        public static LocalisableString ClassicHotkeyStyle => new TranslatableString(getKey(@"classic"), @"Classic");
 
         /// <summary>
         /// "Never repeat"
