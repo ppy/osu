@@ -233,9 +233,6 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleNotifications))]
         ToggleNotifications,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ShowProfile))]
-        ShowProfile,
-
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PauseGameplay))]
         PauseGameplay,
 
@@ -336,5 +333,8 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleFPSCounter))]
         ToggleFPSDisplay,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ShowProfile))]
+        ShowProfile,
     }
 }
