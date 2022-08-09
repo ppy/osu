@@ -183,7 +183,7 @@ namespace osu.Game.Tests.Visual.Editing
             checkTime(100);
             AddStep("Seek(99.999)", () => Clock.Seek(99.999));
             AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
-            checkTime(100);
+            checkTime(150);
             AddStep("Seek(174)", () => Clock.Seek(174));
             AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
             checkTime(175);
