@@ -31,12 +31,14 @@ namespace osu.Game.Input.Bindings
             parentInputManager = GetContainingInputManager();
         }
 
+        // IMPORTANT: Do not change the order of key bindings in this list.
+        // It is used to decide the int values when storing settings in DatabasedKeyBindingContainer.
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
-                                                                       .Concat(OverlayKeyBindings)
                                                                        .Concat(EditorKeyBindings)
                                                                        .Concat(InGameKeyBindings)
                                                                        .Concat(SongSelectKeyBindings)
-                                                                       .Concat(AudioControlKeyBindings);
+                                                                       .Concat(AudioControlKeyBindings)
+                                                                       .Concat(OverlayKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
