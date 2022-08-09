@@ -102,12 +102,18 @@ namespace osu.Game.Overlays.Toolbar
             switch (state.NewValue)
             {
                 case APIState.Connecting:
+                    TooltipText = ToolbarStrings.Connecting;
+                    spinner.Show();
+                    break;
+
                 case APIState.Failing:
+                    TooltipText = ToolbarStrings.ConnectionInterruptedWillTryTo;
                     spinner.Show();
                     break;
 
                 case APIState.Offline:
                 case APIState.Online:
+                    TooltipText = string.Empty;
                     spinner.Hide();
                     break;
 
