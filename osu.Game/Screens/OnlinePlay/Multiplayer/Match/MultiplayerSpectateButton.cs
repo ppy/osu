@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -39,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             var clickOperation = ongoingOperationTracker.BeginOperation();
 
-            Client.ToggleSpectate().ContinueWith(t => endOperation());
+            Client.ToggleSpectate().ContinueWith(_ => endOperation());
 
             void endOperation() => clickOperation?.Dispose();
         }

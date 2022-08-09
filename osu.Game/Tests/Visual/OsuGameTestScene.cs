@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -73,7 +75,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [TearDownSteps]
-        public void TearDownSteps()
+        public virtual void TearDownSteps()
         {
             if (DebugUtils.IsNUnitRunning && Game != null)
             {
@@ -132,6 +134,8 @@ namespace osu.Game.Tests.Visual
 
             public new NotificationOverlay Notifications => base.Notifications;
 
+            public new FirstRunSetupOverlay FirstRunOverlay => base.FirstRunOverlay;
+
             public new MusicController MusicController => base.MusicController;
 
             public new OsuConfigManager LocalConfig => base.LocalConfig;
@@ -167,6 +171,11 @@ namespace osu.Game.Tests.Visual
                 API.Login("Rhythm Champion", "osu!");
 
                 Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);
+
+                // set applied version to latest so that the BackgroundBeatmapProcessor doesn't consider
+                // beatmap star ratings as outdated and reset them throughout the test.
+                foreach (var ruleset in RulesetStore.AvailableRulesets)
+                    ruleset.LastAppliedDifficultyVersion = ruleset.CreateInstance().CreateDifficultyCalculator(Beatmap.Default).Version;
             }
 
             protected override void Update()

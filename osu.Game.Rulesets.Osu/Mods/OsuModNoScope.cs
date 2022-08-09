@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Description => "Where's the cursor?";
 
-        private PeriodTracker spinnerPeriods;
+        private PeriodTracker spinnerPeriods = null!;
 
         [SettingSource(
             "Hidden at combo",

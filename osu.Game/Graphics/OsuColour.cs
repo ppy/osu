@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
@@ -135,6 +137,9 @@ namespace osu.Game.Graphics
         {
             switch (status)
             {
+                case BeatmapOnlineStatus.LocallyModified:
+                    return Color4.OrangeRed;
+
                 case BeatmapOnlineStatus.Ranked:
                 case BeatmapOnlineStatus.Approved:
                     return Color4Extensions.FromHex(@"b3ff66");

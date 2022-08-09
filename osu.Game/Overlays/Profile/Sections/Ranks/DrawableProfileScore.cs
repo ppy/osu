@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -17,6 +19,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring.Drawables;
 using osu.Game.Utils;
 using osuTK;
 
@@ -29,7 +32,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private const float performance_background_shear = 0.45f;
 
-        protected readonly APIScore Score;
+        protected readonly SoloScoreInfo Score;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -37,7 +40,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        public DrawableProfileScore(APIScore score)
+        public DrawableProfileScore(SoloScoreInfo score)
         {
             Score = score;
 
@@ -96,7 +99,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                         Colour = colours.Yellow
                                                     },
-                                                    new DrawableDate(Score.Date, 12)
+                                                    new DrawableDate(Score.EndedAt, 12)
                                                     {
                                                         Colour = colourProvider.Foreground1
                                                     }
@@ -134,9 +137,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Spacing = new Vector2(2),
                                         Children = Score.Mods.Select(mod =>
                                         {
-                                            var ruleset = rulesets.GetRuleset(Score.RulesetID) ?? throw new InvalidOperationException();
+                                            var ruleset = rulesets.GetRuleset(Score.RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {Score.RulesetID} not found locally");
 
-                                            return new ModIcon(ruleset.CreateInstance().CreateModFromAcronym(mod.Acronym))
+                                            return new ModIcon(mod.ToMod(ruleset.CreateInstance()))
                                             {
                                                 Scale = new Vector2(0.35f)
                                             };
@@ -216,39 +219,42 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private Drawable createDrawablePerformance()
         {
-            if (Score.PP.HasValue)
+            if (!Score.PP.HasValue)
             {
-                return new FillFlowContainer
+                if (Score.Beatmap?.Status.GrantsPerformancePoints() == true)
+                    return new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(16), Colour = colourProvider.Highlight1 };
+
+                return new OsuSpriteText
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Children = new[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                            Text = $"{Score.PP:0}",
-                            Colour = colourProvider.Highlight1
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                            Text = "pp",
-                            Colour = colourProvider.Light3
-                        }
-                    }
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    Text = "-",
+                    Colour = colourProvider.Highlight1
                 };
             }
 
-            return new OsuSpriteText
+            return new FillFlowContainer
             {
-                Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                Text = "-",
-                Colour = colourProvider.Highlight1
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Children = new[]
+                {
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                        Text = $"{Score.PP:0}",
+                        Colour = colourProvider.Highlight1
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                        Text = "pp",
+                        Colour = colourProvider.Light3
+                    }
+                }
             };
         }
 

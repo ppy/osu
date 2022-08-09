@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.UI;
@@ -196,7 +198,7 @@ namespace osu.Game.Screens.Play
                 dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
 
                 // need to reapply the fail drop after judgement state changes
-                obj.ApplyCustomUpdateState += (o, _) => dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
+                obj.ApplyCustomUpdateState += (_, _) => dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
 
                 appliedObjects.Add(obj);
             }

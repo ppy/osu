@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -190,7 +188,10 @@ namespace osu.Game.Online.Spectator
             }
 
             if (frame is IConvertibleReplayFrame convertible)
+            {
+                Debug.Assert(currentBeatmap != null);
                 pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+            }
 
             if (pendingFrames.Count > max_pending_frames)
                 purgePendingFrames();
@@ -203,6 +204,11 @@ namespace osu.Game.Online.Spectator
             Schedule(() =>
             {
                 if (!IsPlaying)
+                    return;
+
+                // Disposal can take some time, leading to EndPlaying potentially being called after a future play session.
+                // Account for this by ensuring the score of the current play matches the one in the provided state.
+                if (currentScore != state.Score)
                     return;
 
                 if (pendingFrames.Count > 0)
@@ -296,17 +302,21 @@ namespace osu.Game.Online.Spectator
 
             lastSend = tcs.Task;
 
-            SendFramesInternal(bundle).ContinueWith(t => Schedule(() =>
+            SendFramesInternal(bundle).ContinueWith(t =>
             {
+                // Handle exception outside of `Schedule` to ensure it doesn't go unobserved.
                 bool wasSuccessful = t.Exception == null;
 
-                // If the last bundle send wasn't successful, try again without dequeuing.
-                if (wasSuccessful)
-                    pendingFrameBundles.Dequeue();
+                return Schedule(() =>
+                {
+                    // If the last bundle send wasn't successful, try again without dequeuing.
+                    if (wasSuccessful)
+                        pendingFrameBundles.Dequeue();
 
-                tcs.SetResult(wasSuccessful);
-                sendNextBundleIfRequired();
-            }));
+                    tcs.SetResult(wasSuccessful);
+                    sendNextBundleIfRequired();
+                });
+            });
         }
     }
 }

@@ -1,15 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Overlays;
 using osu.Game.Screens.Utility.SampleComponents;
 using osuTK.Input;
@@ -17,7 +17,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Utility
 {
     [Cached]
-    public class LatencyArea : CompositeDrawable
+    public class LatencyArea : CompositeDrawable, IProvideCursor
     {
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; } = null!;
@@ -35,6 +35,10 @@ namespace osu.Game.Screens.Utility
         public readonly BindableBool IsActiveArea = new BindableBool();
 
         public readonly Bindable<LatencyVisualMode> VisualMode = new Bindable<LatencyVisualMode>();
+
+        public CursorContainer? MenuCursor { get; private set; }
+
+        public bool ProvidingUserCursor => IsActiveArea.Value;
 
         public LatencyArea(Key key, int? targetFrameRate)
         {
@@ -87,7 +91,7 @@ namespace osu.Game.Screens.Utility
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            new LatencyCursorContainer
+                            MenuCursor = new LatencyCursorContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
@@ -101,7 +105,7 @@ namespace osu.Game.Screens.Utility
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            new LatencyCursorContainer
+                            MenuCursor = new LatencyCursorContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
@@ -115,7 +119,7 @@ namespace osu.Game.Screens.Utility
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            new LatencyCursorContainer
+                            MenuCursor = new LatencyCursorContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },

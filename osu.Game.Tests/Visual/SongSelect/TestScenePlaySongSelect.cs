@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -52,7 +55,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             // At a point we have isolated interactive test runs enough, this can likely be removed.
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(Realm);
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, defaultBeatmap = Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, defaultBeatmap = Beatmap.Default));
 
             Dependencies.Cache(music = new MusicController());
 
@@ -96,13 +99,30 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestPlaceholderStarDifficulty()
+        {
+            addRulesetImportStep(0);
+            AddStep("change star filter", () => config.SetValue(OsuSetting.DisplayStarsMinimum, 10.0));
+
+            createSongSelect();
+
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
+
+            AddStep("click link in placeholder", () => getPlaceholder().ChildrenOfType<DrawableLinkCompiler>().First().TriggerClick());
+
+            AddUntilStep("star filter reset", () => config.Get<double>(OsuSetting.DisplayStarsMinimum) == 0.0);
+            AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
         public void TestPlaceholderConvertSetting()
         {
-            changeRuleset(2);
             addRulesetImportStep(0);
             AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
 
             createSongSelect();
+
+            changeRuleset(2);
 
             AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
 
@@ -261,6 +281,28 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("return", () => songSelect.MakeCurrent());
             AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
             AddAssert("filter count is 2", () => songSelect.FilterCount == 2);
+        }
+
+        [Test]
+        public void TestCarouselSelectionUpdatesOnResume()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+
+            AddStep("update beatmap", () =>
+            {
+                var selectedBeatmap = Beatmap.Value.BeatmapInfo;
+                var anotherBeatmap = Beatmap.Value.BeatmapSetInfo.Beatmaps.Except(selectedBeatmap.Yield()).First();
+                Beatmap.Value = manager.GetWorkingBeatmap(anotherBeatmap);
+            });
+
+            AddStep("return", () => songSelect.MakeCurrent());
+            AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
+            AddAssert("carousel updated", () => songSelect.Carousel.SelectedBeatmapInfo.Equals(Beatmap.Value.BeatmapInfo));
         }
 
         [Test]
@@ -870,10 +912,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return set != null;
             });
 
-            FilterableGroupedDifficultyIcon groupIcon = null;
+            GroupedDifficultyIcon groupIcon = null;
             AddUntilStep("Find group icon for different ruleset", () =>
             {
-                return (groupIcon = set.ChildrenOfType<FilterableGroupedDifficultyIcon>()
+                return (groupIcon = set.ChildrenOfType<GroupedDifficultyIcon>()
                                        .FirstOrDefault(icon => icon.Items.First().BeatmapInfo.Ruleset.OnlineID == 3)) != null;
             });
 

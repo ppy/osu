@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -58,7 +60,7 @@ namespace osu.Game.Overlays.Mods
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
                 Masking = true,
-                CornerRadius = ModPanel.CORNER_RADIUS,
+                CornerRadius = ModSelectPanel.CORNER_RADIUS,
                 Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0),
                 Children = new Drawable[]
                 {
@@ -67,7 +69,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.Y,
-                        Width = multiplier_value_area_width + ModPanel.CORNER_RADIUS
+                        Width = multiplier_value_area_width + ModSelectPanel.CORNER_RADIUS
                     },
                     new GridContainer
                     {
@@ -87,7 +89,7 @@ namespace osu.Game.Overlays.Mods
                                     RelativeSizeAxes = Axes.Y,
                                     AutoSizeAxes = Axes.X,
                                     Masking = true,
-                                    CornerRadius = ModPanel.CORNER_RADIUS,
+                                    CornerRadius = ModSelectPanel.CORNER_RADIUS,
                                     Children = new Drawable[]
                                     {
                                         contentBackground = new Box

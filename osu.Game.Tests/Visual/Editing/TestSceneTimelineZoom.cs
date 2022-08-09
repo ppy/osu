@@ -1,9 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -16,22 +17,26 @@ namespace osu.Game.Tests.Visual.Editing
         {
             double initialVisibleRange = 0;
 
+            AddUntilStep("wait for load", () => MusicController.TrackLoaded);
+
             AddStep("reset zoom", () => TimelineArea.Timeline.Zoom = 100);
             AddStep("get initial range", () => initialVisibleRange = TimelineArea.Timeline.VisibleRange);
 
             AddStep("scale zoom", () => TimelineArea.Timeline.Zoom = 200);
-            AddAssert("range halved", () => Precision.AlmostEquals(TimelineArea.Timeline.VisibleRange, initialVisibleRange / 2, 1));
+            AddStep("range halved", () => Assert.That(TimelineArea.Timeline.VisibleRange, Is.EqualTo(initialVisibleRange / 2).Within(1)));
             AddStep("descale zoom", () => TimelineArea.Timeline.Zoom = 50);
-            AddAssert("range doubled", () => Precision.AlmostEquals(TimelineArea.Timeline.VisibleRange, initialVisibleRange * 2, 1));
+            AddStep("range doubled", () => Assert.That(TimelineArea.Timeline.VisibleRange, Is.EqualTo(initialVisibleRange * 2).Within(1)));
 
             AddStep("restore zoom", () => TimelineArea.Timeline.Zoom = 100);
-            AddAssert("range restored", () => Precision.AlmostEquals(TimelineArea.Timeline.VisibleRange, initialVisibleRange, 1));
+            AddStep("range restored", () => Assert.That(TimelineArea.Timeline.VisibleRange, Is.EqualTo(initialVisibleRange).Within(1)));
         }
 
         [Test]
         public void TestVisibleRangeConstantOnSizeChange()
         {
             double initialVisibleRange = 0;
+
+            AddUntilStep("wait for load", () => MusicController.TrackLoaded);
 
             AddStep("reset timeline size", () => TimelineArea.Timeline.Width = 1);
             AddStep("get initial range", () => initialVisibleRange = TimelineArea.Timeline.VisibleRange);

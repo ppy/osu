@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -32,6 +34,15 @@ namespace osu.Game.Screens.Play
         {
             UnderlyingClock = underlyingClock;
         }
+
+        /// <summary>
+        /// The time from which the clock should start. Will be seeked to on calling <see cref="GameplayClockContainer.Reset"/>.
+        /// </summary>
+        /// <remarks>
+        /// If not set, a value of zero will be used.
+        /// Importantly, the value will be inferred from the current ruleset in <see cref="MasterGameplayClockContainer"/> unless specified.
+        /// </remarks>
+        public double? StartTime { get; internal set; }
 
         public double CurrentTime => UnderlyingClock.CurrentTime;
 

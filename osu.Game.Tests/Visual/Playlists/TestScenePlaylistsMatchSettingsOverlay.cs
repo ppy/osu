@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -23,17 +25,21 @@ namespace osu.Game.Tests.Visual.Playlists
 
         protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new TestDependencies();
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            SelectedRoom.Value = new Room();
+            base.SetUpSteps();
 
-            Child = settings = new TestRoomSettings(SelectedRoom.Value)
+            AddStep("create overlay", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible }
-            };
-        });
+                SelectedRoom.Value = new Room();
+
+                Child = settings = new TestRoomSettings(SelectedRoom.Value)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    State = { Value = Visibility.Visible }
+                };
+            });
+        }
 
         [Test]
         public void TestButtonEnabledOnlyWithNameAndBeatmap()

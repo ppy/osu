@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using System;
@@ -15,7 +17,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedProfileSubsection<APIScore>
+    public class PaginatedScoreContainer : PaginatedProfileSubsection<SoloScoreInfo>
     {
         private readonly ScoreType type;
 
@@ -52,7 +54,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             }
         }
 
-        protected override void OnItemsReceived(List<APIScore> items)
+        protected override void OnItemsReceived(List<SoloScoreInfo> items)
         {
             if (CurrentPage == null || CurrentPage?.Offset == 0)
                 drawableItemIndex = 0;
@@ -60,12 +62,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<APIScore>> CreateRequest(PaginationParameters pagination) =>
+        protected override APIRequest<List<SoloScoreInfo>> CreateRequest(PaginationParameters pagination) =>
             new GetUserScoresRequest(User.Value.Id, type, pagination);
 
         private int drawableItemIndex;
 
-        protected override Drawable CreateDrawableItem(APIScore model)
+        protected override Drawable CreateDrawableItem(SoloScoreInfo model)
         {
             switch (type)
             {

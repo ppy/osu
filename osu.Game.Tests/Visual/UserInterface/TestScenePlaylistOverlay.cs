@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -25,6 +27,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private Live<BeatmapSetInfo> first;
 
+        private const int item_count = 100;
+
         [SetUp]
         public void Setup() => Schedule(() =>
         {
@@ -44,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             beatmapSets.Clear();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < item_count; i++)
             {
                 beatmapSets.Add(TestResources.CreateTestBeatmapSetInfo().ToLiveUnmanaged());
             }
@@ -57,6 +61,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestRearrangeItems()
         {
+            AddUntilStep("wait for load complete", () =>
+            {
+                return this
+                       .ChildrenOfType<PlaylistItem>()
+                       .Count(i => i.ChildrenOfType<DelayedLoadWrapper>().First().DelayedLoadCompleted) > 6;
+            });
+
             AddUntilStep("wait for animations to complete", () => !playlistOverlay.Transforms.Any());
 
             AddStep("hold 1st item handle", () =>

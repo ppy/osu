@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
@@ -77,7 +79,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         protected sealed override Drawable CreateHeader(int index, TableColumn column)
             => (column as RankingsTableColumn)?.CreateHeaderText() ?? new HeaderText(column?.Header ?? default, false);
 
-        protected abstract Country GetCountry(TModel item);
+        protected abstract CountryCode GetCountryCode(TModel item);
 
         protected abstract Drawable CreateFlagContent(TModel item);
 
@@ -95,10 +97,10 @@ namespace osu.Game.Overlays.Rankings.Tables
             Margin = new MarginPadding { Bottom = row_spacing },
             Children = new[]
             {
-                new UpdateableFlag(GetCountry(item))
+                new UpdateableFlag(GetCountryCode(item))
                 {
-                    Size = new Vector2(30, 20),
-                    ShowPlaceholderOnNull = false,
+                    Size = new Vector2(28, 20),
+                    ShowPlaceholderOnUnknown = false,
                 },
                 CreateFlagContent(item)
             }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osuTK;
@@ -17,7 +19,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class Nub : CompositeDrawable, IHasCurrentValue<bool>, IHasAccentColour
+    public class Nub : Container, IHasCurrentValue<bool>, IHasAccentColour
     {
         public const float HEIGHT = 15;
 

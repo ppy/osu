@@ -24,8 +24,8 @@ namespace osu.Desktop.Updater
     [SupportedOSPlatform("windows")]
     public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
-        private UpdateManager updateManager;
-        private INotificationOverlay notificationOverlay;
+        private UpdateManager? updateManager;
+        private INotificationOverlay notificationOverlay = null!;
 
         public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
@@ -48,12 +48,12 @@ namespace osu.Desktop.Updater
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
 
-        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
+        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification? notification = null)
         {
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
 
-            const string github_token = null; // TODO: populate.
+            const string? github_token = null; // TODO: populate.
 
             try
             {
@@ -143,7 +143,7 @@ namespace osu.Desktop.Updater
         private class UpdateCompleteNotification : ProgressCompletionNotification
         {
             [Resolved]
-            private OsuGame game { get; set; }
+            private OsuGame game { get; set; } = null!;
 
             public UpdateCompleteNotification(SquirrelUpdateManager updateManager)
             {
@@ -152,7 +152,7 @@ namespace osu.Desktop.Updater
                 Activated = () =>
                 {
                     updateManager.PrepareUpdateAsync()
-                                 .ContinueWith(_ => updateManager.Schedule(() => game?.GracefullyExit()));
+                                 .ContinueWith(_ => updateManager.Schedule(() => game.AttemptExit()));
                     return true;
                 };
             }

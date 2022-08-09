@@ -28,10 +28,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
 
-        public override double ScoreMultiplier => 1.12;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight) };
 
-        private DrawableOsuBlinds blinds;
+        private DrawableOsuBlinds blinds = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -53,9 +53,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// <summary>
             /// Black background boxes behind blind panel textures.
             /// </summary>
-            private Box blackBoxLeft, blackBoxRight;
+            private Box blackBoxLeft = null!, blackBoxRight = null!;
 
-            private Drawable panelLeft, panelRight, bgPanelLeft, bgPanelRight;
+            private Drawable panelLeft = null!;
+            private Drawable panelRight = null!;
+            private Drawable bgPanelLeft = null!;
+            private Drawable bgPanelRight = null!;
 
             private readonly Beatmap<OsuHitObject> beatmap;
 
