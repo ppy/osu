@@ -89,11 +89,11 @@ namespace osu.Game.Overlays.Toolbar
             StateContainer = login;
         }
 
-        private void userChanged(ValueChangedEvent<APIUser> user)
+        private void userChanged(ValueChangedEvent<APIUser> user) => Schedule(() =>
         {
             Text = user.NewValue.Username;
             avatar.User = user.NewValue;
-        }
+        });
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
