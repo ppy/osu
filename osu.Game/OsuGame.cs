@@ -1138,10 +1138,6 @@ namespace osu.Game
                     mouseDisableButtons.Value = !mouseDisableButtons.Value;
                     return true;
 
-                case GlobalAction.ToggleProfile:
-                    ShowUser(new APIUser { Id = API.LocalUser.Value.Id });
-                    return true;
-
                 case GlobalAction.RandomSkin:
                     // Don't allow random skin selection while in the skin editor.
                     // This is mainly to stop many "osu! default (modified)" skins being created via the SkinManager.EnsureMutableSkin() path.

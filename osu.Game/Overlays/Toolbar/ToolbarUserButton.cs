@@ -15,6 +15,7 @@ using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
@@ -34,6 +35,8 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarUserButton()
         {
+            Hotkey = GlobalAction.ToggleProfile;
+
             AutoSizeAxes = Axes.X;
         }
 
