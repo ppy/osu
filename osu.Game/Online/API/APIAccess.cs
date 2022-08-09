@@ -402,7 +402,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        public bool IsLoggedIn => localUser.Value.Id > 1; // TODO: should this also be true if attempting to connect?
+        public bool IsLoggedIn => State.Value > APIState.Offline;
 
         public void Queue(APIRequest request)
         {
