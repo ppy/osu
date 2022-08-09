@@ -112,22 +112,22 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Always"
         /// </summary>
-        public static LocalisableString Always => new TranslatableString(getKey(@"always"), @"Always");
+        public static LocalisableString AlwaysShowHUD => new TranslatableString(getKey(@"always_show_hud"), @"Always");
 
         /// <summary>
         /// "Never"
         /// </summary>
-        public static LocalisableString Never => new TranslatableString(getKey(@"never"), @"Never");
+        public static LocalisableString NeverShowHUD => new TranslatableString(getKey(@"never"), @"Never");
 
         /// <summary>
         /// "Standardised"
         /// </summary>
-        public static LocalisableString Standardised => new TranslatableString(getKey(@"standardised"), @"Standardised");
+        public static LocalisableString StandardisedScoreDisplay => new TranslatableString(getKey(@"standardised_score_display"), @"Standardised");
 
         /// <summary>
         /// "Classic"
         /// </summary>
-        public static LocalisableString Classic => new TranslatableString(getKey(@"classic"), @"Classic");
+        public static LocalisableString ClassicScoreDisplay => new TranslatableString(getKey(@"classic_score_display"), @"Classic");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

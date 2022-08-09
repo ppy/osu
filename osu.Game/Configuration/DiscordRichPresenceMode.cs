@@ -10,13 +10,13 @@ namespace osu.Game.Configuration
 {
     public enum DiscordRichPresenceMode
     {
-        [LocalisableDescription(typeof(OnlineSettingsStrings), nameof(OnlineSettingsStrings.Off))]
+        [LocalisableDescription(typeof(OnlineSettingsStrings), nameof(OnlineSettingsStrings.DiscordPresenceOff))]
         Off,
 
         [LocalisableDescription(typeof(OnlineSettingsStrings), nameof(OnlineSettingsStrings.HideIdentifiableInformation))]
         Limited,
 
-        [LocalisableDescription(typeof(OnlineSettingsStrings), nameof(OnlineSettingsStrings.Full))]
+        [LocalisableDescription(typeof(OnlineSettingsStrings), nameof(OnlineSettingsStrings.DiscordPresenceFull))]
         Full
     }
 }

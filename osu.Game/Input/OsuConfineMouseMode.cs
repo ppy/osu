@@ -18,20 +18,20 @@ namespace osu.Game.Input
         /// <summary>
         /// The mouse cursor will be free to move outside the game window.
         /// </summary>
-        [LocalisableDescription(typeof(MouseSettingsStrings), nameof(MouseSettingsStrings.Never))]
+        [LocalisableDescription(typeof(MouseSettingsStrings), nameof(MouseSettingsStrings.NeverConfine))]
         Never,
 
         /// <summary>
         /// The mouse cursor will be locked to the window bounds during gameplay,
         /// but may otherwise move freely.
         /// </summary>
-        [LocalisableDescription(typeof(MouseSettingsStrings), nameof(MouseSettingsStrings.DuringGameplay))]
+        [LocalisableDescription(typeof(MouseSettingsStrings), nameof(MouseSettingsStrings.ConfineDuringGameplay))]
         DuringGameplay,
 
         /// <summary>
         /// The mouse cursor will always be locked to the window bounds while the game has focus.
         /// </summary>
-        [LocalisableDescription(typeof(MouseSettingsStrings), nameof(MouseSettingsStrings.Always))]
+        [LocalisableDescription(typeof(MouseSettingsStrings), nameof(MouseSettingsStrings.AlwaysConfine))]
         Always
     }
 }

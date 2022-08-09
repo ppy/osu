@@ -10,16 +10,16 @@ namespace osu.Game.Configuration
 {
     public enum ScalingMode
     {
-        [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.Off))]
+        [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.ScalingOff))]
         Off,
 
-        [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.Everything))]
+        [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.ScaleEverything))]
         Everything,
 
         [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.ExcludingOverlays))]
         ExcludeOverlays,
 
-        [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.Gameplay))]
+        [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.ScaleGameplay))]
         Gameplay,
     }
 }
