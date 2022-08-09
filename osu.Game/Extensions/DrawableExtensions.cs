@@ -82,40 +82,38 @@ namespace osu.Game.Extensions
         }
 
         /// <summary>
-        /// Keeps the drawable upright and prevents it from being scaled or flipped with its Parent.
+        /// Keeps the drawable upright and unstretched preventing it from being rotated, sheared, scaled or flipped with its Parent.
         /// </summary>
         /// <param name="drawable">The drawable.</param>
         public static void KeepUprightAndUnscaled(this Drawable drawable)
         {
+            // Decomposes the inverse of the parent FrawInfo.Matrix into rotation, shear and scale.
             var parentMatrix = drawable.Parent.DrawInfo.Matrix;
-            float angle = MathF.Atan(parentMatrix.M12 / parentMatrix.M11);
-            angle = MathHelper.RadiansToDegrees(angle);
-
             parentMatrix.Transpose();
+
+            // Remove Translation.
             parentMatrix.M13 = 0.0f;
             parentMatrix.M23 = 0.0f;
 
-            if ((Math.Abs(Math.Abs(angle) - 90.0)) < 2.0f)
-            {
-                Matrix3 m = Matrix3.CreateRotationZ(MathHelper.DegreesToRadians(40.0f));
-                m.Transpose();
-                parentMatrix *= m;
-                drawable.Rotation = 40.0f;
-            }
-            else
-                drawable.Rotation = 0.0f;
-
             Matrix3 C = parentMatrix.Inverted();
 
-            float alpha, beta, sx, sy;
+            // Extract the rotation.
+            float angle = MathF.Atan2(C.M21, C.M11);
+            drawable.Rotation = MathHelper.RadiansToDegrees(angle);
+
+            // Remove rotation from the C matrix so that it only contains shear and scale.
+            Matrix3 m = Matrix3.CreateRotationZ(-angle);
+            m.Transpose();
+            C = m * C;
+
+            // Extract shear and scale.
+            float alpha, sx, sy;
+            sx = C.M11;
             sy = C.M22;
             alpha = C.M12 / C.M22;
 
-            beta = (C.M21 == 0.0f) ? 0.0f : 1 / ((C.M11 / C.M21) - alpha);
-            sx = (beta == 0.0f) ? C.M11 : C.M21 / beta;
-
             drawable.Scale = new Vector2(sx, sy);
-            drawable.Shear = new Vector2(-alpha, -beta);
+            drawable.Shear = new Vector2(-alpha, 0);
         }
     }
 }
