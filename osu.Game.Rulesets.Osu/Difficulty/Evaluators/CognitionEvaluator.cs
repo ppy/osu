@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
         {
-            if (current.BaseObject is Spinner)
+            if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
@@ -32,7 +33,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             while (loopOpacity > 0)
             {
                 var loopObj = (OsuDifficultyHitObject)currObj.Previous(previousIndex);
+
+                if (loopObj.IsNull())
+                    break;
+
                 loopOpacity = currObj.OpacityAt(loopObj.StartTime, false);
+
+                if (loopOpacity <= 0)
+                    break;
+
                 noteDensity += loopOpacity;
                 previousIndex++;
             }
@@ -90,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 OsuDifficultyHitObject currentObj = (OsuDifficultyHitObject)current.Next(i);
 
-                if (currentObj.OpacityAt(current.StartTime, false) <= 0)
+                if (currentObj.IsNull() || currentObj.OpacityAt(current.StartTime, false) <= 0)
                     break;
 
                 objects.Add(currentObj);
