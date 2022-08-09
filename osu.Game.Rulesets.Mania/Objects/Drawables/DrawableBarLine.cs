@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (barLine.Major)
             {
                 Vector2 size = new Vector2(22, 6);
-                const float triangle_offset = 4;
+                const float line_offset = 4;
 
                 AddInternal(new Circle
                 {
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Origin = Anchor.CentreRight,
 
                     Size = size,
-                    X = -triangle_offset,
+                    X = -line_offset,
                 });
 
                 AddInternal(new Circle
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
                     Size = size,
-                    X = triangle_offset,
+                    X = line_offset,
                 });
             }
         }
