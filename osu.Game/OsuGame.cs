@@ -1138,7 +1138,7 @@ namespace osu.Game
                     mouseDisableButtons.Value = !mouseDisableButtons.Value;
                     return true;
 
-                case GlobalAction.ShowProfile:
+                case GlobalAction.ToggleProfile:
                     ShowUser(new APIUser { Id = API.LocalUser.Value.Id });
                     return true;
 
