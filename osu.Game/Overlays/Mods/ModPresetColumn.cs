@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.Mods
 
             if (!presets.Any())
             {
-                ItemsFlow.RemoveAll(panel => panel is ModPresetPanel);
+                removeAndDisposePresetPanels();
                 return;
             }
 
@@ -75,9 +76,15 @@ namespace osu.Game.Overlays.Mods
                 Shear = Vector2.Zero
             }), loaded =>
             {
-                ItemsFlow.RemoveAll(panel => panel is ModPresetPanel);
+                removeAndDisposePresetPanels();
                 ItemsFlow.AddRange(loaded);
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
+
+            void removeAndDisposePresetPanels()
+            {
+                foreach (var panel in ItemsFlow.OfType<ModPresetPanel>().ToArray())
+                    panel.RemoveAndDisposeImmediately();
+            }
         }
 
         protected override void Dispose(bool isDisposing)
