@@ -12,7 +12,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Connection interrupted, will try to reconnect..."
         /// </summary>
-        public static LocalisableString ConnectionInterruptedWillTryTo => new TranslatableString(getKey(@"connection_interrupted_will_try_to"), @"Connection interrupted, will try to reconnect...");
+        public static LocalisableString AttemptingToReconnect => new TranslatableString(getKey(@"attempting_to_reconnect"), @"Connection interrupted, will try to reconnect...");
 
         /// <summary>
         /// "Connecting..."

@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Toolbar
                     break;
 
                 case APIState.Failing:
-                    TooltipText = ToolbarStrings.ConnectionInterruptedWillTryTo;
+                    TooltipText = ToolbarStrings.AttemptingToReconnect;
                     spinner.Show();
                     break;
 
