@@ -83,7 +83,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
-            MainContents.Size = new Vector2(Math.Clamp(Math.Min(DrawWidth, DrawHeight) * 0.25f, 30, 100));
+            MainContents.Size = new Vector2(Math.Clamp(Math.Min(DrawWidth, DrawHeight) * 0.25f, 20, 100));
         }
     }
 }
