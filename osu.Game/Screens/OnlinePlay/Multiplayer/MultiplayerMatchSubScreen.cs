@@ -49,6 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
 
         private AddItemButton addItemButton;
@@ -141,7 +144,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                         new MultiplayerPlaylist
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            RequestEdit = item => OpenSongSelection(item.ID)
+                                            RequestEdit = OpenSongSelection
                                         }
                                     },
                                     new[]
@@ -219,12 +222,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// Opens the song selection screen to add or edit an item.
         /// </summary>
         /// <param name="itemToEdit">An optional playlist item to edit. If null, a new item will be added instead.</param>
-        internal void OpenSongSelection(long? itemToEdit = null)
+        internal void OpenSongSelection(PlaylistItem itemToEdit = null)
         {
             if (!this.IsCurrentScreen())
                 return;
 
-            this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
+            int id = itemToEdit?.Beatmap.OnlineID ?? Room.Playlist.Last().Beatmap.OnlineID;
+            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == id);
+
+            var workingBeatmap = localBeatmap == null ? null : beatmapManager.GetWorkingBeatmap(localBeatmap);
+
+            this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit?.ID, workingBeatmap));
         }
 
         protected override Drawable CreateFooter() => new MultiplayerMatchFooter();

@@ -9,10 +9,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Skinning;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Skinning
 {
     /// <summary>
     /// Uses the 'x' symbol and has a pop-out effect while rolling over.

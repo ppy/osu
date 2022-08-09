@@ -11,12 +11,14 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
@@ -71,6 +73,11 @@ namespace osu.Game.Overlays.Mods
         /// Whether per-mod customisation controls are visible.
         /// </summary>
         protected virtual bool AllowCustomisation => true;
+
+        /// <summary>
+        /// Whether the column with available mod presets should be shown.
+        /// </summary>
+        protected virtual bool ShowPresets => false;
 
         protected virtual ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, false);
 
@@ -139,40 +146,37 @@ namespace osu.Game.Overlays.Mods
 
             MainAreaContent.AddRange(new Drawable[]
             {
-                new Container
+                new OsuContextMenuContainer
                 {
-                    Padding = new MarginPadding
-                    {
-                        Top = (ShowTotalMultiplier ? DifficultyMultiplierDisplay.HEIGHT : 0) + PADDING,
-                        Bottom = PADDING
-                    },
                     RelativeSizeAxes = Axes.Both,
-                    RelativePositionAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Child = new PopoverContainer
                     {
-                        columnScroll = new ColumnScrollContainer
+                        Padding = new MarginPadding
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = false,
-                            ClampExtension = 100,
-                            ScrollbarOverlapsContent = false,
-                            Child = columnFlow = new ColumnFlowContainer
+                            Top = (ShowTotalMultiplier ? DifficultyMultiplierDisplay.HEIGHT : 0) + PADDING,
+                            Bottom = PADDING
+                        },
+                        RelativeSizeAxes = Axes.Both,
+                        RelativePositionAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            columnScroll = new ColumnScrollContainer
                             {
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                Direction = FillDirection.Horizontal,
-                                Shear = new Vector2(SHEAR, 0),
-                                RelativeSizeAxes = Axes.Y,
-                                AutoSizeAxes = Axes.X,
-                                Margin = new MarginPadding { Horizontal = 70 },
-                                Padding = new MarginPadding { Bottom = 10 },
-                                Children = new[]
+                                RelativeSizeAxes = Axes.Both,
+                                Masking = false,
+                                ClampExtension = 100,
+                                ScrollbarOverlapsContent = false,
+                                Child = columnFlow = new ColumnFlowContainer
                                 {
-                                    createModColumnContent(ModType.DifficultyReduction),
-                                    createModColumnContent(ModType.DifficultyIncrease),
-                                    createModColumnContent(ModType.Automation),
-                                    createModColumnContent(ModType.Conversion),
-                                    createModColumnContent(ModType.Fun)
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Direction = FillDirection.Horizontal,
+                                    Shear = new Vector2(SHEAR, 0),
+                                    RelativeSizeAxes = Axes.Y,
+                                    AutoSizeAxes = Axes.X,
+                                    Margin = new MarginPadding { Horizontal = 70 },
+                                    Padding = new MarginPadding { Bottom = 10 },
+                                    ChildrenEnumerable = createColumns()
                                 }
                             }
                         }
@@ -222,6 +226,8 @@ namespace osu.Game.Overlays.Mods
             globalAvailableMods.BindTo(game.AvailableMods);
         }
 
+        private ModSettingChangeTracker? modSettingChangeTracker;
+
         protected override void LoadComplete()
         {
             // this is called before base call so that the mod state is populated early, and the transition in `PopIn()` can play out properly.
@@ -238,9 +244,17 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.BindValueChanged(val =>
             {
+                modSettingChangeTracker?.Dispose();
+
                 updateMultiplier();
                 updateCustomisation(val);
                 updateFromExternalSelection();
+
+                if (AllowCustomisation)
+                {
+                    modSettingChangeTracker = new ModSettingChangeTracker(val.NewValue);
+                    modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
+                }
             }, true);
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
@@ -259,7 +273,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public void SelectAll()
         {
-            foreach (var column in columnFlow.Columns)
+            foreach (var column in columnFlow.Columns.OfType<ModColumn>())
                 column.SelectAll();
         }
 
@@ -268,8 +282,25 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public void DeselectAll()
         {
-            foreach (var column in columnFlow.Columns)
+            foreach (var column in columnFlow.Columns.OfType<ModColumn>())
                 column.DeselectAll();
+        }
+
+        private IEnumerable<ColumnDimContainer> createColumns()
+        {
+            if (ShowPresets)
+            {
+                yield return new ColumnDimContainer(new ModPresetColumn
+                {
+                    Margin = new MarginPadding { Right = 10 }
+                });
+            }
+
+            yield return createModColumnContent(ModType.DifficultyReduction);
+            yield return createModColumnContent(ModType.DifficultyIncrease);
+            yield return createModColumnContent(ModType.Automation);
+            yield return createModColumnContent(ModType.Conversion);
+            yield return createModColumnContent(ModType.Fun);
         }
 
         private ColumnDimContainer createModColumnContent(ModType modType)
@@ -280,12 +311,7 @@ namespace osu.Game.Overlays.Mods
                 column.Margin = new MarginPadding { Right = 10 };
             });
 
-            return new ColumnDimContainer(column)
-            {
-                AutoSizeAxes = Axes.X,
-                RelativeSizeAxes = Axes.Y,
-                RequestScroll = col => columnScroll.ScrollIntoView(col, extraScroll: 140),
-            };
+            return new ColumnDimContainer(column);
         }
 
         private void createLocalMods()
@@ -307,7 +333,7 @@ namespace osu.Game.Overlays.Mods
             AvailableMods.Value = newLocalAvailableMods;
             filterMods();
 
-            foreach (var column in columnFlow.Columns)
+            foreach (var column in columnFlow.Columns.OfType<ModColumn>())
                 column.AvailableMods = AvailableMods.Value.GetValueOrDefault(column.ModType, Array.Empty<ModState>());
         }
 
@@ -448,7 +474,7 @@ namespace osu.Game.Overlays.Mods
             {
                 var column = columnFlow[i].Column;
 
-                bool allFiltered = column.AvailableMods.All(modState => modState.Filtered.Value);
+                bool allFiltered = column is ModColumn modColumn && modColumn.AvailableMods.All(modState => modState.Filtered.Value);
 
                 double delay = allFiltered ? 0 : nonFilteredColumnCount * 30;
                 double duration = allFiltered ? 0 : fade_in_duration;
@@ -506,14 +532,19 @@ namespace osu.Game.Overlays.Mods
             {
                 var column = columnFlow[i].Column;
 
-                bool allFiltered = column.AvailableMods.All(modState => modState.Filtered.Value);
+                bool allFiltered = false;
+
+                if (column is ModColumn modColumn)
+                {
+                    allFiltered = modColumn.AvailableMods.All(modState => modState.Filtered.Value);
+                    modColumn.FlushPendingSelections();
+                }
 
                 double duration = allFiltered ? 0 : fade_out_duration;
                 float newYPosition = 0;
                 if (!allFiltered)
                     newYPosition = nonFilteredColumnCount % 2 == 0 ? -distance : distance;
 
-                column.FlushPendingSelections();
                 column.TopLevelContent
                       .MoveToY(newYPosition, duration, Easing.OutQuint)
                       .FadeOut(duration, Easing.OutQuint);
@@ -579,6 +610,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Manages horizontal scrolling of mod columns, along with the "active" states of each column based on visibility.
         /// </summary>
+        [Cached]
         internal class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
         {
             public ColumnScrollContainer()
@@ -622,7 +654,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         internal class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
         {
-            public IEnumerable<ModColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
+            public IEnumerable<ModSelectColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
 
             public override void Add(ColumnDimContainer dimContainer)
             {
@@ -638,7 +670,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         internal class ColumnDimContainer : Container
         {
-            public ModColumn Column { get; }
+            public ModSelectColumn Column { get; }
 
             /// <summary>
             /// Tracks whether this column is in an interactive state. Generally only the case when the column is on-screen.
@@ -653,10 +685,19 @@ namespace osu.Game.Overlays.Mods
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
-            public ColumnDimContainer(ModColumn column)
+            public ColumnDimContainer(ModSelectColumn column)
             {
+                AutoSizeAxes = Axes.X;
+                RelativeSizeAxes = Axes.Y;
+
                 Child = Column = column;
                 column.Active.BindTo(Active);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ColumnScrollContainer columnScroll)
+            {
+                RequestScroll = col => columnScroll.ScrollIntoView(col, extraScroll: 140);
             }
 
             protected override void LoadComplete()
@@ -667,7 +708,7 @@ namespace osu.Game.Overlays.Mods
                 FinishTransforms();
             }
 
-            protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || Column.SelectionAnimationRunning;
+            protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || (Column as ModColumn)?.SelectionAnimationRunning == true;
 
             private void updateState()
             {
