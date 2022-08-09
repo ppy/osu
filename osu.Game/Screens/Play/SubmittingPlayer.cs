@@ -203,5 +203,15 @@ namespace osu.Game.Screens.Play
             api.Queue(request);
             return scoreSubmissionSource.Task;
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // Specific to tests, the player can be disposed without OnExiting() ever being called.
+            // We should make sure that the gameplay session has finished even in this case.
+            if (LoadedBeatmapSuccessfully)
+                spectatorClient.EndPlaying(GameplayState);
+        }
     }
 }
