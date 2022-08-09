@@ -152,7 +152,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Show profile"
         /// </summary>
-        public static LocalisableString ShowProfile => new TranslatableString(getKey(@"toggle_notifications"), @"Show profile");
+        public static LocalisableString ShowProfile => new TranslatableString(getKey(@"show_profile"), @"Show profile");
 
         /// <summary>
         /// "Pause gameplay"
