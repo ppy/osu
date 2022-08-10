@@ -10,7 +10,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.UI;
+// using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -22,15 +22,7 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
 
         private readonly Bindable<bool> valid = new Bindable<bool>();
 
-        [Resolved]
-        private KeysPerSecondCalculator? calculator { get; set; }
-
-        // This is to force the skin editor to show the component only in a Gameplay context
-        [Resolved]
-        private GameplayClock? gameplayClock { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private DrawableRuleset? drawableRuleset { get; set; }
+        private KeysPerSecondCalculator? calculator;
 
         protected override double RollingDuration => 350;
 
@@ -42,8 +34,9 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, KeysPerSecondCalculator calculator)
         {
+            this.calculator = calculator;
             Colour = colours.BlueLighter;
             valid.BindValueChanged(e =>
                 DrawableCount.FadeTo(e.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
