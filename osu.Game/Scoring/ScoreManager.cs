@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -21,25 +22,26 @@ using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Online.API;
 
 namespace osu.Game.Scoring
 {
     public class ScoreManager : ModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
         private readonly Scheduler scheduler;
-        private readonly Func<BeatmapDifficultyCache> difficulties;
+        private readonly BeatmapDifficultyCache difficultyCache;
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler,
-                            Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler, IAPIProvider api,
+                            BeatmapDifficultyCache difficultyCache = null, OsuConfigManager configManager = null)
             : base(storage, realm)
         {
             this.scheduler = scheduler;
-            this.difficulties = difficulties;
+            this.difficultyCache = difficultyCache;
             this.configManager = configManager;
 
-            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm)
+            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
@@ -65,8 +67,6 @@ namespace osu.Game.Scoring
         /// <returns>The given <paramref name="scores"/> ordered by decreasing total score.</returns>
         public async Task<ScoreInfo[]> OrderByTotalScoreAsync(ScoreInfo[] scores, CancellationToken cancellationToken = default)
         {
-            var difficultyCache = difficulties?.Invoke();
-
             if (difficultyCache != null)
             {
                 // Compute difficulties asynchronously first to prevent blocking via the GetTotalScore() call below.
@@ -168,11 +168,15 @@ namespace osu.Game.Scoring
                     return score.BeatmapInfo.MaxCombo.Value;
 #pragma warning restore CS0618
 
-                if (difficulties == null)
+                if (difficultyCache == null)
                     return null;
 
                 // We can compute the max combo locally after the async beatmap difficulty computation.
-                var difficulty = await difficulties().GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
+                var difficulty = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
+
+                if (difficulty == null)
+                    Logger.Log($"Couldn't get beatmap difficulty for beatmap {score.BeatmapInfo.OnlineID}");
+
                 return difficulty?.MaxCombo;
             }
 
@@ -264,14 +268,16 @@ namespace osu.Game.Scoring
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreImporter.Import(notification, tasks);
 
+        public Task<Live<ScoreInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
+
         public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            scoreImporter.Import(item, archive, batchImport, cancellationToken);
+            scoreImporter.ImportModel(item, archive, batchImport, cancellationToken);
 
         #region Implementation of IPresentImports<ScoreInfo>
 
-        public Action<IEnumerable<Live<ScoreInfo>>> PostImport
+        public Action<IEnumerable<Live<ScoreInfo>>> PresentImport
         {
-            set => scoreImporter.PostImport = value;
+            set => scoreImporter.PresentImport = value;
         }
 
         #endregion

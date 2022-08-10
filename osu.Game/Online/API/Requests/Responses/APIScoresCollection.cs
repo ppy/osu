@@ -11,9 +11,9 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APIScoresCollection
     {
         [JsonProperty(@"scores")]
-        public List<APIScore> Scores;
+        public List<SoloScoreInfo> Scores;
 
-        [JsonProperty(@"userScore")]
+        [JsonProperty(@"user_score")]
         public APIScoreWithPosition UserScore;
     }
 }

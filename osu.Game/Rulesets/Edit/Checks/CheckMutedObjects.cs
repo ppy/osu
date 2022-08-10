@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (edgeType == EdgeType.None)
                 yield break;
 
-            string postfix = hitObject is IHasDuration ? edgeType.ToString().ToLower() : null;
+            string postfix = hitObject is IHasDuration ? edgeType.ToString().ToLowerInvariant() : null;
 
             if (maxVolume <= muted_threshold)
             {

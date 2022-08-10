@@ -157,10 +157,10 @@ namespace osu.Game.Screens.Play
             {
                 switch (e)
                 {
-                    case KeyDownEvent _:
-                    case KeyUpEvent _:
-                    case MouseDownEvent _:
-                    case MouseUpEvent _:
+                    case KeyDownEvent:
+                    case KeyUpEvent:
+                    case MouseDownEvent:
+                    case MouseUpEvent:
                         return Target.Children.Any(c => c.TriggerEvent(e));
                 }
 

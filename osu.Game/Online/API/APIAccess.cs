@@ -38,7 +38,7 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
-        public int APIVersion => 20220217; // We may want to pull this from the game version eventually.
+        public int APIVersion => 20220705; // We may want to pull this from the game version eventually.
 
         public Exception LastLoginError { get; private set; }
 
@@ -137,6 +137,17 @@ namespace osu.Game.Online.API
 
                         state.Value = APIState.Connecting;
 
+                        if (localUser.IsDefault)
+                        {
+                            // Show a placeholder user if saved credentials are available.
+                            // This is useful for storing local scores and showing a placeholder username after starting the game,
+                            // until a valid connection has been established.
+                            localUser.Value = new APIUser
+                            {
+                                Username = ProvidedUsername,
+                            };
+                        }
+
                         // save the username at this point, if the user requested for it to be.
                         config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
@@ -163,7 +174,13 @@ namespace osu.Game.Online.API
 
                         userReq.Failure += ex =>
                         {
-                            if (ex is WebException webException && webException.Message == @"Unauthorized")
+                            if (ex is APIException)
+                            {
+                                LastLoginError = ex;
+                                log.Add("Login failed on local user retrieval!");
+                                Logout();
+                            }
+                            else if (ex is WebException webException && webException.Message == @"Unauthorized")
                             {
                                 log.Add(@"Login no longer valid");
                                 Logout();
@@ -396,7 +413,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        public bool IsLoggedIn => localUser.Value.Id > 1; // TODO: should this also be true if attempting to connect?
+        public bool IsLoggedIn => State.Value > APIState.Offline;
 
         public void Queue(APIRequest request)
         {

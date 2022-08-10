@@ -13,7 +13,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
@@ -103,7 +102,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Child = new SkinProvidingContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"))
+                        Child = consumer = new SkinConsumer("test", _ => new NamedBox("Default Implementation"))
                     }
                 };
             });
@@ -132,7 +131,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
             });
 
-            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"))));
+            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", _ => new NamedBox("Default Implementation"))));
             AddAssert("consumer using override source", () => consumer.Drawable is SecondarySourceBox);
             AddAssert("skinchanged only called once", () => consumer.SkinChangedCount == 1);
         }
@@ -155,7 +154,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
             });
 
-            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"))));
+            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", _ => new NamedBox("Default Implementation"))));
             AddAssert("consumer using override source", () => consumer.Drawable is SecondarySourceBox);
             AddStep("disable", () => target.Disable());
             AddAssert("consumer using base source", () => consumer.Drawable is BaseSourceBox);

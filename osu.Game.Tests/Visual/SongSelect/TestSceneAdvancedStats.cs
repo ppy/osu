@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("set beatmap", () => advancedStats.BeatmapInfo = new BeatmapInfo
             {
-                Ruleset = rulesets.GetRuleset(3) ?? throw new InvalidOperationException(),
+                Ruleset = rulesets.GetRuleset(3) ?? throw new InvalidOperationException("osu!mania ruleset not found"),
                 Difficulty = new BeatmapDifficulty
                 {
                     CircleSize = 5,

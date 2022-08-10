@@ -38,8 +38,8 @@ namespace osu.Game.Screens.OnlinePlay
             };
 
             // unnecessary to unbind these as this header has the same lifetime as the screen stack we are attaching to.
-            stack.ScreenPushed += (_, __) => updateSubScreenTitle();
-            stack.ScreenExited += (_, __) => updateSubScreenTitle();
+            stack.ScreenPushed += (_, _) => updateSubScreenTitle();
+            stack.ScreenExited += (_, _) => updateSubScreenTitle();
         }
 
         private void updateSubScreenTitle() => title.Screen = stack.CurrentScreen as IOnlinePlaySubScreen;

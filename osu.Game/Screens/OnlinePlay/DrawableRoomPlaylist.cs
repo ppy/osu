@@ -181,7 +181,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             // schedules added as the properties may change value while the drawable items haven't been created yet.
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(scrollToSelection));
-            Items.BindCollectionChanged((_, __) => Scheduler.AddOnce(scrollToSelection), true);
+            Items.BindCollectionChanged((_, _) => Scheduler.AddOnce(scrollToSelection), true);
         }
 
         private void scrollToSelection()
@@ -204,6 +204,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (!AllowSelection)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.SelectNext:
@@ -224,9 +227,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void selectNext(int direction)
         {
-            if (!AllowSelection)
-                return;
-
             var visibleItems = ListContainer.AsEnumerable().Where(r => r.IsPresent);
 
             PlaylistItem item;

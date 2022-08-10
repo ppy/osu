@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                 dialogOverlay.Push(new ConfirmDialog("To complete this operation, osu! will close. Please open it again to use the new data location.", () =>
                                 {
                                     (storage as OsuStorage)?.ChangeDataPath(target.FullName);
-                                    game.GracefullyExit();
+                                    game.Exit();
                                 }, () => { }));
                             },
                             () => { }));

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -275,6 +273,11 @@ namespace osu.Game.Localisation
         /// "Toggle skin editor"
         /// </summary>
         public static LocalisableString ToggleSkinEditor => new TranslatableString(getKey(@"toggle_skin_editor"), @"Toggle skin editor");
+
+        /// <summary>
+        /// "Toggle FPS counter"
+        /// </summary>
+        public static LocalisableString ToggleFPSCounter => new TranslatableString(getKey(@"toggle_fps_counter"), @"Toggle FPS counter");
 
         /// <summary>
         /// "Previous volume meter"

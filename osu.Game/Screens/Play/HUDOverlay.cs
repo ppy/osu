@@ -352,7 +352,7 @@ namespace osu.Game.Screens.Play
                 // When the scoring mode changes, relative positions of elements may change (see DefaultSkin.GetDrawableComponent).
                 // This is a best effort implementation for cases where users haven't customised layouts.
                 scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
-                scoringMode.BindValueChanged(val => Reload());
+                scoringMode.BindValueChanged(_ => Reload());
             }
         }
     }
