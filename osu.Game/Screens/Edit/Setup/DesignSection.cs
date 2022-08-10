@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledSwitchButton letterboxDuringBreaks;
         private LabelledSwitchButton samplesMatchPlaybackRate;
 
-        public override LocalisableString Title => "Design";
+        public override LocalisableString Title => EditorSetupDesignStrings.Design;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -38,9 +39,9 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 EnableCountdown = new LabelledSwitchButton
                 {
-                    Label = "Enable countdown",
+                    Label = EditorSetupDesignStrings.EnableCountdown,
                     Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None },
-                    Description = "If enabled, an \"Are you ready? 3, 2, 1, GO!\" countdown will be inserted at the beginning of the beatmap, assuming there is enough time to do so."
+                    Description = EditorSetupDesignStrings.CountdownDescription
                 },
                 CountdownSettings = new FillFlowContainer
                 {
@@ -52,41 +53,41 @@ namespace osu.Game.Screens.Edit.Setup
                     {
                         CountdownSpeed = new LabelledEnumDropdown<CountdownType>
                         {
-                            Label = "Countdown speed",
+                            Label = EditorSetupDesignStrings.CountdownSpeed,
                             Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None ? Beatmap.BeatmapInfo.Countdown : CountdownType.Normal },
                             Items = Enum.GetValues(typeof(CountdownType)).Cast<CountdownType>().Where(type => type != CountdownType.None)
                         },
                         CountdownOffset = new LabelledNumberBox
                         {
-                            Label = "Countdown offset",
+                            Label = EditorSetupDesignStrings.CountdownOffset,
                             Current = { Value = Beatmap.BeatmapInfo.CountdownOffset.ToString() },
-                            Description = "If the countdown sounds off-time, use this to make it appear one or more beats early.",
+                            Description = EditorSetupDesignStrings.CountdownOffsetDescription,
                         }
                     }
                 },
                 Empty(),
                 widescreenSupport = new LabelledSwitchButton
                 {
-                    Label = "Widescreen support",
-                    Description = "Allows storyboards to use the full screen space, rather than be confined to a 4:3 area.",
+                    Label = EditorSetupDesignStrings.WidescreenSupport,
+                    Description = EditorSetupDesignStrings.WidescreenSupportDescription,
                     Current = { Value = Beatmap.BeatmapInfo.WidescreenStoryboard }
                 },
                 epilepsyWarning = new LabelledSwitchButton
                 {
-                    Label = "Epilepsy warning",
-                    Description = "Recommended if the storyboard or video contain scenes with rapidly flashing colours.",
+                    Label = EditorSetupDesignStrings.EpilepsyWarning,
+                    Description = EditorSetupDesignStrings.EpilepsyWarningDescription,
                     Current = { Value = Beatmap.BeatmapInfo.EpilepsyWarning }
                 },
                 letterboxDuringBreaks = new LabelledSwitchButton
                 {
-                    Label = "Letterbox during breaks",
-                    Description = "Adds horizontal letterboxing to give a cinematic look during breaks.",
+                    Label = EditorSetupDesignStrings.LetterboxDuringBreaks,
+                    Description = EditorSetupDesignStrings.LetterboxDuringBreaksDescription,
                     Current = { Value = Beatmap.BeatmapInfo.LetterboxInBreaks }
                 },
                 samplesMatchPlaybackRate = new LabelledSwitchButton
                 {
-                    Label = "Samples match playback rate",
-                    Description = "When enabled, all samples will speed up or slow down when rate-changing mods are enabled.",
+                    Label = EditorSetupDesignStrings.SamplesMatchPlaybackRate,
+                    Description = EditorSetupDesignStrings.SamplesMatchPlaybackRateDescription,
                     Current = { Value = Beatmap.BeatmapInfo.SamplesMatchPlaybackRate }
                 }
             };
