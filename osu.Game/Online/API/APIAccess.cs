@@ -137,6 +137,17 @@ namespace osu.Game.Online.API
 
                         state.Value = APIState.Connecting;
 
+                        if (localUser.IsDefault)
+                        {
+                            // Show a placeholder user if saved credentials are available.
+                            // This is useful for storing local scores and showing a placeholder username after starting the game,
+                            // until a valid connection has been established.
+                            localUser.Value = new APIUser
+                            {
+                                Username = ProvidedUsername,
+                            };
+                        }
+
                         // save the username at this point, if the user requested for it to be.
                         config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
@@ -402,7 +413,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        public bool IsLoggedIn => localUser.Value.Id > 1; // TODO: should this also be true if attempting to connect?
+        public bool IsLoggedIn => State.Value > APIState.Offline;
 
         public void Queue(APIRequest request)
         {

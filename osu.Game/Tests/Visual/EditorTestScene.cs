@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual
             public WorkingBeatmap TestBeatmap;
 
             public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host, WorkingBeatmap defaultBeatmap)
-                : base(storage, realm, rulesets, api, audioManager, resources, host, defaultBeatmap)
+                : base(storage, realm, api, audioManager, resources, host, defaultBeatmap)
             {
             }
 

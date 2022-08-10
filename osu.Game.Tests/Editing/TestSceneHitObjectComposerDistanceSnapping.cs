@@ -206,7 +206,7 @@ namespace osu.Game.Tests.Editing
         }
 
         private void assertSnapDistance(float expectedDistance, HitObject hitObject = null)
-            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(hitObject ?? new HitObject()) == expectedDistance);
+            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(hitObject ?? new HitObject()), () => Is.EqualTo(expectedDistance));
 
         private void assertDurationToDistance(double duration, float expectedDistance)
             => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DurationToDistance(new HitObject(), duration) == expectedDistance);

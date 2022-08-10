@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
+using osu.Framework.Audio;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
@@ -14,12 +14,16 @@ namespace osu.Game.Beatmaps
     /// Primarily intended for use with <see cref="BeatSyncedContainer"/>.
     /// </summary>
     [Cached]
-    public interface IBeatSyncProvider
+    public interface IBeatSyncProvider : IHasAmplitudes
     {
+        /// <summary>
+        /// Access any available control points from a beatmap providing beat sync. If <c>null</c>, no current provider is available.
+        /// </summary>
         ControlPointInfo? ControlPoints { get; }
 
+        /// <summary>
+        /// Access a clock currently responsible for providing beat sync. If <c>null</c>, no current provider is available.
+        /// </summary>
         IClock? Clock { get; }
-
-        ChannelAmplitudes? Amplitudes { get; }
     }
 }

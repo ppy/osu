@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -195,10 +196,14 @@ namespace osu.Game.Screens.Menu
 
                 PrepareMenuLoad();
                 LoadMenu();
-                notifications.Post(new SimpleErrorNotification
+
+                if (!Debugger.IsAttached)
                 {
-                    Text = "osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
-                });
+                    notifications.Post(new SimpleErrorNotification
+                    {
+                        Text = "osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
+                    });
+                }
             }, 5000);
         }
 

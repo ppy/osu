@@ -15,9 +15,9 @@ using osu.Game.Graphics;
 namespace osu.Game.Overlays.Music
 {
     /// <summary>
-    /// A <see cref="CollectionFilterDropdown"/> for use in the <see cref="NowPlayingOverlay"/>.
+    /// A <see cref="CollectionDropdown"/> for use in the <see cref="NowPlayingOverlay"/>.
     /// </summary>
-    public class CollectionDropdown : CollectionFilterDropdown
+    public class NowPlayingCollectionDropdown : CollectionDropdown
     {
         protected override bool ShowManageCollectionsItem => false;
 

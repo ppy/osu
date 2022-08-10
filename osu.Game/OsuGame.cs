@@ -716,7 +716,7 @@ namespace osu.Game
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
-            MenuCursorContainer.CanShowCursor = menuScreen?.CursorVisible ?? false;
+            GlobalCursorDisplay.ShowCursor = menuScreen?.CursorVisible ?? false;
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => Notifications.Post(n);
@@ -858,11 +858,6 @@ namespace osu.Game
                 d.Origin = Anchor.TopRight;
             }), rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new CollectionManager(Storage)
-            {
-                PostNotification = n => Notifications.Post(n),
-            }, Add, true);
-
             loadComponentSingleFile(legacyImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
@@ -903,6 +898,8 @@ namespace osu.Game
             loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
+
+            loadComponentSingleFile(new BackgroundBeatmapProcessor(), Add);
 
             chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
             // Multiplayer modes need to increase poll rate temporarily.
@@ -1229,7 +1226,7 @@ namespace osu.Game
             ScreenOffsetContainer.X = horizontalOffset;
             overlayContent.X = horizontalOffset * 1.2f;
 
-            MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
+            GlobalCursorDisplay.ShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
         private void screenChanged(IScreen current, IScreen newScreen)
