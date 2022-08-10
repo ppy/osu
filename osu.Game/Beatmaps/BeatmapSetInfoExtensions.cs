@@ -9,7 +9,7 @@ using osu.Game.Models;
 
 namespace osu.Game.Beatmaps
 {
-    public static class HasRealmFilesExtensions
+    public static class BeatmapSetInfoExtensions
     {
         /// <summary>
         /// Returns the storage path for the file in this beatmapset with the given filename, if any exists, otherwise null.

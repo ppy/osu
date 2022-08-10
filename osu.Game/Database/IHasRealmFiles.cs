@@ -14,7 +14,7 @@ namespace osu.Game.Database
     {
         /// <summary>
         /// Available files in this model, with locally filenames.
-        /// When performing lookups, consider using <see cref="HasRealmFilesExtensions.GetFile"/> or <see cref="HasRealmFilesExtensions.GetPathForFile"/> to do case-insensitive lookups.
+        /// When performing lookups, consider using <see cref="BeatmapSetInfoExtensions.GetFile"/> or <see cref="BeatmapSetInfoExtensions.GetPathForFile"/> to do case-insensitive lookups.
         /// </summary>
         IList<RealmNamedFileUsage> Files { get; }
 
