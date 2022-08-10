@@ -15,11 +15,12 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
@@ -77,9 +78,9 @@ namespace osu.Game.Tests.Rulesets
             {
                 var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-                dependencies.CacheAs<TextureStore>(ParentTextureStore = new TestTextureStore());
+                dependencies.CacheAs<TextureStore>(ParentTextureStore = new TestTextureStore(parent.Get<GameHost>().Renderer));
                 dependencies.CacheAs<ISampleStore>(ParentSampleStore = new TestSampleStore());
-                dependencies.CacheAs<ShaderManager>(ParentShaderManager = new TestShaderManager());
+                dependencies.CacheAs<ShaderManager>(ParentShaderManager = new TestShaderManager(parent.Get<GameHost>().Renderer));
 
                 return new DrawableRulesetDependencies(new OsuRuleset(), dependencies);
             }
@@ -95,6 +96,11 @@ namespace osu.Game.Tests.Rulesets
 
         private class TestTextureStore : TextureStore
         {
+            public TestTextureStore(IRenderer renderer)
+                : base(renderer)
+            {
+            }
+
             public override Texture Get(string name, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
             public bool IsDisposed { get; private set; }
@@ -148,8 +154,8 @@ namespace osu.Game.Tests.Rulesets
 
         private class TestShaderManager : ShaderManager
         {
-            public TestShaderManager()
-                : base(new ResourceStore<byte[]>())
+            public TestShaderManager(IRenderer renderer)
+                : base(renderer, new ResourceStore<byte[]>())
             {
             }
 

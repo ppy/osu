@@ -121,7 +121,8 @@ namespace osu.Game.Beatmaps
             OnlineID = -1;
             LastOnlineUpdate = null;
             OnlineMD5Hash = string.Empty;
-            Status = BeatmapOnlineStatus.None;
+            if (Status != BeatmapOnlineStatus.LocallyModified)
+                Status = BeatmapOnlineStatus.None;
         }
 
         #region Properties we may not want persisted (but also maybe no harm?)
@@ -198,8 +199,8 @@ namespace osu.Game.Beatmaps
             Debug.Assert(x.BeatmapSet != null);
             Debug.Assert(y.BeatmapSet != null);
 
-            string? fileHashX = x.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(x.Metadata))?.File.Hash;
-            string? fileHashY = y.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(y.Metadata))?.File.Hash;
+            string? fileHashX = x.BeatmapSet.GetFile(getFilename(x.Metadata))?.File.Hash;
+            string? fileHashY = y.BeatmapSet.GetFile(getFilename(y.Metadata))?.File.Hash;
 
             return fileHashX == fileHashY;
         }

@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("any column dimmed", () => this.ChildrenOfType<ModColumn>().Any(column => !column.Active.Value));
 
-            ModColumn lastColumn = null;
+            ModSelectColumn lastColumn = null;
 
             AddAssert("last column dimmed", () => !this.ChildrenOfType<ModColumn>().Last().Active.Value);
             AddStep("request scroll to last column", () =>
