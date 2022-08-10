@@ -1144,7 +1144,6 @@ namespace osu.Game
                         userProfile.Hide();
                         return true;
                     }
-
                     else
                     {
                         ShowUser(new APIUser { Id = API.LocalUser.Value.Id });
