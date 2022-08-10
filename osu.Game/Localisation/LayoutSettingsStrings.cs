@@ -32,7 +32,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Excluding overlays"
         /// </summary>
-        public static LocalisableString ExcludingOverlays => new TranslatableString(getKey(@"excluding_overlays"), @"Excluding overlays");
+        public static LocalisableString ScaleEverythingExcludingOverlays => new TranslatableString(getKey(@"scale_everything_excluding_overlays"), @"Excluding overlays");
 
         /// <summary>
         /// "Everything"

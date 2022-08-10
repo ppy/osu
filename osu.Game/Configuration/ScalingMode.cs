@@ -16,7 +16,7 @@ namespace osu.Game.Configuration
         [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.ScaleEverything))]
         Everything,
 
-        [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.ExcludingOverlays))]
+        [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.ScaleEverythingExcludingOverlays))]
         ExcludeOverlays,
 
         [LocalisableDescription(typeof(LayoutSettingsStrings), nameof(LayoutSettingsStrings.ScaleGameplay))]

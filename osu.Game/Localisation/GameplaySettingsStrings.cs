@@ -117,7 +117,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Never"
         /// </summary>
-        public static LocalisableString NeverShowHUD => new TranslatableString(getKey(@"never"), @"Never");
+        public static LocalisableString NeverShowHUD => new TranslatableString(getKey(@"never_show_hud"), @"Never");
 
         /// <summary>
         /// "Standardised"
