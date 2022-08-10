@@ -11,7 +11,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -27,6 +27,9 @@ namespace osu.Game.Tests.NonVisual.Skinning
         private const string animation_name = "animation";
         private const int frame_count = 6;
 
+        [Resolved]
+        private IRenderer renderer { get; set; }
+
         [Cached(typeof(IAnimationTimeReference))]
         private TestAnimationTimeReference animationTimeReference = new TestAnimationTimeReference();
 
@@ -35,9 +38,12 @@ namespace osu.Game.Tests.NonVisual.Skinning
         [Test]
         public void TestAnimationTimeReferenceChange()
         {
-            ISkin skin = new TestSkin();
+            AddStep("get animation", () =>
+            {
+                ISkin skin = new TestSkin(renderer);
+                Add(animation = (TextureAnimation)skin.GetAnimation(animation_name, true, false));
+            });
 
-            AddStep("get animation", () => Add(animation = (TextureAnimation)skin.GetAnimation(animation_name, true, false)));
             AddAssert("frame count correct", () => animation.FrameCount == frame_count);
             assertPlaybackPosition(0);
 
@@ -55,9 +61,16 @@ namespace osu.Game.Tests.NonVisual.Skinning
         {
             private static readonly string[] lookup_names = Enumerable.Range(0, frame_count).Select(frame => $"{animation_name}-{frame}").ToArray();
 
+            private readonly IRenderer renderer;
+
+            public TestSkin(IRenderer renderer)
+            {
+                this.renderer = renderer;
+            }
+
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
-                return lookup_names.Contains(componentName) ? Texture.WhitePixel : null;
+                return lookup_names.Contains(componentName) ? renderer.WhitePixel : null;
             }
 
             public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotSupportedException();

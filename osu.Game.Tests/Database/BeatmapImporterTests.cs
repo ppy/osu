@@ -702,12 +702,16 @@ namespace osu.Game.Tests.Database
                     var firstImport = await importer.Import(new ImportTask(pathMissingOneBeatmap));
                     Assert.That(firstImport, Is.Not.Null);
 
+                    realm.Run(r => r.Refresh());
+
                     Assert.That(realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), Has.Count.EqualTo(1));
                     Assert.That(realm.Realm.All<BeatmapSetInfo>().First(s => !s.DeletePending).Beatmaps, Has.Count.EqualTo(11));
 
                     // Second import matches first but contains one extra .osu file.
                     var secondImport = await importer.Import(new ImportTask(pathOriginal));
                     Assert.That(secondImport, Is.Not.Null);
+
+                    realm.Run(r => r.Refresh());
 
                     Assert.That(realm.Realm.All<BeatmapInfo>(), Has.Count.EqualTo(23));
                     Assert.That(realm.Realm.All<BeatmapSetInfo>(), Has.Count.EqualTo(2));

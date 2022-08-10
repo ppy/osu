@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -59,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private void applyCirclePieceState(DrawableOsuHitObject hitObject, IDrawable hitCircle = null)
+        private void applyCirclePieceState(DrawableOsuHitObject hitObject, IDrawable? hitCircle = null)
         {
             var h = hitObject.HitObject;
             using (hitObject.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))

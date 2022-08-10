@@ -432,8 +432,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 var user = playingUsers.Single(u => u.UserID == userId);
 
-                OnlinePlayDependencies.MultiplayerClient.RemoveUser(user.User.AsNonNull());
                 SpectatorClient.SendEndPlay(userId);
+                OnlinePlayDependencies.MultiplayerClient.RemoveUser(user.User.AsNonNull());
 
                 playingUsers.Remove(user);
             });
