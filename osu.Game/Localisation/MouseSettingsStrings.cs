@@ -67,17 +67,17 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Always"
         /// </summary>
-        public static LocalisableString AlwaysConfine => new TranslatableString(getKey(@"always"), @"Always");
+        public static LocalisableString AlwaysConfine => new TranslatableString(getKey(@"always_confine"), @"Always");
 
         /// <summary>
         /// "During Gameplay"
         /// </summary>
-        public static LocalisableString ConfineDuringGameplay => new TranslatableString(getKey(@"during_gameplay"), @"During Gameplay");
+        public static LocalisableString ConfineDuringGameplay => new TranslatableString(getKey(@"confine_during_gameplay"), @"During Gameplay");
 
         /// <summary>
         /// "Never"
         /// </summary>
-        public static LocalisableString NeverConfine => new TranslatableString(getKey(@"never"), @"Never");
+        public static LocalisableString NeverConfine => new TranslatableString(getKey(@"never_confine"), @"Never");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
