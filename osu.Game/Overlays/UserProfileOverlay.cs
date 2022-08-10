@@ -19,7 +19,6 @@ using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays
 {
@@ -41,18 +40,6 @@ namespace osu.Game.Overlays
         protected override ProfileHeader CreateHeader() => new ProfileHeader();
 
         protected override Color4 BackgroundColour => ColourProvider.Background6;
-
-        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-        {
-            switch (e.Action)
-            {
-                case GlobalAction.ToggleProfile:
-                    Hide();
-                    return true;
-            }
-
-            return base.OnPressed(e);
-        }
 
         public void ShowUser(IUser user)
         {
