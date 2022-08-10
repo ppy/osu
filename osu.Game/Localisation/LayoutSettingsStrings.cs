@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -30,6 +28,26 @@ namespace osu.Game.Localisation
         /// "Using fullscreen on macOS makes interacting with the menu bar and spaces no longer work, and may lead to freezes if a system dialog is presented. Using borderless is recommended."
         /// </summary>
         public static LocalisableString FullscreenMacOSNote => new TranslatableString(getKey(@"fullscreen_macos_note"), @"Using fullscreen on macOS makes interacting with the menu bar and spaces no longer work, and may lead to freezes if a system dialog is presented. Using borderless is recommended.");
+
+        /// <summary>
+        /// "Excluding overlays"
+        /// </summary>
+        public static LocalisableString ScaleEverythingExcludingOverlays => new TranslatableString(getKey(@"scale_everything_excluding_overlays"), @"Excluding overlays");
+
+        /// <summary>
+        /// "Everything"
+        /// </summary>
+        public static LocalisableString ScaleEverything => new TranslatableString(getKey(@"scale_everything"), @"Everything");
+
+        /// <summary>
+        /// "Gameplay"
+        /// </summary>
+        public static LocalisableString ScaleGameplay => new TranslatableString(getKey(@"scale_gameplay"), @"Gameplay");
+
+        /// <summary>
+        /// "Off"
+        /// </summary>
+        public static LocalisableString ScalingOff => new TranslatableString(getKey(@"scaling_off"), @"Off");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

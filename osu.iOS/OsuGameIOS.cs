@@ -6,7 +6,10 @@
 using System;
 using Foundation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Handlers;
+using osu.Framework.iOS.Input;
 using osu.Game;
+using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using Xamarin.Essentials;
@@ -26,11 +29,23 @@ namespace osu.iOS
             // Because we have the home indicator (mostly) hidden we don't really care about drawing in this region.
             Edges.Bottom;
 
+        public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
+        {
+            switch (handler)
+            {
+                case IOSMouseHandler _:
+                    return new IOSMouseSettings();
+
+                default:
+                    return base.CreateSettingsSubsectionFor(handler);
+            }
+        }
+
         private class IOSBatteryInfo : BatteryInfo
         {
-            public override double ChargeLevel => Battery.ChargeLevel;
+            public override double? ChargeLevel => Battery.ChargeLevel;
 
-            public override bool IsCharging => Battery.PowerSource != BatteryPowerSource.Battery;
+            public override bool OnBattery => Battery.PowerSource == BatteryPowerSource.Battery;
         }
     }
 }

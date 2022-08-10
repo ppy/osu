@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.LoadComplete();
 
             controlPoints.BindTo(Group.ControlPoints);
-            controlPoints.BindCollectionChanged((_, __) =>
+            controlPoints.BindCollectionChanged((_, _) =>
             {
                 ClearInternal();
 

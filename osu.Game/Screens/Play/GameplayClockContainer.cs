@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Play
@@ -15,7 +16,6 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> via DI for gameplay components to use.
     /// </summary>
-    [Cached]
     public abstract class GameplayClockContainer : Container, IAdjustableClock
     {
         /// <summary>
@@ -43,6 +43,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public event Action OnSeek;
 
+        private double? startTime;
+
         /// <summary>
         /// The time from which the clock should start. Will be seeked to on calling <see cref="Reset"/>.
         /// </summary>
@@ -50,7 +52,17 @@ namespace osu.Game.Screens.Play
         /// If not set, a value of zero will be used.
         /// Importantly, the value will be inferred from the current ruleset in <see cref="MasterGameplayClockContainer"/> unless specified.
         /// </remarks>
-        public double? StartTime { get; set; }
+        public double? StartTime
+        {
+            get => startTime;
+            set
+            {
+                startTime = value;
+
+                if (GameplayClock != null)
+                    GameplayClock.StartTime = value;
+            }
+        }
 
         /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
@@ -71,6 +83,8 @@ namespace osu.Game.Screens.Play
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             dependencies.CacheAs(GameplayClock = CreateGameplayClock(AdjustableSource));
+
+            GameplayClock.StartTime = StartTime;
             GameplayClock.IsPaused.BindTo(IsPaused);
 
             return dependencies;
@@ -101,6 +115,8 @@ namespace osu.Game.Screens.Play
         /// <param name="time">The destination time to seek to.</param>
         public virtual void Seek(double time)
         {
+            Logger.Log($"{nameof(GameplayClockContainer)} seeking to {time}");
+
             AdjustableSource.Seek(time);
 
             // Manually process to make sure the gameplay clock is correctly updated after a seek.

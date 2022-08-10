@@ -9,9 +9,11 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -61,14 +63,28 @@ namespace osu.Game.Screens.Select
             Hotkey = GlobalAction.ToggleModSelection;
         }
 
+        [CanBeNull]
+        private ModSettingChangeTracker modSettingChangeTracker;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(_ => updateMultiplierText(), true);
+            Current.BindValueChanged(mods =>
+            {
+                modSettingChangeTracker?.Dispose();
+
+                updateMultiplierText();
+
+                if (mods.NewValue != null)
+                {
+                    modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+                    modSettingChangeTracker.SettingChanged += _ => updateMultiplierText();
+                }
+            }, true);
         }
 
-        private void updateMultiplierText()
+        private void updateMultiplierText() => Schedule(() =>
         {
             double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
 
@@ -85,6 +101,6 @@ namespace osu.Game.Screens.Select
                 modDisplay.FadeIn();
             else
                 modDisplay.FadeOut();
-        }
+        });
     }
 }

@@ -34,17 +34,18 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : ModelManager<BeatmapSetInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
+    public class BeatmapManager : ModelManager<BeatmapSetInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache
     {
         public ITrackStore BeatmapTrackStore { get; }
 
         private readonly BeatmapImporter beatmapImporter;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
-        private readonly BeatmapOnlineLookupQueue? onlineBeatmapLookupQueue;
 
-        public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
-                              WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
+        public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
+
+        public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
+                              WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
             : base(storage, realm)
         {
             if (performOnlineLookups)
@@ -52,14 +53,16 @@ namespace osu.Game.Beatmaps
                 if (api == null)
                     throw new ArgumentNullException(nameof(api), "API must be provided if online lookups are required.");
 
-                onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+                if (difficultyCache == null)
+                    throw new ArgumentNullException(nameof(difficultyCache), "Difficulty cache must be provided if online lookups are required.");
             }
 
             var userResources = new RealmFileStore(realm, storage).Store;
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            beatmapImporter = CreateBeatmapImporter(storage, realm, rulesets, onlineBeatmapLookupQueue);
+            beatmapImporter = CreateBeatmapImporter(storage, realm);
+            beatmapImporter.ProcessBeatmap = args => ProcessBeatmap?.Invoke(args);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -71,8 +74,7 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
-            new BeatmapImporter(storage, realm, onlineLookupQueue);
+        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm) => new BeatmapImporter(storage, realm);
 
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,
@@ -101,7 +103,7 @@ namespace osu.Game.Beatmaps
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
                 b.BeatmapSet = beatmapSet;
 
-            var imported = beatmapImporter.Import(beatmapSet);
+            var imported = beatmapImporter.ImportModel(beatmapSet);
 
             if (imported == null)
                 throw new InvalidOperationException("Failed to import new beatmap");
@@ -162,8 +164,7 @@ namespace osu.Game.Beatmaps
             // clear the hash, as that's what is used to match .osu files with their corresponding realm beatmaps.
             newBeatmapInfo.Hash = string.Empty;
             // clear online properties.
-            newBeatmapInfo.OnlineID = -1;
-            newBeatmapInfo.Status = BeatmapOnlineStatus.None;
+            newBeatmapInfo.ResetOnlineInfo();
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
         }
@@ -312,12 +313,24 @@ namespace osu.Game.Beatmaps
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
+                beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
-                Realm.Write(r => setInfo.CopyChangesToRealm(r.Find<BeatmapSetInfo>(setInfo.ID)));
+                setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
+                setInfo.Status = BeatmapOnlineStatus.LocallyModified;
+
+                Realm.Write(r =>
+                {
+                    var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
+
+                    setInfo.CopyChangesToRealm(liveBeatmapSet);
+
+                    ProcessBeatmap?.Invoke((liveBeatmapSet, false));
+                });
             }
 
-            workingBeatmapCache.Invalidate(beatmapInfo);
+            Debug.Assert(beatmapInfo.BeatmapSet != null);
 
             static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
             {
@@ -398,6 +411,9 @@ namespace osu.Game.Beatmaps
             Realm.Run(r => Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
+        public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
+            beatmapImporter.ImportAsUpdate(notification, importTask, original);
+
         #region Implementation of ICanAcceptFiles
 
         public Task Import(params string[] paths) => beatmapImporter.Import(paths);
@@ -409,11 +425,8 @@ namespace osu.Game.Beatmaps
         public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) =>
             beatmapImporter.Import(task, batchImport, cancellationToken);
 
-        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool batchImport = false, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(archive, batchImport, cancellationToken);
-
         public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, CancellationToken cancellationToken = default) =>
-            beatmapImporter.Import(item, archive, false, cancellationToken);
+            beatmapImporter.ImportModel(item, archive, false, cancellationToken);
 
         public IEnumerable<string> HandledExtensions => beatmapImporter.HandledExtensions;
 
@@ -421,45 +434,54 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IWorkingBeatmapCache
 
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo? importedBeatmap)
+        /// <summary>
+        /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
+        /// </summary>
+        /// <param name="beatmapInfo">The beatmap to lookup.</param>
+        /// <param name="refetch">Whether to force a refetch from the database to ensure <see cref="BeatmapInfo"/> is up-to-date.</param>
+        /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo? beatmapInfo, bool refetch = false)
         {
-            // Detached sets don't come with files.
-            // If we seem to be missing files, now is a good time to re-fetch.
-            if (importedBeatmap?.BeatmapSet?.Files.Count == 0)
+            if (beatmapInfo != null)
             {
-                Realm.Run(r =>
-                {
-                    var refetch = r.Find<BeatmapInfo>(importedBeatmap.ID)?.Detach();
+                if (refetch)
+                    workingBeatmapCache.Invalidate(beatmapInfo);
 
-                    if (refetch != null)
-                        importedBeatmap = refetch;
-                });
+                // Detached beatmapsets don't come with files as an optimisation (see `RealmObjectExtensions.beatmap_set_mapper`).
+                // If we seem to be missing files, now is a good time to re-fetch.
+                bool missingFiles = beatmapInfo.BeatmapSet?.Files.Count == 0;
+
+                if (refetch || beatmapInfo.IsManaged || missingFiles)
+                {
+                    Guid id = beatmapInfo.ID;
+                    beatmapInfo = Realm.Run(r => r.Find<BeatmapInfo>(id)?.Detach()) ?? beatmapInfo;
+                }
+
+                Debug.Assert(beatmapInfo.IsManaged != true);
             }
 
-            return workingBeatmapCache.GetWorkingBeatmap(importedBeatmap);
+            return workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
         }
 
+        WorkingBeatmap IWorkingBeatmapCache.GetWorkingBeatmap(BeatmapInfo beatmapInfo) => GetWorkingBeatmap(beatmapInfo);
         void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
         void IWorkingBeatmapCache.Invalidate(BeatmapInfo beatmapInfo) => workingBeatmapCache.Invalidate(beatmapInfo);
+
+        public event Action<WorkingBeatmap>? OnInvalidated
+        {
+            add => workingBeatmapCache.OnInvalidated += value;
+            remove => workingBeatmapCache.OnInvalidated -= value;
+        }
 
         public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID));
 
         #endregion
 
-        #region Implementation of IDisposable
-
-        public void Dispose()
-        {
-            onlineBeatmapLookupQueue?.Dispose();
-        }
-
-        #endregion
-
         #region Implementation of IPostImports<out BeatmapSetInfo>
 
-        public Action<IEnumerable<Live<BeatmapSetInfo>>>? PostImport
+        public Action<IEnumerable<Live<BeatmapSetInfo>>>? PresentImport
         {
-            set => beatmapImporter.PostImport = value;
+            set => beatmapImporter.PresentImport = value;
         }
 
         #endregion

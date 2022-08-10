@@ -373,11 +373,11 @@ namespace osu.Game.Beatmaps.Formats
 
             switch (hitObject)
             {
-                case IHasPath _:
+                case IHasPath:
                     type |= LegacyHitObjectType.Slider;
                     break;
 
-                case IHasDuration _:
+                case IHasDuration:
                     if (onlineRulesetID == 3)
                         type |= LegacyHitObjectType.Hold;
                     else

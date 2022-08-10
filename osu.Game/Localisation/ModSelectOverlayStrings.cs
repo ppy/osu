@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -25,6 +23,16 @@ namespace osu.Game.Localisation
         /// "Mod Customisation"
         /// </summary>
         public static LocalisableString ModCustomisation => new TranslatableString(getKey(@"mod_customisation"), @"Mod Customisation");
+
+        /// <summary>
+        /// "Personal Presets"
+        /// </summary>
+        public static LocalisableString PersonalPresets => new TranslatableString(getKey(@"personal_presets"), @"Personal Presets");
+
+        /// <summary>
+        /// "Add preset"
+        /// </summary>
+        public static LocalisableString AddPreset => new TranslatableString(getKey(@"add_preset"), @"Add preset");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -160,13 +160,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
-            windowModeDropdown.Current.BindValueChanged(mode =>
+            windowModeDropdown.Current.BindValueChanged(_ =>
             {
                 updateDisplayModeDropdowns();
                 updateScreenModeWarning();
             }, true);
 
-            windowModes.BindCollectionChanged((sender, args) =>
+            windowModes.BindCollectionChanged((_, _) =>
             {
                 if (windowModes.Count > 1)
                     windowModeDropdown.Show();
@@ -190,7 +190,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 updateDisplayModeDropdowns();
             }), true);
 
-            scalingMode.BindValueChanged(mode =>
+            scalingMode.BindValueChanged(_ =>
             {
                 scalingSettings.ClearTransforms();
                 scalingSettings.AutoSizeDuration = transition_duration;

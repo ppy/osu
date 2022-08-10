@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -75,6 +73,16 @@ namespace osu.Game.Localisation
         /// "Restore all recently deleted beatmaps"
         /// </summary>
         public static LocalisableString RestoreAllRecentlyDeletedBeatmaps => new TranslatableString(getKey(@"restore_all_recently_deleted_beatmaps"), @"Restore all recently deleted beatmaps");
+
+        /// <summary>
+        /// "Delete ALL mod presets"
+        /// </summary>
+        public static LocalisableString DeleteAllModPresets => new TranslatableString(getKey(@"delete_all_mod_presets"), @"Delete ALL mod presets");
+
+        /// <summary>
+        /// "Restore all recently deleted mod presets"
+        /// </summary>
+        public static LocalisableString RestoreAllRecentlyDeletedModPresets => new TranslatableString(getKey(@"restore_all_recently_deleted_mod_presets"), @"Restore all recently deleted mod presets");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

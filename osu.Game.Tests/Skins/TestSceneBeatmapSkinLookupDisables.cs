@@ -10,7 +10,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -58,7 +57,7 @@ namespace osu.Game.Tests.Skins
         {
             AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => config.SetValue(OsuSetting.BeatmapSkins, allowBeatmapLookups));
 
-            ISkin expected() => allowBeatmapLookups ? (ISkin)beatmapSource : userSource;
+            ISkin expected() => allowBeatmapLookups ? beatmapSource : userSource;
 
             AddAssert("Check lookup is from correct source", () => requester.FindProvider(s => s.GetDrawableComponent(new TestSkinComponent()) != null) == expected());
         }

@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                     Action = () =>
                     {
                         // Blocking operations implicitly causes a Compact().
-                        using (realm.BlockAllOperations())
+                        using (realm.BlockAllOperations("compact"))
                         {
                         }
                     }
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             {
                 try
                 {
-                    var token = realm.BlockAllOperations();
+                    var token = realm.BlockAllOperations("maintenance");
 
                     blockAction.Enabled.Value = false;
 

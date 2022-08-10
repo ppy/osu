@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -35,6 +33,11 @@ namespace osu.Game.Localisation
         /// "Adjust gameplay cursor size based on current beatmap"
         /// </summary>
         public static LocalisableString AutoCursorSize => new TranslatableString(getKey(@"auto_cursor_size"), @"Adjust gameplay cursor size based on current beatmap");
+
+        /// <summary>
+        /// "Show gameplay cursor during touch input"
+        /// </summary>
+        public static LocalisableString GameplayCursorDuringTouch => new TranslatableString(getKey(@"gameplay_cursor_during_touch"), @"Show gameplay cursor during touch input");
 
         /// <summary>
         /// "Beatmap skins"

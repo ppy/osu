@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -65,6 +63,21 @@ namespace osu.Game.Localisation
         /// "This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now."
         /// </summary>
         public static LocalisableString HighPrecisionPlatformWarning => new TranslatableString(getKey(@"high_precision_platform_warning"), @"This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now.");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString AlwaysConfine => new TranslatableString(getKey(@"always_confine"), @"Always");
+
+        /// <summary>
+        /// "During Gameplay"
+        /// </summary>
+        public static LocalisableString ConfineDuringGameplay => new TranslatableString(getKey(@"confine_during_gameplay"), @"During Gameplay");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString NeverConfine => new TranslatableString(getKey(@"never_confine"), @"Never");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

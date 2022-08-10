@@ -133,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(users)
             {
                 Expanded = { Value = true },
-            }, l =>
+            }, _ =>
             {
                 foreach (var instance in instances)
                     leaderboard.AddClock(instance.UserId, instance.GameplayClock);
@@ -229,6 +229,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             // Allowed passed/failed users to complete their remaining replay frames.
             // The failed state isn't really possible in multiplayer (yet?) but is added here just for safety in case it starts being used.
             if (state.State == SpectatedUserState.Passed || state.State == SpectatedUserState.Failed)
+                return;
+
+            // we could also potentially receive EndGameplay with "Playing" state, at which point we can only early-return and hope it's a passing player.
+            // todo: this shouldn't exist, but it's here as a hotfix for an issue with multi-spectator screen not proceeding to results screen.
+            // see: https://github.com/ppy/osu/issues/19593
+            if (state.State == SpectatedUserState.Playing)
                 return;
 
             RemoveUser(userId);

@@ -25,23 +25,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private RoomsContainer container;
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            Child = new PopoverContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 0.5f,
+            base.SetUpSteps();
 
-                Child = container = new RoomsContainer
+            AddStep("create container", () =>
+            {
+                Child = new PopoverContainer
                 {
-                    SelectedRoom = { BindTarget = SelectedRoom }
-                }
-            };
-        });
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 0.5f,
+
+                    Child = container = new RoomsContainer
+                    {
+                        SelectedRoom = { BindTarget = SelectedRoom }
+                    }
+                };
+            });
+        }
 
         [Test]
         public void TestBasicListChanges()
@@ -155,6 +159,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("filter catch rooms", () => container.Filter.Value = new FilterCriteria { Ruleset = new CatchRuleset().RulesetInfo });
             AddUntilStep("3 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 3);
+        }
+
+        [Test]
+        public void TestAccessTypeFiltering()
+        {
+            AddStep("add rooms", () =>
+            {
+                RoomManager.AddRooms(1, withPassword: true);
+                RoomManager.AddRooms(1, withPassword: false);
+            });
+
+            AddStep("apply default filter", () => container.Filter.SetDefault());
+
+            AddUntilStep("both rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 2);
+
+            AddStep("filter public rooms", () => container.Filter.Value = new FilterCriteria { Permissions = RoomPermissionsFilter.Public });
+
+            AddUntilStep("private room hidden", () => container.Rooms.All(r => !r.Room.HasPassword.Value));
+
+            AddStep("filter private rooms", () => container.Filter.Value = new FilterCriteria { Permissions = RoomPermissionsFilter.Private });
+
+            AddUntilStep("public room hidden", () => container.Rooms.All(r => r.Room.HasPassword.Value));
         }
 
         [Test]

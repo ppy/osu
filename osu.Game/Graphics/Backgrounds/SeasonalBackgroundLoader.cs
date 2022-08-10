@@ -38,13 +38,19 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(OsuConfigManager config, SessionStatics sessionStatics)
         {
             seasonalBackgroundMode = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode);
-            seasonalBackgroundMode.BindValueChanged(_ => SeasonalBackgroundChanged?.Invoke());
+            seasonalBackgroundMode.BindValueChanged(_ => triggerSeasonalBackgroundChanged());
 
             seasonalBackgrounds = sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds);
-            seasonalBackgrounds.BindValueChanged(_ => SeasonalBackgroundChanged?.Invoke());
+            seasonalBackgrounds.BindValueChanged(_ => triggerSeasonalBackgroundChanged());
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(fetchSeasonalBackgrounds, true);
+        }
+
+        private void triggerSeasonalBackgroundChanged()
+        {
+            if (shouldShowSeasonal)
+                SeasonalBackgroundChanged?.Invoke();
         }
 
         private void fetchSeasonalBackgrounds(ValueChangedEvent<APIState> stateChanged)
@@ -64,20 +70,29 @@ namespace osu.Game.Graphics.Backgrounds
 
         public SeasonalBackground LoadNextBackground()
         {
-            if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Never
-                || (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Sometimes && !isInSeason))
-            {
+            if (!shouldShowSeasonal)
                 return null;
-            }
 
-            var backgrounds = seasonalBackgrounds.Value?.Backgrounds;
-            if (backgrounds == null || !backgrounds.Any())
-                return null;
+            var backgrounds = seasonalBackgrounds.Value.Backgrounds;
 
             current = (current + 1) % backgrounds.Count;
             string url = backgrounds[current].Url;
 
             return new SeasonalBackground(url);
+        }
+
+        private bool shouldShowSeasonal
+        {
+            get
+            {
+                if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Never)
+                    return false;
+
+                if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Sometimes && !isInSeason)
+                    return false;
+
+                return seasonalBackgrounds.Value?.Backgrounds?.Any() == true;
+            }
         }
 
         private bool isInSeason => seasonalBackgrounds.Value != null && DateTimeOffset.Now < seasonalBackgrounds.Value.EndDate;

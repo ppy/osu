@@ -22,6 +22,8 @@ namespace osu.Game.Tournament.Components
         private Video video;
         private ManualClock manualClock;
 
+        public bool VideoAvailable => video != null;
+
         public TourneyVideo(string filename, bool drawFallbackGradient = false)
         {
             this.filename = filename;

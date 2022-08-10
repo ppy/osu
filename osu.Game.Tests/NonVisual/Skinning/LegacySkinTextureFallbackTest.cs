@@ -11,6 +11,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
@@ -141,6 +143,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
                     this.textureStore = textureStore;
                 }
 
+                public IRenderer Renderer => new DummyRenderer();
                 public AudioManager AudioManager => null;
                 public IResourceStore<byte[]> Files => null;
                 public IResourceStore<byte[]> Resources => null;
@@ -157,7 +160,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
             {
                 // use an incrementing width to allow assertion matching on correct textures as they turn from uploads into actual textures.
                 int width = 1;
-                Textures = fileNames.ToDictionary(fileName => fileName, fileName => new TextureUpload(new Image<Rgba32>(width, width++)));
+                Textures = fileNames.ToDictionary(fileName => fileName, _ => new TextureUpload(new Image<Rgba32>(width, width++)));
             }
 
             public TextureUpload Get(string name) => Textures.GetValueOrDefault(name);
