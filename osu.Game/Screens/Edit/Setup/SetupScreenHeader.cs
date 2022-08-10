@@ -11,6 +11,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -77,8 +78,8 @@ namespace osu.Game.Screens.Edit.Setup
         {
             public SetupScreenTitle()
             {
-                Title = "beatmap setup";
-                Description = "change general settings of your beatmap";
+                Title = EditorSetupStrings.BeatmapSetup;
+                Description = EditorSetupStrings.BeatmapSetupDescription;
                 IconTexture = "Icons/Hexacons/social";
             }
         }

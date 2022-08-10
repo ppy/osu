@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -19,7 +20,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledFileChooser audioTrackChooser;
         private LabelledFileChooser backgroundChooser;
 
-        public override LocalisableString Title => "Resources";
+        public override LocalisableString Title => EditorSetupResourcesStrings.Resources;
 
         [Resolved]
         private MusicController music { get; set; }
@@ -43,13 +44,13 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 backgroundChooser = new LabelledFileChooser(".jpg", ".jpeg", ".png")
                 {
-                    Label = "Background",
+                    Label = GameplaySettingsStrings.BackgroundHeader,
                     FixedLabelWidth = LABEL_WIDTH,
                     TabbableContentContainer = this
                 },
                 audioTrackChooser = new LabelledFileChooser(".mp3", ".ogg")
                 {
-                    Label = "Audio Track",
+                    Label = EditorSetupResourcesStrings.AudioTrack,
                     FixedLabelWidth = LABEL_WIDTH,
                     TabbableContentContainer = this
                 },
@@ -144,12 +145,12 @@ namespace osu.Game.Screens.Edit.Setup
         private void updatePlaceholderText()
         {
             audioTrackChooser.Text = audioTrackChooser.Current.Value == null
-                ? "Click to select a track"
-                : "Click to replace the track";
+                ? EditorSetupResourcesStrings.ClickToSelectTrack
+                : EditorSetupResourcesStrings.ClickToReplaceTrack;
 
             backgroundChooser.Text = backgroundChooser.Current.Value == null
-                ? "Click to select a background image"
-                : "Click to replace the background image";
+                ? EditorSetupResourcesStrings.ClickToSelectBackground
+                : EditorSetupResourcesStrings.ClickToReplaceBackground;
         }
     }
 }

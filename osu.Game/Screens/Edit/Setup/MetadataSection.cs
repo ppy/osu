@@ -10,6 +10,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledTextBox sourceTextBox;
         private LabelledTextBox tagsTextBox;
 
-        public override LocalisableString Title => "Metadata";
+        public override LocalisableString Title => EditorSetupMetadataStrings.Metadata;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -35,22 +36,22 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new[]
             {
-                ArtistTextBox = createTextBox<LabelledTextBox>("Artist",
+                ArtistTextBox = createTextBox<LabelledTextBox>(ArtistStrings.TracksIndexFormArtist,
                     !string.IsNullOrEmpty(metadata.ArtistUnicode) ? metadata.ArtistUnicode : metadata.Artist),
-                RomanisedArtistTextBox = createTextBox<LabelledRomanisedTextBox>("Romanised Artist",
+                RomanisedArtistTextBox = createTextBox<LabelledRomanisedTextBox>(EditorSetupMetadataStrings.RomanisedArtist,
                     !string.IsNullOrEmpty(metadata.Artist) ? metadata.Artist : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode)),
 
                 Empty(),
 
-                TitleTextBox = createTextBox<LabelledTextBox>("Title",
+                TitleTextBox = createTextBox<LabelledTextBox>(BeatmapsetWatchesStrings.IndexTableTitle,
                     !string.IsNullOrEmpty(metadata.TitleUnicode) ? metadata.TitleUnicode : metadata.Title),
-                RomanisedTitleTextBox = createTextBox<LabelledRomanisedTextBox>("Romanised Title",
+                RomanisedTitleTextBox = createTextBox<LabelledRomanisedTextBox>(EditorSetupMetadataStrings.RomanisedTitle,
                     !string.IsNullOrEmpty(metadata.Title) ? metadata.Title : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode)),
 
                 Empty(),
 
-                creatorTextBox = createTextBox<LabelledTextBox>("Creator", metadata.Author.Username),
-                difficultyTextBox = createTextBox<LabelledTextBox>("Difficulty Name", Beatmap.BeatmapInfo.DifficultyName),
+                creatorTextBox = createTextBox<LabelledTextBox>(EditorSetupMetadataStrings.Creator, metadata.Author.Username),
+                difficultyTextBox = createTextBox<LabelledTextBox>(EditorSetupMetadataStrings.DifficultyName, Beatmap.BeatmapInfo.DifficultyName),
                 sourceTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoSource, metadata.Source),
                 tagsTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoTags, metadata.Tags)
             };
