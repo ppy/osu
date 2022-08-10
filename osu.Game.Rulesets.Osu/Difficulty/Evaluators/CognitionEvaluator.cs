@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 125) / 15);
+                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 80) / 15);
 
                 // Objects that are arranged in a mostly-linear fashion should be easy to read (such as circles in a stream).
                 //if (loopObj.Angle.IsNotNull() && prevLoopObj.Angle.IsNotNull())
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 var timeDifficultyFactor = 1200 / pastObjectDifficultyInfluence;
 
                 hiddenDifficulty += 12 * timeSpentInvisible / timeDifficultyFactor;
-                hiddenDifficulty += 7 * currVelocity;
+                hiddenDifficulty += 2 * currVelocity;
             }
 
             double preemptDifficulty = 0.0;
