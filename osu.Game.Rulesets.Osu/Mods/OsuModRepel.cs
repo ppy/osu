@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => "Repel";
         public override string Acronym => "RP";
         public override ModType Type => ModType.Fun;
-        public override string Description => "Hit objects run away!";
+        public override LocalisableString Description => "Hit objects run away!";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModMagnetised) };
 

@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -374,7 +375,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override string Name => string.Empty;
             public override string Acronym => string.Empty;
             public override double ScoreMultiplier => 1;
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
 
             public bool Applied { get; private set; }
 
