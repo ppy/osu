@@ -7,6 +7,7 @@ using FFmpeg.AutoGen;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
@@ -15,13 +16,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double cognition_window_size = 2000;
 
+        private const double note_density_difficulty_multiplier = 1.0;
+
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
+            var prevObj = (OsuDifficultyHitObject)current.Previous(0);
+
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
+
+            // Maybe I should just pass in clockrate...
+            var clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
 
             List<OsuDifficultyHitObject> pastVisibleObjects = retrievePastVisibleObjects(currObj);
             List<OsuDifficultyHitObject> currentVisibleObjects = retrieveCurrentVisibleObjects(currObj);
@@ -29,6 +37,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Rather than note density being the number of on-screen objects visible at the current object,
             // consider it as how many objects the current object has been visible for.
             double noteDensityDifficulty = 1.0;
+
+            double pastObjectDifficultyInfluence = 1.0;
 
             foreach (var loopObj in pastVisibleObjects)
             {
@@ -43,12 +53,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 //if (loopObj.Angle.IsNotNull() && prevLoopObj.Angle.IsNotNull())
                 //   loopDifficulty *= 1 - Math.Pow(Math.Sin(0.5 * loopObj.Angle.Value), 5);
 
-                noteDensityDifficulty += loopDifficulty;
+                pastObjectDifficultyInfluence += loopDifficulty;
             }
 
-            noteDensityDifficulty = Math.Pow(3 * Math.Log(Math.Max(1, noteDensityDifficulty - 1)), 2.3);
+            noteDensityDifficulty = Math.Pow(3 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 1)), 2.3) * note_density_difficulty_multiplier;
 
             double hiddenDifficulty = 0;
+
+            if (hidden)
+            {
+                var timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
+                var isRhythmChange = (currObj.StrainTime - prevObj.StrainTime < 5);
+
+                var timeDifficultyFactor = 1200 / pastObjectDifficultyInfluence;
+
+                hiddenDifficulty += 12 * timeSpentInvisible / timeDifficultyFactor;
+                hiddenDifficulty += 7 * currVelocity;
+            }
 
             double preemptDifficulty = 0.0;
             if (currObj.preempt < 400)
@@ -98,6 +119,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             return objects;
+        }
+
+        private static double getDurationSpentInvisible(OsuDifficultyHitObject current)
+        {
+            var baseObject = (OsuHitObject)current.BaseObject;
+
+            double fadeOutStartTime = baseObject.StartTime - baseObject.TimePreempt + baseObject.TimeFadeIn;
+            double fadeOutDuration = baseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
+
+            return (fadeOutStartTime + fadeOutDuration) - (baseObject.StartTime - baseObject.TimePreempt);
         }
 
         private static double logistic(double x) => 1 / (1 + Math.Pow(Math.E, -x));
