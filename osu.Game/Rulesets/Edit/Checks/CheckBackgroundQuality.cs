@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
