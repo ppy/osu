@@ -6,10 +6,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -21,6 +22,9 @@ namespace osu.Game.Tests.Skins
     [HeadlessTest]
     public class TestSceneSkinProvidingContainer : OsuTestScene
     {
+        [Resolved]
+        private IRenderer renderer { get; set; }
+
         /// <summary>
         /// Ensures that the first inserted skin after resetting (via source change)
         /// is always prioritised over others when providing the same resource.
@@ -35,7 +39,7 @@ namespace osu.Game.Tests.Skins
             {
                 var sources = new List<TestSkin>();
                 for (int i = 0; i < 10; i++)
-                    sources.Add(new TestSkin());
+                    sources.Add(new TestSkin(renderer));
 
                 mostPrioritisedSource = sources.First();
 
@@ -76,12 +80,19 @@ namespace osu.Game.Tests.Skins
         {
             public const string TEXTURE_NAME = "virtual-texture";
 
+            private readonly IRenderer renderer;
+
+            public TestSkin(IRenderer renderer)
+            {
+                this.renderer = renderer;
+            }
+
             public Drawable GetDrawableComponent(ISkinComponent component) => throw new System.NotImplementedException();
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
                 if (componentName == TEXTURE_NAME)
-                    return Texture.WhitePixel;
+                    return renderer.WhitePixel;
 
                 return null;
             }

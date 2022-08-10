@@ -15,6 +15,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -32,6 +33,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private SpectatorClient spectatorClient { get; set; }
 
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
@@ -134,6 +138,8 @@ namespace osu.Game.Screens.Play
                 if (realmBeatmap != null)
                     realmBeatmap.LastPlayed = DateTimeOffset.Now;
             });
+
+            spectatorClient.BeginPlaying(GameplayState, Score);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -141,7 +147,10 @@ namespace osu.Game.Screens.Play
             bool exiting = base.OnExiting(e);
 
             if (LoadedBeatmapSuccessfully)
+            {
                 submitScore(Score.DeepClone());
+                spectatorClient.EndPlaying(GameplayState);
+            }
 
             return exiting;
         }
