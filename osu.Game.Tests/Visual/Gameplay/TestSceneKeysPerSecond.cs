@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         CachedDependencies = new (Type, object)[]
                         {
                             (typeof(GameplayClock), mainClock = new MockFrameStableClock(new MockFrameBasedClock())),
-                            (typeof(DrawableRuleset), new DrawableCookieziRuleset(ruleset, mainClock))
+                            (typeof(DrawableRuleset), new MockDrawableRuleset(ruleset, mainClock))
                         }
                     },
                 };
@@ -261,9 +261,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             public IBindable<bool> WaitingOnFrames => new Bindable<bool>();
         }
 
-        private class DrawableCookieziRuleset : DrawableRuleset
+        private class MockDrawableRuleset : DrawableRuleset
         {
-            public DrawableCookieziRuleset(Ruleset ruleset, IFrameStableClock clock)
+            public MockDrawableRuleset(Ruleset ruleset, IFrameStableClock clock)
                 : base(ruleset)
             {
                 FrameStableClock = clock;
