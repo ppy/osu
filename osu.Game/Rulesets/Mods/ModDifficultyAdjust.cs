@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => @"Difficulty Adjust";
 
-        public override string Description => @"Override a beatmap's difficulty settings.";
+        public override LocalisableString Description => @"Override a beatmap's difficulty settings.";
 
         public override string Acronym => "DA";
 
