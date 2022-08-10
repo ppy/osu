@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
 
             double span = 1000 * rate;
             double relativeTime = workingClock.CurrentTime - timestamp;
-            return relativeTime >= 0 && relativeTime <= span;
+            return relativeTime > 0 && relativeTime <= span;
         }
 
         ~KeysPerSecondCalculator()
