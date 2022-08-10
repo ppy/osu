@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <summary>
         /// The name of this item.
         /// </summary>
-        public readonly LocalisableString Name;
+        public readonly LocalisableString? Name;
 
         /// <summary>
         /// A function returning the <see cref="Drawable"/> content to be displayed.

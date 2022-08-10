@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         private static Drawable createHeader(StatisticItem item)
         {
-            if (string.IsNullOrEmpty(item.Name))
+            if (item.Name == null)
                 return Empty();
 
             return new FillFlowContainer
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Text = item.Name,
+                        Text = item.Name.Value,
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                     }
                 }
