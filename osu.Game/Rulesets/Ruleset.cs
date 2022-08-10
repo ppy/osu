@@ -28,7 +28,6 @@ using osu.Game.Users;
 using JetBrains.Annotations;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
-using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.Filter;
@@ -314,7 +313,7 @@ namespace osu.Game.Rulesets
         /// <returns>
         /// All valid <see cref="HitResult"/>s along with a display-friendly name.
         /// </returns>
-        public IEnumerable<(HitResult result, LocalisableString displayName)> GetHitResults()
+        public IEnumerable<(HitResult result, string displayName)> GetHitResults()
         {
             var validResults = GetValidHitResults();
 
@@ -352,7 +351,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="result">The result type to get the name for.</param>
         /// <returns>The display name.</returns>
-        public virtual LocalisableString GetDisplayNameForHitResult(HitResult result) => result.GetLocalisableDescription();
+        public virtual string GetDisplayNameForHitResult(HitResult result) => result.GetDescription();
 
         /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.
