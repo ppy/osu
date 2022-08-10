@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD.KPSCounter
 
         private double maxTime = double.NegativeInfinity;
 
-        public bool Ready => workingClock != null && gameplayClock != null;
+        public bool Ready => workingClock != null && gameplayClock != null && listener != null;
         public int Value => timestamps.Count(isTimestampWithinSpan);
 
         public KeysPerSecondCalculator()
