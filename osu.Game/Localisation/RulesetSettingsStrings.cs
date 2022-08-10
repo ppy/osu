@@ -17,17 +17,17 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "None"
         /// </summary>
-        public static LocalisableString BorderNone => new TranslatableString(getKey(@"none"), @"None");
+        public static LocalisableString BorderNone => new TranslatableString(getKey(@"no_borders"), @"None");
 
         /// <summary>
         /// "Corners"
         /// </summary>
-        public static LocalisableString BorderCorners => new TranslatableString(getKey(@"corners"), @"Corners");
+        public static LocalisableString BorderCorners => new TranslatableString(getKey(@"corner_borders"), @"Corners");
 
         /// <summary>
         /// "Full"
         /// </summary>
-        public static LocalisableString BorderFull => new TranslatableString(getKey(@"full"), @"Full");
+        public static LocalisableString BorderFull => new TranslatableString(getKey(@"full_borders"), @"Full");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
