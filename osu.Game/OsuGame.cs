@@ -1140,15 +1140,10 @@ namespace osu.Game
 
                 case GlobalAction.ToggleProfile:
                     if (userProfile.State.Value == Visibility.Visible)
-                    {
                         userProfile.Hide();
-                        return true;
-                    }
                     else
-                    {
-                        ShowUser(new APIUser { Id = API.LocalUser.Value.Id });
-                        return true;
-                    }
+                        ShowUser(API.LocalUser.Value);
+                    return true;
 
                 case GlobalAction.RandomSkin:
                     // Don't allow random skin selection while in the skin editor.
