@@ -42,7 +42,7 @@ namespace osu.Game.Database
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
 
-        [Resolved]
+        [Resolved(canBeNull: true)] // canBeNull required while we remain on mono for mobile platforms.
         private DesktopGameHost? desktopGameHost { get; set; }
 
         [Resolved]
