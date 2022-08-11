@@ -191,6 +191,8 @@ namespace osu.Game.Rulesets.UI
 
         public void Attach(KeysPerSecondCalculator calculator)
         {
+            if (calculator == null) return;
+
             var listener = new ActionListener();
 
             KeyBindingContainer.Add(listener);
