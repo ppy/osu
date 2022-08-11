@@ -142,10 +142,10 @@ namespace osu.Game.Online.API
                             // Show a placeholder user if saved credentials are available.
                             // This is useful for storing local scores and showing a placeholder username after starting the game,
                             // until a valid connection has been established.
-                            localUser.Value = new APIUser
+                            setLocalUser(new APIUser
                             {
                                 Username = ProvidedUsername,
-                            };
+                            });
                         }
 
                         // save the username at this point, if the user requested for it to be.
@@ -188,12 +188,12 @@ namespace osu.Game.Online.API
                             else
                                 failConnectionProcess();
                         };
-                        userReq.Success += u =>
+                        userReq.Success += user =>
                         {
-                            localUser.Value = u;
-
                             // todo: save/pull from settings
-                            localUser.Value.Status.Value = new UserStatusOnline();
+                            user.Status.Value = new UserStatusOnline();
+
+                            setLocalUser(user);
 
                             failureCount = 0;
                         };
@@ -453,7 +453,7 @@ namespace osu.Game.Online.API
             // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
             Schedule(() =>
             {
-                localUser.Value = createGuestUser();
+                setLocalUser(createGuestUser());
                 friends.Clear();
             });
 
@@ -462,6 +462,8 @@ namespace osu.Game.Online.API
         }
 
         private static APIUser createGuestUser() => new GuestUser();
+
+        private void setLocalUser(APIUser user) => Scheduler.Add(() => localUser.Value = user, false);
 
         protected override void Dispose(bool isDisposing)
         {
