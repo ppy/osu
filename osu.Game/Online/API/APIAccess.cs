@@ -195,6 +195,8 @@ namespace osu.Game.Online.API
 
                             setLocalUser(user);
 
+                            //we're connected!
+                            state.Value = APIState.Online;
                             failureCount = 0;
                         };
 
@@ -208,13 +210,7 @@ namespace osu.Game.Online.API
                         var friendsReq = new GetFriendsRequest();
 
                         friendsReq.Failure += _ => failConnectionProcess();
-                        friendsReq.Success += res =>
-                        {
-                            friends.AddRange(res);
-
-                            //we're connected!
-                            state.Value = APIState.Online;
-                        };
+                        friendsReq.Success += res => friends.AddRange(res);
 
                         if (!handleRequest(friendsReq))
                         {
@@ -338,8 +334,7 @@ namespace osu.Game.Online.API
                 if (req.CompletionState != APIRequestCompletionState.Completed)
                     return false;
 
-                // we could still be in initialisation, at which point we don't want to say we're Online yet.
-                if (IsLoggedIn) state.Value = APIState.Online;
+                // Reset failure count if this request succeeded.
                 failureCount = 0;
                 return true;
             }
