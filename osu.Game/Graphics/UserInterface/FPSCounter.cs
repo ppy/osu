@@ -167,6 +167,11 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
+            // If the game goes into a suspended state (ie. debugger attached or backgrounded on a mobile device)
+            // we want to ignore really long periods of no processing.
+            if (updateClock.ElapsedFrameTime > 10000)
+                return;
+
             mainContent.Width = Math.Max(mainContent.Width, counters.DrawWidth);
 
             // Handle the case where the window has become inactive or the user changed the
@@ -177,15 +182,15 @@ namespace osu.Game.Graphics.UserInterface
             // use elapsed frame time rather then FramesPerSecond to better catch stutter frames.
             bool hasDrawSpike = displayedFpsCount > (1000 / spike_time_ms) && drawClock.ElapsedFrameTime > spike_time_ms;
 
-            // note that we use an elapsed time here of 1 intentionally.
-            // this weights all updates equally. if we passed in the elapsed time, longer frames would be weighted incorrectly lower.
-            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, updateClock.ElapsedFrameTime, hasUpdateSpike ? 0 : 100, 1);
+            const float damp_time = 100;
+
+            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, updateClock.ElapsedFrameTime, hasUpdateSpike ? 0 : damp_time, updateClock.ElapsedFrameTime);
 
             if (hasDrawSpike)
                 // show spike time using raw elapsed value, to account for `FramesPerSecond` being so averaged spike frames don't show.
                 displayedFpsCount = 1000 / drawClock.ElapsedFrameTime;
             else
-                displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, drawClock.FramesPerSecond, 100, Time.Elapsed);
+                displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, drawClock.FramesPerSecond, damp_time, Time.Elapsed);
 
             if (Time.Current - lastUpdate > min_time_between_updates)
             {
@@ -203,7 +208,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (hasSignificantChanges)
                 requestDisplay();
-            else if (isDisplayed && Time.Current - lastDisplayRequiredTime > 2000)
+            else if (isDisplayed && Time.Current - lastDisplayRequiredTime > 2000 && !IsHovered)
             {
                 mainContent.FadeTo(0, 300, Easing.OutQuint);
                 isDisplayed = false;

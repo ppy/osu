@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("reset clock", () => Clock.Seek(0));
 
-            AddStep("start clock", Clock.Start);
+            AddStep("start clock", () => Clock.Start());
             AddAssert("clock running", () => Clock.IsRunning);
 
             AddStep("seek near end", () => Clock.Seek(Clock.TrackLength - 250));
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("clock stopped at end", () => Clock.CurrentTime == Clock.TrackLength);
 
-            AddStep("start clock again", Clock.Start);
+            AddStep("start clock again", () => Clock.Start());
             AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
         }
 
@@ -76,20 +76,20 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("reset clock", () => Clock.Seek(0));
 
-            AddStep("stop clock", Clock.Stop);
+            AddStep("stop clock", () => Clock.Stop());
             AddAssert("clock stopped", () => !Clock.IsRunning);
 
             AddStep("seek exactly to end", () => Clock.Seek(Clock.TrackLength));
             AddAssert("clock stopped at end", () => Clock.CurrentTime == Clock.TrackLength);
 
-            AddStep("start clock again", Clock.Start);
+            AddStep("start clock again", () => Clock.Start());
             AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
         }
 
         [Test]
         public void TestClampWhenSeekOutsideBeatmapBounds()
         {
-            AddStep("stop clock", Clock.Stop);
+            AddStep("stop clock", () => Clock.Stop());
 
             AddStep("seek before start time", () => Clock.Seek(-1000));
             AddAssert("time is clamped to 0", () => Clock.CurrentTime == 0);
