@@ -6,13 +6,16 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Extensions;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -22,6 +25,12 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider? snapProvider { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private EditorBeatmap? editorBeatmap { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler? changeHandler { get; set; }
 
         /// <summary>
         /// During a transform, the initial origin is stored so it can be used throughout the operation.
@@ -322,5 +331,105 @@ namespace osu.Game.Rulesets.Osu.Edit
         private OsuHitObject[] selectedMovableObjects => SelectedItems.OfType<OsuHitObject>()
                                                                       .Where(h => !(h is Spinner))
                                                                       .ToArray();
+
+        /// <summary>
+        /// All osu! hitobjects which can be merged.
+        /// </summary>
+        private OsuHitObject[] selectedMergeableObjects => SelectedItems.OfType<OsuHitObject>()
+                                                                        .Where(h => h is HitCircle or Slider)
+                                                                        .OrderBy(h => h.StartTime)
+                                                                        .ToArray();
+
+        private void mergeSelection()
+        {
+            if (editorBeatmap == null || changeHandler == null || selectedMergeableObjects.Length < 2)
+                return;
+
+            changeHandler.BeginChange();
+
+            // Have an initial slider object.
+            var firstHitObject = selectedMergeableObjects[0];
+            var mergedHitObject = firstHitObject as Slider ?? new Slider
+            {
+                StartTime = firstHitObject.StartTime,
+                Position = firstHitObject.Position,
+                NewCombo = firstHitObject.NewCombo,
+                SampleControlPoint = firstHitObject.SampleControlPoint,
+            };
+
+            if (mergedHitObject.Path.ControlPoints.Count == 0)
+            {
+                mergedHitObject.Path.ControlPoints.Add(new PathControlPoint(Vector2.Zero, PathType.Linear));
+            }
+
+            // Merge all the selected hit objects into one slider path.
+            bool lastCircle = firstHitObject is HitCircle;
+
+            foreach (var selectedMergeableObject in selectedMergeableObjects.Skip(1))
+            {
+                if (selectedMergeableObject is IHasPath hasPath)
+                {
+                    var offset = lastCircle ? selectedMergeableObject.Position - mergedHitObject.Position : mergedHitObject.Path.ControlPoints[^1].Position;
+                    float distanceToLastControlPoint = Vector2.Distance(mergedHitObject.Path.ControlPoints[^1].Position, offset);
+
+                    // Calculate the distance required to travel to the expected distance of the merging slider.
+                    mergedHitObject.Path.ExpectedDistance.Value = mergedHitObject.Path.CalculatedDistance + distanceToLastControlPoint + hasPath.Path.Distance;
+
+                    // Remove the last control point if it sits exactly on the start of the next control point.
+                    if (Precision.AlmostEquals(distanceToLastControlPoint, 0))
+                    {
+                        mergedHitObject.Path.ControlPoints.RemoveAt(mergedHitObject.Path.ControlPoints.Count - 1);
+                    }
+
+                    mergedHitObject.Path.ControlPoints.AddRange(hasPath.Path.ControlPoints.Select(o => new PathControlPoint(o.Position + offset, o.Type)));
+                    lastCircle = false;
+                }
+                else
+                {
+                    // Turn the last control point into a linear type if this is the first merging circle in a sequence, so the subsequent control points can be inherited path type.
+                    if (!lastCircle)
+                    {
+                        mergedHitObject.Path.ControlPoints.Last().Type = PathType.Linear;
+                    }
+
+                    mergedHitObject.Path.ControlPoints.Add(new PathControlPoint(selectedMergeableObject.Position - mergedHitObject.Position));
+                    mergedHitObject.Path.ExpectedDistance.Value = null;
+                    lastCircle = true;
+                }
+            }
+
+            // Make sure only the merged hit object is in the beatmap.
+            if (firstHitObject is Slider)
+            {
+                foreach (var selectedMergeableObject in selectedMergeableObjects.Skip(1))
+                {
+                    editorBeatmap.Remove(selectedMergeableObject);
+                }
+            }
+            else
+            {
+                foreach (var selectedMergeableObject in selectedMergeableObjects)
+                {
+                    editorBeatmap.Remove(selectedMergeableObject);
+                }
+
+                editorBeatmap.Add(mergedHitObject);
+            }
+
+            // Make sure the merged hitobject is selected.
+            SelectedItems.Clear();
+            SelectedItems.Add(mergedHitObject);
+
+            changeHandler.EndChange();
+        }
+
+        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
+        {
+            foreach (var item in base.GetContextMenuItemsForSelection(selection))
+                yield return item;
+
+            if (selection.Count() > 1 && selection.All(o => o.Item is HitCircle or Slider))
+                yield return new OsuMenuItem("Merge selection", MenuItemType.Destructive, mergeSelection);
+        }
     }
 }
