@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
 using osuTK;
-// using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD.KeysPerSecond
 {
