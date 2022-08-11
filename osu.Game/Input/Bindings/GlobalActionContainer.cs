@@ -17,7 +17,7 @@ namespace osu.Game.Input.Bindings
 
         private InputManager? parentInputManager;
 
-        public GlobalActionContainer(OsuGameBase game)
+        public GlobalActionContainer(OsuGameBase? game)
             : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
             if (game is IKeyBindingHandler<GlobalAction>)
