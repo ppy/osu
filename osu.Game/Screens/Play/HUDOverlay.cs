@@ -50,8 +50,7 @@ namespace osu.Game.Screens.Play
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
-        [Cached]
-        private readonly KeysPerSecondCalculator keysPerSecondCalculator;
+        private KeysPerSecondCalculator keysPerSecondCalculator;
 
         public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
@@ -131,8 +130,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay)
+        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay, KeysPerSecondCalculator calculator)
         {
+            keysPerSecondCalculator = calculator;
+
             if (drawableRuleset != null)
             {
                 BindDrawableRuleset(drawableRuleset);
