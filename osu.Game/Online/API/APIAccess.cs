@@ -195,6 +195,8 @@ namespace osu.Game.Online.API
 
                             setLocalUser(user);
 
+                            //we're connected!
+                            state.Value = APIState.Online;
                             failureCount = 0;
                         };
 
@@ -208,13 +210,7 @@ namespace osu.Game.Online.API
                         var friendsReq = new GetFriendsRequest();
 
                         friendsReq.Failure += _ => failConnectionProcess();
-                        friendsReq.Success += res =>
-                        {
-                            friends.AddRange(res);
-
-                            //we're connected!
-                            state.Value = APIState.Online;
-                        };
+                        friendsReq.Success += res => friends.AddRange(res);
 
                         if (!handleRequest(friendsReq))
                         {
