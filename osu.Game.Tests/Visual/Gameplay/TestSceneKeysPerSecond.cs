@@ -19,7 +19,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD.KPSCounter;
+using osu.Game.Screens.Play.HUD.KeysPerSecond;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay

@@ -20,12 +20,12 @@ using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD.KPSCounter;
+using osu.Game.Screens.Play.HUD.KeysPerSecond;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler, ICanAttachKpsCalculator
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
         public readonly KeyBindingContainer<T> KeyBindingContainer;
@@ -187,15 +187,15 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
-        #region KPS Counter Attachment
+        #region Keys per second Counter Attachment
 
-        public void Attach(KeysPerSecondCalculator kps)
+        public void Attach(KeysPerSecondCalculator calculator)
         {
             var listener = new ActionListener();
 
             KeyBindingContainer.Add(listener);
 
-            kps.Listener = listener;
+            calculator.Listener = listener;
         }
 
         public class ActionListener : KeysPerSecondCalculator.InputListener, IKeyBindingHandler<T>
@@ -257,11 +257,7 @@ namespace osu.Game.Rulesets.UI
     public interface ICanAttachKeyCounter
     {
         void Attach(KeyCounterDisplay keyCounter);
-    }
-
-    public interface ICanAttachKpsCalculator
-    {
-        void Attach(KeysPerSecondCalculator keysPerSecondCalculator);
+        void Attach(KeysPerSecondCalculator calculator);
     }
 
     public class RulesetInputManagerInputState<T> : InputState
