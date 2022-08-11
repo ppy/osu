@@ -200,10 +200,12 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("click confirmation", () =>
             {
                 InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().First());
-                InputManager.Click(MouseButton.Left);
+                InputManager.PressButton(MouseButton.Left);
             });
 
             assertCollectionCount(0);
+
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         [Test]

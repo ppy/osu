@@ -1,10 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,14 +8,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
-using osu.Game.Extensions;
 
 namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboardVideo : CompositeDrawable
     {
         public readonly StoryboardVideo Video;
-        private Video video;
+
+        private Video? drawableVideo;
 
         public override bool RemoveWhenNotAlive => false;
 
@@ -33,7 +29,7 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader(true)]
         private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            string path = beatmap.Value.BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.Equals(Video.Path, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
+            string? path = beatmap.Value.BeatmapSetInfo?.GetPathForFile(Video.Path);
 
             if (path == null)
                 return;
@@ -43,7 +39,7 @@ namespace osu.Game.Storyboards.Drawables
             if (stream == null)
                 return;
 
-            InternalChild = video = new Video(stream, false)
+            InternalChild = drawableVideo = new Video(stream, false)
             {
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fill,
@@ -57,12 +53,12 @@ namespace osu.Game.Storyboards.Drawables
         {
             base.LoadComplete();
 
-            if (video == null) return;
+            if (drawableVideo == null) return;
 
-            using (video.BeginAbsoluteSequence(Video.StartTime))
+            using (drawableVideo.BeginAbsoluteSequence(Video.StartTime))
             {
-                Schedule(() => video.PlaybackPosition = Time.Current - Video.StartTime);
-                video.FadeIn(500);
+                Schedule(() => drawableVideo.PlaybackPosition = Time.Current - Video.StartTime);
+                drawableVideo.FadeIn(500);
             }
         }
     }
