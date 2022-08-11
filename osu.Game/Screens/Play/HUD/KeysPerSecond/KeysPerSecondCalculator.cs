@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.UI;
 
-namespace osu.Game.Screens.Play.HUD.KPSCounter
+namespace osu.Game.Screens.Play.HUD.KeysPerSecond
 {
     public class KeysPerSecondCalculator : Component
     {

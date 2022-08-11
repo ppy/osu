@@ -22,7 +22,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.HUD.KPSCounter;
+using osu.Game.Screens.Play.HUD.KeysPerSecond;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -127,7 +127,6 @@ namespace osu.Game.Screens.Play
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
                 },
-                keysPerSecondCalculator = new KeysPerSecondCalculator()
             };
         }
 
@@ -265,7 +264,7 @@ namespace osu.Game.Screens.Play
         protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
             (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
-            (drawableRuleset as ICanAttachKpsCalculator)?.Attach(keysPerSecondCalculator);
+            (drawableRuleset as ICanAttachKeyCounter)?.Attach(keysPerSecondCalculator);
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
