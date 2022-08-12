@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override IconUsage? Icon => FontAwesome.Solid.Hammer;
 
-        public override double ScoreMultiplier => 1.0;
+        public sealed override double ScoreMultiplier => 0.5;
 
         public override bool RequiresConfiguration => true;
 
