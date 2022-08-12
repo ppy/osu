@@ -27,8 +27,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private PlaylistOverlay playlistOverlay = null!;
 
-        private Live<BeatmapSetInfo> first = null!;
-
         private BeatmapManager beatmapManager = null!;
 
         private const int item_count = 20;
@@ -67,7 +65,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 beatmapManager.Import(TestResources.CreateTestBeatmapSetInfo());
             }
 
-            first = beatmapSets.First().ToLive(Realm);
+            beatmapSets.First().ToLive(Realm);
         });
 
         [Test]
@@ -117,6 +115,68 @@ namespace osu.Game.Tests.Visual.UserInterface
                 () => playlistOverlay.ChildrenOfType<PlaylistItem>()
                                      .Where(item => item.MatchingFilter)
                                      .All(item => item.FilterTerms.Any(term => term.ToString().Contains("10"))));
+
+            AddStep("Import new non-matching beatmap", () =>
+            {
+                var testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo(1);
+                testBeatmapSetInfo.Beatmaps.Single().Metadata.Title = "no guid";
+                beatmapManager.Import(testBeatmapSetInfo);
+            });
+
+            AddStep("Force realm refresh", () => Realm.Run(r => r.Refresh()));
+
+            AddAssert("results filtered correctly",
+                () => playlistOverlay.ChildrenOfType<PlaylistItem>()
+                                     .Where(item => item.MatchingFilter)
+                                     .All(item => item.FilterTerms.Any(term => term.ToString().Contains("10"))));
+        }
+
+        [Test]
+        public void TestCollectionFiltering()
+        {
+            NowPlayingCollectionDropdown collectionDropdown() => playlistOverlay.ChildrenOfType<NowPlayingCollectionDropdown>().Single();
+
+            AddStep("Add collection", () =>
+            {
+                Dependencies.Get<RealmAccess>().Write(r =>
+                {
+                    r.RemoveAll<BeatmapCollection>();
+                    r.Add(new BeatmapCollection("wang"));
+                });
+            });
+
+            AddUntilStep("wait for dropdown to have new collection", () => collectionDropdown().Items.Count() == 2);
+
+            AddStep("Filter to collection", () =>
+            {
+                collectionDropdown().Current.Value = collectionDropdown().Items.Last();
+            });
+
+            AddUntilStep("No items present", () => !playlistOverlay.ChildrenOfType<PlaylistItem>().Any(i => i.MatchingFilter));
+
+            AddStep("Import new non-matching beatmap", () =>
+            {
+                beatmapManager.Import(TestResources.CreateTestBeatmapSetInfo(1));
+            });
+
+            AddStep("Force realm refresh", () => Realm.Run(r => r.Refresh()));
+
+            AddUntilStep("No items matching", () => !playlistOverlay.ChildrenOfType<PlaylistItem>().Any(i => i.MatchingFilter));
+
+            BeatmapSetInfo collectionAddedBeatmapSet = null!;
+
+            AddStep("Import new matching beatmap", () =>
+            {
+                collectionAddedBeatmapSet = TestResources.CreateTestBeatmapSetInfo(1);
+
+                beatmapManager.Import(collectionAddedBeatmapSet);
+                Realm.Write(r => r.All<BeatmapCollection>().First().BeatmapMD5Hashes.Add(collectionAddedBeatmapSet.Beatmaps.First().MD5Hash));
+            });
+
+            AddStep("Force realm refresh", () => Realm.Run(r => r.Refresh()));
+
+            AddUntilStep("Only matching item",
+                () => playlistOverlay.ChildrenOfType<PlaylistItem>().Where(i => i.MatchingFilter).Select(i => i.Model.ID), () => Is.EquivalentTo(new[] { collectionAddedBeatmapSet.ID }));
         }
     }
 }
