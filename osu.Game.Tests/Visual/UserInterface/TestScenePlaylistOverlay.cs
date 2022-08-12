@@ -1,18 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Bindables;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Database;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Music;
+using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
@@ -21,13 +23,27 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestScenePlaylistOverlay : OsuManualInputManagerTestScene
     {
-        private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
+        protected override bool UseFreshStoragePerRun => true;
 
-        private PlaylistOverlay playlistOverlay;
+        private PlaylistOverlay playlistOverlay = null!;
 
-        private Live<BeatmapSetInfo> first;
+        private Live<BeatmapSetInfo> first = null!;
 
-        private const int item_count = 100;
+        private BeatmapManager beatmapManager = null!;
+
+        private const int item_count = 20;
+
+        private List<BeatmapSetInfo> beatmapSets => beatmapManager.GetAllUsableBeatmapSets();
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
+        {
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
+
+            beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+        }
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -46,16 +62,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             };
 
-            beatmapSets.Clear();
-
             for (int i = 0; i < item_count; i++)
             {
-                beatmapSets.Add(TestResources.CreateTestBeatmapSetInfo().ToLiveUnmanaged());
+                beatmapManager.Import(TestResources.CreateTestBeatmapSetInfo());
             }
 
-            first = beatmapSets.First();
-
-            playlistOverlay.BeatmapSets.BindTo(beatmapSets);
+            first = beatmapSets.First().ToLive(Realm);
         });
 
         [Test]
@@ -70,9 +82,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("wait for animations to complete", () => !playlistOverlay.Transforms.Any());
 
+            PlaylistItem firstItem = null!;
+
             AddStep("hold 1st item handle", () =>
             {
-                var handle = this.ChildrenOfType<OsuRearrangeableListItem<Live<BeatmapSetInfo>>.PlaylistItemHandle>().First();
+                firstItem = this.ChildrenOfType<PlaylistItem>().First();
+                var handle = firstItem.ChildrenOfType<PlaylistItem.PlaylistItemHandle>().First();
+
                 InputManager.MoveMouseTo(handle.ScreenSpaceDrawQuad.Centre);
                 InputManager.PressButton(MouseButton.Left);
             });
@@ -83,7 +99,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(item.ScreenSpaceDrawQuad.BottomLeft);
             });
 
-            AddAssert("song 1 is 5th", () => beatmapSets[4].Equals(first));
+            AddAssert("first is moved", () => playlistOverlay.ChildrenOfType<Playlist>().Single().Items.ElementAt(4).Value.Equals(firstItem.Model.Value));
 
             AddStep("release handle", () => InputManager.ReleaseButton(MouseButton.Left));
         }
