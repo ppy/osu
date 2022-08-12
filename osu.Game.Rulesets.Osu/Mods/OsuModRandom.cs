@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            if (!(beatmap is OsuBeatmap osuBeatmap))
+            if (beatmap is not OsuBeatmap osuBeatmap)
                 return;
 
             Seed.Value ??= RNG.Next();
@@ -38,17 +39,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var positionInfos = OsuHitObjectGenerationUtils.GeneratePositionInfos(osuBeatmap.HitObjects);
 
-            float sequenceOffset = 0;
+            // Offsets the angles of all hit objects in a "section" by the same amount.
+            float sectionOffset = 0;
+
+            // Whether the angles are positive or negative (clockwise or counter-clockwise flow).
             bool flowDirection = false;
 
             for (int i = 0; i < positionInfos.Count; i++)
             {
-                if (i == 0 ||
-                    (positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 && positionInfos[i - 1].HitObject.NewCombo && rng.NextDouble() < 0.6) ||
-                    OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject, true) ||
-                    (OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject) && rng.NextDouble() < 0.4))
+                if (shouldStartNewSection(osuBeatmap, positionInfos, i, 0.6f, 0.4f))
                 {
-                    sequenceOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.001f);
+                    sectionOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.001f);
                     flowDirection = !flowDirection;
                 }
 
@@ -59,21 +60,25 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
                 else
                 {
+                    // Offsets only the angle of the current hit object if a flow change occurs.
                     float flowChangeOffset = 0;
+
+                    // Offsets only the angle of the current hit object.
                     float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.002f);
 
-                    if (positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 && positionInfos[i - 1].HitObject.NewCombo && rng.NextDouble() < 0.6)
+                    if (shouldApplyFlowChange(positionInfos, i, 0.6f))
                     {
                         flowChangeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.002f);
                         flowDirection = !flowDirection;
                     }
 
-                    positionInfos[i].RelativeAngle = getRelativeTargetAngle(
-                        positionInfos[i].DistanceFromPrevious,
-                        (sequenceOffset + oneTimeOffset) * positionInfos[i].DistanceFromPrevious +
-                        flowChangeOffset * (playfield_diagonal - positionInfos[i].DistanceFromPrevious),
-                        flowDirection
-                    );
+                    float totalOffset =
+                        // sectionOffset and oneTimeOffset should mainly affect patterns with large spacing.
+                        (sectionOffset + oneTimeOffset) * positionInfos[i].DistanceFromPrevious +
+                        // flowChangeOffset should mainly affect streams.
+                        flowChangeOffset * (playfield_diagonal - positionInfos[i].DistanceFromPrevious);
+
+                    positionInfos[i].RelativeAngle = getRelativeTargetAngle(positionInfos[i].DistanceFromPrevious, totalOffset, flowDirection);
                 }
             }
 
@@ -89,5 +94,34 @@ namespace osu.Game.Rulesets.Osu.Mods
             float relativeAngle = (float)Math.PI - angle;
             return flowDirection ? -relativeAngle : relativeAngle;
         }
+
+        /// <summary>
+        /// A new section should be started...<br/>
+        /// ...at the beginning of the <see cref="OsuBeatmap"/>.<br/>
+        /// ...on every combo start with a probability of <paramref name="newComboProbability"/> (excluding new-combo-spam and 1-2-combos).<br/>
+        /// ...on every downbeat.<br/>
+        /// ...on every beat with a probability of <paramref name="beatProbability"/>.<br/>
+        /// </summary>
+        /// <returns>Whether a new section should be started at the current <see cref="OsuHitObject"/>.</returns>
+        private bool shouldStartNewSection(
+            OsuBeatmap beatmap,
+            IReadOnlyList<OsuHitObjectGenerationUtils.ObjectPositionInfo> positionInfos,
+            int i,
+            float newComboProbability,
+            float beatProbability
+        ) =>
+            i == 0 ||
+            (positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 && positionInfos[i - 1].HitObject.NewCombo && rng?.NextDouble() < newComboProbability) ||
+            OsuHitObjectGenerationUtils.IsHitObjectOnBeat(beatmap, positionInfos[i - 1].HitObject, true) ||
+            (OsuHitObjectGenerationUtils.IsHitObjectOnBeat(beatmap, positionInfos[i - 1].HitObject) && rng?.NextDouble() < beatProbability);
+
+        /// <summary>
+        /// A flow change should occur on every combo start with a probability of <paramref name="probability"/> (excluding new-combo-spam and 1-2-combos).
+        /// </summary>
+        /// <returns>Whether a flow change should be applied at the current <see cref="OsuHitObject"/>.</returns>
+        private bool shouldApplyFlowChange(IReadOnlyList<OsuHitObjectGenerationUtils.ObjectPositionInfo> positionInfos, int i, float probability) =>
+            positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 &&
+            positionInfos[i - 1].HitObject.NewCombo &&
+            rng?.NextDouble() < probability;
     }
 }
