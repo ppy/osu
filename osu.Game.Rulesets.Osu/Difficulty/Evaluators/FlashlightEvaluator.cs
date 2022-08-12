@@ -18,11 +18,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double min_velocity = 0.5;
         private const double slider_multiplier = 1.3;
 
+        private const double min_grid_multiplier = 0.35;
+
         /// <summary>
         /// Evaluates the difficulty of memorising and hitting an object, based on:
         /// <list type="bullet">
         /// <item><description>distance between a number of previous objects and the current object,</description></item>
         /// <item><description>the visual opacity of the current object,</description></item>
+        /// <item><description>the angle made by the current object,</description></item>
         /// <item><description>length and speed of the current object (for sliders),</description></item>
         /// <item><description>and whether the hidden mod is enabled.</description></item>
         /// </list>
@@ -76,6 +79,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Additional bonus for Hidden due to there being no approach circles.
             if (hidden)
                 result *= 1.0 + hidden_bonus;
+
+            // Nerf patterns with angles that are commonly used in grid maps.
+            // 0 deg, 60 deg, 120 deg and 180 deg are commonly used in hexgrid maps.
+            // 0 deg, 45 deg, 90 deg, 135 deg and 180 deg are commonly used in squaregrid maps.
+            if (osuCurrent.Angle != null) {
+                double hexgrid_multiplier = 1.0 - Math.Pow(Math.Cos((180 / 60.0) * (double)(osuCurrent.Angle)), 20.0);
+                double squaregrid_multiplier = 1.0 - Math.Pow(Math.Cos((180 / 45.0) * (double)(osuCurrent.Angle)), 20.0);
+                result *= (1.0 - min_grid_multiplier) * hexgrid_multiplier * squaregrid_multiplier + min_grid_multiplier;
+            }
 
             double sliderBonus = 0.0;
 
