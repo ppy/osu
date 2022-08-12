@@ -46,9 +46,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (i == 0 ||
                     (positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 && positionInfos[i - 1].HitObject.NewCombo && rng.NextDouble() < 0.6) ||
                     OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject, true) ||
-                    (OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject) && rng.NextDouble() < 0.3))
+                    (OsuHitObjectGenerationUtils.IsHitObjectOnBeat(osuBeatmap, positionInfos[i - 1].HitObject) && rng.NextDouble() < 0.4))
                 {
-                    sequenceOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.0012f);
+                    sequenceOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.001f);
                     flowDirection = !flowDirection;
                 }
 
