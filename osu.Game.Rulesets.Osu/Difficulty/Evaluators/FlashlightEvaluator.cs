@@ -83,7 +83,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Nerf patterns with angles that are commonly used in grid maps.
             // 0 deg, 60 deg, 120 deg and 180 deg are commonly used in hexgrid maps.
             // 0 deg, 45 deg, 90 deg, 135 deg and 180 deg are commonly used in squaregrid maps.
-            if (osuCurrent.Angle != null) {
+            if (osuCurrent.Angle != null)
+            {
                 double hexgrid_multiplier = 1.0 - Math.Pow(Math.Cos((180 / 60.0) * (double)(osuCurrent.Angle)), 20.0);
                 double squaregrid_multiplier = 1.0 - Math.Pow(Math.Cos((180 / 45.0) * (double)(osuCurrent.Angle)), 20.0);
                 result *= (1.0 - min_grid_multiplier) * hexgrid_multiplier * squaregrid_multiplier + min_grid_multiplier;
