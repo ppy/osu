@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 if (shouldStartNewSection(osuBeatmap, positionInfos, i, 0.6f, 0.4f))
                 {
-                    sectionOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.001f);
+                    sectionOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.0008f);
                     flowDirection = !flowDirection;
                 }
 
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="flowDirection">Whether the relative angle should be positive or negative.</param>
         private static float getRelativeTargetAngle(float targetDistance, float offset, bool flowDirection)
         {
-            float angle = (float)(2.16 / (1 + 200 * Math.Exp(0.036 * (targetDistance - 320))) + 0.5 + offset);
+            float angle = (float)(2.16 / (1 + 200 * Math.Exp(0.036 * (targetDistance - 310))) + 0.5 + offset);
             float relativeAngle = (float)Math.PI - angle;
             return flowDirection ? -relativeAngle : relativeAngle;
         }
