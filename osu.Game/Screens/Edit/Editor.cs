@@ -18,6 +18,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -31,10 +32,11 @@ using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Resources.Localisation.Web;
+using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -50,6 +52,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK.Graphics;
 using osuTK.Input;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Edit
 {
@@ -168,6 +171,9 @@ namespace osu.Game.Screens.Edit
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+        [Resolved(canBeNull: true)]
+        private OnScreenDisplay onScreenDisplay { get; set; }
 
         public Editor(EditorLoader loader = null)
         {
@@ -323,6 +329,9 @@ namespace osu.Game.Screens.Edit
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
         }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -330,12 +339,18 @@ namespace osu.Game.Screens.Edit
 
             Mode.Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
             Mode.BindValueChanged(onModeChanged, true);
+
+            musicController.TrackChanged += onTrackChanged;
         }
 
-        /// <summary>
-        /// If the beatmap's track has changed, this method must be called to keep the editor in a valid state.
-        /// </summary>
-        public void UpdateClockSource() => clock.ChangeSource(Beatmap.Value.Track);
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            musicController.TrackChanged -= onTrackChanged;
+        }
+
+        private void onTrackChanged(WorkingBeatmap working, TrackChangeDirection direction) => clock.ChangeSource(working.Track);
 
         /// <summary>
         /// Creates an <see cref="EditorState"/> instance representing the current state of the editor.
@@ -405,6 +420,7 @@ namespace osu.Game.Screens.Edit
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
             updateLastSavedHash();
+            onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.BeatmapSaved, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
             return true;
         }
 
@@ -934,5 +950,13 @@ namespace osu.Game.Screens.Edit
         ControlPointInfo IBeatSyncProvider.ControlPoints => editorBeatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => clock;
         ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
+
+        private class BeatmapEditorToast : Toast
+        {
+            public BeatmapEditorToast(LocalisableString value, string beatmapDisplayName)
+                : base(InputSettingsStrings.EditorSection, value, beatmapDisplayName)
+            {
+            }
+        }
     }
 }

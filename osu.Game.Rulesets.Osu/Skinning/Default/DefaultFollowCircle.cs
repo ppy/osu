@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK.Graphics;
 
@@ -30,21 +30,42 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             };
         }
 
-        protected override void OnTrackingChanged(ValueChangedEvent<bool> tracking)
+        protected override void OnSliderPress()
         {
-            const float scale_duration = 300f;
-            const float fade_duration = 300f;
+            const float duration = 300f;
 
-            this.ScaleTo(tracking.NewValue ? DrawableSliderBall.FOLLOW_AREA : 1f, scale_duration, Easing.OutQuint)
-                .FadeTo(tracking.NewValue ? 1f : 0, fade_duration, Easing.OutQuint);
+            if (Precision.AlmostEquals(0, Alpha))
+                this.ScaleTo(1);
+
+            this.ScaleTo(DrawableSliderBall.FOLLOW_AREA, duration, Easing.OutQuint)
+                .FadeIn(duration, Easing.OutQuint);
+        }
+
+        protected override void OnSliderRelease()
+        {
+            const float duration = 150;
+
+            this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 1.2f, duration, Easing.OutQuint)
+                .FadeTo(0, duration, Easing.OutQuint);
         }
 
         protected override void OnSliderEnd()
         {
-            const float fade_duration = 450f;
+            const float duration = 300;
 
-            // intentionally pile on an extra FadeOut to make it happen much faster
-            this.FadeOut(fade_duration / 4, Easing.Out);
+            this.ScaleTo(1, duration, Easing.OutQuint)
+                .FadeOut(duration / 2, Easing.OutQuint);
+        }
+
+        protected override void OnSliderTick()
+        {
+            this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 1.08f, 40, Easing.OutQuint)
+                .Then()
+                .ScaleTo(DrawableSliderBall.FOLLOW_AREA, 200f, Easing.OutQuint);
+        }
+
+        protected override void OnSliderBreak()
+        {
         }
     }
 }

@@ -12,14 +12,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Mods.Input;
@@ -29,10 +25,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModColumn : CompositeDrawable
+    public class ModColumn : ModSelectColumn
     {
-        public readonly Container TopLevelContent;
-
         public readonly ModType ModType;
 
         private IReadOnlyList<ModState> availableMods = Array.Empty<ModState>();
@@ -62,25 +56,11 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        /// <summary>
-        /// Determines whether this column should accept user input.
-        /// </summary>
-        public Bindable<bool> Active = new BindableBool(true);
-
-        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && Active.Value;
-
         protected virtual ModPanel CreateModPanel(ModState mod) => new ModPanel(mod);
 
         private readonly bool allowIncompatibleSelection;
 
-        private readonly TextFlowContainer headerText;
-        private readonly Box headerBackground;
-        private readonly Container contentContainer;
-        private readonly Box contentBackground;
-        private readonly FillFlowContainer<ModPanel> panelFlow;
         private readonly ToggleAllCheckbox? toggleAllCheckbox;
-
-        private Colour4 accentColour;
 
         private Bindable<ModSelectHotkeyStyle> hotkeyStyle = null!;
         private IModHotkeyHandler hotkeyHandler = null!;
@@ -88,123 +68,17 @@ namespace osu.Game.Overlays.Mods
         private Task? latestLoadTask;
         internal bool ItemsLoaded => latestLoadTask == null;
 
-        private const float header_height = 42;
-
         public ModColumn(ModType modType, bool allowIncompatibleSelection)
         {
             ModType = modType;
             this.allowIncompatibleSelection = allowIncompatibleSelection;
 
-            Width = 320;
-            RelativeSizeAxes = Axes.Y;
-            Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
-
-            Container controlContainer;
-            InternalChildren = new Drawable[]
-            {
-                TopLevelContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    CornerRadius = ModPanel.CORNER_RADIUS,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = header_height + ModPanel.CORNER_RADIUS,
-                            Children = new Drawable[]
-                            {
-                                headerBackground = new Box
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = header_height + ModPanel.CORNER_RADIUS
-                                },
-                                headerText = new OsuTextFlowContainer(t =>
-                                {
-                                    t.Font = OsuFont.TorusAlternate.With(size: 17);
-                                    t.Shadow = false;
-                                    t.Colour = Colour4.Black;
-                                })
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
-                                    Padding = new MarginPadding
-                                    {
-                                        Horizontal = 17,
-                                        Bottom = ModPanel.CORNER_RADIUS
-                                    }
-                                }
-                            }
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = header_height },
-                            Child = contentContainer = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Masking = true,
-                                CornerRadius = ModPanel.CORNER_RADIUS,
-                                BorderThickness = 3,
-                                Children = new Drawable[]
-                                {
-                                    contentBackground = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both
-                                    },
-                                    new GridContainer
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        RowDimensions = new[]
-                                        {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                            new Dimension()
-                                        },
-                                        Content = new[]
-                                        {
-                                            new Drawable[]
-                                            {
-                                                controlContainer = new Container
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    Padding = new MarginPadding { Horizontal = 14 }
-                                                }
-                                            },
-                                            new Drawable[]
-                                            {
-                                                new OsuScrollContainer(Direction.Vertical)
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    ClampExtension = 100,
-                                                    ScrollbarOverlapsContent = false,
-                                                    Child = panelFlow = new FillFlowContainer<ModPanel>
-                                                    {
-                                                        RelativeSizeAxes = Axes.X,
-                                                        AutoSizeAxes = Axes.Y,
-                                                        Spacing = new Vector2(0, 7),
-                                                        Padding = new MarginPadding(7)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            createHeaderText();
+            HeaderText = ModType.Humanize(LetterCasing.Title);
 
             if (allowIncompatibleSelection)
             {
-                controlContainer.Height = 35;
-                controlContainer.Add(toggleAllCheckbox = new ToggleAllCheckbox(this)
+                ControlContainer.Height = 35;
+                ControlContainer.Add(toggleAllCheckbox = new ToggleAllCheckbox(this)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -212,7 +86,7 @@ namespace osu.Game.Overlays.Mods
                     RelativeSizeAxes = Axes.X,
                     Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)
                 });
-                panelFlow.Padding = new MarginPadding
+                ItemsFlow.Padding = new MarginPadding
                 {
                     Top = 0,
                     Bottom = 7,
@@ -221,32 +95,16 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private void createHeaderText()
-        {
-            IEnumerable<string> headerTextWords = ModType.Humanize(LetterCasing.Title).Split(' ');
-
-            if (headerTextWords.Count() > 1)
-            {
-                headerText.AddText($"{headerTextWords.First()} ", t => t.Font = t.Font.With(weight: FontWeight.SemiBold));
-                headerTextWords = headerTextWords.Skip(1);
-            }
-
-            headerText.AddText(string.Join(' ', headerTextWords));
-        }
-
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours, OsuConfigManager configManager)
+        private void load(OsuColour colours, OsuConfigManager configManager)
         {
-            headerBackground.Colour = accentColour = colours.ForModType(ModType);
+            AccentColour = colours.ForModType(ModType);
 
             if (toggleAllCheckbox != null)
             {
-                toggleAllCheckbox.AccentColour = accentColour;
-                toggleAllCheckbox.AccentHoverColour = accentColour.Lighten(0.3f);
+                toggleAllCheckbox.AccentColour = AccentColour;
+                toggleAllCheckbox.AccentHoverColour = AccentColour.Lighten(0.3f);
             }
-
-            contentContainer.BorderColour = ColourInfo.GradientVertical(colourProvider.Background4, colourProvider.Background3);
-            contentBackground.Colour = colourProvider.Background4;
 
             hotkeyStyle = configManager.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle);
         }
@@ -278,7 +136,7 @@ namespace osu.Game.Overlays.Mods
 
             latestLoadTask = loadTask = LoadComponentsAsync(panels, loaded =>
             {
-                panelFlow.ChildrenEnumerable = loaded;
+                ItemsFlow.ChildrenEnumerable = loaded;
                 updateState();
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
             loadTask.ContinueWith(_ =>

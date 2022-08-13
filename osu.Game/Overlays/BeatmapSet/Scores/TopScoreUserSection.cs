@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 Size = new Vector2(19, 14),
                                 Margin = new MarginPadding { Top = 3 }, // makes spacing look more even
-                                ShowPlaceholderOnNull = false,
+                                ShowPlaceholderOnUnknown = false,
                             },
                         }
                     }
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             set
             {
                 avatar.User = value.User;
-                flag.Country = value.User.Country;
+                flag.CountryCode = value.User.CountryCode;
                 achievedOn.Date = value.Date;
 
                 usernameText.Clear();

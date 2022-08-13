@@ -1,161 +1,76 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
-using osu.Framework.Timing;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneSongProgress : OsuTestScene
+    public class TestSceneSongProgress : SkinnableHUDComponentTestScene
     {
-        private SongProgress progress;
-        private TestSongProgressGraph graph;
-        private readonly Container progressContainer;
+        private GameplayClockContainer gameplayClockContainer = null!;
 
-        private readonly StopwatchClock clock;
-        private readonly FramedClock framedClock;
+        private const double skip_target_time = -2000;
 
-        [Cached]
-        private readonly GameplayClock gameplayClock;
-
-        public TestSceneSongProgress()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            clock = new StopwatchClock();
-            gameplayClock = new GameplayClock(framedClock = new FramedClock(clock));
+            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
-            Add(progressContainer = new Container
-            {
-                RelativeSizeAxes = Axes.X,
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-                Height = 100,
-                Y = -100,
-                Child = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(1),
-                }
-            });
+            Add(gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time));
+
+            Dependencies.CacheAs(gameplayClockContainer.GameplayClock);
         }
 
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("add new song progress", () =>
-            {
-                if (progress != null)
-                {
-                    progress.Expire();
-                    progress = null;
-                }
-
-                progressContainer.Add(progress = new SongProgress
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                });
-            });
-
-            AddStep("add new big graph", () =>
-            {
-                if (graph != null)
-                {
-                    graph.Expire();
-                    graph = null;
-                }
-
-                Add(graph = new TestSongProgressGraph
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 200,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                });
-            });
-
-            AddStep("reset clock", clock.Reset);
-        }
-
-        [Test]
-        public void TestGraphRecreation()
-        {
-            AddAssert("ensure not created", () => graph.CreationCount == 0);
-            AddStep("display values", displayRandomValues);
-            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
-            AddRepeatStep("new values", displayRandomValues, 5);
-            AddWaitStep("wait some", 5);
-            AddAssert("ensure recreation debounced", () => graph.CreationCount == 2);
+            AddStep("reset clock", () => gameplayClockContainer.Reset());
+            AddStep("set hit objects", setHitObjects);
         }
 
         [Test]
         public void TestDisplay()
         {
-            AddStep("display max values", displayMaxValues);
-            AddUntilStep("wait for graph", () => graph.CreationCount == 1);
-            AddStep("start", clock.Start);
-            AddStep("allow seeking", () => progress.AllowSeeking.Value = true);
-            AddStep("hide graph", () => progress.ShowGraph.Value = false);
-            AddStep("disallow seeking", () => progress.AllowSeeking.Value = false);
-            AddStep("allow seeking", () => progress.AllowSeeking.Value = true);
-            AddStep("show graph", () => progress.ShowGraph.Value = true);
-            AddStep("stop", clock.Stop);
+            AddStep("seek to intro", () => gameplayClockContainer.Seek(skip_target_time));
+            AddStep("start", gameplayClockContainer.Start);
+            AddStep("stop", gameplayClockContainer.Stop);
         }
 
-        private void displayRandomValues()
+        [Test]
+        public void TestToggleSeeking()
         {
-            var objects = new List<HitObject>();
-            for (double i = 0; i < 5000; i += RNG.NextDouble() * 10 + i / 1000)
-                objects.Add(new HitObject { StartTime = i });
+            DefaultSongProgress getDefaultProgress() => this.ChildrenOfType<DefaultSongProgress>().Single();
 
-            replaceObjects(objects);
+            AddStep("allow seeking", () => getDefaultProgress().AllowSeeking.Value = true);
+            AddStep("hide graph", () => getDefaultProgress().ShowGraph.Value = false);
+            AddStep("disallow seeking", () => getDefaultProgress().AllowSeeking.Value = false);
+            AddStep("allow seeking", () => getDefaultProgress().AllowSeeking.Value = true);
+            AddStep("show graph", () => getDefaultProgress().ShowGraph.Value = true);
         }
 
-        private void displayMaxValues()
+        private void setHitObjects()
         {
             var objects = new List<HitObject>();
             for (double i = 0; i < 5000; i++)
                 objects.Add(new HitObject { StartTime = i });
 
-            replaceObjects(objects);
+            this.ChildrenOfType<SongProgress>().ForEach(progress => progress.Objects = objects);
         }
 
-        private void replaceObjects(List<HitObject> objects)
-        {
-            progress.Objects = objects;
-            graph.Objects = objects;
+        protected override Drawable CreateDefaultImplementation() => new DefaultSongProgress();
 
-            progress.RequestSeek = pos => clock.Seek(pos);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            framedClock.ProcessFrame();
-        }
-
-        private class TestSongProgressGraph : SongProgressGraph
-        {
-            public int CreationCount { get; private set; }
-
-            protected override void RecreateGraph()
-            {
-                base.RecreateGraph();
-                CreationCount++;
-            }
-        }
+        protected override Drawable CreateLegacyImplementation() => new LegacySongProgress();
     }
 }
