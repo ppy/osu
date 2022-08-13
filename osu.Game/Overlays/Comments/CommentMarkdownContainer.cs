@@ -18,8 +18,10 @@ namespace osu.Game.Overlays.Comments
 
         private class CommentMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
         {
-            // Don't render image in comment for now
-            protected override void AddImage(LinkInline linkInline) { }
+            protected override void AddImage(LinkInline linkInline)
+            {
+                AddDrawable(new OsuMarkdownImage(linkInline));
+            }
         }
 
         private class CommentMarkdownHeading : OsuMarkdownHeading
