@@ -20,6 +20,11 @@ namespace osu.Game.Rulesets.Osu.Utils
         private const int preceding_hitobjects_to_shift = 10;
 
         /// <summary>
+        /// How far should the algorithm backtrack when an object goes out of bounds.
+        /// </summary>
+        private const int backtrack_count = 1;
+
+        /// <summary>
         /// How far an object has to be out of bounds before it gets rotated towards playfield center.
         /// </summary>
         private const double out_of_bounds_tolerance = 10;
@@ -120,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                         rotateAwayFromEdge = true;
                         // the rotation algorithm is deterministic, so there is no reason to backtrack beyond objects
                         // that have been rotated already
-                        i = Math.Max(furthestIndexWithRotation, i - preceding_hitobjects_to_shift);
+                        i = Math.Max(furthestIndexWithRotation, i - backtrack_count);
                         continue;
                     }
 
