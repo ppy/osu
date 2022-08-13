@@ -80,13 +80,30 @@ namespace osu.Game.Screens.Play.HUD.KeysPerSecond
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
                         },
-                        new OsuSpriteText
+                        new FillFlowContainer
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.Numeric.With(size: 8, fixedWidth: true),
-                            Text = @"KPS",
-                            Padding = new MarginPadding { Bottom = 1.5f }, // align baseline better
+                            Direction = FillDirection.Vertical,
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Font = OsuFont.Numeric.With(size: 6, fixedWidth: false),
+                                    Text = @"clicks",
+                                },
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Font = OsuFont.Numeric.With(size: 6, fixedWidth: false),
+                                    Text = @"/sec",
+                                    Padding = new MarginPadding { Bottom = 3f }, // align baseline better
+                                }
+                            }
                         }
                     }
                 };
