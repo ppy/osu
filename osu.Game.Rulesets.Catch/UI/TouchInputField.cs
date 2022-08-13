@@ -146,13 +146,6 @@ namespace osu.Game.Rulesets.Catch.UI
             base.OnTouchUp(e);
         }
 
-        private CatchAction removeDashFromAction(TouchCatchAction touchCatchAction)
-        {
-            if (touchCatchAction == TouchCatchAction.DashLeft || touchCatchAction == TouchCatchAction.MoveLeft)
-                return CatchAction.MoveLeft;
-            return CatchAction.MoveRight;
-        }
-
         private void calculateActiveKeys()
         {
             if (trackedActions.ContainsValue(TouchCatchAction.DashLeft) || trackedActions.ContainsValue(TouchCatchAction.MoveLeft))
