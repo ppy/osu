@@ -395,7 +395,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 Columns = new[]
                 {
-                    new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                    new StatisticItem(null, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                     {
                         new AverageHitError(score.HitEvents),
                         new UnstableRate(score.HitEvents)
