@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Scoring;
 using System;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Catch.Edit;
 using osu.Game.Rulesets.Catch.Skinning.Legacy;
 using osu.Game.Rulesets.Edit;
@@ -162,7 +163,7 @@ namespace osu.Game.Rulesets.Catch
             };
         }
 
-        public override string GetDisplayNameForHitResult(HitResult result)
+        public override LocalisableString GetDisplayNameForHitResult(HitResult result)
         {
             switch (result)
             {
