@@ -1,11 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using MessagePack;
 using Newtonsoft.Json;
@@ -23,7 +20,7 @@ namespace osu.Game.Online.API
     {
         [JsonProperty("acronym")]
         [Key(0)]
-        public string Acronym { get; set; }
+        public string Acronym { get; set; } = string.Empty;
 
         [JsonProperty("settings")]
         [Key(1)]
@@ -49,7 +46,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        public Mod ToMod([NotNull] Ruleset ruleset)
+        public Mod ToMod(Ruleset ruleset)
         {
             Mod resultMod = ruleset.CreateModFromAcronym(Acronym);
 
@@ -79,6 +76,8 @@ namespace osu.Game.Online.API
 
             return resultMod;
         }
+
+        public bool ShouldSerializeSettings() => Settings.Count > 0;
 
         public bool Equals(APIMod other)
         {

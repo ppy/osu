@@ -78,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private IBeatmapInfo beatmap;
         private IRulesetInfo ruleset;
-        private Mod[] requiredMods;
+        private Mod[] requiredMods = Array.Empty<Mod>();
 
         private Container maskingContainer;
         private Container difficultyIconContainer;
@@ -139,7 +139,8 @@ namespace osu.Game.Screens.OnlinePlay
             ruleset = rulesets.GetRuleset(Item.RulesetID);
             var rulesetInstance = ruleset?.CreateInstance();
 
-            requiredMods = Item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+            if (rulesetInstance != null)
+                requiredMods = Item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
         }
 
         protected override void LoadComplete()
