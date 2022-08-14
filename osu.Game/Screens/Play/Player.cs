@@ -34,7 +34,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Screens.Play.HUD.KeysPerSecond;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -122,8 +121,6 @@ namespace osu.Game.Screens.Play
 
         private SkipOverlay skipIntroOverlay;
         private SkipOverlay skipOutroOverlay;
-
-        protected KeysPerSecondCalculator KeysPerSecondCalculator { get; private set; }
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
@@ -228,9 +225,6 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(ScoreProcessor);
-
-            KeysPerSecondCalculator = new KeysPerSecondCalculator();
-            dependencies.CacheAs(KeysPerSecondCalculator);
 
             HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor.ApplyBeatmap(playableBeatmap);
@@ -448,7 +442,6 @@ namespace osu.Game.Screens.Play
                         OnRetry = Restart,
                         OnQuit = () => PerformExit(true),
                     },
-                    KeysPerSecondCalculator
                 },
             };
 

@@ -50,8 +50,8 @@ namespace osu.Game.Screens.Play
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
-        [Resolved(canBeNull: true)]
-        private KeysPerSecondCalculator keysPerSecondCalculator { get; set; }
+        [Cached]
+        private readonly KeysPerSecondCalculator keysPerSecondCalculator;
 
         public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
@@ -127,6 +127,7 @@ namespace osu.Game.Screens.Play
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
                 },
+                keysPerSecondCalculator = new KeysPerSecondCalculator()
             };
         }
 
