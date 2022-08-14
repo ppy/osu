@@ -20,7 +20,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD.KeysPerSecond;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.UI
 
         #region Keys per second Counter Attachment
 
-        public void Attach(KeysPerSecondCalculator calculator)
+        public void Attach(ClicksPerSecondCalculator calculator)
         {
             if (calculator == null) return;
 
@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.UI
             calculator.Listener = listener;
         }
 
-        public class ActionListener : KeysPerSecondCalculator.InputListener, IKeyBindingHandler<T>
+        public class ActionListener : ClicksPerSecondCalculator.InputListener, IKeyBindingHandler<T>
         {
             public bool OnPressed(KeyBindingPressEvent<T> e)
             {
@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            public ActionListener(KeysPerSecondCalculator calculator)
+            public ActionListener(ClicksPerSecondCalculator calculator)
                 : base(calculator)
             {
             }
@@ -262,7 +262,7 @@ namespace osu.Game.Rulesets.UI
     public interface ICanAttachKeyCounter
     {
         void Attach(KeyCounterDisplay keyCounter);
-        void Attach(KeysPerSecondCalculator calculator);
+        void Attach(ClicksPerSecondCalculator calculator);
     }
 
     public class RulesetInputManagerInputState<T> : InputState

@@ -22,7 +22,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.HUD.KeysPerSecond;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         [Cached]
-        private readonly KeysPerSecondCalculator keysPerSecondCalculator;
+        private readonly ClicksPerSecondCalculator clicksPerSecondCalculator;
 
         public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Play
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
                 },
-                keysPerSecondCalculator = new KeysPerSecondCalculator()
+                clicksPerSecondCalculator = new ClicksPerSecondCalculator()
             };
         }
 
@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Play
         protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
             (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
-            (drawableRuleset as ICanAttachKeyCounter)?.Attach(keysPerSecondCalculator);
+            (drawableRuleset as ICanAttachKeyCounter)?.Attach(clicksPerSecondCalculator);
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
