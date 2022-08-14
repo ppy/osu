@@ -13,27 +13,27 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Screens.Play.HUD.KeysPerSecond
+namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
-    public class KeysPerSecondCounter : RollingCounter<int>, ISkinnableDrawable
+    public class ClicksPerSecondCounter : RollingCounter<int>, ISkinnableDrawable
     {
         private const float alpha_when_invalid = 0.3f;
 
         private readonly Bindable<bool> valid = new Bindable<bool>();
 
-        private KeysPerSecondCalculator? calculator;
+        private ClicksPerSecondCalculator? calculator;
 
         protected override double RollingDuration => 350;
 
         public bool UsesFixedAnchor { get; set; }
 
-        public KeysPerSecondCounter()
+        public ClicksPerSecondCounter()
         {
             Current.Value = 0;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, KeysPerSecondCalculator calculator)
+        private void load(OsuColour colours, ClicksPerSecondCalculator calculator)
         {
             this.calculator = calculator;
             Colour = colours.BlueLighter;

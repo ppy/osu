@@ -9,9 +9,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.UI;
 
-namespace osu.Game.Screens.Play.HUD.KeysPerSecond
+namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
-    public class KeysPerSecondCalculator : Component
+    public class ClicksPerSecondCalculator : Component
     {
         private readonly List<double> timestamps;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play.HUD.KeysPerSecond
         public bool Ready => workingClock != null && gameplayClock != null && listener != null;
         public int Value => timestamps.Count(isTimestampWithinSpan);
 
-        public KeysPerSecondCalculator()
+        public ClicksPerSecondCalculator()
         {
             RelativeSizeAxes = Axes.Both;
             timestamps = new List<double>();
@@ -91,9 +91,9 @@ namespace osu.Game.Screens.Play.HUD.KeysPerSecond
 
         public abstract class InputListener : Component
         {
-            protected KeysPerSecondCalculator Calculator;
+            protected ClicksPerSecondCalculator Calculator;
 
-            protected InputListener(KeysPerSecondCalculator calculator)
+            protected InputListener(ClicksPerSecondCalculator calculator)
             {
                 RelativeSizeAxes = Axes.Both;
                 Depth = float.MinValue;

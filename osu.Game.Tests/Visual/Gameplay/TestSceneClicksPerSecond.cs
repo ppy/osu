@@ -19,16 +19,16 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD.KeysPerSecond;
+using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneKeysPerSecond : OsuTestScene
+    public class TestSceneClicksPerSecond : OsuTestScene
     {
         private DependencyProvidingContainer? dependencyContainer;
         private MockFrameStableClock? mainClock;
-        private KeysPerSecondCalculator? calculator;
+        private ClicksPerSecondCalculator? calculator;
         private ManualInputListener? listener;
 
         [SetUpSteps]
@@ -61,12 +61,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 dependencyContainer!.Children = new Drawable[]
                 {
-                    calculator = new KeysPerSecondCalculator(),
+                    calculator = new ClicksPerSecondCalculator(),
                     new DependencyProvidingContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        CachedDependencies = new (Type, object)[] { (typeof(KeysPerSecondCalculator), calculator) },
-                        Child = new KeysPerSecondCounter // For visual debugging, has no real purpose in the tests
+                        CachedDependencies = new (Type, object)[] { (typeof(ClicksPerSecondCalculator), calculator) },
+                        Child = new ClicksPerSecondCounter // For visual debugging, has no real purpose in the tests
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -204,11 +204,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         #region Mock classes
 
-        private class ManualInputListener : KeysPerSecondCalculator.InputListener
+        private class ManualInputListener : ClicksPerSecondCalculator.InputListener
         {
             public void AddInput() => Calculator.AddTimestamp();
 
-            public ManualInputListener(KeysPerSecondCalculator calculator)
+            public ManualInputListener(ClicksPerSecondCalculator calculator)
                 : base(calculator)
             {
             }
