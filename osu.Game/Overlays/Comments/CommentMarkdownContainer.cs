@@ -4,7 +4,6 @@
 #nullable disable
 
 using Markdig.Syntax;
-using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Game.Graphics.Containers.Markdown;
 
@@ -12,17 +11,9 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentMarkdownContainer : OsuMarkdownContainer
     {
-        public override MarkdownTextFlowContainer CreateTextFlow() => new CommentMarkdownTextFlowContainer();
+        public override MarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
 
         protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new CommentMarkdownHeading(headingBlock);
-
-        private class CommentMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
-        {
-            protected override void AddImage(LinkInline linkInline)
-            {
-                AddDrawable(new OsuMarkdownImage(linkInline));
-            }
-        }
 
         private class CommentMarkdownHeading : OsuMarkdownHeading
         {
