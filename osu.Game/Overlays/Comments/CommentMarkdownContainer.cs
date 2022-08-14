@@ -11,8 +11,6 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentMarkdownContainer : OsuMarkdownContainer
     {
-        public override MarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
-
         protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new CommentMarkdownHeading(headingBlock);
 
         private class CommentMarkdownHeading : OsuMarkdownHeading
