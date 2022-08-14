@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Mods
         {
             if (AllowCustomisation)
             {
-                yield return customisationButton = new ShearedToggleButton(BUTTON_WIDTH)
+                yield return CustomisationButton = new ShearedToggleButton(BUTTON_WIDTH)
                 {
                     Text = ModSelectOverlayStrings.ModCustomisation,
                     Active = { BindTarget = customisationVisible }
@@ -107,11 +107,11 @@ namespace osu.Game.Overlays.Mods
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
-        private ShearedButton backButton = null!;
 
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
-        private ShearedToggleButton? customisationButton;
+        protected ShearedButton BackButton { get; private set; } = null!;
+        protected ShearedToggleButton? CustomisationButton { get; private set; }
 
         private Sample? columnAppearSample;
 
@@ -214,7 +214,7 @@ namespace osu.Game.Overlays.Mods
                     Horizontal = 70
                 },
                 Spacing = new Vector2(10),
-                ChildrenEnumerable = CreateFooterButtons().Prepend(backButton = new ShearedButton(BUTTON_WIDTH)
+                ChildrenEnumerable = CreateFooterButtons().Prepend(BackButton = new ShearedButton(BUTTON_WIDTH)
                 {
                     Text = CommonStrings.Back,
                     Action = Hide,
@@ -358,7 +358,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
         {
-            if (customisationButton == null)
+            if (CustomisationButton == null)
                 return;
 
             bool anyCustomisableMod = false;
@@ -394,7 +394,7 @@ namespace osu.Game.Overlays.Mods
 
             foreach (var button in footerButtonFlow)
             {
-                if (button != customisationButton)
+                if (button != CustomisationButton)
                     button.Enabled.Value = !customisationVisible.Value;
             }
 
@@ -587,14 +587,14 @@ namespace osu.Game.Overlays.Mods
             {
                 if (customisationVisible.Value)
                 {
-                    Debug.Assert(customisationButton != null);
-                    customisationButton.TriggerClick();
+                    Debug.Assert(CustomisationButton != null);
+                    CustomisationButton.TriggerClick();
 
                     if (!immediate)
                         return;
                 }
 
-                backButton.TriggerClick();
+                BackButton.TriggerClick();
             }
         }
 

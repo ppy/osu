@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -29,10 +28,18 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneModSelectOverlay : OsuManualInputManagerTestScene
     {
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; }
+        protected override bool UseFreshStoragePerRun => true;
 
-        private UserModSelectOverlay modSelectOverlay;
+        private RulesetStore rulesetStore = null!;
+
+        private TestModSelectOverlay modSelectOverlay = null!;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
+            Dependencies.Cache(Realm);
+        }
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -44,7 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void createScreen()
         {
-            AddStep("create screen", () => Child = modSelectOverlay = new UserModSelectOverlay
+            AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
@@ -137,7 +144,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("any column dimmed", () => this.ChildrenOfType<ModColumn>().Any(column => !column.Active.Value));
 
-            ModSelectColumn lastColumn = null;
+            ModSelectColumn lastColumn = null!;
 
             AddAssert("last column dimmed", () => !this.ChildrenOfType<ModColumn>().Last().Active.Value);
             AddStep("request scroll to last column", () =>
@@ -170,7 +177,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("dismiss mod customisation via toggle", () =>
             {
-                InputManager.MoveMouseTo(modSelectOverlay.ChildrenOfType<ShearedToggleButton>().Single());
+                InputManager.MoveMouseTo(modSelectOverlay.CustomisationButton);
                 InputManager.Click(MouseButton.Left);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -224,8 +231,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestSettingsNotCrossPolluting()
         {
-            Bindable<IReadOnlyList<Mod>> selectedMods2 = null;
-            ModSelectOverlay modSelectOverlay2 = null;
+            Bindable<IReadOnlyList<Mod>> selectedMods2 = null!;
+            ModSelectOverlay modSelectOverlay2 = null!;
 
             createScreen();
             AddStep("select diff adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
@@ -353,7 +360,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestExternallySetModIsReplacedByOverlayInstance()
         {
             Mod external = new OsuModDoubleTime();
-            Mod overlayButtonMod = null;
+            Mod overlayButtonMod = null!;
 
             createScreen();
             changeRuleset(0);
@@ -460,12 +467,12 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("select difficulty adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
             assertCustomisationToggleState(disabled: false, active: true);
-            AddAssert("back button disabled", () => !this.ChildrenOfType<ShearedButton>().First().Enabled.Value);
+            AddAssert("back button disabled", () => !modSelectOverlay.BackButton.Enabled.Value);
 
             AddStep("dismiss customisation area", () => InputManager.Key(Key.Escape));
             AddStep("click back button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedButton>().First());
+                InputManager.MoveMouseTo(modSelectOverlay.BackButton);
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("mod select hidden", () => modSelectOverlay.State.Value == Visibility.Hidden);
@@ -474,7 +481,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestColumnHiding()
         {
-            AddStep("create screen", () => Child = modSelectOverlay = new UserModSelectOverlay
+            AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
@@ -527,14 +534,20 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void assertCustomisationToggleState(bool disabled, bool active)
         {
-            ShearedToggleButton getToggle() => modSelectOverlay.ChildrenOfType<ShearedToggleButton>().Single();
-
-            AddAssert($"customisation toggle is {(disabled ? "" : "not ")}disabled", () => getToggle().Active.Disabled == disabled);
-            AddAssert($"customisation toggle is {(active ? "" : "not ")}active", () => getToggle().Active.Value == active);
+            AddAssert($"customisation toggle is {(disabled ? "" : "not ")}disabled", () => modSelectOverlay.CustomisationButton.AsNonNull().Active.Disabled == disabled);
+            AddAssert($"customisation toggle is {(active ? "" : "not ")}active", () => modSelectOverlay.CustomisationButton.AsNonNull().Active.Value == active);
         }
 
         private ModPanel getPanelForMod(Type modType)
             => modSelectOverlay.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.GetType() == modType);
+
+        private class TestModSelectOverlay : UserModSelectOverlay
+        {
+            protected override bool ShowPresets => true;
+
+            public new ShearedButton BackButton => base.BackButton;
+            public new ShearedToggleButton? CustomisationButton => base.CustomisationButton;
+        }
 
         private class TestUnimplementedMod : Mod
         {
