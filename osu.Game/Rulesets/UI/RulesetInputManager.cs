@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.UI
         {
             if (calculator == null) return;
 
-            var listener = new ActionListener();
+            var listener = new ActionListener(calculator);
 
             KeyBindingContainer.Add(listener);
 
@@ -202,16 +202,19 @@ namespace osu.Game.Rulesets.UI
 
         public class ActionListener : KeysPerSecondCalculator.InputListener, IKeyBindingHandler<T>
         {
-            public override event Action OnNewInput;
-
             public bool OnPressed(KeyBindingPressEvent<T> e)
             {
-                OnNewInput?.Invoke();
+                Calculator.AddTimestamp();
 
                 return false;
             }
 
             public void OnReleased(KeyBindingReleaseEvent<T> e)
+            {
+            }
+
+            public ActionListener(KeysPerSecondCalculator calculator)
+                : base(calculator)
             {
             }
         }

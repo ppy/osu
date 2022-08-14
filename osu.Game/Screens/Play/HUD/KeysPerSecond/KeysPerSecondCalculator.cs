@@ -29,7 +29,6 @@ namespace osu.Game.Screens.Play.HUD.KeysPerSecond
             {
                 onResetRequested?.Invoke();
                 listener = value;
-                listener.OnNewInput += addTimestamp;
             }
         }
 
@@ -43,12 +42,9 @@ namespace osu.Game.Screens.Play.HUD.KeysPerSecond
         {
             get
             {
-                if (gameplayClock != null)
+                if (gameplayClock?.TrueGameplayRate > 0)
                 {
-                    if (gameplayClock.TrueGameplayRate > 0)
-                    {
-                        baseRate = gameplayClock.TrueGameplayRate;
-                    }
+                    baseRate = gameplayClock.TrueGameplayRate;
                 }
 
                 return baseRate;
@@ -71,12 +67,9 @@ namespace osu.Game.Screens.Play.HUD.KeysPerSecond
         {
             timestamps.Clear();
             maxTime = double.NegativeInfinity;
-
-            if (listener != null)
-                listener.OnNewInput -= addTimestamp;
         }
 
-        private void addTimestamp()
+        public void AddTimestamp()
         {
             if (workingClock == null) return;
 
@@ -96,20 +89,16 @@ namespace osu.Game.Screens.Play.HUD.KeysPerSecond
             return relativeTime > 0 && relativeTime <= span;
         }
 
-        ~KeysPerSecondCalculator()
-        {
-            cleanUp();
-        }
-
         public abstract class InputListener : Component
         {
-            protected InputListener()
+            protected KeysPerSecondCalculator Calculator;
+
+            protected InputListener(KeysPerSecondCalculator calculator)
             {
                 RelativeSizeAxes = Axes.Both;
                 Depth = float.MinValue;
+                Calculator = calculator;
             }
-
-            public abstract event Action? OnNewInput;
         }
     }
 }
