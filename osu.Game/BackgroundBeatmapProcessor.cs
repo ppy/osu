@@ -127,8 +127,15 @@ namespace osu.Game
 
                     if (set != null)
                     {
-                        Logger.Log($"Background processing {set} ({++i} / {beatmapSetIds.Count})");
-                        beatmapUpdater.Process(set);
+                        try
+                        {
+                            Logger.Log($"Background processing {set} ({++i} / {beatmapSetIds.Count})");
+                            beatmapUpdater.Process(set);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log($"Background processing failed on {set}: {e}");
+                        }
                     }
                 });
             }

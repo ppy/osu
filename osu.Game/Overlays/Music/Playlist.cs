@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -17,9 +15,11 @@ namespace osu.Game.Overlays.Music
 {
     public class Playlist : OsuRearrangeableListContainer<Live<BeatmapSetInfo>>
     {
-        public Action<Live<BeatmapSetInfo>> RequestSelection;
+        public Action<Live<BeatmapSetInfo>>? RequestSelection;
 
         public readonly Bindable<Live<BeatmapSetInfo>> SelectedSet = new Bindable<Live<BeatmapSetInfo>>();
+
+        private FilterCriteria currentCriteria = new FilterCriteria();
 
         public new MarginPadding Padding
         {
@@ -31,24 +31,22 @@ namespace osu.Game.Overlays.Music
         {
             var items = (SearchContainer<RearrangeableListItem<Live<BeatmapSetInfo>>>)ListContainer;
 
+            string[]? currentCollectionHashes = criteria.Collection?.PerformRead(c => c.BeatmapMD5Hashes.ToArray());
+
             foreach (var item in items.OfType<PlaylistItem>())
             {
-                if (criteria.Collection == null)
-                    item.InSelectedCollection = true;
-                else
-                {
-                    item.InSelectedCollection = item.Model.Value.Beatmaps.Select(b => b.MD5Hash)
-                                                    .Any(criteria.Collection.BeatmapHashes.Contains);
-                }
+                item.InSelectedCollection = currentCollectionHashes == null || item.Model.Value.Beatmaps.Select(b => b.MD5Hash).Any(currentCollectionHashes.Contains);
             }
 
             items.SearchTerm = criteria.SearchText;
+            currentCriteria = criteria;
         }
 
-        public Live<BeatmapSetInfo> FirstVisibleSet => Items.FirstOrDefault(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
+        public Live<BeatmapSetInfo>? FirstVisibleSet => Items.FirstOrDefault(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
 
         protected override OsuRearrangeableListItem<Live<BeatmapSetInfo>> CreateOsuDrawable(Live<BeatmapSetInfo> item) => new PlaylistItem(item)
         {
+            InSelectedCollection = currentCriteria.Collection?.PerformRead(c => item.Value.Beatmaps.Select(b => b.MD5Hash).Any(c.BeatmapMD5Hashes.Contains)) != false,
             SelectedSet = { BindTarget = SelectedSet },
             RequestSelection = set => RequestSelection?.Invoke(set)
         };

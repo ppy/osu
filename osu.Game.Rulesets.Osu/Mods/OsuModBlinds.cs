@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -33,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight) };
 
-        private DrawableOsuBlinds blinds;
+        private DrawableOsuBlinds blinds = null!;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -55,9 +53,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// <summary>
             /// Black background boxes behind blind panel textures.
             /// </summary>
-            private Box blackBoxLeft, blackBoxRight;
+            private Box blackBoxLeft = null!, blackBoxRight = null!;
 
-            private Drawable panelLeft, panelRight, bgPanelLeft, bgPanelRight;
+            private Drawable panelLeft = null!;
+            private Drawable panelRight = null!;
+            private Drawable bgPanelLeft = null!;
+            private Drawable bgPanelRight = null!;
 
             private readonly Beatmap<OsuHitObject> beatmap;
 

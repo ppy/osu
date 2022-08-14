@@ -56,8 +56,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             importedBeatmapId = importedBeatmap.OnlineID;
         }
 
-        [SetUp]
-        public new void Setup() => Schedule(() => playingUsers.Clear());
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("clear playing users", () => playingUsers.Clear());
+        }
 
         [Test]
         public void TestDelayedStart()
@@ -428,8 +432,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 var user = playingUsers.Single(u => u.UserID == userId);
 
-                OnlinePlayDependencies.MultiplayerClient.RemoveUser(user.User.AsNonNull());
                 SpectatorClient.SendEndPlay(userId);
+                OnlinePlayDependencies.MultiplayerClient.RemoveUser(user.User.AsNonNull());
 
                 playingUsers.Remove(user);
             });
