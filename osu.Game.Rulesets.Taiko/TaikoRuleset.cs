@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     Columns = new[]
                     {
-                        new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        new StatisticItem(null, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
                             new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)
