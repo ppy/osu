@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Magnet;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "No need to chase the circles – your cursor is a magnet!";
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.5;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax), typeof(OsuModRepel) };
 
         private IFrameStableClock gameplayClock = null!;
