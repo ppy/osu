@@ -10,7 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
@@ -28,11 +28,9 @@ namespace osu.Game.Tests.Visual.Background
         [Resolved]
         private SessionStatics statics { get; set; }
 
-        [Cached(typeof(LargeTextureStore))]
-        private LookupLoggingTextureStore textureStore = new LookupLoggingTextureStore();
-
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
+        private LookupLoggingTextureStore textureStore;
         private SeasonalBackgroundLoader backgroundLoader;
         private Container backgroundContainer;
 
@@ -45,15 +43,32 @@ namespace osu.Game.Tests.Visual.Background
             "Backgrounds/bg3"
         };
 
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            textureStore = new LookupLoggingTextureStore(dependencies.Get<IRenderer>());
+            dependencies.CacheAs(typeof(LargeTextureStore), textureStore);
+
+            return dependencies;
+        }
+
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore wrappedStore)
         {
             textureStore.AddStore(wrappedStore);
 
-            Add(backgroundContainer = new Container
+            Child = new DependencyProvidingContainer
             {
-                RelativeSizeAxes = Axes.Both
-            });
+                CachedDependencies = new (Type, object)[]
+                {
+                    (typeof(LargeTextureStore), textureStore)
+                },
+                Child = backgroundContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                }
+            };
         }
 
         [SetUp]
@@ -192,6 +207,11 @@ namespace osu.Game.Tests.Visual.Background
         private class LookupLoggingTextureStore : LargeTextureStore
         {
             public List<string> PerformedLookups { get; } = new List<string>();
+
+            public LookupLoggingTextureStore(IRenderer renderer)
+                : base(renderer)
+            {
+            }
 
             public override Texture Get(string name, WrapMode wrapModeS, WrapMode wrapModeT)
             {

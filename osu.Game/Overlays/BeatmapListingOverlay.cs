@@ -104,11 +104,11 @@ namespace osu.Game.Overlays
             filterControl.CardSize.BindValueChanged(_ => onCardSizeChanged());
 
             apiUser = api.LocalUser.GetBoundCopy();
-            apiUser.BindValueChanged(_ =>
+            apiUser.BindValueChanged(_ => Schedule(() =>
             {
                 if (api.IsLoggedIn)
                     addContentToResultsArea(Drawable.Empty());
-            });
+            }));
         }
 
         public void ShowWithSearch(string query)

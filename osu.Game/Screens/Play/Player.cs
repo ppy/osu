@@ -249,6 +249,9 @@ namespace osu.Game.Screens.Play
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
             GameplayClockContainer.Add(rulesetSkinProvider);
 
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
             rulesetSkinProvider.AddRange(new Drawable[]
             {
                 failAnimationLayer = new FailAnimation(DrawableRuleset)
@@ -278,6 +281,9 @@ namespace osu.Game.Screens.Play
                     },
                 },
             });
+
+            if (cancellationToken.IsCancellationRequested)
+                return;
 
             if (Configuration.AllowRestart)
             {
