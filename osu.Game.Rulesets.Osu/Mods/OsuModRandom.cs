@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             for (int i = 0; i < positionInfos.Count; i++)
             {
-                if (shouldStartNewSection(osuBeatmap, positionInfos, i, 0.6f, 0.4f))
+                if (shouldStartNewSection(osuBeatmap, positionInfos, i))
                 {
                     sectionOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.0008f);
                     flowDirection = !flowDirection;
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     // Offsets only the angle of the current hit object.
                     float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.002f);
 
-                    if (shouldApplyFlowChange(positionInfos, i, 0.6f))
+                    if (shouldApplyFlowChange(positionInfos, i))
                     {
                         flowChangeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.002f);
                         flowDirection = !flowDirection;
@@ -95,33 +95,35 @@ namespace osu.Game.Rulesets.Osu.Mods
             return flowDirection ? -relativeAngle : relativeAngle;
         }
 
-        /// <summary>
-        /// A new section should be started...<br/>
-        /// ...at the beginning of the <see cref="OsuBeatmap"/>.<br/>
-        /// ...on every combo start with a probability of <paramref name="newComboProbability"/> (excluding new-combo-spam and 1-2-combos).<br/>
-        /// ...on every downbeat.<br/>
-        /// ...on every beat with a probability of <paramref name="beatProbability"/>.<br/>
-        /// </summary>
         /// <returns>Whether a new section should be started at the current <see cref="OsuHitObject"/>.</returns>
-        private bool shouldStartNewSection(
-            OsuBeatmap beatmap,
-            IReadOnlyList<OsuHitObjectGenerationUtils.ObjectPositionInfo> positionInfos,
-            int i,
-            float newComboProbability,
-            float beatProbability
-        ) =>
-            i == 0 ||
-            (positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 && positionInfos[i - 1].HitObject.NewCombo && rng?.NextDouble() < newComboProbability) ||
-            OsuHitObjectGenerationUtils.IsHitObjectOnBeat(beatmap, positionInfos[i - 1].HitObject, true) ||
-            (OsuHitObjectGenerationUtils.IsHitObjectOnBeat(beatmap, positionInfos[i - 1].HitObject) && rng?.NextDouble() < beatProbability);
+        private bool shouldStartNewSection(OsuBeatmap beatmap, IReadOnlyList<OsuHitObjectGenerationUtils.ObjectPositionInfo> positionInfos, int i)
+        {
+            if (i == 0)
+                return true;
 
-        /// <summary>
-        /// A flow change should occur on every combo start with a probability of <paramref name="probability"/> (excluding new-combo-spam and 1-2-combos).
-        /// </summary>
+            // Exclude new-combo-spam and 1-2-combos.
+            bool previousObjectStartedCombo = positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 &&
+                                              positionInfos[i - 1].HitObject.NewCombo;
+            bool previousObjectWasOnDownbeat = OsuHitObjectGenerationUtils.IsHitObjectOnBeat(beatmap, positionInfos[i - 1].HitObject, true);
+            bool previousObjectWasOnBeat = OsuHitObjectGenerationUtils.IsHitObjectOnBeat(beatmap, positionInfos[i - 1].HitObject);
+
+            return (previousObjectStartedCombo && randomBool(0.6f)) ||
+                   previousObjectWasOnDownbeat ||
+                   (previousObjectWasOnBeat && randomBool(0.4f));
+        }
+
         /// <returns>Whether a flow change should be applied at the current <see cref="OsuHitObject"/>.</returns>
-        private bool shouldApplyFlowChange(IReadOnlyList<OsuHitObjectGenerationUtils.ObjectPositionInfo> positionInfos, int i, float probability) =>
-            positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 &&
-            positionInfos[i - 1].HitObject.NewCombo &&
+        private bool shouldApplyFlowChange(IReadOnlyList<OsuHitObjectGenerationUtils.ObjectPositionInfo> positionInfos, int i)
+        {
+            // Exclude new-combo-spam and 1-2-combos.
+            bool previousObjectStartedCombo = positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 &&
+                                              positionInfos[i - 1].HitObject.NewCombo;
+
+            return previousObjectStartedCombo && randomBool(0.6f);
+        }
+
+        /// <returns>true with a probability of <paramref name="probability"/>, false otherwise.</returns>
+        private bool randomBool(float probability) =>
             rng?.NextDouble() < probability;
     }
 }
