@@ -150,6 +150,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleNotifications => new TranslatableString(getKey(@"toggle_notifications"), @"Toggle notifications");
 
         /// <summary>
+        /// "Toggle profile"
+        /// </summary>
+        public static LocalisableString ToggleProfile => new TranslatableString(getKey(@"toggle_profile"), @"Toggle profile");
+
+        /// <summary>
         /// "Pause gameplay"
         /// </summary>
         public static LocalisableString PauseGameplay => new TranslatableString(getKey(@"pause_gameplay"), @"Pause gameplay");

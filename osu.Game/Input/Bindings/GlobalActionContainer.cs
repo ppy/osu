@@ -17,7 +17,7 @@ namespace osu.Game.Input.Bindings
 
         private InputManager? parentInputManager;
 
-        public GlobalActionContainer(OsuGameBase game)
+        public GlobalActionContainer(OsuGameBase? game)
             : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
             if (game is IKeyBindingHandler<GlobalAction>)
@@ -60,6 +60,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.F }, GlobalAction.ToggleFPSDisplay),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
+            new KeyBinding(new[] { InputKey.Control, InputKey.P }, GlobalAction.ToggleProfile),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
 
@@ -339,5 +340,8 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleFPSCounter))]
         ToggleFPSDisplay,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleProfile))]
+        ToggleProfile,
     }
 }
