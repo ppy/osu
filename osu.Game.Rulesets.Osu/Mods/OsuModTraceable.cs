@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles) };
 
         /// <summary>
-        /// Fade multipliers from Hidden Mod ported over to match player expectations of fade.
+        /// Fade multipliers match hidden Mod for user convenience.
         /// </summary>
         private const double fade_in_duration_multiplier = 0.4;
 
@@ -93,6 +93,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             ((PlaySliderBody)slider.Body.Drawable).BorderColour = slider.AccentColour.Value;
         }
 
+        #region "Fade out effect" mod setting code.
+
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
@@ -106,9 +108,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        /// <summary>
-        /// Code for Applying fade out for the "Fade out effect" mod setting.
-        /// </summary>
         private void applyFadeOutState(DrawableHitObject drawableObject, bool increaseVisibility)
         {
             if (!FadeOutEffect.Value) return;
@@ -136,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 case DrawableSliderRepeat sliderRepeat:
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        // only apply to circle piece – reverse arrow is not affected by hidden.
+                        // only apply to circle piece – reverse arrow is not affected by fade out.
                         sliderRepeat.CirclePiece.FadeOut(fadeDuration);
 
                     break;
@@ -175,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (drawableObject)
             {
                 case DrawableSliderRepeat repeat:
-                    // Use the same fade sequence as the slider head.
+                    // Use the same fade sequence as the slider head approach.
                     Debug.Assert(repeat.Slider != null);
                     return getParameters(repeat.Slider.HeadCircle);
 
@@ -211,8 +210,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void hideSpinnerApproachCircle(DrawableSpinner spinner)
         {
-            if (!FadeOutEffect.Value) return;
-
             var spinnerBody = ((IHasApproachCircle)spinner.Body.Drawable)?.ApproachCircle;
             if (spinnerBody == null)
                 return;
@@ -220,5 +217,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             using (spinner.BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt))
                 spinnerBody.Hide();
         }
+
+        #endregion
     }
 }
