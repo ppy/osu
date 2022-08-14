@@ -61,10 +61,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 dependencyContainer!.Children = new Drawable[]
                 {
-                    calculator = new KeysPerSecondCalculator
-                    {
-                        Listener = listener = new ManualInputListener()
-                    },
+                    calculator = new KeysPerSecondCalculator(),
                     new DependencyProvidingContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -77,6 +74,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         }
                     }
                 };
+                calculator!.Listener = listener = new ManualInputListener(calculator!);
             });
         }
 
@@ -208,9 +206,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class ManualInputListener : KeysPerSecondCalculator.InputListener
         {
-            public override event Action? OnNewInput;
+            public void AddInput() => Calculator.AddTimestamp();
 
-            public void AddInput() => OnNewInput?.Invoke();
+            public ManualInputListener(KeysPerSecondCalculator calculator)
+                : base(calculator)
+            {
+            }
         }
 
         private class MockFrameBasedClock : ManualClock, IFrameBasedClock
