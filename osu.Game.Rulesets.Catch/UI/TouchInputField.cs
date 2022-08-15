@@ -50,48 +50,70 @@ namespace osu.Game.Rulesets.Catch.UI
             // Container should handle input everywhere.
             RelativeSizeAxes = Axes.Both;
 
-
             Children = new Drawable[]
             {
                 mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
+                    Alpha = 0,
                     Children = new Drawable[]
                     {
-                        leftBox = new ArrowHitbox(TouchCatchAction.MoveLeft, ref trackedActions, colours.Blue)
+                        new Container
                         {
-                            Anchor = Anchor.TopLeft,
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 0.15f,
+                            Height = 1,
+                            Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            X = 0,
-                            RelativePositionAxes = Axes.Both,
-                            Size = new Vector2(100.0f, 100.0f)
+                            Children = new Drawable[]
+                            {
+                                leftBox = new ArrowHitbox(TouchCatchAction.MoveLeft, ref trackedActions, colours.Gray2)
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    RelativeSizeAxes = Axes.Both,
+                                    RelativePositionAxes = Axes.Both,
+                                    Width = 0.5f,
+                                },
+                                leftDashBox = new ArrowHitbox(TouchCatchAction.DashLeft, ref trackedActions, colours.Gray3)
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    RelativeSizeAxes = Axes.Both,
+                                    RelativePositionAxes = Axes.Both,
+                                    Width = 0.5f,
+                                }
+                            }
                         },
-                        rightBox = new ArrowHitbox(TouchCatchAction.MoveRight, ref trackedActions, colours.Blue)
+                        new Container
                         {
-                            Anchor = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 0.15f,
+                            Height = 1,
+                            Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            X = 0,
-                            RelativePositionAxes = Axes.Both,
-                            Size = new Vector2(100.0f, 100.0f),
+                            Children = new Drawable[]
+                            {
+                                rightBox = new ArrowHitbox(TouchCatchAction.MoveRight, ref trackedActions, colours.Gray2)
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    RelativeSizeAxes = Axes.Both,
+                                    RelativePositionAxes = Axes.Both,
+                                    Width = 0.5f,
+                                },
+                                rightDashBox = new ArrowHitbox(TouchCatchAction.DashRight, ref trackedActions, colours.Gray3)
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    RelativeSizeAxes = Axes.Both,
+                                    RelativePositionAxes = Axes.Both,
+                                    Width = 0.5f,
+                                },
+                            }
                         },
-                        leftDashBox = new ArrowHitbox(TouchCatchAction.DashLeft, ref trackedActions, colours.Pink)
-                        {
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.CentreLeft,
-                            X = 0.1f,
-                            RelativePositionAxes = Axes.Both,
-                            Size = new Vector2(100.0f, 100.0f),
-                        },
-                        rightDashBox = new ArrowHitbox(TouchCatchAction.DashRight, ref trackedActions, colours.Pink)
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.CentreRight,
-                            X = -0.1f,
-                            RelativePositionAxes = Axes.Both,
-                            Size = new Vector2(100.0f, 100.0f),
-                        },
-                    }
+                    },
                 },
             };
         }
@@ -99,13 +121,13 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             // Hide whenever the keyboard is used.
-            Hide();
+            PopOut();
             return false;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (getTouchCatchActionFromInput(e.MousePosition) != TouchCatchAction.None)
+            if (getTouchCatchActionFromInput(e.ScreenSpaceMousePosition) == TouchCatchAction.None)
                 return false;
 
             handleDown(e.Button, e.ScreenSpaceMousePosition);
@@ -114,14 +136,15 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (getTouchCatchActionFromInput(e.MousePosition) != TouchCatchAction.None)
+            if (getTouchCatchActionFromInput(e.ScreenSpaceMousePosition) == TouchCatchAction.None)
                 return;
 
             handleUp(e.Button);
             base.OnMouseUp(e);
         }
 
-        protected override void OnTouchMove(TouchMoveEvent e)
+        /* I plan to come back to this code to add touch support
+         * protected override void OnTouchMove(TouchMoveEvent e)
         {
             // I'm not sure if this is posible but let's be safe
             if (!trackedActions.ContainsKey(e.Touch.Source))
@@ -132,7 +155,7 @@ namespace osu.Game.Rulesets.Catch.UI
             calculateActiveKeys();
 
             base.OnTouchMove(e);
-        }
+        }*/
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
@@ -166,7 +189,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void handleDown(object source, Vector2 position)
         {
-            Show();
+            PopIn();
 
             TouchCatchAction catchAction = getTouchCatchActionFromInput(position);
 
@@ -195,6 +218,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 return TouchCatchAction.MoveLeft;
             if (rightBox.Contains(inputPosition))
                 return TouchCatchAction.MoveRight;
+
             return TouchCatchAction.None;
         }
 
@@ -216,7 +240,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             private readonly Dictionary<object, TouchCatchAction> trackedActions;
 
-            private bool isHiglighted = false;
+            private bool isHiglighted;
 
             public ArrowHitbox(TouchCatchAction handledAction, ref Dictionary<object, TouchCatchAction> trackedActions, Color4 colour)
             {
@@ -228,7 +252,6 @@ namespace osu.Game.Rulesets.Catch.UI
                     new Container
                     {
                         Width = 1,
-                        Height = 1,
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
@@ -237,13 +260,15 @@ namespace osu.Game.Rulesets.Catch.UI
                                 Alpha = 0,
                                 Colour = colour.Multiply(1.4f).Darken(2.8f),
                                 Blending = BlendingParameters.Additive,
-                                Size = new Vector2(100.0f, 100.0f),
+                                Width = 1,
+                                RelativeSizeAxes = Axes.Both,
                             },
                             new Box
                             {
-                                Alpha = 0.5f,
+                                Alpha = 0.8f,
                                 Colour = colour,
-                                Size = new Vector2(100.0f, 100.0f),
+                                Width = 1,
+                                RelativeSizeAxes = Axes.Both,
                             }
                         }
                     }
@@ -257,6 +282,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     isHiglighted = true;
                     overlay.FadeTo(0.5f, 80, Easing.OutQuint);
                 }
+
                 return false;
             }
 
