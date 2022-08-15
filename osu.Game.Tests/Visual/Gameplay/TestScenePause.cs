@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public TestScenePause()
         {
-            base.Content.Add(content = new MenuCursorContainer { RelativeSizeAxes = Axes.Both });
+            base.Content.Add(content = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both });
         }
 
         [SetUpSteps]
@@ -313,7 +313,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("pause again", () =>
             {
                 Player.Pause();
-                return !Player.GameplayClockContainer.GameplayClock.IsRunning;
+                return !Player.GameplayClockContainer.IsRunning;
             });
 
             AddAssert("loop is playing", () => getLoop().IsPlaying);
@@ -378,7 +378,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("pause overlay " + (isShown ? "shown" : "hidden"), () => Player.PauseOverlayVisible == isShown);
 
         private void confirmClockRunning(bool isRunning) =>
-            AddUntilStep("clock " + (isRunning ? "running" : "stopped"), () => Player.GameplayClockContainer.GameplayClock.IsRunning == isRunning);
+            AddUntilStep("clock " + (isRunning ? "running" : "stopped"), () => Player.GameplayClockContainer.IsRunning == isRunning);
 
         protected override bool AllowFail => true;
 

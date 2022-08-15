@@ -8,7 +8,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -35,6 +38,10 @@ namespace osu.Game.Screens.Ranking.Statistics
         private readonly Container content;
         private readonly LoadingSpinner spinner;
 
+        private bool wasOpened;
+        private Sample popInSample;
+        private Sample popOutSample;
+
         public StatisticsPanel()
         {
             InternalChild = new Container
@@ -56,9 +63,12 @@ namespace osu.Game.Screens.Ranking.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             Score.BindValueChanged(populateStatistics, true);
+
+            popInSample = audio.Samples.Get(@"Results/statistics-panel-pop-in");
+            popOutSample = audio.Samples.Get(@"Results/statistics-panel-pop-out");
         }
 
         private CancellationTokenSource loadCancellation;
@@ -81,18 +91,16 @@ namespace osu.Game.Screens.Ranking.Statistics
             spinner.Show();
 
             var localCancellationSource = loadCancellation = new CancellationTokenSource();
-            IBeatmap playableBeatmap = null;
+
+            var workingBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo);
 
             // Todo: The placement of this is temporary. Eventually we'll both generate the playable beatmap _and_ run through it in a background task to generate the hit events.
-            Task.Run(() =>
-            {
-                playableBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo).GetPlayableBeatmap(newScore.Ruleset, newScore.Mods);
-            }, loadCancellation.Token).ContinueWith(_ => Schedule(() =>
+            Task.Run(() => workingBeatmap.GetPlayableBeatmap(newScore.Ruleset, newScore.Mods), loadCancellation.Token).ContinueWith(task => Schedule(() =>
             {
                 bool hitEventsAvailable = newScore.HitEvents.Count != 0;
                 Container<Drawable> container;
 
-                var statisticRows = newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap);
+                var statisticRows = newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, task.GetResultSafely());
 
                 if (!hitEventsAvailable && statisticRows.SelectMany(r => r.Columns).All(c => c.RequiresHitEvents))
                 {
@@ -216,9 +224,21 @@ namespace osu.Game.Screens.Ranking.Statistics
             return true;
         }
 
-        protected override void PopIn() => this.FadeIn(150, Easing.OutQuint);
+        protected override void PopIn()
+        {
+            this.FadeIn(150, Easing.OutQuint);
 
-        protected override void PopOut() => this.FadeOut(150, Easing.OutQuint);
+            popInSample?.Play();
+            wasOpened = true;
+        }
+
+        protected override void PopOut()
+        {
+            this.FadeOut(150, Easing.OutQuint);
+
+            if (wasOpened)
+                popOutSample?.Play();
+        }
 
         protected override void Dispose(bool isDisposing)
         {

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
@@ -25,10 +23,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Magnet;
         public override ModType Type => ModType.Fun;
         public override string Description => "No need to chase the circles – your cursor is a magnet!";
-        public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax) };
+        public override double ScoreMultiplier => 0.5;
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax), typeof(OsuModRepel) };
 
-        private IFrameStableClock gameplayClock;
+        private IFrameStableClock gameplayClock = null!;
 
         [SettingSource("Attraction strength", "How strong the pull is.", 0)]
         public BindableFloat AttractionStrength { get; } = new BindableFloat(0.5f)

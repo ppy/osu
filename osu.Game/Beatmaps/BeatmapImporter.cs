@@ -3,24 +3,24 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using osu.Framework.Audio.Track;
+using System.Threading.Tasks;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Skinning;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -29,18 +29,124 @@ namespace osu.Game.Beatmaps
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>, IDisposable
+    public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
+        public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
 
-        public BeatmapImporter(Storage storage, RealmAccess realm, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+        public BeatmapImporter(Storage storage, RealmAccess realm)
             : base(storage, realm)
         {
-            this.onlineLookupQueue = onlineLookupQueue;
+        }
+
+        public override async Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original)
+        {
+            var imported = await Import(notification, importTask);
+
+            if (!imported.Any())
+                return null;
+
+            Debug.Assert(imported.Count() == 1);
+
+            var first = imported.First();
+
+            // If there were no changes, ensure we don't accidentally nuke ourselves.
+            if (first.ID == original.ID)
+                return first;
+
+            first.PerformWrite(updated =>
+            {
+                var realm = updated.Realm;
+
+                Logger.Log($"Beatmap \"{updated}\" update completed successfully", LoggingTarget.Database);
+
+                original = realm.Find<BeatmapSetInfo>(original.ID);
+
+                // Generally the import process will do this for us if the OnlineIDs match,
+                // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).
+                original.DeletePending = true;
+
+                // Transfer local values which should be persisted across a beatmap update.
+                updated.DateAdded = original.DateAdded;
+
+                transferCollectionReferences(realm, original, updated);
+
+                foreach (var beatmap in original.Beatmaps.ToArray())
+                {
+                    var updatedBeatmap = updated.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.Hash);
+
+                    if (updatedBeatmap != null)
+                    {
+                        // If the updated beatmap matches an existing one, transfer any user data across..
+                        if (beatmap.Scores.Any())
+                        {
+                            Logger.Log($"Transferring {beatmap.Scores.Count()} scores for unchanged difficulty \"{beatmap}\"", LoggingTarget.Database);
+
+                            foreach (var score in beatmap.Scores)
+                                score.BeatmapInfo = updatedBeatmap;
+                        }
+
+                        // ..then nuke the old beatmap completely.
+                        // this is done instead of a soft deletion to avoid a user potentially creating weird
+                        // interactions, like restoring the outdated beatmap then updating a second time
+                        // (causing user data to be wiped).
+                        original.Beatmaps.Remove(beatmap);
+
+                        realm.Remove(beatmap.Metadata);
+                        realm.Remove(beatmap);
+                    }
+                    else
+                    {
+                        // If the beatmap differs in the original, leave it in a soft-deleted state but reset online info.
+                        // This caters to the case where a user has made modifications they potentially want to restore,
+                        // but after restoring we want to ensure it can't be used to trigger an update of the beatmap.
+                        beatmap.ResetOnlineInfo();
+                    }
+                }
+
+                // If the original has no beatmaps left, delete the set as well.
+                if (!original.Beatmaps.Any())
+                    realm.Remove(original);
+            });
+
+            return first;
+        }
+
+        private static void transferCollectionReferences(Realm realm, BeatmapSetInfo original, BeatmapSetInfo updated)
+        {
+            // First check if every beatmap in the original set is in any collections.
+            // In this case, we will assume they also want any newly added difficulties added to the collection.
+            foreach (var c in realm.All<BeatmapCollection>())
+            {
+                if (original.Beatmaps.Select(b => b.MD5Hash).All(c.BeatmapMD5Hashes.Contains))
+                {
+                    foreach (var b in original.Beatmaps)
+                        c.BeatmapMD5Hashes.Remove(b.MD5Hash);
+
+                    foreach (var b in updated.Beatmaps)
+                        c.BeatmapMD5Hashes.Add(b.MD5Hash);
+                }
+            }
+
+            // Handle collections using permissive difficulty name to track difficulties.
+            foreach (var originalBeatmap in original.Beatmaps)
+            {
+                var updatedBeatmap = updated.Beatmaps.FirstOrDefault(b => b.DifficultyName == originalBeatmap.DifficultyName);
+
+                if (updatedBeatmap == null)
+                    continue;
+
+                var collections = realm.All<BeatmapCollection>().AsEnumerable().Where(c => c.BeatmapMD5Hashes.Contains(originalBeatmap.MD5Hash));
+
+                foreach (var c in collections)
+                {
+                    c.BeatmapMD5Hashes.Remove(originalBeatmap.MD5Hash);
+                    c.BeatmapMD5Hashes.Add(updatedBeatmap.MD5Hash);
+                }
+            }
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == ".osz";
@@ -64,8 +170,7 @@ namespace osu.Game.Beatmaps
 
             bool hadOnlineIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
 
-            onlineLookupQueue?.Update(beatmapSet);
-
+            // TODO: this may no longer be valid as we aren't doing an online population at this point.
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
             {
@@ -86,19 +191,24 @@ namespace osu.Game.Beatmaps
 
             if (beatmapSet.OnlineID > 0)
             {
-                var existingSetWithSameOnlineID = realm.All<BeatmapSetInfo>().SingleOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
-
-                if (existingSetWithSameOnlineID != null)
+                // OnlineID should really be unique, but to avoid catastrophic failure let's iterate just to be sure.
+                foreach (var existingSetWithSameOnlineID in realm.All<BeatmapSetInfo>().Where(b => b.OnlineID == beatmapSet.OnlineID))
                 {
                     existingSetWithSameOnlineID.DeletePending = true;
                     existingSetWithSameOnlineID.OnlineID = -1;
 
                     foreach (var b in existingSetWithSameOnlineID.Beatmaps)
-                        b.OnlineID = -1;
+                        b.ResetOnlineInfo();
 
-                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be deleted.");
+                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be disassociated and marked for deletion.");
                 }
             }
+        }
+
+        protected override void PostImport(BeatmapSetInfo model, Realm realm, bool batchImport)
+        {
+            base.PostImport(model, realm, batchImport);
+            ProcessBeatmap?.Invoke((model, batchImport));
         }
 
         private void validateOnlineIds(BeatmapSetInfo beatmapSet, Realm realm)
@@ -133,7 +243,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineID = -1);
+            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.ResetOnlineInfo());
         }
 
         protected override bool CanSkipImport(BeatmapSetInfo existing, BeatmapSetInfo import)
@@ -286,64 +396,11 @@ namespace osu.Game.Beatmaps
                         MD5Hash = memoryStream.ComputeMD5Hash(),
                     };
 
-                    updateBeatmapStatistics(beatmap, decoded);
-
                     beatmaps.Add(beatmap);
                 }
             }
 
             return beatmaps;
-        }
-
-        private void updateBeatmapStatistics(BeatmapInfo beatmap, IBeatmap decoded)
-        {
-            var rulesetInstance = ((IRulesetInfo)beatmap.Ruleset).CreateInstance();
-
-            decoded.BeatmapInfo.Ruleset = rulesetInstance.RulesetInfo;
-
-            // TODO: this should be done in a better place once we actually need to dynamically update it.
-            beatmap.StarRating = rulesetInstance.CreateDifficultyCalculator(new DummyConversionBeatmap(decoded)).Calculate().StarRating;
-            beatmap.Length = calculateLength(decoded);
-            beatmap.BPM = 60000 / decoded.GetMostCommonBeatLength();
-        }
-
-        private double calculateLength(IBeatmap b)
-        {
-            if (!b.HitObjects.Any())
-                return 0;
-
-            var lastObject = b.HitObjects.Last();
-
-            //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-            double endTime = lastObject.GetEndTime();
-            double startTime = b.HitObjects.First().StartTime;
-
-            return endTime - startTime;
-        }
-
-        public void Dispose()
-        {
-            onlineLookupQueue?.Dispose();
-        }
-
-        /// <summary>
-        /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.
-        /// </summary>
-        private class DummyConversionBeatmap : WorkingBeatmap
-        {
-            private readonly IBeatmap beatmap;
-
-            public DummyConversionBeatmap(IBeatmap beatmap)
-                : base(beatmap.BeatmapInfo, null)
-            {
-                this.beatmap = beatmap;
-            }
-
-            protected override IBeatmap GetBeatmap() => beatmap;
-            protected override Texture? GetBackground() => null;
-            protected override Track? GetBeatmapTrack() => null;
-            protected internal override ISkin? GetSkin() => null;
-            public override Stream? GetStream(string storagePath) => null;
         }
     }
 }

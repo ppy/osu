@@ -128,16 +128,20 @@ namespace osu.Game.Tests.Resources
 
                     var rulesetInfo = getRuleset();
 
+                    string hash = Guid.NewGuid().ToString().ComputeMD5Hash();
+
                     yield return new BeatmapInfo
                     {
                         OnlineID = beatmapId,
                         DifficultyName = $"{version} {beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                         StarRating = diff,
                         Length = length,
+                        BeatmapSet = beatmapSet,
                         BPM = bpm,
-                        Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        Hash = hash,
+                        MD5Hash = hash,
                         Ruleset = rulesetInfo,
-                        Metadata = metadata,
+                        Metadata = metadata.DeepClone(),
                         Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = diff,

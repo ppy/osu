@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
@@ -18,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override string Acronym => "CS";
 
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.9;
 
         public override string Description => "No more tricky speed changes!";
 

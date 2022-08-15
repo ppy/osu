@@ -10,7 +10,7 @@ using System.Linq;
 namespace osu.Game.Screens.Select.Carousel
 {
     /// <summary>
-    /// A group which ensures at least one child is selected (if the group itself is selected).
+    /// A group which ensures at least one item is selected (if the group itself is selected).
     /// </summary>
     public class CarouselGroupEagerSelect : CarouselGroup
     {
@@ -35,46 +35,46 @@ namespace osu.Game.Screens.Select.Carousel
 
         /// <summary>
         /// To avoid overhead during filter operations, we don't attempt any selections until after all
-        /// children have been filtered. This bool will be true during the base <see cref="Filter(FilterCriteria)"/>
+        /// items have been filtered. This bool will be true during the base <see cref="Filter(FilterCriteria)"/>
         /// operation.
         /// </summary>
-        private bool filteringChildren;
+        private bool filteringItems;
 
         public override void Filter(FilterCriteria criteria)
         {
-            filteringChildren = true;
+            filteringItems = true;
             base.Filter(criteria);
-            filteringChildren = false;
+            filteringItems = false;
 
             attemptSelection();
         }
 
-        public override void RemoveChild(CarouselItem i)
+        public override void RemoveItem(CarouselItem i)
         {
-            base.RemoveChild(i);
+            base.RemoveItem(i);
 
             if (i != LastSelected)
                 updateSelectedIndex();
         }
 
-        private bool addingChildren;
+        private bool addingItems;
 
-        public void AddChildren(IEnumerable<CarouselItem> items)
+        public void AddItems(IEnumerable<CarouselItem> items)
         {
-            addingChildren = true;
+            addingItems = true;
 
             foreach (var i in items)
-                AddChild(i);
+                AddItem(i);
 
-            addingChildren = false;
+            addingItems = false;
 
             attemptSelection();
         }
 
-        public override void AddChild(CarouselItem i)
+        public override void AddItem(CarouselItem i)
         {
-            base.AddChild(i);
-            if (!addingChildren)
+            base.AddItem(i);
+            if (!addingItems)
                 attemptSelection();
         }
 
@@ -97,21 +97,21 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void attemptSelection()
         {
-            if (filteringChildren) return;
+            if (filteringItems) return;
 
             // we only perform eager selection if we are a currently selected group.
             if (State.Value != CarouselItemState.Selected) return;
 
-            // we only perform eager selection if none of our children are in a selected state already.
-            if (Children.Any(i => i.State.Value == CarouselItemState.Selected)) return;
+            // we only perform eager selection if none of our items are in a selected state already.
+            if (Items.Any(i => i.State.Value == CarouselItemState.Selected)) return;
 
             PerformSelection();
         }
 
         protected virtual CarouselItem GetNextToSelect()
         {
-            return Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
-                   Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
+            return Items.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
+                   Items.Reverse().Skip(Items.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
         }
 
         protected virtual void PerformSelection()
@@ -131,6 +131,6 @@ namespace osu.Game.Screens.Select.Carousel
             updateSelectedIndex();
         }
 
-        private void updateSelectedIndex() => lastSelectedIndex = LastSelected == null ? 0 : Math.Max(0, InternalChildren.IndexOf(LastSelected));
+        private void updateSelectedIndex() => lastSelectedIndex = LastSelected == null ? 0 : Math.Max(0, GetIndexOfItem(LastSelected));
     }
 }
