@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
 
@@ -56,6 +57,8 @@ namespace osu.Game.Rulesets.UI
 
         private IGameplayClock? parentGameplayClock;
 
+        private IClock referenceClock = null!;
+
         /// <summary>
         /// The current direction of playback to be exposed to frame stable children.
         /// </summary>
@@ -65,18 +68,15 @@ namespace osu.Game.Rulesets.UI
         private int direction = 1;
 
         [BackgroundDependencyLoader]
-        private void load(IGameplayClock? clock)
+        private void load(IGameplayClock? gameplayClock)
         {
-            if (clock != null)
+            if (gameplayClock != null)
             {
-                parentGameplayClock = clock;
+                parentGameplayClock = gameplayClock;
                 IsPaused.BindTo(parentGameplayClock.IsPaused);
             }
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
+            referenceClock = gameplayClock ?? Clock;
             Clock = this;
         }
 
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.UI
                 state = PlaybackState.Valid;
             }
 
-            double proposedTime = Clock.CurrentTime;
+            double proposedTime = referenceClock.CurrentTime;
 
             if (FrameStablePlayback)
                 // if we require frame stability, the proposed time will be adjusted to move at most one known
@@ -148,14 +148,14 @@ namespace osu.Game.Rulesets.UI
             if (state == PlaybackState.Valid && proposedTime != manualClock.CurrentTime)
                 direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
 
-            double timeBehind = Math.Abs(proposedTime - Clock.CurrentTime);
+            double timeBehind = Math.Abs(proposedTime - CurrentTime);
 
             IsCatchingUp.Value = timeBehind > 200;
             WaitingOnFrames.Value = state == PlaybackState.NotValid;
 
             manualClock.CurrentTime = proposedTime;
-            manualClock.Rate = Math.Abs(Clock.Rate) * direction;
-            manualClock.IsRunning = Clock.IsRunning;
+            manualClock.Rate = Math.Abs(referenceClock.Rate) * direction;
+            manualClock.IsRunning = referenceClock.IsRunning;
 
             // determine whether catch-up is required.
             if (state == PlaybackState.Valid && timeBehind > 0)
@@ -244,7 +244,7 @@ namespace osu.Game.Rulesets.UI
 
         public bool IsRunning => framedClock.IsRunning;
 
-        public void ProcessFrame() => framedClock.ProcessFrame();
+        public void ProcessFrame() { }
 
         public double ElapsedFrameTime => framedClock.ElapsedFrameTime;
 
@@ -256,7 +256,23 @@ namespace osu.Game.Rulesets.UI
 
         #region Delegation of IGameplayClock
 
-        public double TrueGameplayRate => parentGameplayClock?.TrueGameplayRate ?? 1;
+        public double TrueGameplayRate
+        {
+            get
+            {
+                double baseRate = Rate;
+
+                foreach (double adjustment in NonGameplayAdjustments)
+                {
+                    if (Precision.AlmostEquals(adjustment, 0))
+                        return 0;
+
+                    baseRate /= adjustment;
+                }
+
+                return baseRate;
+            }
+        }
 
         public double? StartTime => parentGameplayClock?.StartTime;
 
