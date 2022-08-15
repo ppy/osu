@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -128,6 +129,8 @@ namespace osu.Game.Rulesets.UI
 
             if (parentGameplayClock == null)
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
+
+            Debug.Assert(parentGameplayClock != null);
 
             double proposedTime = parentGameplayClock.CurrentTime;
 
