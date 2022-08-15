@@ -28,6 +28,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 
@@ -280,11 +281,16 @@ namespace osu.Game.Screens.OnlinePlay.Match
             };
         }
 
+        [Resolved(canBeNull: true)]
+        private IDialogOverlay dialogOverlay { get; set; }
+
         public override bool OnBackButton()
         {
             if (Room.RoomID.Value == null)
             {
-                // room has not been created yet; exit immediately.
+                if (!ensureExitConfirmed())
+                    return true;
+
                 settingsOverlay.Hide();
                 return base.OnBackButton();
             }
@@ -330,14 +336,41 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Scheduler.AddOnce(updateRuleset);
         }
 
+        protected bool ExitConfirmed { get; private set; }
+
         public override bool OnExiting(ScreenExitEvent e)
         {
+            if (!ensureExitConfirmed())
+                return true;
+
             RoomManager?.PartRoom();
             Mods.Value = Array.Empty<Mod>();
 
             onLeaving();
 
             return base.OnExiting(e);
+        }
+
+        private bool ensureExitConfirmed()
+        {
+            if (ExitConfirmed)
+                return true;
+
+            if (dialogOverlay == null || Room.RoomID.Value != null || Room.Playlist.Count == 0)
+                return true;
+
+            // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
+            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog)
+                return false;
+
+            dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
+            {
+                ExitConfirmed = true;
+                settingsOverlay.Hide();
+                this.Exit();
+            }));
+
+            return false;
         }
 
         protected void StartPlay()

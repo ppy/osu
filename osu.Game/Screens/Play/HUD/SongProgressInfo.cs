@@ -10,7 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
     public class SongProgressInfo : Container
     {
@@ -38,10 +38,10 @@ namespace osu.Game.Screens.Play
             set => endTime = value;
         }
 
-        private GameplayClock gameplayClock;
+        private IGameplayClock gameplayClock;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, GameplayClock clock)
+        private void load(OsuColour colours, IGameplayClock clock)
         {
             if (clock != null)
                 gameplayClock = clock;

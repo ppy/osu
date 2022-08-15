@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -24,6 +25,7 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using Realms;
@@ -63,8 +65,11 @@ namespace osu.Game.Database
         /// 17   2022-07-16    Added CountryCode to RealmUser.
         /// 18   2022-07-19    Added OnlineMD5Hash and LastOnlineUpdate to BeatmapInfo.
         /// 19   2022-07-19    Added DateSubmitted and DateRanked to BeatmapSetInfo.
+        /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
+        /// 21   2022-07-27    Migrate collections to realm (BeatmapCollection).
+        /// 22   2022-07-31    Added ModPreset.
         /// </summary>
-        private const int schema_version = 19;
+        private const int schema_version = 22;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -168,6 +173,11 @@ namespace osu.Game.Database
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
 
+#if DEBUG
+            if (!DebugUtils.IsNUnitRunning)
+                applyFilenameSchemaSuffix(ref Filename);
+#endif
+
             string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
 
             // Attempt to recover a newer database version if available.
@@ -205,6 +215,51 @@ namespace osu.Game.Database
 
                 cleanupPendingDeletions();
             }
+        }
+
+        /// <summary>
+        /// Some developers may be annoyed if a newer version migration (ie. caused by testing a pull request)
+        /// cause their test database to be unusable with previous versions.
+        /// To get around this, store development databases against their realm version.
+        /// Note that this means changes made on newer realm versions will disappear.
+        /// </summary>
+        private void applyFilenameSchemaSuffix(ref string filename)
+        {
+            string originalFilename = filename;
+
+            filename = getVersionedFilename(schema_version);
+
+            // First check if the current realm version already exists...
+            if (storage.Exists(filename))
+                return;
+
+            // Check for a previous version we can use as a base database to migrate from...
+            for (int i = schema_version - 1; i >= 0; i--)
+            {
+                string previousFilename = getVersionedFilename(i);
+
+                if (storage.Exists(previousFilename))
+                {
+                    copyPreviousVersion(previousFilename, filename);
+                    return;
+                }
+            }
+
+            // Finally, check for  a non-versioned file exists (aka before this method was added)...
+            if (storage.Exists(originalFilename))
+                copyPreviousVersion(originalFilename, filename);
+
+            void copyPreviousVersion(string previousFilename, string newFilename)
+            {
+                using (var previous = storage.GetStream(previousFilename))
+                using (var current = storage.CreateFileSafely(newFilename))
+                {
+                    Logger.Log(@$"Copying previous realm database {previousFilename} to {newFilename} for migration to schema version {schema_version}");
+                    previous.CopyTo(current);
+                }
+            }
+
+            string getVersionedFilename(int version) => originalFilename.Replace(realm_extension, $"_{version}{realm_extension}");
         }
 
         private void attemptRecoverFromFile(string recoveryFilename)
@@ -277,7 +332,6 @@ namespace osu.Game.Database
                             realm.Remove(score);
 
                         realm.Remove(beatmap.Metadata);
-
                         realm.Remove(beatmap);
                     }
 
@@ -287,6 +341,11 @@ namespace osu.Game.Database
                 var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
 
                 foreach (var s in pendingDeleteSkins)
+                    realm.Remove(s);
+
+                var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
+
+                foreach (var s in pendingDeletePresets)
                     realm.Remove(s);
 
                 transaction.Commit();
@@ -780,6 +839,37 @@ namespace osu.Game.Database
                 case 14:
                     foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
                         beatmap.UserSettings = new BeatmapUserSettings();
+
+                    break;
+
+                case 20:
+                    // As we now have versioned difficulty calculations, let's reset
+                    // all star ratings and have `BackgroundBeatmapProcessor` recalculate them.
+                    foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
+                        beatmap.StarRating = -1;
+
+                    break;
+
+                case 21:
+                    // Migrate collections from external file to inside realm.
+                    // We use the "legacy" importer because that is how things were actually being saved out until now.
+                    var legacyCollectionImporter = new LegacyCollectionImporter(this);
+
+                    if (legacyCollectionImporter.GetAvailableCount(storage).GetResultSafely() > 0)
+                    {
+                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(task =>
+                        {
+                            if (task.Exception != null)
+                            {
+                                // can be removed 20221027 (just for initial safety).
+                                Logger.Error(task.Exception.InnerException, "Collections could not be migrated to realm. Please provide your \"collection.db\" to the dev team.");
+                                return;
+                            }
+
+                            storage.Move("collection.db", "collection.db.migrated");
+                        });
+                    }
+
                     break;
             }
         }
