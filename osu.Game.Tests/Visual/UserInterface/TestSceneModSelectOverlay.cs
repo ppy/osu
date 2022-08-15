@@ -192,7 +192,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("select customisable mod", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });
             assertCustomisationToggleState(disabled: false, active: false);
 
-            AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            AddStep("select mod requiring configuration externally", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            assertCustomisationToggleState(disabled: false, active: false);
+
+            AddStep("reset mods", () => SelectedMods.SetDefault());
+            AddStep("select difficulty adjust via panel", () => getPanelForMod(typeof(OsuModDifficultyAdjust)).TriggerClick());
             assertCustomisationToggleState(disabled: false, active: true);
 
             AddStep("dismiss mod customisation via toggle", () =>
@@ -203,7 +207,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             assertCustomisationToggleState(disabled: false, active: false);
 
             AddStep("reset mods", () => SelectedMods.SetDefault());
-            AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            AddStep("select difficulty adjust via panel", () => getPanelForMod(typeof(OsuModDifficultyAdjust)).TriggerClick());
             assertCustomisationToggleState(disabled: false, active: true);
 
             AddStep("dismiss mod customisation via keyboard", () => InputManager.Key(Key.Escape));
@@ -215,7 +219,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("select mod without configuration", () => SelectedMods.Value = new[] { new OsuModAutoplay() });
             assertCustomisationToggleState(disabled: true, active: false);
 
-            AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            AddStep("select difficulty adjust via panel", () => getPanelForMod(typeof(OsuModDifficultyAdjust)).TriggerClick());
             assertCustomisationToggleState(disabled: false, active: true);
 
             AddStep("select mod without configuration", () => SelectedMods.Value = new[] { new OsuModAutoplay() });
@@ -235,7 +239,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             createScreen();
             assertCustomisationToggleState(disabled: true, active: false);
 
-            AddStep("select mod requiring configuration", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            AddStep("select difficulty adjust via panel", () => getPanelForMod(typeof(OsuModDifficultyAdjust)).TriggerClick());
             assertCustomisationToggleState(disabled: false, active: true);
 
             AddStep("move mouse to settings area", () => InputManager.MoveMouseTo(this.ChildrenOfType<ModSettingsArea>().Single()));
@@ -262,7 +266,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             ModSelectOverlay modSelectOverlay2 = null!;
 
             createScreen();
-            AddStep("select diff adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
+            AddStep("select difficulty adjust via panel", () => getPanelForMod(typeof(OsuModDifficultyAdjust)).TriggerClick());
 
             AddStep("set setting", () => modSelectOverlay.ChildrenOfType<OsuSliderBar<float>>().First().Current.Value = 8);
 
@@ -492,7 +496,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             createScreen();
             changeRuleset(0);
 
-            AddStep("select difficulty adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
+            AddStep("select difficulty adjust via panel", () => getPanelForMod(typeof(OsuModDifficultyAdjust)).TriggerClick());
             assertCustomisationToggleState(disabled: false, active: true);
             AddAssert("back button disabled", () => !modSelectOverlay.BackButton.Enabled.Value);
 
