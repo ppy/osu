@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The final clock which is exposed to gameplay components.
         /// </summary>
-        protected IFrameBasedClock FramedClock { get; private set; } = null!;
+        protected IFrameBasedClock FramedClock { get; private set; }
 
         private readonly BindableBool isPaused = new BindableBool(true);
 
@@ -69,6 +69,9 @@ namespace osu.Game.Screens.Play
 
             decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
             IsPaused.BindValueChanged(OnIsPausedChanged);
+
+            // this will be replaced during load, but non-null for tests which don't add this component to the hierarchy.
+            FramedClock = new FramedClock();
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
