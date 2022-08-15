@@ -126,7 +126,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             for (int i = 0; i < Users.Count; i++)
             {
-                grid.Add(instances[i] = new PlayerArea(Users[i], masterClockContainer.GameplayClock));
+                grid.Add(instances[i] = new PlayerArea(Users[i], masterClockContainer));
                 syncManager.AddPlayerClock(instances[i].GameplayClock);
             }
 

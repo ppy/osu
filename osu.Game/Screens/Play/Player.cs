@@ -475,7 +475,7 @@ namespace osu.Game.Screens.Play
 
         private void updateSampleDisabledState()
         {
-            samplePlaybackDisabled.Value = DrawableRuleset.FrameStableClock.IsCatchingUp.Value || GameplayClockContainer.GameplayClock.IsPaused.Value;
+            samplePlaybackDisabled.Value = DrawableRuleset.FrameStableClock.IsCatchingUp.Value || GameplayClockContainer.IsPaused.Value;
         }
 
         private void updatePauseOnFocusLostState()
@@ -877,7 +877,7 @@ namespace osu.Game.Screens.Play
         private double? lastPauseActionTime;
 
         protected bool PauseCooldownActive =>
-            lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
+            lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + pause_cooldown;
 
         /// <summary>
         /// A set of conditionals which defines whether the current game state and configuration allows for
@@ -915,7 +915,7 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Stop();
             PauseOverlay.Show();
-            lastPauseActionTime = GameplayClockContainer.GameplayClock.CurrentTime;
+            lastPauseActionTime = GameplayClockContainer.CurrentTime;
             return true;
         }
 
@@ -1005,7 +1005,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual void StartGameplay()
         {
-            if (GameplayClockContainer.GameplayClock.IsRunning)
+            if (GameplayClockContainer.IsRunning)
                 throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
 
             GameplayClockContainer.Reset(true);

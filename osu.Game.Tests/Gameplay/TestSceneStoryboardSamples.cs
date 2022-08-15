@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Gameplay
 
                 beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
-                    Clock = gameplayContainer.GameplayClock
+                    Clock = gameplayContainer
                 });
             });
 
