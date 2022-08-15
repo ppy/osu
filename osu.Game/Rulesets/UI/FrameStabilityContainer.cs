@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.UI
             if (state == PlaybackState.Valid && proposedTime != manualClock.CurrentTime)
                 direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
 
-            double timeBehind = Math.Abs(proposedTime - CurrentTime);
+            double timeBehind = Math.Abs(proposedTime - referenceClock.CurrentTime);
 
             IsCatchingUp.Value = timeBehind > 200;
             WaitingOnFrames.Value = state == PlaybackState.NotValid;
