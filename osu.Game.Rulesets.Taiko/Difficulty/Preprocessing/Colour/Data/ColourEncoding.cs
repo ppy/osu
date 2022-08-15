@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// <summary>
         /// <see cref="MonoEncoding"/>s that are grouped together within this <see cref="ColourEncoding"/>.
         /// </summary>
-        public List<MonoEncoding> Payload { get; private set; } = new List<MonoEncoding>();
+        public readonly List<MonoEncoding> Payload = new List<MonoEncoding>();
 
         /// <summary>
         /// The parent <see cref="CoupledColourEncoding"/> that contains this <see cref="ColourEncoding"/>
