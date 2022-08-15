@@ -1,12 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
 
@@ -20,20 +16,16 @@ namespace osu.Game.Tests.NonVisual
         public void TestTrueGameplayRateWithZeroAdjustment(double underlyingClockRate)
         {
             var framedClock = new FramedClock(new ManualClock { Rate = underlyingClockRate });
-            var gameplayClock = new TestGameplayClock(framedClock);
-
-            gameplayClock.MutableNonGameplayAdjustments.Add(new BindableDouble());
+            var gameplayClock = new TestGameplayClockContainer(framedClock);
 
             Assert.That(gameplayClock.TrueGameplayRate, Is.EqualTo(0));
         }
 
-        private class TestGameplayClock : GameplayClock
+        private class TestGameplayClockContainer : GameplayClockContainer
         {
-            public List<Bindable<double>> MutableNonGameplayAdjustments { get; } = new List<Bindable<double>>();
+            public override IEnumerable<double> NonGameplayAdjustments => new[] { 0.0 };
 
-            public override IEnumerable<double> NonGameplayAdjustments => MutableNonGameplayAdjustments.Select(b => b.Value);
-
-            public TestGameplayClock(IFrameBasedClock underlyingClock)
+            public TestGameplayClockContainer(IFrameBasedClock underlyingClock)
                 : base(underlyingClock)
             {
             }
