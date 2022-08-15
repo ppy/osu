@@ -6,13 +6,16 @@
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Contracted;
 using osu.Game.Screens.Ranking.Expanded;
@@ -93,9 +96,12 @@ namespace osu.Game.Screens.Ranking
 
         public readonly ScoreInfo Score;
 
-        private bool displayWithFlair;
+        [Resolved]
+        private OsuGameBase game { get; set; }
 
-        private Container content;
+        private DrawableAudioMixer mixer;
+
+        private bool displayWithFlair;
 
         private Container topLayerContainer;
         private Drawable topLayerBackground;
@@ -107,6 +113,8 @@ namespace osu.Game.Screens.Ranking
         private Container middleLayerContentContainer;
         private Drawable middleLayerContent;
 
+        private DrawableSample samplePanelFocus;
+
         public ScorePanel(ScoreInfo score, bool isNewLocalScore = false)
         {
             Score = score;
@@ -116,13 +124,13 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             // ScorePanel doesn't include the top extruding area in its own size.
             // Adding a manual offset here allows the expanded version to take on an "acceptable" vertical centre when at 100% UI scale.
             const float vertical_fudge = 20;
 
-            InternalChild = content = new Container
+            InternalChild = mixer = new DrawableAudioMixer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -174,7 +182,8 @@ namespace osu.Game.Screens.Ranking
                             },
                             middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
                         }
-                    }
+                    },
+                    samplePanelFocus = new DrawableSample(audio.Samples.Get(@"Results/score-panel-focus"))
                 }
             };
         }
@@ -202,10 +211,30 @@ namespace osu.Game.Screens.Ranking
                 state = value;
 
                 if (IsLoaded)
+                {
                     updateState();
+
+                    if (value == PanelState.Expanded)
+                        playAppearSample();
+                }
 
                 StateChanged?.Invoke(value);
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            mixer.Balance.Value = (ScreenSpaceDrawQuad.Centre.X / game.ScreenSpaceDrawQuad.Width) * 2 - 1;
+        }
+
+        private void playAppearSample()
+        {
+            var channel = samplePanelFocus?.GetChannel();
+            if (channel == null) return;
+
+            channel.Frequency.Value = 0.99 + RNG.NextDouble(0.2);
+            channel.Play();
         }
 
         private void updateState()
@@ -221,7 +250,8 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(expanded_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
 
-                    topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User) { Alpha = 0 });
+                    bool firstLoad = topLayerContent == null;
+                    topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User, firstLoad) { Alpha = 0 });
                     middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair) { Alpha = 0 });
 
                     // only the first expanded display should happen with flair.
@@ -244,7 +274,7 @@ namespace osu.Game.Screens.Ranking
                     break;
             }
 
-            content.ResizeTo(Size, RESIZE_DURATION, Easing.OutQuint);
+            mixer.ResizeTo(Size, RESIZE_DURATION, Easing.OutQuint);
 
             bool topLayerExpanded = topLayerContainer.Y < 0;
 

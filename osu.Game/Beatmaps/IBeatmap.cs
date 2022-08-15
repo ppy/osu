@@ -11,6 +11,10 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A materialised beatmap.
+    /// Generally this interface will be implemented alongside <see cref="IBeatmap{T}"/>, which exposes the ruleset-typed hit objects.
+    /// </summary>
     public interface IBeatmap
     {
         /// <summary>
@@ -65,6 +69,9 @@ namespace osu.Game.Beatmaps
         IBeatmap Clone();
     }
 
+    /// <summary>
+    /// A materialised beatmap containing converted HitObjects.
+    /// </summary>
     public interface IBeatmap<out T> : IBeatmap
         where T : HitObject
     {

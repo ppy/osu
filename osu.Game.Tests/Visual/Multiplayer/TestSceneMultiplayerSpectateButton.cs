@@ -35,55 +35,58 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private BeatmapSetInfo importedSet;
         private BeatmapManager beatmaps;
-        private RulesetStore rulesets;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
         }
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            AvailabilityTracker.SelectedItem.BindTo(selectedItem);
+            base.SetUpSteps();
 
-            importedSet = beatmaps.GetAllUsableBeatmapSets().First();
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
-            selectedItem.Value = new PlaylistItem(Beatmap.Value.BeatmapInfo)
+            AddStep("create button", () =>
             {
-                RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
-            };
+                AvailabilityTracker.SelectedItem.BindTo(selectedItem);
 
-            Child = new PopoverContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = new FillFlowContainer
+                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
+                selectedItem.Value = new PlaylistItem(Beatmap.Value.BeatmapInfo)
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
+                };
+
+                Child = new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new FillFlowContainer
                     {
-                        spectateButton = new MultiplayerSpectateButton
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(200, 50),
-                        },
-                        startControl = new MatchStartControl
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(200, 50),
+                            spectateButton = new MultiplayerSpectateButton
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(200, 50),
+                            },
+                            startControl = new MatchStartControl
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(200, 50),
+                            }
                         }
                     }
-                }
-            };
-        });
+                };
+            });
+        }
 
         [TestCase(MultiplayerRoomState.Open)]
         [TestCase(MultiplayerRoomState.WaitingForLoad)]

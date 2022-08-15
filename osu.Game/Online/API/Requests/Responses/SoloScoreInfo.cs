@@ -102,6 +102,14 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("pp")]
         public double? PP { get; set; }
 
+        public bool ShouldSerializeID() => false;
+        public bool ShouldSerializeUser() => false;
+        public bool ShouldSerializeBeatmap() => false;
+        public bool ShouldSerializeBeatmapSet() => false;
+        public bool ShouldSerializePP() => false;
+        public bool ShouldSerializeOnlineID() => false;
+        public bool ShouldSerializeHasReplay() => false;
+
         #endregion
 
         public override string ToString() => $"score_id: {ID} user_id: {UserID}";
@@ -149,6 +157,23 @@ namespace osu.Game.Online.API.Requests.Responses
             Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
             Mods = mods,
             PP = PP,
+        };
+
+        /// <summary>
+        /// Creates a <see cref="SoloScoreInfo"/> from a local score for score submission.
+        /// </summary>
+        /// <param name="score">The local score.</param>
+        public static SoloScoreInfo ForSubmission(ScoreInfo score) => new SoloScoreInfo
+        {
+            Rank = score.Rank,
+            TotalScore = (int)score.TotalScore,
+            Accuracy = score.Accuracy,
+            PP = score.PP,
+            MaxCombo = score.MaxCombo,
+            RulesetID = score.RulesetID,
+            Passed = score.Passed,
+            Mods = score.APIMods,
+            Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
         };
 
         public long OnlineID => ID ?? -1;

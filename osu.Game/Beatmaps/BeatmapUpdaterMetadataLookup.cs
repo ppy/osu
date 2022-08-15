@@ -7,7 +7,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using osu.Framework.Development;
@@ -15,7 +14,6 @@ using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -32,20 +30,16 @@ namespace osu.Game.Beatmaps
     /// This will always be checked before doing a second online query to get required metadata.
     /// </remarks>
     [ExcludeFromDynamicCompile]
-    public class BeatmapOnlineLookupQueue : IDisposable
+    public class BeatmapUpdaterMetadataLookup : IDisposable
     {
         private readonly IAPIProvider api;
         private readonly Storage storage;
-
-        private const int update_queue_request_concurrency = 4;
-
-        private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapOnlineLookupQueue));
 
         private FileWebRequest cacheDownloadRequest;
 
         private const string cache_database_name = "online.db";
 
-        public BeatmapOnlineLookupQueue(IAPIProvider api, Storage storage)
+        public BeatmapUpdaterMetadataLookup(IAPIProvider api, Storage storage)
         {
             this.api = api;
             this.storage = storage;
@@ -55,27 +49,30 @@ namespace osu.Game.Beatmaps
                 prepareLocalCache();
         }
 
-        public void Update(BeatmapSetInfo beatmapSet)
+        /// <summary>
+        /// Queue an update for a beatmap set.
+        /// </summary>
+        /// <remarks>
+        /// This may happen during initial import, or at a later stage in response to a user action or server event.
+        /// </remarks>
+        /// <param name="beatmapSet">The beatmap set to update. Updates will be applied directly (so a transaction should be started if this instance is managed).</param>
+        /// <param name="preferOnlineFetch">Whether metadata from an online source should be preferred. If <c>true</c>, the local cache will be skipped to ensure the freshest data state possible.</param>
+        public void Update(BeatmapSetInfo beatmapSet, bool preferOnlineFetch)
         {
             foreach (var b in beatmapSet.Beatmaps)
-                lookup(beatmapSet, b);
+                lookup(beatmapSet, b, preferOnlineFetch);
         }
 
-        public Task UpdateAsync(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
+        private void lookup(BeatmapSetInfo set, BeatmapInfo beatmapInfo, bool preferOnlineFetch)
         {
-            return Task.WhenAll(beatmapSet.Beatmaps.Select(b => UpdateAsync(beatmapSet, b, cancellationToken)).ToArray());
-        }
+            bool apiAvailable = api?.State.Value == APIState.Online;
 
-        // todo: expose this when we need to do individual difficulty lookups.
-        protected Task UpdateAsync(BeatmapSetInfo beatmapSet, BeatmapInfo beatmapInfo, CancellationToken cancellationToken)
-            => Task.Factory.StartNew(() => lookup(beatmapSet, beatmapInfo), cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+            bool useLocalCache = !apiAvailable || !preferOnlineFetch;
 
-        private void lookup(BeatmapSetInfo set, BeatmapInfo beatmapInfo)
-        {
-            if (checkLocalCache(set, beatmapInfo))
+            if (useLocalCache && checkLocalCache(set, beatmapInfo))
                 return;
 
-            if (api?.State.Value != APIState.Online)
+            if (!apiAvailable)
                 return;
 
             var req = new GetBeatmapRequest(beatmapInfo);
@@ -88,7 +85,7 @@ namespace osu.Game.Beatmaps
                 if (req.CompletionState == APIRequestCompletionState.Failed)
                 {
                     logForModel(set, $"Online retrieval failed for {beatmapInfo}");
-                    beatmapInfo.OnlineID = -1;
+                    beatmapInfo.ResetOnlineInfo();
                     return;
                 }
 
@@ -96,21 +93,26 @@ namespace osu.Game.Beatmaps
 
                 if (res != null)
                 {
-                    beatmapInfo.Status = res.Status;
-
-                    Debug.Assert(beatmapInfo.BeatmapSet != null);
-
-                    beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapOnlineStatus.None;
-                    beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
-                    beatmapInfo.BeatmapSet.DateRanked = res.BeatmapSet?.Ranked;
-                    beatmapInfo.BeatmapSet.DateSubmitted = res.BeatmapSet?.Submitted;
-
+                    beatmapInfo.OnlineID = res.OnlineID;
                     beatmapInfo.OnlineMD5Hash = res.MD5Hash;
                     beatmapInfo.LastOnlineUpdate = res.LastUpdated;
 
-                    beatmapInfo.OnlineID = res.OnlineID;
+                    Debug.Assert(beatmapInfo.BeatmapSet != null);
+                    beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
 
-                    beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
+                    // Some metadata should only be applied if there's no local changes.
+                    if (shouldSaveOnlineMetadata(beatmapInfo))
+                    {
+                        beatmapInfo.Status = res.Status;
+                        beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
+                    }
+
+                    if (beatmapInfo.BeatmapSet.Beatmaps.All(shouldSaveOnlineMetadata))
+                    {
+                        beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapOnlineStatus.None;
+                        beatmapInfo.BeatmapSet.DateRanked = res.BeatmapSet?.Ranked;
+                        beatmapInfo.BeatmapSet.DateSubmitted = res.BeatmapSet?.Submitted;
+                    }
 
                     logForModel(set, $"Online retrieval mapped {beatmapInfo} to {res.OnlineBeatmapSetID} / {res.OnlineID}.");
                 }
@@ -118,7 +120,7 @@ namespace osu.Game.Beatmaps
             catch (Exception e)
             {
                 logForModel(set, $"Online retrieval failed for {beatmapInfo} ({e.Message})");
-                beatmapInfo.OnlineID = -1;
+                beatmapInfo.ResetOnlineInfo();
             }
         }
 
@@ -134,7 +136,7 @@ namespace osu.Game.Beatmaps
                 File.Delete(compressedCacheFilePath);
                 File.Delete(cacheFilePath);
 
-                Logger.Log($"{nameof(BeatmapOnlineLookupQueue)}'s online cache download failed: {ex}", LoggingTarget.Database);
+                Logger.Log($"{nameof(BeatmapUpdaterMetadataLookup)}'s online cache download failed: {ex}", LoggingTarget.Database);
             };
 
             cacheDownloadRequest.Finished += () =>
@@ -151,7 +153,7 @@ namespace osu.Game.Beatmaps
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log($"{nameof(BeatmapOnlineLookupQueue)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
+                    Logger.Log($"{nameof(BeatmapUpdaterMetadataLookup)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
                     File.Delete(cacheFilePath);
                 }
                 finally
@@ -209,18 +211,25 @@ namespace osu.Game.Beatmaps
                             {
                                 var status = (BeatmapOnlineStatus)reader.GetByte(2);
 
-                                beatmapInfo.Status = status;
+                                // Some metadata should only be applied if there's no local changes.
+                                if (shouldSaveOnlineMetadata(beatmapInfo))
+                                {
+                                    beatmapInfo.Status = status;
+                                    beatmapInfo.Metadata.Author.OnlineID = reader.GetInt32(3);
+                                }
 
-                                Debug.Assert(beatmapInfo.BeatmapSet != null);
-
-                                beatmapInfo.BeatmapSet.Status = status;
-                                beatmapInfo.BeatmapSet.OnlineID = reader.GetInt32(0);
                                 // TODO: DateSubmitted and DateRanked are not provided by local cache.
                                 beatmapInfo.OnlineID = reader.GetInt32(1);
-                                beatmapInfo.Metadata.Author.OnlineID = reader.GetInt32(3);
-
                                 beatmapInfo.OnlineMD5Hash = reader.GetString(4);
                                 beatmapInfo.LastOnlineUpdate = reader.GetDateTimeOffset(5);
+
+                                Debug.Assert(beatmapInfo.BeatmapSet != null);
+                                beatmapInfo.BeatmapSet.OnlineID = reader.GetInt32(0);
+
+                                if (beatmapInfo.BeatmapSet.Beatmaps.All(shouldSaveOnlineMetadata))
+                                {
+                                    beatmapInfo.BeatmapSet.Status = status;
+                                }
 
                                 logForModel(set, $"Cached local retrieval for {beatmapInfo}.");
                                 return true;
@@ -238,12 +247,17 @@ namespace osu.Game.Beatmaps
         }
 
         private void logForModel(BeatmapSetInfo set, string message) =>
-            RealmArchiveModelImporter<BeatmapSetInfo>.LogForModel(set, $"[{nameof(BeatmapOnlineLookupQueue)}] {message}");
+            RealmArchiveModelImporter<BeatmapSetInfo>.LogForModel(set, $"[{nameof(BeatmapUpdaterMetadataLookup)}] {message}");
+
+        /// <summary>
+        /// Check whether the provided beatmap is in a state where online "ranked" status metadata should be saved against it.
+        /// Handles the case where a user may have locally modified a beatmap in the editor and expects the local status to stick.
+        /// </summary>
+        private static bool shouldSaveOnlineMetadata(BeatmapInfo beatmapInfo) => beatmapInfo.MatchesOnlineVersion || beatmapInfo.Status != BeatmapOnlineStatus.LocallyModified;
 
         public void Dispose()
         {
             cacheDownloadRequest?.Dispose();
-            updateScheduler?.Dispose();
         }
     }
 }

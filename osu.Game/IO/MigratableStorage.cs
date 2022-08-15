@@ -26,6 +26,11 @@ namespace osu.Game.IO
         /// </summary>
         public virtual string[] IgnoreFiles => Array.Empty<string>();
 
+        /// <summary>
+        /// A list of file/directory suffixes which should not be migrated.
+        /// </summary>
+        public virtual string[] IgnoreSuffixes => Array.Empty<string>();
+
         protected MigratableStorage(Storage storage, string subPath = null)
             : base(storage, subPath)
         {
@@ -73,12 +78,18 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IgnoreFiles.Contains(fi.Name))
                     continue;
 
+                if (IgnoreSuffixes.Any(suffix => fi.Name.EndsWith(suffix, StringComparison.Ordinal)))
+                    continue;
+
                 allFilesDeleted &= AttemptOperation(() => fi.Delete(), throwOnFailure: false);
             }
 
             foreach (DirectoryInfo dir in target.GetDirectories())
             {
                 if (topLevelExcludes && IgnoreDirectories.Contains(dir.Name))
+                    continue;
+
+                if (IgnoreSuffixes.Any(suffix => dir.Name.EndsWith(suffix, StringComparison.Ordinal)))
                     continue;
 
                 allFilesDeleted &= AttemptOperation(() => dir.Delete(true), throwOnFailure: false);
@@ -96,17 +107,33 @@ namespace osu.Game.IO
             if (!destination.Exists)
                 Directory.CreateDirectory(destination.FullName);
 
-            foreach (System.IO.FileInfo fi in source.GetFiles())
+            foreach (System.IO.FileInfo fileInfo in source.GetFiles())
             {
-                if (topLevelExcludes && IgnoreFiles.Contains(fi.Name))
+                if (topLevelExcludes && IgnoreFiles.Contains(fileInfo.Name))
                     continue;
 
-                AttemptOperation(() => fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true));
+                if (IgnoreSuffixes.Any(suffix => fileInfo.Name.EndsWith(suffix, StringComparison.Ordinal)))
+                    continue;
+
+                AttemptOperation(() =>
+                {
+                    fileInfo.Refresh();
+
+                    // A temporary file may have been deleted since the initial GetFiles operation.
+                    // We don't want the whole migration process to fail in such a case.
+                    if (!fileInfo.Exists)
+                        return;
+
+                    fileInfo.CopyTo(Path.Combine(destination.FullName, fileInfo.Name), true);
+                });
             }
 
             foreach (DirectoryInfo dir in source.GetDirectories())
             {
                 if (topLevelExcludes && IgnoreDirectories.Contains(dir.Name))
+                    continue;
+
+                if (IgnoreSuffixes.Any(suffix => dir.Name.EndsWith(suffix, StringComparison.Ordinal)))
                     continue;
 
                 CopyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);

@@ -4,7 +4,6 @@
 #nullable disable
 
 using NUnit.Framework;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets;
@@ -120,7 +119,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void pressAndCheckTime(Key key, double expectedTime)
         {
             AddStep($"press {key}", () => InputManager.Key(key));
-            AddUntilStep($"time is {expectedTime}", () => Precision.AlmostEquals(expectedTime, EditorClock.CurrentTime, 1));
+            AddUntilStep($"time is {expectedTime}", () => EditorClock.CurrentTime, () => Is.EqualTo(expectedTime).Within(1));
         }
     }
 }

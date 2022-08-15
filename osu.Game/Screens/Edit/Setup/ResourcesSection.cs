@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.IO;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -30,8 +29,8 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private IBindable<WorkingBeatmap> working { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private Editor editor { get; set; }
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; }
 
         [Resolved]
         private SetupScreenHeader header { get; set; }
@@ -78,7 +77,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // remove the previous background for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
+            var oldFile = set.GetFile(working.Value.Metadata.BackgroundFile);
 
             using (var stream = source.OpenRead())
             {
@@ -87,6 +86,8 @@ namespace osu.Game.Screens.Edit.Setup
 
                 beatmaps.AddFile(set, stream, destination.Name);
             }
+
+            editorBeatmap.SaveState();
 
             working.Value.Metadata.BackgroundFile = destination.Name;
             header.Background.UpdateBackground();
@@ -105,7 +106,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // remove the previous audio track for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.AudioFile);
+            var oldFile = set.GetFile(working.Value.Metadata.AudioFile);
 
             using (var stream = source.OpenRead())
             {
@@ -117,9 +118,9 @@ namespace osu.Game.Screens.Edit.Setup
 
             working.Value.Metadata.AudioFile = destination.Name;
 
+            editorBeatmap.SaveState();
             music.ReloadCurrentTrack();
 
-            editor?.UpdateClockSource();
             return true;
         }
 
