@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public IEnumerable<Bindable<double>> NonGameplayAdjustments => GameplayClock.NonGameplayAdjustments;
+        public IEnumerable<double> NonGameplayAdjustments => GameplayClock.NonGameplayAdjustments;
 
         /// <summary>
         /// The final clock which is exposed to gameplay components.

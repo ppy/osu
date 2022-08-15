@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
@@ -30,7 +31,7 @@ namespace osu.Game.Tests.NonVisual
         {
             public List<Bindable<double>> MutableNonGameplayAdjustments { get; } = new List<Bindable<double>>();
 
-            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => MutableNonGameplayAdjustments;
+            public override IEnumerable<double> NonGameplayAdjustments => MutableNonGameplayAdjustments.Select(b => b.Value);
 
             public TestGameplayClock(IFrameBasedClock underlyingClock)
                 : base(underlyingClock)
