@@ -86,7 +86,9 @@ namespace osu.Game.Screens.Play
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.CacheAs<IGameplayClock>(GameplayClock = CreateGameplayClock(AdjustableSource));
+            GameplayClock = CreateGameplayClock(AdjustableSource);
+
+            dependencies.CacheAs<IGameplayClock>(this);
 
             GameplayClock.StartTime = StartTime;
             GameplayClock.IsPaused.BindTo(isPaused);
