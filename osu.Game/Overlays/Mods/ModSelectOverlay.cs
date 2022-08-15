@@ -708,7 +708,18 @@ namespace osu.Game.Overlays.Mods
                 FinishTransforms();
             }
 
-            protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || (Column as ModColumn)?.SelectionAnimationRunning == true;
+            protected override bool RequiresChildrenUpdate
+            {
+                get
+                {
+                    bool result = base.RequiresChildrenUpdate;
+
+                    if (Column is ModColumn modColumn)
+                        result |= !modColumn.ItemsLoaded || modColumn.SelectionAnimationRunning;
+
+                    return result;
+                }
+            }
 
             private void updateState()
             {
