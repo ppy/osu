@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 using osu.Game.Rulesets.Taiko.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -63,7 +64,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 );
             }
 
-            return TaikoDifficultyPreprocessor.Process(difficultyHitObjects);
+            TaikoColourDifficultyPreprocessor.ProcessAndAssign(difficultyHitObjects);
+
+            return difficultyHitObjects;
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)

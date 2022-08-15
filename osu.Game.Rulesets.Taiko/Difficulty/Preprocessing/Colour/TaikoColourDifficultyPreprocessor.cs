@@ -18,9 +18,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// assigning the appropriate <see cref="TaikoDifficultyHitObjectColour"/>s to each <see cref="TaikoDifficultyHitObject"/>,
         /// and pre-evaluating colour difficulty of each <see cref="TaikoDifficultyHitObject"/>.
         /// </summary>
-        public static List<TaikoDifficultyHitObjectColour> ProcessAndAssign(List<DifficultyHitObject> hitObjects)
+        public static void ProcessAndAssign(List<DifficultyHitObject> hitObjects)
         {
-            List<TaikoDifficultyHitObjectColour> colours = new List<TaikoDifficultyHitObjectColour>();
             List<CoupledColourEncoding> encodings = encode(hitObjects);
 
             // Assign indexing and encoding data to all relevant objects. Only the first note of each encoding type is
@@ -48,8 +47,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                     }
                 }
             }
-
-            return colours;
         }
 
         /// <summary>
