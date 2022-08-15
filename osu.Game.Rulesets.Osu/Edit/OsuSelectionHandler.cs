@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
@@ -18,6 +19,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -60,6 +62,17 @@ namespace osu.Game.Rulesets.Osu.Edit
             base.OnOperationEnded();
             referenceOrigin = null;
             referencePathTypes = null;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Key == Key.M && e.ControlPressed && e.ShiftPressed)
+            {
+                mergeSelection();
+                return true;
+            }
+
+            return false;
         }
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
