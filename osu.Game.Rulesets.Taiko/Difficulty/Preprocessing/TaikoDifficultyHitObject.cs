@@ -45,9 +45,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <summary>
         /// Colour data for this hit object. This is used by colour evaluator to calculate colour difficulty, but can be used
         /// by other skills in the future.
-        /// This need to be writeable by TaikoDifficultyHitObjectColour so that it can assign potentially reused instances
         /// </summary>
-        public TaikoDifficultyHitObjectColour Colour;
+        public readonly TaikoDifficultyHitObjectColour Colour;
 
         /// <summary>
         /// Creates a new difficulty hit object.
@@ -59,7 +58,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="objects">The list of all <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="centreHitObjects">The list of centre (don) <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="rimHitObjects">The list of rim (kat) <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
-        /// <param name="noteObjects">The list of <see cref="DifficultyHitObject"/>s that is a hit (i.e. not a slider or spinner) in the current beatmap.</param>
+        /// <param name="noteObjects">The list of <see cref="DifficultyHitObject"/>s that is a hit (i.e. not a drumroll or swell) in the current beatmap.</param>
         /// <param name="index">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
         public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate,
                                         List<DifficultyHitObject> objects,
@@ -68,33 +67,31 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                                         List<TaikoDifficultyHitObject> noteObjects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            // Create the Colour object, its properties should be filled in by TaikoDifficultyPreprocessor
-            Colour = new TaikoDifficultyHitObjectColour();
-
-            var currentHit = hitObject as Hit;
             noteDifficultyHitObjects = noteObjects;
 
+            // Create the Colour object, its properties should be filled in by TaikoDifficultyPreprocessor
+            Colour = new TaikoDifficultyHitObjectColour();
             Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRate);
-            HitType? hitType = currentHit?.Type;
 
-            if (hitType == HitType.Centre)
+            switch ((hitObject as Hit)?.Type)
             {
-                MonoIndex = centreHitObjects.Count;
-                centreHitObjects.Add(this);
-                monoDifficultyHitObjects = centreHitObjects;
-            }
-            else if (hitType == HitType.Rim)
-            {
-                MonoIndex = rimHitObjects.Count;
-                rimHitObjects.Add(this);
-                monoDifficultyHitObjects = rimHitObjects;
-            }
+                case HitType.Centre:
+                    MonoIndex = centreHitObjects.Count;
+                    centreHitObjects.Add(this);
+                    monoDifficultyHitObjects = centreHitObjects;
+                    break;
 
-            // Need to be done after HitType is set.
-            if (hitType == null) return;
+                case HitType.Rim:
+                    MonoIndex = rimHitObjects.Count;
+                    rimHitObjects.Add(this);
+                    monoDifficultyHitObjects = rimHitObjects;
+                    break;
 
-            NoteIndex = noteObjects.Count;
-            noteObjects.Add(this);
+                default:
+                    NoteIndex = noteObjects.Count;
+                    noteObjects.Add(this);
+                    break;
+            }
         }
 
         /// <summary>

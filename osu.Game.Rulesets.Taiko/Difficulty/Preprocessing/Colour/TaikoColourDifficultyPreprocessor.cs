@@ -9,8 +9,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
 {
     /// <summary>
-    /// Utility class to perform various encodings. This is separated out from the encoding classes to prevent circular
-    /// dependencies.
+    /// Utility class to perform various encodings.
     /// </summary>
     public class TaikoColourDifficultyPreprocessor
     {
@@ -26,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
 
             // Assign indexing and encoding data to all relevant objects. Only the first note of each encoding type is
             // assigned with the relevant encodings.
-            encodings.ForEach(coupledEncoding =>
+            foreach (var coupledEncoding in encodings)
             {
                 coupledEncoding.Payload[0].Payload[0].EncodedData[0].Colour.CoupledColourEncoding = coupledEncoding;
 
@@ -48,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                         monoEncoding.EncodedData[0].Colour.MonoEncoding = monoEncoding;
                     }
                 }
-            });
+            }
 
             return colours;
         }
@@ -58,35 +57,29 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// </summary>
         public static List<MonoEncoding> EncodeMono(List<DifficultyHitObject> data)
         {
-            List<MonoEncoding> encoded = new List<MonoEncoding>();
-
-            MonoEncoding? lastEncoded = null;
+            List<MonoEncoding> encodings = new List<MonoEncoding>();
+            MonoEncoding? currentEncoding = null;
 
             for (int i = 0; i < data.Count; i++)
             {
                 TaikoDifficultyHitObject taikoObject = (TaikoDifficultyHitObject)data[i];
+
                 // This ignores all non-note objects, which may or may not be the desired behaviour
                 TaikoDifficultyHitObject? previousObject = taikoObject.PreviousNote(0);
 
-                // If the colour changed or if this is the first object in the run, create a new mono encoding
-                if
-                (
-                    previousObject == null || // First object in the list
-                    (taikoObject.BaseObject as Hit)?.Type != (previousObject.BaseObject as Hit)?.Type
-                )
+                // If this is the first object in the list or the colour changed, create a new mono encoding
+                if (currentEncoding == null || (taikoObject.BaseObject as Hit)?.Type != (previousObject?.BaseObject as Hit)?.Type)
                 {
-                    lastEncoded = new MonoEncoding();
-                    lastEncoded.EncodedData.Add(taikoObject);
-                    encoded.Add(lastEncoded);
+                    currentEncoding = new MonoEncoding();
+                    encodings.Add(currentEncoding);
                     continue;
                 }
 
-                // If we're here, we're in the same encoding as the previous object, thus lastEncoded is not null.
                 // Add the current object to the encoded payload.
-                lastEncoded!.EncodedData.Add(taikoObject);
+                currentEncoding.EncodedData.Add(taikoObject);
             }
 
-            return encoded;
+            return encodings;
         }
 
         /// <summary>
@@ -94,27 +87,24 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// </summary>
         public static List<ColourEncoding> EncodeColour(List<MonoEncoding> data)
         {
-            List<ColourEncoding> encoded = new List<ColourEncoding>();
-            ColourEncoding? lastEncoded = null;
+            List<ColourEncoding> encodings = new List<ColourEncoding>();
+            ColourEncoding? currentEncoding = null;
 
             for (int i = 0; i < data.Count; i++)
             {
-                // Starts a new ColourEncoding if the previous MonoEncoding has a different mono length, or if this is
-                // the first MonoEncoding in the list.
-                if (lastEncoded == null || data[i].RunLength != data[i - 1].RunLength)
+                // Start a new ColourEncoding if the previous MonoEncoding has a different mono length, or if this is the first MonoEncoding in the list.
+                if (currentEncoding == null || data[i].RunLength != data[i - 1].RunLength)
                 {
-                    lastEncoded = new ColourEncoding();
-                    lastEncoded.Payload.Add(data[i]);
-                    encoded.Add(lastEncoded);
+                    currentEncoding = new ColourEncoding();
+                    encodings.Add(currentEncoding);
                     continue;
                 }
 
-                // If we're here, we're in the same encoding as the previous object. Add the current MonoEncoding to the
-                // encoded payload.
-                lastEncoded.Payload.Add(data[i]);
+                // Add the current MonoEncoding to the encoded payload.
+                currentEncoding.Payload.Add(data[i]);
             }
 
-            return encoded;
+            return encodings;
         }
 
         /// <summary>
@@ -122,16 +112,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// </summary>
         public static List<CoupledColourEncoding> EncodeCoupledColour(List<ColourEncoding> data)
         {
-            List<CoupledColourEncoding> encoded = new List<CoupledColourEncoding>();
-            CoupledColourEncoding? lastEncoded = null;
+            List<CoupledColourEncoding> encodings = new List<CoupledColourEncoding>();
+            CoupledColourEncoding? currentEncoding = null;
 
             for (int i = 0; i < data.Count; i++)
             {
-                // Starts a new CoupledColourEncoding. ColourEncodings that should be grouped together will be handled
-                // later within this loop.
-                lastEncoded = new CoupledColourEncoding
+                // Start a new CoupledColourEncoding. ColourEncodings that should be grouped together will be handled later within this loop.
+                currentEncoding = new CoupledColourEncoding
                 {
-                    Previous = lastEncoded
+                    Previous = currentEncoding
                 };
 
                 // Determine if future ColourEncodings should be grouped.
@@ -140,7 +129,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                 if (!isCoupled)
                 {
                     // If not, add the current ColourEncoding to the encoded payload and continue.
-                    lastEncoded.Payload.Add(data[i]);
+                    currentEncoding.Payload.Add(data[i]);
                 }
                 else
                 {
@@ -148,27 +137,27 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                     // subsequent ColourEncodings should be grouped by increasing i and doing the appropriate isCoupled check.
                     while (isCoupled)
                     {
-                        lastEncoded.Payload.Add(data[i]);
+                        currentEncoding.Payload.Add(data[i]);
                         i++;
                         isCoupled = i < data.Count - 2 && data[i].IsRepetitionOf(data[i + 2]);
                     }
 
                     // Skip over viewed data and add the rest to the payload
-                    lastEncoded.Payload.Add(data[i]);
-                    lastEncoded.Payload.Add(data[i + 1]);
+                    currentEncoding.Payload.Add(data[i]);
+                    currentEncoding.Payload.Add(data[i + 1]);
                     i++;
                 }
 
-                encoded.Add(lastEncoded);
+                encodings.Add(currentEncoding);
             }
 
             // Final pass to find repetition intervals
-            for (int i = 0; i < encoded.Count; i++)
+            for (int i = 0; i < encodings.Count; i++)
             {
-                encoded[i].FindRepetitionInterval();
+                encodings[i].FindRepetitionInterval();
             }
 
-            return encoded;
+            return encodings;
         }
 
         /// <summary>
