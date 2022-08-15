@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     [Cached(typeof(IGameplayClock))]
     [Cached(typeof(IFrameStableClock))]
-    public class FrameStabilityContainer : Container, IHasReplayHandler, IFrameStableClock, IGameplayClock
+    public sealed class FrameStabilityContainer : Container, IHasReplayHandler, IFrameStableClock, IGameplayClock
     {
         public ReplayInputHandler? ReplayInputHandler { get; set; }
 
