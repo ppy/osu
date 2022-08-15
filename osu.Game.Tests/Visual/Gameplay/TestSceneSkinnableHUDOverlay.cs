@@ -36,8 +36,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
-        [Cached]
-        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
+        [Cached(typeof(IGameplayClock))]
+        private readonly IGameplayClock gameplayClock = new GameplayClock(new FramedClock());
 
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
