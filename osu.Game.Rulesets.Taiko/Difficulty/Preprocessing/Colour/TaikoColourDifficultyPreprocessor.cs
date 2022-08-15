@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                 TaikoDifficultyHitObject? previousObject = taikoObject.PreviousNote(0);
 
                 // If this is the first object in the list or the colour changed, create a new mono encoding
-                if (currentEncoding == null || (taikoObject.BaseObject as Hit)?.Type != (previousObject?.BaseObject as Hit)?.Type)
+                if (currentEncoding == null || previousObject == null || (taikoObject.BaseObject as Hit)?.Type != (previousObject.BaseObject as Hit)?.Type)
                 {
                     currentEncoding = new MonoEncoding();
                     encodings.Add(currentEncoding);
