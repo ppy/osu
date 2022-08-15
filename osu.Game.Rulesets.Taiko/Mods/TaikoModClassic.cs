@@ -76,28 +76,25 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             double timeRange = (playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
 
-            if (mods != null)
+            if (mods.OfType<TaikoModHardRock>().Any())
             {
-                if (mods.OfType<TaikoModHardRock>().Any())
-                {
-                    // For hardrock, the playfield time range is clamped to within classicMaxTimeRange and the equivalent
-                    // time range for a 16:10 aspect ratio.
-                    drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.None;
-                    timeRange = Math.Clamp(timeRange, DrawableTaikoRuleset.AspectRatioToTimeRange(1.6f), classic_max_time_range);
+                // For hardrock, the playfield time range is clamped to within classicMaxTimeRange and the equivalent
+                // time range for a 16:10 aspect ratio.
+                drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.None;
+                timeRange = Math.Clamp(timeRange, DrawableTaikoRuleset.AspectRatioToTimeRange(1.6f), classic_max_time_range);
 
-                    // Scale hidden parameter to match the adjusted time range. This only affects hdhr.
-                    float hiddenRatio = 1.0f - Math.Min((float)timeRange / (float)DrawableTaikoRuleset.DEFAULT_TIME_RANGE, 1.0f);
-                    float fadeOutDuration = Math.Max(0.24f - hiddenRatio, 0.1f);
-                    hiddenInitialAlpha.Value = 0.3f * fadeOutDuration / 0.2f;
-                    hiddenFadeOutDuration.Value = fadeOutDuration;
-                }
-                else if (mods.OfType<TaikoModHidden>().Any())
-                {
-                    // Hidden aspect adjustment is overriden by hardrock in the case of hdhr, hence these are applied only
-                    // if hardrock is not enabled.
-                    drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.Trim;
-                    drawableTaikoRuleset.TargetAspectRatio.Value = classic_hidden_aspect_ratio;
-                }
+                // Scale hidden parameter to match the adjusted time range. This only affects hdhr.
+                float hiddenRatio = 1.0f - Math.Min((float)timeRange / (float)DrawableTaikoRuleset.DEFAULT_TIME_RANGE, 1.0f);
+                float fadeOutDuration = Math.Max(0.24f - hiddenRatio, 0.1f);
+                hiddenInitialAlpha.Value = 0.3f * fadeOutDuration / 0.2f;
+                hiddenFadeOutDuration.Value = fadeOutDuration;
+            }
+            else if (mods.OfType<TaikoModHidden>().Any())
+            {
+                // Hidden aspect adjustment is overriden by hardrock in the case of hdhr, hence these are applied only
+                // if hardrock is not enabled.
+                drawableTaikoRuleset.AdjustmentMethod.Value = AspectRatioAdjustmentMethod.Trim;
+                drawableTaikoRuleset.TargetAspectRatio.Value = classic_hidden_aspect_ratio;
             }
 
             drawableTaikoRuleset.TimeRange.Value = timeRange;
@@ -115,8 +112,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
                         Debug.Assert(drawableTaikoRuleset != null);
 
                         // For classic nomod, the effective aspect ratio will be limited to 2:1 by fading the notes in.
-                        // We do not need to explicitly detect mods here, as both hidden and hardrock limits the time
-                        // range to under the 2:1 limit.
+                        // We do not need to explicitly detect mods here, as both hidden and hardrock in classic limits
+                        // the time range to under the 2:1 limit.
                         if (drawableTaikoRuleset.TimeRange.Value > classic_max_time_range)
                         {
                             o.Alpha = 0;
