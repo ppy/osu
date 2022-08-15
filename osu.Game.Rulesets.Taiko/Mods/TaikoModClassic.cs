@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private static readonly double classic_max_time_range = DrawableTaikoRuleset.AspectRatioToTimeRange(classic_max_aspect_ratio);
 
         /// <summary>
-        /// The classic hidden aspect ratio. Note that time rate is also stretched to this from the default aspect ratio.
+        /// The classic hidden aspect ratio. Note that time range is also stretched to this from the default aspect ratio.
         /// </summary>
         private const float classic_hidden_aspect_ratio = 4.0f / 3.0f;
 
