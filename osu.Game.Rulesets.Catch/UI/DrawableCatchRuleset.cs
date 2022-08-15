@@ -39,7 +39,6 @@ namespace osu.Game.Rulesets.Catch.UI
             KeyBindingInputManager.Add(new TouchInputField());
         }
 
-
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
         protected override ReplayRecorder CreateReplayRecorder(Score score) => new CatchReplayRecorder(score, (CatchPlayfield)Playfield);
