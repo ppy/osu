@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledFileChooser audioTrackChooser;
         private LabelledFileChooser backgroundChooser;
 
-        public override LocalisableString Title => EditorSetupResourcesStrings.Resources;
+        public override LocalisableString Title => EditorSetupStrings.ResourcesHeader;
 
         [Resolved]
         private MusicController music { get; set; }
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 audioTrackChooser = new LabelledFileChooser(".mp3", ".ogg")
                 {
-                    Label = EditorSetupResourcesStrings.AudioTrack,
+                    Label = EditorSetupStrings.AudioTrack,
                     FixedLabelWidth = LABEL_WIDTH,
                     TabbableContentContainer = this
                 },
@@ -145,12 +145,12 @@ namespace osu.Game.Screens.Edit.Setup
         private void updatePlaceholderText()
         {
             audioTrackChooser.Text = audioTrackChooser.Current.Value == null
-                ? EditorSetupResourcesStrings.ClickToSelectTrack
-                : EditorSetupResourcesStrings.ClickToReplaceTrack;
+                ? EditorSetupStrings.ClickToSelectTrack
+                : EditorSetupStrings.ClickToReplaceTrack;
 
             backgroundChooser.Text = backgroundChooser.Current.Value == null
-                ? EditorSetupResourcesStrings.ClickToSelectBackground
-                : EditorSetupResourcesStrings.ClickToReplaceBackground;
+                ? EditorSetupStrings.ClickToSelectBackground
+                : EditorSetupStrings.ClickToReplaceBackground;
         }
     }
 }

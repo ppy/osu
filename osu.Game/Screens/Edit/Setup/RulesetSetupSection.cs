@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public abstract class RulesetSetupSection : SetupSection
     {
-        public sealed override LocalisableString Title => EditorSetupRulesetStrings.Ruleset(rulesetInfo.Name);
+        public sealed override LocalisableString Title => EditorSetupStrings.RulesetHeader(rulesetInfo.Name);
 
         private readonly RulesetInfo rulesetInfo;
 

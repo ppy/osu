@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledSliderBar<float> approachRateSlider;
         private LabelledSliderBar<float> overallDifficultySlider;
 
-        public override LocalisableString Title => BeatmapDiscussionsStrings.OwnerEditorVersion;
+        public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = BeatmapsetsStrings.ShowStatsCs,
                     FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupDifficultyStrings.CircleSizeDescription,
+                    Description = EditorSetupStrings.CircleSizeDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.CircleSize)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = BeatmapsetsStrings.ShowStatsDrain,
                     FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupDifficultyStrings.DrainRateDescription,
+                    Description = EditorSetupStrings.DrainRateDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.DrainRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = BeatmapsetsStrings.ShowStatsAr,
                     FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupDifficultyStrings.ApproachRateDescription,
+                    Description = EditorSetupStrings.ApproachRateDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.ApproachRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = BeatmapsetsStrings.ShowStatsAccuracy,
                     FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupDifficultyStrings.OverallDifficultyDescription,
+                    Description = EditorSetupStrings.OverallDifficultyDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.OverallDifficulty)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
