@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play
         private bool isClickable;
 
         [Resolved]
-        private GameplayClock gameplayClock { get; set; }
+        private IGameplayClock gameplayClock { get; set; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 

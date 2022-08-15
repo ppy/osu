@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.UI
 
         public IFrameStableClock FrameStableClock => frameStableClock;
 
-        [Cached(typeof(GameplayClock))]
+        [Cached(typeof(IGameplayClock))]
         private readonly FrameStabilityClock frameStableClock;
 
         public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
@@ -64,12 +64,12 @@ namespace osu.Game.Rulesets.UI
         private int direction = 1;
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock)
+        private void load(IGameplayClock clock)
         {
             if (clock != null)
             {
                 parentGameplayClock = frameStableClock.ParentGameplayClock = clock;
-                frameStableClock.IsPaused.BindTo(clock.IsPaused);
+                ((IBindable<bool>)frameStableClock.IsPaused).BindTo(clock.IsPaused);
             }
         }
 
@@ -272,7 +272,7 @@ namespace osu.Game.Rulesets.UI
 
         private class FrameStabilityClock : GameplayClock, IFrameStableClock
         {
-            public GameplayClock ParentGameplayClock;
+            public IGameplayClock ParentGameplayClock;
 
             public readonly Bindable<bool> IsCatchingUp = new Bindable<bool>();
 

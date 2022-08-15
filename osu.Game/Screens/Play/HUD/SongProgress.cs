@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD
         public bool UsesFixedAnchor { get; set; }
 
         [Resolved]
-        protected GameplayClock GameplayClock { get; private set; } = null!;
+        protected IGameplayClock GameplayClock { get; private set; } = null!;
 
         [Resolved(canBeNull: true)]
         private DrawableRuleset? drawableRuleset { get; set; }
