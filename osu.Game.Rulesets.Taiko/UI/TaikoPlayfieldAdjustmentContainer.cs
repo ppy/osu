@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         public const float DEFAULT_ASPECT = 16f / 9f;
 
         /// <summary>
-        /// The target aspect ratio for the playfield. This only affects display directly and not the time range,
+        /// The target aspect ratio for the playfield. This only affects display directly and not the time range.
         /// </summary>
         public Bindable<float> TargetAspectRatio = new Bindable<float>(DEFAULT_ASPECT);
 
