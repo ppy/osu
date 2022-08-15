@@ -86,11 +86,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                     rimHitObjects.Add(this);
                     monoDifficultyHitObjects = rimHitObjects;
                     break;
+            }
 
-                default:
-                    NoteIndex = noteObjects.Count;
-                    noteObjects.Add(this);
-                    break;
+            if (hitObject is Hit)
+            {
+                NoteIndex = noteObjects.Count;
+                noteObjects.Add(this);
             }
         }
 
