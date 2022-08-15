@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public const double MINIMUM_SKIP_TIME = 1000;
 
-        protected Track Track => (Track)SourceClock;
-
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
             Default = 1,
@@ -133,7 +131,7 @@ namespace osu.Game.Screens.Play
                     this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ =>
                     {
                         if (IsPaused.Value == isPaused.NewValue)
-                            AdjustableSource.Stop();
+                            base.OnIsPausedChanged(isPaused);
                     });
                 }
                 else
@@ -142,14 +140,14 @@ namespace osu.Game.Screens.Play
             else
             {
                 if (isPaused.NewValue)
-                    AdjustableSource.Stop();
+                    base.OnIsPausedChanged(isPaused);
 
                 // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
                 pauseFreqAdjust.Value = isPaused.NewValue ? 0 : 1;
 
                 // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
                 // Without doing this, an initial seek may be performed with the wrong offset.
-                GameplayClock.ProcessFrame();
+                FramedClock.ProcessFrame();
             }
         }
 
@@ -178,12 +176,12 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Skip()
         {
-            if (GameplayClock.CurrentTime > skipTargetTime - MINIMUM_SKIP_TIME)
+            if (FramedClock.CurrentTime > skipTargetTime - MINIMUM_SKIP_TIME)
                 return;
 
             double skipTarget = skipTargetTime - MINIMUM_SKIP_TIME;
 
-            if (GameplayClock.CurrentTime < 0 && skipTarget > 6000)
+            if (FramedClock.CurrentTime < 0 && skipTarget > 6000)
                 // double skip exception for storyboards with very long intros
                 skipTarget = 0;
 
@@ -218,8 +216,11 @@ namespace osu.Game.Screens.Play
             if (speedAdjustmentsApplied)
                 return;
 
-            Track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            Track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            if (SourceClock is Track track)
+            {
+                track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+                track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            }
 
             nonGameplayAdjustments.Add(pauseFreqAdjust);
             nonGameplayAdjustments.Add(UserPlaybackRate);
@@ -232,8 +233,11 @@ namespace osu.Game.Screens.Play
             if (!speedAdjustmentsApplied)
                 return;
 
-            Track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            Track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            if (SourceClock is Track track)
+            {
+                track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+                track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            }
 
             nonGameplayAdjustments.Remove(pauseFreqAdjust);
             nonGameplayAdjustments.Remove(UserPlaybackRate);

@@ -15,7 +15,7 @@ using osu.Framework.Utils;
 namespace osu.Game.Screens.Play
 {
     /// <summary>
-    /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> via DI for gameplay components to use.
+    /// Encapsulates gameplay timing logic and provides a <see cref="IGameplayClock"/> via DI for gameplay components to use.
     /// </summary>
     public class GameplayClockContainer : Container, IAdjustableClock, IGameplayClock
     {
@@ -24,15 +24,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public IBindable<bool> IsPaused => isPaused;
 
-        private readonly BindableBool isPaused = new BindableBool(true);
-
         /// <summary>
-        /// The adjustable source clock used for gameplay. Should be used for seeks and clock control.
-        /// </summary>
-        protected readonly DecoupleableInterpolatingFramedClock AdjustableSource;
-
-        /// <summary>
-        /// The source clock.
+        /// The source clock. Should generally not be used for any timekeeping purposes.
         /// </summary>
         public IClock SourceClock { get; private set; }
 
@@ -55,7 +48,14 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The final clock which is exposed to gameplay components.
         /// </summary>
-        protected IFrameBasedClock GameplayClock { get; private set; } = null!;
+        protected IFrameBasedClock FramedClock { get; private set; } = null!;
+
+        private readonly BindableBool isPaused = new BindableBool(true);
+
+        /// <summary>
+        /// The adjustable source clock used for gameplay. Should be used for seeks and clock control.
+        /// </summary>
+        private readonly DecoupleableInterpolatingFramedClock decoupledClock;
 
         /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Play
 
             RelativeSizeAxes = Axes.Both;
 
-            AdjustableSource = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
             IsPaused.BindValueChanged(OnIsPausedChanged);
         }
 
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            GameplayClock = CreateGameplayClock(AdjustableSource);
+            FramedClock = CreateGameplayClock(decoupledClock);
 
             dependencies.CacheAs<IGameplayClock>(this);
 
@@ -89,13 +89,13 @@ namespace osu.Game.Screens.Play
         {
             ensureSourceClockSet();
 
-            if (!AdjustableSource.IsRunning)
+            if (!decoupledClock.IsRunning)
             {
                 // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
                 // This accounts for the clock source potentially taking time to enter a completely stopped state
-                Seek(GameplayClock.CurrentTime);
+                Seek(FramedClock.CurrentTime);
 
-                AdjustableSource.Start();
+                decoupledClock.Start();
             }
 
             isPaused.Value = false;
@@ -109,10 +109,10 @@ namespace osu.Game.Screens.Play
         {
             Logger.Log($"{nameof(GameplayClockContainer)} seeking to {time}");
 
-            AdjustableSource.Seek(time);
+            decoupledClock.Seek(time);
 
             // Manually process to make sure the gameplay clock is correctly updated after a seek.
-            GameplayClock.ProcessFrame();
+            FramedClock.ProcessFrame();
 
             OnSeek?.Invoke();
         }
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Play
         public void Reset(bool startClock = false)
         {
             // Manually stop the source in order to not affect the IsPaused state.
-            AdjustableSource.Stop();
+            decoupledClock.Stop();
 
             if (!IsPaused.Value || startClock)
                 Start();
@@ -142,10 +142,10 @@ namespace osu.Game.Screens.Play
         /// Changes the source clock.
         /// </summary>
         /// <param name="sourceClock">The new source.</param>
-        protected void ChangeSource(IClock sourceClock) => AdjustableSource.ChangeSource(SourceClock = sourceClock);
+        protected void ChangeSource(IClock sourceClock) => decoupledClock.ChangeSource(SourceClock = sourceClock);
 
         /// <summary>
-        /// Ensures that the <see cref="AdjustableSource"/> is set to <see cref="SourceClock"/>, if it hasn't been given a source yet.
+        /// Ensures that the <see cref="decoupledClock"/> is set to <see cref="SourceClock"/>, if it hasn't been given a source yet.
         /// This is usually done before a seek to avoid accidentally seeking only the adjustable source in decoupled mode,
         /// but not the actual source clock.
         /// That will pretty much only happen on the very first call of this method, as the source clock is passed in the constructor,
@@ -153,38 +153,38 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void ensureSourceClockSet()
         {
-            if (AdjustableSource.Source == null)
+            if (decoupledClock.Source == null)
                 ChangeSource(SourceClock);
         }
 
         protected override void Update()
         {
             if (!IsPaused.Value)
-                GameplayClock.ProcessFrame();
+                FramedClock.ProcessFrame();
 
             base.Update();
         }
 
         /// <summary>
-        /// Invoked when the value of <see cref="IsPaused"/> is changed to start or stop the <see cref="AdjustableSource"/> clock.
+        /// Invoked when the value of <see cref="IsPaused"/> is changed to start or stop the <see cref="decoupledClock"/> clock.
         /// </summary>
         /// <param name="isPaused">Whether the clock should now be paused.</param>
         protected virtual void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
         {
             if (isPaused.NewValue)
-                AdjustableSource.Stop();
+                decoupledClock.Stop();
             else
-                AdjustableSource.Start();
+                decoupledClock.Start();
         }
 
         /// <summary>
-        /// Creates the final <see cref="GameplayClock"/> which is exposed via DI to be used by gameplay components.
+        /// Creates the final <see cref="FramedClock"/> which is exposed via DI to be used by gameplay components.
         /// </summary>
         /// <remarks>
         /// Any intermediate clocks such as platform offsets should be applied here.
         /// </remarks>
         /// <param name="source">The <see cref="IFrameBasedClock"/> providing the source time.</param>
-        /// <returns>The final <see cref="GameplayClock"/>.</returns>
+        /// <returns>The final <see cref="FramedClock"/>.</returns>
         protected virtual IFrameBasedClock CreateGameplayClock(IFrameBasedClock source) => source;
 
         #region IAdjustableClock
@@ -201,15 +201,15 @@ namespace osu.Game.Screens.Play
 
         double IAdjustableClock.Rate
         {
-            get => GameplayClock.Rate;
+            get => FramedClock.Rate;
             set => throw new NotSupportedException();
         }
 
-        public double Rate => GameplayClock.Rate;
+        public double Rate => FramedClock.Rate;
 
-        public double CurrentTime => GameplayClock.CurrentTime;
+        public double CurrentTime => FramedClock.CurrentTime;
 
-        public bool IsRunning => GameplayClock.IsRunning;
+        public bool IsRunning => FramedClock.IsRunning;
 
         #endregion
 
@@ -218,11 +218,11 @@ namespace osu.Game.Screens.Play
             // Handled via update. Don't process here to safeguard from external usages potentially processing frames additional times.
         }
 
-        public double ElapsedFrameTime => GameplayClock.ElapsedFrameTime;
+        public double ElapsedFrameTime => FramedClock.ElapsedFrameTime;
 
-        public double FramesPerSecond => GameplayClock.FramesPerSecond;
+        public double FramesPerSecond => FramedClock.FramesPerSecond;
 
-        public FrameTimeInfo TimeInfo => GameplayClock.TimeInfo;
+        public FrameTimeInfo TimeInfo => FramedClock.TimeInfo;
 
         public double TrueGameplayRate
         {
