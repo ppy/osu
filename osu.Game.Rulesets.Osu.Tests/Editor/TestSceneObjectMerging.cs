@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Utils;
@@ -19,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestSimpleMerge()
         {
-            HitCircle circle1 = null;
-            HitCircle circle2 = null;
+            HitCircle? circle1 = null;
+            HitCircle? circle2 = null;
 
             AddStep("select first two circles", () =>
             {
@@ -33,20 +31,20 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             mergeSelection();
 
-            AddAssert("slider created", () => sliderCreatedFor(
+            AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
                 (pos: circle1.Position, pathType: PathType.Linear),
                 (pos: circle2.Position, pathType: null)));
 
             AddStep("undo", () => Editor.Undo());
-            AddAssert("merged objects restored", () => objectsRestored(circle1, circle2));
+            AddAssert("merged objects restored", () => circle1 is not null && circle2 is not null && objectsRestored(circle1, circle2));
         }
 
         [Test]
         public void TestMergeCircleSlider()
         {
-            HitCircle circle1 = null;
-            Slider slider = null;
-            HitCircle circle2 = null;
+            HitCircle? circle1 = null;
+            Slider? slider = null;
+            HitCircle? circle2 = null;
 
             AddStep("select a circle, slider, circle", () =>
             {
@@ -63,6 +61,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider created", () =>
             {
+                if (circle1 is null || circle2 is null || slider is null)
+                    return false;
+
                 var controlPoints = slider.Path.ControlPoints;
                 (Vector2, PathType?)[] args = new (Vector2, PathType?)[controlPoints.Count + 2];
                 args[0] = (circle1.Position, PathType.Linear);
@@ -77,15 +78,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             AddStep("undo", () => Editor.Undo());
-            AddAssert("merged objects restored", () => objectsRestored(circle1, slider, circle2));
+            AddAssert("merged objects restored", () => circle1 is not null && circle2 is not null && slider is not null && objectsRestored(circle1, slider, circle2));
         }
 
         [Test]
         public void TestMergeSliderSlider()
         {
-            Slider slider1 = null;
-            SliderPath slider1Path = null;
-            Slider slider2 = null;
+            Slider? slider1 = null;
+            SliderPath? slider1Path = null;
+            Slider? slider2 = null;
 
             AddStep("select two sliders", () =>
             {
@@ -101,6 +102,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider created", () =>
             {
+                if (slider1 is null || slider2 is null || slider1Path is null)
+                    return false;
+
                 var controlPoints1 = slider1Path.ControlPoints;
                 var controlPoints2 = slider2.Path.ControlPoints;
                 (Vector2, PathType?)[] args = new (Vector2, PathType?)[controlPoints1.Count + controlPoints2.Count - 1];
@@ -121,14 +125,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("merged slider matches first slider", () =>
             {
                 var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
-                return mergedSlider.HeadCircle.Samples.SequenceEqual(slider1.HeadCircle.Samples)
-                       && mergedSlider.TailCircle.Samples.SequenceEqual(slider1.TailCircle.Samples)
-                       && mergedSlider.Samples.SequenceEqual(slider1.Samples)
-                       && mergedSlider.SampleControlPoint.IsRedundant(slider1.SampleControlPoint);
+                return slider1 is not null && mergedSlider.HeadCircle.Samples.SequenceEqual(slider1.HeadCircle.Samples)
+                                           && mergedSlider.TailCircle.Samples.SequenceEqual(slider1.TailCircle.Samples)
+                                           && mergedSlider.Samples.SequenceEqual(slider1.Samples)
+                                           && mergedSlider.SampleControlPoint.IsRedundant(slider1.SampleControlPoint);
             });
 
             AddAssert("slider end is at same completion for last slider", () =>
             {
+                if (slider1Path is null || slider2 is null)
+                    return false;
+
                 var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
                 return Precision.AlmostEquals(mergedSlider.Path.Distance, slider1Path.CalculatedDistance + slider2.Path.Distance);
             });
