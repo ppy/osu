@@ -68,18 +68,18 @@ namespace osu.Game.Rulesets.Catch.UI
                             Origin = Anchor.CentreLeft,
                             Children = new Drawable[]
                             {
-                                leftBox = new ArrowHitbox(TouchCatchAction.MoveLeft, ref trackedActions, colours.Gray2)
+                                leftBox = new ArrowHitbox(TouchCatchAction.MoveLeft, ref trackedActions, colours.Gray3)
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
                                     RelativeSizeAxes = Axes.Both,
                                     RelativePositionAxes = Axes.Both,
                                     Width = 0.5f,
                                 },
-                                leftDashBox = new ArrowHitbox(TouchCatchAction.DashLeft, ref trackedActions, colours.Gray3)
+                                leftDashBox = new ArrowHitbox(TouchCatchAction.DashLeft, ref trackedActions, colours.Gray2)
                                 {
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
                                     RelativeSizeAxes = Axes.Both,
                                     RelativePositionAxes = Axes.Both,
                                     Width = 0.5f,
@@ -95,18 +95,18 @@ namespace osu.Game.Rulesets.Catch.UI
                             Origin = Anchor.CentreRight,
                             Children = new Drawable[]
                             {
-                                rightBox = new ArrowHitbox(TouchCatchAction.MoveRight, ref trackedActions, colours.Gray2)
+                                rightBox = new ArrowHitbox(TouchCatchAction.MoveRight, ref trackedActions, colours.Gray3)
                                 {
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
                                     RelativeSizeAxes = Axes.Both,
                                     RelativePositionAxes = Axes.Both,
                                     Width = 0.5f,
                                 },
-                                rightDashBox = new ArrowHitbox(TouchCatchAction.DashRight, ref trackedActions, colours.Gray3)
+                                rightDashBox = new ArrowHitbox(TouchCatchAction.DashRight, ref trackedActions, colours.Gray2)
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
                                     RelativeSizeAxes = Axes.Both,
                                     RelativePositionAxes = Axes.Both,
                                     Width = 0.5f,
