@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void Update(Playfield playfield)
         {
-            Debug.Assert(drawableTaikoRuleset != null);
+            Debug.Assert(drawableTaikoRuleset != null && mods != null);
 
             // Classic taiko scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
             const float scroll_rate = 10;
