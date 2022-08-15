@@ -81,7 +81,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                 {
                     currentEncoding = new MonoEncoding();
                     encodings.Add(currentEncoding);
-                    continue;
                 }
 
                 // Add the current object to the encoded payload.
@@ -106,7 +105,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                 {
                     currentEncoding = new ColourEncoding();
                     encodings.Add(currentEncoding);
-                    continue;
                 }
 
                 // Add the current MonoEncoding to the encoded payload.
