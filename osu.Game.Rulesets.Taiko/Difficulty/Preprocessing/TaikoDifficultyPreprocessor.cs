@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
-    public class TaikoDifficultyPreprocessor
+    public static class TaikoDifficultyPreprocessor
     {
         /// <summary>
         /// Does preprocessing on a list of <see cref="TaikoDifficultyHitObject"/>s.
