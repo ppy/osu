@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledSwitchButton letterboxDuringBreaks;
         private LabelledSwitchButton samplesMatchPlaybackRate;
 
-        public override LocalisableString Title => EditorSetupDesignStrings.Design;
+        public override LocalisableString Title => EditorSetupStrings.DesignHeader;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -39,9 +39,9 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 EnableCountdown = new LabelledSwitchButton
                 {
-                    Label = EditorSetupDesignStrings.EnableCountdown,
+                    Label = EditorSetupStrings.EnableCountdown,
                     Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None },
-                    Description = EditorSetupDesignStrings.CountdownDescription
+                    Description = EditorSetupStrings.CountdownDescription
                 },
                 CountdownSettings = new FillFlowContainer
                 {
@@ -53,41 +53,41 @@ namespace osu.Game.Screens.Edit.Setup
                     {
                         CountdownSpeed = new LabelledEnumDropdown<CountdownType>
                         {
-                            Label = EditorSetupDesignStrings.CountdownSpeed,
+                            Label = EditorSetupStrings.CountdownSpeed,
                             Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None ? Beatmap.BeatmapInfo.Countdown : CountdownType.Normal },
                             Items = Enum.GetValues(typeof(CountdownType)).Cast<CountdownType>().Where(type => type != CountdownType.None)
                         },
                         CountdownOffset = new LabelledNumberBox
                         {
-                            Label = EditorSetupDesignStrings.CountdownOffset,
+                            Label = EditorSetupStrings.CountdownOffset,
                             Current = { Value = Beatmap.BeatmapInfo.CountdownOffset.ToString() },
-                            Description = EditorSetupDesignStrings.CountdownOffsetDescription,
+                            Description = EditorSetupStrings.CountdownOffsetDescription,
                         }
                     }
                 },
                 Empty(),
                 widescreenSupport = new LabelledSwitchButton
                 {
-                    Label = EditorSetupDesignStrings.WidescreenSupport,
-                    Description = EditorSetupDesignStrings.WidescreenSupportDescription,
+                    Label = EditorSetupStrings.WidescreenSupport,
+                    Description = EditorSetupStrings.WidescreenSupportDescription,
                     Current = { Value = Beatmap.BeatmapInfo.WidescreenStoryboard }
                 },
                 epilepsyWarning = new LabelledSwitchButton
                 {
-                    Label = EditorSetupDesignStrings.EpilepsyWarning,
-                    Description = EditorSetupDesignStrings.EpilepsyWarningDescription,
+                    Label = EditorSetupStrings.EpilepsyWarning,
+                    Description = EditorSetupStrings.EpilepsyWarningDescription,
                     Current = { Value = Beatmap.BeatmapInfo.EpilepsyWarning }
                 },
                 letterboxDuringBreaks = new LabelledSwitchButton
                 {
-                    Label = EditorSetupDesignStrings.LetterboxDuringBreaks,
-                    Description = EditorSetupDesignStrings.LetterboxDuringBreaksDescription,
+                    Label = EditorSetupStrings.LetterboxDuringBreaks,
+                    Description = EditorSetupStrings.LetterboxDuringBreaksDescription,
                     Current = { Value = Beatmap.BeatmapInfo.LetterboxInBreaks }
                 },
                 samplesMatchPlaybackRate = new LabelledSwitchButton
                 {
-                    Label = EditorSetupDesignStrings.SamplesMatchPlaybackRate,
-                    Description = EditorSetupDesignStrings.SamplesMatchPlaybackRateDescription,
+                    Label = EditorSetupStrings.SamplesMatchPlaybackRate,
+                    Description = EditorSetupStrings.SamplesMatchPlaybackRateDescription,
                     Current = { Value = Beatmap.BeatmapInfo.SamplesMatchPlaybackRate }
                 }
             };
