@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -15,12 +16,14 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> via DI for gameplay components to use.
     /// </summary>
-    public class GameplayClockContainer : Container, IAdjustableClock, IFrameBasedClock
+    public class GameplayClockContainer : Container, IAdjustableClock, IGameplayClock
     {
         /// <summary>
         /// Whether gameplay is paused.
         /// </summary>
-        public readonly BindableBool IsPaused = new BindableBool(true);
+        public IBindable<bool> IsPaused => isPaused;
+
+        private readonly BindableBool isPaused = new BindableBool(true);
 
         /// <summary>
         /// The adjustable source clock used for gameplay. Should be used for seeks and clock control.
@@ -58,6 +61,8 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        public IEnumerable<Bindable<double>> NonGameplayAdjustments => GameplayClock.NonGameplayAdjustments;
+
         /// <summary>
         /// The final clock which is exposed to gameplay components.
         /// </summary>
@@ -84,7 +89,7 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs<IGameplayClock>(GameplayClock = CreateGameplayClock(AdjustableSource));
 
             GameplayClock.StartTime = StartTime;
-            GameplayClock.IsPaused.BindTo(IsPaused);
+            GameplayClock.IsPaused.BindTo(isPaused);
 
             return dependencies;
         }
@@ -105,7 +110,7 @@ namespace osu.Game.Screens.Play
                 AdjustableSource.Start();
             }
 
-            IsPaused.Value = false;
+            isPaused.Value = false;
         }
 
         /// <summary>
@@ -127,7 +132,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Stops gameplay.
         /// </summary>
-        public void Stop() => IsPaused.Value = true;
+        public void Stop() => isPaused.Value = true;
 
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
@@ -232,5 +237,7 @@ namespace osu.Game.Screens.Play
         public double FramesPerSecond => GameplayClock.FramesPerSecond;
 
         public FrameTimeInfo TimeInfo => GameplayClock.TimeInfo;
+
+        public double TrueGameplayRate => GameplayClock.TrueGameplayRate;
     }
 }
