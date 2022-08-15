@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
     /// <summary>
     /// Utility class to perform various encodings.
     /// </summary>
-    public class TaikoColourDifficultyPreprocessor
+    public static class TaikoColourDifficultyPreprocessor
     {
         /// <summary>
         /// Processes and encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="TaikoDifficultyHitObjectColour"/>s,
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         public static List<TaikoDifficultyHitObjectColour> ProcessAndAssign(List<DifficultyHitObject> hitObjects)
         {
             List<TaikoDifficultyHitObjectColour> colours = new List<TaikoDifficultyHitObjectColour>();
-            List<CoupledColourEncoding> encodings = Encode(hitObjects);
+            List<CoupledColourEncoding> encodings = encode(hitObjects);
 
             // Assign indexing and encoding data to all relevant objects. Only the first note of each encoding type is
             // assigned with the relevant encodings.
@@ -53,9 +53,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         }
 
         /// <summary>
+        /// Encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="CoupledColourEncoding"/>s.
+        /// </summary>
+        private static List<CoupledColourEncoding> encode(List<DifficultyHitObject> data)
+        {
+            List<MonoEncoding> firstPass = encodeMono(data);
+            List<ColourEncoding> secondPass = encodeColour(firstPass);
+            List<CoupledColourEncoding> thirdPass = encodeCoupledColour(secondPass);
+
+            return thirdPass;
+        }
+
+        /// <summary>
         /// Encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="MonoEncoding"/>s.
         /// </summary>
-        public static List<MonoEncoding> EncodeMono(List<DifficultyHitObject> data)
+        private static List<MonoEncoding> encodeMono(List<DifficultyHitObject> data)
         {
             List<MonoEncoding> encodings = new List<MonoEncoding>();
             MonoEncoding? currentEncoding = null;
@@ -85,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// <summary>
         /// Encodes a list of <see cref="MonoEncoding"/>s into a list of <see cref="ColourEncoding"/>s.
         /// </summary>
-        public static List<ColourEncoding> EncodeColour(List<MonoEncoding> data)
+        private static List<ColourEncoding> encodeColour(List<MonoEncoding> data)
         {
             List<ColourEncoding> encodings = new List<ColourEncoding>();
             ColourEncoding? currentEncoding = null;
@@ -110,7 +122,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// <summary>
         /// Encodes a list of <see cref="ColourEncoding"/>s into a list of <see cref="CoupledColourEncoding"/>s.
         /// </summary>
-        public static List<CoupledColourEncoding> EncodeCoupledColour(List<ColourEncoding> data)
+        private static List<CoupledColourEncoding> encodeCoupledColour(List<ColourEncoding> data)
         {
             List<CoupledColourEncoding> encodings = new List<CoupledColourEncoding>();
             CoupledColourEncoding? currentEncoding = null;
@@ -155,18 +167,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
             }
 
             return encodings;
-        }
-
-        /// <summary>
-        /// Encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="CoupledColourEncoding"/>s.
-        /// </summary>
-        public static List<CoupledColourEncoding> Encode(List<DifficultyHitObject> data)
-        {
-            List<MonoEncoding> firstPass = EncodeMono(data);
-            List<ColourEncoding> secondPass = EncodeColour(firstPass);
-            List<CoupledColourEncoding> thirdPass = EncodeCoupledColour(secondPass);
-
-            return thirdPass;
         }
     }
 }
