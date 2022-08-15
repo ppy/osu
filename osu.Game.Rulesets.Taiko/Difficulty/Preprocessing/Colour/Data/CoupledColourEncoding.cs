@@ -20,18 +20,23 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// <summary>
         /// The <see cref="ColourEncoding"/>s that are grouped together within this <see cref="CoupledColourEncoding"/>.
         /// </summary>
-        public List<ColourEncoding> Payload = new List<ColourEncoding>();
+        public readonly List<ColourEncoding> Payload = new List<ColourEncoding>();
 
         /// <summary>
         /// The previous <see cref="CoupledColourEncoding"/>. This is used to determine the repetition interval.
         /// </summary>
-        public CoupledColourEncoding? Previous = null;
+        public readonly CoupledColourEncoding? Previous;
 
         /// <summary>
         /// How many <see cref="CoupledColourEncoding"/> between the current and previous identical <see cref="CoupledColourEncoding"/>.
         /// If no repetition is found this will have a value of <see cref="max_repetition_interval"/> + 1.
         /// </summary>
         public int RepetitionInterval { get; private set; } = max_repetition_interval + 1;
+
+        public CoupledColourEncoding(CoupledColourEncoding? previous)
+        {
+            Previous = previous;
+        }
 
         /// <summary>
         /// Returns true if other is considered a repetition of this encoding. This is true if other's first two payloads

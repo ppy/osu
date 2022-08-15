@@ -118,10 +118,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
             for (int i = 0; i < data.Count; i++)
             {
                 // Start a new CoupledColourEncoding. ColourEncodings that should be grouped together will be handled later within this loop.
-                currentEncoding = new CoupledColourEncoding
-                {
-                    Previous = currentEncoding
-                };
+                currentEncoding = new CoupledColourEncoding(currentEncoding);
 
                 // Determine if future ColourEncodings should be grouped.
                 bool isCoupled = i < data.Count - 2 && data[i].IsRepetitionOf(data[i + 2]);
