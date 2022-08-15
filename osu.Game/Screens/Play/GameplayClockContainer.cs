@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -16,13 +15,8 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> via DI for gameplay components to use.
     /// </summary>
-    public class GameplayClockContainer : Container, IAdjustableClock
+    public class GameplayClockContainer : Container, IAdjustableClock, IFrameBasedClock
     {
-        /// <summary>
-        /// The final clock which is exposed to gameplay components.
-        /// </summary>
-        public GameplayClock GameplayClock { get; private set; }
-
         /// <summary>
         /// Whether gameplay is paused.
         /// </summary>
@@ -41,7 +35,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Invoked when a seek has been performed via <see cref="Seek"/>
         /// </summary>
-        public event Action OnSeek;
+        public event Action? OnSeek;
 
         private double? startTime;
 
@@ -59,10 +53,15 @@ namespace osu.Game.Screens.Play
             {
                 startTime = value;
 
-                if (GameplayClock != null)
+                if (GameplayClock.IsNotNull())
                     GameplayClock.StartTime = value;
             }
         }
+
+        /// <summary>
+        /// The final clock which is exposed to gameplay components.
+        /// </summary>
+        protected GameplayClock GameplayClock { get; private set; } = null!;
 
         /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
@@ -215,12 +214,23 @@ namespace osu.Game.Screens.Play
             set => throw new NotSupportedException();
         }
 
-        double IClock.Rate => GameplayClock.Rate;
+        public double Rate => GameplayClock.Rate;
 
         public double CurrentTime => GameplayClock.CurrentTime;
 
         public bool IsRunning => GameplayClock.IsRunning;
 
         #endregion
+
+        public void ProcessFrame()
+        {
+            // Handled via update. Don't process here to safeguard from external usages potentially processing frames additional times.
+        }
+
+        public double ElapsedFrameTime => GameplayClock.ElapsedFrameTime;
+
+        public double FramesPerSecond => GameplayClock.FramesPerSecond;
+
+        public FrameTimeInfo TimeInfo => GameplayClock.TimeInfo;
     }
 }
