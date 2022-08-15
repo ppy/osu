@@ -94,7 +94,10 @@ namespace osu.Game.Screens.Play.HUD
                 double objectOffsetCurrent = currentTime - FirstHitTime;
 
                 double objectDuration = LastHitTime - FirstHitTime;
-                UpdateProgress(objectOffsetCurrent / objectDuration, false);
+                if (objectDuration == 0)
+                    UpdateProgress(0, false);
+                else
+                    UpdateProgress(objectOffsetCurrent / objectDuration, false);
             }
         }
     }
