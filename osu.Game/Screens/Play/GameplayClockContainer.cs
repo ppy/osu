@@ -3,13 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 
 namespace osu.Game.Screens.Play
 {
@@ -40,8 +41,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public event Action? OnSeek;
 
-        private double? startTime;
-
         /// <summary>
         /// The time from which the clock should start. Will be seeked to on calling <see cref="Reset"/>.
         /// </summary>
@@ -49,24 +48,14 @@ namespace osu.Game.Screens.Play
         /// If not set, a value of zero will be used.
         /// Importantly, the value will be inferred from the current ruleset in <see cref="MasterGameplayClockContainer"/> unless specified.
         /// </remarks>
-        public double? StartTime
-        {
-            get => startTime;
-            set
-            {
-                startTime = value;
+        public double? StartTime { get; set; }
 
-                if (GameplayClock.IsNotNull())
-                    GameplayClock.StartTime = value;
-            }
-        }
-
-        public IEnumerable<double> NonGameplayAdjustments => GameplayClock.NonGameplayAdjustments;
+        public virtual IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
 
         /// <summary>
         /// The final clock which is exposed to gameplay components.
         /// </summary>
-        protected GameplayClock GameplayClock { get; private set; } = null!;
+        protected IFrameBasedClock GameplayClock { get; private set; } = null!;
 
         /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
@@ -89,9 +78,6 @@ namespace osu.Game.Screens.Play
             GameplayClock = CreateGameplayClock(AdjustableSource);
 
             dependencies.CacheAs<IGameplayClock>(this);
-
-            GameplayClock.StartTime = StartTime;
-            GameplayClock.IsPaused.BindTo(isPaused);
 
             return dependencies;
         }
@@ -126,7 +112,7 @@ namespace osu.Game.Screens.Play
             AdjustableSource.Seek(time);
 
             // Manually process to make sure the gameplay clock is correctly updated after a seek.
-            GameplayClock.UnderlyingClock.ProcessFrame();
+            GameplayClock.ProcessFrame();
 
             OnSeek?.Invoke();
         }
@@ -174,7 +160,7 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             if (!IsPaused.Value)
-                GameplayClock.UnderlyingClock.ProcessFrame();
+                GameplayClock.ProcessFrame();
 
             base.Update();
         }
@@ -199,7 +185,7 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         /// <param name="source">The <see cref="IFrameBasedClock"/> providing the source time.</param>
         /// <returns>The final <see cref="GameplayClock"/>.</returns>
-        protected virtual GameplayClock CreateGameplayClock(IFrameBasedClock source) => new GameplayClock(source);
+        protected virtual IFrameBasedClock CreateGameplayClock(IFrameBasedClock source) => source;
 
         #region IAdjustableClock
 
@@ -238,6 +224,22 @@ namespace osu.Game.Screens.Play
 
         public FrameTimeInfo TimeInfo => GameplayClock.TimeInfo;
 
-        public double TrueGameplayRate => GameplayClock.TrueGameplayRate;
+        public double TrueGameplayRate
+        {
+            get
+            {
+                double baseRate = Rate;
+
+                foreach (double adjustment in NonGameplayAdjustments)
+                {
+                    if (Precision.AlmostEquals(adjustment, 0))
+                        return 0;
+
+                    baseRate /= adjustment;
+                }
+
+                return baseRate;
+            }
+        }
     }
 }
