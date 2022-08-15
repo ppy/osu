@@ -47,6 +47,26 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("clear contents", Clear);
             AddStep("reset ruleset", () => Ruleset.Value = rulesetStore.GetRuleset(0));
             AddStep("reset mods", () => SelectedMods.SetDefault());
+            AddStep("set up presets", () =>
+            {
+                Realm.Write(r =>
+                {
+                    r.RemoveAll<ModPreset>();
+                    r.Add(new ModPreset
+                    {
+                        Name = "AR0",
+                        Description = "Too... many... circles...",
+                        Ruleset = r.Find<RulesetInfo>(OsuRuleset.SHORT_NAME),
+                        Mods = new[]
+                        {
+                            new OsuModDifficultyAdjust
+                            {
+                                ApproachRate = { Value = 0 }
+                            }
+                        }
+                    });
+                });
+            });
         }
 
         private void createScreen()
@@ -200,6 +220,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("select mod without configuration", () => SelectedMods.Value = new[] { new OsuModAutoplay() });
             assertCustomisationToggleState(disabled: true, active: false); // config was dismissed without explicit user action.
+
+            AddStep("select mod preset with mod requiring configuration", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ModPresetPanel>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            assertCustomisationToggleState(disabled: false, active: false);
         }
 
         [Test]
