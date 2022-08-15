@@ -247,8 +247,8 @@ namespace osu.Game.Overlays.Mods
                 modSettingChangeTracker?.Dispose();
 
                 updateMultiplier();
-                updateCustomisation(val);
                 updateFromExternalSelection();
+                updateCustomisation();
 
                 if (AllowCustomisation)
                 {
@@ -356,25 +356,26 @@ namespace osu.Game.Overlays.Mods
             multiplierDisplay.Current.Value = multiplier;
         }
 
-        private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
+        private void updateCustomisation()
         {
             if (CustomisationButton == null)
                 return;
 
-            bool anyCustomisableMod = false;
-            bool anyModWithRequiredCustomisationAdded = false;
+            bool anyCustomisableModActive = false;
+            bool anyModRequiresCustomisation = false;
 
-            foreach (var mod in SelectedMods.Value)
+            foreach (var modState in allAvailableMods)
             {
-                anyCustomisableMod |= mod.GetSettingsSourceProperties().Any();
-                anyModWithRequiredCustomisationAdded |= valueChangedEvent.OldValue.All(m => m.GetType() != mod.GetType()) && mod.RequiresConfiguration;
+                anyCustomisableModActive |= modState.Active.Value && modState.Mod.GetSettingsSourceProperties().Any();
+                anyModRequiresCustomisation |= modState.RequiresConfiguration;
+                modState.RequiresConfiguration = false;
             }
 
-            if (anyCustomisableMod)
+            if (anyCustomisableModActive)
             {
                 customisationVisible.Disabled = false;
 
-                if (anyModWithRequiredCustomisationAdded && !customisationVisible.Value)
+                if (anyModRequiresCustomisation && !customisationVisible.Value)
                     customisationVisible.Value = true;
             }
             else
