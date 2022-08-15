@@ -19,42 +19,39 @@ namespace osu.Game.Screens.Play
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
     /// </remarks>
     /// </summary>
-    public class GameplayClock : IFrameBasedClock
+    public class GameplayClock : IGameplayClock
     {
         internal readonly IFrameBasedClock UnderlyingClock;
 
         public readonly BindableBool IsPaused = new BindableBool();
 
-        /// <summary>
-        /// All adjustments applied to this clock which don't come from gameplay or mods.
-        /// </summary>
-        public virtual IEnumerable<Bindable<double>> NonGameplayAdjustments => Enumerable.Empty<Bindable<double>>();
+        IBindable<bool> IGameplayClock.IsPaused => IsPaused;
+
+        public virtual IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
 
         public GameplayClock(IFrameBasedClock underlyingClock)
         {
             UnderlyingClock = underlyingClock;
         }
 
+        public double? StartTime { get; internal set; }
+
         public double CurrentTime => UnderlyingClock.CurrentTime;
 
         public double Rate => UnderlyingClock.Rate;
 
-        /// <summary>
-        /// The rate of gameplay when playback is at 100%.
-        /// This excludes any seeking / user adjustments.
-        /// </summary>
         public double TrueGameplayRate
         {
             get
             {
                 double baseRate = Rate;
 
-                foreach (var adjustment in NonGameplayAdjustments)
+                foreach (double adjustment in NonGameplayAdjustments)
                 {
-                    if (Precision.AlmostEquals(adjustment.Value, 0))
+                    if (Precision.AlmostEquals(adjustment, 0))
                         return 0;
 
-                    baseRate /= adjustment.Value;
+                    baseRate /= adjustment;
                 }
 
                 return baseRate;

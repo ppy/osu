@@ -32,30 +32,86 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestAccessAfterStorageMigrate()
         {
-            RunTestWithRealm((realm, storage) =>
+            using (var migratedStorage = new TemporaryNativeStorage("realm-test-migration-target"))
+            {
+                RunTestWithRealm((realm, storage) =>
+                {
+                    var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
+
+                    Live<BeatmapInfo>? liveBeatmap = null;
+
+                    realm.Run(r =>
+                    {
+                        r.Write(_ => r.Add(beatmap));
+
+                        liveBeatmap = beatmap.ToLive(realm);
+                    });
+
+                    migratedStorage.DeleteDirectory(string.Empty);
+
+                    using (realm.BlockAllOperations("testing"))
+                        storage.Migrate(migratedStorage);
+
+                    Assert.IsFalse(liveBeatmap?.PerformRead(l => l.Hidden));
+                });
+            }
+        }
+
+        [Test]
+        public void TestFailedWritePerformsRollback()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                Assert.Throws<InvalidOperationException>(() =>
+                {
+                    realm.Write(r =>
+                    {
+                        r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata()));
+                        throw new InvalidOperationException();
+                    });
+                });
+
+                Assert.That(realm.Run(r => r.All<BeatmapInfo>()), Is.Empty);
+            });
+        }
+
+        [Test]
+        public void TestFailedNestedWritePerformsRollback()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                Assert.Throws<InvalidOperationException>(() =>
+                {
+                    realm.Write(r =>
+                    {
+                        realm.Write(_ =>
+                        {
+                            r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata()));
+                            throw new InvalidOperationException();
+                        });
+                    });
+                });
+
+                Assert.That(realm.Run(r => r.All<BeatmapInfo>()), Is.Empty);
+            });
+        }
+
+        [Test]
+        public void TestNestedWriteCalls()
+        {
+            RunTestWithRealm((realm, _) =>
             {
                 var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
 
-                Live<BeatmapInfo>? liveBeatmap = null;
+                var liveBeatmap = beatmap.ToLive(realm);
 
                 realm.Run(r =>
-                {
-                    r.Write(_ => r.Add(beatmap));
+                    r.Write(_ =>
+                        r.Write(_ =>
+                            r.Add(beatmap)))
+                );
 
-                    liveBeatmap = beatmap.ToLive(realm);
-                });
-
-                using (var migratedStorage = new TemporaryNativeStorage("realm-test-migration-target"))
-                {
-                    migratedStorage.DeleteDirectory(string.Empty);
-
-                    using (realm.BlockAllOperations())
-                    {
-                        storage.Migrate(migratedStorage);
-                    }
-
-                    Assert.IsFalse(liveBeatmap?.PerformRead(l => l.Hidden));
-                }
+                Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
             });
         }
 
@@ -283,14 +339,12 @@ namespace osu.Game.Tests.Database
                     liveBeatmap.PerformRead(resolved =>
                     {
                         // retrieval causes an implicit refresh. even changes that aren't related to the retrieval are fired at this point.
-                        // ReSharper disable once AccessToDisposedClosure
                         Assert.AreEqual(2, outerRealm.All<BeatmapInfo>().Count());
                         Assert.AreEqual(1, changesTriggered);
 
                         // can access properties without a crash.
                         Assert.IsFalse(resolved.Hidden);
 
-                        // ReSharper disable once AccessToDisposedClosure
                         outerRealm.Write(r =>
                         {
                             // can use with the main context.

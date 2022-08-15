@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -30,9 +28,9 @@ namespace osu.Game.Rulesets.Mods
 
         protected const float TRANSITION_DURATION = 100;
 
-        protected BindableNumber<int> CurrentCombo;
+        protected readonly BindableNumber<int> CurrentCombo = new BindableInt();
 
-        protected IBindable<bool> IsBreakTime;
+        protected readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
         protected float ComboBasedAlpha;
 
@@ -42,14 +40,14 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToPlayer(Player player)
         {
-            IsBreakTime = player.IsBreakTime.GetBoundCopy();
+            IsBreakTime.BindTo(player.IsBreakTime);
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             if (HiddenComboCount.Value == 0) return;
 
-            CurrentCombo = scoreProcessor.Combo.GetBoundCopy();
+            CurrentCombo.BindTo(scoreProcessor.Combo);
             CurrentCombo.BindValueChanged(combo =>
             {
                 ComboBasedAlpha = Math.Max(MIN_ALPHA, 1 - (float)combo.NewValue / HiddenComboCount.Value);

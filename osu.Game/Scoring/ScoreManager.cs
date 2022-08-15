@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -21,6 +22,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Online.API;
 
 namespace osu.Game.Scoring
 {
@@ -31,7 +33,7 @@ namespace osu.Game.Scoring
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler,
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler, IAPIProvider api,
                             BeatmapDifficultyCache difficultyCache = null, OsuConfigManager configManager = null)
             : base(storage, realm)
         {
@@ -39,7 +41,7 @@ namespace osu.Game.Scoring
             this.difficultyCache = difficultyCache;
             this.configManager = configManager;
 
-            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm)
+            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
@@ -171,6 +173,10 @@ namespace osu.Game.Scoring
 
                 // We can compute the max combo locally after the async beatmap difficulty computation.
                 var difficulty = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
+
+                if (difficulty == null)
+                    Logger.Log($"Couldn't get beatmap difficulty for beatmap {score.BeatmapInfo.OnlineID}");
+
                 return difficulty?.MaxCombo;
             }
 
@@ -261,6 +267,8 @@ namespace osu.Game.Scoring
         public IEnumerable<string> HandledExtensions => scoreImporter.HandledExtensions;
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => scoreImporter.Import(notification, tasks);
+
+        public Task<Live<ScoreInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
 
         public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool batchImport = false, CancellationToken cancellationToken = default) =>
             scoreImporter.ImportModel(item, archive, batchImport, cancellationToken);

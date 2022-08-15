@@ -1,11 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -16,18 +16,14 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> via DI for gameplay components to use.
     /// </summary>
-    [Cached]
-    public abstract class GameplayClockContainer : Container, IAdjustableClock
+    public class GameplayClockContainer : Container, IAdjustableClock, IGameplayClock
     {
-        /// <summary>
-        /// The final clock which is exposed to gameplay components.
-        /// </summary>
-        public GameplayClock GameplayClock { get; private set; }
-
         /// <summary>
         /// Whether gameplay is paused.
         /// </summary>
-        public readonly BindableBool IsPaused = new BindableBool(true);
+        public IBindable<bool> IsPaused => isPaused;
+
+        private readonly BindableBool isPaused = new BindableBool(true);
 
         /// <summary>
         /// The adjustable source clock used for gameplay. Should be used for seeks and clock control.
@@ -37,12 +33,14 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The source clock.
         /// </summary>
-        protected IClock SourceClock { get; private set; }
+        public IClock SourceClock { get; private set; }
 
         /// <summary>
         /// Invoked when a seek has been performed via <see cref="Seek"/>
         /// </summary>
-        public event Action OnSeek;
+        public event Action? OnSeek;
+
+        private double? startTime;
 
         /// <summary>
         /// The time from which the clock should start. Will be seeked to on calling <see cref="Reset"/>.
@@ -51,13 +49,30 @@ namespace osu.Game.Screens.Play
         /// If not set, a value of zero will be used.
         /// Importantly, the value will be inferred from the current ruleset in <see cref="MasterGameplayClockContainer"/> unless specified.
         /// </remarks>
-        public double? StartTime { get; set; }
+        public double? StartTime
+        {
+            get => startTime;
+            set
+            {
+                startTime = value;
+
+                if (GameplayClock.IsNotNull())
+                    GameplayClock.StartTime = value;
+            }
+        }
+
+        public IEnumerable<double> NonGameplayAdjustments => GameplayClock.NonGameplayAdjustments;
+
+        /// <summary>
+        /// The final clock which is exposed to gameplay components.
+        /// </summary>
+        protected GameplayClock GameplayClock { get; private set; } = null!;
 
         /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
         /// </summary>
         /// <param name="sourceClock">The source <see cref="IClock"/> used for timing.</param>
-        protected GameplayClockContainer(IClock sourceClock)
+        public GameplayClockContainer(IClock sourceClock)
         {
             SourceClock = sourceClock;
 
@@ -71,8 +86,12 @@ namespace osu.Game.Screens.Play
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.CacheAs(GameplayClock = CreateGameplayClock(AdjustableSource));
-            GameplayClock.IsPaused.BindTo(IsPaused);
+            GameplayClock = CreateGameplayClock(AdjustableSource);
+
+            dependencies.CacheAs<IGameplayClock>(this);
+
+            GameplayClock.StartTime = StartTime;
+            GameplayClock.IsPaused.BindTo(isPaused);
 
             return dependencies;
         }
@@ -93,7 +112,7 @@ namespace osu.Game.Screens.Play
                 AdjustableSource.Start();
             }
 
-            IsPaused.Value = false;
+            isPaused.Value = false;
         }
 
         /// <summary>
@@ -115,7 +134,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Stops gameplay.
         /// </summary>
-        public void Stop() => IsPaused.Value = true;
+        public void Stop() => isPaused.Value = true;
 
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
@@ -180,7 +199,7 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         /// <param name="source">The <see cref="IFrameBasedClock"/> providing the source time.</param>
         /// <returns>The final <see cref="GameplayClock"/>.</returns>
-        protected abstract GameplayClock CreateGameplayClock(IFrameBasedClock source);
+        protected virtual GameplayClock CreateGameplayClock(IFrameBasedClock source) => new GameplayClock(source);
 
         #region IAdjustableClock
 
@@ -192,9 +211,7 @@ namespace osu.Game.Screens.Play
 
         void IAdjustableClock.Reset() => Reset();
 
-        public void ResetSpeedAdjustments()
-        {
-        }
+        public void ResetSpeedAdjustments() => throw new NotImplementedException();
 
         double IAdjustableClock.Rate
         {
@@ -202,12 +219,25 @@ namespace osu.Game.Screens.Play
             set => throw new NotSupportedException();
         }
 
-        double IClock.Rate => GameplayClock.Rate;
+        public double Rate => GameplayClock.Rate;
 
         public double CurrentTime => GameplayClock.CurrentTime;
 
         public bool IsRunning => GameplayClock.IsRunning;
 
         #endregion
+
+        public void ProcessFrame()
+        {
+            // Handled via update. Don't process here to safeguard from external usages potentially processing frames additional times.
+        }
+
+        public double ElapsedFrameTime => GameplayClock.ElapsedFrameTime;
+
+        public double FramesPerSecond => GameplayClock.FramesPerSecond;
+
+        public FrameTimeInfo TimeInfo => GameplayClock.TimeInfo;
+
+        public double TrueGameplayRate => GameplayClock.TrueGameplayRate;
     }
 }

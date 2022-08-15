@@ -91,6 +91,7 @@ namespace osu.Game.Configuration
             // Input
             SetDefault(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
             SetDefault(OsuSetting.GameplayCursorSize, 1.0f, 0.1f, 2f, 0.01f);
+            SetDefault(OsuSetting.GameplayCursorDuringTouch, false);
             SetDefault(OsuSetting.AutoCursorSize, false);
 
             SetDefault(OsuSetting.MouseDisableButtons, false);
@@ -167,6 +168,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
+
+            SetDefault(OsuSetting.LastProcessedMetadataId, -1);
         }
 
         public IDictionary<OsuSetting, string> GetLoggableState() =>
@@ -222,6 +225,12 @@ namespace osu.Game.Configuration
 
             return new TrackedSettings
             {
+                new TrackedSetting<bool>(OsuSetting.ShowFpsDisplay, state => new SettingDescription(
+                    rawValue: state,
+                    name: GlobalActionKeyBindingStrings.ToggleFPSCounter,
+                    value: state ? CommonStrings.Enabled.ToLower() : CommonStrings.Disabled.ToLower(),
+                    shortcut: LookupKeyBindings(GlobalAction.ToggleFPSDisplay))
+                ),
                 new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, disabledState => new SettingDescription(
                     rawValue: !disabledState,
                     name: GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons,
@@ -284,6 +293,7 @@ namespace osu.Game.Configuration
         MenuCursorSize,
         GameplayCursorSize,
         AutoCursorSize,
+        GameplayCursorDuringTouch,
         DimLevel,
         BlurLevel,
         LightenDuringBreaks,
@@ -363,5 +373,6 @@ namespace osu.Game.Configuration
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
+        LastProcessedMetadataId
     }
 }

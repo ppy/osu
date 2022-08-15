@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,21 +51,21 @@ namespace osu.Game.Screens.Play
 
         private readonly WorkingBeatmap beatmap;
 
-        private HardwareCorrectionOffsetClock userGlobalOffsetClock;
-        private HardwareCorrectionOffsetClock userBeatmapOffsetClock;
-        private HardwareCorrectionOffsetClock platformOffsetClock;
-        private MasterGameplayClock masterGameplayClock;
-        private Bindable<double> userAudioOffset;
+        private HardwareCorrectionOffsetClock userGlobalOffsetClock = null!;
+        private HardwareCorrectionOffsetClock userBeatmapOffsetClock = null!;
+        private HardwareCorrectionOffsetClock platformOffsetClock = null!;
+        private MasterGameplayClock masterGameplayClock = null!;
+        private Bindable<double> userAudioOffset = null!;
 
-        private IDisposable beatmapOffsetSubscription;
+        private IDisposable? beatmapOffsetSubscription;
 
         private readonly double skipTargetTime;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         /// <summary>
         /// Create a new master gameplay clock container.
@@ -255,7 +253,7 @@ namespace osu.Game.Screens.Play
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => GameplayClock;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : null;
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
         {
@@ -305,7 +303,7 @@ namespace osu.Game.Screens.Play
         private class MasterGameplayClock : GameplayClock
         {
             public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
-            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => MutableNonGameplayAdjustments;
+            public override IEnumerable<double> NonGameplayAdjustments => MutableNonGameplayAdjustments.Select(b => b.Value);
 
             public MasterGameplayClock(FramedOffsetClock underlyingClock)
                 : base(underlyingClock)

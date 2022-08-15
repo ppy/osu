@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, _) =>
             {
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                 {
                 }
             });
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Database
             {
                 Task writeTask;
 
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                 {
                     writeTask = realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
                     Thread.Sleep(100);
@@ -169,7 +169,7 @@ namespace osu.Game.Tests.Database
 
                 Assert.Throws<TimeoutException>(() =>
                 {
-                    using (realm.BlockAllOperations())
+                    using (realm.BlockAllOperations("testing"))
                     {
                     }
                 });
@@ -177,7 +177,7 @@ namespace osu.Game.Tests.Database
                 stopThreadedUsage.Set();
 
                 // Ensure we can block a second time after the usage has ended.
-                using (realm.BlockAllOperations())
+                using (realm.BlockAllOperations("testing"))
                 {
                 }
             });
