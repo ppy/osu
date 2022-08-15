@@ -9,7 +9,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Tests.NonVisual
 {
     [TestFixture]
-    public class GameplayClockTest
+    public class GameplayClockContainerTest
     {
         [TestCase(0)]
         [TestCase(1)]
