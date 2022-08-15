@@ -209,9 +209,7 @@ namespace osu.Game.Screens.Play
 
         void IAdjustableClock.Reset() => Reset();
 
-        public void ResetSpeedAdjustments()
-        {
-        }
+        public void ResetSpeedAdjustments() => throw new NotImplementedException();
 
         double IAdjustableClock.Rate
         {
