@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            setClock();
+            Clock = this;
         }
 
         private PlaybackState state;
@@ -128,12 +128,7 @@ namespace osu.Game.Rulesets.UI
                 state = PlaybackState.Valid;
             }
 
-            if (parentGameplayClock == null)
-                setClock(); // LoadComplete may not be run yet, but we still want the clock.
-
-            Debug.Assert(parentGameplayClock != null);
-
-            double proposedTime = parentGameplayClock.CurrentTime;
+            double proposedTime = Clock.CurrentTime;
 
             if (FrameStablePlayback)
                 // if we require frame stability, the proposed time will be adjusted to move at most one known
@@ -153,14 +148,14 @@ namespace osu.Game.Rulesets.UI
             if (state == PlaybackState.Valid && proposedTime != manualClock.CurrentTime)
                 direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
 
-            double timeBehind = Math.Abs(proposedTime - parentGameplayClock.CurrentTime);
+            double timeBehind = Math.Abs(proposedTime - Clock.CurrentTime);
 
             IsCatchingUp.Value = timeBehind > 200;
             WaitingOnFrames.Value = state == PlaybackState.NotValid;
 
             manualClock.CurrentTime = proposedTime;
-            manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
-            manualClock.IsRunning = parentGameplayClock.IsRunning;
+            manualClock.Rate = Math.Abs(Clock.Rate) * direction;
+            manualClock.IsRunning = Clock.IsRunning;
 
             // determine whether catch-up is required.
             if (state == PlaybackState.Valid && timeBehind > 0)
@@ -237,12 +232,6 @@ namespace osu.Game.Rulesets.UI
                     ? Math.Min(proposedTime, manualClock.CurrentTime + sixty_frame_time)
                     : Math.Max(proposedTime, manualClock.CurrentTime - sixty_frame_time);
             }
-        }
-
-        private void setClock()
-        {
-            if (parentGameplayClock != null)
-                Clock = this;
         }
 
         public ReplayInputHandler? ReplayInputHandler { get; set; }
