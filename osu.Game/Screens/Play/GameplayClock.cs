@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play
 
         IBindable<bool> IGameplayClock.IsPaused => IsPaused;
 
-        public virtual IEnumerable<Bindable<double>> NonGameplayAdjustments => Enumerable.Empty<Bindable<double>>();
+        public virtual IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
 
         public GameplayClock(IFrameBasedClock underlyingClock)
         {
@@ -46,12 +46,12 @@ namespace osu.Game.Screens.Play
             {
                 double baseRate = Rate;
 
-                foreach (var adjustment in NonGameplayAdjustments)
+                foreach (double adjustment in NonGameplayAdjustments)
                 {
-                    if (Precision.AlmostEquals(adjustment.Value, 0))
+                    if (Precision.AlmostEquals(adjustment, 0))
                         return 0;
 
-                    baseRate /= adjustment.Value;
+                    baseRate /= adjustment;
                 }
 
                 return baseRate;

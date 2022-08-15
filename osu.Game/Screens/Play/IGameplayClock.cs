@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// All adjustments applied to this clock which don't come from gameplay or mods.
         /// </summary>
-        IEnumerable<Bindable<double>> NonGameplayAdjustments { get; }
+        IEnumerable<double> NonGameplayAdjustments { get; }
 
         IBindable<bool> IsPaused { get; }
     }
