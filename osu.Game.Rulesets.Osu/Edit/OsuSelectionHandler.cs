@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 using osuTK.Input;
@@ -27,12 +26,6 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider? snapProvider { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private EditorBeatmap? editorBeatmap { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler? changeHandler { get; set; }
 
         /// <summary>
         /// During a transform, the initial origin is stored so it can be used throughout the operation.
@@ -355,10 +348,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void mergeSelection()
         {
-            if (editorBeatmap == null || changeHandler == null || selectedMergeableObjects.Length < 2)
+            if (EditorBeatmap == null || ChangeHandler == null || selectedMergeableObjects.Length < 2)
                 return;
 
-            changeHandler.BeginChange();
+            ChangeHandler.BeginChange();
 
             // Have an initial slider object.
             var firstHitObject = selectedMergeableObjects[0];
@@ -416,24 +409,24 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 foreach (var selectedMergeableObject in selectedMergeableObjects.Skip(1))
                 {
-                    editorBeatmap.Remove(selectedMergeableObject);
+                    EditorBeatmap.Remove(selectedMergeableObject);
                 }
             }
             else
             {
                 foreach (var selectedMergeableObject in selectedMergeableObjects)
                 {
-                    editorBeatmap.Remove(selectedMergeableObject);
+                    EditorBeatmap.Remove(selectedMergeableObject);
                 }
 
-                editorBeatmap.Add(mergedHitObject);
+                EditorBeatmap.Add(mergedHitObject);
             }
 
             // Make sure the merged hitobject is selected.
             SelectedItems.Clear();
             SelectedItems.Add(mergedHitObject);
 
-            changeHandler.EndChange();
+            ChangeHandler.EndChange();
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
