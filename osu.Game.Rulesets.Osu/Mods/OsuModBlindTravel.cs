@@ -102,9 +102,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            scheduler.Update();
-
             Debug.Assert(parallaxContainer != null);
+
+            scheduler.Update();
 
             var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
 
