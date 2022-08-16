@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD
         public bool UsesFixedAnchor { get; set; }
 
         [Resolved]
-        protected GameplayClock GameplayClock { get; private set; } = null!;
+        protected IGameplayClock GameplayClock { get; private set; } = null!;
 
         [Resolved(canBeNull: true)]
         private DrawableRuleset? drawableRuleset { get; set; }
@@ -94,7 +94,10 @@ namespace osu.Game.Screens.Play.HUD
                 double objectOffsetCurrent = currentTime - FirstHitTime;
 
                 double objectDuration = LastHitTime - FirstHitTime;
-                UpdateProgress(objectOffsetCurrent / objectDuration, false);
+                if (objectDuration == 0)
+                    UpdateProgress(0, false);
+                else
+                    UpdateProgress(objectOffsetCurrent / objectDuration, false);
             }
         }
     }
