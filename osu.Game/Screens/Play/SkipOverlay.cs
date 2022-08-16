@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         public IBindable<bool> IsSkippable = new Bindable<bool>();
 
         [Resolved]
-        private GameplayClock gameplayClock { get; set; }
+        private IGameplayClock gameplayClock { get; set; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 

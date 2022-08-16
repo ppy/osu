@@ -8,10 +8,10 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -71,12 +71,10 @@ namespace osu.Game.Screens.Menu
         private readonly float[] frequencyAmplitudes = new float[256];
 
         private IShader shader = null!;
-
-        private readonly Texture texture;
+        private Texture texture = null!;
 
         public LogoVisualisation()
         {
-            texture = Texture.WhitePixel;
             Blending = BlendingParameters.Additive;
         }
 
@@ -88,8 +86,9 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(IRenderer renderer, ShaderManager shaders)
         {
+            texture = renderer.WhitePixel;
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
@@ -173,7 +172,7 @@ namespace osu.Game.Screens.Menu
 
             private readonly float[] audioData = new float[256];
 
-            private readonly QuadBatch<TexturedVertex2D> vertexBatch = new QuadBatch<TexturedVertex2D>(100, 10);
+            private IVertexBatch<TexturedVertex2D>? vertexBatch;
 
             public VisualisationDrawNode(LogoVisualisation source)
                 : base(source)
@@ -191,9 +190,11 @@ namespace osu.Game.Screens.Menu
                 Source.frequencyAmplitudes.AsSpan().CopyTo(audioData);
             }
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            public override void Draw(IRenderer renderer)
             {
-                base.Draw(vertexAction);
+                base.Draw(renderer);
+
+                vertexBatch ??= renderer.CreateQuadBatch<TexturedVertex2D>(100, 10);
 
                 shader.Bind();
 
@@ -228,7 +229,7 @@ namespace osu.Game.Screens.Menu
                             Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                         );
 
-                        DrawQuad(
+                        renderer.DrawQuad(
                             texture,
                             rectangle,
                             colourInfo,
@@ -246,7 +247,7 @@ namespace osu.Game.Screens.Menu
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch.Dispose();
+                vertexBatch?.Dispose();
             }
         }
     }

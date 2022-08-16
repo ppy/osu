@@ -137,13 +137,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void seekManualTo(double time) => AddStep($"seek manual clock to {time}", () => manualClock.CurrentTime = time);
 
-        private void confirmSeek(double time) => AddUntilStep($"wait for seek to {time}", () => consumer.Clock.CurrentTime == time);
+        private void confirmSeek(double time) => AddUntilStep($"wait for seek to {time}", () => consumer.Clock.CurrentTime, () => Is.EqualTo(time));
 
         private void checkFrameCount(int frames) =>
-            AddAssert($"elapsed frames is {frames}", () => consumer.ElapsedFrames == frames);
+            AddAssert($"elapsed frames is {frames}", () => consumer.ElapsedFrames, () => Is.EqualTo(frames));
 
         private void checkRate(double rate) =>
-            AddAssert($"clock rate is {rate}", () => consumer.Clock.Rate == rate);
+            AddAssert($"clock rate is {rate}", () => consumer.Clock.Rate, () => Is.EqualTo(rate));
 
         public class ClockConsumingChild : CompositeDrawable
         {

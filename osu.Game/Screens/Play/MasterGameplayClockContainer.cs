@@ -303,7 +303,7 @@ namespace osu.Game.Screens.Play
         private class MasterGameplayClock : GameplayClock
         {
             public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
-            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => MutableNonGameplayAdjustments;
+            public override IEnumerable<double> NonGameplayAdjustments => MutableNonGameplayAdjustments.Select(b => b.Value);
 
             public MasterGameplayClock(FramedOffsetClock underlyingClock)
                 : base(underlyingClock)

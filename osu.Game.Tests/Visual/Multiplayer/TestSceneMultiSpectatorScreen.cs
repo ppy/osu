@@ -432,8 +432,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 var user = playingUsers.Single(u => u.UserID == userId);
 
-                OnlinePlayDependencies.MultiplayerClient.RemoveUser(user.User.AsNonNull());
                 SpectatorClient.SendEndPlay(userId);
+                OnlinePlayDependencies.MultiplayerClient.RemoveUser(user.User.AsNonNull());
 
                 playingUsers.Remove(user);
             });
@@ -451,7 +451,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         private void checkPaused(int userId, bool state)
-            => AddUntilStep($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
+            => AddUntilStep($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().IsRunning != state);
 
         private void checkPausedInstant(int userId, bool state)
         {
