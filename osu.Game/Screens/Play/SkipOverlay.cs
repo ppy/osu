@@ -8,7 +8,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -40,8 +39,7 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         private bool isClickable;
-
-        public IBindable<bool> IsSkippable = new Bindable<bool>();
+        private bool skipQueued;
 
         [Resolved]
         private IGameplayClock gameplayClock { get; set; }
@@ -94,8 +92,6 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
-
-            IsSkippable.BindTo(button.Enabled);
         }
 
         private const double fade_time = 300;
@@ -130,6 +126,20 @@ namespace osu.Game.Screens.Play
             displayTime = gameplayClock.CurrentTime;
 
             fadeContainer.TriggerShow();
+
+            if (skipQueued)
+            {
+                Scheduler.AddDelayed(() => button.TriggerClick(), 200);
+                skipQueued = false;
+            }
+        }
+
+        public void SkipWhenReady()
+        {
+            if (IsLoaded)
+                button.TriggerClick();
+            else
+                skipQueued = true;
         }
 
         protected override void Update()
