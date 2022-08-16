@@ -10,6 +10,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
@@ -22,6 +23,15 @@ namespace osu.Game.Screens.Edit
 {
     public class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
     {
+        /// <summary>
+        /// While performing updates on hitobjects, this will momentarily become true.
+        /// </summary>
+        /// <remarks>
+        /// This is intended to be used to avoid performing operations (like playback of samples)
+        /// while mutating hitobjects.
+        /// </remarks>
+        public bool UpdateInProgress { get; private set; }
+
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> is added to this <see cref="EditorBeatmap"/>.
         /// </summary>
@@ -225,7 +235,11 @@ namespace osu.Game.Screens.Edit
         {
             // updates are debounced regardless of whether a batch is active.
             batchPendingUpdates.Add(hitObject);
+
+            advertiseUpdateInProgress();
         }
+
+        private ScheduledDelegate updateCompleteDelegate;
 
         /// <summary>
         /// Update all hit objects with potentially changed difficulty or control point data.
@@ -234,6 +248,8 @@ namespace osu.Game.Screens.Edit
         {
             foreach (var h in HitObjects)
                 batchPendingUpdates.Add(h);
+
+            advertiseUpdateInProgress();
         }
 
         /// <summary>
@@ -332,6 +348,15 @@ namespace osu.Game.Screens.Edit
         /// Clears all <see cref="HitObjects"/> from this <see cref="EditorBeatmap"/>.
         /// </summary>
         public void Clear() => RemoveRange(HitObjects.ToArray());
+
+        private void advertiseUpdateInProgress()
+        {
+            UpdateInProgress = true;
+
+            // Debounce is arbitrarily high enough to avoid flip-flopping the value each other frame.
+            updateCompleteDelegate?.Cancel();
+            updateCompleteDelegate = Scheduler.AddDelayed(() => UpdateInProgress = false, 50);
+        }
 
         private void processHitObject(HitObject hitObject) => hitObject.ApplyDefaults(ControlPointInfo, PlayableBeatmap.Difficulty);
 

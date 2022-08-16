@@ -225,8 +225,6 @@ namespace osu.Game.Screens.Edit
             dependencies.CacheAs(clock);
             AddInternal(clock);
 
-            clock.SeekingOrStopped.BindValueChanged(_ => updateSampleDisabledState());
-
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
@@ -428,7 +426,12 @@ namespace osu.Game.Screens.Edit
         protected override void Update()
         {
             base.Update();
+
             clock.ProcessFrame();
+
+            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value
+                                           || currentScreen is not ComposeScreen
+                                           || editorBeatmap.UpdateInProgress;
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
@@ -822,14 +825,8 @@ namespace osu.Game.Screens.Edit
             }
             finally
             {
-                updateSampleDisabledState();
                 rebindClipboardBindables();
             }
-        }
-
-        private void updateSampleDisabledState()
-        {
-            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value || !(currentScreen is ComposeScreen);
         }
 
         private void seek(UIEvent e, int direction)
@@ -936,11 +933,7 @@ namespace osu.Game.Screens.Edit
 
         protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap.Ruleset));
 
-        private void cancelExit()
-        {
-            updateSampleDisabledState();
-            loader?.CancelPendingDifficultySwitch();
-        }
+        private void cancelExit() => loader?.CancelPendingDifficultySwitch();
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 
