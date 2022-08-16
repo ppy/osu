@@ -301,7 +301,7 @@ namespace osu.Game.Beatmaps
                 stream.Seek(0, SeekOrigin.Begin);
 
                 // AddFile generally handles updating/replacing files, but this is a case where the filename may have also changed so let's delete for simplicity.
-                var existingFileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase));
+                var existingFileInfo = beatmapInfo.Path != null ? setInfo.GetFile(beatmapInfo.Path) : null;
                 string targetFilename = createBeatmapFilenameFromMetadata(beatmapInfo);
 
                 // ensure that two difficulties from the set don't point at the same beatmap file.
@@ -313,15 +313,14 @@ namespace osu.Game.Beatmaps
 
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
-                beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
-                beatmapInfo.LastUpdated = DateTimeOffset.Now;
 
-                if (setInfo.Beatmaps.All(b => b.Status == BeatmapOnlineStatus.LocallyModified))
-                    setInfo.Status = BeatmapOnlineStatus.LocallyModified;
+                beatmapInfo.LastUpdated = DateTimeOffset.Now;
+                beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
                 setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
+                setInfo.Status = BeatmapOnlineStatus.LocallyModified;
 
                 Realm.Write(r =>
                 {

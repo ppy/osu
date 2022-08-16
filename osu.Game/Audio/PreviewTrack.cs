@@ -105,5 +105,11 @@ namespace osu.Game.Audio
         /// Retrieves the audio track.
         /// </summary>
         protected abstract Track? GetTrack();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Track?.Dispose();
+        }
     }
 }
