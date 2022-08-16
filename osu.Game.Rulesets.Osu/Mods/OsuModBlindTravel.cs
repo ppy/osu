@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             Debug.Assert(parallaxContainer != null);
 
             var combo = e.NewValue;
-            if (combo % shrinkEveryComboAmount == 0 && parallaxContainer != null)
+            if (combo % shrinkEveryComboAmount == 0)
             {
                 currentScopeFOV = getScopeFOVForCombo(combo);
                 applyParallaxForFOV(parallaxContainer, currentScopeFOV);
