@@ -141,6 +141,33 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
         }
 
+        [Test]
+        public void TestNonMerge()
+        {
+            HitCircle? circle1 = null;
+            HitCircle? circle2 = null;
+            Spinner? spinner = null;
+
+            AddStep("select first two circles and spinner", () =>
+            {
+                circle1 = (HitCircle)EditorBeatmap.HitObjects.First(h => h is HitCircle);
+                circle2 = (HitCircle)EditorBeatmap.HitObjects.First(h => h is HitCircle && h != circle1);
+                spinner = (Spinner)EditorBeatmap.HitObjects.First(h => h is Spinner);
+                EditorClock.Seek(spinner.StartTime);
+                EditorBeatmap.SelectedHitObjects.Add(circle1);
+                EditorBeatmap.SelectedHitObjects.Add(circle2);
+                EditorBeatmap.SelectedHitObjects.Add(spinner);
+            });
+
+            mergeSelection();
+
+            AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
+                (pos: circle1.Position, pathType: PathType.Linear),
+                (pos: circle2.Position, pathType: null)));
+
+            AddAssert("spinner not merged", () => EditorBeatmap.HitObjects.Contains(spinner));
+        }
+
         private void mergeSelection()
         {
             AddStep("merge selection", () =>
