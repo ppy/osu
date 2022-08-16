@@ -362,20 +362,20 @@ namespace osu.Game.Overlays.Mods
                 return;
 
             bool anyCustomisableModActive = false;
-            bool anyModRequiresCustomisation = false;
+            bool anyModPendingConfiguration = false;
 
             foreach (var modState in allAvailableMods)
             {
                 anyCustomisableModActive |= modState.Active.Value && modState.Mod.GetSettingsSourceProperties().Any();
-                anyModRequiresCustomisation |= modState.RequiresConfiguration;
-                modState.RequiresConfiguration = false;
+                anyModPendingConfiguration |= modState.PendingConfiguration;
+                modState.PendingConfiguration = false;
             }
 
             if (anyCustomisableModActive)
             {
                 customisationVisible.Disabled = false;
 
-                if (anyModRequiresCustomisation && !customisationVisible.Value)
+                if (anyModPendingConfiguration && !customisationVisible.Value)
                     customisationVisible.Value = true;
             }
             else

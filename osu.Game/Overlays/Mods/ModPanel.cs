@@ -59,13 +59,13 @@ namespace osu.Game.Overlays.Mods
 
         protected override void Select()
         {
-            modState.RequiresConfiguration = Mod.RequiresConfiguration;
+            modState.PendingConfiguration = Mod.RequiresConfiguration;
             Active.Value = true;
         }
 
         protected override void Deselect()
         {
-            modState.RequiresConfiguration = false;
+            modState.PendingConfiguration = false;
             Active.Value = false;
         }
 
