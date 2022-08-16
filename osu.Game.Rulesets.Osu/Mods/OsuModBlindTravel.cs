@@ -18,6 +18,7 @@ using osu.Game.Screens;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -28,10 +29,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "BT";
         public override IconUsage? Icon => FontAwesome.Solid.PlaneDeparture;
         public override ModType Type => ModType.Fun;
-        public override string Description => "Trust yourself into the void";
+        public override string Description => "You cursor is focused.";
         public override double ScoreMultiplier => 1;
 
-        private const double default_follow_delay = 100;
+        private const float default_follow_delay = 100;
 
         [SettingSource("Camera delay", "Milliseconds for the camera to catch up with your cursor")]
         public BindableDouble CameraDelay { get; } = new BindableDouble(default_follow_delay)
@@ -41,15 +42,21 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = default_follow_delay,
         };
 
-        private Double cameraDelay => CameraDelay.Value;
+        private double cameraDelay => CameraDelay.Value;
 
-        private float applyIncreasedVisibilityDuration = 1000;
+        private float applyIncreasedVisibilityDuration = 6000;
 
         private float increasedVisibilityDuration = 1000;
 
         private const float default_scope_scale = 1;
 
         private const float default_scope_fov = 0.6f;
+
+        private bool increasedVisibilityMode;
+
+        private Scheduler scheduler = new Scheduler();
+
+        private bool isTraveling;
 
         [SettingSource("Base FOV", "Adjust the base field of view")]
         public BindableFloat BaseScopeFov { get; } = new BindableFloat(default_scope_fov)
@@ -77,6 +84,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private float baseParallaxAmount;
 
+        private IFrameStableClock? gameplayClock;
+
         public void ApplyToPlayer(Player player)
         {
             baseParallaxAmount = player.BackgroundParallaxAmount;
@@ -95,8 +104,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            // we avoid assiging to playfield every update by assigning it here.
             playfield = drawableRuleset.Playfield;
+            gameplayClock = drawableRuleset.FrameStableClock;
         }
 
         public void Update(Playfield playfield)
@@ -120,16 +129,18 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void moveDrawableToScope(Drawable drawable, Vector2 position, Playfield playfield)
         {
+            Debug.Assert(gameplayClock != null);
+
             var scopePositionForDrawable = position + playfield.DrawSize / 2;
 
-            drawable.MoveTo(scopePositionForDrawable, cameraDelay);
+            double dampLength = cameraDelay / 2;
+
+            scopePositionForDrawable.X = (float)Interpolation.DampContinuously(drawable.X, scopePositionForDrawable.X, dampLength, gameplayClock.ElapsedFrameTime);
+            scopePositionForDrawable.Y = (float)Interpolation.DampContinuously(drawable.Y, scopePositionForDrawable.Y, dampLength, gameplayClock.ElapsedFrameTime);
+
+            drawable.Position = scopePositionForDrawable;
         }
 
-        private bool increasedVisibilityMode;
-
-        private Scheduler scheduler = new Scheduler();
-
-        private bool isTraveling;
 
         private void InternalApplyIncreasedVisibilityState()
         {
@@ -141,10 +152,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             increasedVisibilityMode = true;
             isTraveling = false;
 
-            applyParallaxForFOV(parallaxContainer, default_scope_scale);
-            ApplyBlindTravel(playfield, default_scope_scale);
 
-            playfield.MoveTo(Vector2.Zero);
+            ApplyBlindTravel(playfield, default_scope_scale);
+            applyParallaxForFOV(parallaxContainer, default_scope_scale);
+
             scheduler.AddDelayed(() => increasedVisibilityMode = false, increasedVisibilityDuration);
         }
 
