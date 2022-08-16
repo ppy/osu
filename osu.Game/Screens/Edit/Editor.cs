@@ -10,6 +10,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -949,7 +950,7 @@ namespace osu.Game.Screens.Edit
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => editorBeatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => clock;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
 
         private class BeatmapEditorToast : Toast
         {

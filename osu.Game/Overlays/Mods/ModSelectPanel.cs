@@ -43,8 +43,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         public const float CORNER_RADIUS = 7;
-
-        protected const float HEIGHT = 42;
+        public const float HEIGHT = 42;
 
         protected virtual float IdleSwitchWidth => 14;
         protected virtual float ExpandedSwitchWidth => 30;

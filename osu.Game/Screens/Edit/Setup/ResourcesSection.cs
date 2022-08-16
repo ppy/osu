@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.IO;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -78,7 +77,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // remove the previous background for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
+            var oldFile = set.GetFile(working.Value.Metadata.BackgroundFile);
 
             using (var stream = source.OpenRead())
             {
@@ -107,7 +106,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // remove the previous audio track for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.AudioFile);
+            var oldFile = set.GetFile(working.Value.Metadata.AudioFile);
 
             using (var stream = source.OpenRead())
             {
