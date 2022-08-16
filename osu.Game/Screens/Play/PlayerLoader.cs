@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Play
 
         private EpilepsyWarning? epilepsyWarning;
 
-        private bool isHotKeyRestart;
+        private bool quickRestart;
 
         [Resolved(CanBeNull = true)]
         private INotificationOverlay? notificationOverlay { get; set; }
@@ -363,17 +363,12 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
+            CurrentPlayer.Configuration.AutomaticallySkipIntro = quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
             LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
             {
-                if (isHotKeyRestart)
-                {
-                    CurrentPlayer.Configuration.AutomaticallySkipIntro = true;
-                    isHotKeyRestart = false;
-                }
-
                 MetadataInfo.Loading = false;
                 OnPlayerLoaded();
             });
@@ -383,11 +378,9 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void restartRequested()
+        private void restartRequested(bool quickRestartRequested)
         {
-            if (CurrentPlayer != null)
-                isHotKeyRestart = CurrentPlayer.IsQuickRestart.Value;
-
+            quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
         }
