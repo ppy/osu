@@ -372,11 +372,8 @@ namespace osu.Game.Screens.Play
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
 
-            skipIntroOverlay.IsSkippable.ValueChanged += e =>
-            {
-                if (Configuration.AutomaticallySkipIntro && e.NewValue && RestartCount > 0)
-                    performUserRequestedSkip();
-            };
+            if (Configuration.AutomaticallySkipIntro)
+                skipIntroOverlay.SkipWhenReady();
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
