@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override string Acronym => "CS";
 
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.9;
 
         public override string Description => "No more tricky speed changes!";
 
