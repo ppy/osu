@@ -348,13 +348,15 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void mergeSelection()
         {
-            if (selectedMergeableObjects.Length < 2)
+            var mergeableObjects = selectedMergeableObjects;
+
+            if (mergeableObjects.Length < 2)
                 return;
 
             ChangeHandler?.BeginChange();
 
             // Have an initial slider object.
-            var firstHitObject = selectedMergeableObjects[0];
+            var firstHitObject = mergeableObjects[0];
             var mergedHitObject = firstHitObject as Slider ?? new Slider
             {
                 StartTime = firstHitObject.StartTime,
@@ -371,7 +373,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Merge all the selected hit objects into one slider path.
             bool lastCircle = firstHitObject is HitCircle;
 
-            foreach (var selectedMergeableObject in selectedMergeableObjects.Skip(1))
+            foreach (var selectedMergeableObject in mergeableObjects.Skip(1))
             {
                 if (selectedMergeableObject is IHasPath hasPath)
                 {
@@ -407,14 +409,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Make sure only the merged hit object is in the beatmap.
             if (firstHitObject is Slider)
             {
-                foreach (var selectedMergeableObject in selectedMergeableObjects.Skip(1))
+                foreach (var selectedMergeableObject in mergeableObjects.Skip(1))
                 {
                     EditorBeatmap.Remove(selectedMergeableObject);
                 }
             }
             else
             {
-                foreach (var selectedMergeableObject in selectedMergeableObjects)
+                foreach (var selectedMergeableObject in mergeableObjects)
                 {
                     EditorBeatmap.Remove(selectedMergeableObject);
                 }
