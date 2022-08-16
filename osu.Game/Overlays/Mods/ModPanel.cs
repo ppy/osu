@@ -37,8 +37,6 @@ namespace osu.Game.Overlays.Mods
                 Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                 Scale = new Vector2(HEIGHT / ModSwitchSmall.DEFAULT_SIZE)
             };
-
-            Action = select;
         }
 
         public ModPanel(Mod mod)
@@ -59,18 +57,16 @@ namespace osu.Game.Overlays.Mods
             Filtered.BindValueChanged(_ => updateFilterState(), true);
         }
 
-        private void select()
+        protected override void Select()
         {
-            if (!Active.Value)
-            {
-                modState.RequiresConfiguration = Mod.RequiresConfiguration;
-                Active.Value = true;
-            }
-            else
-            {
-                modState.RequiresConfiguration = false;
-                Active.Value = false;
-            }
+            modState.RequiresConfiguration = Mod.RequiresConfiguration;
+            Active.Value = true;
+        }
+
+        protected override void Deselect()
+        {
+            modState.RequiresConfiguration = false;
+            Active.Value = false;
         }
 
         #region Filtering support
