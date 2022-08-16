@@ -26,7 +26,8 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = EditorSetupStrings.HitcircleSliderCombos,
                     FixedLabelWidth = LABEL_WIDTH,
-                    ColourNamePrefix = EditorSetupStrings.ComboColourPrefix }
+                    ColourNamePrefix = EditorSetupStrings.ComboColourPrefix
+                }
             };
 
             if (Beatmap.BeatmapSkin != null)
