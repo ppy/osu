@@ -77,7 +77,6 @@ namespace osu.Game.Tests.Gameplay
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(working, 0)
                 {
-                    IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
@@ -106,7 +105,6 @@ namespace osu.Game.Tests.Gameplay
                 Add(gameplayContainer = new MasterGameplayClockContainer(working, start_time)
                 {
                     StartTime = start_time,
-                    IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
@@ -141,7 +139,7 @@ namespace osu.Game.Tests.Gameplay
 
                 beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
-                    Clock = gameplayContainer.GameplayClock
+                    Clock = gameplayContainer
                 });
             });
 
