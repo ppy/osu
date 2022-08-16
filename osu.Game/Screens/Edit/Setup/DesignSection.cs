@@ -126,6 +126,8 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning.Current.Value;
             Beatmap.BeatmapInfo.LetterboxInBreaks = letterboxDuringBreaks.Current.Value;
             Beatmap.BeatmapInfo.SamplesMatchPlaybackRate = samplesMatchPlaybackRate.Current.Value;
+
+            Beatmap.SaveState();
         }
     }
 }

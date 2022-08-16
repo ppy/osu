@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
         private void updateBeatmap()
         {
             Beatmap.BeatmapInfo.SpecialStyle = specialStyle.Current.Value;
+            Beatmap.SaveState();
         }
     }
 }
