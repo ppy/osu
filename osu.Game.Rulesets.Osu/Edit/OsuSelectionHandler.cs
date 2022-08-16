@@ -335,7 +335,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// All osu! hitobjects which can be moved/rotated/scaled.
         /// </summary>
         private OsuHitObject[] selectedMovableObjects => SelectedItems.OfType<OsuHitObject>()
-                                                                      .Where(h => !(h is Spinner))
+                                                                      .Where(h => h is not Spinner)
                                                                       .ToArray();
 
         /// <summary>
@@ -434,7 +434,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            if (selection.Count() > 1 && selection.All(o => o.Item is HitCircle or Slider))
+            if (selectedMergeableObjects.Length > 1)
                 yield return new OsuMenuItem("Merge selection", MenuItemType.Destructive, mergeSelection);
         }
     }
