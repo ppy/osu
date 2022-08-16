@@ -78,8 +78,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             individualStrains[column] = applyDecay(individualStrains[column], startTime - startTimes[column], individual_decay_base);
             individualStrains[column] += 2.0 * holdFactor;
 
-            // individualStrain should be the hardest individualStrain column for notes in a chord
-            individualStrain = maniaCurrent.DeltaTime == 0 ? Math.Max(individualStrain, individualStrains[column]) : individualStrains[column];
+            // For notes at the same time (in a chord), the individualStrain should be the hardest individualStrain out of those columns
+            individualStrain = maniaCurrent.DeltaTime <= 1 ? Math.Max(individualStrain, individualStrains[column]) : individualStrains[column];
 
             // Decay and increase overallStrain
             overallStrain = applyDecay(overallStrain, current.DeltaTime, overall_decay_base);
