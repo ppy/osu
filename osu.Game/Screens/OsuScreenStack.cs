@@ -15,7 +15,7 @@ namespace osu.Game.Screens
         [Cached]
         private BackgroundScreenStack backgroundScreenStack;
 
-        private readonly ParallaxContainer parallaxContainer;
+        public readonly ParallaxContainer parallaxContainer;
 
         protected float ParallaxAmount => parallaxContainer.ParallaxAmount;
 
