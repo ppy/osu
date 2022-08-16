@@ -314,7 +314,7 @@ namespace osu.Game.Beatmaps
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
-                beatmapInfo.LastUpdated = DateTimeOffset.Now;
+                beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
                 beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
