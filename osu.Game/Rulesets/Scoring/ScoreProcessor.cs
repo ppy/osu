@@ -16,6 +16,8 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Scoring;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -636,7 +638,10 @@ namespace osu.Game.Rulesets.Scoring
 
     public enum ScoringMode
     {
+        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.StandardisedScoreDisplay))]
         Standardised,
+
+        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.ClassicScoreDisplay))]
         Classic
     }
 }

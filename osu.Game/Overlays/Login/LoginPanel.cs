@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Users;
 using osuTK;
@@ -109,7 +110,7 @@ namespace osu.Game.Overlays.Login
                             Origin = Anchor.TopCentre,
                             TextAnchor = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
-                            Text = state.NewValue == APIState.Failing ? "Connection is failing, will attempt to reconnect... " : "Attempting to connect... ",
+                            Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
                             Margin = new MarginPadding { Top = 10, Bottom = 10 },
                         },
                     };
