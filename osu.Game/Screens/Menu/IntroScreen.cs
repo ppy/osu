@@ -285,7 +285,6 @@ namespace osu.Game.Screens.Menu
                 drawableTrack.VolumeTo(1, 2200, Easing.InCubic);
             }
             else
-
             {
                 drawableTrack.Restart();
             }
