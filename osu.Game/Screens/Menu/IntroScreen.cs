@@ -276,12 +276,17 @@ namespace osu.Game.Screens.Menu
         {
             var drawableTrack = musicController.CurrentTrack;
 
-            drawableTrack.Start();
-
             if (!UsingThemedIntro)
             {
-                drawableTrack.VolumeTo(0).Then()
-                             .VolumeTo(1, 2000, Easing.OutQuint);
+                initialBeatmap?.PrepareTrackForPreview(false);
+
+                drawableTrack.VolumeTo(0);
+                drawableTrack.Restart();
+                drawableTrack.VolumeTo(1, 2200, Easing.InCubic);
+            }
+            else
+            {
+                drawableTrack.Restart();
             }
         }
 
