@@ -226,6 +226,8 @@ namespace osu.Game.Screens.Edit
             dependencies.CacheAs(clock);
             AddInternal(clock);
 
+            clock.SeekingOrStopped.BindValueChanged(_ => updateSampleDisabledState());
+
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
@@ -429,12 +431,7 @@ namespace osu.Game.Screens.Edit
         protected override void Update()
         {
             base.Update();
-
             clock.ProcessFrame();
-
-            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value
-                                           || currentScreen is not ComposeScreen
-                                           || temporaryMuteFromUpdateInProgress;
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
@@ -728,10 +725,15 @@ namespace osu.Game.Screens.Edit
         private void updateInProgress(ValueChangedEvent<bool> obj)
         {
             temporaryMuteFromUpdateInProgress = true;
+            updateSampleDisabledState();
 
             // Debounce is arbitrarily high enough to avoid flip-flopping the value each other frame.
             temporaryMuteRestorationDelegate?.Cancel();
-            temporaryMuteRestorationDelegate = Scheduler.AddDelayed(() => temporaryMuteFromUpdateInProgress = false, 50);
+            temporaryMuteRestorationDelegate = Scheduler.AddDelayed(() =>
+            {
+                temporaryMuteFromUpdateInProgress = false;
+                updateSampleDisabledState();
+            }, 50);
         }
 
         #endregion
@@ -844,8 +846,16 @@ namespace osu.Game.Screens.Edit
             }
             finally
             {
+                updateSampleDisabledState();
                 rebindClipboardBindables();
             }
+        }
+
+        private void updateSampleDisabledState()
+        {
+            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value
+                                           || currentScreen is not ComposeScreen
+                                           || temporaryMuteFromUpdateInProgress;
         }
 
         private void seek(UIEvent e, int direction)
@@ -952,7 +962,11 @@ namespace osu.Game.Screens.Edit
 
         protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap.Ruleset));
 
-        private void cancelExit() => loader?.CancelPendingDifficultySwitch();
+        private void cancelExit()
+        {
+            updateSampleDisabledState();
+            loader?.CancelPendingDifficultySwitch();
+        }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 
