@@ -94,6 +94,7 @@ namespace osu.Game.Beatmaps
 
             var beatmapSet = new BeatmapSetInfo
             {
+                DateAdded = DateTimeOffset.UtcNow,
                 Beatmaps =
                 {
                     new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata)
@@ -313,6 +314,7 @@ namespace osu.Game.Beatmaps
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
+                beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
                 beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
