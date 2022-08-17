@@ -173,6 +173,7 @@ namespace osu.Game.Tests.Visual.Editing
             reset();
 
             AddStep("Seek(49)", () => Clock.Seek(49));
+            checkTime(49);
             AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
             checkTime(50);
             AddStep("Seek(49.999)", () => Clock.Seek(49.999));
@@ -207,6 +208,7 @@ namespace osu.Game.Tests.Visual.Editing
             reset();
 
             AddStep("Seek(450)", () => Clock.Seek(450));
+            checkTime(450);
             AddStep("SeekBackward", () => Clock.SeekBackward());
             checkTime(400);
             AddStep("SeekBackward", () => Clock.SeekBackward());
@@ -228,6 +230,7 @@ namespace osu.Game.Tests.Visual.Editing
             reset();
 
             AddStep("Seek(450)", () => Clock.Seek(450));
+            checkTime(450);
             AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
             checkTime(400);
             AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
@@ -252,6 +255,7 @@ namespace osu.Game.Tests.Visual.Editing
             reset();
 
             AddStep("Seek(451)", () => Clock.Seek(451));
+            checkTime(451);
             AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
             checkTime(450);
             AddStep("Seek(450.999)", () => Clock.Seek(450.999));
@@ -276,6 +280,7 @@ namespace osu.Game.Tests.Visual.Editing
             double lastTime = 0;
 
             AddStep("Seek(0)", () => Clock.Seek(0));
+            checkTime(0);
 
             for (int i = 0; i < 9; i++)
             {
