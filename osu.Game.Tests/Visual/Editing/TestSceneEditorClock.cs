@@ -55,51 +55,51 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestStopAtTrackEnd()
         {
-            AddStep("reset clock", () => Clock.Seek(0));
+            AddStep("reset clock", () => EditorClock.Seek(0));
 
-            AddStep("start clock", () => Clock.Start());
-            AddAssert("clock running", () => Clock.IsRunning);
+            AddStep("start clock", () => EditorClock.Start());
+            AddAssert("clock running", () => EditorClock.IsRunning);
 
-            AddStep("seek near end", () => Clock.Seek(Clock.TrackLength - 250));
-            AddUntilStep("clock stops", () => !Clock.IsRunning);
+            AddStep("seek near end", () => EditorClock.Seek(EditorClock.TrackLength - 250));
+            AddUntilStep("clock stops", () => !EditorClock.IsRunning);
 
-            AddUntilStep("clock stopped at end", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
+            AddUntilStep("clock stopped at end", () => EditorClock.CurrentTime, () => Is.EqualTo(EditorClock.TrackLength));
 
-            AddStep("start clock again", () => Clock.Start());
-            AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
+            AddStep("start clock again", () => EditorClock.Start());
+            AddAssert("clock looped to start", () => EditorClock.IsRunning && EditorClock.CurrentTime < 500);
         }
 
         [Test]
         public void TestWrapWhenStoppedAtTrackEnd()
         {
-            AddStep("reset clock", () => Clock.Seek(0));
+            AddStep("reset clock", () => EditorClock.Seek(0));
 
-            AddStep("stop clock", () => Clock.Stop());
-            AddAssert("clock stopped", () => !Clock.IsRunning);
+            AddStep("stop clock", () => EditorClock.Stop());
+            AddAssert("clock stopped", () => !EditorClock.IsRunning);
 
-            AddStep("seek exactly to end", () => Clock.Seek(Clock.TrackLength));
-            AddAssert("clock stopped at end", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
+            AddStep("seek exactly to end", () => EditorClock.Seek(EditorClock.TrackLength));
+            AddAssert("clock stopped at end", () => EditorClock.CurrentTime, () => Is.EqualTo(EditorClock.TrackLength));
 
-            AddStep("start clock again", () => Clock.Start());
-            AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
+            AddStep("start clock again", () => EditorClock.Start());
+            AddAssert("clock looped to start", () => EditorClock.IsRunning && EditorClock.CurrentTime < 500);
         }
 
         [Test]
         public void TestClampWhenSeekOutsideBeatmapBounds()
         {
-            AddStep("stop clock", () => Clock.Stop());
+            AddStep("stop clock", () => EditorClock.Stop());
 
-            AddStep("seek before start time", () => Clock.Seek(-1000));
-            AddAssert("time is clamped to 0", () => Clock.CurrentTime, () => Is.EqualTo(0));
+            AddStep("seek before start time", () => EditorClock.Seek(-1000));
+            AddAssert("time is clamped to 0", () => EditorClock.CurrentTime, () => Is.EqualTo(0));
 
-            AddStep("seek beyond track length", () => Clock.Seek(Clock.TrackLength + 1000));
-            AddAssert("time is clamped to track length", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
+            AddStep("seek beyond track length", () => EditorClock.Seek(EditorClock.TrackLength + 1000));
+            AddAssert("time is clamped to track length", () => EditorClock.CurrentTime, () => Is.EqualTo(EditorClock.TrackLength));
 
-            AddStep("seek smoothly before start time", () => Clock.SeekSmoothlyTo(-1000));
-            AddUntilStep("time is clamped to 0", () => Clock.CurrentTime, () => Is.EqualTo(0));
+            AddStep("seek smoothly before start time", () => EditorClock.SeekSmoothlyTo(-1000));
+            AddUntilStep("time is clamped to 0", () => EditorClock.CurrentTime, () => Is.EqualTo(0));
 
-            AddStep("seek smoothly beyond track length", () => Clock.SeekSmoothlyTo(Clock.TrackLength + 1000));
-            AddUntilStep("time is clamped to track length", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
+            AddStep("seek smoothly beyond track length", () => EditorClock.SeekSmoothlyTo(EditorClock.TrackLength + 1000));
+            AddUntilStep("time is clamped to track length", () => EditorClock.CurrentTime, () => Is.EqualTo(EditorClock.TrackLength));
         }
 
         protected override void Dispose(bool isDisposing)

@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             base.LoadComplete();
 
-            Clock.Seek(2500);
+            EditorClock.Seek(2500);
         }
 
         public abstract Drawable CreateTestComponent();
