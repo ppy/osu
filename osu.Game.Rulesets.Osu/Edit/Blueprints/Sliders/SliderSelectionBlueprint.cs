@@ -251,13 +251,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void convertToStream()
         {
-            if (editorBeatmap == null || changeHandler == null || beatDivisor == null)
+            if (editorBeatmap == null || beatDivisor == null)
                 return;
 
             var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(HitObject.StartTime);
             double streamSpacing = timingPoint.BeatLength / beatDivisor.Value;
 
-            changeHandler.BeginChange();
+            changeHandler?.BeginChange();
 
             int i = 0;
             double time = HitObject.StartTime;
@@ -292,7 +292,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             editorBeatmap.Remove(HitObject);
 
-            changeHandler.EndChange();
+            changeHandler?.EndChange();
         }
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]
