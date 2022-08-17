@@ -66,8 +66,8 @@ namespace osu.Game.Overlays.Mods
         private IModHotkeyHandler hotkeyHandler = null!;
 
         private Task? latestLoadTask;
-        private bool itemsLoaded;
-        internal bool ItemsLoaded => latestLoadTask?.IsCompleted == true && itemsLoaded;
+        private ICollection<ModPanel>? latestLoadedPanels;
+        internal bool ItemsLoaded => latestLoadTask?.IsCompleted == true && latestLoadedPanels?.All(panel => panel.Parent != null) == true;
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
@@ -133,14 +133,13 @@ namespace osu.Game.Overlays.Mods
         {
             cancellationTokenSource?.Cancel();
 
-            var panels = availableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = Vector2.Zero));
+            var panels = availableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = Vector2.Zero)).ToArray();
+            latestLoadedPanels = panels;
 
-            itemsLoaded = false;
             latestLoadTask = LoadComponentsAsync(panels, loaded =>
             {
                 ItemsFlow.ChildrenEnumerable = loaded;
                 updateState();
-                itemsLoaded = true;
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
         }
 
