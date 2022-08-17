@@ -3,14 +3,12 @@
 
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 using osu.Framework.Graphics;
 using osuTK;
 using osu.Game.Screens.Play;
-using osu.Framework.Threading;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Framework.Bindables;
@@ -19,12 +17,23 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModBlindTravel : ModWithVisibilityAdjustment, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToPlayer, IApplicableToDrawableRuleset<OsuHitObject>
+    internal class OsuModBlindTravel : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToPlayer, IApplicableToDrawableRuleset<OsuHitObject>
 
     {
+        private const int last_zoom_combo = 200;
+        private const int zoom_every_combo_amount = 100;
+        private const int increased_visibility_zoom = 1;
+        private const int apply_zoom_duration = 6000;
+        private const int increased_visibility_duration = 3000;
+        private const int default_follow_delay = 100;
+        private const double default_zoom = 1.5;
+        private const double zoom_with_combo_by = 0.1;
+
         public override string Name => "Blind Travel";
         public override string Acronym => "BT";
         public override IconUsage? Icon => FontAwesome.Solid.PlaneDeparture;
@@ -32,9 +41,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "You cursor is focused.";
         public override double ScoreMultiplier => 1;
 
-        private const float default_follow_delay = 100;
 
-        [SettingSource("Camera delay", "Milliseconds for the camera to catch up with your cursor")]
+        [SettingSource("Focus delay", "Milliseconds for for your cursor be focused")]
         public BindableDouble CameraDelay { get; } = new BindableDouble(default_follow_delay)
         {
             MinValue = default_follow_delay,
@@ -44,179 +52,178 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private double cameraDelay => CameraDelay.Value;
 
-        private float applyIncreasedVisibilityDuration = 6000;
 
-        private float increasedVisibilityDuration = 1000;
-
-        private const float default_scope_scale = 1;
-
-        private const float default_scope_fov = 0.6f;
-
-        private bool increasedVisibilityMode;
-
-        private Scheduler scheduler = new Scheduler();
-
-        private bool isTraveling;
-
-        [SettingSource("Base FOV", "Adjust the base field of view")]
-        public BindableFloat BaseScopeFov { get; } = new BindableFloat(default_scope_fov)
+        [SettingSource("Base zoom", "Adjust the zoom applied to your cursor.")]
+        public BindableDouble BaseZoom { get; } = new BindableDouble(default_zoom)
         {
-            MinValue = default_scope_fov,
-            MaxValue = default_scope_scale,
+            MinValue = 0.5f,
+            MaxValue = 2,
             Precision = 0.05f
         };
 
-        private float baseScopeFOV => BaseScopeFov.Value;
+        private double baseZoom => BaseZoom.Value;
 
-        private float currentScopeFOV = default_scope_fov;
+        private double currentZoom;
 
-        // scaling works as (if fov = 1; scale is half of that)
-        private float CurrentScopeFovAsScale => 1 / currentScopeFOV;
-
-        [SettingSource("Change FOV based on combo", "Shrinks the FOV based on combo")]
-        public BindableBool ComboBasedFOV { get; } = new BindableBool(true);
-
-        private const float shrinkFOVWithComboBy = 0.05f;
-
-        private Playfield? playfield;
-
-        private ParallaxContainer? parallaxContainer;
-
-        private float baseParallaxAmount;
-
-        private IFrameStableClock? gameplayClock;
-
-        public void ApplyToPlayer(Player player)
+        private double CurrentZoom
         {
-            baseParallaxAmount = player.BackgroundParallaxAmount;
-            parallaxContainer = player.FindClosestParent<OsuScreenStack>().parallaxContainer;
-
-            currentScopeFOV = baseScopeFOV;
-            applyParallaxForFOV(parallaxContainer, currentScopeFOV);
-
-            player.IsBreakTime.ValueChanged += onBreakTime;
-        }
-
-        private void onBreakTime(ValueChangedEvent<bool> e)
-        {
-            InternalApplyIncreasedVisibilityState();
-        }
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            playfield = drawableRuleset.Playfield;
-            gameplayClock = drawableRuleset.FrameStableClock;
-        }
-
-        public void Update(Playfield playfield)
-        {
-            Debug.Assert(parallaxContainer != null);
-
-            scheduler.Update();
-
-            var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
-
-            // applies parallax to managed cursors (such as auto).
-            parallaxContainer.MousePosition = cursorPos;
-
-            if (!isTraveling)
-                return;
-
-            var scopePosition = -cursorPos;
-
-            moveDrawableToScope(playfield, scopePosition, playfield);
-        }
-
-        private void moveDrawableToScope(Drawable drawable, Vector2 position, Playfield playfield)
-        {
-            Debug.Assert(gameplayClock != null);
-
-            var scopePositionForDrawable = position + playfield.DrawSize / 2;
-
-            double dampLength = cameraDelay / 2;
-
-            scopePositionForDrawable.X = (float)Interpolation.DampContinuously(drawable.X, scopePositionForDrawable.X, dampLength, gameplayClock.ElapsedFrameTime);
-            scopePositionForDrawable.Y = (float)Interpolation.DampContinuously(drawable.Y, scopePositionForDrawable.Y, dampLength, gameplayClock.ElapsedFrameTime);
-
-            drawable.Position = scopePositionForDrawable;
-        }
-
-
-        private void InternalApplyIncreasedVisibilityState()
-        {
-            if (increasedVisibilityMode)
-                return;
-
-            Debug.Assert(playfield != null && parallaxContainer != null);
-
-            increasedVisibilityMode = true;
-            isTraveling = false;
-
-
-            ApplyBlindTravel(playfield, default_scope_scale);
-            applyParallaxForFOV(parallaxContainer, default_scope_scale);
-
-            scheduler.AddDelayed(() => increasedVisibilityMode = false, increasedVisibilityDuration);
-        }
-
-        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
-        {
-            InternalApplyIncreasedVisibilityState();
-        }
-
-        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
-        {
-            Debug.Assert(playfield != null && parallaxContainer != null);
-            if (!increasedVisibilityMode && !isTraveling)
+            get => currentZoom;
+            set
             {
-                ApplyBlindTravel(playfield, CurrentScopeFovAsScale);
-                applyParallaxForFOV(parallaxContainer, currentScopeFOV);
+                Debug.Assert(ParallaxContainer != null && Player != null);
 
-                isTraveling = true;
+                if (currentZoom == value) return;
+
+                currentZoom = value;
+
+                ParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * Player.BackgroundParallaxAmount * (float)value;
             }
         }
 
-        private void ApplyBlindTravel(Playfield playfield, float scale)
+        [SettingSource("Change zoom based on combo", "Zooms in on your cursor based on combo")]
+        public BindableBool ComboBasedZoom { get; } = new BindableBool(true);
+
+        private OsuPlayfield? Playfield;
+
+        private Player? Player;
+
+        private ParallaxContainer? ParallaxContainer;
+
+        private IFrameStableClock? GameplayClock;
+
+        private Vector2 ParentHalfVector
         {
-            playfield.ScaleTo(scale, applyIncreasedVisibilityDuration, Easing.Out);
+            get
+            {
+                Debug.Assert(Playfield != null);
+                return Playfield.DrawSize / 2;
+            }
+        }
+
+        private DateTime increasedVisibilityModeExpiration = DateTime.Now;
+
+        private bool AppliedFirstIncreaseVisibilityMode;
+
+        private bool IncreasedVisibilityMode
+        {
+            get
+            {
+                Debug.Assert(Player != null);
+
+                bool isApplicable = Player.IsBreakTime.Value || !AppliedFirstIncreaseVisibilityMode;
+                bool previousIncreasedVisibilityExpired = DateTime.Now > increasedVisibilityModeExpiration;
+
+                if (!previousIncreasedVisibilityExpired)
+                    return true;
+
+                if (!isApplicable)
+                    return false;
+
+                increasedVisibilityModeExpiration = DateTime.Now.AddMilliseconds(increased_visibility_duration);
+
+                AppliedFirstIncreaseVisibilityMode = true;
+
+                return true;
+            }
         }
 
         protected BindableInt Combo = new BindableInt();
 
+        private List<Drawable> ZoomedDrawables = new List<Drawable>();
+
+        private List<Drawable> DrawablesFollowingCursor = new List<Drawable>();
+
+        public void ApplyToPlayer(Player player)
+        {
+            Player = player;
+            ParallaxContainer = player.FindClosestParent<OsuScreenStack>().parallaxContainer;
+        }
+
+        public void ApplyToDrawableRuleset(Rulesets.UI.DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            Playfield = (OsuPlayfield)drawableRuleset.Playfield;
+            GameplayClock = drawableRuleset.FrameStableClock;
+
+            ZoomedDrawables.Add(Playfield);
+            DrawablesFollowingCursor.Add(Playfield);
+        }
+
+        public void Update(Playfield _)
+        {
+            Debug.Assert(ParallaxContainer != null && Playfield != null && GameplayClock != null && Player != null);
+
+            var cursorPos = Playfield.Cursor.ActiveCursor.DrawPosition;
+
+            // applies parallax to managed cursors (such as auto).
+            ParallaxContainer.MousePosition = cursorPos;
+
+            if (IncreasedVisibilityMode)
+            {
+                CurrentZoom = increased_visibility_zoom;
+                ApplyZoomForZoomedDrawables(CurrentZoom);
+                MoveDrawablesFollowingCursor(Vector2.Zero - ParentHalfVector);
+                return;
+            }
+
+            ApplyZoomForZoomedDrawables(CurrentZoom);
+
+            var translatedCursorPosition = -cursorPos;
+            MoveDrawablesFollowingCursor(translatedCursorPosition);
+        }
+
+        private void MoveDrawablesFollowingCursor(Vector2 position)
+        {
+            Debug.Assert(GameplayClock != null && Playfield != null);
+
+            double dampLength = cameraDelay / 2;
+
+            foreach (var drawable in DrawablesFollowingCursor)
+            {
+                var followPosition = Vector2.Clamp(position + ParentHalfVector, -ParentHalfVector, ParentHalfVector);
+
+                float x = (float)Interpolation.DampContinuously(drawable.X, followPosition.X, dampLength, GameplayClock.ElapsedFrameTime);
+
+                float y = (float)Interpolation.DampContinuously(drawable.Y, followPosition.Y, dampLength, GameplayClock.ElapsedFrameTime);
+
+                // Handle playback edge cases (for whatever reason one of these values may be infinity)
+                if (Double.IsInfinity(x) || Double.IsInfinity(y))
+                    continue;
+
+                drawable.Position = new Vector2(x, y);
+            }
+        }
+
+        private void ApplyZoomForZoomedDrawables(double zoom)
+        {
+            Debug.Assert(GameplayClock != null);
+
+            foreach (var drawable in ZoomedDrawables)
+            {
+                float currentScale = (float)Interpolation.ValueAt(Math.Min(Math.Abs(GameplayClock.ElapsedFrameTime), apply_zoom_duration), drawable.Scale.X, zoom, 0, apply_zoom_duration, Easing.Out);
+
+                drawable.Scale = new Vector2(currentScale, currentScale);
+            }
+        }
+
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            if (ComboBasedFOV.Value)
+            if (ComboBasedZoom.Value)
             {
                 scoreProcessor.Combo.BindTo(Combo);
                 Combo.ValueChanged += OnComboChange;
             }
         }
 
-        private const int lastShrinkableSizeCombo = 200;
-        private const int shrinkEveryComboAmount = 100;
-
-        private void applyParallaxForFOV(ParallaxContainer parallaxContainer, float fov)
-        {
-            // The lower the fov, the more shakier it gets
-            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * baseParallaxAmount * (25 / fov);
-        }
-
         private void OnComboChange(ValueChangedEvent<int> e)
         {
-            Debug.Assert(parallaxContainer != null);
-
-            var combo = e.NewValue;
-            if (combo % shrinkEveryComboAmount == 0)
-            {
-                currentScopeFOV = getScopeFOVForCombo(combo);
-                applyParallaxForFOV(parallaxContainer, currentScopeFOV);
-            }
+            if (!IncreasedVisibilityMode)
+                CurrentZoom = GetZoomForCombo(e.NewValue);
         }
 
-        private float getScopeFOVForCombo(int combo)
+        private double GetZoomForCombo(int combo)
         {
-            var setCombo = Math.Min(combo, lastShrinkableSizeCombo);
-            return baseScopeFOV - shrinkFOVWithComboBy * (setCombo / shrinkEveryComboAmount);
+            double setCombo = Math.Min(combo, last_zoom_combo);
+            return baseZoom + zoom_with_combo_by * (int)Math.Floor(setCombo / zoom_every_combo_amount);
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
@@ -233,6 +240,5 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return rank;
             }
         }
-
     }
 }
