@@ -131,10 +131,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             // applies parallax to managed cursors (such as auto).
             ParallaxContainer.MousePosition = cursorPos;
 
-            var translatedCursorPosition = -cursorPos;
-
             ApplyZoomForZoomedDrawables(CurrentZoom);
-            MoveDrawablesFollowingCursor(translatedCursorPosition);
+            MoveDrawablesFollowingCursor(cursorPos);
         }
 
         private void MoveDrawablesFollowingCursor(Vector2 position)
@@ -145,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             foreach (var drawable in DrawablesFollowingCursor)
             {
-                var followPosition = Vector2.Clamp(position + ParentHalfVector, -ParentHalfVector, ParentHalfVector);
+                var followPosition = Vector2.Clamp(ParentHalfVector - position, -ParentHalfVector, ParentHalfVector);
 
                 float x = (float)Interpolation.DampContinuously(drawable.X, followPosition.X, dampLength, GameplayClock.ElapsedFrameTime);
 
