@@ -23,6 +23,17 @@ namespace osu.Game.Screens.Edit
     public class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
     {
         /// <summary>
+        /// Will become <c>true</c> when a new update is queued, and <c>false</c> when all updates have been applied.
+        /// </summary>
+        /// <remarks>
+        /// This is intended to be used to avoid performing operations (like playback of samples)
+        /// while mutating hitobjects.
+        /// </remarks>
+        public IBindable<bool> UpdateInProgress => updateInProgress;
+
+        private readonly BindableBool updateInProgress = new BindableBool();
+
+        /// <summary>
         /// Invoked when a <see cref="HitObject"/> is added to this <see cref="EditorBeatmap"/>.
         /// </summary>
         public event Action<HitObject> HitObjectAdded;
@@ -228,6 +239,8 @@ namespace osu.Game.Screens.Edit
         {
             // updates are debounced regardless of whether a batch is active.
             batchPendingUpdates.Add(hitObject);
+
+            updateInProgress.Value = true;
         }
 
         /// <summary>
@@ -237,6 +250,8 @@ namespace osu.Game.Screens.Edit
         {
             foreach (var h in HitObjects)
                 batchPendingUpdates.Add(h);
+
+            updateInProgress.Value = true;
         }
 
         /// <summary>
@@ -329,6 +344,8 @@ namespace osu.Game.Screens.Edit
             foreach (var h in deletes) HitObjectRemoved?.Invoke(h);
             foreach (var h in inserts) HitObjectAdded?.Invoke(h);
             foreach (var h in updates) HitObjectUpdated?.Invoke(h);
+
+            updateInProgress.Value = false;
         }
 
         /// <summary>
