@@ -63,6 +63,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [Test]
         public void TestInitialState()
         {
+            AddStep("set beatmap", () => setBeatmap());
+
             AddStep("create mascot", () => SetContents(_ => new DrawableTaikoMascot { RelativeSizeAxes = Axes.Both }));
 
             AddAssert("mascot initially idle", () => allMascotsIn(TaikoMascotAnimationState.Idle));
@@ -87,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [Test]
         public void TestIdleState()
         {
-            prepareTest(false);
+            prepareDrawableRulesetAndBeatmap(false);
 
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
             assertStateAfterResult(new JudgementResult(new Hit.StrongNestedHit(), new TaikoStrongJudgement()) { Type = HitResult.IgnoreMiss }, TaikoMascotAnimationState.Idle);
@@ -96,7 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [Test]
         public void TestKiaiState()
         {
-            prepareTest(true);
+            prepareDrawableRulesetAndBeatmap(true);
 
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Ok }, TaikoMascotAnimationState.Kiai);
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoStrongJudgement()) { Type = HitResult.IgnoreMiss }, TaikoMascotAnimationState.Kiai);
@@ -106,7 +108,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [Test]
         public void TestMissState()
         {
-            prepareTest(false);
+            prepareDrawableRulesetAndBeatmap(false);
 
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Fail);
@@ -118,9 +120,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [TestCase(false)]
         public void TestClearStateOnComboMilestone(bool kiai)
         {
-            AddStep("set beatmap", () => setBeatmap(kiai));
-
-            prepareTest(kiai);
+            prepareDrawableRulesetAndBeatmap(kiai);
 
             AddRepeatStep("reach 49 combo", () => applyNewResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }), 49);
 
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [TestCase(false, TaikoMascotAnimationState.Idle)]
         public void TestClearStateOnClearedSwell(bool kiai, TaikoMascotAnimationState expectedStateAfterClear)
         {
-            prepareTest(kiai);
+            prepareDrawableRulesetAndBeatmap(kiai);
 
             assertStateAfterResult(new JudgementResult(new Swell(), new TaikoSwellJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Clear);
             AddUntilStep($"state reverts to {expectedStateAfterClear.ToString().ToLowerInvariant()}", () => allMascotsIn(expectedStateAfterClear));
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             scoreProcessor.ApplyBeatmap(Beatmap.Value.Beatmap);
         }
 
-        private void prepareTest(bool kiai)
+        private void prepareDrawableRulesetAndBeatmap(bool kiai)
         {
             AddStep("set beatmap", () => setBeatmap(kiai));
 
