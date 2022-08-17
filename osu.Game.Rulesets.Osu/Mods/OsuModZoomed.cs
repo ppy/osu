@@ -22,7 +22,7 @@ using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModBlindTravel : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToPlayer, IApplicableToDrawableRuleset<OsuHitObject>
+    internal class OsuModZoomed : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToPlayer, IApplicableToDrawableRuleset<OsuHitObject>
 
     {
         private const int last_zoom_combo = 200;
@@ -32,11 +32,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double default_zoom = 1.8;
         private const double zoom_with_combo_by = 0.1;
 
-        public override string Name => "Blind Travel";
-        public override string Acronym => "BT";
-        public override IconUsage? Icon => FontAwesome.Solid.PlaneDeparture;
+        public override string Name => "Zoomed";
+        public override string Acronym => "ZM";
+        public override IconUsage? Icon => FontAwesome.Solid.Glasses;
         public override ModType Type => ModType.Fun;
-        public override string Description => "You cursor is focused.";
+        public override string Description => "Big brother is watching your cursor.";
         public override double ScoreMultiplier => 1;
 
 

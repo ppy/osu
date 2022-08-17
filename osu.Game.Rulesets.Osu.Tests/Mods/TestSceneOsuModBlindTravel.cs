@@ -6,12 +6,12 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModBlindTravel : OsuModTestScene
+    public class TestSceneOsuZoomed : OsuModTestScene
     {
         [Test]
-        public void TestBlindTravel() => CreateModTest(new ModTestData
+        public void TestZoomed() => CreateModTest(new ModTestData
         {
-            Mod = new OsuModBlindTravel(),
+            Mod = new OsuModZoomed(),
             PassCondition = () => true,
             Autoplay = false,
         });
