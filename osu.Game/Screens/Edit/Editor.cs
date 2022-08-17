@@ -24,6 +24,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -231,6 +232,8 @@ namespace osu.Game.Screens.Edit
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
             dependencies.CacheAs(editorBeatmap);
 
+            editorBeatmap.UpdateInProgress.BindValueChanged(updateInProgress);
+
             canSave = editorBeatmap.BeatmapInfo.Ruleset.CreateInstance() is ILegacyRuleset;
 
             if (canSave)
@@ -431,7 +434,7 @@ namespace osu.Game.Screens.Edit
 
             samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value
                                            || currentScreen is not ComposeScreen
-                                           || editorBeatmap.UpdateInProgress;
+                                           || temporaryMuteFromUpdateInProgress;
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
@@ -716,6 +719,22 @@ namespace osu.Game.Screens.Edit
             ExitConfirmed = true;
             this.Exit();
         }
+
+        #region Mute from update application
+
+        private ScheduledDelegate temporaryMuteRestorationDelegate;
+        private bool temporaryMuteFromUpdateInProgress;
+
+        private void updateInProgress(ValueChangedEvent<bool> obj)
+        {
+            temporaryMuteFromUpdateInProgress = true;
+
+            // Debounce is arbitrarily high enough to avoid flip-flopping the value each other frame.
+            temporaryMuteRestorationDelegate?.Cancel();
+            temporaryMuteRestorationDelegate = Scheduler.AddDelayed(() => temporaryMuteFromUpdateInProgress = false, 50);
+        }
+
+        #endregion
 
         #region Clipboard support
 
