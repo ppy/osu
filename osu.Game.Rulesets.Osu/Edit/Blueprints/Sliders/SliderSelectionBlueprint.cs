@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -111,7 +112,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(HitObject, true)
             {
-                RemoveControlPointsRequested = removeControlPoints
+                RemoveControlPointsRequested = removeControlPoints,
+                SplitControlPointsRequested = splitControlPoints
             });
 
             base.OnSelected();
@@ -240,6 +242,72 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 placementHandler?.Delete(HitObject);
                 return;
             }
+
+            // The path will have a non-zero offset if the head is removed, but sliders don't support this behaviour since the head is positioned at the slider's position
+            // So the slider needs to be offset by this amount instead, and all control points offset backwards such that the path is re-positioned at (0, 0)
+            Vector2 first = controlPoints[0].Position;
+            foreach (var c in controlPoints)
+                c.Position -= first;
+            HitObject.Position += first;
+        }
+
+        private void splitControlPoints(List<PathControlPoint> toSplit)
+        {
+            // Ensure that there are any points to be split
+            if (toSplit.Count == 0)
+                return;
+
+            foreach (var c in toSplit)
+            {
+                if (c == controlPoints[0] || c == controlPoints[^1] || c.Type is null)
+                    continue;
+
+                // Split off the section of slider before this control point so the remaining control points to split are in the latter part of the slider.
+                var splitControlPoints = controlPoints.TakeWhile(current => current != c).ToList();
+
+                if (splitControlPoints.Count == 0)
+                    continue;
+
+                foreach (var current in splitControlPoints)
+                {
+                    controlPoints.Remove(current);
+                }
+
+                splitControlPoints.Add(c);
+
+                // Turn the control points which were split off into a new slider.
+                var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
+                samplePoint.Time = HitObject.StartTime;
+                var difficultyPoint = (DifficultyControlPoint)HitObject.DifficultyControlPoint.DeepClone();
+                difficultyPoint.Time = HitObject.StartTime;
+
+                var newSlider = new Slider
+                {
+                    StartTime = HitObject.StartTime,
+                    Position = HitObject.Position + splitControlPoints[0].Position,
+                    NewCombo = HitObject.NewCombo,
+                    SampleControlPoint = samplePoint,
+                    DifficultyControlPoint = difficultyPoint,
+                    Samples = HitObject.Samples.Select(s => s.With()).ToList(),
+                    RepeatCount = HitObject.RepeatCount,
+                    NodeSamples = HitObject.NodeSamples.Select(n => (IList<HitSampleInfo>)n.Select(s => s.With()).ToList()).ToList(),
+                    Path = new SliderPath(splitControlPoints.Select(o => new PathControlPoint(o.Position - splitControlPoints[0].Position, o == splitControlPoints[^1] ? null : o.Type)).ToArray())
+                };
+
+                editorBeatmap.Add(newSlider);
+
+                HitObject.NewCombo = false;
+                HitObject.Path.ExpectedDistance.Value -= newSlider.Path.CalculatedDistance;
+                HitObject.StartTime += newSlider.SpanDuration;
+
+                // In case the remainder of the slider has no length left over, give it length anyways so we don't get a 0 length slider.
+                if (HitObject.Path.ExpectedDistance.Value <= Precision.DOUBLE_EPSILON)
+                {
+                    HitObject.Path.ExpectedDistance.Value = null;
+                }
+            }
+
+            editorBeatmap.SelectedHitObjects.Clear();
 
             // The path will have a non-zero offset if the head is removed, but sliders don't support this behaviour since the head is positioned at the slider's position
             // So the slider needs to be offset by this amount instead, and all control points offset backwards such that the path is re-positioned at (0, 0)

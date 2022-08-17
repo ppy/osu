@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private InputManager inputManager;
 
         public Action<List<PathControlPoint>> RemoveControlPointsRequested;
+        public Action<List<PathControlPoint>> SplitControlPointsRequested;
 
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider snapProvider { get; set; }
@@ -95,6 +96,28 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             changeHandler?.BeginChange();
             RemoveControlPointsRequested?.Invoke(toRemove);
+            changeHandler?.EndChange();
+
+            // Since pieces are re-used, they will not point to the deleted control points while remaining selected
+            foreach (var piece in Pieces)
+                piece.IsSelected.Value = false;
+
+            return true;
+        }
+
+        // The slider can only be split on control points which connect two different slider segments.
+        private bool splittable(PathControlPointPiece p) => p.ControlPoint.Type.HasValue && p != Pieces[0] && p != Pieces[^1];
+
+        private bool splitSelected()
+        {
+            List<PathControlPoint> toSplit = Pieces.Where(p => p.IsSelected.Value && splittable(p)).Select(p => p.ControlPoint).ToList();
+
+            // Ensure that there are any points to be split
+            if (toSplit.Count == 0)
+                return false;
+
+            changeHandler?.BeginChange();
+            SplitControlPointsRequested?.Invoke(toSplit);
             changeHandler?.EndChange();
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
@@ -322,6 +345,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 if (count == 0)
                     return null;
 
+                var splittablePieces = selectedPieces.Where(splittable).ToList();
+                int splittableCount = splittablePieces.Count;
+
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (!selectedPieces.Contains(Pieces[0]))
@@ -333,14 +359,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 items.Add(createMenuItemForPathType(PathType.Bezier));
                 items.Add(createMenuItemForPathType(PathType.Catmull));
 
-                return new MenuItem[]
+                var menuItems = new MenuItem[splittableCount > 0 ? 3 : 2];
+                int i = 0;
+
+                menuItems[i++] = new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive,
+                    () => DeleteSelected());
+
+                if (splittableCount > 0)
                 {
-                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => DeleteSelected()),
-                    new OsuMenuItem("Curve type")
-                    {
-                        Items = items
-                    }
+                    menuItems[i++] = new OsuMenuItem($"Split {"control point".ToQuantity(splittableCount, splittableCount > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}",
+                        MenuItemType.Destructive, () => splitSelected());
+                }
+
+                menuItems[i] = new OsuMenuItem("Curve type")
+                {
+                    Items = items
                 };
+
+                return menuItems;
             }
         }
 
