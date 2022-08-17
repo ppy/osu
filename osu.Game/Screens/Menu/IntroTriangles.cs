@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Menu
                         // If the user has requested no theme, fallback to the same intro voice and delay as IntroCircles.
                         // The triangles intro voice and theme are combined which makes it impossible to use.
                         welcome?.Play();
-                        Scheduler.AddDelayed(StartTrack, IntroCircles.TRACK_START_DELAY_NON_THEMED);
+                        Scheduler.AddDelayed(StartTrack, IntroCircles.TRACK_START_DELAY);
                     }
                     else
                         StartTrack();
