@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const int last_zoom_combo = 200;
         private const int zoom_every_combo_amount = 100;
         private const int apply_zoom_duration = 1000;
-        private const int default_follow_delay = 100;
+        private const int default_follow_delay = 0;
         private const double default_zoom = 1.8;
         private const double zoom_with_combo_by = 0.1;
 
@@ -41,14 +41,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
 
         [SettingSource("Focus delay", "Milliseconds for for your cursor be focused")]
-        public BindableDouble CameraDelay { get; } = new BindableDouble(default_follow_delay)
+        public BindableInt CameraDelay { get; } = new BindableInt(default_follow_delay)
         {
             MinValue = default_follow_delay,
-            MaxValue = default_follow_delay * 10,
-            Precision = default_follow_delay,
+            MaxValue = 1000,
+            Precision = 100,
         };
 
-        private double cameraDelay => CameraDelay.Value;
+        private int cameraDelay => CameraDelay.Value;
 
 
         [SettingSource("Base zoom", "Adjust the zoom applied to your cursor.")]
@@ -135,15 +135,31 @@ namespace osu.Game.Rulesets.Osu.Mods
             MoveDrawablesFollowingCursor(cursorPos);
         }
 
+        private Vector2 getDrawablePositionForCursorPosition(Vector2 position)
+        {
+            return Vector2.Clamp(ParentHalfVector - position, -ParentHalfVector, ParentHalfVector);
+        }
+
         private void MoveDrawablesFollowingCursor(Vector2 position)
         {
             Debug.Assert(GameplayClock != null && Playfield != null);
 
-            double dampLength = cameraDelay / 2;
+
+            // prevent division by 0
+            if (Precision.AlmostEquals(cameraDelay, 0))
+            {
+                foreach (var drawable in DrawablesFollowingCursor)
+                    drawable.Position = getDrawablePositionForCursorPosition(position);
+
+                return;
+            }
+
+            int dampLength = cameraDelay / 2;
 
             foreach (var drawable in DrawablesFollowingCursor)
             {
-                var followPosition = Vector2.Clamp(ParentHalfVector - position, -ParentHalfVector, ParentHalfVector);
+                var followPosition = getDrawablePositionForCursorPosition(position);
+
 
                 float x = (float)Interpolation.DampContinuously(drawable.X, followPosition.X, dampLength, GameplayClock.ElapsedFrameTime);
 
