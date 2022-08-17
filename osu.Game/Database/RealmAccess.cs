@@ -902,7 +902,14 @@ namespace osu.Game.Database
                 {
                     using (var source = storage.GetStream(Filename, mode: FileMode.Open))
                     using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                    {
+                        // source may not exist.
+                        if (source == null)
+                            return;
+
                         source.CopyTo(destination);
+                    }
+
                     return;
                 }
                 catch (IOException)
