@@ -683,7 +683,7 @@ namespace osu.Game.Screens.Select
         }
 
         private void ensureTrackLooping(IWorkingBeatmap beatmap, TrackChangeDirection changeDirection)
-            => beatmap.PrepareTrackForPreviewLooping();
+            => beatmap.PrepareTrackForPreview(true);
 
         public override bool OnBackButton()
         {
