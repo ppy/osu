@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Base zoom", "Adjust the zoom applied to your cursor.")]
         public BindableDouble BaseZoom { get; } = new BindableDouble(default_zoom)
         {
-            MinValue = 0.5f,
+            MinValue = 1.5f,
             MaxValue = 2,
             Precision = 0.05f
         };
