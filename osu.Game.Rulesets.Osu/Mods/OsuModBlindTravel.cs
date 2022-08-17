@@ -27,11 +27,9 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         private const int last_zoom_combo = 200;
         private const int zoom_every_combo_amount = 100;
-        private const int increased_visibility_zoom = 1;
-        private const int apply_zoom_duration = 6000;
-        private const int increased_visibility_duration = 3000;
+        private const int apply_zoom_duration = 1000;
         private const int default_follow_delay = 100;
-        private const double default_zoom = 1.5;
+        private const double default_zoom = 1.8;
         private const double zoom_with_combo_by = 0.1;
 
         public override string Name => "Blind Travel";
@@ -102,31 +100,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private DateTime increasedVisibilityModeExpiration = DateTime.Now;
 
-        private bool AppliedFirstIncreaseVisibilityMode;
-
-        private bool IncreasedVisibilityMode
-        {
-            get
-            {
-                Debug.Assert(Player != null);
-
-                bool isApplicable = Player.IsBreakTime.Value || !AppliedFirstIncreaseVisibilityMode;
-                bool previousIncreasedVisibilityExpired = DateTime.Now > increasedVisibilityModeExpiration;
-
-                if (!previousIncreasedVisibilityExpired)
-                    return true;
-
-                if (!isApplicable)
-                    return false;
-
-                increasedVisibilityModeExpiration = DateTime.Now.AddMilliseconds(increased_visibility_duration);
-
-                AppliedFirstIncreaseVisibilityMode = true;
-
-                return true;
-            }
-        }
-
         protected BindableInt Combo = new BindableInt();
 
         private List<Drawable> ZoomedDrawables = new List<Drawable>();
@@ -137,6 +110,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             Player = player;
             ParallaxContainer = player.FindClosestParent<OsuScreenStack>().parallaxContainer;
+            CurrentZoom = baseZoom;
         }
 
         public void ApplyToDrawableRuleset(Rulesets.UI.DrawableRuleset<OsuHitObject> drawableRuleset)
@@ -157,17 +131,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             // applies parallax to managed cursors (such as auto).
             ParallaxContainer.MousePosition = cursorPos;
 
-            if (IncreasedVisibilityMode)
-            {
-                CurrentZoom = increased_visibility_zoom;
-                ApplyZoomForZoomedDrawables(CurrentZoom);
-                MoveDrawablesFollowingCursor(Vector2.Zero - ParentHalfVector);
-                return;
-            }
+            var translatedCursorPosition = -cursorPos;
 
             ApplyZoomForZoomedDrawables(CurrentZoom);
-
-            var translatedCursorPosition = -cursorPos;
             MoveDrawablesFollowingCursor(translatedCursorPosition);
         }
 
@@ -216,8 +182,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void OnComboChange(ValueChangedEvent<int> e)
         {
-            if (!IncreasedVisibilityMode)
-                CurrentZoom = GetZoomForCombo(e.NewValue);
+            CurrentZoom = GetZoomForCombo(e.NewValue);
         }
 
         private double GetZoomForCombo(int combo)
