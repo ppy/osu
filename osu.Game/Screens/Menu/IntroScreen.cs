@@ -272,11 +272,17 @@ namespace osu.Game.Screens.Menu
                 FadeInBackground(200);
         }
 
-        protected virtual void StartTrack()
+        protected void StartTrack()
         {
-            // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-            if (UsingThemedIntro)
-                Track.Start();
+            var drawableTrack = musicController.CurrentTrack;
+
+            drawableTrack.Start();
+
+            if (!UsingThemedIntro)
+            {
+                drawableTrack.VolumeTo(0).Then()
+                             .VolumeTo(1, 2000, Easing.OutQuint);
+            }
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

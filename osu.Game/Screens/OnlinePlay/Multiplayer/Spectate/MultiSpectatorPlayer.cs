@@ -1,12 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -26,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         /// <param name="score">The score containing the player's replay.</param>
         /// <param name="spectatorPlayerClock">The clock controlling the gameplay running state.</param>
-        public MultiSpectatorPlayer([NotNull] Score score, [NotNull] ISpectatorPlayerClock spectatorPlayerClock)
+        public MultiSpectatorPlayer(Score score, ISpectatorPlayerClock spectatorPlayerClock)
             : base(score, new PlayerConfiguration { AllowUserInteraction = false })
         {
             this.spectatorPlayerClock = spectatorPlayerClock;
@@ -41,6 +37,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             HUDOverlay.HoldToQuit.Expire();
         }
 
+        protected override void Update()
+        {
+            // The player clock's running state is controlled externally, but the local pausing state needs to be updated to start/stop gameplay.
+            CatchUpSpectatorPlayerClock catchUpClock = (CatchUpSpectatorPlayerClock)GameplayClockContainer.SourceClock;
+
+            if (catchUpClock.IsRunning)
+                GameplayClockContainer.Start();
+            else
+                GameplayClockContainer.Stop();
+
+            base.Update();
+        }
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -50,28 +59,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-            => new SpectatorGameplayClockContainer(spectatorPlayerClock);
-
-        private class SpectatorGameplayClockContainer : GameplayClockContainer
-        {
-            public SpectatorGameplayClockContainer([NotNull] IClock sourceClock)
-                : base(sourceClock)
-            {
-            }
-
-            protected override void Update()
-            {
-                // The SourceClock here is always a CatchUpSpectatorPlayerClock.
-                // The player clock's running state is controlled externally, but the local pausing state needs to be updated to stop gameplay.
-                if (SourceClock.IsRunning)
-                    Start();
-                else
-                    Stop();
-
-                base.Update();
-            }
-
-            protected override GameplayClock CreateGameplayClock(IFrameBasedClock source) => new GameplayClock(source);
-        }
+            => new GameplayClockContainer(spectatorPlayerClock);
     }
 }

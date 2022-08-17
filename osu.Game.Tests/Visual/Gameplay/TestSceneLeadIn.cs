@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public double FirstHitObjectTime => DrawableRuleset.Objects.First().StartTime;
 
-            public double GameplayClockTime => GameplayClockContainer.GameplayClock.CurrentTime;
+            public double GameplayClockTime => GameplayClockContainer.CurrentTime;
 
             protected override void UpdateAfterChildren()
             {
@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 if (!FirstFrameClockTime.HasValue)
                 {
-                    FirstFrameClockTime = GameplayClockContainer.GameplayClock.CurrentTime;
+                    FirstFrameClockTime = GameplayClockContainer.CurrentTime;
                     AddInternal(new OsuSpriteText
                     {
                         Text = $"GameplayStartTime: {DrawableRuleset.GameplayStartTime} "
