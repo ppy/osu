@@ -21,7 +21,6 @@ using osu.Game.Rulesets.Osu.UI;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModZoomed : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToPlayer, IApplicableToDrawableRuleset<OsuHitObject>
-
     {
         private const int last_zoom_combo = 200;
         private const int zoom_every_combo_amount = 100;
@@ -62,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Change zoom based on combo", "Zooms in on your cursor based on combo")]
         public BindableBool ComboBasedZoom { get; } = new BindableBool(true);
 
-        private BindableInt Combo = new BindableInt();
+        private BindableInt combo = new BindableInt();
 
         private OsuPlayfield? playfield;
 
@@ -142,12 +141,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (ComboBasedZoom.Value)
             {
-                scoreProcessor.Combo.BindTo(Combo);
-                Combo.ValueChanged += OnComboChange;
+                scoreProcessor.Combo.BindTo(combo);
+                combo.ValueChanged += onComboChange;
             }
         }
 
-        private void OnComboChange(ValueChangedEvent<int> e)
+        private void onComboChange(ValueChangedEvent<int> e)
         {
             currentZoom = getZoomForCombo(e.NewValue);
         }
@@ -172,6 +171,5 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return rank;
             }
         }
-
     }
 }
