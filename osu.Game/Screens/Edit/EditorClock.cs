@@ -4,10 +4,12 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
@@ -19,7 +21,7 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// A decoupled clock which adds editor-specific functionality, such as snapping to a user-defined beat divisor.
     /// </summary>
-    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
+    public class EditorClock : CompositeComponent, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
         public IBindable<Track> Track => track;
 
@@ -33,7 +35,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly BindableBeatDivisor beatDivisor;
 
-        private readonly DecoupleableInterpolatingFramedClock underlyingClock;
+        private readonly FramedBeatmapClock underlyingClock;
 
         private bool playbackFinished;
 
@@ -52,7 +54,8 @@ namespace osu.Game.Screens.Edit
 
             this.beatDivisor = beatDivisor ?? new BindableBeatDivisor();
 
-            underlyingClock = new DecoupleableInterpolatingFramedClock();
+            underlyingClock = new FramedBeatmapClock(applyOffsets: true);
+            AddInternal(underlyingClock);
         }
 
         /// <summary>
@@ -219,6 +222,9 @@ namespace osu.Game.Screens.Edit
 
         public void ProcessFrame()
         {
+            // EditorClock wasn't being added in many places. This gives us more certainty that it is.
+            Debug.Assert(underlyingClock.LoadState > LoadState.NotLoaded);
+
             underlyingClock.ProcessFrame();
 
             playbackFinished = CurrentTime >= TrackLength;
