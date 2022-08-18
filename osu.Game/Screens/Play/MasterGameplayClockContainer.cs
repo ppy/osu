@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public const double MINIMUM_SKIP_TIME = 1000;
 
-        protected Track Track => (Track)SourceClock;
-
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
             Default = 1,
@@ -54,7 +52,6 @@ namespace osu.Game.Screens.Play
         private HardwareCorrectionOffsetClock userGlobalOffsetClock = null!;
         private HardwareCorrectionOffsetClock userBeatmapOffsetClock = null!;
         private HardwareCorrectionOffsetClock platformOffsetClock = null!;
-        private MasterGameplayClock masterGameplayClock = null!;
         private Bindable<double> userAudioOffset = null!;
 
         private IDisposable? beatmapOffsetSubscription;
@@ -134,7 +131,7 @@ namespace osu.Game.Screens.Play
                     this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ =>
                     {
                         if (IsPaused.Value == isPaused.NewValue)
-                            AdjustableSource.Stop();
+                            base.OnIsPausedChanged(isPaused);
                     });
                 }
                 else
@@ -143,14 +140,14 @@ namespace osu.Game.Screens.Play
             else
             {
                 if (isPaused.NewValue)
-                    AdjustableSource.Stop();
+                    base.OnIsPausedChanged(isPaused);
 
                 // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
                 pauseFreqAdjust.Value = isPaused.NewValue ? 0 : 1;
 
                 // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
                 // Without doing this, an initial seek may be performed with the wrong offset.
-                GameplayClock.UnderlyingClock.ProcessFrame();
+                FramedClock.ProcessFrame();
             }
         }
 
@@ -179,19 +176,19 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Skip()
         {
-            if (GameplayClock.CurrentTime > skipTargetTime - MINIMUM_SKIP_TIME)
+            if (FramedClock.CurrentTime > skipTargetTime - MINIMUM_SKIP_TIME)
                 return;
 
             double skipTarget = skipTargetTime - MINIMUM_SKIP_TIME;
 
-            if (GameplayClock.CurrentTime < 0 && skipTarget > 6000)
+            if (FramedClock.CurrentTime < 0 && skipTarget > 6000)
                 // double skip exception for storyboards with very long intros
                 skipTarget = 0;
 
             Seek(skipTarget);
         }
 
-        protected override GameplayClock CreateGameplayClock(IFrameBasedClock source)
+        protected override IFrameBasedClock CreateGameplayClock(IFrameBasedClock source)
         {
             // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
             // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
@@ -199,9 +196,7 @@ namespace osu.Game.Screens.Play
 
             // the final usable gameplay clock with user-set offsets applied.
             userGlobalOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock, pauseFreqAdjust);
-            userBeatmapOffsetClock = new HardwareCorrectionOffsetClock(userGlobalOffsetClock, pauseFreqAdjust);
-
-            return masterGameplayClock = new MasterGameplayClock(userBeatmapOffsetClock);
+            return userBeatmapOffsetClock = new HardwareCorrectionOffsetClock(userGlobalOffsetClock, pauseFreqAdjust);
         }
 
         /// <summary>
@@ -221,11 +216,14 @@ namespace osu.Game.Screens.Play
             if (speedAdjustmentsApplied)
                 return;
 
-            Track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            Track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            if (SourceClock is not Track track)
+                return;
 
-            masterGameplayClock.MutableNonGameplayAdjustments.Add(pauseFreqAdjust);
-            masterGameplayClock.MutableNonGameplayAdjustments.Add(UserPlaybackRate);
+            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+
+            nonGameplayAdjustments.Add(pauseFreqAdjust);
+            nonGameplayAdjustments.Add(UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -235,11 +233,14 @@ namespace osu.Game.Screens.Play
             if (!speedAdjustmentsApplied)
                 return;
 
-            Track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            Track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            if (SourceClock is not Track track)
+                return;
 
-            masterGameplayClock.MutableNonGameplayAdjustments.Remove(pauseFreqAdjust);
-            masterGameplayClock.MutableNonGameplayAdjustments.Remove(UserPlaybackRate);
+            track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+
+            nonGameplayAdjustments.Remove(pauseFreqAdjust);
+            nonGameplayAdjustments.Remove(UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
         }
@@ -252,7 +253,7 @@ namespace osu.Game.Screens.Play
         }
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;
-        IClock IBeatSyncProvider.Clock => GameplayClock;
+        IClock IBeatSyncProvider.Clock => this;
         ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
@@ -300,15 +301,8 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class MasterGameplayClock : GameplayClock
-        {
-            public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
-            public override IEnumerable<double> NonGameplayAdjustments => MutableNonGameplayAdjustments.Select(b => b.Value);
+        private readonly List<Bindable<double>> nonGameplayAdjustments = new List<Bindable<double>>();
 
-            public MasterGameplayClock(FramedOffsetClock underlyingClock)
-                : base(underlyingClock)
-            {
-            }
-        }
+        public override IEnumerable<double> NonGameplayAdjustments => nonGameplayAdjustments.Select(b => b.Value);
     }
 }
