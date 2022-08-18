@@ -57,20 +57,8 @@ namespace osu.Game.Screens.Play
         {
             this.beatmap = beatmap;
             this.skipTargetTime = skipTargetTime;
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // Reset may have been called externally before LoadComplete.
-            // If it was, and the clock is in a playing state, we want to ensure that it isn't stopped here.
-            bool isStarted = !IsPaused.Value;
-
-            // If a custom start time was not specified, calculate the best value to use.
-            StartTime ??= findEarliestStartTime();
-
-            Reset(startClock: isStarted);
+            StartTime = findEarliestStartTime();
         }
 
         private double findEarliestStartTime()
