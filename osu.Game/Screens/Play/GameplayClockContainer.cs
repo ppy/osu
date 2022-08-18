@@ -117,9 +117,6 @@ namespace osu.Game.Screens.Play
 
             GameplayClock.Seek(time);
 
-            // Manually process to make sure the gameplay clock is correctly updated after a seek.
-            GameplayClock.ProcessFrame();
-
             OnSeek?.Invoke();
         }
 
@@ -161,14 +158,6 @@ namespace osu.Game.Screens.Play
         {
             if (GameplayClock.Source == null)
                 ChangeSource(SourceClock);
-        }
-
-        protected override void Update()
-        {
-            if (!IsPaused.Value)
-                GameplayClock.ProcessFrame();
-
-            base.Update();
         }
 
         /// <summary>
