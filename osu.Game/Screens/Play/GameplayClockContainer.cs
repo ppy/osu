@@ -38,12 +38,23 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// The time from which the clock should start. Will be seeked to on calling <see cref="Reset"/>.
+        /// Settting a start time will <see cref="Reset"/> to the new value.
         /// </summary>
         /// <remarks>
         /// By default, a value of zero will be used.
         /// Importantly, the value will be inferred from the current beatmap in <see cref="MasterGameplayClockContainer"/> by default.
         /// </remarks>
-        public double StartTime { get; set; } = 0;
+        public double StartTime
+        {
+            get => startTime;
+            set
+            {
+                startTime = value;
+                Reset();
+            }
+        }
+
+        private double startTime;
 
         public virtual IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
 

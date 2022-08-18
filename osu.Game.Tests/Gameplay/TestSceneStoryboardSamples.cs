@@ -90,6 +90,9 @@ namespace osu.Game.Tests.Gameplay
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
         }
 
+        /// <summary>
+        /// Sample at 0ms, start time at 1000ms (so the sample should not be played).
+        /// </summary>
         [Test]
         public void TestSampleHasLifetimeEndWithInitialClockTime()
         {
