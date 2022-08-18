@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 
 namespace osu.Game.Rulesets
@@ -83,17 +84,36 @@ namespace osu.Game.Rulesets
                         r.InstantiationInfo = instanceInfo.InstantiationInfo;
                         r.Available = true;
 
+                        testRulesetCompatibility(r);
+
                         detachedRulesets.Add(r.Clone());
                     }
                     catch (Exception ex)
                     {
                         r.Available = false;
-                        Logger.Log($"Could not load ruleset {r}: {ex.Message}");
+                        Logger.Log($"Could not load ruleset {r.Name}. Please check for an update from the developer.", level: LogLevel.Error);
+                        Logger.Log($"Ruleset load failed with {ex.Message}");
                     }
                 }
 
                 availableRulesets.AddRange(detachedRulesets.OrderBy(r => r));
             });
+        }
+
+        private void testRulesetCompatibility(RulesetInfo rulesetInfo)
+        {
+            // do various operations to ensure that we are in a good state.
+            // if we can avoid loading the ruleset at this point (rather than erroring later in runtime) then that is preferred.
+            var instance = rulesetInfo.CreateInstance();
+
+            instance.CreateAllMods();
+            instance.CreateIcon();
+            instance.CreateResourceStore();
+
+            var beatmap = new Beatmap();
+            var converter = instance.CreateBeatmapConverter(beatmap);
+
+            instance.CreateBeatmapProcessor(converter.Convert());
         }
     }
 }
