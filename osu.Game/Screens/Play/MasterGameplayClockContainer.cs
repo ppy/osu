@@ -49,9 +49,10 @@ namespace osu.Game.Screens.Play
 
         private readonly WorkingBeatmap beatmap;
 
-        private HardwareCorrectionOffsetClock userGlobalOffsetClock = null!;
-        private HardwareCorrectionOffsetClock userBeatmapOffsetClock = null!;
-        private HardwareCorrectionOffsetClock platformOffsetClock = null!;
+        private OffsetCorrectionClock userGlobalOffsetClock = null!;
+        private OffsetCorrectionClock userBeatmapOffsetClock = null!;
+        private OffsetCorrectionClock platformOffsetClock = null!;
+
         private Bindable<double> userAudioOffset = null!;
 
         private IDisposable? beatmapOffsetSubscription;
@@ -63,6 +64,10 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
+
+        private readonly List<Bindable<double>> nonGameplayAdjustments = new List<Bindable<double>>();
+
+        public override IEnumerable<double> NonGameplayAdjustments => nonGameplayAdjustments.Select(b => b.Value);
 
         /// <summary>
         /// Create a new master gameplay clock container.
@@ -192,11 +197,11 @@ namespace osu.Game.Screens.Play
         {
             // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
             // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            platformOffsetClock = new HardwareCorrectionOffsetClock(source, pauseFreqAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+            platformOffsetClock = new OffsetCorrectionClock(source, pauseFreqAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
             // the final usable gameplay clock with user-set offsets applied.
-            userGlobalOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock, pauseFreqAdjust);
-            return userBeatmapOffsetClock = new HardwareCorrectionOffsetClock(userGlobalOffsetClock, pauseFreqAdjust);
+            userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock, pauseFreqAdjust);
+            return userBeatmapOffsetClock = new OffsetCorrectionClock(userGlobalOffsetClock, pauseFreqAdjust);
         }
 
         /// <summary>
@@ -254,55 +259,7 @@ namespace osu.Game.Screens.Play
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => this;
+
         ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
-
-        private class HardwareCorrectionOffsetClock : FramedOffsetClock
-        {
-            private readonly BindableDouble pauseRateAdjust;
-
-            private double offset;
-
-            public new double Offset
-            {
-                get => offset;
-                set
-                {
-                    if (value == offset)
-                        return;
-
-                    offset = value;
-
-                    updateOffset();
-                }
-            }
-
-            public double RateAdjustedOffset => base.Offset;
-
-            public HardwareCorrectionOffsetClock(IClock source, BindableDouble pauseRateAdjust)
-                : base(source)
-            {
-                this.pauseRateAdjust = pauseRateAdjust;
-            }
-
-            public override void ProcessFrame()
-            {
-                base.ProcessFrame();
-                updateOffset();
-            }
-
-            private void updateOffset()
-            {
-                // changing this during the pause transform effect will cause a potentially large offset to be suddenly applied as we approach zero rate.
-                if (pauseRateAdjust.Value == 1)
-                {
-                    // we always want to apply the same real-time offset, so it should be adjusted by the difference in playback rate (from realtime) to achieve this.
-                    base.Offset = Offset * Rate;
-                }
-            }
-        }
-
-        private readonly List<Bindable<double>> nonGameplayAdjustments = new List<Bindable<double>>();
-
-        public override IEnumerable<double> NonGameplayAdjustments => nonGameplayAdjustments.Select(b => b.Value);
     }
 }
