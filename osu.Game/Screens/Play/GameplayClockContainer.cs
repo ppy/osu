@@ -40,10 +40,10 @@ namespace osu.Game.Screens.Play
         /// The time from which the clock should start. Will be seeked to on calling <see cref="Reset"/>.
         /// </summary>
         /// <remarks>
-        /// If not set, a value of zero will be used.
-        /// Importantly, the value will be inferred from the current ruleset in <see cref="MasterGameplayClockContainer"/> unless specified.
+        /// By default, a value of zero will be used.
+        /// Importantly, the value will be inferred from the current beatmap in <see cref="MasterGameplayClockContainer"/> by default.
         /// </remarks>
-        public double? StartTime { get; set; }
+        public double StartTime { get; set; } = 0;
 
         public virtual IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
 
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Play
                 Start();
 
             ensureSourceClockSet();
-            Seek(StartTime ?? 0);
+            Seek(StartTime);
         }
 
         /// <summary>
