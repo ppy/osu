@@ -97,6 +97,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
+            if (!FadeOutEffect.Value) return;
+
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
                 applyFadeInAdjustment(obj);
 
@@ -115,15 +117,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             (double fadeStartTime, double fadeDuration) = getFadeOutParameters(drawableOsuObject);
-
-            if (increaseVisibility)
-            {
-                if (drawableObject is DrawableSpinner spinner)
-                {
-                    spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
-                    hideSpinnerApproachCircle(spinner);
-                }
-            }
+ 
 
             switch (drawableObject)
             {
