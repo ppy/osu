@@ -93,13 +93,7 @@ namespace osu.Game.Screens.Play
             ensureSourceClockSet();
 
             if (!decoupledClock.IsRunning)
-            {
-                // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
-                // This accounts for the clock source potentially taking time to enter a completely stopped state
-                Seek(FramedClock.CurrentTime);
-
                 decoupledClock.Start();
-            }
 
             isPaused.Value = false;
         }
