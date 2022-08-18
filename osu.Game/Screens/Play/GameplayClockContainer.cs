@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Play
         /// Seek to a specific time in gameplay.
         /// </summary>
         /// <param name="time">The destination time to seek to.</param>
-        public virtual void Seek(double time)
+        public void Seek(double time)
         {
             Logger.Log($"{nameof(GameplayClockContainer)} seeking to {time}");
 
