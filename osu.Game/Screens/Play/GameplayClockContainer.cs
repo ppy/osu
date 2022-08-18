@@ -89,22 +89,22 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Starts gameplay.
+        /// Starts gameplay and marks un-paused state.
         /// </summary>
         public virtual void Start()
         {
             ensureSourceClockSet();
 
+            isPaused.Value = false;
+
+            // the clock may be stopped via internal means (ie. not via `IsPaused`).
             if (!GameplayClock.IsRunning)
             {
                 // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
                 // This accounts for the clock source potentially taking time to enter a completely stopped state
                 Seek(GameplayClock.CurrentTime);
-
                 GameplayClock.Start();
             }
-
-            isPaused.Value = false;
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Stops gameplay.
+        /// Stops gameplay and marks paused state.
         /// </summary>
         public void Stop() => isPaused.Value = true;
 
@@ -134,11 +134,11 @@ namespace osu.Game.Screens.Play
             // Manually stop the source in order to not affect the IsPaused state.
             GameplayClock.Stop();
 
-            if (!IsPaused.Value || startClock)
-                Start();
-
             ensureSourceClockSet();
             Seek(StartTime);
+
+            if (!IsPaused.Value || startClock)
+                Start();
         }
 
         /// <summary>
