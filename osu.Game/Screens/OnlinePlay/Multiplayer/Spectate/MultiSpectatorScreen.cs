@@ -160,8 +160,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             base.LoadComplete();
 
-            masterClockContainer.Reset();
-
             syncManager.ReadyToStart += onReadyToStart;
             syncManager.MasterState.BindValueChanged(onMasterStateChanged, true);
         }
