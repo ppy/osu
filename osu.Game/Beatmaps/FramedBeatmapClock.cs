@@ -15,6 +15,15 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A clock intended to be the single source-of-truth for beatmap timing.
+    ///
+    /// It provides some functionality:
+    ///  - Applies (and tracks changes of) beatmap, user, and platform offsets.
+    ///  - Adjusts <see cref="Seek"/> operations to account for said offsets, seeking in raw time values.
+    ///  - Exposes track length.
+    ///  - Allows changing the source to a new track (for cases like editor track updating).
+    /// </summary>
     public class FramedBeatmapClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
         private readonly bool applyOffsets;
@@ -45,21 +54,6 @@ namespace osu.Game.Beatmaps
         private IDisposable? beatmapOffsetSubscription;
 
         private readonly DecoupleableInterpolatingFramedClock decoupledClock;
-
-        private double totalAppliedOffset
-        {
-            get
-            {
-                if (!applyOffsets)
-                    return 0;
-
-                Debug.Assert(userGlobalOffsetClock != null);
-                Debug.Assert(userBeatmapOffsetClock != null);
-                Debug.Assert(platformOffsetClock != null);
-
-                return userGlobalOffsetClock.RateAdjustedOffset + userBeatmapOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
-            }
-        }
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -131,10 +125,19 @@ namespace osu.Game.Beatmaps
             finalClockSource.ProcessFrame();
         }
 
-        protected override void Dispose(bool isDisposing)
+        private double totalAppliedOffset
         {
-            base.Dispose(isDisposing);
-            beatmapOffsetSubscription?.Dispose();
+            get
+            {
+                if (!applyOffsets)
+                    return 0;
+
+                Debug.Assert(userGlobalOffsetClock != null);
+                Debug.Assert(userBeatmapOffsetClock != null);
+                Debug.Assert(platformOffsetClock != null);
+
+                return userGlobalOffsetClock.RateAdjustedOffset + userBeatmapOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
+            }
         }
 
         #region Delegation of IAdjustableClock / ISourceChangeableClock to decoupled clock.
@@ -201,5 +204,11 @@ namespace osu.Game.Beatmaps
         public FrameTimeInfo TimeInfo => finalClockSource.TimeInfo;
 
         #endregion
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmapOffsetSubscription?.Dispose();
+        }
     }
 }
