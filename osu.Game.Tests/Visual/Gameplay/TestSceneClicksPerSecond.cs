@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         RelativeSizeAxes = Axes.Both,
                         CachedDependencies = new (Type, object)[]
                         {
-                            (typeof(GameplayClock), mainClock = new MockFrameStableClock(new MockFrameBasedClock())),
+                            (typeof(IGameplayClock), mainClock = new MockFrameStableClock(new MockFrameBasedClock())),
                             (typeof(DrawableRuleset), new MockDrawableRuleset(ruleset, mainClock))
                         }
                     },
@@ -249,17 +249,33 @@ namespace osu.Game.Tests.Visual.Gameplay
             public FrameTimeInfo TimeInfo { get; private set; }
         }
 
-        private class MockFrameStableClock : GameplayClock, IFrameStableClock
+        private class MockFrameStableClock : IGameplayClock, IFrameStableClock
         {
+            internal readonly IFrameBasedClock UnderlyingClock;
+
+            public readonly BindableBool IsPaused = new BindableBool();
+
             public MockFrameStableClock(MockFrameBasedClock underlyingClock)
-                : base(underlyingClock)
             {
+                UnderlyingClock = underlyingClock;
             }
 
             public void Seek(double time) => (UnderlyingClock as MockFrameBasedClock)?.Seek(time);
 
             public IBindable<bool> IsCatchingUp => new Bindable<bool>();
             public IBindable<bool> WaitingOnFrames => new Bindable<bool>();
+            public double CurrentTime => UnderlyingClock.CurrentTime;
+            public double Rate => UnderlyingClock.Rate;
+            public bool IsRunning => UnderlyingClock.IsRunning;
+            public void ProcessFrame() => UnderlyingClock.ProcessFrame();
+
+            public double ElapsedFrameTime => UnderlyingClock.ElapsedFrameTime;
+            public double FramesPerSecond => UnderlyingClock.FramesPerSecond;
+            public FrameTimeInfo TimeInfo => UnderlyingClock.TimeInfo;
+            public double TrueGameplayRate => UnderlyingClock.Rate;
+            public double? StartTime => 0;
+            public IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
+            IBindable<bool> IGameplayClock.IsPaused => IsPaused;
         }
 
         private class MockDrawableRuleset : DrawableRuleset

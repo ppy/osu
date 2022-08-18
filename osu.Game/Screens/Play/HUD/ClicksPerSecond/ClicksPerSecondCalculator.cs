@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
         private InputListener? listener;
 
         [Resolved]
-        private GameplayClock? gameplayClock { get; set; }
+        private IGameplayClock? gameplayClock { get; set; }
 
         [Resolved(canBeNull: true)]
         private DrawableRuleset? drawableRuleset { get; set; }
