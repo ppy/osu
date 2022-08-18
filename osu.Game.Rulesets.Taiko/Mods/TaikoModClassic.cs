@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private readonly BindableFloat hiddenInitialAlpha = new BindableFloat(0.65f);
 
-        private IReadOnlyList<Mod>? mods;
+        private IReadOnlyList<Mod> mods = Array.Empty<Mod>();
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
@@ -50,7 +50,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
             var playfield = (TaikoPlayfield)drawableRuleset.Playfield;
             playfield.ClassicHitTargetPosition.Value = true;
 
-            mods = drawableRuleset.Mods;
+            // drawableRuleset.Mods should always be non-null here, but just in case.
+            mods = drawableRuleset.Mods ?? mods;
 
             foreach (var mod in mods)
             {
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void Update(Playfield playfield)
         {
-            Debug.Assert(drawableTaikoRuleset != null && mods != null);
+            Debug.Assert(drawableTaikoRuleset != null);
 
             // Classic taiko scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
             const float scroll_rate = 10;
