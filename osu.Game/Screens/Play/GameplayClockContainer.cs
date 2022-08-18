@@ -136,9 +136,11 @@ namespace osu.Game.Screens.Play
 
             if (!IsPaused.Value || startClock)
                 Start();
-
-            ensureSourceClockSet();
-            Seek(StartTime ?? 0);
+            else
+            {
+                ensureSourceClockSet();
+                Seek(StartTime ?? 0);
+            }
         }
 
         /// <summary>
