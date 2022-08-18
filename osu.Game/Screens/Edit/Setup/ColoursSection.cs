@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 comboColours = new LabelledColourPalette
                 {
-                    Label = EditorSetupStrings.HitcircleSliderCombos,
+                    Label = EditorSetupStrings.HitCircleSliderCombos,
                     FixedLabelWidth = LABEL_WIDTH,
                     ColourNamePrefix = EditorSetupStrings.ComboColourPrefix
                 }

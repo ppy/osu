@@ -10,9 +10,9 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.EditorSetup";
 
         /// <summary>
-        /// "beatmap setup"
+        /// "Beatmap Setup"
         /// </summary>
-        public static LocalisableString BeatmapSetup => new TranslatableString(getKey(@"beatmap_setup"), @"beatmap setup");
+        public static LocalisableString BeatmapSetup => new TranslatableString(getKey(@"beatmap_setup"), @"Beatmap Setup");
 
         /// <summary>
         /// "change general settings of your beatmap"
@@ -25,9 +25,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ColoursHeader => new TranslatableString(getKey(@"colours_header"), @"Colours");
 
         /// <summary>
-        /// "Hitcircle / Slider Combos"
+        /// "Hit circle / Slider Combos"
         /// </summary>
-        public static LocalisableString HitcircleSliderCombos => new TranslatableString(getKey(@"hitcircle_slider_combos"), @"Hitcircle / Slider Combos");
+        public static LocalisableString HitCircleSliderCombos => new TranslatableString(getKey(@"hit_circle_slider_combos"), @"Hit circle / Slider Combos");
 
         /// <summary>
         /// "Design"
