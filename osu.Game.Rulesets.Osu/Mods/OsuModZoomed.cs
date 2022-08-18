@@ -12,10 +12,8 @@ using osu.Game.Screens.Play;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Framework.Bindables;
-using osu.Game.Screens;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Osu.UI;
@@ -52,9 +50,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Base zoom", "Adjust the zoom applied to your cursor.")]
         public BindableDouble BaseZoom { get; } = new BindableDouble(default_zoom)
         {
-            MinValue = 1.5f,
+            MinValue = 1.5,
             MaxValue = 2,
-            Precision = 0.05f
+            Precision = 0.05
         };
 
         private double baseZoom => BaseZoom.Value;
@@ -64,24 +62,13 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Change zoom based on combo", "Zooms in on your cursor based on combo")]
         public BindableBool ComboBasedZoom { get; } = new BindableBool(true);
 
+        private BindableInt Combo = new BindableInt();
+
         private OsuPlayfield? playfield;
 
         private Player? player;
 
-        private ParallaxContainer? parallaxContainer;
-
         private IFrameStableClock? gameplayClock;
-
-        private Vector2 parentHalfVector
-        {
-            get
-            {
-                Debug.Assert(playfield != null);
-                return playfield.DrawSize / 2;
-            }
-        }
-
-        protected BindableInt Combo = new BindableInt();
 
         private readonly List<Drawable> zoomedDrawables = new List<Drawable>();
 
@@ -90,7 +77,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToPlayer(Player player)
         {
             this.player = player;
-            parallaxContainer = player.FindClosestParent<OsuScreenStack>().parallaxContainer;
             currentZoom = baseZoom;
         }
 
@@ -105,62 +91,50 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield _)
         {
-            Debug.Assert(parallaxContainer != null && playfield != null && gameplayClock != null && player != null);
-
-            var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
-
-            // applies parallax to managed cursors (such as auto).
-            parallaxContainer.MousePosition = cursorPos;
-
-            applyZoomForZoomedDrawables(currentZoom);
-            moveDrawablesFollowingCursor(cursorPos);
+            applyZoomForZoomedDrawables();
+            moveDrawablesFollowingCursor();
         }
 
-        private Vector2 getDrawablePositionForCursorPosition(Vector2 position)
+        private Vector2 getDrawablePositionForCursorPosition(Drawable drawable)
         {
-            return Vector2.Clamp(parentHalfVector - position, -parentHalfVector, parentHalfVector);
+            Debug.Assert(playfield != null);
+
+            var position = playfield.Cursor.ActiveCursor.DrawPosition;
+
+            return Vector2.Clamp(playfield.OriginPosition - position, -playfield.OriginPosition, playfield.OriginPosition);
         }
 
-        private void moveDrawablesFollowingCursor(Vector2 position)
+        private void moveDrawablesFollowingCursor()
         {
-            Debug.Assert(gameplayClock != null && playfield != null);
+            Debug.Assert(gameplayClock != null);
 
             // prevent division by 0
             if (Precision.AlmostEquals(cameraDelay, 0))
             {
                 foreach (var drawable in drawablesFollowingCursor)
-                    drawable.Position = getDrawablePositionForCursorPosition(position);
+                    drawable.Position = getDrawablePositionForCursorPosition(drawable);
 
                 return;
             }
 
-            int dampLength = cameraDelay / 2;
-
             foreach (var drawable in drawablesFollowingCursor)
             {
-                var followPosition = getDrawablePositionForCursorPosition(position);
+                var followPosition = getDrawablePositionForCursorPosition(drawable);
 
-                float x = (float)Interpolation.DampContinuously(drawable.X, followPosition.X, dampLength, gameplayClock.ElapsedFrameTime);
-
-                float y = (float)Interpolation.DampContinuously(drawable.Y, followPosition.Y, dampLength, gameplayClock.ElapsedFrameTime);
-
-                // Handle playback edge cases (for whatever reason one of these values may be infinity)
-                if (double.IsInfinity(x) || double.IsInfinity(y))
-                    continue;
-
-                drawable.Position = new Vector2(x, y);
+                drawable.Position = Interpolation.ValueAt(
+                    Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), cameraDelay), drawable.Position, followPosition, 0, cameraDelay, Easing.Out);
             }
         }
 
-        private void applyZoomForZoomedDrawables(double zoom)
+        private void applyZoomForZoomedDrawables()
         {
             Debug.Assert(gameplayClock != null);
 
             foreach (var drawable in zoomedDrawables)
             {
-                float currentScale = (float)Interpolation.ValueAt(Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), apply_zoom_duration), drawable.Scale.X, zoom, 0, apply_zoom_duration, Easing.Out);
+                double currentScale = Interpolation.ValueAt(Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), apply_zoom_duration), drawable.Scale.X, currentZoom, 0, apply_zoom_duration, Easing.Out);
 
-                drawable.Scale = new Vector2(currentScale, currentScale);
+                drawable.Scale = new Vector2((float)currentScale);
             }
         }
 
@@ -175,19 +149,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void OnComboChange(ValueChangedEvent<int> e)
         {
-            double zoom = getZoomForCombo(e.NewValue);
-
-            if (currentZoom == zoom)
-                return;
-
-            Debug.Assert(parallaxContainer != null && player != null);
-            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * player.BackgroundParallaxAmount * (float)currentZoom;
+            currentZoom = getZoomForCombo(e.NewValue);
         }
 
         private double getZoomForCombo(int combo)
         {
             double setCombo = Math.Min(combo, last_zoom_combo);
-            return baseZoom + zoom_with_combo_by * (int)Math.Floor(setCombo / zoom_every_combo_amount);
+            return baseZoom + zoom_with_combo_by * Math.Floor(setCombo / zoom_every_combo_amount);
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
@@ -204,5 +172,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return rank;
             }
         }
+
     }
 }
