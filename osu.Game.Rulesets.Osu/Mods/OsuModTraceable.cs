@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -41,16 +40,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            applyFadeOutState(hitObject, true);
+            applyFadeOutState(hitObject);
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            applyTraceableState(hitObject);
-            applyFadeOutState(hitObject, true);
+            applyTraceableState(hitObject, state);
+            applyFadeOutState(hitObject);
         }
 
-        private void applyTraceableState(DrawableHitObject drawable)
+        private void applyTraceableState(DrawableHitObject drawable, ArmedState state)
         {
             if (drawable is not DrawableOsuHitObject)
                 return;
@@ -110,14 +109,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private void applyFadeOutState(DrawableHitObject drawableObject, bool increaseVisibility)
+        private void applyFadeOutState(DrawableHitObject drawableObject)
         {
             if (!FadeOutEffect.Value) return;
             if (drawableObject is not DrawableOsuHitObject drawableOsuObject)
                 return;
 
             (double fadeStartTime, double fadeDuration) = getFadeOutParameters(drawableOsuObject);
- 
 
             switch (drawableObject)
             {
@@ -200,16 +198,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                         return (fadeOutStartTime, fadeOutDuration);
                 }
             }
-        }
-
-        private void hideSpinnerApproachCircle(DrawableSpinner spinner)
-        {
-            var spinnerBody = ((IHasApproachCircle)spinner.Body.Drawable)?.ApproachCircle;
-            if (spinnerBody == null)
-                return;
-
-            using (spinner.BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt))
-                spinnerBody.Hide();
         }
 
         #endregion
