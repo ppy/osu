@@ -216,11 +216,11 @@ namespace osu.Game.Screens.Play
             if (speedAdjustmentsApplied)
                 return;
 
-            if (SourceClock is Track track)
-            {
-                track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-                track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
-            }
+            if (SourceClock is not Track track)
+                return;
+
+            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             nonGameplayAdjustments.Add(pauseFreqAdjust);
             nonGameplayAdjustments.Add(UserPlaybackRate);
@@ -233,11 +233,11 @@ namespace osu.Game.Screens.Play
             if (!speedAdjustmentsApplied)
                 return;
 
-            if (SourceClock is Track track)
-            {
-                track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-                track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
-            }
+            if (SourceClock is not Track track)
+                return;
+
+            track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             nonGameplayAdjustments.Remove(pauseFreqAdjust);
             nonGameplayAdjustments.Remove(UserPlaybackRate);
