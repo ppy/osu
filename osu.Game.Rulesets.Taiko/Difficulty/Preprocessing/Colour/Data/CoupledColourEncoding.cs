@@ -60,14 +60,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// </summary>
         public void FindRepetitionInterval()
         {
-            if (Previous?.Previous == null)
+            if (Previous == null)
             {
                 RepetitionInterval = max_repetition_interval + 1;
                 return;
             }
 
-            CoupledColourEncoding? other = Previous.Previous;
-            int interval = 2;
+            CoupledColourEncoding? other = Previous;
+            int interval = 1;
 
             while (interval < max_repetition_interval)
             {
