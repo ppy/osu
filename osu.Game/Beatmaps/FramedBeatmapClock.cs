@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -16,6 +17,8 @@ namespace osu.Game.Beatmaps
 {
     public class FramedBeatmapClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
+        private readonly bool applyOffsets;
+
         /// <summary>
         /// The length of the underlying beatmap track. Will default to 60 seconds if unavailable.
         /// </summary>
@@ -26,9 +29,16 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Track? Track { get; private set; } // TODO: virtual rather than null?
 
-        private readonly OffsetCorrectionClock userGlobalOffsetClock;
-        private readonly OffsetCorrectionClock platformOffsetClock;
-        private readonly OffsetCorrectionClock finalOffsetClock;
+        /// <summary>
+        /// The total frequency adjustment from pause transforms. Should eventually be handled in a better way.
+        /// </summary>
+        public readonly BindableDouble ExternalPauseFrequencyAdjust = new BindableDouble(1);
+
+        private readonly OffsetCorrectionClock? userGlobalOffsetClock;
+        private readonly OffsetCorrectionClock? platformOffsetClock;
+        private readonly OffsetCorrectionClock? userBeatmapOffsetClock;
+
+        private readonly IFrameBasedClock finalClockSource;
 
         private Bindable<double> userAudioOffset = null!;
 
@@ -36,7 +46,20 @@ namespace osu.Game.Beatmaps
 
         private readonly DecoupleableInterpolatingFramedClock decoupledClock;
 
-        private double totalAppliedOffset => userGlobalOffsetClock.RateAdjustedOffset + finalOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
+        private double totalAppliedOffset
+        {
+            get
+            {
+                if (!applyOffsets)
+                    return 0;
+
+                Debug.Assert(userGlobalOffsetClock != null);
+                Debug.Assert(userBeatmapOffsetClock != null);
+                Debug.Assert(platformOffsetClock != null);
+
+                return userGlobalOffsetClock.RateAdjustedOffset + userBeatmapOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
+            }
+        }
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -53,44 +76,59 @@ namespace osu.Game.Beatmaps
             set => decoupledClock.IsCoupled = value;
         }
 
-        public FramedBeatmapClock(IClock? sourceClock = null)
+        public FramedBeatmapClock(IClock? sourceClock = null, bool applyOffsets = false)
         {
-            // TODO: Unused for now?
-            var pauseFreqAdjust = new BindableDouble(1);
+            this.applyOffsets = applyOffsets;
 
             // A decoupled clock is used to ensure precise time values even when the host audio subsystem is not reporting
             // high precision times (on windows there's generally only 5-10ms reporting intervals, as an example).
             decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             decoupledClock.ChangeSource(sourceClock);
 
-            // Audio timings in general with newer BASS versions don't match stable.
-            // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            platformOffsetClock = new OffsetCorrectionClock(decoupledClock, pauseFreqAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+            if (applyOffsets)
+            {
+                // Audio timings in general with newer BASS versions don't match stable.
+                // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
+                platformOffsetClock = new OffsetCorrectionClock(decoupledClock, ExternalPauseFrequencyAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
-            // User global offset (set in settings) should also be applied.
-            userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock, pauseFreqAdjust);
+                // User global offset (set in settings) should also be applied.
+                userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock, ExternalPauseFrequencyAdjust);
 
-            // User per-beatmap offset will be applied to this final clock.
-            finalOffsetClock = new OffsetCorrectionClock(userGlobalOffsetClock, pauseFreqAdjust);
+                // User per-beatmap offset will be applied to this final clock.
+                finalClockSource = userBeatmapOffsetClock = new OffsetCorrectionClock(userGlobalOffsetClock, ExternalPauseFrequencyAdjust);
+            }
+            else
+            {
+                finalClockSource = decoupledClock;
+            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
-            userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
+            if (applyOffsets)
+            {
+                Debug.Assert(userBeatmapOffsetClock != null);
+                Debug.Assert(userGlobalOffsetClock != null);
 
-            beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
-                r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
-                settings => settings.Offset,
-                val => finalOffsetClock.Offset = val);
+                userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
+                userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
+
+                beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
+                    r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
+                    settings => settings.Offset,
+                    val =>
+                    {
+                        userBeatmapOffsetClock.Offset = val;
+                    });
+            }
         }
 
         protected override void Update()
         {
             base.Update();
-            finalOffsetClock.ProcessFrame();
+            finalClockSource.ProcessFrame();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -112,25 +150,25 @@ namespace osu.Game.Beatmaps
         public void Reset()
         {
             decoupledClock.Reset();
-            finalOffsetClock.ProcessFrame();
+            finalClockSource.ProcessFrame();
         }
 
         public void Start()
         {
             decoupledClock.Start();
-            finalOffsetClock.ProcessFrame();
+            finalClockSource.ProcessFrame();
         }
 
         public void Stop()
         {
             decoupledClock.Stop();
-            finalOffsetClock.ProcessFrame();
+            finalClockSource.ProcessFrame();
         }
 
         public bool Seek(double position)
         {
             bool success = decoupledClock.Seek(position - totalAppliedOffset);
-            finalOffsetClock.ProcessFrame();
+            finalClockSource.ProcessFrame();
 
             return success;
         }
@@ -147,20 +185,20 @@ namespace osu.Game.Beatmaps
 
         #region Delegation of IFrameBasedClock to clock with all offsets applied
 
-        public double CurrentTime => finalOffsetClock.CurrentTime;
+        public double CurrentTime => finalClockSource.CurrentTime;
 
-        public bool IsRunning => finalOffsetClock.IsRunning;
+        public bool IsRunning => finalClockSource.IsRunning;
 
         public void ProcessFrame()
         {
             // Noop to ensure an external consumer doesn't process the internal clock an extra time.
         }
 
-        public double ElapsedFrameTime => finalOffsetClock.ElapsedFrameTime;
+        public double ElapsedFrameTime => finalClockSource.ElapsedFrameTime;
 
-        public double FramesPerSecond => finalOffsetClock.FramesPerSecond;
+        public double FramesPerSecond => finalClockSource.FramesPerSecond;
 
-        public FrameTimeInfo TimeInfo => finalOffsetClock.TimeInfo;
+        public FrameTimeInfo TimeInfo => finalClockSource.TimeInfo;
 
         #endregion
     }
