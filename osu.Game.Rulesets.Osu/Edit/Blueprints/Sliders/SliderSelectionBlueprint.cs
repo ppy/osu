@@ -294,11 +294,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     Path = new SliderPath(splitControlPoints.Select(o => new PathControlPoint(o.Position - splitControlPoints[0].Position, o == splitControlPoints[^1] ? null : o.Type)).ToArray())
                 };
 
+                HitObject.StartTime += 1;
+
                 editorBeatmap.Add(newSlider);
 
                 HitObject.NewCombo = false;
                 HitObject.Path.ExpectedDistance.Value -= newSlider.Path.CalculatedDistance;
-                HitObject.StartTime += newSlider.SpanDuration;
+                HitObject.StartTime += newSlider.SpanDuration - 1;
 
                 // In case the remainder of the slider has no length left over, give it length anyways so we don't get a 0 length slider.
                 if (HitObject.Path.ExpectedDistance.Value <= Precision.DOUBLE_EPSILON)
@@ -307,14 +309,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
             }
 
-            editorBeatmap.SelectedHitObjects.Clear();
-
             // The path will have a non-zero offset if the head is removed, but sliders don't support this behaviour since the head is positioned at the slider's position
             // So the slider needs to be offset by this amount instead, and all control points offset backwards such that the path is re-positioned at (0, 0)
             Vector2 first = controlPoints[0].Position;
             foreach (var c in controlPoints)
                 c.Position -= first;
             HitObject.Position += first;
+
+            editorBeatmap.SelectedHitObjects.Clear();
         }
 
         private void convertToStream()
