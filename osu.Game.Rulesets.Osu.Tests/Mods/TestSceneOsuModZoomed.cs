@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuZoomed : OsuModTestScene
+    public class TestSceneOsuModZoomed : OsuModTestScene
     {
         [Test]
         public void TestZoomed() => CreateModTest(new ModTestData
