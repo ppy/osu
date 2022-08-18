@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -91,8 +90,7 @@ namespace osu.Game.Rulesets
                     catch (Exception ex)
                     {
                         r.Available = false;
-                        Logger.Log($"Could not load ruleset {r.Name}. Please check for an update from the developer.", level: LogLevel.Error);
-                        Logger.Log($"Ruleset load failed with {ex.Message}");
+                        LogFailedLoad(r.Name, ex);
                     }
                 }
 
