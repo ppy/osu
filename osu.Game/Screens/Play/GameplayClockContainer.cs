@@ -104,9 +104,16 @@ namespace osu.Game.Screens.Play
                 // This accounts for the clock source potentially taking time to enter a completely stopped state
                 Seek(GameplayClock.CurrentTime);
 
-                // Delay the start operation to ensure all children components get the initial seek time.
-                // Without this, children may get a start time beyond StartTime without seeing the time has elapsed.
-                // This can manifest as events which should be fired at the precise StartTime not firing.
+                // The case which cause this to be added is FrameStabilityContainer, which manages its own current and elapsed time.
+                // Because we generally update our own current time quicker than children can query it (via Start/Seek/Update),
+                // this means that the first frame ever exposed to children may have a non-zero current time.
+                //
+                // If the child component is not aware of the parent ElapsedFrameTime (which is the case for FrameStabilityContainer)
+                // they will take on the new CurrentTime with a zero elapsed time. This can in turn cause components to behave incorrectly
+                // if they are intending to trigger events at the precise StartTime (ie. DrawableStoryboardSample).
+                //
+                // By scheduling the start call, children are guaranteed to receive one frame at the original start time, allowing
+                // then to progress with a correct locally calculated elapsed time.
                 SchedulerAfterChildren.Add(GameplayClock.Start);
             }
         }
