@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
 
-            // The effectiveMissCount is calculated by gaining a ratio for totalSuccessfulHits and increasing the misspenalty for shorter object counts lower than 1000, past 1000 is 1:1.
+            // The effectiveMissCount is calculated by gaining a ratio for totalSuccessfulHits and increasing the miss penalty for shorter object counts lower than 1000.
             effectiveMissCount = Math.Max(1.0, 1000.0 / totalSuccessfulHits) * countMiss;
 
             double multiplier = 1.13;
