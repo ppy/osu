@@ -96,6 +96,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Difficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
 
             Beatmap.UpdateAllHitObjects();
+            Beatmap.SaveState();
         }
     }
 }

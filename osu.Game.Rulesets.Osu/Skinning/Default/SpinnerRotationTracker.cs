@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         private bool rotationTransferred;
 
         [Resolved(canBeNull: true)]
-        private GameplayClock gameplayClock { get; set; }
+        private IGameplayClock gameplayClock { get; set; }
 
         protected override void Update()
         {
