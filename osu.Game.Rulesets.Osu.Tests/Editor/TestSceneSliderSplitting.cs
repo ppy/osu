@@ -3,9 +3,9 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -27,15 +27,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private ComposeBlueprintContainer blueprintContainer
             => Editor.ChildrenOfType<ComposeBlueprintContainer>().First();
 
-        private ContextMenuContainer contextMenuContainer
-            => Editor.ChildrenOfType<ContextMenuContainer>().First();
-
         private Slider? slider;
         private PathControlPointVisualiser? visualiser;
 
         [Test]
         public void TestBasicSplit()
         {
+            double endTime = 0;
+
             AddStep("add slider", () =>
             {
                 slider = new Slider
@@ -52,6 +51,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 };
 
                 EditorBeatmap.Add(slider);
+
+                endTime = slider.EndTime;
             });
 
             AddStep("select added slider", () =>
@@ -66,39 +67,104 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 if (visualiser is not null) visualiser.Pieces[2].IsSelected.Value = true;
             });
             addContextMenuItemStep("Split control point");
+
+            AddAssert("slider split", () => slider is not null && EditorBeatmap.HitObjects.Count == 2 &&
+                                            sliderCreatedFor((Slider)EditorBeatmap.HitObjects[0], 0, slider.StartTime,
+                                                (new Vector2(0, 50), PathType.PerfectCurve),
+                                                (new Vector2(150, 200), null),
+                                                (new Vector2(300, 50), null)
+                                            ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[1], slider.StartTime, endTime,
+                                                (new Vector2(300, 50), PathType.PerfectCurve),
+                                                (new Vector2(400, 50), null),
+                                                (new Vector2(400, 200), null)
+                                            ));
+
+            AddStep("undo", () => Editor.Undo());
+            AddAssert("original slider restored", () => EditorBeatmap.HitObjects.Count == 1 && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[0], 0, endTime,
+                (new Vector2(0, 50), PathType.PerfectCurve),
+                (new Vector2(150, 200), null),
+                (new Vector2(300, 50), PathType.PerfectCurve),
+                (new Vector2(400, 50), null),
+                (new Vector2(400, 200), null)
+            ));
         }
 
         [Test]
-        public void TestStartTimeOffsetPlusDeselect()
+        public void TestDoubleSplit()
         {
-            HitCircle? circle = null;
+            double endTime = 0;
 
-            AddStep("add circle", () =>
+            AddStep("add slider", () =>
             {
-                circle = new HitCircle();
+                slider = new Slider
+                {
+                    Position = new Vector2(0, 50),
+                    Path = new SliderPath(new[]
+                    {
+                        new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
+                        new PathControlPoint(new Vector2(150, 150)),
+                        new PathControlPoint(new Vector2(300, 0), PathType.Bezier),
+                        new PathControlPoint(new Vector2(400, 0)),
+                        new PathControlPoint(new Vector2(400, 150), PathType.Catmull),
+                        new PathControlPoint(new Vector2(300, 200)),
+                        new PathControlPoint(new Vector2(400, 250))
+                    })
+                };
 
-                EditorBeatmap.Add(circle);
+                EditorBeatmap.Add(slider);
+
+                endTime = slider.EndTime;
             });
 
-            AddStep("select added circle", () =>
+            AddStep("select added slider", () =>
             {
-                EditorBeatmap.SelectedHitObjects.Add(circle);
+                EditorBeatmap.SelectedHitObjects.Add(slider);
+                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser>().First();
             });
 
-            AddStep("add another circle", () =>
+            moveMouseToControlPoint(2);
+            AddStep("select first control point", () =>
             {
-                var circle2 = new HitCircle();
-
-                EditorBeatmap.Add(circle2);
+                if (visualiser is not null) visualiser.Pieces[2].IsSelected.Value = true;
             });
-
-            AddStep("change time of selected circle and deselect", () =>
+            moveMouseToControlPoint(4);
+            AddStep("select second control point", () =>
             {
-                if (circle is null) return;
-
-                circle.StartTime += 1;
-                EditorBeatmap.SelectedHitObjects.Clear();
+                if (visualiser is not null) visualiser.Pieces[4].IsSelected.Value = true;
             });
+            addContextMenuItemStep("Split 2 control points");
+
+            AddAssert("slider split", () => slider is not null && EditorBeatmap.HitObjects.Count == 3 &&
+                                            sliderCreatedFor((Slider)EditorBeatmap.HitObjects[0], 0, EditorBeatmap.HitObjects[1].StartTime,
+                                                (new Vector2(0, 50), PathType.PerfectCurve),
+                                                (new Vector2(150, 200), null),
+                                                (new Vector2(300, 50), null)
+                                            ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[1], EditorBeatmap.HitObjects[0].GetEndTime(), slider.StartTime,
+                                                (new Vector2(300, 50), PathType.Bezier),
+                                                (new Vector2(400, 50), null),
+                                                (new Vector2(400, 200), null)
+                                            ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[2], EditorBeatmap.HitObjects[1].GetEndTime(), endTime,
+                                                (new Vector2(400, 200), PathType.Catmull),
+                                                (new Vector2(300, 250), null),
+                                                (new Vector2(400, 300), null)
+                                            ));
+        }
+
+        private bool sliderCreatedFor(Slider s, double startTime, double endTime, params (Vector2 pos, PathType? pathType)[] expectedControlPoints)
+        {
+            if (!Precision.AlmostEquals(s.StartTime, startTime, 1) || !Precision.AlmostEquals(s.EndTime, endTime, 1)) return false;
+
+            int i = 0;
+
+            foreach ((Vector2 pos, PathType? pathType) in expectedControlPoints)
+            {
+                var controlPoint = s.Path.ControlPoints[i++];
+
+                if (!Precision.AlmostEquals(controlPoint.Position + s.Position, pos) || controlPoint.Type != pathType)
+                    return false;
+            }
+
+            return true;
         }
 
         private void moveMouseToControlPoint(int index)
