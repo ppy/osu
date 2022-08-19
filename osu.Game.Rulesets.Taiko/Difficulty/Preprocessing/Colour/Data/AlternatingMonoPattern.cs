@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// <summary>
         /// <see cref="MonoStreak"/>s that are grouped together within this <see cref="AlternatingMonoPattern"/>.
         /// </summary>
-        public readonly List<MonoStreak> Payload = new List<MonoStreak>();
+        public readonly List<MonoStreak> MonoStreaks = new List<MonoStreak>();
 
         /// <summary>
         /// The parent <see cref="RepeatingHitPatterns"/> that contains this <see cref="AlternatingMonoPattern"/>
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         public RepeatingHitPatterns? Parent;
 
         /// <summary>
-        /// Index of this encoding within it's parent encoding
+        /// Index of this <see cref="AlternatingMonoPattern"/> within it's parent <see cref="RepeatingHitPatterns"/>
         /// </summary>
         public int Index;
 
@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         public bool IsRepetitionOf(AlternatingMonoPattern other)
         {
             return HasIdenticalMonoLength(other) &&
-                   other.Payload.Count == Payload.Count &&
-                   (other.Payload[0].EncodedData[0].BaseObject as Hit)?.Type ==
-                   (Payload[0].EncodedData[0].BaseObject as Hit)?.Type;
+                   other.MonoStreaks.Count == MonoStreaks.Count &&
+                   (other.MonoStreaks[0].HitObjects[0].BaseObject as Hit)?.Type ==
+                   (MonoStreaks[0].HitObjects[0].BaseObject as Hit)?.Type;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// </summary>
         public bool HasIdenticalMonoLength(AlternatingMonoPattern other)
         {
-            return other.Payload[0].RunLength == Payload[0].RunLength;
+            return other.MonoStreaks[0].RunLength == MonoStreaks[0].RunLength;
         }
     }
 }

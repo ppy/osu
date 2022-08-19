@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// <summary>
         /// List of <see cref="DifficultyHitObject"/>s that are encoded within this <see cref="MonoStreak"/>.
         /// </summary>
-        public List<TaikoDifficultyHitObject> EncodedData { get; private set; } = new List<TaikoDifficultyHitObject>();
+        public List<TaikoDifficultyHitObject> HitObjects { get; private set; } = new List<TaikoDifficultyHitObject>();
 
         /// <summary>
         /// The parent <see cref="AlternatingMonoPattern"/> that contains this <see cref="MonoStreak"/>
@@ -24,13 +24,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         public AlternatingMonoPattern? Parent;
 
         /// <summary>
-        /// Index of this encoding within it's parent encoding
+        /// Index of this <see cref="MonoStreak"/> within it's parent <see cref="AlternatingMonoPattern"/>
         /// </summary>
         public int Index;
 
         /// <summary>
         /// How long the mono pattern encoded within is
         /// </summary>
-        public int RunLength => EncodedData.Count;
+        public int RunLength => HitObjects.Count;
     }
 }
