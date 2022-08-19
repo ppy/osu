@@ -671,7 +671,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
             {
                 double time = i;
-                AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.GameplayClock.CurrentTime > time);
+                AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.CurrentTime > time);
             }
 
             AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);

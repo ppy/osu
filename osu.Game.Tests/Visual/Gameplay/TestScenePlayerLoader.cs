@@ -29,6 +29,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Utils;
 using osuTK.Input;
+using SkipOverlay = osu.Game.Screens.Play.SkipOverlay;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -56,6 +57,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private readonly ChangelogOverlay changelogOverlay;
 
+        private double savedTrackVolume;
+        private double savedMasterVolume;
+        private bool savedMutedState;
+
         public TestScenePlayerLoader()
         {
             AddRange(new Drawable[]
@@ -75,11 +80,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [SetUp]
-        public void Setup() => Schedule(() =>
-        {
-            player = null;
-            audioManager.Volume.SetDefault();
-        });
+        public void Setup() => Schedule(() => player = null);
 
         /// <summary>
         /// Sets the input manager child to a new test player loader container instance.
@@ -98,7 +99,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void prepareBeatmap()
         {
             var workingBeatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+
+            // Add intro time to test quick retry skipping (TestQuickRetry).
+            workingBeatmap.BeatmapInfo.AudioLeadIn = 60000;
+
+            // Turn on epilepsy warning to test warning display (TestEpilepsyWarning).
             workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
+
             Beatmap.Value = workingBeatmap;
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
@@ -147,6 +154,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 moveMouse();
                 return player?.LoadState == LoadState.Ready;
             });
+
             AddRepeatStep("move mouse", moveMouse, 20);
 
             AddAssert("loader still active", () => loader.IsCurrentScreen());
@@ -154,6 +162,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             void moveMouse()
             {
+                notificationOverlay.State.Value = Visibility.Hidden;
+
                 InputManager.MoveMouseTo(
                     loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft
                     + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft)
@@ -274,6 +284,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("load player", () => resetPlayer(false, beforeLoad));
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
 
+            saveVolumes();
+
             AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value == 1);
             AddStep("click notification", () =>
             {
@@ -287,6 +299,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("check " + volumeName, assert);
 
+            restoreVolumes();
+
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
@@ -294,6 +308,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(false)]
         public void TestEpilepsyWarning(bool warning)
         {
+            saveVolumes();
+            setFullVolume();
+
             AddStep("change epilepsy warning", () => epilepsyWarning = warning);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
@@ -306,6 +323,30 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AddUntilStep("sound volume decreased", () => Beatmap.Value.Track.AggregateVolume.Value == 0.25);
                 AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
             }
+
+            restoreVolumes();
+        }
+
+        [Test]
+        public void TestEpilepsyWarningEarlyExit()
+        {
+            saveVolumes();
+            setFullVolume();
+
+            AddStep("set epilepsy warning", () => epilepsyWarning = true);
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddUntilStep("wait for epilepsy warning", () => getWarning().Alpha > 0);
+            AddUntilStep("warning is shown", () => getWarning().State.Value == Visibility.Visible);
+
+            AddStep("exit early", () => loader.Exit());
+
+            AddUntilStep("warning is hidden", () => getWarning().State.Value == Visibility.Hidden);
+            AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
+
+            restoreVolumes();
         }
 
         [TestCase(true, 1.0, false)] // on battery, above cutoff --> no warning
@@ -336,21 +377,65 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
-        [Test]
-        public void TestEpilepsyWarningEarlyExit()
+        private void restoreVolumes()
         {
-            AddStep("set epilepsy warning", () => epilepsyWarning = true);
+            AddStep("restore previous volumes", () =>
+            {
+                audioManager.VolumeTrack.Value = savedTrackVolume;
+                audioManager.Volume.Value = savedMasterVolume;
+                volumeOverlay.IsMuted.Value = savedMutedState;
+            });
+        }
+
+        private void setFullVolume()
+        {
+            AddStep("set volumes to 100%", () =>
+            {
+                audioManager.VolumeTrack.Value = 1;
+                audioManager.Volume.Value = 1;
+                volumeOverlay.IsMuted.Value = false;
+            });
+        }
+
+        private void saveVolumes()
+        {
+            AddStep("save previous volumes", () =>
+            {
+                savedTrackVolume = audioManager.VolumeTrack.Value;
+                savedMasterVolume = audioManager.Volume.Value;
+                savedMutedState = volumeOverlay.IsMuted.Value;
+            });
+        }
+
+        [Test]
+        public void TestQuickRetry()
+        {
+            TestPlayer getCurrentPlayer() => loader.CurrentPlayer as TestPlayer;
+            bool checkSkipButtonVisible() => player.ChildrenOfType<SkipOverlay>().FirstOrDefault()?.IsButtonVisible == true;
+
+            TestPlayer previousPlayer = null;
+
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
-            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+            AddUntilStep("wait for current", () => getCurrentPlayer()?.IsCurrentScreen() == true);
+            AddStep("store previous player", () => previousPlayer = getCurrentPlayer());
 
-            AddUntilStep("wait for epilepsy warning", () => getWarning().Alpha > 0);
-            AddUntilStep("warning is shown", () => getWarning().State.Value == Visibility.Visible);
+            AddStep("Restart map normally", () => getCurrentPlayer().Restart());
+            AddUntilStep("wait for load", () => getCurrentPlayer()?.LoadedBeatmapSuccessfully == true);
 
-            AddStep("exit early", () => loader.Exit());
+            AddUntilStep("restart completed", () => getCurrentPlayer() != null && getCurrentPlayer() != previousPlayer);
+            AddStep("store previous player", () => previousPlayer = getCurrentPlayer());
 
-            AddUntilStep("warning is hidden", () => getWarning().State.Value == Visibility.Hidden);
-            AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
+            AddUntilStep("skip button visible", checkSkipButtonVisible);
+
+            AddStep("press quick retry key", () => InputManager.PressKey(Key.Tilde));
+            AddUntilStep("restart completed", () => getCurrentPlayer() != null && getCurrentPlayer() != previousPlayer);
+            AddStep("release quick retry key", () => InputManager.ReleaseKey(Key.Tilde));
+
+            AddUntilStep("wait for player", () => getCurrentPlayer()?.LoadState == LoadState.Ready);
+
+            AddUntilStep("time reached zero", () => getCurrentPlayer()?.GameplayClockContainer.CurrentTime > 0);
+            AddUntilStep("skip button not visible", () => !checkSkipButtonVisible());
         }
 
         private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();
