@@ -46,7 +46,15 @@ namespace osu.Game.Graphics.UserInterface
         private Sample? textCommittedSample;
         private Sample? caretMovedSample;
 
+        private Sample? selectCharSample;
+        private Sample? selectWordSample;
+        private Sample? selectAllSample;
+        private Sample? deselectSample;
+
         private OsuCaret? caret;
+
+        private bool selectionStarted;
+        private double sampleLastPlaybackTime;
 
         public OsuTextBox()
         {
@@ -78,6 +86,11 @@ namespace osu.Game.Graphics.UserInterface
             textRemovedSample = audio.Samples.Get(@"Keyboard/key-delete");
             textCommittedSample = audio.Samples.Get(@"Keyboard/key-confirm");
             caretMovedSample = audio.Samples.Get(@"Keyboard/key-movement");
+
+            selectCharSample = audio.Samples.Get(@"Keyboard/select-char");
+            selectWordSample = audio.Samples.Get(@"Keyboard/select-word");
+            selectAllSample = audio.Samples.Get(@"Keyboard/select-all");
+            deselectSample = audio.Samples.Get(@"Keyboard/deselect");
         }
 
         private Color4 selectionColour;
@@ -112,7 +125,72 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnCaretMoved(selecting);
 
-            caretMovedSample?.Play();
+            if (!selecting)
+                caretMovedSample?.Play();
+        }
+
+        protected override void OnTextSelectionChanged(TextSelectionType selectionType)
+        {
+            base.OnTextSelectionChanged(selectionType);
+
+            if (selectionType == TextSelectionType.Word)
+            {
+                if (!selectionStarted)
+                    playSelectSample(selectionType);
+                else
+                    playSelectSample();
+            }
+            else
+            {
+                playSelectSample(selectionType);
+            }
+
+            selectionStarted = true;
+        }
+
+        protected override void OnTextDeselected()
+        {
+            if (selectionStarted)
+                playSelectSample(TextSelectionType.Deselect);
+
+            selectionStarted = false;
+
+            base.OnTextDeselected();
+        }
+
+        private void playSelectSample(TextSelectionType selectionType = TextSelectionType.Character)
+        {
+            if (Time.Current < sampleLastPlaybackTime + 15) return;
+
+            SampleChannel? channel;
+            double pitch = 0.98 + RNG.NextDouble(0.04);
+
+            switch (selectionType)
+            {
+                case TextSelectionType.All:
+                    channel = selectAllSample?.GetChannel();
+                    break;
+
+                case TextSelectionType.Word:
+                    channel = selectWordSample?.GetChannel();
+                    break;
+
+                case TextSelectionType.Deselect:
+                    channel = deselectSample?.GetChannel();
+                    break;
+
+                default:
+                    channel = selectCharSample?.GetChannel();
+                    pitch += (SelectedText.Length / (float)Text.Length) * 0.15f;
+                    break;
+            }
+
+            if (channel == null) return;
+
+            channel.Frequency.Value = pitch;
+            channel.Play();
+
+            sampleLastPlaybackTime = Time.Current;
         }
 
         protected override void OnImeComposition(string newComposition, int removedTextLength, int addedTextLength, bool caretMoved)
