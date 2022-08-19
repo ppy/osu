@@ -9,19 +9,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
 {
     /// <summary>
     /// Encode colour information for a sequence of <see cref="TaikoDifficultyHitObject"/>s. Consecutive <see cref="TaikoDifficultyHitObject"/>s
-    /// of the same <see cref="HitType"/> are encoded within the same <see cref="MonoEncoding"/>.
+    /// of the same <see cref="HitType"/> are encoded within the same <see cref="MonoStreak"/>.
     /// </summary>
-    public class MonoEncoding
+    public class MonoStreak
     {
         /// <summary>
-        /// List of <see cref="DifficultyHitObject"/>s that are encoded within this <see cref="MonoEncoding"/>.
+        /// List of <see cref="DifficultyHitObject"/>s that are encoded within this <see cref="MonoStreak"/>.
         /// </summary>
         public List<TaikoDifficultyHitObject> EncodedData { get; private set; } = new List<TaikoDifficultyHitObject>();
 
         /// <summary>
-        /// The parent <see cref="ColourEncoding"/> that contains this <see cref="MonoEncoding"/>
+        /// The parent <see cref="AlternatingMonoPattern"/> that contains this <see cref="MonoStreak"/>
         /// </summary>
-        public ColourEncoding? Parent;
+        public AlternatingMonoPattern? Parent;
 
         /// <summary>
         /// Index of this encoding within it's parent encoding

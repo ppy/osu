@@ -7,20 +7,20 @@ using osu.Game.Rulesets.Taiko.Objects;
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
 {
     /// <summary>
-    /// Encodes a list of <see cref="MonoEncoding"/>s.
-    /// <see cref="MonoEncoding"/>s with the same <see cref="MonoEncoding.RunLength"/> are grouped together.
+    /// Encodes a list of <see cref="MonoStreak"/>s.
+    /// <see cref="MonoStreak"/>s with the same <see cref="MonoStreak.RunLength"/> are grouped together.
     /// </summary>
-    public class ColourEncoding
+    public class AlternatingMonoPattern
     {
         /// <summary>
-        /// <see cref="MonoEncoding"/>s that are grouped together within this <see cref="ColourEncoding"/>.
+        /// <see cref="MonoStreak"/>s that are grouped together within this <see cref="AlternatingMonoPattern"/>.
         /// </summary>
-        public readonly List<MonoEncoding> Payload = new List<MonoEncoding>();
+        public readonly List<MonoStreak> Payload = new List<MonoStreak>();
 
         /// <summary>
-        /// The parent <see cref="CoupledColourEncoding"/> that contains this <see cref="ColourEncoding"/>
+        /// The parent <see cref="RepeatingHitPatterns"/> that contains this <see cref="AlternatingMonoPattern"/>
         /// </summary>
-        public CoupledColourEncoding? Parent;
+        public RepeatingHitPatterns? Parent;
 
         /// <summary>
         /// Index of this encoding within it's parent encoding
@@ -28,10 +28,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         public int Index;
 
         /// <summary>
-        /// Determine if this <see cref="ColourEncoding"/> is a repetition of another <see cref="ColourEncoding"/>. This
+        /// Determine if this <see cref="AlternatingMonoPattern"/> is a repetition of another <see cref="AlternatingMonoPattern"/>. This
         /// is a strict comparison and is true if and only if the colour sequence is exactly the same.
         /// </summary>
-        public bool IsRepetitionOf(ColourEncoding other)
+        public bool IsRepetitionOf(AlternatingMonoPattern other)
         {
             return HasIdenticalMonoLength(other) &&
                    other.Payload.Count == Payload.Count &&
@@ -40,9 +40,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         }
 
         /// <summary>
-        /// Determine if this <see cref="ColourEncoding"/> has the same mono length of another <see cref="ColourEncoding"/>.
+        /// Determine if this <see cref="AlternatingMonoPattern"/> has the same mono length of another <see cref="AlternatingMonoPattern"/>.
         /// </summary>
-        public bool HasIdenticalMonoLength(ColourEncoding other)
+        public bool HasIdenticalMonoLength(AlternatingMonoPattern other)
         {
             return other.Payload[0].RunLength == Payload[0].RunLength;
         }
