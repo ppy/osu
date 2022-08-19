@@ -20,30 +20,30 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// </summary>
         public static void ProcessAndAssign(List<DifficultyHitObject> hitObjects)
         {
-            List<RepeatingHitPatterns> encodings = encode(hitObjects);
+            List<RepeatingHitPatterns> hitPatterns = encode(hitObjects);
 
             // Assign indexing and encoding data to all relevant objects. Only the first note of each encoding type is
             // assigned with the relevant encodings.
-            foreach (var coupledEncoding in encodings)
+            foreach (var repeatingHitPattern in hitPatterns)
             {
-                coupledEncoding.Payload[0].Payload[0].EncodedData[0].Colour.CoupledColourEncoding = coupledEncoding;
+                repeatingHitPattern.AlternatingMonoPatterns[0].MonoStreaks[0].HitObjects[0].Colour.RepeatingHitPatterns = repeatingHitPattern;
 
                 // The outermost loop is kept a ForEach loop since it doesn't need index information, and we want to
-                // keep i and j for ColourEncoding's and MonoEncoding's index respectively, to keep it in line with
+                // keep i and j for AlternatingMonoPattern's and MonoStreak's index respectively, to keep it in line with
                 // documentation.
-                for (int i = 0; i < coupledEncoding.Payload.Count; ++i)
+                for (int i = 0; i < repeatingHitPattern.AlternatingMonoPatterns.Count; ++i)
                 {
-                    AlternatingMonoPattern colourEncoding = coupledEncoding.Payload[i];
-                    colourEncoding.Parent = coupledEncoding;
-                    colourEncoding.Index = i;
-                    colourEncoding.Payload[0].EncodedData[0].Colour.ColourEncoding = colourEncoding;
+                    AlternatingMonoPattern monoPattern = repeatingHitPattern.AlternatingMonoPatterns[i];
+                    monoPattern.Parent = repeatingHitPattern;
+                    monoPattern.Index = i;
+                    monoPattern.MonoStreaks[0].HitObjects[0].Colour.AlternatingMonoPattern = monoPattern;
 
-                    for (int j = 0; j < colourEncoding.Payload.Count; ++j)
+                    for (int j = 0; j < monoPattern.MonoStreaks.Count; ++j)
                     {
-                        MonoStreak monoEncoding = colourEncoding.Payload[j];
-                        monoEncoding.Parent = colourEncoding;
-                        monoEncoding.Index = j;
-                        monoEncoding.EncodedData[0].Colour.MonoEncoding = monoEncoding;
+                        MonoStreak monoStreak = monoPattern.MonoStreaks[j];
+                        monoStreak.Parent = monoPattern;
+                        monoStreak.Index = j;
+                        monoStreak.HitObjects[0].Colour.MonoStreak = monoStreak;
                     }
                 }
             }
@@ -54,20 +54,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// </summary>
         private static List<RepeatingHitPatterns> encode(List<DifficultyHitObject> data)
         {
-            List<MonoStreak> firstPass = encodeMono(data);
-            List<AlternatingMonoPattern> secondPass = encodeColour(firstPass);
-            List<RepeatingHitPatterns> thirdPass = encodeCoupledColour(secondPass);
+            List<MonoStreak> monoStreaks = encodeMonoStreak(data);
+            List<AlternatingMonoPattern> alternatingMonoPatterns = encodeAlternatingMonoPattern(monoStreaks);
+            List<RepeatingHitPatterns> repeatingHitPatterns = encodeRepeatingHitPattern(alternatingMonoPatterns);
 
-            return thirdPass;
+            return repeatingHitPatterns;
         }
 
         /// <summary>
         /// Encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="MonoStreak"/>s.
         /// </summary>
-        private static List<MonoStreak> encodeMono(List<DifficultyHitObject> data)
+        private static List<MonoStreak> encodeMonoStreak(List<DifficultyHitObject> data)
         {
-            List<MonoStreak> encodings = new List<MonoStreak>();
-            MonoStreak? currentEncoding = null;
+            List<MonoStreak> monoStreaks = new List<MonoStreak>();
+            MonoStreak? currentMonoStreak = null;
 
             for (int i = 0; i < data.Count; i++)
             {
@@ -76,92 +76,92 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                 // This ignores all non-note objects, which may or may not be the desired behaviour
                 TaikoDifficultyHitObject? previousObject = taikoObject.PreviousNote(0);
 
-                // If this is the first object in the list or the colour changed, create a new mono encoding
-                if (currentEncoding == null || previousObject == null || (taikoObject.BaseObject as Hit)?.Type != (previousObject.BaseObject as Hit)?.Type)
+                // If this is the first object in the list or the colour changed, create a new mono streak
+                if (currentMonoStreak == null || previousObject == null || (taikoObject.BaseObject as Hit)?.Type != (previousObject.BaseObject as Hit)?.Type)
                 {
-                    currentEncoding = new MonoStreak();
-                    encodings.Add(currentEncoding);
+                    currentMonoStreak = new MonoStreak();
+                    monoStreaks.Add(currentMonoStreak);
                 }
 
                 // Add the current object to the encoded payload.
-                currentEncoding.EncodedData.Add(taikoObject);
+                currentMonoStreak.HitObjects.Add(taikoObject);
             }
 
-            return encodings;
+            return monoStreaks;
         }
 
         /// <summary>
         /// Encodes a list of <see cref="MonoStreak"/>s into a list of <see cref="AlternatingMonoPattern"/>s.
         /// </summary>
-        private static List<AlternatingMonoPattern> encodeColour(List<MonoStreak> data)
+        private static List<AlternatingMonoPattern> encodeAlternatingMonoPattern(List<MonoStreak> data)
         {
-            List<AlternatingMonoPattern> encodings = new List<AlternatingMonoPattern>();
-            AlternatingMonoPattern? currentEncoding = null;
+            List<AlternatingMonoPattern> monoPatterns = new List<AlternatingMonoPattern>();
+            AlternatingMonoPattern? currentMonoPattern = null;
 
             for (int i = 0; i < data.Count; i++)
             {
-                // Start a new ColourEncoding if the previous MonoEncoding has a different mono length, or if this is the first MonoEncoding in the list.
-                if (currentEncoding == null || data[i].RunLength != data[i - 1].RunLength)
+                // Start a new AlternatingMonoPattern if the previous MonoStreak has a different mono length, or if this is the first MonoStreak in the list.
+                if (currentMonoPattern == null || data[i].RunLength != data[i - 1].RunLength)
                 {
-                    currentEncoding = new AlternatingMonoPattern();
-                    encodings.Add(currentEncoding);
+                    currentMonoPattern = new AlternatingMonoPattern();
+                    monoPatterns.Add(currentMonoPattern);
                 }
 
-                // Add the current MonoEncoding to the encoded payload.
-                currentEncoding.Payload.Add(data[i]);
+                // Add the current MonoStreak to the encoded payload.
+                currentMonoPattern.MonoStreaks.Add(data[i]);
             }
 
-            return encodings;
+            return monoPatterns;
         }
 
         /// <summary>
         /// Encodes a list of <see cref="AlternatingMonoPattern"/>s into a list of <see cref="RepeatingHitPatterns"/>s.
         /// </summary>
-        private static List<RepeatingHitPatterns> encodeCoupledColour(List<AlternatingMonoPattern> data)
+        private static List<RepeatingHitPatterns> encodeRepeatingHitPattern(List<AlternatingMonoPattern> data)
         {
-            List<RepeatingHitPatterns> encodings = new List<RepeatingHitPatterns>();
-            RepeatingHitPatterns? currentEncoding = null;
+            List<RepeatingHitPatterns> hitPatterns = new List<RepeatingHitPatterns>();
+            RepeatingHitPatterns? currentHitPattern = null;
 
             for (int i = 0; i < data.Count; i++)
             {
-                // Start a new CoupledColourEncoding. ColourEncodings that should be grouped together will be handled later within this loop.
-                currentEncoding = new RepeatingHitPatterns(currentEncoding);
+                // Start a new RepeatingHitPattern. AlternatingMonoPatterns that should be grouped together will be handled later within this loop.
+                currentHitPattern = new RepeatingHitPatterns(currentHitPattern);
 
-                // Determine if future ColourEncodings should be grouped.
+                // Determine if future AlternatingMonoPatterns should be grouped.
                 bool isCoupled = i < data.Count - 2 && data[i].IsRepetitionOf(data[i + 2]);
 
                 if (!isCoupled)
                 {
-                    // If not, add the current ColourEncoding to the encoded payload and continue.
-                    currentEncoding.Payload.Add(data[i]);
+                    // If not, add the current AlternatingMonoPattern to the encoded payload and continue.
+                    currentHitPattern.AlternatingMonoPatterns.Add(data[i]);
                 }
                 else
                 {
-                    // If so, add the current ColourEncoding to the encoded payload and start repeatedly checking if the
-                    // subsequent ColourEncodings should be grouped by increasing i and doing the appropriate isCoupled check.
+                    // If so, add the current AlternatingMonoPattern to the encoded payload and start repeatedly checking if the
+                    // subsequent AlternatingMonoPatterns should be grouped by increasing i and doing the appropriate isCoupled check.
                     while (isCoupled)
                     {
-                        currentEncoding.Payload.Add(data[i]);
+                        currentHitPattern.AlternatingMonoPatterns.Add(data[i]);
                         i++;
                         isCoupled = i < data.Count - 2 && data[i].IsRepetitionOf(data[i + 2]);
                     }
 
                     // Skip over viewed data and add the rest to the payload
-                    currentEncoding.Payload.Add(data[i]);
-                    currentEncoding.Payload.Add(data[i + 1]);
+                    currentHitPattern.AlternatingMonoPatterns.Add(data[i]);
+                    currentHitPattern.AlternatingMonoPatterns.Add(data[i + 1]);
                     i++;
                 }
 
-                encodings.Add(currentEncoding);
+                hitPatterns.Add(currentHitPattern);
             }
 
             // Final pass to find repetition intervals
-            for (int i = 0; i < encodings.Count; i++)
+            for (int i = 0; i < hitPatterns.Count; i++)
             {
-                encodings[i].FindRepetitionInterval();
+                hitPatterns[i].FindRepetitionInterval();
             }
 
-            return encodings;
+            return hitPatterns;
         }
     }
 }

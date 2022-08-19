@@ -11,18 +11,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
     public class TaikoDifficultyHitObjectColour
     {
         /// <summary>
-        /// The <see cref="MonoEncoding"/> that encodes this note, only present if this is the first note within a <see cref="MonoEncoding"/>
+        /// The <see cref="MonoStreak"/> that encodes this note, only present if this is the first note within a <see cref="MonoStreak"/>
         /// </summary>
-        public MonoStreak? MonoEncoding;
+        public MonoStreak? MonoStreak;
 
         /// <summary>
-        /// The <see cref="ColourEncoding"/> that encodes this note, only present if this is the first note within a <see cref="ColourEncoding"/>
+        /// The <see cref="AlternatingMonoPattern"/> that encodes this note, only present if this is the first note within a <see cref="AlternatingMonoPattern"/>
         /// </summary>
-        public AlternatingMonoPattern? ColourEncoding;
+        public AlternatingMonoPattern? AlternatingMonoPattern;
 
         /// <summary>
-        /// The <see cref="CoupledColourEncoding"/> that encodes this note, only present if this is the first note within a <see cref="CoupledColourEncoding"/>
+        /// The <see cref="RepeatingHitPatterns"/> that encodes this note, only present if this is the first note within a <see cref="RepeatingHitPatterns"/>
         /// </summary>
-        public RepeatingHitPatterns? CoupledColourEncoding;
+        public RepeatingHitPatterns? RepeatingHitPatterns;
     }
 }

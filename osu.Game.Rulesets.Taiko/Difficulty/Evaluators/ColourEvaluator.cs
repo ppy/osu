@@ -28,25 +28,25 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <summary>
         /// Evaluate the difficulty of the first note of a <see cref="MonoStreak"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(MonoStreak encoding)
+        public static double EvaluateDifficultyOf(MonoStreak monoStreak)
         {
-            return sigmoid(encoding.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(encoding.Parent!) * 0.5;
+            return sigmoid(monoStreak.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(monoStreak.Parent!) * 0.5;
         }
 
         /// <summary>
         /// Evaluate the difficulty of the first note of a <see cref="AlternatingMonoPattern"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(AlternatingMonoPattern encoding)
+        public static double EvaluateDifficultyOf(AlternatingMonoPattern alternatingMonoPattern)
         {
-            return sigmoid(encoding.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(encoding.Parent!);
+            return sigmoid(alternatingMonoPattern.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(alternatingMonoPattern.Parent!);
         }
 
         /// <summary>
         /// Evaluate the difficulty of the first note of a <see cref="RepeatingHitPatterns"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(RepeatingHitPatterns encoding)
+        public static double EvaluateDifficultyOf(RepeatingHitPatterns repeatingHitPattern)
         {
-            return 2 * (1 - sigmoid(encoding.RepetitionInterval, 2, 2, 0.5, 1));
+            return 2 * (1 - sigmoid(repeatingHitPattern.RepetitionInterval, 2, 2, 0.5, 1));
         }
 
         public static double EvaluateDifficultyOf(DifficultyHitObject hitObject)
@@ -54,12 +54,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             TaikoDifficultyHitObjectColour colour = ((TaikoDifficultyHitObject)hitObject).Colour;
             double difficulty = 0.0d;
 
-            if (colour.MonoEncoding != null) // Difficulty for MonoEncoding
-                difficulty += EvaluateDifficultyOf(colour.MonoEncoding);
-            if (colour.ColourEncoding != null) // Difficulty for ColourEncoding
-                difficulty += EvaluateDifficultyOf(colour.ColourEncoding);
-            if (colour.CoupledColourEncoding != null) // Difficulty for CoupledColourEncoding
-                difficulty += EvaluateDifficultyOf(colour.CoupledColourEncoding);
+            if (colour.MonoStreak != null) // Difficulty for MonoStreak
+                difficulty += EvaluateDifficultyOf(colour.MonoStreak);
+            if (colour.AlternatingMonoPattern != null) // Difficulty for AlternatingMonoPattern
+                difficulty += EvaluateDifficultyOf(colour.AlternatingMonoPattern);
+            if (colour.RepeatingHitPatterns != null) // Difficulty for RepeatingHitPattern
+                difficulty += EvaluateDifficultyOf(colour.RepeatingHitPatterns);
 
             return difficulty;
         }

@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// <summary>
         /// The <see cref="AlternatingMonoPattern"/>s that are grouped together within this <see cref="RepeatingHitPatterns"/>.
         /// </summary>
-        public readonly List<AlternatingMonoPattern> Payload = new List<AlternatingMonoPattern>();
+        public readonly List<AlternatingMonoPattern> AlternatingMonoPatterns = new List<AlternatingMonoPattern>();
 
         /// <summary>
         /// The previous <see cref="RepeatingHitPatterns"/>. This is used to determine the repetition interval.
@@ -39,24 +39,24 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         }
 
         /// <summary>
-        /// Returns true if other is considered a repetition of this encoding. This is true if other's first two payloads
+        /// Returns true if other is considered a repetition of this pattern. This is true if other's first two payloads
         /// have identical mono lengths.
         /// </summary>
         private bool isRepetitionOf(RepeatingHitPatterns other)
         {
-            if (Payload.Count != other.Payload.Count) return false;
+            if (AlternatingMonoPatterns.Count != other.AlternatingMonoPatterns.Count) return false;
 
-            for (int i = 0; i < Math.Min(Payload.Count, 2); i++)
+            for (int i = 0; i < Math.Min(AlternatingMonoPatterns.Count, 2); i++)
             {
-                if (!Payload[i].HasIdenticalMonoLength(other.Payload[i])) return false;
+                if (!AlternatingMonoPatterns[i].HasIdenticalMonoLength(other.AlternatingMonoPatterns[i])) return false;
             }
 
             return true;
         }
 
         /// <summary>
-        /// Finds the closest previous <see cref="RepeatingHitPatterns"/> that has the identical <see cref="Payload"/>.
-        /// Interval is defined as the amount of <see cref="RepeatingHitPatterns"/> chunks between the current and repeated encoding.
+        /// Finds the closest previous <see cref="RepeatingHitPatterns"/> that has the identical <see cref="AlternatingMonoPatterns"/>.
+        /// Interval is defined as the amount of <see cref="RepeatingHitPatterns"/> chunks between the current and repeated patterns.
         /// </summary>
         public void FindRepetitionInterval()
         {
