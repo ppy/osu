@@ -103,7 +103,11 @@ namespace osu.Game.Screens.Play
                 // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
                 // This accounts for the clock source potentially taking time to enter a completely stopped state
                 Seek(GameplayClock.CurrentTime);
-                GameplayClock.Start();
+
+                // Delay the start operation to ensure all children components get the initial seek time.
+                // Without this, children may get a start time beyond StartTime without seeing the time has elapsed.
+                // This can manifest as events which should be fired at the precise StartTime not firing.
+                SchedulerAfterChildren.Add(GameplayClock.Start);
             }
         }
 
