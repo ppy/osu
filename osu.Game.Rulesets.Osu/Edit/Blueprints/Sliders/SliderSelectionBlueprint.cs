@@ -294,6 +294,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     Path = new SliderPath(splitControlPoints.Select(o => new PathControlPoint(o.Position - splitControlPoints[0].Position, o == splitControlPoints[^1] ? null : o.Type)).ToArray())
                 };
 
+                // Increase the start time of the slider before adding the new slider so the new slider is immediately inserted at the correct index and internal state remains valid.
                 HitObject.StartTime += 1;
 
                 editorBeatmap.Add(newSlider);
