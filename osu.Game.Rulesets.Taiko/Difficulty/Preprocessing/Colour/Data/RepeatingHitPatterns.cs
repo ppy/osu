@@ -23,6 +23,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         public readonly List<AlternatingMonoPattern> AlternatingMonoPatterns = new List<AlternatingMonoPattern>();
 
         /// <summary>
+        /// The parent <see cref="TaikoDifficultyHitObject"/> in this <see cref="RepeatingHitPatterns"/>
+        /// </summary>
+        public TaikoDifficultyHitObject FirstHitObject => AlternatingMonoPatterns[0].FirstHitObject;
+
+        /// <summary>
         /// The previous <see cref="RepeatingHitPatterns"/>. This is used to determine the repetition interval.
         /// </summary>
         public readonly RepeatingHitPatterns? Previous;

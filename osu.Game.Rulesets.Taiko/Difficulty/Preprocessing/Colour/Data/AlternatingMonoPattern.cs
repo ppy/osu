@@ -28,6 +28,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         public int Index;
 
         /// <summary>
+        /// The first <see cref="TaikoDifficultyHitObject"/> in this <see cref="AlternatingMonoPattern"/>.
+        /// </summary>
+        public TaikoDifficultyHitObject FirstHitObject => MonoStreaks[0].FirstHitObject;
+
+        /// <summary>
         /// Determine if this <see cref="AlternatingMonoPattern"/> is a repetition of another <see cref="AlternatingMonoPattern"/>. This
         /// is a strict comparison and is true if and only if the colour sequence is exactly the same.
         /// </summary>

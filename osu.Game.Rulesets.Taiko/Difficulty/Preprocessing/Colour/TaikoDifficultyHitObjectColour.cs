@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         public AlternatingMonoPattern? AlternatingMonoPattern;
 
         /// <summary>
-        /// The <see cref="RepeatingHitPatterns"/> that encodes this note, only present if this is the first note within a <see cref="RepeatingHitPatterns"/>
+        /// The <see cref="RepeatingHitPattern"/> that encodes this note, only present if this is the first note within a <see cref="RepeatingHitPattern"/>
         /// </summary>
-        public RepeatingHitPatterns? RepeatingHitPatterns;
+        public RepeatingHitPatterns? RepeatingHitPattern;
     }
 }
