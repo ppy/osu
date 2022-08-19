@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
 {
     /// <summary>
     /// Encode colour information for a sequence of <see cref="TaikoDifficultyHitObject"/>s. Consecutive <see cref="TaikoDifficultyHitObject"/>s
-    /// of the same <see cref="HitType"/> are encoded within the same <see cref="MonoStreak"/>.
+    /// of the same <see cref="Objects.HitType"/> are encoded within the same <see cref="MonoStreak"/>.
     /// </summary>
     public class MonoStreak
     {
@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// Index of this <see cref="MonoStreak"/> within it's parent <see cref="AlternatingMonoPattern"/>
         /// </summary>
         public int Index;
+
+        public HitType? HitType => (HitObjects[0].BaseObject as Hit)?.Type;
 
         /// <summary>
         /// How long the mono pattern encoded within is

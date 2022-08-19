@@ -35,8 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         {
             return HasIdenticalMonoLength(other) &&
                    other.MonoStreaks.Count == MonoStreaks.Count &&
-                   (other.MonoStreaks[0].HitObjects[0].BaseObject as Hit)?.Type ==
-                   (MonoStreaks[0].HitObjects[0].BaseObject as Hit)?.Type;
+                   other.MonoStreaks[0].HitType == MonoStreaks[0].HitType;
         }
 
         /// <summary>
