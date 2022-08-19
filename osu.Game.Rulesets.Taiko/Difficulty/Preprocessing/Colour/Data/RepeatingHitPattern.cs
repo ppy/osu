@@ -7,33 +7,33 @@ using System.Collections.Generic;
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
 {
     /// <summary>
-    /// Encodes a list of <see cref="ColourEncoding"/>s, grouped together by back and forth repetition of the same
-    /// <see cref="ColourEncoding"/>. Also stores the repetition interval between this and the previous <see cref="CoupledColourEncoding"/>.
+    /// Encodes a list of <see cref="AlternatingMonoPattern"/>s, grouped together by back and forth repetition of the same
+    /// <see cref="AlternatingMonoPattern"/>. Also stores the repetition interval between this and the previous <see cref="RepeatingHitPatterns"/>.
     /// </summary>
-    public class CoupledColourEncoding
+    public class RepeatingHitPatterns
     {
         /// <summary>
-        /// Maximum amount of <see cref="CoupledColourEncoding"/>s to look back to find a repetition.
+        /// Maximum amount of <see cref="RepeatingHitPatterns"/>s to look back to find a repetition.
         /// </summary>
         private const int max_repetition_interval = 16;
 
         /// <summary>
-        /// The <see cref="ColourEncoding"/>s that are grouped together within this <see cref="CoupledColourEncoding"/>.
+        /// The <see cref="AlternatingMonoPattern"/>s that are grouped together within this <see cref="RepeatingHitPatterns"/>.
         /// </summary>
-        public readonly List<ColourEncoding> Payload = new List<ColourEncoding>();
+        public readonly List<AlternatingMonoPattern> Payload = new List<AlternatingMonoPattern>();
 
         /// <summary>
-        /// The previous <see cref="CoupledColourEncoding"/>. This is used to determine the repetition interval.
+        /// The previous <see cref="RepeatingHitPatterns"/>. This is used to determine the repetition interval.
         /// </summary>
-        public readonly CoupledColourEncoding? Previous;
+        public readonly RepeatingHitPatterns? Previous;
 
         /// <summary>
-        /// How many <see cref="CoupledColourEncoding"/> between the current and previous identical <see cref="CoupledColourEncoding"/>.
+        /// How many <see cref="RepeatingHitPatterns"/> between the current and previous identical <see cref="RepeatingHitPatterns"/>.
         /// If no repetition is found this will have a value of <see cref="max_repetition_interval"/> + 1.
         /// </summary>
         public int RepetitionInterval { get; private set; } = max_repetition_interval + 1;
 
-        public CoupledColourEncoding(CoupledColourEncoding? previous)
+        public RepeatingHitPatterns(RepeatingHitPatterns? previous)
         {
             Previous = previous;
         }
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// Returns true if other is considered a repetition of this encoding. This is true if other's first two payloads
         /// have identical mono lengths.
         /// </summary>
-        private bool isRepetitionOf(CoupledColourEncoding other)
+        private bool isRepetitionOf(RepeatingHitPatterns other)
         {
             if (Payload.Count != other.Payload.Count) return false;
 
@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         }
 
         /// <summary>
-        /// Finds the closest previous <see cref="CoupledColourEncoding"/> that has the identical <see cref="Payload"/>.
-        /// Interval is defined as the amount of <see cref="CoupledColourEncoding"/> chunks between the current and repeated encoding.
+        /// Finds the closest previous <see cref="RepeatingHitPatterns"/> that has the identical <see cref="Payload"/>.
+        /// Interval is defined as the amount of <see cref="RepeatingHitPatterns"/> chunks between the current and repeated encoding.
         /// </summary>
         public void FindRepetitionInterval()
         {
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
                 return;
             }
 
-            CoupledColourEncoding? other = Previous;
+            RepeatingHitPatterns? other = Previous;
             int interval = 1;
 
             while (interval < max_repetition_interval)

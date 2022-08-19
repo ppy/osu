@@ -13,16 +13,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// <summary>
         /// The <see cref="MonoEncoding"/> that encodes this note, only present if this is the first note within a <see cref="MonoEncoding"/>
         /// </summary>
-        public MonoEncoding? MonoEncoding;
+        public MonoStreak? MonoEncoding;
 
         /// <summary>
         /// The <see cref="ColourEncoding"/> that encodes this note, only present if this is the first note within a <see cref="ColourEncoding"/>
         /// </summary>
-        public ColourEncoding? ColourEncoding;
+        public AlternatingMonoPattern? ColourEncoding;
 
         /// <summary>
         /// The <see cref="CoupledColourEncoding"/> that encodes this note, only present if this is the first note within a <see cref="CoupledColourEncoding"/>
         /// </summary>
-        public CoupledColourEncoding? CoupledColourEncoding;
+        public RepeatingHitPatterns? CoupledColourEncoding;
     }
 }

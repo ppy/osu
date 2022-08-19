@@ -26,25 +26,25 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
-        /// Evaluate the difficulty of the first note of a <see cref="MonoEncoding"/>.
+        /// Evaluate the difficulty of the first note of a <see cref="MonoStreak"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(MonoEncoding encoding)
+        public static double EvaluateDifficultyOf(MonoStreak encoding)
         {
             return sigmoid(encoding.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(encoding.Parent!) * 0.5;
         }
 
         /// <summary>
-        /// Evaluate the difficulty of the first note of a <see cref="ColourEncoding"/>.
+        /// Evaluate the difficulty of the first note of a <see cref="AlternatingMonoPattern"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(ColourEncoding encoding)
+        public static double EvaluateDifficultyOf(AlternatingMonoPattern encoding)
         {
             return sigmoid(encoding.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(encoding.Parent!);
         }
 
         /// <summary>
-        /// Evaluate the difficulty of the first note of a <see cref="CoupledColourEncoding"/>.
+        /// Evaluate the difficulty of the first note of a <see cref="RepeatingHitPatterns"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(CoupledColourEncoding encoding)
+        public static double EvaluateDifficultyOf(RepeatingHitPatterns encoding)
         {
             return 2 * (1 - sigmoid(encoding.RepetitionInterval, 2, 2, 0.5, 1));
         }

@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         /// </summary>
         public static void ProcessAndAssign(List<DifficultyHitObject> hitObjects)
         {
-            List<CoupledColourEncoding> encodings = encode(hitObjects);
+            List<RepeatingHitPatterns> encodings = encode(hitObjects);
 
             // Assign indexing and encoding data to all relevant objects. Only the first note of each encoding type is
             // assigned with the relevant encodings.
@@ -33,14 +33,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                 // documentation.
                 for (int i = 0; i < coupledEncoding.Payload.Count; ++i)
                 {
-                    ColourEncoding colourEncoding = coupledEncoding.Payload[i];
+                    AlternatingMonoPattern colourEncoding = coupledEncoding.Payload[i];
                     colourEncoding.Parent = coupledEncoding;
                     colourEncoding.Index = i;
                     colourEncoding.Payload[0].EncodedData[0].Colour.ColourEncoding = colourEncoding;
 
                     for (int j = 0; j < colourEncoding.Payload.Count; ++j)
                     {
-                        MonoEncoding monoEncoding = colourEncoding.Payload[j];
+                        MonoStreak monoEncoding = colourEncoding.Payload[j];
                         monoEncoding.Parent = colourEncoding;
                         monoEncoding.Index = j;
                         monoEncoding.EncodedData[0].Colour.MonoEncoding = monoEncoding;
@@ -50,24 +50,24 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         }
 
         /// <summary>
-        /// Encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="CoupledColourEncoding"/>s.
+        /// Encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="RepeatingHitPatterns"/>s.
         /// </summary>
-        private static List<CoupledColourEncoding> encode(List<DifficultyHitObject> data)
+        private static List<RepeatingHitPatterns> encode(List<DifficultyHitObject> data)
         {
-            List<MonoEncoding> firstPass = encodeMono(data);
-            List<ColourEncoding> secondPass = encodeColour(firstPass);
-            List<CoupledColourEncoding> thirdPass = encodeCoupledColour(secondPass);
+            List<MonoStreak> firstPass = encodeMono(data);
+            List<AlternatingMonoPattern> secondPass = encodeColour(firstPass);
+            List<RepeatingHitPatterns> thirdPass = encodeCoupledColour(secondPass);
 
             return thirdPass;
         }
 
         /// <summary>
-        /// Encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="MonoEncoding"/>s.
+        /// Encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="MonoStreak"/>s.
         /// </summary>
-        private static List<MonoEncoding> encodeMono(List<DifficultyHitObject> data)
+        private static List<MonoStreak> encodeMono(List<DifficultyHitObject> data)
         {
-            List<MonoEncoding> encodings = new List<MonoEncoding>();
-            MonoEncoding? currentEncoding = null;
+            List<MonoStreak> encodings = new List<MonoStreak>();
+            MonoStreak? currentEncoding = null;
 
             for (int i = 0; i < data.Count; i++)
             {
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                 // If this is the first object in the list or the colour changed, create a new mono encoding
                 if (currentEncoding == null || previousObject == null || (taikoObject.BaseObject as Hit)?.Type != (previousObject.BaseObject as Hit)?.Type)
                 {
-                    currentEncoding = new MonoEncoding();
+                    currentEncoding = new MonoStreak();
                     encodings.Add(currentEncoding);
                 }
 
@@ -91,19 +91,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         }
 
         /// <summary>
-        /// Encodes a list of <see cref="MonoEncoding"/>s into a list of <see cref="ColourEncoding"/>s.
+        /// Encodes a list of <see cref="MonoStreak"/>s into a list of <see cref="AlternatingMonoPattern"/>s.
         /// </summary>
-        private static List<ColourEncoding> encodeColour(List<MonoEncoding> data)
+        private static List<AlternatingMonoPattern> encodeColour(List<MonoStreak> data)
         {
-            List<ColourEncoding> encodings = new List<ColourEncoding>();
-            ColourEncoding? currentEncoding = null;
+            List<AlternatingMonoPattern> encodings = new List<AlternatingMonoPattern>();
+            AlternatingMonoPattern? currentEncoding = null;
 
             for (int i = 0; i < data.Count; i++)
             {
                 // Start a new ColourEncoding if the previous MonoEncoding has a different mono length, or if this is the first MonoEncoding in the list.
                 if (currentEncoding == null || data[i].RunLength != data[i - 1].RunLength)
                 {
-                    currentEncoding = new ColourEncoding();
+                    currentEncoding = new AlternatingMonoPattern();
                     encodings.Add(currentEncoding);
                 }
 
@@ -115,17 +115,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
         }
 
         /// <summary>
-        /// Encodes a list of <see cref="ColourEncoding"/>s into a list of <see cref="CoupledColourEncoding"/>s.
+        /// Encodes a list of <see cref="AlternatingMonoPattern"/>s into a list of <see cref="RepeatingHitPatterns"/>s.
         /// </summary>
-        private static List<CoupledColourEncoding> encodeCoupledColour(List<ColourEncoding> data)
+        private static List<RepeatingHitPatterns> encodeCoupledColour(List<AlternatingMonoPattern> data)
         {
-            List<CoupledColourEncoding> encodings = new List<CoupledColourEncoding>();
-            CoupledColourEncoding? currentEncoding = null;
+            List<RepeatingHitPatterns> encodings = new List<RepeatingHitPatterns>();
+            RepeatingHitPatterns? currentEncoding = null;
 
             for (int i = 0; i < data.Count; i++)
             {
                 // Start a new CoupledColourEncoding. ColourEncodings that should be grouped together will be handled later within this loop.
-                currentEncoding = new CoupledColourEncoding(currentEncoding);
+                currentEncoding = new RepeatingHitPatterns(currentEncoding);
 
                 // Determine if future ColourEncodings should be grouped.
                 bool isCoupled = i < data.Count - 2 && data[i].IsRepetitionOf(data[i + 2]);
