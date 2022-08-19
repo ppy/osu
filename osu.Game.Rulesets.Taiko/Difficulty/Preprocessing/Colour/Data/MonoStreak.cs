@@ -28,6 +28,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// </summary>
         public int Index;
 
+        /// <summary>
+        /// The first <see cref="TaikoDifficultyHitObject"/> in this <see cref="MonoStreak"/>.
+        /// </summary>
+        public TaikoDifficultyHitObject FirstHitObject => HitObjects[0];
+
+        /// <summary>
+        /// The hit type of all objects encoded within this <see cref="MonoStreak"/>
+        /// </summary>
         public HitType? HitType => (HitObjects[0].BaseObject as Hit)?.Type;
 
         /// <summary>

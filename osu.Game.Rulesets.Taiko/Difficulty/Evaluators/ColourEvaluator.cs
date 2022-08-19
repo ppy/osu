@@ -58,8 +58,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 difficulty += EvaluateDifficultyOf(colour.MonoStreak);
             if (colour.AlternatingMonoPattern != null) // Difficulty for AlternatingMonoPattern
                 difficulty += EvaluateDifficultyOf(colour.AlternatingMonoPattern);
-            if (colour.RepeatingHitPatterns != null) // Difficulty for RepeatingHitPattern
-                difficulty += EvaluateDifficultyOf(colour.RepeatingHitPatterns);
+            if (colour.RepeatingHitPattern != null) // Difficulty for RepeatingHitPattern
+                difficulty += EvaluateDifficultyOf(colour.RepeatingHitPattern);
 
             return difficulty;
         }

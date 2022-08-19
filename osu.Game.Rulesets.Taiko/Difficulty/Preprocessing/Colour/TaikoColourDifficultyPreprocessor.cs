@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
             // assigned with the relevant encodings.
             foreach (var repeatingHitPattern in hitPatterns)
             {
-                repeatingHitPattern.AlternatingMonoPatterns[0].MonoStreaks[0].HitObjects[0].Colour.RepeatingHitPatterns = repeatingHitPattern;
+                repeatingHitPattern.FirstHitObject.Colour.RepeatingHitPattern = repeatingHitPattern;
 
                 // The outermost loop is kept a ForEach loop since it doesn't need index information, and we want to
                 // keep i and j for AlternatingMonoPattern's and MonoStreak's index respectively, to keep it in line with
@@ -36,14 +36,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
                     AlternatingMonoPattern monoPattern = repeatingHitPattern.AlternatingMonoPatterns[i];
                     monoPattern.Parent = repeatingHitPattern;
                     monoPattern.Index = i;
-                    monoPattern.MonoStreaks[0].HitObjects[0].Colour.AlternatingMonoPattern = monoPattern;
+                    monoPattern.FirstHitObject.Colour.AlternatingMonoPattern = monoPattern;
 
                     for (int j = 0; j < monoPattern.MonoStreaks.Count; ++j)
                     {
                         MonoStreak monoStreak = monoPattern.MonoStreaks[j];
                         monoStreak.Parent = monoPattern;
                         monoStreak.Index = j;
-                        monoStreak.HitObjects[0].Colour.MonoStreak = monoStreak;
+                        monoStreak.FirstHitObject.Colour.MonoStreak = monoStreak;
                     }
                 }
             }
