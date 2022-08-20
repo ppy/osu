@@ -340,7 +340,7 @@ namespace osu.Game.Database
                     // import to store
                     realm.Add(item);
 
-                    PostImport(item, realm);
+                    PostImport(item, realm, batchImport);
 
                     transaction.Commit();
                 }
@@ -485,7 +485,8 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The model prepared for import.</param>
         /// <param name="realm">The current realm context.</param>
-        protected virtual void PostImport(TModel model, Realm realm)
+        /// <param name="batchImport">Whether the import was part of a batch.</param>
+        protected virtual void PostImport(TModel model, Realm realm, bool batchImport)
         {
         }
 

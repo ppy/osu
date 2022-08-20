@@ -123,6 +123,8 @@ namespace osu.Game.Screens.Play
 
         private EpilepsyWarning? epilepsyWarning;
 
+        private bool quickRestart;
+
         [Resolved(CanBeNull = true)]
         private INotificationOverlay? notificationOverlay { get; set; }
 
@@ -361,6 +363,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
+            CurrentPlayer.Configuration.AutomaticallySkipIntro = quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
@@ -375,8 +378,9 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void restartRequested()
+        private void restartRequested(bool quickRestartRequested)
         {
+            quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
         }
@@ -549,6 +553,8 @@ namespace osu.Game.Screens.Play
 
         #region Low battery warning
 
+        private const double low_battery_threshold = 0.25;
+
         private Bindable<bool> batteryWarningShownOnce = null!;
 
         private void showBatteryWarningIfNeeded()
@@ -557,7 +563,7 @@ namespace osu.Game.Screens.Play
 
             if (!batteryWarningShownOnce.Value)
             {
-                if (!batteryInfo.IsCharging && batteryInfo.ChargeLevel <= 0.25)
+                if (batteryInfo.OnBattery && batteryInfo.ChargeLevel <= low_battery_threshold)
                 {
                     notificationOverlay?.Post(new BatteryWarningNotification());
                     batteryWarningShownOnce.Value = true;

@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Mods
         private IModHotkeyHandler hotkeyHandler = null!;
 
         private Task? latestLoadTask;
-        internal bool ItemsLoaded => latestLoadTask == null;
+        internal bool ItemsLoaded => latestLoadTask?.IsCompleted == true;
 
         public ModColumn(ModType modType, bool allowIncompatibleSelection)
         {
@@ -132,18 +132,11 @@ namespace osu.Game.Overlays.Mods
 
             var panels = availableMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = Vector2.Zero));
 
-            Task? loadTask;
-
-            latestLoadTask = loadTask = LoadComponentsAsync(panels, loaded =>
+            latestLoadTask = LoadComponentsAsync(panels, loaded =>
             {
                 ItemsFlow.ChildrenEnumerable = loaded;
                 updateState();
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
-            loadTask.ContinueWith(_ =>
-            {
-                if (loadTask == latestLoadTask)
-                    latestLoadTask = null;
-            });
         }
 
         private void updateState()
