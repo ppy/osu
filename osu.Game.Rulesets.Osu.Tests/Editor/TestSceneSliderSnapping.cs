@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestRotatingSliderRetainsPerfectControlPointType()
         {
-            OsuSelectionHandler selectionHandler = null;
+            OsuSelectionHandler selectionHandler;
 
             AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PerfectCurve);
 
@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestFlippingSliderRetainsPerfectControlPointType()
         {
-            OsuSelectionHandler selectionHandler = null;
+            OsuSelectionHandler selectionHandler;
 
             AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PerfectCurve);
 
