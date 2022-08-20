@@ -7,6 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -25,11 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Big brother is watching your cursor.";
         public override double ScoreMultiplier => 1;
 
-        private const int last_zoom_combo = 200;
-        private const int zoom_every_combo_amount = 100;
         private const int apply_zoom_duration = 1000;
-        private const double default_zoom = 1.8;
-        private const double zoom_with_combo_by = 0.1;
 
         [SettingSource("Delay", "Delay in milliseconds for the view to catch up to the cursor")]
         public BindableInt MovementDelay { get; } = new BindableInt
@@ -40,15 +38,20 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource("Initial zoom", "The starting zoom level")]
-        public BindableDouble InitialZoom { get; } = new BindableDouble(default_zoom)
+        public BindableDouble InitialZoom { get; } = new BindableDouble(1.8)
         {
             MinValue = 1.5,
             MaxValue = 2,
             Precision = 0.05
         };
 
-        [SettingSource("Increase zoom with combo", "Whether zoom should increase as combo increases")]
-        public BindableBool ComboBasedZoom { get; } = new BindableBool(true);
+        [SettingSource("Final zoom combo", "The combo count at which point the zoom level stops increasing.", SettingControlType = typeof(SettingsSlider<int, OsuSliderBar<int>>))]
+        public BindableInt FinalZoomCombo { get; } = new BindableInt(200)
+        {
+            MinValue = 0,
+            MaxValue = 500,
+            Precision = 100
+        };
 
         private double currentZoom;
 
@@ -89,17 +92,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            if (ComboBasedZoom.Value)
-            {
-                scoreProcessor.Combo.BindTo(currentCombo);
-                currentCombo.ValueChanged += e => currentZoom = getZoomForCombo(e.NewValue);
-            }
+            scoreProcessor.Combo.BindTo(currentCombo);
+            currentCombo.ValueChanged += e => currentZoom = getZoomForCombo(e.NewValue);
         }
 
         private double getZoomForCombo(int combo)
         {
-            double setCombo = Math.Min(combo, last_zoom_combo);
-            return InitialZoom.Value + zoom_with_combo_by * Math.Floor(setCombo / zoom_every_combo_amount);
+            double setCombo = Math.Min(combo, FinalZoomCombo.Value);
+            double increaseRatio = setCombo / 1000;
+            return InitialZoom.Value + increaseRatio;
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
