@@ -2,25 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Rulesets.Mods;
-using osu.Framework.Graphics;
-using osuTK;
-using osu.Game.Screens.Play;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
+using System.Diagnostics;
 using osu.Framework.Bindables;
-using osu.Game.Configuration;
-using osu.Game.Rulesets.Osu.Objects;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Scoring;
+using osuTK;
+
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModZoomed : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToPlayer, IApplicableToDrawableRuleset<OsuHitObject>
+    internal class OsuModZoomed : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToDrawableRuleset<OsuHitObject>
     {
         private const int last_zoom_combo = 200;
         private const int zoom_every_combo_amount = 100;
@@ -63,72 +62,62 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private BindableInt combo = new BindableInt();
 
-        private OsuPlayfield? playfield;
-
-        private Player? player;
-
         private IFrameStableClock? gameplayClock;
 
         private readonly List<Drawable> zoomedDrawables = new List<Drawable>();
 
         private readonly List<Drawable> drawablesFollowingCursor = new List<Drawable>();
 
-        public void ApplyToPlayer(Player player)
+        private void addTrackingCursorZoomedDrawable(Drawable drawable)
         {
-            this.player = player;
-            currentZoom = baseZoom;
+            zoomedDrawables.Add(drawable);
+            drawablesFollowingCursor.Add(drawable);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            playfield = (OsuPlayfield)drawableRuleset.Playfield;
+            currentZoom = baseZoom;
             gameplayClock = drawableRuleset.FrameStableClock;
 
-            zoomedDrawables.Add(playfield);
-            drawablesFollowingCursor.Add(playfield);
+            addTrackingCursorZoomedDrawable(drawableRuleset.Playfield);
         }
 
-        public void Update(Playfield _)
-        {
-            applyZoomForZoomedDrawables();
-            moveDrawablesFollowingCursor();
-        }
-
-        private Vector2 getDrawablePositionForCursorPosition(Drawable drawable)
-        {
-            Debug.Assert(playfield != null);
-
-            var position = playfield.Cursor.ActiveCursor.DrawPosition;
-
-            return Vector2.Clamp(playfield.OriginPosition - position, -playfield.OriginPosition, playfield.OriginPosition);
-        }
-
-        private void moveDrawablesFollowingCursor()
+        public void Update(Playfield playfield)
         {
             Debug.Assert(gameplayClock != null);
 
+            applyZoomForZoomedDrawables(gameplayClock);
+            moveDrawablesFollowingCursor(playfield, gameplayClock);
+        }
+
+        private Vector2 getDrawablePositionForCursorPosition(Playfield playfield, Drawable drawable)
+        {
+            var position = playfield.Cursor.ActiveCursor.DrawPosition;
+            return Vector2.Clamp(playfield.OriginPosition - position, -playfield.OriginPosition, playfield.OriginPosition);
+        }
+
+        private void moveDrawablesFollowingCursor(Playfield playfield, IFrameStableClock gameplayClock)
+        {
             // prevent division by 0
             if (Precision.AlmostEquals(cameraDelay, 0))
             {
                 foreach (var drawable in drawablesFollowingCursor)
-                    drawable.Position = getDrawablePositionForCursorPosition(drawable);
+                    drawable.Position = getDrawablePositionForCursorPosition(playfield, drawable);
 
                 return;
             }
 
             foreach (var drawable in drawablesFollowingCursor)
             {
-                var followPosition = getDrawablePositionForCursorPosition(drawable);
+                var followPosition = getDrawablePositionForCursorPosition(playfield, drawable);
 
                 drawable.Position = Interpolation.ValueAt(
                     Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), cameraDelay), drawable.Position, followPosition, 0, cameraDelay, Easing.Out);
             }
         }
 
-        private void applyZoomForZoomedDrawables()
+        private void applyZoomForZoomedDrawables(IFrameStableClock gameplayClock)
         {
-            Debug.Assert(gameplayClock != null);
-
             foreach (var drawable in zoomedDrawables)
             {
                 double currentScale = Interpolation.ValueAt(Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), apply_zoom_duration), drawable.Scale.X, currentZoom, 0, apply_zoom_duration, Easing.Out);
