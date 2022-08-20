@@ -16,18 +16,10 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osuTK;
 
-
 namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModZoomed : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        private const int last_zoom_combo = 200;
-        private const int zoom_every_combo_amount = 100;
-        private const int apply_zoom_duration = 1000;
-        private const int default_follow_delay = 0;
-        private const double default_zoom = 1.8;
-        private const double zoom_with_combo_by = 0.1;
-
         public override string Name => "Zoomed";
         public override string Acronym => "ZM";
         public override IconUsage? Icon => FontAwesome.Solid.Glasses;
@@ -35,10 +27,16 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Big brother is watching your cursor.";
         public override double ScoreMultiplier => 1;
 
+        private const int last_zoom_combo = 200;
+        private const int zoom_every_combo_amount = 100;
+        private const int apply_zoom_duration = 1000;
+        private const double default_zoom = 1.8;
+        private const double zoom_with_combo_by = 0.1;
+
         [SettingSource("Focus delay", "Milliseconds for for your cursor be focused")]
-        public BindableInt CameraDelay { get; } = new BindableInt(default_follow_delay)
+        public BindableInt CameraDelay { get; } = new BindableInt
         {
-            MinValue = default_follow_delay,
+            MinValue = 0,
             MaxValue = 1000,
             Precision = 100,
         };
@@ -60,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Change zoom based on combo", "Zooms in on your cursor based on combo")]
         public BindableBool ComboBasedZoom { get; } = new BindableBool(true);
 
-        private BindableInt combo = new BindableInt();
+        private readonly BindableInt currentCombo = new BindableInt();
 
         private IFrameStableClock? gameplayClock;
 
@@ -130,14 +128,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (ComboBasedZoom.Value)
             {
-                scoreProcessor.Combo.BindTo(combo);
-                combo.ValueChanged += onComboChange;
+                scoreProcessor.Combo.BindTo(currentCombo);
+                currentCombo.ValueChanged += e => currentZoom = getZoomForCombo(e.NewValue);
             }
-        }
-
-        private void onComboChange(ValueChangedEvent<int> e)
-        {
-            currentZoom = getZoomForCombo(e.NewValue);
         }
 
         private double getZoomForCombo(int combo)
