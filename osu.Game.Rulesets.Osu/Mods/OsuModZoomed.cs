@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -33,58 +32,49 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double default_zoom = 1.8;
         private const double zoom_with_combo_by = 0.1;
 
-        [SettingSource("Focus delay", "Milliseconds for for your cursor be focused")]
-        public BindableInt CameraDelay { get; } = new BindableInt
+        [SettingSource("Delay", "Delay in milliseconds for the view to catch up to the cursor")]
+        public BindableInt MovementDelay { get; } = new BindableInt
         {
             MinValue = 0,
             MaxValue = 1000,
             Precision = 100,
         };
 
-        private int cameraDelay => CameraDelay.Value;
-
-        [SettingSource("Base zoom", "Adjust the zoom applied to your cursor.")]
-        public BindableDouble BaseZoom { get; } = new BindableDouble(default_zoom)
+        [SettingSource("Initial zoom", "The starting zoom level")]
+        public BindableDouble InitialZoom { get; } = new BindableDouble(default_zoom)
         {
             MinValue = 1.5,
             MaxValue = 2,
             Precision = 0.05
         };
 
-        private double baseZoom => BaseZoom.Value;
+        [SettingSource("Increase zoom with combo", "Whether zoom should increase as combo increases")]
+        public BindableBool ComboBasedZoom { get; } = new BindableBool(true);
+
+        private int cameraDelay => MovementDelay.Value;
+
+        private double baseZoom => InitialZoom.Value;
 
         private double currentZoom;
-
-        [SettingSource("Change zoom based on combo", "Zooms in on your cursor based on combo")]
-        public BindableBool ComboBasedZoom { get; } = new BindableBool(true);
 
         private readonly BindableInt currentCombo = new BindableInt();
 
         private IFrameStableClock? gameplayClock;
 
-        private readonly List<Drawable> zoomedDrawables = new List<Drawable>();
-
-        private readonly List<Drawable> drawablesFollowingCursor = new List<Drawable>();
-
-        private void addTrackingCursorZoomedDrawable(Drawable drawable)
-        {
-            zoomedDrawables.Add(drawable);
-            drawablesFollowingCursor.Add(drawable);
-        }
-
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             currentZoom = baseZoom;
             gameplayClock = drawableRuleset.FrameStableClock;
-
-            addTrackingCursorZoomedDrawable(drawableRuleset.Playfield);
         }
 
         public void Update(Playfield playfield)
         {
             Debug.Assert(gameplayClock != null);
 
-            applyZoomForZoomedDrawables(gameplayClock);
+            double currentScale = Interpolation.ValueAt(Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), apply_zoom_duration), playfield.Scale.X, currentZoom, 0, apply_zoom_duration, Easing.Out);
+
+            playfield.Scale = new Vector2((float)currentScale);
+
             moveDrawablesFollowingCursor(playfield, gameplayClock);
         }
 
@@ -96,31 +86,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void moveDrawablesFollowingCursor(Playfield playfield, IFrameStableClock gameplayClock)
         {
-            // prevent division by 0
-            if (Precision.AlmostEquals(cameraDelay, 0))
+            var trackingPosition = getDrawablePositionForCursorPosition(playfield, playfield);
+
+            if (cameraDelay == 0)
+                playfield.Position = trackingPosition;
+            else
             {
-                foreach (var drawable in drawablesFollowingCursor)
-                    drawable.Position = getDrawablePositionForCursorPosition(playfield, drawable);
-
-                return;
-            }
-
-            foreach (var drawable in drawablesFollowingCursor)
-            {
-                var followPosition = getDrawablePositionForCursorPosition(playfield, drawable);
-
-                drawable.Position = Interpolation.ValueAt(
-                    Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), cameraDelay), drawable.Position, followPosition, 0, cameraDelay, Easing.Out);
-            }
-        }
-
-        private void applyZoomForZoomedDrawables(IFrameStableClock gameplayClock)
-        {
-            foreach (var drawable in zoomedDrawables)
-            {
-                double currentScale = Interpolation.ValueAt(Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), apply_zoom_duration), drawable.Scale.X, currentZoom, 0, apply_zoom_duration, Easing.Out);
-
-                drawable.Scale = new Vector2((float)currentScale);
+                playfield.Position = Interpolation.ValueAt(
+                    Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), cameraDelay), playfield.Position, trackingPosition, 0, cameraDelay, Easing.Out);
             }
         }
 
