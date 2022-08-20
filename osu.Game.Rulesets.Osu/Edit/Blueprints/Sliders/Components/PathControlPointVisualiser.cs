@@ -105,12 +105,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             return true;
         }
 
-        // The slider can only be split on control points which connect two different slider segments.
-        private bool splittable(PathControlPointPiece p) => p.ControlPoint.Type.HasValue && p != Pieces[0] && p != Pieces[^1];
-
         private bool splitSelected()
         {
-            List<PathControlPoint> toSplit = Pieces.Where(p => p.IsSelected.Value && splittable(p)).Select(p => p.ControlPoint).ToList();
+            List<PathControlPoint> toSplit = Pieces.Where(p => p.IsSelected.Value && isSplittable(p)).Select(p => p.ControlPoint).ToList();
 
             // Ensure that there are any points to be split
             if (toSplit.Count == 0)
@@ -126,6 +123,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             return true;
         }
+
+        private bool isSplittable(PathControlPointPiece p) =>
+            // A slider can only be split on control points which connect two different slider segments.
+            p.ControlPoint.Type.HasValue && p != Pieces.FirstOrDefault() && p != Pieces.LastOrDefault();
 
         private void onControlPointsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -345,38 +346,42 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 if (count == 0)
                     return null;
 
-                var splittablePieces = selectedPieces.Where(splittable).ToList();
+                var splittablePieces = selectedPieces.Where(isSplittable).ToList();
                 int splittableCount = splittablePieces.Count;
 
-                List<MenuItem> items = new List<MenuItem>();
+                List<MenuItem> curveTypeItems = new List<MenuItem>();
 
                 if (!selectedPieces.Contains(Pieces[0]))
-                    items.Add(createMenuItemForPathType(null));
+                    curveTypeItems.Add(createMenuItemForPathType(null));
 
                 // todo: hide/disable items which aren't valid for selected points
-                items.Add(createMenuItemForPathType(PathType.Linear));
-                items.Add(createMenuItemForPathType(PathType.PerfectCurve));
-                items.Add(createMenuItemForPathType(PathType.Bezier));
-                items.Add(createMenuItemForPathType(PathType.Catmull));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.Linear));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.PerfectCurve));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.Bezier));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.Catmull));
 
-                var menuItems = new MenuItem[splittableCount > 0 ? 3 : 2];
-                int i = 0;
-
-                menuItems[i++] = new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive,
-                    () => DeleteSelected());
+                var menuItems = new List<MenuItem>
+                {
+                    new OsuMenuItem("Curve type")
+                    {
+                        Items = curveTypeItems
+                    }
+                };
 
                 if (splittableCount > 0)
                 {
-                    menuItems[i++] = new OsuMenuItem($"Split {"control point".ToQuantity(splittableCount, splittableCount > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}",
-                        MenuItemType.Destructive, () => splitSelected());
+                    menuItems.Add(new OsuMenuItem($"Split {"control point".ToQuantity(splittableCount, splittableCount > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}",
+                        MenuItemType.Destructive,
+                        () => splitSelected()));
                 }
 
-                menuItems[i] = new OsuMenuItem("Curve type")
-                {
-                    Items = items
-                };
+                menuItems.Add(
+                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}",
+                        MenuItemType.Destructive,
+                        () => DeleteSelected())
+                );
 
-                return menuItems;
+                return menuItems.ToArray();
             }
         }
 
