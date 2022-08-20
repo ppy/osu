@@ -1,13 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osuTK;
 
@@ -19,19 +15,12 @@ namespace osu.Game.Tests.Visual.Editing
         [BackgroundDependencyLoader]
         private void load()
         {
-            var clock = new EditorClock { IsCoupled = false };
-            Dependencies.CacheAs(clock);
-
-            var playback = new PlaybackControl
+            Child = new PlaybackControl
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(200, 100)
             };
-
-            Beatmap.Value = CreateWorkingBeatmap(new Beatmap());
-
-            Child = playback;
         }
     }
 }

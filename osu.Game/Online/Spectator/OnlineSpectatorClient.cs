@@ -80,7 +80,7 @@ namespace osu.Game.Online.Spectator
 
             Debug.Assert(connection != null);
 
-            return connection.InvokeAsync(nameof(ISpectatorServer.SendFrameData), bundle);
+            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), bundle);
         }
 
         protected override Task EndPlayingInternal(SpectatorState state)

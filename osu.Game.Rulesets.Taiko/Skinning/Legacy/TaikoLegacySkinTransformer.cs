@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
@@ -24,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             hasExplosion = new Lazy<bool>(() => GetTexture(getHitName(TaikoSkinComponents.TaikoExplosionGreat)) != null);
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponent component)
         {
             if (component is GameplaySkinComponent<HitResult>)
             {
@@ -151,7 +149,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             throw new ArgumentOutOfRangeException(nameof(component), $"Invalid component type: {component}");
         }
 
-        public override ISample GetSample(ISampleInfo sampleInfo)
+        public override ISample? GetSample(ISampleInfo sampleInfo)
         {
             if (sampleInfo is HitSampleInfo hitSampleInfo)
                 return base.GetSample(new LegacyTaikoSampleInfo(hitSampleInfo));
@@ -173,9 +171,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     foreach (string name in base.LookupNames)
                         yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
-
-                    foreach (string name in base.LookupNames)
-                        yield return name;
                 }
             }
         }

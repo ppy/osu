@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -47,10 +45,6 @@ namespace osu.Game.Rulesets.Pippidon
             new KeyBinding(InputKey.S, PippidonAction.MoveDown),
         };
 
-        public override Drawable CreateIcon() => new Sprite
-        {
-            Margin = new MarginPadding { Top = 3 },
-            Texture = new TextureStore(new TextureLoaderStore(CreateResourceStore()), false).Get("Textures/coin"),
-        };
+        public override Drawable CreateIcon() => new PippidonRulesetIcon(this);
     }
 }

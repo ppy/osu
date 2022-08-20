@@ -486,9 +486,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Something is selected", () => carousel.SelectedBeatmapInfo != null);
         }
 
-        /// <summary>
-        /// Test sorting
-        /// </summary>
         [Test]
         public void TestSorting()
         {
@@ -517,6 +514,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert($"Check {zzz_string} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Artist == zzz_string);
         }
 
+        /// <summary>
+        /// Ensures stability is maintained on different sort modes for items with equal properties.
+        /// </summary>
         [Test]
         public void TestSortingStability()
         {
@@ -547,6 +547,53 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
             AddAssert("Items reset to original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + index).All(b => b));
+        }
+
+        /// <summary>
+        /// Ensures stability is maintained on different sort modes while a new item is added to the carousel.
+        /// </summary>
+        [Test]
+        public void TestSortingStabilityWithNewItems()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            for (int i = 0; i < 3; i++)
+            {
+                var set = TestResources.CreateTestBeatmapSetInfo(3);
+
+                // only need to set the first as they are a shared reference.
+                var beatmap = set.Beatmaps.First();
+
+                beatmap.Metadata.Artist = "same artist";
+                beatmap.Metadata.Title = "same title";
+
+                sets.Add(set);
+            }
+
+            int idOffset = sets.First().OnlineID;
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
+            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + index).All(b => b));
+
+            AddStep("Add new item", () =>
+            {
+                var set = TestResources.CreateTestBeatmapSetInfo();
+
+                // only need to set the first as they are a shared reference.
+                var beatmap = set.Beatmaps.First();
+
+                beatmap.Metadata.Artist = "same artist";
+                beatmap.Metadata.Title = "same title";
+
+                carousel.UpdateBeatmapSet(set);
+            });
+
+            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + index).All(b => b));
+
+            AddStep("Sort by title", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false));
+            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.OnlineID == idOffset + index).All(b => b));
         }
 
         [Test]

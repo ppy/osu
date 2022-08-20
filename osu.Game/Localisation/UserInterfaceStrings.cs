@@ -114,6 +114,46 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NoLimit => new TranslatableString(getKey(@"no_limit"), @"no limit");
 
+        /// <summary>
+        /// "Beatmap (with storyboard / video)"
+        /// </summary>
+        public static LocalisableString BeatmapWithStoryboard => new TranslatableString(getKey(@"beatmap_with_storyboard"), @"Beatmap (with storyboard / video)");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString AlwaysSeasonalBackground => new TranslatableString(getKey(@"always_seasonal_backgrounds"), @"Always");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString NeverSeasonalBackground => new TranslatableString(getKey(@"never_seasonal_backgrounds"), @"Never");
+
+        /// <summary>
+        /// "Sometimes"
+        /// </summary>
+        public static LocalisableString SometimesSeasonalBackground => new TranslatableString(getKey(@"sometimes_seasonal_backgrounds"), @"Sometimes");
+
+        /// <summary>
+        /// "Sequential"
+        /// </summary>
+        public static LocalisableString SequentialHotkeyStyle => new TranslatableString(getKey(@"mods_sequential_hotkeys"), @"Sequential");
+
+        /// <summary>
+        /// "Classic"
+        /// </summary>
+        public static LocalisableString ClassicHotkeyStyle => new TranslatableString(getKey(@"mods_classic_hotkeys"), @"Classic");
+
+        /// <summary>
+        /// "Never repeat"
+        /// </summary>
+        public static LocalisableString NeverRepeat => new TranslatableString(getKey(@"never_repeat_random"), @"Never repeat");
+
+        /// <summary>
+        /// "True Random"
+        /// </summary>
+        public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True Random");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
