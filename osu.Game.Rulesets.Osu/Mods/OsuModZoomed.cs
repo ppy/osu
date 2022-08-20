@@ -51,10 +51,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Increase zoom with combo", "Whether zoom should increase as combo increases")]
         public BindableBool ComboBasedZoom { get; } = new BindableBool(true);
 
-        private int cameraDelay => MovementDelay.Value;
-
-        private double baseZoom => InitialZoom.Value;
-
         private double currentZoom;
 
         private readonly BindableInt currentCombo = new BindableInt();
@@ -63,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            currentZoom = baseZoom;
+            currentZoom = InitialZoom.Value;
             gameplayClock = drawableRuleset.FrameStableClock;
         }
 
@@ -88,12 +84,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var trackingPosition = getDrawablePositionForCursorPosition(playfield, playfield);
 
-            if (cameraDelay == 0)
+            if (MovementDelay.Value == 0)
                 playfield.Position = trackingPosition;
             else
             {
                 playfield.Position = Interpolation.ValueAt(
-                    Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), cameraDelay), playfield.Position, trackingPosition, 0, cameraDelay, Easing.Out);
+                    Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), MovementDelay.Value), playfield.Position, trackingPosition, 0, MovementDelay.Value, Easing.Out);
             }
         }
 
@@ -109,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private double getZoomForCombo(int combo)
         {
             double setCombo = Math.Min(combo, last_zoom_combo);
-            return baseZoom + zoom_with_combo_by * Math.Floor(setCombo / zoom_every_combo_amount);
+            return InitialZoom.Value + zoom_with_combo_by * Math.Floor(setCombo / zoom_every_combo_amount);
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
