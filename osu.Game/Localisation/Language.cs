@@ -34,13 +34,13 @@ namespace osu.Game.Localisation
         [Description(@"Ελληνικά")]
         el,
 
-        [Description(@"español")]
+        [Description(@"Español")]
         es,
 
         [Description(@"Suomi")]
         fi,
 
-        [Description(@"français")]
+        [Description(@"Français")]
         fr,
 
         [Description(@"Magyar")]
