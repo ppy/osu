@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -55,23 +54,18 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private readonly BindableInt currentCombo = new BindableInt();
 
-        private IFrameStableClock? gameplayClock;
-
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             currentZoom = InitialZoom.Value;
-            gameplayClock = drawableRuleset.FrameStableClock;
         }
 
         public void Update(Playfield playfield)
         {
-            Debug.Assert(gameplayClock != null);
-
-            double currentScale = Interpolation.ValueAt(Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), apply_zoom_duration), playfield.Scale.X, currentZoom, 0, apply_zoom_duration, Easing.Out);
+            double currentScale = Interpolation.ValueAt(Math.Min(Math.Abs(playfield.Clock.ElapsedFrameTime), apply_zoom_duration), playfield.Scale.X, currentZoom, 0, apply_zoom_duration, Easing.Out);
 
             playfield.Scale = new Vector2((float)currentScale);
 
-            moveDrawablesFollowingCursor(playfield, gameplayClock);
+            moveDrawablesFollowingCursor(playfield);
         }
 
         private Vector2 getDrawablePositionForCursorPosition(Playfield playfield, Drawable drawable)
@@ -80,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             return Vector2.Clamp(playfield.OriginPosition - position, -playfield.OriginPosition, playfield.OriginPosition);
         }
 
-        private void moveDrawablesFollowingCursor(Playfield playfield, IFrameStableClock gameplayClock)
+        private void moveDrawablesFollowingCursor(Playfield playfield)
         {
             var trackingPosition = getDrawablePositionForCursorPosition(playfield, playfield);
 
@@ -89,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             else
             {
                 playfield.Position = Interpolation.ValueAt(
-                    Math.Min(Math.Abs(gameplayClock.ElapsedFrameTime), MovementDelay.Value), playfield.Position, trackingPosition, 0, MovementDelay.Value, Easing.Out);
+                    Math.Min(Math.Abs(playfield.Clock.ElapsedFrameTime), MovementDelay.Value), playfield.Position, trackingPosition, 0, MovementDelay.Value, Easing.Out);
             }
         }
 
