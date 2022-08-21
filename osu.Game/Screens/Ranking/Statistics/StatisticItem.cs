@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <summary>
         /// The name of this item.
         /// </summary>
-        public readonly LocalisableString? Name;
+        public readonly LocalisableString Name;
 
         /// <summary>
         /// A function returning the <see cref="Drawable"/> content to be displayed.
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="createContent">A function returning the <see cref="Drawable"/> content to be displayed.</param>
         /// <param name="requiresHitEvents">Whether this item requires hit events. If true, <see cref="CreateContent"/> will not be called if no hit events are available.</param>
         /// <param name="dimension">The <see cref="Dimension"/> of this item. This can be thought of as the column dimension of an encompassing <see cref="GridContainer"/>.</param>
-        public StatisticItem(LocalisableString? name, [NotNull] Func<Drawable> createContent, bool requiresHitEvents = false, [CanBeNull] Dimension dimension = null)
+        public StatisticItem(LocalisableString name, [NotNull] Func<Drawable> createContent, bool requiresHitEvents = false, [CanBeNull] Dimension dimension = null)
         {
             Name = name;
             RequiresHitEvents = requiresHitEvents;
