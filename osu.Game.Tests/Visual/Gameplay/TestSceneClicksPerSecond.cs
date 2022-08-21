@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -13,9 +14,9 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -27,9 +28,12 @@ namespace osu.Game.Tests.Visual.Gameplay
     public class TestSceneClicksPerSecond : OsuTestScene
     {
         private DependencyProvidingContainer? dependencyContainer;
-        private MockFrameStableClock? mainClock;
         private ClicksPerSecondCalculator? calculator;
         private ManualInputListener? listener;
+        private GameplayClockContainer? gameplayClockContainer;
+        private ManualClock? manualClock;
+        private DrawableRuleset? drawableRuleset;
+        private IFrameStableClock? frameStableClock;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -40,41 +44,20 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 Debug.Assert(ruleset != null);
 
-                Children = new Drawable[]
+                Child = gameplayClockContainer = new GameplayClockContainer(manualClock = new ManualClock());
+                gameplayClockContainer.AddRange(new Drawable[]
                 {
+                    drawableRuleset = new TestDrawableRuleset(frameStableClock = new TestFrameStableClock(manualClock)),
                     dependencyContainer = new DependencyProvidingContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         CachedDependencies = new (Type, object)[]
                         {
-                            (typeof(IGameplayClock), mainClock = new MockFrameStableClock(new MockFrameBasedClock())),
-                            (typeof(DrawableRuleset), new MockDrawableRuleset(ruleset, mainClock))
-                        }
-                    },
-                };
-            });
-        }
-
-        private void createCalculator()
-        {
-            AddStep("create calculator", () =>
-            {
-                dependencyContainer!.Children = new Drawable[]
-                {
-                    calculator = new ClicksPerSecondCalculator(),
-                    new DependencyProvidingContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        CachedDependencies = new (Type, object)[] { (typeof(ClicksPerSecondCalculator), calculator) },
-                        Child = new ClicksPerSecondCounter // For visual debugging, has no real purpose in the tests
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Scale = new Vector2(5),
+                            (typeof(DrawableRuleset), drawableRuleset),
+                            (typeof(IGameplayClock), gameplayClockContainer)
                         }
                     }
-                };
-                calculator!.Listener = listener = new ManualInputListener(calculator!);
+                });
             });
         }
 
@@ -82,6 +65,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestBasicConsistency()
         {
             createCalculator();
+            startClock();
 
             AddStep("Create gradually increasing KPS inputs", () =>
             {
@@ -101,6 +85,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestRateAdjustConsistency()
         {
             createCalculator();
+            startClock();
 
             AddStep("Create consistent KPS inputs", () => addInputs(generateConsistentKps(10)));
 
@@ -125,6 +110,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestInputsDiscardedOnRewind()
         {
             createCalculator();
+            startClock();
 
             AddStep("Create consistent KPS inputs", () => addInputs(generateConsistentKps(10)));
             seek(1000);
@@ -136,38 +122,79 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("KPS didn't changed", () => calculator!.Value == 10);
         }
 
-        private void seek(double time) => AddStep($"Seek main clock to {time}ms", () => mainClock?.Seek(time));
-
-        private void changeRate(double rate) => AddStep($"Change rate to x{rate}", () =>
-            (mainClock?.UnderlyingClock as MockFrameBasedClock)!.Rate = rate);
-
-        private void advanceForwards(int frames = 1) => AddStep($"Advance main clock {frames} frame(s) forward.", () =>
+        private void seekAllClocks(double time)
         {
-            if (mainClock == null) return;
+            gameplayClockContainer?.Seek(time);
+            manualClock!.CurrentTime = time;
+        }
 
-            MockFrameBasedClock underlyingClock = (MockFrameBasedClock)mainClock.UnderlyingClock;
-            underlyingClock.Backwards = false;
+        protected override Ruleset CreateRuleset() => new OsuRuleset();
 
-            for (int i = 0; i < frames; i++)
+        #region Quick steps methods
+
+        private void createCalculator()
+        {
+            AddStep("create calculator", () =>
             {
-                underlyingClock.ProcessFrame();
-            }
+                Debug.Assert(dependencyContainer?.Dependencies.Get(typeof(DrawableRuleset)) is DrawableRuleset);
+                dependencyContainer!.Children = new Drawable[]
+                {
+                    calculator = new ClicksPerSecondCalculator(),
+                    new DependencyProvidingContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        CachedDependencies = new (Type, object)[] { (typeof(ClicksPerSecondCalculator), calculator) },
+                        Child = new ClicksPerSecondCounter // For visual debugging, has no real purpose in the tests
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(5),
+                        }
+                    }
+                };
+                calculator!.Listener = listener = new ManualInputListener(calculator!);
+            });
+        }
+
+        private void seek(double time) => AddStep($"Seek clocks to {time}ms", () => seekAllClocks(time));
+
+        private void changeRate(double rate) => AddStep($"Change rate to x{rate}", () => manualClock!.Rate = rate);
+
+        private void advanceForwards(double time) =>
+            AddStep($"Advance clocks {time} seconds forward.", () =>
+            {
+                gameplayClockContainer!.Seek(gameplayClockContainer.CurrentTime + time * manualClock!.Rate);
+
+                for (int i = 0; i < time; i++)
+                {
+                    frameStableClock?.ProcessFrame();
+                }
+            });
+
+        private void startClock() => AddStep("Start clocks", () =>
+        {
+            gameplayClockContainer?.Start();
+            manualClock!.Rate = 1;
         });
+
+        #endregion
+
+        #region Input generation
 
         private void addInputs(IEnumerable<double> inputs)
         {
-            Debug.Assert(mainClock != null && listener != null);
+            Debug.Assert(manualClock != null && listener != null && gameplayClockContainer != null);
             if (!inputs.Any()) return;
 
-            double baseTime = mainClock.CurrentTime;
+            double baseTime = gameplayClockContainer.CurrentTime;
 
             foreach (double timestamp in inputs)
             {
-                mainClock.Seek(timestamp);
+                seekAllClocks(timestamp);
                 listener.AddInput();
             }
 
-            mainClock.Seek(baseTime);
+            seekAllClocks(baseTime);
         }
 
         private IEnumerable<double> generateGraduallyIncreasingKps()
@@ -200,9 +227,52 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+        #endregion
 
-        #region Mock classes
+        #region Test classes
+
+        private class TestFrameStableClock : IFrameStableClock
+        {
+            public TestFrameStableClock(IClock source, double startTime = 0)
+            {
+                this.source = source;
+                StartTime = startTime;
+
+                if (source is ManualClock manualClock)
+                {
+                    manualClock.CurrentTime = startTime;
+                }
+            }
+
+            public double CurrentTime => source.CurrentTime;
+            public double Rate => source.Rate;
+            public bool IsRunning => source.IsRunning;
+
+            private IClock source;
+
+            public void ProcessFrame()
+            {
+                if (source is ManualClock manualClock)
+                {
+                    manualClock.CurrentTime += 1000 * Rate;
+                }
+
+                TimeInfo = new FrameTimeInfo
+                {
+                    Elapsed = 1000 * Rate,
+                    Current = CurrentTime
+                };
+            }
+
+            public double ElapsedFrameTime => TimeInfo.Elapsed;
+            public double FramesPerSecond => 1 / ElapsedFrameTime * 1000;
+            public FrameTimeInfo TimeInfo { get; private set; }
+
+            public double? StartTime { get; }
+            public IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
+            public IBindable<bool> IsCatchingUp => new Bindable<bool>();
+            public IBindable<bool> WaitingOnFrames => new Bindable<bool>();
+        }
 
         private class ManualInputListener : ClicksPerSecondCalculator.InputListener
         {
@@ -214,108 +284,54 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class MockFrameBasedClock : ManualClock, IFrameBasedClock
+#nullable disable
+
+        [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
+        private class TestDrawableRuleset : DrawableRuleset
         {
-            public const double FRAME_INTERVAL = 1000;
-            public bool Backwards;
+            public override IEnumerable<HitObject> Objects => Enumerable.Empty<HitObject>();
 
-            public MockFrameBasedClock()
+            public override event Action<JudgementResult> NewResult
             {
-                Rate = 1;
-                IsRunning = true;
+                add => throw new InvalidOperationException($"{nameof(NewResult)} operations not supported in test context");
+                remove => throw new InvalidOperationException($"{nameof(NewResult)} operations not supported in test context");
             }
 
-            public void ProcessFrame()
+            public override event Action<JudgementResult> RevertResult
             {
-                CurrentTime += FRAME_INTERVAL * Rate * (Backwards ? -1 : 1);
-                TimeInfo = new FrameTimeInfo
-                {
-                    Current = CurrentTime,
-                    Elapsed = FRAME_INTERVAL * Rate * (Backwards ? -1 : 1)
-                };
+                add => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
+                remove => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
             }
 
-            public void Seek(double time)
-            {
-                TimeInfo = new FrameTimeInfo
-                {
-                    Elapsed = time - CurrentTime,
-                    Current = CurrentTime = time
-                };
-            }
-
-            public double ElapsedFrameTime => TimeInfo.Elapsed;
-            public double FramesPerSecond => 1 / FRAME_INTERVAL;
-            public FrameTimeInfo TimeInfo { get; private set; }
-        }
-
-        private class MockFrameStableClock : IGameplayClock, IFrameStableClock
-        {
-            internal readonly IFrameBasedClock UnderlyingClock;
-
-            public readonly BindableBool IsPaused = new BindableBool();
-
-            public MockFrameStableClock(MockFrameBasedClock underlyingClock)
-            {
-                UnderlyingClock = underlyingClock;
-            }
-
-            public void Seek(double time) => (UnderlyingClock as MockFrameBasedClock)?.Seek(time);
-
-            public IBindable<bool> IsCatchingUp => new Bindable<bool>();
-            public IBindable<bool> WaitingOnFrames => new Bindable<bool>();
-            public double CurrentTime => UnderlyingClock.CurrentTime;
-            public double Rate => UnderlyingClock.Rate;
-            public bool IsRunning => UnderlyingClock.IsRunning;
-            public void ProcessFrame() => UnderlyingClock.ProcessFrame();
-
-            public double ElapsedFrameTime => UnderlyingClock.ElapsedFrameTime;
-            public double FramesPerSecond => UnderlyingClock.FramesPerSecond;
-            public FrameTimeInfo TimeInfo => UnderlyingClock.TimeInfo;
-            public double TrueGameplayRate => UnderlyingClock.Rate;
-            public double? StartTime => 0;
-            public IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
-            IBindable<bool> IGameplayClock.IsPaused => IsPaused;
-        }
-
-        private class MockDrawableRuleset : DrawableRuleset
-        {
-            public MockDrawableRuleset(Ruleset ruleset, IFrameStableClock clock)
-                : base(ruleset)
-            {
-                FrameStableClock = clock;
-            }
-
-#pragma warning disable CS0067
-            public override event Action<JudgementResult>? NewResult;
-            public override event Action<JudgementResult>? RevertResult;
-#pragma warning restore CS0067
-            public override Playfield? Playfield => null;
-            public override Container? Overlays => null;
-            public override Container? FrameStableComponents => null;
+            public override Playfield Playfield => null;
+            public override Container Overlays => null;
+            public override Container FrameStableComponents => null;
             public override IFrameStableClock FrameStableClock { get; }
 
             internal override bool FrameStablePlayback { get; set; }
             public override IReadOnlyList<Mod> Mods => Array.Empty<Mod>();
-            public override IEnumerable<HitObject> Objects => Array.Empty<HitObject>();
+
             public override double GameplayStartTime => 0;
-            public override GameplayCursorContainer? Cursor => null;
+            public override GameplayCursorContainer Cursor => null;
 
-            public override void SetReplayScore(Score replayScore)
+            public TestDrawableRuleset()
+                : base(new OsuRuleset())
             {
             }
 
-            public override void SetRecordTarget(Score score)
+            public TestDrawableRuleset(IFrameStableClock frameStableClock)
+                : this()
             {
+                FrameStableClock = frameStableClock;
             }
 
-            public override void RequestResume(Action continueResume)
-            {
-            }
+            public override void SetReplayScore(Score replayScore) => throw new NotImplementedException();
 
-            public override void CancelResume()
-            {
-            }
+            public override void SetRecordTarget(Score score) => throw new NotImplementedException();
+
+            public override void RequestResume(Action continueResume) => throw new NotImplementedException();
+
+            public override void CancelResume() => throw new NotImplementedException();
         }
 
         #endregion
