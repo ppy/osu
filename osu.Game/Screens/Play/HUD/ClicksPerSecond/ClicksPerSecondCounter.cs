@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -19,9 +18,8 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
     {
         private const float alpha_when_invalid = 0.3f;
 
-        private readonly Bindable<bool> valid = new Bindable<bool>();
-
-        private ClicksPerSecondCalculator? calculator;
+        [Resolved(canBeNull: false)]
+        private ClicksPerSecondCalculator calculator { get; set; } = null!;
 
         protected override double RollingDuration => 350;
 
@@ -33,26 +31,19 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, ClicksPerSecondCalculator calculator)
+        private void load(OsuColour colours)
         {
-            this.calculator = calculator;
             Colour = colours.BlueLighter;
-            valid.BindValueChanged(e =>
-                DrawableCount.FadeTo(e.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
         }
 
         protected override void Update()
         {
             base.Update();
 
-            valid.Value = calculator != null && calculator.Ready;
-            Current.Value = calculator != null ? calculator.Ready ? calculator.Value : 0 : 0;
+            Current.Value = calculator.Ready ? calculator.Value : 0;
         }
 
-        protected override IHasText CreateText() => new TextComponent
-        {
-            Alpha = alpha_when_invalid
-        };
+        protected override IHasText CreateText() => new TextComponent();
 
         private class TextComponent : CompositeDrawable, IHasText
         {
