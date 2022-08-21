@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -65,7 +63,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("seek near end", () => Clock.Seek(Clock.TrackLength - 250));
             AddUntilStep("clock stops", () => !Clock.IsRunning);
 
-            AddAssert("clock stopped at end", () => Clock.CurrentTime == Clock.TrackLength);
+            AddUntilStep("clock stopped at end", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
 
             AddStep("start clock again", () => Clock.Start());
             AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
@@ -80,7 +78,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("clock stopped", () => !Clock.IsRunning);
 
             AddStep("seek exactly to end", () => Clock.Seek(Clock.TrackLength));
-            AddAssert("clock stopped at end", () => Clock.CurrentTime == Clock.TrackLength);
+            AddAssert("clock stopped at end", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
 
             AddStep("start clock again", () => Clock.Start());
             AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
@@ -92,16 +90,16 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("stop clock", () => Clock.Stop());
 
             AddStep("seek before start time", () => Clock.Seek(-1000));
-            AddAssert("time is clamped to 0", () => Clock.CurrentTime == 0);
+            AddAssert("time is clamped to 0", () => Clock.CurrentTime, () => Is.EqualTo(0));
 
             AddStep("seek beyond track length", () => Clock.Seek(Clock.TrackLength + 1000));
-            AddAssert("time is clamped to track length", () => Clock.CurrentTime == Clock.TrackLength);
+            AddAssert("time is clamped to track length", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
 
             AddStep("seek smoothly before start time", () => Clock.SeekSmoothlyTo(-1000));
-            AddAssert("time is clamped to 0", () => Clock.CurrentTime == 0);
+            AddUntilStep("time is clamped to 0", () => Clock.CurrentTime, () => Is.EqualTo(0));
 
             AddStep("seek smoothly beyond track length", () => Clock.SeekSmoothlyTo(Clock.TrackLength + 1000));
-            AddAssert("time is clamped to track length", () => Clock.CurrentTime == Clock.TrackLength);
+            AddUntilStep("time is clamped to track length", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
         }
 
         protected override void Dispose(bool isDisposing)
