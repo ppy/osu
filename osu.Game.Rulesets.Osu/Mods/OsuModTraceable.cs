@@ -111,9 +111,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void applyFadeOutState(DrawableHitObject drawableObject)
         {
-            if (!FadeOutEffect.Value) return;
-            if (drawableObject is not DrawableOsuHitObject drawableOsuObject)
-                return;
+            if (!FadeOutEffect.Value || drawableObject is not DrawableOsuHitObject drawableOsuObject) return;
 
             (double fadeStartTime, double fadeDuration) = getFadeOutParameters(drawableOsuObject);
 
@@ -127,7 +125,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 case DrawableSliderRepeat sliderRepeat:
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        // only apply to circle piece – reverse arrow is not affected by fade out.
                         sliderRepeat.CirclePiece.FadeOut(fadeDuration);
 
                     break;
@@ -166,7 +163,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (drawableObject)
             {
                 case DrawableSliderRepeat repeat:
-                    // Use the same fade sequence as the slider head approach.
                     Debug.Assert(repeat.Slider != null);
                     return getParameters(repeat.Slider.HeadCircle);
 
