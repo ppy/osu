@@ -84,29 +84,23 @@ namespace osu.Game.Screens.Play
             return time;
         }
 
-        protected override void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
+        protected override void StopGameplayClock()
         {
             if (IsLoaded)
             {
                 // During normal operation, the source is stopped after performing a frequency ramp.
-                if (isPaused.NewValue)
+                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 0, 200, Easing.Out).OnComplete(_ =>
                 {
-                    this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 0, 200, Easing.Out).OnComplete(_ =>
-                    {
-                        if (IsPaused.Value == isPaused.NewValue)
-                            base.OnIsPausedChanged(isPaused);
-                    });
-                }
-                else
-                    this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 1, 200, Easing.In);
+                    if (IsPaused.Value)
+                        base.StopGameplayClock();
+                });
             }
             else
             {
-                if (isPaused.NewValue)
-                    base.OnIsPausedChanged(isPaused);
+                base.StopGameplayClock();
 
                 // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
-                GameplayClock.ExternalPauseFrequencyAdjust.Value = isPaused.NewValue ? 0 : 1;
+                GameplayClock.ExternalPauseFrequencyAdjust.Value = 0;
 
                 // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
                 // Without doing this, an initial seek may be performed with the wrong offset.
@@ -114,10 +108,25 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public override void Start()
+        protected override void StartGameplayClock()
         {
             addSourceClockAdjustments();
-            base.Start();
+
+            base.StartGameplayClock();
+
+            if (IsLoaded)
+            {
+                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 1, 200, Easing.In);
+            }
+            else
+            {
+                // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
+                GameplayClock.ExternalPauseFrequencyAdjust.Value = 1;
+
+                // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
+                // Without doing this, an initial seek may be performed with the wrong offset.
+                GameplayClock.ProcessFrame();
+            }
         }
 
         /// <summary>
