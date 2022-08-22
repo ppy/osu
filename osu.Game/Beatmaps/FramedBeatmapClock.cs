@@ -49,7 +49,7 @@ namespace osu.Game.Beatmaps
 
         private readonly IFrameBasedClock finalClockSource;
 
-        private Bindable<double> userAudioOffset = null!;
+        private Bindable<double>? userAudioOffset;
 
         private IDisposable? beatmapOffsetSubscription;
 
