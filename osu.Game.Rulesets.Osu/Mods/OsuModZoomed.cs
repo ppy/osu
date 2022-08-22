@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
         public override string Description => "Big brother is watching your cursor.";
         public override double ScoreMultiplier => 1;
+        public override Type[] IncompatibleMods => new Type[] { typeof(OsuModBarrelRoll) };
 
         private const int apply_zoom_duration = 1000;
 
