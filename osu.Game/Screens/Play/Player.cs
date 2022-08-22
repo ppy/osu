@@ -640,8 +640,7 @@ namespace osu.Game.Screens.Play
             bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
             DrawableRuleset.FrameStablePlayback = false;
 
-            GameplayClockContainer.StartTime = time;
-            GameplayClockContainer.Reset();
+            GameplayClockContainer.Reset(time);
 
             // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
             frameStablePlaybackResetDelegate = ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
@@ -1012,7 +1011,7 @@ namespace osu.Game.Screens.Play
             if (GameplayClockContainer.IsRunning)
                 throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
 
-            GameplayClockContainer.Reset(true);
+            GameplayClockContainer.Reset(startClock: true);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)

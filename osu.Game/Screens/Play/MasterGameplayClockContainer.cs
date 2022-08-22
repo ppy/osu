@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
             this.beatmap = beatmap;
             this.skipTargetTime = skipTargetTime;
 
-            StartTime = findEarliestStartTime();
+            Reset(findEarliestStartTime());
         }
 
         private double findEarliestStartTime()

@@ -38,23 +38,13 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// The time from which the clock should start. Will be seeked to on calling <see cref="Reset"/>.
-        /// Settting a start time will <see cref="Reset"/> to the new value.
+        /// Can be adjusted by calling <see cref="Reset"/> with a time value.
         /// </summary>
         /// <remarks>
         /// By default, a value of zero will be used.
         /// Importantly, the value will be inferred from the current beatmap in <see cref="MasterGameplayClockContainer"/> by default.
         /// </remarks>
-        public double StartTime
-        {
-            get => startTime;
-            set
-            {
-                startTime = value;
-                Reset();
-            }
-        }
-
-        private double startTime;
+        public double StartTime { get; private set; }
 
         public virtual IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
 
@@ -139,13 +129,18 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
         /// </summary>
+        /// <param name="time">The time to seek to on resetting. If <c>null</c>, the existing <see cref="StartTime"/> will be used.</param>
         /// <param name="startClock">Whether to start the clock immediately, if not already started.</param>
-        public void Reset(bool startClock = false)
+        public void Reset(double? time = null, bool startClock = false)
         {
             // Manually stop the source in order to not affect the IsPaused state.
             GameplayClock.Stop();
 
             ensureSourceClockSet();
+
+            if (time != null)
+                StartTime = time.Value;
+
             Seek(StartTime);
 
             if (!IsPaused.Value || startClock)

@@ -192,8 +192,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                                         .DefaultIfEmpty(0)
                                         .Min();
 
-            masterClockContainer.StartTime = startTime;
-            masterClockContainer.Reset(true);
+            masterClockContainer.Reset(startTime, true);
 
             // Although the clock has been started, this flag is set to allow for later synchronisation state changes to also be able to start it.
             canStartMasterClock = true;
