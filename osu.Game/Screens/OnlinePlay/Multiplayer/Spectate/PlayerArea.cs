@@ -1,11 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -28,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// Raised after <see cref="Player.StartGameplay"/> is called on <see cref="Player"/>.
         /// </summary>
-        public event Action OnGameplayStarted;
+        public event Action? OnGameplayStarted;
 
         /// <summary>
         /// Whether a <see cref="Player"/> is loaded in the area.
@@ -43,21 +40,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The <see cref="ISpectatorPlayerClock"/> used to control the gameplay running state of a loaded <see cref="Player"/>.
         /// </summary>
-        [NotNull]
         public readonly ISpectatorPlayerClock GameplayClock;
 
         /// <summary>
         /// The currently-loaded score.
         /// </summary>
-        [CanBeNull]
-        public Score Score { get; private set; }
+        public Score? Score { get; private set; }
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble();
         private readonly Container gameplayContent;
         private readonly LoadingLayer loadingLayer;
-        private OsuScreenStack stack;
+        private OsuScreenStack? stack;
 
-        public PlayerArea(int userId, [NotNull] ISpectatorPlayerClock clock)
+        public PlayerArea(int userId, ISpectatorPlayerClock clock)
         {
             UserId = userId;
             GameplayClock = clock;
@@ -79,10 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             audioContainer.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
         }
 
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-
-        public void LoadScore([NotNull] Score score)
+        public void LoadScore(Score score)
         {
             if (Score != null)
                 throw new InvalidOperationException($"Cannot load a new score on a {nameof(PlayerArea)} that has an existing score.");

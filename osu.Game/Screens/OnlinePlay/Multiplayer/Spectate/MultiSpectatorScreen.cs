@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -42,17 +40,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override UserActivity InitialActivity => new UserActivity.SpectatingMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         private readonly PlayerArea[] instances;
-        private MasterGameplayClockContainer masterClockContainer;
-        private ISyncManager syncManager;
-        private PlayerGrid grid;
-        private MultiSpectatorLeaderboard leaderboard;
-        private PlayerArea currentAudioSource;
+        private MasterGameplayClockContainer masterClockContainer = null!;
+        private ISyncManager syncManager = null!;
+        private PlayerGrid grid = null!;
+        private MultiSpectatorLeaderboard leaderboard = null!;
+        private PlayerArea? currentAudioSource;
         private bool canStartMasterClock;
 
         private readonly Room room;
@@ -178,7 +176,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
         }
 
-        private bool isCandidateAudioSource([CanBeNull] ISpectatorPlayerClock clock)
+        private bool isCandidateAudioSource(ISpectatorPlayerClock? clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
 
         private void onReadyToStart()
@@ -186,7 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             // Seek the master clock to the gameplay time.
             // This is chosen as the first available frame in the players' replays, which matches the seek by each individual SpectatorPlayer.
             double startTime = instances.Where(i => i.Score != null)
-                                        .SelectMany(i => i.Score.Replay.Frames)
+                                        .SelectMany(i => i.Score.AsNonNull().Replay.Frames)
                                         .Select(f => f.Time)
                                         .DefaultIfEmpty(0)
                                         .Min();
