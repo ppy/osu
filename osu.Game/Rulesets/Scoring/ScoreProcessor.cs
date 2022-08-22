@@ -405,8 +405,6 @@ namespace osu.Game.Rulesets.Scoring
             return ScoreRank.D;
         }
 
-        public int GetStatistic(HitResult result) => scoreResultCounts.GetValueOrDefault(result);
-
         /// <summary>
         /// Resets this ScoreProcessor to a default state.
         /// </summary>
@@ -449,7 +447,10 @@ namespace osu.Game.Rulesets.Scoring
             score.HitEvents = hitEvents;
 
             foreach (var result in HitResultExtensions.ALL_TYPES)
-                score.Statistics[result] = GetStatistic(result);
+                score.Statistics[result] = scoreResultCounts.GetValueOrDefault(result);
+
+            foreach (var result in HitResultExtensions.ALL_TYPES)
+                score.MaximumStatistics[result] = maximumResultCounts.GetValueOrDefault(result);
 
             // Populate total score after everything else.
             score.TotalScore = (long)Math.Round(ComputeFinalScore(ScoringMode.Standardised, score));
