@@ -60,6 +60,8 @@ namespace osu.Game.Rulesets.Mania
 
         public const string SHORT_NAME = "mania";
 
+        public override string RulesetAPIVersionSupported => "internal";
+
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
         public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new ManiaLegacySkinTransformer(skin, beatmap);
