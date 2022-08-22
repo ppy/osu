@@ -27,11 +27,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneClicksPerSecond : OsuTestScene
     {
-        private DependencyProvidingContainer? dependencyContainer;
-        private ClicksPerSecondCalculator? calculator;
+        private DependencyProvidingContainer dependencyContainer = null!;
+        private ClicksPerSecondCalculator calculator = null!;
         private ManualInputListener? listener;
-        private GameplayClockContainer? gameplayClockContainer;
-        private ManualClock? manualClock;
+        private GameplayClockContainer gameplayClockContainer = null!;
+        private ManualClock manualClock = null!;
         private DrawableRuleset? drawableRuleset;
         private IFrameStableClock? frameStableClock;
 
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 seek(i * 10000);
                 advanceForwards(2);
                 int kps = i + 1;
-                AddAssert($"{kps} KPS", () => calculator!.Value == kps);
+                AddAssert($"{kps} KPS", () => calculator.Value == kps);
             }
         }
 
@@ -95,14 +95,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 changeRate(i);
                 double rate = i;
-                AddAssert($"KPS approx. = {i}", () => MathHelper.ApproximatelyEquivalent(calculator!.Value, 10 * rate, 0.5));
+                AddAssert($"KPS approx. = {i}", () => MathHelper.ApproximatelyEquivalent(calculator.Value, 10 * rate, 0.5));
             }
 
             for (double i = 1; i >= 0.5; i -= 0.25)
             {
                 changeRate(i);
                 double rate = i;
-                AddAssert($"KPS approx. = {i}", () => MathHelper.ApproximatelyEquivalent(calculator!.Value, 10 * rate, 0.5));
+                AddAssert($"KPS approx. = {i}", () => MathHelper.ApproximatelyEquivalent(calculator.Value, 10 * rate, 0.5));
             }
         }
 
@@ -115,17 +115,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Create consistent KPS inputs", () => addInputs(generateConsistentKps(10)));
             seek(1000);
 
-            AddAssert("KPS = 10", () => calculator!.Value == 10);
+            AddAssert("KPS = 10", () => calculator.Value == 10);
 
             AddStep("Create delayed inputs", () => addInputs(generateConsistentKps(10, 50)));
             seek(1000);
-            AddAssert("KPS didn't changed", () => calculator!.Value == 10);
+            AddAssert("KPS didn't changed", () => calculator.Value == 10);
         }
 
         private void seekAllClocks(double time)
         {
-            gameplayClockContainer?.Seek(time);
-            manualClock!.CurrentTime = time;
+            gameplayClockContainer.Seek(time);
+            manualClock.CurrentTime = time;
         }
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();
@@ -136,8 +136,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create calculator", () =>
             {
-                Debug.Assert(dependencyContainer?.Dependencies.Get(typeof(DrawableRuleset)) is DrawableRuleset);
-                dependencyContainer!.Children = new Drawable[]
+                dependencyContainer.Children = new Drawable[]
                 {
                     calculator = new ClicksPerSecondCalculator(),
                     new DependencyProvidingContainer
@@ -152,18 +151,18 @@ namespace osu.Game.Tests.Visual.Gameplay
                         }
                     }
                 };
-                calculator!.Listener = listener = new ManualInputListener(calculator!);
+                calculator.Listener = listener = new ManualInputListener(calculator);
             });
         }
 
         private void seek(double time) => AddStep($"Seek clocks to {time}ms", () => seekAllClocks(time));
 
-        private void changeRate(double rate) => AddStep($"Change rate to x{rate}", () => manualClock!.Rate = rate);
+        private void changeRate(double rate) => AddStep($"Change rate to x{rate}", () => manualClock.Rate = rate);
 
         private void advanceForwards(double time) =>
             AddStep($"Advance clocks {time} seconds forward.", () =>
             {
-                gameplayClockContainer!.Seek(gameplayClockContainer.CurrentTime + time * manualClock!.Rate);
+                gameplayClockContainer.Seek(gameplayClockContainer.CurrentTime + time * manualClock.Rate);
 
                 for (int i = 0; i < time; i++)
                 {
@@ -173,8 +172,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void startClock() => AddStep("Start clocks", () =>
         {
-            gameplayClockContainer?.Start();
-            manualClock!.Rate = 1;
+            gameplayClockContainer.Start();
+            manualClock.Rate = 1;
         });
 
         #endregion
@@ -183,7 +182,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void addInputs(IEnumerable<double> inputs)
         {
-            Debug.Assert(manualClock != null && listener != null && gameplayClockContainer != null);
             if (!inputs.Any()) return;
 
             double baseTime = gameplayClockContainer.CurrentTime;
@@ -191,7 +189,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             foreach (double timestamp in inputs)
             {
                 seekAllClocks(timestamp);
-                listener.AddInput();
+                listener?.AddInput();
             }
 
             seekAllClocks(baseTime);
@@ -199,7 +197,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private IEnumerable<double> generateGraduallyIncreasingKps()
         {
-            IEnumerable<double>? final = null;
+            IEnumerable<double> final = null!;
 
             for (int i = 1; i <= 10; i++)
             {
@@ -211,10 +209,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                     continue;
                 }
 
-                final = final!.Concat(currentKps);
+                final = final.Concat(currentKps);
             }
 
-            return final!;
+            return final;
         }
 
         private IEnumerable<double> generateConsistentKps(double kps, double start = 0, double duration = 10)
@@ -236,7 +234,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public TestFrameStableClock(IClock source, double startTime = 0)
             {
                 this.source = source;
-                StartTime = startTime;
 
                 if (source is ManualClock manualClock)
                 {
@@ -248,7 +245,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public double Rate => source.Rate;
             public bool IsRunning => source.IsRunning;
 
-            private IClock source;
+            private readonly IClock source;
 
             public void ProcessFrame()
             {
@@ -268,7 +265,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public double FramesPerSecond => 1 / ElapsedFrameTime * 1000;
             public FrameTimeInfo TimeInfo { get; private set; }
 
-            public double? StartTime { get; }
             public IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
             public IBindable<bool> IsCatchingUp => new Bindable<bool>();
             public IBindable<bool> WaitingOnFrames => new Bindable<bool>();
