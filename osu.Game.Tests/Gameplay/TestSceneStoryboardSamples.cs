@@ -107,12 +107,13 @@ namespace osu.Game.Tests.Gameplay
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(working, start_time)
                 {
-                    StartTime = start_time,
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
                     }
                 });
+
+                gameplayContainer.Reset(start_time);
             });
 
             AddStep("start time", () => gameplayContainer.Start());
