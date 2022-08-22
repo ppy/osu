@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModBarrelRoll : ModBarrelRoll<OsuHitObject>, IApplicableToDrawableHitObject
     {
-        public override Type[] IncompatibleMods => new Type[] { typeof(OsuModZoomed) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModZoomed) };
 
         public void ApplyToDrawableHitObject(DrawableHitObject d)
         {
