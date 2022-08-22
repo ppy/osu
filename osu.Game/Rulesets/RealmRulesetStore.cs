@@ -68,8 +68,14 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var resolvedType = Type.GetType(r.InstantiationInfo)
-                                           ?? throw new RulesetLoadException(@"Type could not be resolved");
+                        var resolvedType = Type.GetType(r.InstantiationInfo);
+
+                        if (resolvedType == null)
+                        {
+                            // ruleset DLL was probably deleted.
+                            r.Available = false;
+                            continue;
+                        }
 
                         var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
                                            ?? throw new RulesetLoadException(@"Instantiation failure");
