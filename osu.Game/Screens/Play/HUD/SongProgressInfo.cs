@@ -60,17 +60,12 @@ namespace osu.Game.Screens.Play.HUD
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
-                        Child = new GrowToFitContainer
+                        Child = timeCurrent = new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Child = timeCurrent = new OsuSpriteText
-                            {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                Colour = colours.BlueLighter,
-                                Font = OsuFont.Numeric,
-                            }
+                            Colour = colours.BlueLighter,
+                            Font = OsuFont.Numeric,
                         }
                     }
                 },
@@ -84,17 +79,12 @@ namespace osu.Game.Screens.Play.HUD
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
-                        Child = new GrowToFitContainer
+                        Child = progress = new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Child = progress = new OsuSpriteText
-                            {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                Colour = colours.BlueLighter,
-                                Font = OsuFont.Numeric,
-                             }
+                            Colour = colours.BlueLighter,
+                            Font = OsuFont.Numeric,
                         }
                     }
                 },
@@ -108,17 +98,12 @@ namespace osu.Game.Screens.Play.HUD
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
-                        Child = new GrowToFitContainer
+                        Child = timeLeft = new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Child = timeLeft = new OsuSpriteText
-                            {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                Colour = colours.BlueLighter,
-                                Font = OsuFont.Numeric,
-                            }
+                            Colour = colours.BlueLighter,
+                            Font = OsuFont.Numeric,
                         }
                     }
                 }
