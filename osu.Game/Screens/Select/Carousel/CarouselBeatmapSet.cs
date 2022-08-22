@@ -99,6 +99,12 @@ namespace osu.Game.Screens.Select.Carousel
 
                 case SortMode.Difficulty:
                     return compareUsingAggregateMax(otherSet, b => b.StarRating);
+
+                case SortMode.DateSubmitted:
+                    if (BeatmapSet.DateSubmitted == null || otherSet.BeatmapSet.DateSubmitted == null)
+                        return 0;
+
+                    return otherSet.BeatmapSet.DateSubmitted.Value.CompareTo(BeatmapSet.DateSubmitted.Value);
             }
         }
 
