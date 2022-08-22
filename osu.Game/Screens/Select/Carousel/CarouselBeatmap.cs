@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Select.Carousel
                      criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
 
             match &= criteria.Sort != SortMode.DateRanked || BeatmapInfo.BeatmapSet?.DateRanked != null;
+            match &= criteria.Sort != SortMode.DateSubmitted || BeatmapInfo.BeatmapSet?.DateSubmitted != null;
 
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
