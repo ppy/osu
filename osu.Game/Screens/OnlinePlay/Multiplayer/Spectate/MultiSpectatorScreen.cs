@@ -125,10 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             };
 
             for (int i = 0; i < Users.Count; i++)
-            {
-                grid.Add(instances[i] = new PlayerArea(Users[i], masterClockContainer));
-                syncManager.AddPlayerClock(instances[i].GameplayClock);
-            }
+                grid.Add(instances[i] = new PlayerArea(Users[i], syncManager.AddClock()));
 
             LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(users)
             {
@@ -242,7 +239,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var instance = instances.Single(i => i.UserId == userId);
 
             instance.FadeColour(colours.Gray4, 400, Easing.OutQuint);
-            syncManager.RemovePlayerClock(instance.GameplayClock);
+            syncManager.RemoveClock(instance.GameplayClock);
         }
 
         public override bool OnBackButton()
