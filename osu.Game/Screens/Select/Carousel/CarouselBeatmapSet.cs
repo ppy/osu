@@ -129,7 +129,19 @@ namespace osu.Game.Screens.Select.Carousel
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
-            Filtered.Value = Items.All(i => i.Filtered.Value);
+            bool match = Items.All(i => i.Filtered.Value);
+
+            if (BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
+            {
+                // only check ruleset equality or convertability for selected beatmap
+                Filtered.Value = !match;
+                return;
+            }
+
+            match &= criteria.Sort != SortMode.DateRanked || BeatmapSet?.DateRanked != null;
+            match &= criteria.Sort != SortMode.DateSubmitted || BeatmapSet?.DateSubmitted != null;
+
+            Filtered.Value = match;
         }
 
         public override string ToString() => BeatmapSet.ToString();
