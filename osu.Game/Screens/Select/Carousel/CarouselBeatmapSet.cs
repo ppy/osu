@@ -131,13 +131,6 @@ namespace osu.Game.Screens.Select.Carousel
             base.Filter(criteria);
             bool match = Items.All(i => i.Filtered.Value);
 
-            if (BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
-            {
-                // only check ruleset equality or convertability for selected beatmap
-                Filtered.Value = !match;
-                return;
-            }
-
             match &= criteria.Sort != SortMode.DateRanked || BeatmapSet?.DateRanked != null;
             match &= criteria.Sort != SortMode.DateSubmitted || BeatmapSet?.DateSubmitted != null;
 
