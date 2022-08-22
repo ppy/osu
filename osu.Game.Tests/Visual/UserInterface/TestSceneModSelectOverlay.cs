@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
@@ -584,7 +585,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public override string Name => "Unimplemented mod";
             public override string Acronym => "UM";
-            public override string Description => "A mod that is not implemented.";
+            public override LocalisableString Description => "A mod that is not implemented.";
             public override double ScoreMultiplier => 1;
             public override ModType Type => ModType.Conversion;
         }
