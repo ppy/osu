@@ -43,6 +43,8 @@ namespace osu.Game.Rulesets.Catch
 
         public const string SHORT_NAME = "fruits";
 
+        public override string RulesetAPIVersionSupported => "internal";
+
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
             new KeyBinding(InputKey.Z, CatchAction.MoveLeft),

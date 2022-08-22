@@ -45,6 +45,23 @@ namespace osu.Game.Rulesets
         private static readonly ConcurrentDictionary<string, IMod[]> mod_reference_cache = new ConcurrentDictionary<string, IMod[]>();
 
         /// <summary>
+        /// Version history:
+        /// 2022.205.0   FramedReplayInputHandler.CollectPendingInputs renamed to FramedReplayHandler.CollectReplayInputs.
+        /// 2022.822.0   All strings return values have been converted to LocalisableString to allow for localisation support.
+        /// </summary>
+        public const string CURRENT_RULESET_API_VERSION = "2022.822.0";
+
+        /// <summary>
+        /// Define the ruleset API version supported by this ruleset.
+        /// Ruleset implementations should be updated to support the latest version to ensure they can still be loaded.
+        /// </summary>
+        /// <remarks>
+        /// When updating a ruleset to support the latest API, you should set this to <see cref="CURRENT_RULESET_API_VERSION"/>.
+        /// See https://github.com/ppy/osu/wiki/Breaking-Changes for full details on required ongoing changes.
+        /// </remarks>
+        public virtual string RulesetAPIVersionSupported => string.Empty;
+
+        /// <summary>
         /// A queryable source containing all available mods.
         /// Call <see cref="IMod.CreateInstance"/> for consumption purposes.
         /// </summary>

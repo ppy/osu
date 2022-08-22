@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.Taiko
 
         public const string SHORT_NAME = "taiko";
 
+        public override string RulesetAPIVersionSupported => "internal";
+
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
             new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),

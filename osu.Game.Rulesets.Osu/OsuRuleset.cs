@@ -54,6 +54,8 @@ namespace osu.Game.Rulesets.Osu
 
         public const string SHORT_NAME = "osu";
 
+        public override string RulesetAPIVersionSupported => "internal";
+
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
             new KeyBinding(InputKey.Z, OsuAction.LeftButton),
