@@ -74,39 +74,41 @@ namespace osu.Game.Screens.Play
                 GameplayClock = new FramedBeatmapClock(sourceClock, applyOffsets) { IsCoupled = false },
                 Content
             };
-
-            IsPaused.BindValueChanged(OnIsPausedChanged);
         }
 
         /// <summary>
         /// Starts gameplay and marks un-paused state.
         /// </summary>
-        public virtual void Start()
+        public void Start()
         {
-            ensureSourceClockSet();
+            if (!isPaused.Value)
+                return;
 
             isPaused.Value = false;
 
-            // the clock may be stopped via internal means (ie. not via `IsPaused`).
-            // see Reset() calling `GameplayClock.Stop()` as one example.
-            if (!GameplayClock.IsRunning)
-            {
-                // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
-                // This accounts for the clock source potentially taking time to enter a completely stopped state
-                Seek(GameplayClock.CurrentTime);
+            ensureSourceClockSet();
 
-                // The case which cause this to be added is FrameStabilityContainer, which manages its own current and elapsed time.
-                // Because we generally update our own current time quicker than children can query it (via Start/Seek/Update),
-                // this means that the first frame ever exposed to children may have a non-zero current time.
-                //
-                // If the child component is not aware of the parent ElapsedFrameTime (which is the case for FrameStabilityContainer)
-                // they will take on the new CurrentTime with a zero elapsed time. This can in turn cause components to behave incorrectly
-                // if they are intending to trigger events at the precise StartTime (ie. DrawableStoryboardSample).
-                //
-                // By scheduling the start call, children are guaranteed to receive one frame at the original start time, allowing
-                // then to progress with a correct locally calculated elapsed time.
-                SchedulerAfterChildren.Add(GameplayClock.Start);
-            }
+            // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
+            // This accounts for the clock source potentially taking time to enter a completely stopped state
+            Seek(GameplayClock.CurrentTime);
+
+            // The case which cause this to be added is FrameStabilityContainer, which manages its own current and elapsed time.
+            // Because we generally update our own current time quicker than children can query it (via Start/Seek/Update),
+            // this means that the first frame ever exposed to children may have a non-zero current time.
+            //
+            // If the child component is not aware of the parent ElapsedFrameTime (which is the case for FrameStabilityContainer)
+            // they will take on the new CurrentTime with a zero elapsed time. This can in turn cause components to behave incorrectly
+            // if they are intending to trigger events at the precise StartTime (ie. DrawableStoryboardSample).
+            //
+            // By scheduling the start call, children are guaranteed to receive one frame at the original start time, allowing
+            // then to progress with a correct locally calculated elapsed time.
+            SchedulerAfterChildren.Add(() =>
+            {
+                if (isPaused.Value)
+                    return;
+
+                StartGameplayClock();
+            });
         }
 
         /// <summary>
@@ -125,7 +127,17 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Stops gameplay and marks paused state.
         /// </summary>
-        public void Stop() => isPaused.Value = true;
+        public void Stop()
+        {
+            if (isPaused.Value)
+                return;
+
+            isPaused.Value = true;
+            StopGameplayClock();
+        }
+
+        protected virtual void StartGameplayClock() => GameplayClock.Start();
+        protected virtual void StopGameplayClock() => GameplayClock.Stop();
 
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
@@ -134,8 +146,9 @@ namespace osu.Game.Screens.Play
         /// <param name="startClock">Whether to start the clock immediately, if not already started.</param>
         public void Reset(double? time = null, bool startClock = false)
         {
-            // Manually stop the source in order to not affect the IsPaused state.
-            GameplayClock.Stop();
+            bool wasPaused = isPaused.Value;
+
+            Stop();
 
             ensureSourceClockSet();
 
@@ -144,7 +157,7 @@ namespace osu.Game.Screens.Play
 
             Seek(StartTime);
 
-            if (!IsPaused.Value || startClock)
+            if (!wasPaused || startClock)
                 Start();
         }
 
@@ -165,18 +178,6 @@ namespace osu.Game.Screens.Play
         {
             if (GameplayClock.Source == null)
                 ChangeSource(SourceClock);
-        }
-
-        /// <summary>
-        /// Invoked when the value of <see cref="IsPaused"/> is changed to start or stop the <see cref="GameplayClock"/> clock.
-        /// </summary>
-        /// <param name="isPaused">Whether the clock should now be paused.</param>
-        protected virtual void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
-        {
-            if (isPaused.NewValue)
-                GameplayClock.Stop();
-            else
-                GameplayClock.Start();
         }
 
         #region IAdjustableClock
