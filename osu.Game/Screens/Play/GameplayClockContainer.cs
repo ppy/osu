@@ -88,6 +88,7 @@ namespace osu.Game.Screens.Play
             isPaused.Value = false;
 
             // the clock may be stopped via internal means (ie. not via `IsPaused`).
+            // see Reset() calling `GameplayClock.Stop()` as one example.
             if (!GameplayClock.IsRunning)
             {
                 // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
