@@ -5,11 +5,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Timing;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -38,7 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The master clock which is used to control the timing of all player clocks clocks.
         /// </summary>
-        public IAdjustableClock MasterClock { get; }
+        public GameplayClockContainer MasterClock { get; }
 
         public IBindable<MasterClockState> MasterState => masterState;
 
@@ -52,18 +51,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private bool hasStarted;
         private double? firstStartAttemptTime;
 
-        public CatchUpSyncManager(IAdjustableClock master)
+        public CatchUpSyncManager(GameplayClockContainer master)
         {
             MasterClock = master;
         }
 
-        public void AddPlayerClock(ISpectatorPlayerClock clock)
+        public ISpectatorPlayerClock AddClock()
         {
-            Debug.Assert(!playerClocks.Contains(clock));
+            var clock = new CatchUpSpectatorPlayerClock { Source = MasterClock };
             playerClocks.Add(clock);
+            return clock;
         }
 
-        public void RemovePlayerClock(ISpectatorPlayerClock clock)
+        public void RemoveClock(ISpectatorPlayerClock clock)
         {
             playerClocks.Remove(clock);
             clock.Stop();
