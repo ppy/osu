@@ -19,8 +19,8 @@ namespace osu.Game.Beatmaps
     /// A clock intended to be the single source-of-truth for beatmap timing.
     ///
     /// It provides some functionality:
-    ///  - Applies (and tracks changes of) beatmap, user, and platform offsets.
-    ///  - Adjusts <see cref="Seek"/> operations to account for said offsets, seeking in raw time values.
+    ///  - Optionally applies (and tracks changes of) beatmap, user, and platform offsets (see ctor argument applyOffsets).
+    ///  - Adjusts <see cref="Seek"/> operations to account for any applied offsets, seeking in raw "beatmap" time values.
     ///  - Exposes track length.
     ///  - Allows changing the source to a new track (for cases like editor track updating).
     /// </summary>
