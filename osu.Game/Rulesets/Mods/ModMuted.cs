@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Muted";
         public override string Acronym => "MU";
         public override IconUsage? Icon => FontAwesome.Solid.VolumeMute;
-        public override string Description => "Can you still feel the rhythm without music?";
+        public override LocalisableString Description => "Can you still feel the rhythm without music?";
         public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 1;
     }
