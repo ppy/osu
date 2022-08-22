@@ -101,6 +101,7 @@ namespace osu.Game.Screens.Select.Carousel
                     return compareUsingAggregateMax(otherSet, b => b.StarRating);
 
                 case SortMode.DateSubmitted:
+                    // Beatmaps which have no submitted date should already be filtered away in this mode.
                     if (BeatmapSet.DateSubmitted == null || otherSet.BeatmapSet.DateSubmitted == null)
                         return 0;
 
