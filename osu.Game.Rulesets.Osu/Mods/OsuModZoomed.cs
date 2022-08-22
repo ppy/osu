@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             moveDrawablesFollowingCursor(playfield);
         }
 
-        private Vector2 getDrawablePositionForCursorPosition(Playfield playfield, Drawable drawable)
+        private Vector2 getTrackingPosition(Playfield playfield)
         {
             var position = playfield.Cursor.ActiveCursor.DrawPosition;
             return Vector2.Clamp(playfield.OriginPosition - position, -playfield.OriginPosition, playfield.OriginPosition);
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void moveDrawablesFollowingCursor(Playfield playfield)
         {
-            var trackingPosition = getDrawablePositionForCursorPosition(playfield, playfield);
+            var trackingPosition = getTrackingPosition(playfield);
 
             if (MovementDelay.Value == 0)
                 playfield.Position = trackingPosition;
