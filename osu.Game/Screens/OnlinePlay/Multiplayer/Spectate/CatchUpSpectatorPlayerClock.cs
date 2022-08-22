@@ -17,14 +17,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public const double CATCHUP_RATE = 2;
 
-        /// <summary>
-        /// The source clock.
-        /// </summary>
-        public IFrameBasedClock? Source { get; set; }
+        public IFrameBasedClock Source { get; set; }
 
         public double CurrentTime { get; private set; }
 
         public bool IsRunning { get; private set; }
+
+        public CatchUpSpectatorPlayerClock(IFrameBasedClock source)
+        {
+            Source = source;
+        }
 
         public void Reset() => CurrentTime = 0;
 
@@ -66,9 +68,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             ElapsedFrameTime = 0;
             FramesPerSecond = 0;
-
-            if (Source == null)
-                return;
 
             Source.ProcessFrame();
 

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public const double MAXIMUM_START_DELAY = 15000;
 
-        public event Action ReadyToStart;
+        public event Action? ReadyToStart;
 
         /// <summary>
         /// The master clock which is used to control the timing of all player clocks clocks.
@@ -58,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public ISpectatorPlayerClock AddClock()
         {
-            var clock = new CatchUpSpectatorPlayerClock { Source = MasterClock };
+            var clock = new CatchUpSpectatorPlayerClock(MasterClock);
             playerClocks.Add(clock);
             return clock;
         }
