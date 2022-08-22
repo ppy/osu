@@ -289,7 +289,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
-        public virtual string GetVariantName(int variant) => string.Empty;
+        public virtual LocalisableString GetVariantName(int variant) => string.Empty;
 
         /// <summary>
         /// For rulesets which support legacy (osu-stable) replay conversion, this method will create an empty replay frame

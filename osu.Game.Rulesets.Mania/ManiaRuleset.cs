@@ -312,7 +312,7 @@ namespace osu.Game.Rulesets.Mania
             return Array.Empty<KeyBinding>();
         }
 
-        public override string GetVariantName(int variant)
+        public override LocalisableString GetVariantName(int variant)
         {
             switch (getPlayfieldType(variant))
             {
