@@ -307,7 +307,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
                 HitObjects = { new TestHitObject(result) }
             });
 
-            Assert.That(scoreProcessor.ComputeFinalScore(ScoringMode.Standardised, new ScoreInfo
+            Assert.That(scoreProcessor.ComputeScore(ScoringMode.Standardised, new ScoreInfo
             {
                 Ruleset = new TestRuleset().RulesetInfo,
                 MaxCombo = result.AffectsCombo() ? 1 : 0,
@@ -350,7 +350,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
                 }
             };
 
-            double totalScore = new TestScoreProcessor().ComputeFinalScore(ScoringMode.Standardised, testScore);
+            double totalScore = new TestScoreProcessor().ComputeScore(ScoringMode.Standardised, testScore);
             Assert.That(totalScore, Is.EqualTo(750_000)); // 500K from accuracy (100%), and 250K from combo (50%).
         }
 #pragma warning restore CS0618
