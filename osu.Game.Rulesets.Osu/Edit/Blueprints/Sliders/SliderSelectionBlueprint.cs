@@ -277,9 +277,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 // Turn the control points which were split off into a new slider.
                 var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
-                samplePoint.Time = HitObject.StartTime;
                 var difficultyPoint = (DifficultyControlPoint)HitObject.DifficultyControlPoint.DeepClone();
-                difficultyPoint.Time = HitObject.StartTime;
 
                 var newSlider = new Slider
                 {
