@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.UI
             this.gameplayStartTime = gameplayStartTime;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(IGameplayClock? gameplayClock)
         {
             if (gameplayClock != null)

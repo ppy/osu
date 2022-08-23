@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Bindables;
-using osu.Framework.Timing;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -17,12 +15,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// An event which is invoked when gameplay is ready to start.
         /// </summary>
-        event Action ReadyToStart;
+        event Action? ReadyToStart;
 
         /// <summary>
         /// The master clock which player clocks should synchronise to.
         /// </summary>
-        IAdjustableClock MasterClock { get; }
+        GameplayClockContainer MasterClock { get; }
 
         /// <summary>
         /// An event which is invoked when the state of <see cref="MasterClock"/> is changed.
@@ -30,15 +28,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         IBindable<MasterClockState> MasterState { get; }
 
         /// <summary>
-        /// Adds an <see cref="ISpectatorPlayerClock"/> to manage.
+        /// Create a new managed <see cref="ISpectatorPlayerClock"/>.
         /// </summary>
-        /// <param name="clock">The <see cref="ISpectatorPlayerClock"/> to add.</param>
-        void AddPlayerClock(ISpectatorPlayerClock clock);
+        /// <returns>The newly created <see cref="ISpectatorPlayerClock"/>.</returns>
+        ISpectatorPlayerClock CreateManagedClock();
 
         /// <summary>
         /// Removes an <see cref="ISpectatorPlayerClock"/>, stopping it from being managed by this <see cref="ISyncManager"/>.
         /// </summary>
         /// <param name="clock">The <see cref="ISpectatorPlayerClock"/> to remove.</param>
-        void RemovePlayerClock(ISpectatorPlayerClock clock);
+        void RemoveManagedClock(ISpectatorPlayerClock clock);
     }
 }
