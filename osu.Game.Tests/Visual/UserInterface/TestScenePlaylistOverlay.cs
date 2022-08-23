@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Add collection", () =>
             {
-                Dependencies.Get<RealmAccess>().Write(r =>
+                Realm.Write(r =>
                 {
                     r.RemoveAll<BeatmapCollection>();
                     r.Add(new BeatmapCollection("wang"));
