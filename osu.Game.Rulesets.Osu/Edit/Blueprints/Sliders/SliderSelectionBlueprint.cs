@@ -253,6 +253,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void splitControlPoints(List<PathControlPoint> toSplit)
         {
+            // Arbitrary gap in milliseconds to put between split slider pieces
+            const double split_gap = 100;
+
             // Ensure that there are any points to be split
             if (toSplit.Count == 0)
                 return;
@@ -286,6 +289,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     NewCombo = HitObject.NewCombo,
                     SampleControlPoint = samplePoint,
                     DifficultyControlPoint = difficultyPoint,
+                    LegacyLastTickOffset = HitObject.LegacyLastTickOffset,
                     Samples = HitObject.Samples.Select(s => s.With()).ToList(),
                     RepeatCount = HitObject.RepeatCount,
                     NodeSamples = HitObject.NodeSamples.Select(n => (IList<HitSampleInfo>)n.Select(s => s.With()).ToList()).ToList(),
@@ -293,13 +297,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 };
 
                 // Increase the start time of the slider before adding the new slider so the new slider is immediately inserted at the correct index and internal state remains valid.
-                HitObject.StartTime += 1;
+                HitObject.StartTime += split_gap;
 
                 editorBeatmap.Add(newSlider);
 
                 HitObject.NewCombo = false;
                 HitObject.Path.ExpectedDistance.Value -= newSlider.Path.CalculatedDistance;
-                HitObject.StartTime += newSlider.SpanDuration - 1;
+                HitObject.StartTime += newSlider.SpanDuration;
 
                 // In case the remainder of the slider has no length left over, give it length anyways so we don't get a 0 length slider.
                 if (HitObject.Path.ExpectedDistance.Value <= Precision.DOUBLE_EPSILON)

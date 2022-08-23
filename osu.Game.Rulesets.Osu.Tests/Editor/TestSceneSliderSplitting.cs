@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -29,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private Slider? slider;
         private PathControlPointVisualiser? visualiser;
+
+        private const double split_gap = 100;
 
         [Test]
         public void TestBasicSplit()
@@ -69,11 +72,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addContextMenuItemStep("Split control point");
 
             AddAssert("slider split", () => slider is not null && EditorBeatmap.HitObjects.Count == 2 &&
-                                            sliderCreatedFor((Slider)EditorBeatmap.HitObjects[0], 0, slider.StartTime,
+                                            sliderCreatedFor((Slider)EditorBeatmap.HitObjects[0], 0, EditorBeatmap.HitObjects[1].StartTime - split_gap,
                                                 (new Vector2(0, 50), PathType.PerfectCurve),
                                                 (new Vector2(150, 200), null),
                                                 (new Vector2(300, 50), null)
-                                            ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[1], slider.StartTime, endTime,
+                                            ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[1], slider.StartTime, endTime + split_gap,
                                                 (new Vector2(300, 50), PathType.PerfectCurve),
                                                 (new Vector2(400, 50), null),
                                                 (new Vector2(400, 200), null)
@@ -135,19 +138,78 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addContextMenuItemStep("Split 2 control points");
 
             AddAssert("slider split", () => slider is not null && EditorBeatmap.HitObjects.Count == 3 &&
-                                            sliderCreatedFor((Slider)EditorBeatmap.HitObjects[0], 0, EditorBeatmap.HitObjects[1].StartTime,
+                                            sliderCreatedFor((Slider)EditorBeatmap.HitObjects[0], 0, EditorBeatmap.HitObjects[1].StartTime - split_gap,
                                                 (new Vector2(0, 50), PathType.PerfectCurve),
                                                 (new Vector2(150, 200), null),
                                                 (new Vector2(300, 50), null)
-                                            ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[1], EditorBeatmap.HitObjects[0].GetEndTime(), slider.StartTime,
+                                            ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[1], EditorBeatmap.HitObjects[0].GetEndTime() + split_gap, slider.StartTime - split_gap,
                                                 (new Vector2(300, 50), PathType.Bezier),
                                                 (new Vector2(400, 50), null),
                                                 (new Vector2(400, 200), null)
-                                            ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[2], EditorBeatmap.HitObjects[1].GetEndTime(), endTime,
+                                            ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[2], EditorBeatmap.HitObjects[1].GetEndTime() + split_gap, endTime + split_gap * 2,
                                                 (new Vector2(400, 200), PathType.Catmull),
                                                 (new Vector2(300, 250), null),
                                                 (new Vector2(400, 300), null)
                                             ));
+        }
+
+        [Test]
+        public void TestSplitRetainsHitsounds()
+        {
+            HitSampleInfo? sample = null;
+
+            AddStep("add slider", () =>
+            {
+                slider = new Slider
+                {
+                    Position = new Vector2(0, 50),
+                    LegacyLastTickOffset = 36, // This is necessary for undo to retain the sample control point
+                    Path = new SliderPath(new[]
+                    {
+                        new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
+                        new PathControlPoint(new Vector2(150, 150)),
+                        new PathControlPoint(new Vector2(300, 0), PathType.PerfectCurve),
+                        new PathControlPoint(new Vector2(400, 0)),
+                        new PathControlPoint(new Vector2(400, 150))
+                    })
+                };
+
+                EditorBeatmap.Add(slider);
+            });
+
+            AddStep("add hitsounds", () =>
+            {
+                if (slider is null) return;
+
+                slider.SampleControlPoint.SampleBank = "soft";
+                slider.SampleControlPoint.SampleVolume = 70;
+                sample = new HitSampleInfo("hitwhistle");
+                slider.Samples.Add(sample);
+            });
+
+            AddStep("select added slider", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Add(slider);
+                visualiser = blueprintContainer.SelectionBlueprints.First(o => o.Item == slider).ChildrenOfType<PathControlPointVisualiser>().First();
+            });
+
+            moveMouseToControlPoint(2);
+            AddStep("select control point", () =>
+            {
+                if (visualiser is not null) visualiser.Pieces[2].IsSelected.Value = true;
+            });
+            addContextMenuItemStep("Split control point");
+            AddAssert("sliders have hitsounds", hasHitsounds);
+
+            AddStep("select first slider", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]));
+            AddStep("remove first slider", () => EditorBeatmap.RemoveAt(0));
+            AddStep("undo", () => Editor.Undo());
+            AddAssert("sliders have hitsounds", hasHitsounds);
+
+            bool hasHitsounds() => sample is not null &&
+                                   EditorBeatmap.HitObjects.All(o => o.SampleControlPoint.SampleBank == "soft" &&
+                                                                     o.SampleControlPoint.SampleVolume == 70 &&
+                                                                     o.Samples.Contains(sample));
         }
 
         private bool sliderCreatedFor(Slider s, double startTime, double endTime, params (Vector2 pos, PathType? pathType)[] expectedControlPoints)
