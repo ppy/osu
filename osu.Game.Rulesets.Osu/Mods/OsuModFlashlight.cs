@@ -17,12 +17,18 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObject
+    public class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObject, IApplicableToDisable
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModBlinds)).ToArray();
 
         private const double default_follow_delay = 120;
+
+        private readonly Bindable<bool> isDisabled = new Bindable<bool>(false);
+
+        public Bindable<bool> ReplayLoaded { get; } = new Bindable<bool>(false);
+
+        public bool IsDisable => isDisabled.Value;
 
         [SettingSource("Follow delay", "Milliseconds until the flashlight reaches the cursor")]
         public BindableNumber<double> FollowDelay { get; } = new BindableDouble(default_follow_delay)
@@ -53,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private OsuFlashlight flashlight = null!;
 
-        protected override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(this);
+        protected override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(this, isDisabled);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
@@ -61,20 +67,47 @@ namespace osu.Game.Rulesets.Osu.Mods
                 s.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
         }
 
+        public void OnToggle()
+        {
+            if (!ReplayLoaded.Value) return;
+
+            if (isDisabled.Value)
+            {
+                flashlight.Alpha = 1f;
+                isDisabled.Value = false;
+            }
+            else
+            {
+                flashlight.Alpha = 0.3f;
+                isDisabled.Value = true;
+            }
+        }
+
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
             private readonly double followDelay;
 
-            public OsuFlashlight(OsuModFlashlight modFlashlight)
+            private readonly Bindable<bool> isDisable;
+
+            public OsuFlashlight(OsuModFlashlight modFlashlight, Bindable<bool> isDisableBind)
                 : base(modFlashlight)
             {
                 followDelay = modFlashlight.FollowDelay.Value;
 
                 FlashlightSize = new Vector2(0, GetSizeFor(0));
+
+                isDisable = isDisableBind;
+
+                isDisable.BindValueChanged(disable =>
+                {
+                    if (disable.NewValue) this.TransformTo(nameof(FlashlightDim), 0.0f, 50);
+                }, true);
             }
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
             {
+                if (isDisable.Value)
+                    return;
                 // If a slider is in a tracking state, a further dim should be applied to the (remaining) visible portion of the playfield over a brief duration.
                 this.TransformTo(nameof(FlashlightDim), e.NewValue ? 0.8f : 0.0f, 50);
             }
