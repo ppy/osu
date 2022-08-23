@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// Display the specified mod at a fixed size.
     /// </summary>
-    public class ModIcon : Container, IHasTooltip
+    public class ModIcon : ClickableContainer, IHasTooltip
     {
         public readonly BindableBool Selected = new BindableBool();
 
@@ -95,6 +95,16 @@ namespace osu.Game.Rulesets.UI
                     Size = new Vector2(45),
                     Icon = FontAwesome.Solid.Question
                 },
+            };
+
+            Action = () =>
+            {
+                if (mod is IApplicableToDisable dmod)
+                {
+                    dmod.OnToggle();
+
+                    Colour = dmod.IsDisable ? OsuColour.Gray(0.7f) : Colour = Color4.White;
+                }
             };
         }
 
