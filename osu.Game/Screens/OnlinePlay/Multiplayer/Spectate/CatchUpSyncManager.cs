@@ -54,14 +54,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             MasterClock = master;
         }
 
-        public ISpectatorPlayerClock AddClock()
+        public ISpectatorPlayerClock CreateManagedClock()
         {
             var clock = new CatchUpSpectatorPlayerClock(MasterClock);
             playerClocks.Add(clock);
             return clock;
         }
 
-        public void RemoveClock(ISpectatorPlayerClock clock)
+        public void RemoveManagedClock(ISpectatorPlayerClock clock)
         {
             playerClocks.Remove(clock);
             clock.Stop();

@@ -28,15 +28,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         IBindable<MasterClockState> MasterState { get; }
 
         /// <summary>
-        /// Adds a new managed <see cref="ISpectatorPlayerClock"/>.
+        /// Create a new managed <see cref="ISpectatorPlayerClock"/>.
         /// </summary>
-        /// <returns>The added <see cref="ISpectatorPlayerClock"/>.</returns>
-        ISpectatorPlayerClock AddClock();
+        /// <returns>The newly created <see cref="ISpectatorPlayerClock"/>.</returns>
+        ISpectatorPlayerClock CreateManagedClock();
 
         /// <summary>
         /// Removes an <see cref="ISpectatorPlayerClock"/>, stopping it from being managed by this <see cref="ISyncManager"/>.
         /// </summary>
         /// <param name="clock">The <see cref="ISpectatorPlayerClock"/> to remove.</param>
-        void RemoveClock(ISpectatorPlayerClock clock);
+        void RemoveManagedClock(ISpectatorPlayerClock clock);
     }
 }
