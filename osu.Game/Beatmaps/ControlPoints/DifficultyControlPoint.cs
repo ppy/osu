@@ -16,7 +16,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         public static readonly DifficultyControlPoint DEFAULT = new DifficultyControlPoint
         {
             SliderVelocityBindable = { Disabled = true },
-            GenerateTicksBindable = { Disabled = true },
         };
 
         /// <summary>
@@ -29,12 +28,6 @@ namespace osu.Game.Beatmaps.ControlPoints
             MinValue = 0.1,
             MaxValue = 10
         };
-
-        /// <summary>
-        /// Whether or not slider ticks should be generated at this control point.
-        /// This exists for backwards compatibility with maps that abuse NaN slider velocity behavior on osu!stable (e.g. /b/2628991).
-        /// </summary>
-        public readonly BindableBool GenerateTicksBindable = new BindableBool(true);
 
         public override Color4 GetRepresentingColour(OsuColour colours) => colours.Lime1;
 
@@ -51,11 +44,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// Whether or not slider ticks should be generated at this control point.
         /// This exists for backwards compatibility with maps that abuse NaN slider velocity behavior on osu!stable (e.g. /b/2628991).
         /// </summary>
-        public bool GenerateTicks
-        {
-            get => GenerateTicksBindable.Value;
-            set => GenerateTicksBindable.Value = value;
-        }
+        public bool GenerateTicks { get; set; } = true;
 
         public override bool IsRedundant(ControlPoint? existing)
             => existing is DifficultyControlPoint existingDifficulty
@@ -79,6 +68,7 @@ namespace osu.Game.Beatmaps.ControlPoints
                && SliderVelocity == other.SliderVelocity
                && GenerateTicks == other.GenerateTicks;
 
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
         public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), SliderVelocity, GenerateTicks);
     }
 }
