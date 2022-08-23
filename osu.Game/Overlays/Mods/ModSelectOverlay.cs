@@ -45,7 +45,8 @@ namespace osu.Game.Overlays.Mods
         /// Contrary to <see cref="OsuGameBase.AvailableMods"/> and <see cref="globalAvailableMods"/>, the <see cref="Mod"/> instances
         /// inside the <see cref="ModState"/> objects are owned solely by this <see cref="ModSelectOverlay"/> instance.
         /// </remarks>
-        public Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> AvailableMods { get; } = new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>(new Dictionary<ModType, IReadOnlyList<ModState>>());
+        public Bindable<Dictionary<ModType, IReadOnlyList<ModState>>> AvailableMods { get; } =
+            new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>(new Dictionary<ModType, IReadOnlyList<ModState>>());
 
         private Func<Mod, bool> isValidMod = _ => true;
 
@@ -186,18 +187,20 @@ namespace osu.Game.Overlays.Mods
 
             if (ShowTotalMultiplier)
             {
-                MainAreaContent.Add(new Container
+                MainAreaContent.Add(new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     AutoSizeAxes = Axes.X,
+                    Direction = FillDirection.Horizontal,
                     Height = DifficultyMultiplierDisplay.HEIGHT,
                     Margin = new MarginPadding { Horizontal = 100 },
-                    Child = multiplierDisplay = new DifficultyMultiplierDisplay
+                    Spacing = new Vector2(5, 0),
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    },
+                        new BpmDisplay(),
+                        multiplierDisplay = new DifficultyMultiplierDisplay()
+                    }
                 });
             }
 
