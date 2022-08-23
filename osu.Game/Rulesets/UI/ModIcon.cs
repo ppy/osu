@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.UI
 
             Action = () =>
             {
-                if (mod is IApplicableToDisable dmod)
+                if (mod is ICanBeToggledDuringReplay dmod)
                 {
                     dmod.OnToggle();
 

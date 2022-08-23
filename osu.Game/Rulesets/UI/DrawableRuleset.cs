@@ -372,7 +372,7 @@ namespace osu.Game.Rulesets.UI
             foreach (var mod in mods.OfType<IReadFromConfig>())
                 mod.ReadFromConfig(config);
 
-            foreach (var mod in mods.OfType<IApplicableToDisable>())
+            foreach (var mod in mods.OfType<ICanBeToggledDuringReplay>())
                 mod.ReplayLoaded.BindTo(HasReplayLoaded);
         }
 

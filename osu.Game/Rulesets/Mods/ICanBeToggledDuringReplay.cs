@@ -5,7 +5,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public interface IApplicableToDisable : IApplicableMod
+    public interface ICanBeToggledDuringReplay : IApplicableMod
     {
         Bindable<bool> ReplayLoaded
         {

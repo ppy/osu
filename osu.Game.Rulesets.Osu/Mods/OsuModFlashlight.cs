@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObject, IApplicableToDisable
+    public class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObject, ICanBeToggledDuringReplay
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModBlinds)).ToArray();
