@@ -928,7 +928,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private class SoloModSelectOverlay : UserModSelectOverlay
+        internal class SoloModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
         }

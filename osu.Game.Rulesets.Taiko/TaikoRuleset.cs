@@ -25,6 +25,7 @@ using osu.Game.Scoring;
 using System;
 using System.Linq;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Edit;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -192,7 +193,7 @@ namespace osu.Game.Rulesets.Taiko
             };
         }
 
-        public override string GetDisplayNameForHitResult(HitResult result)
+        public override LocalisableString GetDisplayNameForHitResult(HitResult result)
         {
             switch (result)
             {

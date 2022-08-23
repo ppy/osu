@@ -1,15 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Timing;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -33,12 +30,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public const double MAXIMUM_START_DELAY = 15000;
 
-        public event Action ReadyToStart;
+        public event Action? ReadyToStart;
 
         /// <summary>
         /// The master clock which is used to control the timing of all player clocks clocks.
         /// </summary>
-        public IAdjustableClock MasterClock { get; }
+        public GameplayClockContainer MasterClock { get; }
 
         public IBindable<MasterClockState> MasterState => masterState;
 
@@ -52,18 +49,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private bool hasStarted;
         private double? firstStartAttemptTime;
 
-        public CatchUpSyncManager(IAdjustableClock master)
+        public CatchUpSyncManager(GameplayClockContainer master)
         {
             MasterClock = master;
         }
 
-        public void AddPlayerClock(ISpectatorPlayerClock clock)
+        public ISpectatorPlayerClock CreateManagedClock()
         {
-            Debug.Assert(!playerClocks.Contains(clock));
+            var clock = new CatchUpSpectatorPlayerClock(MasterClock);
             playerClocks.Add(clock);
+            return clock;
         }
 
-        public void RemovePlayerClock(ISpectatorPlayerClock clock)
+        public void RemoveManagedClock(ISpectatorPlayerClock clock)
         {
             playerClocks.Remove(clock);
             clock.Stop();
