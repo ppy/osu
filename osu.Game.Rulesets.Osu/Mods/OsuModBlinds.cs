@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -20,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
+    public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor, ICanBeToggledDuringReplay
     {
         public override string Name => "Blinds";
         public override LocalisableString Description => "Play with blinds on your screen.";
@@ -34,6 +35,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private DrawableOsuBlinds blinds = null!;
 
+        private readonly Bindable<bool> isDisabled = new Bindable<bool>();
+        public bool IsDisable => isDisabled.Value;
+        public Bindable<bool> ReplayLoaded { get; } = new Bindable<bool>();
+
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield, drawableRuleset.Beatmap));
@@ -45,6 +50,22 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+
+        public void OnToggle()
+        {
+            if (!ReplayLoaded.Value) return;
+
+            if (isDisabled.Value)
+            {
+                blinds.Alpha = 1f;
+                isDisabled.Value = false;
+            }
+            else
+            {
+                blinds.Alpha = 0.3f;
+                isDisabled.Value = true;
+            }
+        }
 
         /// <summary>
         /// Element for the Blinds mod drawing 2 black boxes covering the whole screen which resize inside a restricted area with some leniency.
