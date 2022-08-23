@@ -12,7 +12,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
@@ -55,6 +55,7 @@ namespace osu.Game.Tests.Skins
                 lookedUpFileNames = new List<string>();
                 mockResourceProvider = new Mock<IStorageResourceProvider>();
                 mockResourceProvider.Setup(m => m.AudioManager).Returns(Audio);
+                mockResourceProvider.Setup(m => m.Renderer).Returns(new DummyRenderer());
                 mockResourceStore = new Mock<IResourceStore<byte[]>>();
                 mockResourceStore.Setup(r => r.Get(It.IsAny<string>()))
                                  .Callback<string>(n => lookedUpFileNames.Add(n))

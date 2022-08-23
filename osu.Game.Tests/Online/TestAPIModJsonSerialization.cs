@@ -6,8 +6,10 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -148,6 +150,16 @@ namespace osu.Game.Tests.Online
             Assert.That(apiMod.Settings["speed_change"], Is.EqualTo(1.01d));
         }
 
+        [Test]
+        public void TestSerialisedModSettingPresence()
+        {
+            var mod = new TestMod();
+
+            mod.TestSetting.Value = mod.TestSetting.Default;
+            JObject serialised = JObject.Parse(JsonConvert.SerializeObject(new APIMod(mod)));
+            Assert.False(serialised.ContainsKey("settings"));
+        }
+
         private class TestRuleset : Ruleset
         {
             public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[]
@@ -171,7 +183,7 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TM";
-            public override string Description => "This is a test mod.";
+            public override LocalisableString Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Test")]
@@ -188,7 +200,7 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TMTR";
-            public override string Description => "This is a test mod.";
+            public override LocalisableString Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Initial rate", "The starting speed of the track")]

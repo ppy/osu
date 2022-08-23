@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             Add(gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time));
 
-            Dependencies.CacheAs(gameplayClockContainer.GameplayClock);
+            Dependencies.CacheAs<IGameplayClock>(gameplayClockContainer);
         }
 
         [SetUpSteps]

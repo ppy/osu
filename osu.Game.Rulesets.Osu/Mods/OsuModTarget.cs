@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "TP";
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.ModTarget;
-        public override string Description => @"Practice keeping up with the beat of the song.";
+        public override LocalisableString Description => @"Practice keeping up with the beat of the song.";
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]

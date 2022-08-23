@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 
 namespace osu.Game.Rulesets
@@ -68,8 +68,14 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var resolvedType = Type.GetType(r.InstantiationInfo)
-                                           ?? throw new RulesetLoadException(@"Type could not be resolved");
+                        var resolvedType = Type.GetType(r.InstantiationInfo);
+
+                        if (resolvedType == null)
+                        {
+                            // ruleset DLL was probably deleted.
+                            r.Available = false;
+                            continue;
+                        }
 
                         var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
                                            ?? throw new RulesetLoadException(@"Instantiation failure");
@@ -83,17 +89,35 @@ namespace osu.Game.Rulesets
                         r.InstantiationInfo = instanceInfo.InstantiationInfo;
                         r.Available = true;
 
+                        testRulesetCompatibility(r);
+
                         detachedRulesets.Add(r.Clone());
                     }
                     catch (Exception ex)
                     {
                         r.Available = false;
-                        Logger.Log($"Could not load ruleset {r}: {ex.Message}");
+                        LogFailedLoad(r.Name, ex);
                     }
                 }
 
                 availableRulesets.AddRange(detachedRulesets.OrderBy(r => r));
             });
+        }
+
+        private void testRulesetCompatibility(RulesetInfo rulesetInfo)
+        {
+            // do various operations to ensure that we are in a good state.
+            // if we can avoid loading the ruleset at this point (rather than erroring later in runtime) then that is preferred.
+            var instance = rulesetInfo.CreateInstance();
+
+            instance.CreateAllMods();
+            instance.CreateIcon();
+            instance.CreateResourceStore();
+
+            var beatmap = new Beatmap();
+            var converter = instance.CreateBeatmapConverter(beatmap);
+
+            instance.CreateBeatmapProcessor(converter.Convert());
         }
     }
 }

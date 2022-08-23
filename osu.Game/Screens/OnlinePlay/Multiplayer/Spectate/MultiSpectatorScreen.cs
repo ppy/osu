@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -42,17 +40,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override UserActivity InitialActivity => new UserActivity.SpectatingMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         private readonly PlayerArea[] instances;
-        private MasterGameplayClockContainer masterClockContainer;
-        private ISyncManager syncManager;
-        private PlayerGrid grid;
-        private MultiSpectatorLeaderboard leaderboard;
-        private PlayerArea currentAudioSource;
+        private MasterGameplayClockContainer masterClockContainer = null!;
+        private ISyncManager syncManager = null!;
+        private PlayerGrid grid = null!;
+        private MultiSpectatorLeaderboard leaderboard = null!;
+        private PlayerArea? currentAudioSource;
         private bool canStartMasterClock;
 
         private readonly Room room;
@@ -125,10 +123,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             };
 
             for (int i = 0; i < Users.Count; i++)
-            {
-                grid.Add(instances[i] = new PlayerArea(Users[i], masterClockContainer.GameplayClock));
-                syncManager.AddPlayerClock(instances[i].GameplayClock);
-            }
+                grid.Add(instances[i] = new PlayerArea(Users[i], syncManager.CreateManagedClock()));
 
             LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(users)
             {
@@ -181,7 +176,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
         }
 
-        private bool isCandidateAudioSource([CanBeNull] ISpectatorPlayerClock clock)
+        private bool isCandidateAudioSource(ISpectatorPlayerClock? clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
 
         private void onReadyToStart()
@@ -189,7 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             // Seek the master clock to the gameplay time.
             // This is chosen as the first available frame in the players' replays, which matches the seek by each individual SpectatorPlayer.
             double startTime = instances.Where(i => i.Score != null)
-                                        .SelectMany(i => i.Score.Replay.Frames)
+                                        .SelectMany(i => i.Score.AsNonNull().Replay.Frames)
                                         .Select(f => f.Time)
                                         .DefaultIfEmpty(0)
                                         .Min();
@@ -231,12 +226,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (state.State == SpectatedUserState.Passed || state.State == SpectatedUserState.Failed)
                 return;
 
+            // we could also potentially receive EndGameplay with "Playing" state, at which point we can only early-return and hope it's a passing player.
+            // todo: this shouldn't exist, but it's here as a hotfix for an issue with multi-spectator screen not proceeding to results screen.
+            // see: https://github.com/ppy/osu/issues/19593
+            if (state.State == SpectatedUserState.Playing)
+                return;
+
             RemoveUser(userId);
 
             var instance = instances.Single(i => i.UserId == userId);
 
             instance.FadeColour(colours.Gray4, 400, Easing.OutQuint);
-            syncManager.RemovePlayerClock(instance.GameplayClock);
+            syncManager.RemoveManagedClock(instance.GameplayClock);
         }
 
         public override bool OnBackButton()
