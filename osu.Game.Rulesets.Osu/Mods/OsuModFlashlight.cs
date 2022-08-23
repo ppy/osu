@@ -24,9 +24,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private const double default_follow_delay = 120;
 
-        private readonly Bindable<bool> isDisabled = new Bindable<bool>(false);
+        private readonly Bindable<bool> isDisabled = new Bindable<bool>();
 
-        public Bindable<bool> ReplayLoaded { get; } = new Bindable<bool>(false);
+        public Bindable<bool> ReplayLoaded { get; } = new Bindable<bool>();
 
         public bool IsDisable => isDisabled.Value;
 
