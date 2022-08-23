@@ -373,7 +373,9 @@ namespace osu.Game.Beatmaps.Formats
             string[] split = line.Split(',');
 
             double time = getOffsetTime(Parsing.ParseDouble(split[0].Trim()));
-            double beatLength = Parsing.ParseDouble(split[1].Trim());
+            double beatLength = Parsing.ParseDouble(split[1].Trim(), allowNaN: true);
+
+            // If beatLength is NaN, speedMultiplier should still be 1 because all comparisons against NaN are false.
             double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
             TimeSignature timeSignature = TimeSignature.SimpleQuadruple;
@@ -412,6 +414,9 @@ namespace osu.Game.Beatmaps.Formats
 
             if (timingChange)
             {
+                if (double.IsNaN(beatLength))
+                    throw new InvalidDataException("Beat length cannot be NaN in a timing control point");
+
                 var controlPoint = CreateTimingControlPoint();
 
                 controlPoint.BeatLength = beatLength;
@@ -425,6 +430,7 @@ namespace osu.Game.Beatmaps.Formats
 #pragma warning restore 618
             {
                 SliderVelocity = speedMultiplier,
+                GenerateTicks = !double.IsNaN(beatLength),
             }, timingChange);
 
             var effectPoint = new EffectControlPoint

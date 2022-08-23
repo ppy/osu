@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         private void createTicks(CancellationToken cancellationToken)
         {
-            if (tickSpacing == 0)
+            if (tickSpacing == 0 || !DifficultyControlPoint.GenerateTicks)
                 return;
 
             bool first = true;
