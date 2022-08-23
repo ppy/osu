@@ -593,7 +593,8 @@ namespace osu.Game.Rulesets.Scoring
 
                 if (result.IsBonus())
                     current.BonusScore += count * Judgement.ToNumericResult(result);
-                else
+
+                if (result.AffectsAccuracy())
                 {
                     // The maximum result of this judgement if it wasn't a miss.
                     // E.g. For a GOOD judgement, the max result is either GREAT/PERFECT depending on which one the ruleset uses (osu!: GREAT, osu!mania: PERFECT).
