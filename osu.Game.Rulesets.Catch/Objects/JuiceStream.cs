@@ -40,9 +40,6 @@ namespace osu.Game.Rulesets.Catch.Objects
         [JsonIgnore]
         public double TickDistance => tickDistanceFactor * DifficultyControlPoint.SliderVelocity;
 
-        [JsonIgnore]
-        public bool GenerateTicks => DifficultyControlPoint.GenerateTicks;
-
         /// <summary>
         /// The length of one span of this <see cref="JuiceStream"/>.
         /// </summary>
@@ -67,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             int nodeIndex = 0;
             SliderEventDescriptor? lastEvent = null;
 
-            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, GenerateTicks, cancellationToken))
+            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
             {
                 // generate tiny droplets since the last point
                 if (lastEvent != null)
