@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         private void createTicks(CancellationToken cancellationToken)
         {
-            if (tickSpacing == 0 || !DifficultyControlPoint.GenerateTicks)
+            if (tickSpacing == 0)
                 return;
 
             for (double t = StartTime + tickSpacing; t <= EndTime - tickSpacing; t += tickSpacing)

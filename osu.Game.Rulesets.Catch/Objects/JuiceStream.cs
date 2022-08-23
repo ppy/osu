@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -50,9 +51,12 @@ namespace osu.Game.Rulesets.Catch.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+#pragma warning disable 618
+            bool generateTicks = (DifficultyControlPoint as LegacyBeatmapDecoder.LegacyDifficultyControlPoint)?.GenerateTicks ?? true;
+#pragma warning restore 618
 
             velocityFactor = base_scoring_distance * difficulty.SliderMultiplier / timingPoint.BeatLength;
-            tickDistanceFactor = base_scoring_distance * difficulty.SliderMultiplier / difficulty.SliderTickRate;
+            tickDistanceFactor = generateTicks ? (base_scoring_distance * difficulty.SliderMultiplier / difficulty.SliderTickRate) : double.PositiveInfinity;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)

@@ -430,7 +430,6 @@ namespace osu.Game.Beatmaps.Formats
 #pragma warning restore 618
             {
                 SliderVelocity = speedMultiplier,
-                GenerateTicks = !double.IsNaN(beatLength),
             }, timingChange);
 
             var effectPoint = new EffectControlPoint
