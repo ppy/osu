@@ -66,6 +66,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             beatmapSets.First().ToLive(Realm);
+
+            // Ensure all the initial imports are present before running any tests.
+            Realm.Run(r => r.Refresh());
         });
 
         [Test]
