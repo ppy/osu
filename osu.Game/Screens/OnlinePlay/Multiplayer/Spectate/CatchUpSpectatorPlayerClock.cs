@@ -17,7 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public const double CATCHUP_RATE = 2;
 
-        public IFrameBasedClock Source { get; set; }
+        public readonly IFrameBasedClock Source;
 
         public double CurrentTime { get; private set; }
 
