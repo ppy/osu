@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToRate
+    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToRate, ICanBeToggledDuringReplay
     {
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
@@ -36,6 +36,10 @@ namespace osu.Game.Rulesets.Mods
 
         private double finalRateTime;
         private double beginRampTime;
+
+        private readonly Bindable<bool> isDisabled = new Bindable<bool>();
+        public bool IsDisable => isDisabled.Value;
+        public Bindable<bool> ReplayLoaded { get; } = new Bindable<bool>();
 
         public BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
@@ -88,7 +92,25 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            applyRateAdjustment(playfield.Clock.CurrentTime);
+            if (!isDisabled.Value)
+            {
+                applyRateAdjustment(playfield.Clock.CurrentTime);
+            }
+        }
+
+        public void OnToggle()
+        {
+            if (!ReplayLoaded.Value) return;
+
+            if (isDisabled.Value)
+            {
+                isDisabled.Value = false;
+            }
+            else
+            {
+                SpeedChange.Value = InitialRate.Value;
+                isDisabled.Value = true;
+            }
         }
 
         /// <summary>
