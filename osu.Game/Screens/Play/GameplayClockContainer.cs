@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         /// By default, a value of zero will be used.
         /// Importantly, the value will be inferred from the current beatmap in <see cref="MasterGameplayClockContainer"/> by default.
         /// </remarks>
-        public double StartTime { get; private set; }
+        public double StartTime { get; protected set; }
 
         public virtual IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
 
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play
 
             InternalChildren = new Drawable[]
             {
-                GameplayClock = new FramedBeatmapClock(sourceClock, applyOffsets) { IsCoupled = false },
+                GameplayClock = new FramedBeatmapClock(applyOffsets) { IsCoupled = false },
                 Content
             };
         }
