@@ -29,8 +29,8 @@ namespace osu.Game.Tests.OnlinePlay
         public void Setup()
         {
             syncManager = new CatchUpSyncManager(master = new GameplayClockContainer(new TestManualClock()));
-            player1 = syncManager.AddClock();
-            player2 = syncManager.AddClock();
+            player1 = syncManager.CreateManagedClock();
+            player2 = syncManager.CreateManagedClock();
 
             clocksById = new Dictionary<ISpectatorPlayerClock, int>
             {
