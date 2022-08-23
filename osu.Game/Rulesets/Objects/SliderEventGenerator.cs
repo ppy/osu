@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Objects
     {
         // ReSharper disable once MethodOverloadWithOptionalParameter
         public static IEnumerable<SliderEventDescriptor> Generate(double startTime, double spanDuration, double velocity, double tickDistance, double totalDistance, int spanCount,
-                                                                  double? legacyLastTickOffset, CancellationToken cancellationToken = default)
+                                                                  double? legacyLastTickOffset, bool shouldGenerateTicks, CancellationToken cancellationToken = default)
         {
             // A very lenient maximum length of a slider for ticks to be generated.
             // This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
@@ -41,16 +41,19 @@ namespace osu.Game.Rulesets.Objects
                     double spanStartTime = startTime + span * spanDuration;
                     bool reversed = span % 2 == 1;
 
-                    var ticks = generateTicks(span, spanStartTime, spanDuration, reversed, length, tickDistance, minDistanceFromEnd, cancellationToken);
-
-                    if (reversed)
+                    if (shouldGenerateTicks)
                     {
-                        // For repeat spans, ticks are returned in reverse-StartTime order, which is undesirable for some rulesets
-                        ticks = ticks.Reverse();
-                    }
+                        var ticks = generateTicks(span, spanStartTime, spanDuration, reversed, length, tickDistance, minDistanceFromEnd, cancellationToken);
 
-                    foreach (var e in ticks)
-                        yield return e;
+                        if (reversed)
+                        {
+                            // For repeat spans, ticks are returned in reverse-StartTime order, which is undesirable for some rulesets
+                            ticks = ticks.Reverse();
+                        }
+
+                        foreach (var e in ticks)
+                            yield return e;
+                    }
 
                     if (span < spanCount - 1)
                     {

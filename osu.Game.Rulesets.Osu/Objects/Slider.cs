@@ -143,6 +143,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double TickDistanceMultiplier = 1;
 
         /// <summary>
+        /// Whether this <see cref="Slider"/> should generate <see cref="SliderTick"/>s.
+        /// </summary>
+        public bool GenerateTicks { get; private set; }
+
+        /// <summary>
         /// Whether this <see cref="Slider"/>'s judgement is fully handled by its nested <see cref="HitObject"/>s.
         /// If <c>false</c>, this <see cref="Slider"/> will be judged proportionally to the number of nested <see cref="HitObject"/>s hit.
         /// </summary>
@@ -170,13 +175,14 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
+            GenerateTicks = DifficultyControlPoint.GenerateTicks;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
             base.CreateNestedHitObjects(cancellationToken);
 
-            var sliderEvents = SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken);
+            var sliderEvents = SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, GenerateTicks, cancellationToken);
 
             foreach (var e in sliderEvents)
             {
