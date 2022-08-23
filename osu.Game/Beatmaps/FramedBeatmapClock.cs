@@ -70,14 +70,13 @@ namespace osu.Game.Beatmaps
             set => decoupledClock.IsCoupled = value;
         }
 
-        public FramedBeatmapClock(IClock? sourceClock = null, bool applyOffsets = false)
+        public FramedBeatmapClock(bool applyOffsets = false)
         {
             this.applyOffsets = applyOffsets;
 
             // A decoupled clock is used to ensure precise time values even when the host audio subsystem is not reporting
             // high precision times (on windows there's generally only 5-10ms reporting intervals, as an example).
             decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
-            decoupledClock.ChangeSource(sourceClock);
 
             if (applyOffsets)
             {
