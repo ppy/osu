@@ -128,7 +128,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 p.AllowSelection = true;
             });
 
-            moveToItem(0);
+            // ModIcon will handle clicks before EditableSelectable
+            moveToItem(0, new Vector2(50, 0));
             assertHandleVisibility(0, true);
             assertDeleteButtonVisibility(0, true);
 
