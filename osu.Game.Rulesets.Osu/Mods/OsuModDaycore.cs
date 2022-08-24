@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModDaycore : ModDaycore
     {
-        public override double ScoreMultiplier => 0.3;
+        public override double ScoreMultiplier => this.SpeedChange.Value >= 0.95 ? 0.9 : 0.3;
     }
 }

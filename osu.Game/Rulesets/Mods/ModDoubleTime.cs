@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Speed increase", "The actual increase to apply")]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
-            MinValue = 1.01,
+            MinValue = 1.10,
             MaxValue = 2,
             Default = 1.5,
             Value = 1.5,

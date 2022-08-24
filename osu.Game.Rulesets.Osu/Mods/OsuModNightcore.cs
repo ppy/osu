@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModNightcore : ModNightcore<OsuHitObject>
     {
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
+        public override double ScoreMultiplier => this.SpeedChange.Value >= 1.45 ? 1.12 : 1;
     }
 }
