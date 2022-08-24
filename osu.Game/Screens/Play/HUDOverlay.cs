@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        ModDisplay = CreateModsContainer(),
+                        ModDisplay = CreateModsContainer(replayLoaded),
                         PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                     }
                 },
@@ -261,6 +261,7 @@ namespace osu.Game.Screens.Play
         {
             (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
 
+
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
 
@@ -281,7 +282,7 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.BottomRight,
         };
 
-        protected ClickableModDisplay CreateModsContainer() => new ClickableModDisplay
+        protected ClickableModDisplay CreateModsContainer(Bindable<bool> replayLoaded) => new ClickableModDisplay(replayLoaded)
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,

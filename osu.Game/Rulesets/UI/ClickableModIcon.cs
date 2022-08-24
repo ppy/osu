@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.UI
     {
         public readonly BindableBool Selected = new BindableBool();
 
+        private readonly Bindable<bool> replayLoaded = new Bindable<bool>();
+
         private readonly SpriteIcon modIcon;
         private readonly SpriteText modAcronym;
         private readonly SpriteIcon background;
@@ -59,11 +61,13 @@ namespace osu.Game.Rulesets.UI
         /// Construct a new instance.
         /// </summary>
         /// <param name="mod">The mod to be displayed</param>
+        /// <param name="replayLoaded">Whether replay is loaded.</param>
         /// <param name="showTooltip">Whether a tooltip describing the mod should display on hover.</param>
-        public ClickableModIcon(IMod mod, bool showTooltip = true)
+        public ClickableModIcon(IMod mod, Bindable<bool> replayLoaded, bool showTooltip = true)
         {
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
             this.showTooltip = showTooltip;
+            this.replayLoaded.BindTo(replayLoaded);
 
             Size = new Vector2(size);
 
@@ -99,6 +103,8 @@ namespace osu.Game.Rulesets.UI
 
             Action = () =>
             {
+                if (!replayLoaded.Value) return;
+
                 if (mod is ICanBeToggledDuringReplay dmod)
                 {
                     dmod.OnToggle();

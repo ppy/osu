@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>();
 
+        private readonly Bindable<bool> replayLoaded = new Bindable<bool>();
+
         public Bindable<IReadOnlyList<Mod>> Current
         {
             get => current.Current;
@@ -42,9 +44,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly FillFlowContainer<ClickableModIcon> iconsContainer;
 
-        public ClickableModDisplay()
+        public ClickableModDisplay(Bindable<bool> replayLoaded)
         {
             AutoSizeAxes = Axes.Both;
+            this.replayLoaded.BindTo(replayLoaded);
 
             InternalChild = iconsContainer = new ReverseChildIDFillFlowContainer<ClickableModIcon>
             {
@@ -69,7 +72,7 @@ namespace osu.Game.Screens.Play.HUD
             if (mods.NewValue == null) return;
 
             foreach (Mod mod in mods.NewValue)
-                iconsContainer.Add(new ClickableModIcon(mod) { Scale = new Vector2(0.6f) });
+                iconsContainer.Add(new ClickableModIcon(mod, replayLoaded) { Scale = new Vector2(0.6f) });
 
             appearTransform();
         }

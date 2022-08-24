@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Mods
 
         private readonly Bindable<bool> isDisabled = new Bindable<bool>();
         public bool IsDisable => isDisabled.Value;
-        public Bindable<bool> ReplayLoaded { get; } = new Bindable<bool>();
 
         public virtual void ApplyToTrack(IAdjustableAudioComponent track)
         {
@@ -33,8 +32,6 @@ namespace osu.Game.Rulesets.Mods
 
         public void OnToggle()
         {
-            if (!ReplayLoaded.Value) return;
-
             if (isDisabled.Value)
             {
                 SpeedChange.Value = speedChange;

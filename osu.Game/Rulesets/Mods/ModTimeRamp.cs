@@ -39,7 +39,6 @@ namespace osu.Game.Rulesets.Mods
 
         private readonly Bindable<bool> isDisabled = new Bindable<bool>();
         public bool IsDisable => isDisabled.Value;
-        public Bindable<bool> ReplayLoaded { get; } = new Bindable<bool>();
 
         public BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
@@ -100,8 +99,6 @@ namespace osu.Game.Rulesets.Mods
 
         public void OnToggle()
         {
-            if (!ReplayLoaded.Value) return;
-
             if (isDisabled.Value)
             {
                 isDisabled.Value = false;

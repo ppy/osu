@@ -37,7 +37,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private readonly Bindable<bool> isDisabled = new Bindable<bool>();
         public bool IsDisable => isDisabled.Value;
-        public Bindable<bool> ReplayLoaded { get; } = new Bindable<bool>();
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -53,8 +52,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void OnToggle()
         {
-            if (!ReplayLoaded.Value) return;
-
             if (isDisabled.Value)
             {
                 blinds.Alpha = 1f;
