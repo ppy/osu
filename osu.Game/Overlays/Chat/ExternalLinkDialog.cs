@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Chat
 {
     public class ExternalLinkDialog : PopupDialog
     {
-        public ExternalLinkDialog(string url, Action openExternalLinkAction)
+        public ExternalLinkDialog(string url, Action openExternalLinkAction, Action copyExternalLinkAction)
         {
             HeaderText = "Just checking...";
             BodyText = $"You are about to leave osu! and open the following link in a web browser:\n\n{url}";
@@ -24,6 +24,11 @@ namespace osu.Game.Overlays.Chat
                 {
                     Text = @"Yes. Go for it.",
                     Action = openExternalLinkAction
+                },
+                new PopupDialogOkButton
+                {
+                    Text = @"No! Copy the URL instead!",
+                    Action = copyExternalLinkAction
                 },
                 new PopupDialogCancelButton
                 {
