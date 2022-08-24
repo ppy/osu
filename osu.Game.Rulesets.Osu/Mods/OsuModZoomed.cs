@@ -51,23 +51,23 @@ namespace osu.Game.Rulesets.Osu.Mods
         public BindableInt FinalZoomCombo { get; } = new BindableInt(200)
         {
             MinValue = 0,
-            MaxValue = 500,
+            MaxValue = 300,
             Precision = 100
         };
 
-        private double currentZoom;
+        private readonly BindableDouble currentZoom = new BindableDouble();
 
         private readonly BindableInt currentCombo = new BindableInt();
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            currentCombo.MaxValue = FinalZoomCombo.Value;
-            currentZoom = InitialZoom.Value;
+            currentZoom.Value = InitialZoom.Value;
+            currentZoom.MaxValue = getZoomForCombo(FinalZoomCombo.Value);
         }
 
         public void Update(Playfield playfield)
         {
-            double currentScale = Interpolation.ValueAt(Math.Min(Math.Abs(playfield.Clock.ElapsedFrameTime), apply_zoom_duration), playfield.Scale.X, currentZoom, 0, apply_zoom_duration, Easing.Out);
+            double currentScale = Interpolation.ValueAt(Math.Min(Math.Abs(playfield.Clock.ElapsedFrameTime), apply_zoom_duration), playfield.Scale.X, currentZoom.Value, 0, apply_zoom_duration, Easing.Out);
 
             playfield.Scale = new Vector2((float)currentScale);
 
@@ -96,10 +96,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             currentCombo.BindTo(scoreProcessor.Combo);
-            currentCombo.ValueChanged += e => currentZoom = getZoomForCombo(e.NewValue);
+            currentCombo.ValueChanged += e => currentZoom.Value = getZoomForCombo(e.NewValue);
         }
 
-        private double getZoomForCombo(int combo)
+        private double getZoomForCombo(double combo)
         {
             double increaseRatio = combo / 1000;
             return InitialZoom.Value + increaseRatio;
