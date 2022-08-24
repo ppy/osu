@@ -21,9 +21,9 @@ namespace osu.Game.Tests.OnlinePlay
         private GameplayClockContainer master;
         private CatchUpSyncManager syncManager;
 
-        private Dictionary<ISpectatorPlayerClock, int> clocksById;
-        private ISpectatorPlayerClock player1;
-        private ISpectatorPlayerClock player2;
+        private Dictionary<CatchUpSpectatorPlayerClock, int> clocksById;
+        private CatchUpSpectatorPlayerClock player1;
+        private CatchUpSpectatorPlayerClock player2;
 
         [SetUp]
         public void Setup()
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.OnlinePlay
             player1 = syncManager.CreateManagedClock();
             player2 = syncManager.CreateManagedClock();
 
-            clocksById = new Dictionary<ISpectatorPlayerClock, int>
+            clocksById = new Dictionary<CatchUpSpectatorPlayerClock, int>
             {
                 { player1, 1 },
                 { player2, 2 }
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.OnlinePlay
             assertPlayerClockState(() => player1, false);
         }
 
-        private void setWaiting(Func<ISpectatorPlayerClock> playerClock, bool waiting)
+        private void setWaiting(Func<CatchUpSpectatorPlayerClock> playerClock, bool waiting)
             => AddStep($"set player clock {clocksById[playerClock()]} waiting = {waiting}", () => playerClock().WaitingOnFrames.Value = waiting);
 
         private void setAllWaiting(bool waiting) => AddStep($"set all player clocks waiting = {waiting}", () =>
@@ -160,13 +160,13 @@ namespace osu.Game.Tests.OnlinePlay
         /// <summary>
         /// clock.Time = master.Time - offsetFromMaster
         /// </summary>
-        private void setPlayerClockTime(Func<ISpectatorPlayerClock> playerClock, double offsetFromMaster)
+        private void setPlayerClockTime(Func<CatchUpSpectatorPlayerClock> playerClock, double offsetFromMaster)
             => AddStep($"set player clock {clocksById[playerClock()]} = master - {offsetFromMaster}", () => playerClock().Seek(master.CurrentTime - offsetFromMaster));
 
-        private void assertCatchingUp(Func<ISpectatorPlayerClock> playerClock, bool catchingUp) =>
+        private void assertCatchingUp(Func<CatchUpSpectatorPlayerClock> playerClock, bool catchingUp) =>
             AddAssert($"player clock {clocksById[playerClock()]} {(catchingUp ? "is" : "is not")} catching up", () => playerClock().IsCatchingUp == catchingUp);
 
-        private void assertPlayerClockState(Func<ISpectatorPlayerClock> playerClock, bool running)
+        private void assertPlayerClockState(Func<CatchUpSpectatorPlayerClock> playerClock, bool running)
             => AddAssert($"player clock {clocksById[playerClock()]} {(running ? "is" : "is not")} running", () => playerClock().IsRunning == running);
 
         private class TestManualClock : ManualClock, IAdjustableClock

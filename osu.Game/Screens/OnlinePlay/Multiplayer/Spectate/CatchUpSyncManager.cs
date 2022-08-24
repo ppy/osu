@@ -11,7 +11,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     /// <summary>
-    /// Manages the synchronisation between one or more <see cref="ISpectatorPlayerClock"/>s in relation to a master clock.
+    /// Manages the synchronisation between one or more <see cref="CatchUpSpectatorPlayerClock"/>s in relation to a master clock.
     /// </summary>
     public class CatchUpSyncManager : Component
     {
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The player clocks.
         /// </summary>
-        private readonly List<ISpectatorPlayerClock> playerClocks = new List<ISpectatorPlayerClock>();
+        private readonly List<CatchUpSpectatorPlayerClock> playerClocks = new List<CatchUpSpectatorPlayerClock>();
 
         private readonly Bindable<MasterClockState> masterState = new Bindable<MasterClockState>();
 
@@ -61,10 +61,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         /// <summary>
-        /// Create a new managed <see cref="ISpectatorPlayerClock"/>.
+        /// Create a new managed <see cref="CatchUpSpectatorPlayerClock"/>.
         /// </summary>
-        /// <returns>The newly created <see cref="ISpectatorPlayerClock"/>.</returns>
-        public ISpectatorPlayerClock CreateManagedClock()
+        /// <returns>The newly created <see cref="CatchUpSpectatorPlayerClock"/>.</returns>
+        public CatchUpSpectatorPlayerClock CreateManagedClock()
         {
             var clock = new CatchUpSpectatorPlayerClock(MasterClock);
             playerClocks.Add(clock);
@@ -72,10 +72,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         /// <summary>
-        /// Removes an <see cref="ISpectatorPlayerClock"/>, stopping it from being managed by this <see cref="CatchUpSyncManager"/>.
+        /// Removes an <see cref="CatchUpSpectatorPlayerClock"/>, stopping it from being managed by this <see cref="CatchUpSyncManager"/>.
         /// </summary>
-        /// <param name="clock">The <see cref="ISpectatorPlayerClock"/> to remove.</param>
-        public void RemoveManagedClock(ISpectatorPlayerClock clock)
+        /// <param name="clock">The <see cref="CatchUpSpectatorPlayerClock"/> to remove.</param>
+        public void RemoveManagedClock(CatchUpSpectatorPlayerClock clock)
         {
             playerClocks.Remove(clock);
             clock.Stop();
