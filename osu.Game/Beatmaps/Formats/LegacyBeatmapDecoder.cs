@@ -373,6 +373,8 @@ namespace osu.Game.Beatmaps.Formats
             string[] split = line.Split(',');
 
             double time = getOffsetTime(Parsing.ParseDouble(split[0].Trim()));
+
+            // beatLength is allowed to be NaN to handle an edge case in which some beatmaps use NaN slider velocity to disable slider tick generation (see LegacyDifficultyControlPoint).
             double beatLength = Parsing.ParseDouble(split[1].Trim(), allowNaN: true);
 
             // If beatLength is NaN, speedMultiplier should still be 1 because all comparisons against NaN are false.
