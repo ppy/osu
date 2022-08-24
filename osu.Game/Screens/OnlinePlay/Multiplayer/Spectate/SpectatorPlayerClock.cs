@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
 
@@ -16,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The catch up rate.
         /// </summary>
-        public const double CATCHUP_RATE = 2;
+        private const double catchup_rate = 2;
 
         private readonly GameplayClockContainer masterClock;
 
@@ -25,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// Whether this clock is waiting on frames to continue playback.
         /// </summary>
-        public Bindable<bool> WaitingOnFrames { get; } = new Bindable<bool>(true);
+        public bool WaitingOnFrames { get; set; } = true;
 
         /// <summary>
         /// Whether this clock is behind the master clock and running at a higher rate to catch up to it.
@@ -68,23 +67,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
-        public double Rate => IsCatchingUp ? CATCHUP_RATE : 1;
-
-        double IAdjustableClock.Rate
+        public double Rate
         {
-            get => Rate;
-            set => throw new NotSupportedException();
+            get => IsCatchingUp ? catchup_rate : 1;
+            set => throw new NotImplementedException();
         }
-
-        double IClock.Rate => Rate;
 
         public void ProcessFrame()
         {
-            ElapsedFrameTime = 0;
-            FramesPerSecond = 0;
-
-            masterClock.ProcessFrame();
-
             if (IsRunning)
             {
                 double elapsedSource = masterClock.ElapsedFrameTime;
@@ -93,6 +83,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 CurrentTime += elapsed;
                 ElapsedFrameTime = elapsed;
                 FramesPerSecond = masterClock.FramesPerSecond;
+            }
+            else
+            {
+                ElapsedFrameTime = 0;
+                FramesPerSecond = 0;
             }
         }
 

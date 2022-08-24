@@ -146,12 +146,12 @@ namespace osu.Game.Tests.OnlinePlay
         }
 
         private void setWaiting(Func<SpectatorPlayerClock> playerClock, bool waiting)
-            => AddStep($"set player clock {clocksById[playerClock()]} waiting = {waiting}", () => playerClock().WaitingOnFrames.Value = waiting);
+            => AddStep($"set player clock {clocksById[playerClock()]} waiting = {waiting}", () => playerClock().WaitingOnFrames = waiting);
 
         private void setAllWaiting(bool waiting) => AddStep($"set all player clocks waiting = {waiting}", () =>
         {
-            player1.WaitingOnFrames.Value = waiting;
-            player2.WaitingOnFrames.Value = waiting;
+            player1.WaitingOnFrames = waiting;
+            player2.WaitingOnFrames = waiting;
         });
 
         private void setMasterTime(double time)
