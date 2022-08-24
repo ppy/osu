@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Mods
                     {
                         if (i.Mod is OsuModFlashlight dmod)
                         {
-                            return dmod.IsDisable;
+                            return dmod.IsDisabled.Value;
                         }
                     }
 
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Mods
                     {
                         if (i.Mod is OsuModFlashlight dmod)
                         {
-                            return !dmod.IsDisable;
+                            return !dmod.IsDisabled.Value;
                         }
                     }
 
