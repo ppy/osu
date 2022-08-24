@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Chat
                     Text = @"Yes. Go for it.",
                     Action = openExternalLinkAction
                 },
-                new PopupDialogOkButton
+                new PopupDialogCancelButton
                 {
                     Text = @"No! Copy the URL instead!",
                     Action = copyExternalLinkAction
