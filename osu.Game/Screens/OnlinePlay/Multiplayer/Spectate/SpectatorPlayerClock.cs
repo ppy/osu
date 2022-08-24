@@ -68,12 +68,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
-        public double Rate => IsCatchingUp ? catchup_rate : 1;
-
-        double IAdjustableClock.Rate
+        public double Rate
         {
-            get => Rate;
-            set => throw new NotSupportedException();
+            get => IsCatchingUp ? catchup_rate : 1;
+            set => throw new NotImplementedException();
         }
 
         public void ProcessFrame()
