@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
 
@@ -25,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// Whether this clock is waiting on frames to continue playback.
         /// </summary>
-        public Bindable<bool> WaitingOnFrames { get; } = new Bindable<bool>(true);
+        public bool WaitingOnFrames { get; set; } = true;
 
         /// <summary>
         /// Whether this clock is behind the master clock and running at a higher rate to catch up to it.
