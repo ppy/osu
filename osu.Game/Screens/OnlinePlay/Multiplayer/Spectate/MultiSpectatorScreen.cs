@@ -4,11 +4,9 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
@@ -52,7 +50,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private PlayerGrid grid = null!;
         private MultiSpectatorLeaderboard leaderboard = null!;
         private PlayerArea? currentAudioSource;
-        private bool canStartMasterClock;
 
         private readonly Room room;
         private readonly MultiplayerRoomUser[] users;
@@ -159,7 +156,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             masterClockContainer.Reset();
 
             syncManager.ReadyToStart += onReadyToStart;
-            syncManager.MasterState.BindValueChanged(onMasterStateChanged, true);
         }
 
         protected override void Update()
@@ -192,27 +188,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             masterClockContainer.StartTime = startTime;
             masterClockContainer.Reset(true);
-
-            // Although the clock has been started, this flag is set to allow for later synchronisation state changes to also be able to start it.
-            canStartMasterClock = true;
-        }
-
-        private void onMasterStateChanged(ValueChangedEvent<MasterClockState> state)
-        {
-            Logger.Log($"{nameof(MultiSpectatorScreen)}'s master clock become {state.NewValue}");
-
-            switch (state.NewValue)
-            {
-                case MasterClockState.Synchronised:
-                    if (canStartMasterClock)
-                        masterClockContainer.Start();
-
-                    break;
-
-                case MasterClockState.TooFarAhead:
-                    masterClockContainer.Stop();
-                    break;
-            }
         }
 
         protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState)
