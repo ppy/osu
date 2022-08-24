@@ -32,7 +32,7 @@ namespace osu.Game.Online.Chat
         public void OpenUrlExternally(string url, bool bypassWarning = false)
         {
             if (!bypassWarning && externalLinkWarning.Value)
-                dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url), () => host.GetClipboard().SetText(url)));
+                dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url), () => host.GetClipboard()?.SetText(url)));
             else
                 host.OpenUrlExternally(url);
         }
