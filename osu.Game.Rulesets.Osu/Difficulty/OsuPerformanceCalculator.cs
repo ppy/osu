@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        public const double PERFORMANCE_BASE_MULTIPLIER = 1.14;
+        public const double PERFORMANCE_BASE_MULTIPLIER = 1.12;
 
         private double accuracy;
         private int scoreMaxCombo;
