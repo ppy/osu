@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -33,12 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// An event which is invoked when gameplay is ready to start.
         /// </summary>
-        public event Action? ReadyToStart;
-
-        /// <summary>
-        /// The catch-up state of the master clock.
-        /// </summary>
-        public IBindable<MasterClockState> MasterState => masterState;
+        public Action? ReadyToStart;
 
         public double CurrentMasterTime => masterClock.CurrentTime;
 
@@ -52,9 +47,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         private readonly List<SpectatorPlayerClock> playerClocks = new List<SpectatorPlayerClock>();
 
-        private readonly Bindable<MasterClockState> masterState = new Bindable<MasterClockState>();
+        private MasterClockState masterState = MasterClockState.Synchronised;
 
         private bool hasStarted;
+
         private double? firstStartAttemptTime;
 
         public SpectatorSyncManager(GameplayClockContainer master)
@@ -111,7 +107,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (playerClocks.Count == 0)
                 return false;
 
-            int readyCount = playerClocks.Count(s => !s.WaitingOnFrames.Value);
+            int readyCount = playerClocks.Count(s => !s.WaitingOnFrames);
 
             if (readyCount == playerClocks.Count)
                 return performStart();
@@ -158,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 }
 
                 // Make sure the player clock is running if it can.
-                clock.IsRunning = !clock.WaitingOnFrames.Value;
+                clock.IsRunning = !clock.WaitingOnFrames;
 
                 if (clock.IsCatchingUp)
                 {
@@ -180,8 +176,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         private void updateMasterState()
         {
-            bool anyInSync = playerClocks.Any(s => !s.IsCatchingUp);
-            masterState.Value = anyInSync ? MasterClockState.Synchronised : MasterClockState.TooFarAhead;
+            MasterClockState newState = playerClocks.Any(s => !s.IsCatchingUp) ? MasterClockState.Synchronised : MasterClockState.TooFarAhead;
+
+            if (masterState == newState)
+                return;
+
+            masterState = newState;
+            Logger.Log($"{nameof(SpectatorSyncManager)}'s master clock become {masterState}");
+
+            switch (masterState)
+            {
+                case MasterClockState.Synchronised:
+                    if (hasStarted)
+                        masterClock.Start();
+
+                    break;
+
+                case MasterClockState.TooFarAhead:
+                    masterClock.Stop();
+                    break;
+            }
         }
     }
 }
