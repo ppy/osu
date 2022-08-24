@@ -42,6 +42,7 @@ namespace osu.Game.Overlays.Mods
         private readonly Box underlayBackground;
         private readonly Box contentBackground;
         private readonly BpmCounter counter;
+        private readonly OsuSpriteText dashText;
 
         public BpmDisplay()
         {
@@ -100,13 +101,27 @@ namespace osu.Game.Overlays.Mods
                                         }
                                     }
                                 },
-                                counter = new BpmCounter
+                                new Container
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
-                                    Current = { BindTarget = current }
-                                },
+                                    AutoSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        counter = new BpmCounter
+                                        {
+                                            Current = { BindTarget = current }
+                                        },
+                                        dashText = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold),
+                                            Text = "-"
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -152,18 +167,20 @@ namespace osu.Game.Overlays.Mods
 
             if (double.IsNormal(mostCommonBPM))
             {
-                this.FadeIn(transition_duration, Easing.OutQuint);
+                counter.FadeIn(transition_duration, Easing.OutQuint);
+                dashText.FadeOut(transition_duration, Easing.OutQuint);
             }
             else
             {
                 // when no map is selected, common length will be zero, producing infinity.
                 mostCommonBPM = 0d;
-                this.FadeOut(transition_duration, Easing.OutQuint);
+                counter.FadeOut(transition_duration, Easing.OutQuint);
+                dashText.FadeIn(transition_duration, Easing.OutQuint);
             }
 
             current.Value = (int)mostCommonBPM;
 
-            if (Precision.AlmostEquals(rate, 1d))
+            if (mostCommonBPM == 0d || Precision.AlmostEquals(rate, 1d))
             {
                 underlayBackground.FadeColour(colourProvider.Background3, transition_duration, Easing.OutQuint);
                 counter.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
