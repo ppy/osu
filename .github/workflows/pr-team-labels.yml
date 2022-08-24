@@ -11,5 +11,5 @@ jobs:
       - uses: actions/checkout@v2
       - uses: equitybee/team-label-action@v1.0.2
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.PR_WRITE_TOKEN }}
           organization-name: ppy
