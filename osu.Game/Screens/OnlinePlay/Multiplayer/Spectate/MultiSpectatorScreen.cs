@@ -73,53 +73,54 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             FillFlowContainer leaderboardFlow;
             Container scoreDisplayContainer;
 
-            masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0);
-
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
-                (Drawable)(syncManager = new SpectatorSyncManager(masterClockContainer)
+                masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
                 {
-                    ReadyToStart = performInitialSeek,
-                }),
-                masterClockContainer.WithChild(new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                    Content = new[]
+                    Child = new GridContainer
                     {
-                        new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                        Content = new[]
                         {
-                            scoreDisplayContainer = new Container
+                            new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
-                            },
-                        },
-                        new Drawable[]
-                        {
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                                Content = new[]
+                                scoreDisplayContainer = new Container
                                 {
-                                    new Drawable[]
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y
+                                },
+                            },
+                            new Drawable[]
+                            {
+                                new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                    Content = new[]
                                     {
-                                        leaderboardFlow = new FillFlowContainer
+                                        new Drawable[]
                                         {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Vertical,
-                                            Spacing = new Vector2(5)
-                                        },
-                                        grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                                            leaderboardFlow = new FillFlowContainer
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Vertical,
+                                                Spacing = new Vector2(5)
+                                            },
+                                            grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                })
+                },
+                syncManager = new SpectatorSyncManager(masterClockContainer)
+                {
+                    ReadyToStart = performInitialSeek,
+                }
             };
 
             for (int i = 0; i < Users.Count; i++)
