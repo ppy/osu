@@ -29,7 +29,6 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private DependencyProvidingContainer dependencyContainer = null!;
         private ClicksPerSecondCalculator calculator = null!;
-        private ManualInputListener? listener;
         private GameplayClockContainer gameplayClockContainer = null!;
         private ManualClock manualClock = null!;
         private DrawableRuleset? drawableRuleset;
@@ -151,7 +150,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                         }
                     }
                 };
-                calculator.Listener = listener = new ManualInputListener(calculator);
             });
         }
 
@@ -189,7 +187,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             foreach (double timestamp in inputs)
             {
                 seekAllClocks(timestamp);
-                listener?.AddInput();
+                calculator.AddTimestamp();
             }
 
             seekAllClocks(baseTime);
@@ -270,18 +268,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public IBindable<bool> WaitingOnFrames => new Bindable<bool>();
         }
 
-        private class ManualInputListener : ClicksPerSecondCalculator.InputListener
-        {
-            public void AddInput() => Calculator.AddTimestamp();
-
-            public ManualInputListener(ClicksPerSecondCalculator calculator)
-                : base(calculator)
-            {
-            }
-        }
-
-#nullable disable
-
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
         private class TestDrawableRuleset : DrawableRuleset
         {
@@ -299,24 +285,19 @@ namespace osu.Game.Tests.Visual.Gameplay
                 remove => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
             }
 
-            public override Playfield Playfield => null;
-            public override Container Overlays => null;
-            public override Container FrameStableComponents => null;
+            public override Playfield Playfield => null!;
+            public override Container Overlays => null!;
+            public override Container FrameStableComponents => null!;
             public override IFrameStableClock FrameStableClock { get; }
 
             internal override bool FrameStablePlayback { get; set; }
             public override IReadOnlyList<Mod> Mods => Array.Empty<Mod>();
 
             public override double GameplayStartTime => 0;
-            public override GameplayCursorContainer Cursor => null;
-
-            public TestDrawableRuleset()
-                : base(new OsuRuleset())
-            {
-            }
+            public override GameplayCursorContainer Cursor => null!;
 
             public TestDrawableRuleset(IFrameStableClock frameStableClock)
-                : this()
+                : base(new OsuRuleset())
             {
                 FrameStableClock = frameStableClock;
             }

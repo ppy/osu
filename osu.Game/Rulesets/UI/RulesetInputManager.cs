@@ -194,20 +194,20 @@ namespace osu.Game.Rulesets.UI
             var listener = new ActionListener(calculator);
 
             KeyBindingContainer.Add(listener);
-
-            calculator.Listener = listener;
         }
 
-        private class ActionListener : ClicksPerSecondCalculator.InputListener, IKeyBindingHandler<T>
+        private class ActionListener : Component, IKeyBindingHandler<T>
         {
+            private readonly ClicksPerSecondCalculator calculator;
+
             public ActionListener(ClicksPerSecondCalculator calculator)
-                : base(calculator)
             {
+                this.calculator = calculator;
             }
 
             public bool OnPressed(KeyBindingPressEvent<T> e)
             {
-                Calculator.AddTimestamp();
+                calculator.AddTimestamp();
                 return false;
             }
 

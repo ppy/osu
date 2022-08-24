@@ -16,9 +16,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
     public class ClicksPerSecondCounter : RollingCounter<int>, ISkinnableDrawable
     {
-        private const float alpha_when_invalid = 0.3f;
-
-        [Resolved(canBeNull: false)]
+        [Resolved]
         private ClicksPerSecondCalculator calculator { get; set; } = null!;
 
         protected override double RollingDuration => 350;
@@ -40,7 +38,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
         {
             base.Update();
 
-            Current.Value = calculator.Ready ? calculator.Value : 0;
+            Current.Value = calculator.Value;
         }
 
         protected override IHasText CreateText() => new TextComponent();
