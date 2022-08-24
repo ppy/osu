@@ -22,7 +22,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public double CurrentTime { get; private set; }
 
-        public bool IsRunning { get; private set; }
+        /// <summary>
+        /// Whether this clock is waiting on frames to continue playback.
+        /// </summary>
+        public Bindable<bool> WaitingOnFrames { get; } = new Bindable<bool>(true);
+
+        /// <summary>
+        /// Whether this clock is behind the master clock and running at a higher rate to catch up to it.
+        /// </summary>
+        /// <remarks>
+        /// Of note, this will be false if this clock is *ahead* of the master clock.
+        /// </remarks>
+        public bool IsCatchingUp { get; set; }
+
+        /// <summary>
+        /// Whether this spectator clock should be running.
+        /// Use instead of <see cref="Start"/> / <see cref="Stop"/> to control time.
+        /// </summary>
+        public bool IsRunning { get; set; }
 
         public SpectatorPlayerClock(GameplayClockContainer masterClock)
         {
@@ -31,24 +48,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public void Reset() => CurrentTime = 0;
 
-        /// <summary>
-        /// Starts this <see cref="SpectatorPlayerClock"/>.
-        /// </summary>
-        public void Start() => IsRunning = true;
-
-        /// <summary>
-        /// Stops this <see cref="SpectatorPlayerClock"/>.
-        /// </summary>
-        public void Stop() => IsRunning = false;
-
-        void IAdjustableClock.Start()
+        public void Start()
         {
-            // Our running state should only be managed by an ISyncManager, ignore calls from external sources.
+            // Our running state should only be managed by SpectatorSyncManager via IsRunning.
         }
 
-        void IAdjustableClock.Stop()
+        public void Stop()
         {
-            // Our running state should only be managed by an ISyncManager, ignore calls from external sources.
+            // Our running state should only be managed by an SpectatorSyncManager via IsRunning.
         }
 
         public bool Seek(double position)
@@ -94,18 +101,5 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public double FramesPerSecond { get; private set; }
 
         public FrameTimeInfo TimeInfo => new FrameTimeInfo { Elapsed = ElapsedFrameTime, Current = CurrentTime };
-
-        /// <summary>
-        /// Whether this clock is waiting on frames to continue playback.
-        /// </summary>
-        public Bindable<bool> WaitingOnFrames { get; } = new Bindable<bool>(true);
-
-        /// <summary>
-        /// Whether this clock is behind the master clock and running at a higher rate to catch up to it.
-        /// </summary>
-        /// <remarks>
-        /// Of note, this will be false if this clock is *ahead* of the master clock.
-        /// </remarks>
-        public bool IsCatchingUp { get; set; }
     }
 }
