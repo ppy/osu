@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Gameplay
                 });
             });
 
-            AddStep("reset clock", () => gameplayContainer.Start());
+            AddStep("reset clock", () => gameplayContainer.Reset(startClock: true));
 
             AddUntilStep("sample played", () => sample.RequestedPlaying);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Gameplay
                 });
             });
 
-            AddStep("start", () => gameplayContainer.Start());
+            AddStep("reset clock", () => gameplayContainer.Reset(startClock: true));
 
             AddUntilStep("sample played", () => sample.IsPlayed);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
