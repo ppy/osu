@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -17,15 +18,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public const double CATCHUP_RATE = 2;
 
-        public readonly IFrameBasedClock Source;
+        private readonly GameplayClockContainer masterClock;
 
         public double CurrentTime { get; private set; }
 
         public bool IsRunning { get; private set; }
 
-        public CatchUpSpectatorPlayerClock(IFrameBasedClock source)
+        public CatchUpSpectatorPlayerClock(GameplayClockContainer masterClock)
         {
-            Source = source;
+            this.masterClock = masterClock;
         }
 
         public void Reset() => CurrentTime = 0;
@@ -69,16 +70,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             ElapsedFrameTime = 0;
             FramesPerSecond = 0;
 
-            Source.ProcessFrame();
+            masterClock.ProcessFrame();
 
             if (IsRunning)
             {
-                double elapsedSource = Source.ElapsedFrameTime;
+                double elapsedSource = masterClock.ElapsedFrameTime;
                 double elapsed = elapsedSource * Rate;
 
                 CurrentTime += elapsed;
                 ElapsedFrameTime = elapsed;
-                FramesPerSecond = Source.FramesPerSecond;
+                FramesPerSecond = masterClock.FramesPerSecond;
             }
         }
 
