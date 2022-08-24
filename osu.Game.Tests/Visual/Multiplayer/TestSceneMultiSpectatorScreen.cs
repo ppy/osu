@@ -357,12 +357,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         /// <summary>
         /// Tests spectating with a beatmap that has a high <see cref="BeatmapInfo.AudioLeadIn"/> value.
+        ///
+        /// This test is not intended not to check the correct initial time value, but only to guard against
+        /// gameplay potentially getting stuck in a stopped state due to lead in time being present.
         /// </summary>
         [Test]
         public void TestAudioLeadIn() => testLeadIn(b => b.BeatmapInfo.AudioLeadIn = 2000);
 
         /// <summary>
         /// Tests spectating with a beatmap that has a storyboard element with a negative start time (i.e. intro storyboard element).
+        ///
+        /// This test is not intended not to check the correct initial time value, but only to guard against
+        /// gameplay potentially getting stuck in a stopped state due to lead in time being present.
         /// </summary>
         [Test]
         public void TestIntroStoryboardElement() => testLeadIn(b =>
@@ -384,7 +390,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for player load", () => spectatorScreen.AllPlayersLoaded);
 
-            AddWaitStep("wait for progression", 3);
+            AddUntilStep($"wait for clock running", () => getInstance(PLAYER_1_ID).SpectatorPlayerClock.IsRunning);
 
             assertNotCatchingUp(PLAYER_1_ID);
             assertRunning(PLAYER_1_ID);
