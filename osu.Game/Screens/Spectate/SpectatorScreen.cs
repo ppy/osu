@@ -118,11 +118,6 @@ namespace osu.Game.Screens.Spectate
                     foreach ((int userId, SpectatorState state) in e.NewItems.AsNonNull())
                         onUserStateChanged(userId, state);
                     break;
-
-                case NotifyDictionaryChangedAction.Remove:
-                    foreach ((int userId, SpectatorState state) in e.OldItems.AsNonNull())
-                        onUserStateChanged(userId, state);
-                    break;
             }
         }
 
