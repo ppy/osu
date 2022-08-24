@@ -261,7 +261,6 @@ namespace osu.Game.Screens.Play
         {
             (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
 
-
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
 
