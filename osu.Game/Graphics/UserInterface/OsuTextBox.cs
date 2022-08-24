@@ -193,7 +193,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 default:
                     channel = selectCharSample?.GetChannel();
-                    pitch += (SelectedText.Length / (float)Text.Length) * 0.15f;
+                    pitch += (SelectedText.Length / (double)Text.Length) * 0.15f;
                     break;
             }
 
