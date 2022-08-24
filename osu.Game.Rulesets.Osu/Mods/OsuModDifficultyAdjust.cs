@@ -60,10 +60,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             double res = 1.00; // => Base value
 
             // <=> Laggy method
-            if(9.5 < this.ApproachRate.Value) res += 0.05; 
-            if(9.5 < this.DrainRate.Value) res += 0.04;
-            if(9.5 < this.CircleSize.Value) res += 0.05; 
-            if(9.5 < this.OverallDifficulty.Value) res += 0.06; 
+            if(9.5 < ApproachRate.Value) res += 0.05; 
+            if(9.5 < DrainRate.Value) res += 0.04;
+            if(9.5 < CircleSize.Value) res += 0.05; 
+            if(9.5 < OverallDifficulty.Value) res += 0.06; 
 
             return res;
         }
