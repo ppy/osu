@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -35,7 +33,7 @@ namespace osu.Game.Rulesets.UI
 
         private const float size = 80;
 
-        public virtual LocalisableString TooltipText => showTooltip ? ((mod as Mod)?.IconTooltip ?? mod.Name) : null;
+        public virtual LocalisableString TooltipText => showTooltip ? ((mod as Mod)?.IconTooltip ?? mod.Name) : string.Empty;
 
         private IMod mod;
         private readonly bool showTooltip;
@@ -53,7 +51,7 @@ namespace osu.Game.Rulesets.UI
         }
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = new OsuColour();
 
         private Color4 backgroundColour;
 
