@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -35,11 +36,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public event Action? ReadyToStart;
 
-        /// <summary>
-        /// The catch-up state of the master clock.
-        /// </summary>
-        public IBindable<MasterClockState> MasterState => masterState;
-
         public double CurrentMasterTime => masterClock.CurrentTime;
 
         /// <summary>
@@ -55,11 +51,32 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private readonly Bindable<MasterClockState> masterState = new Bindable<MasterClockState>();
 
         private bool hasStarted;
+
         private double? firstStartAttemptTime;
 
         public SpectatorSyncManager(GameplayClockContainer master)
         {
             masterClock = master;
+
+            masterState.BindValueChanged(onMasterStateChanged);
+        }
+
+        private void onMasterStateChanged(ValueChangedEvent<MasterClockState> state)
+        {
+            Logger.Log($"{nameof(SpectatorSyncManager)}'s master clock become {state.NewValue}");
+
+            switch (state.NewValue)
+            {
+                case MasterClockState.Synchronised:
+                    if (hasStarted)
+                        masterClock.Start();
+
+                    break;
+
+                case MasterClockState.TooFarAhead:
+                    masterClock.Stop();
+                    break;
+            }
         }
 
         /// <summary>
