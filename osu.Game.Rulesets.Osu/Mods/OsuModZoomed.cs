@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "ZM";
         public override IconUsage? Icon => FontAwesome.Solid.Glasses;
         public override ModType Type => ModType.Fun;
-        public override string Description => "Big brother is watching your cursor.";
+        public override LocalisableString Description => "Big brother is watching your cursor.";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModBarrelRoll) };
 
