@@ -9,9 +9,9 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     /// <summary>
-    /// A <see cref="CatchUpSpectatorPlayerClock"/> which catches up using rate adjustment.
+    /// A clock which catches up using rate adjustment.
     /// </summary>
-    public class CatchUpSpectatorPlayerClock : IFrameBasedClock, IAdjustableClock
+    public class SpectatorPlayerClock : IFrameBasedClock, IAdjustableClock
     {
         /// <summary>
         /// The catch up rate.
@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public bool IsRunning { get; private set; }
 
-        public CatchUpSpectatorPlayerClock(GameplayClockContainer masterClock)
+        public SpectatorPlayerClock(GameplayClockContainer masterClock)
         {
             this.masterClock = masterClock;
         }
@@ -32,12 +32,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public void Reset() => CurrentTime = 0;
 
         /// <summary>
-        /// Starts this <see cref="CatchUpSpectatorPlayerClock"/>.
+        /// Starts this <see cref="SpectatorPlayerClock"/>.
         /// </summary>
         public void Start() => IsRunning = true;
 
         /// <summary>
-        /// Stops this <see cref="CatchUpSpectatorPlayerClock"/>.
+        /// Stops this <see cref="SpectatorPlayerClock"/>.
         /// </summary>
         public void Stop() => IsRunning = false;
 
