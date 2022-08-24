@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// An event which is invoked when gameplay is ready to start.
         /// </summary>
-        public event Action? ReadyToStart;
+        public Action? ReadyToStart;
 
         public double CurrentMasterTime => masterClock.CurrentTime;
 

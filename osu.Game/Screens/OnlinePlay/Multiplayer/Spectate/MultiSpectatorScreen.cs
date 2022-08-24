@@ -78,7 +78,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             InternalChildren = new[]
             {
-                (Drawable)(syncManager = new SpectatorSyncManager(masterClockContainer)),
+                (Drawable)(syncManager = new SpectatorSyncManager(masterClockContainer)
+                {
+                    ReadyToStart = performInitialSeek,
+                }),
                 masterClockContainer.WithChild(new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -154,8 +157,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             base.LoadComplete();
 
             masterClockContainer.Reset();
-
-            syncManager.ReadyToStart += onReadyToStart;
         }
 
         protected override void Update()
@@ -176,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private bool isCandidateAudioSource(SpectatorPlayerClock? clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames;
 
-        private void onReadyToStart()
+        private void performInitialSeek()
         {
             // Seek the master clock to the gameplay time.
             // This is chosen as the first available frame in the players' replays, which matches the seek by each individual SpectatorPlayer.
