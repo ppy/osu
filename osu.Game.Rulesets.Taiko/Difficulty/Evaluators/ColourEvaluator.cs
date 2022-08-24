@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(MonoStreak monoStreak)
         {
-            return sigmoid(monoStreak.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(monoStreak.Parent!) * 0.5;
+            return sigmoid(monoStreak.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(monoStreak.Parent) * 0.5;
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(AlternatingMonoPattern alternatingMonoPattern)
         {
-            return sigmoid(alternatingMonoPattern.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(alternatingMonoPattern.Parent!);
+            return sigmoid(alternatingMonoPattern.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(alternatingMonoPattern.Parent);
         }
 
         /// <summary>
