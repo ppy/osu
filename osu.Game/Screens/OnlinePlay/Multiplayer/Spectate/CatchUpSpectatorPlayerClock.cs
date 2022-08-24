@@ -9,9 +9,9 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     /// <summary>
-    /// A <see cref="ISpectatorPlayerClock"/> which catches up using rate adjustment.
+    /// A <see cref="CatchUpSpectatorPlayerClock"/> which catches up using rate adjustment.
     /// </summary>
-    public class CatchUpSpectatorPlayerClock : ISpectatorPlayerClock
+    public class CatchUpSpectatorPlayerClock : IFrameBasedClock, IAdjustableClock
     {
         /// <summary>
         /// The catch up rate.
@@ -31,8 +31,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public void Reset() => CurrentTime = 0;
 
+        /// <summary>
+        /// Starts this <see cref="CatchUpSpectatorPlayerClock"/>.
+        /// </summary>
         public void Start() => IsRunning = true;
 
+        /// <summary>
+        /// Stops this <see cref="CatchUpSpectatorPlayerClock"/>.
+        /// </summary>
         public void Stop() => IsRunning = false;
 
         void IAdjustableClock.Start()
@@ -89,8 +95,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public FrameTimeInfo TimeInfo => new FrameTimeInfo { Elapsed = ElapsedFrameTime, Current = CurrentTime };
 
+        /// <summary>
+        /// Whether this clock is waiting on frames to continue playback.
+        /// </summary>
         public Bindable<bool> WaitingOnFrames { get; } = new Bindable<bool>(true);
 
+        /// <summary>
+        /// Whether this clock is behind the master clock and running at a higher rate to catch up to it.
+        /// </summary>
+        /// <remarks>
+        /// Of note, this will be false if this clock is *ahead* of the master clock.
+        /// </remarks>
         public bool IsCatchingUp { get; set; }
     }
 }

@@ -177,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
         }
 
-        private bool isCandidateAudioSource(ISpectatorPlayerClock? clock)
+        private bool isCandidateAudioSource(CatchUpSpectatorPlayerClock? clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
 
         private void onReadyToStart()

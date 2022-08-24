@@ -15,14 +15,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     public class MultiSpectatorPlayer : SpectatorPlayer
     {
         private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>(true);
-        private readonly ISpectatorPlayerClock spectatorPlayerClock;
+        private readonly CatchUpSpectatorPlayerClock spectatorPlayerClock;
 
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorPlayer"/>.
         /// </summary>
         /// <param name="score">The score containing the player's replay.</param>
         /// <param name="spectatorPlayerClock">The clock controlling the gameplay running state.</param>
-        public MultiSpectatorPlayer(Score score, ISpectatorPlayerClock spectatorPlayerClock)
+        public MultiSpectatorPlayer(Score score, CatchUpSpectatorPlayerClock spectatorPlayerClock)
             : base(score, new PlayerConfiguration { AllowUserInteraction = false })
         {
             this.spectatorPlayerClock = spectatorPlayerClock;
