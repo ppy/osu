@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// <summary>
         /// The parent <see cref="AlternatingMonoPattern"/> that contains this <see cref="MonoStreak"/>
         /// </summary>
-        public AlternatingMonoPattern? Parent;
+        public AlternatingMonoPattern Parent = null!;
 
         /// <summary>
         /// Index of this <see cref="MonoStreak"/> within it's parent <see cref="AlternatingMonoPattern"/>

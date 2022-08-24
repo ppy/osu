@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data
         /// <summary>
         /// The parent <see cref="RepeatingHitPatterns"/> that contains this <see cref="AlternatingMonoPattern"/>
         /// </summary>
-        public RepeatingHitPatterns? Parent;
+        public RepeatingHitPatterns Parent = null!;
 
         /// <summary>
         /// Index of this <see cref="AlternatingMonoPattern"/> within it's parent <see cref="RepeatingHitPatterns"/>
