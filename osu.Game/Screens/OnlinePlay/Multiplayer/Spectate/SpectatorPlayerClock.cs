@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The catch up rate.
         /// </summary>
-        public const double CATCHUP_RATE = 2;
+        private const double catchup_rate = 2;
 
         private readonly GameplayClockContainer masterClock;
 
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
-        public double Rate => IsCatchingUp ? CATCHUP_RATE : 1;
+        public double Rate => IsCatchingUp ? catchup_rate : 1;
 
         double IAdjustableClock.Rate
         {
@@ -76,13 +76,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             set => throw new NotSupportedException();
         }
 
-        double IClock.Rate => Rate;
-
         public void ProcessFrame()
         {
-            ElapsedFrameTime = 0;
-            FramesPerSecond = 0;
-
             if (IsRunning)
             {
                 double elapsedSource = masterClock.ElapsedFrameTime;
@@ -91,6 +86,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 CurrentTime += elapsed;
                 ElapsedFrameTime = elapsed;
                 FramesPerSecond = masterClock.FramesPerSecond;
+            }
+            else
+            {
+                ElapsedFrameTime = 0;
+                FramesPerSecond = 0;
             }
         }
 
