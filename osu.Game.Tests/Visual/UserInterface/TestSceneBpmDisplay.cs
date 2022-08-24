@@ -25,26 +25,30 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestBpmDisplay()
         {
-            BpmDisplay disp = null!;
+            BpmDisplay bpmDisplay = null!;
 
-            int getDisplayedBpm() => disp.ChildrenOfType<RollingCounter<int>>().Single().Current.Value;
+            int getDisplayedBpm() => bpmDisplay.ChildrenOfType<RollingCounter<int>>().Single().Current.Value;
 
             AddStep("create content", () =>
             {
-                Child = disp = new BpmDisplay()
+                Child = bpmDisplay = new BpmDisplay()
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 };
             });
-            AddUntilStep("display hidden", () => disp.Alpha == 0f);
+            AddUntilStep("display hidden", () => bpmDisplay.Alpha == 0f);
             AddStep("load beatmap", () =>
             {
                 var beatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
-                beatmap.ControlPointInfo.Add(0d, new TimingControlPoint() { BeatLength = 500d, TimeSignature = TimeSignature.SimpleQuadruple });
+                beatmap.ControlPointInfo.Add(0, new TimingControlPoint
+                {
+                    BeatLength = 500d,
+                    TimeSignature = TimeSignature.SimpleQuadruple
+                });
                 Beatmap.Value = CreateWorkingBeatmap(beatmap);
             });
-            AddUntilStep("display shown", () => disp.Alpha == 1f);
+            AddUntilStep("display shown", () => bpmDisplay.Alpha == 1f);
             AddAssert("bpm is 128", () => getDisplayedBpm() == 128);
             AddStep("select DT", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });
             AddAssert("bpm is 192", () => getDisplayedBpm() == 192); //128*1.5
