@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer = null!;
-        private CatchUpSyncManager syncManager = null!;
+        private SpectatorSyncManager syncManager = null!;
         private PlayerGrid grid = null!;
         private MultiSpectatorLeaderboard leaderboard = null!;
         private PlayerArea? currentAudioSource;
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             InternalChildren = new[]
             {
-                (Drawable)(syncManager = new CatchUpSyncManager(masterClockContainer)),
+                (Drawable)(syncManager = new SpectatorSyncManager(masterClockContainer)),
                 masterClockContainer.WithChild(new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
         }
 
-        private bool isCandidateAudioSource(CatchUpSpectatorPlayerClock? clock)
+        private bool isCandidateAudioSource(SpectatorPlayerClock? clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
 
         private void onReadyToStart()
