@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             checkPausedInstant(PLAYER_2_ID, true);
 
             // Wait for the start delay seconds...
-            AddWaitStep("wait maximum start delay seconds", (int)(CatchUpSyncManager.MAXIMUM_START_DELAY / TimePerAction));
+            AddWaitStep("wait maximum start delay seconds", (int)(SpectatorSyncManager.MAXIMUM_START_DELAY / TimePerAction));
 
             // Player 1 should start playing by itself, player 2 should remain paused.
             checkPausedInstant(PLAYER_1_ID, false);
@@ -318,7 +318,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             loadSpectateScreen();
             sendFrames(PLAYER_1_ID, 300);
 
-            AddWaitStep("wait maximum start delay seconds", (int)(CatchUpSyncManager.MAXIMUM_START_DELAY / TimePerAction));
+            AddWaitStep("wait maximum start delay seconds", (int)(SpectatorSyncManager.MAXIMUM_START_DELAY / TimePerAction));
             checkPaused(PLAYER_1_ID, false);
 
             sendFrames(PLAYER_2_ID, 300);

@@ -127,13 +127,16 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     didFlip = true;
 
-                    foreach (var point in slider.Path.ControlPoints)
-                    {
-                        point.Position = new Vector2(
-                            (direction == Direction.Horizontal ? -1 : 1) * point.Position.X,
-                            (direction == Direction.Vertical ? -1 : 1) * point.Position.Y
-                        );
-                    }
+                    var controlPoints = slider.Path.ControlPoints.Select(p =>
+                        new PathControlPoint(new Vector2(
+                            (direction == Direction.Horizontal ? -1 : 1) * p.Position.X,
+                            (direction == Direction.Vertical ? -1 : 1) * p.Position.Y
+                        ), p.Type)).ToArray();
+
+                    // Importantly, update as a single operation so automatic adjustment of control points to different
+                    // curve types does not unexpectedly trigger and change the slider's shape.
+                    slider.Path.ControlPoints.Clear();
+                    slider.Path.ControlPoints.AddRange(controlPoints);
                 }
             }
 
@@ -183,8 +186,13 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (h is IHasPath path)
                 {
-                    foreach (var point in path.Path.ControlPoints)
-                        point.Position = RotatePointAroundOrigin(point.Position, Vector2.Zero, delta);
+                    var controlPoints = path.Path.ControlPoints.Select(p =>
+                        new PathControlPoint(RotatePointAroundOrigin(p.Position, Vector2.Zero, delta), p.Type)).ToArray();
+
+                    // Importantly, update as a single operation so automatic adjustment of control points to different
+                    // curve types does not unexpectedly trigger and change the slider's shape.
+                    path.Path.ControlPoints.Clear();
+                    path.Path.ControlPoints.AddRange(controlPoints);
                 }
             }
 
