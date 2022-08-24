@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
@@ -195,6 +196,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private void onMasterStateChanged(ValueChangedEvent<MasterClockState> state)
         {
+            Logger.Log($"{nameof(MultiSpectatorScreen)}'s master clock become {state.NewValue}");
+
             switch (state.NewValue)
             {
                 case MasterClockState.Synchronised:

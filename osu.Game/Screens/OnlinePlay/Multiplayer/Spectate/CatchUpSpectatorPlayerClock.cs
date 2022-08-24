@@ -73,7 +73,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             if (IsRunning)
             {
-                double elapsedSource = Source.ElapsedFrameTime;
+                // When in catch-up mode, the source is usually not running.
+                // In such a case, its elapsed time may be zero, which would cause catch-up to get stuck.
+                // To avoid this, use a constant 16ms elapsed time for now. Probably not too correct, but this whole logic isn't too correct anyway.
+                double elapsedSource = Source.IsRunning ? Source.ElapsedFrameTime : 16;
                 double elapsed = elapsedSource * Rate;
 
                 CurrentTime += elapsed;
