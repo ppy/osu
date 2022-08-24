@@ -1,0 +1,15 @@
+name: Assign PR team labels
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  team-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: equitybee/team-label-action@main
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          organization-name: ppy
