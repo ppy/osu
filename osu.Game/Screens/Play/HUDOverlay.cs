@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play
         public float BottomScoringElementsHeight { get; private set; }
 
         public readonly KeyCounterDisplay KeyCounter;
-        public readonly ModDisplay ModDisplay;
+        public readonly ClickableModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
@@ -281,7 +281,7 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.BottomRight,
         };
 
-        protected ModDisplay CreateModsContainer() => new ModDisplay
+        protected ClickableModDisplay CreateModsContainer() => new ClickableModDisplay
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,

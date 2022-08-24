@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// Display the specified mod at a fixed size.
     /// </summary>
-    public class ModIcon : Container, IHasTooltip
+    public class ClickableModIcon : ClickableContainer, IHasTooltip
     {
         public readonly BindableBool Selected = new BindableBool();
 
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="mod">The mod to be displayed</param>
         /// <param name="showTooltip">Whether a tooltip describing the mod should display on hover.</param>
-        public ModIcon(IMod mod, bool showTooltip = true)
+        public ClickableModIcon(IMod mod, bool showTooltip = true)
         {
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
             this.showTooltip = showTooltip;
@@ -95,6 +95,16 @@ namespace osu.Game.Rulesets.UI
                     Size = new Vector2(45),
                     Icon = FontAwesome.Solid.Question
                 },
+            };
+
+            Action = () =>
+            {
+                if (mod is ICanBeToggledDuringReplay dmod)
+                {
+                    dmod.OnToggle();
+
+                    Colour = dmod.IsDisable ? OsuColour.Gray(0.7f) : Colour = Color4.White;
+                }
             };
         }
 
