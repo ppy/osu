@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Screens.Play;
@@ -48,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         private readonly List<SpectatorPlayerClock> playerClocks = new List<SpectatorPlayerClock>();
 
-        private readonly Bindable<MasterClockState> masterState = new Bindable<MasterClockState>();
+        private MasterClockState masterState = MasterClockState.Synchronised;
 
         private bool hasStarted;
 
@@ -57,26 +56,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public SpectatorSyncManager(GameplayClockContainer master)
         {
             masterClock = master;
-
-            masterState.BindValueChanged(onMasterStateChanged);
-        }
-
-        private void onMasterStateChanged(ValueChangedEvent<MasterClockState> state)
-        {
-            Logger.Log($"{nameof(SpectatorSyncManager)}'s master clock become {state.NewValue}");
-
-            switch (state.NewValue)
-            {
-                case MasterClockState.Synchronised:
-                    if (hasStarted)
-                        masterClock.Start();
-
-                    break;
-
-                case MasterClockState.TooFarAhead:
-                    masterClock.Stop();
-                    break;
-            }
         }
 
         /// <summary>
@@ -197,8 +176,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         private void updateMasterState()
         {
-            bool anyInSync = playerClocks.Any(s => !s.IsCatchingUp);
-            masterState.Value = anyInSync ? MasterClockState.Synchronised : MasterClockState.TooFarAhead;
+            MasterClockState newState = playerClocks.Any(s => !s.IsCatchingUp) ? MasterClockState.Synchronised : MasterClockState.TooFarAhead;
+
+            if (masterState == newState)
+                return;
+
+            masterState = newState;
+            Logger.Log($"{nameof(SpectatorSyncManager)}'s master clock become {masterState}");
+
+            switch (masterState)
+            {
+                case MasterClockState.Synchronised:
+                    if (hasStarted)
+                        masterClock.Start();
+
+                    break;
+
+                case MasterClockState.TooFarAhead:
+                    masterClock.Stop();
+                    break;
+            }
         }
     }
 }
