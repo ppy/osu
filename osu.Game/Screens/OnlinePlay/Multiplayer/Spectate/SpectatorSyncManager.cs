@@ -45,7 +45,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The master clock which is used to control the timing of all player clocks clocks.
         /// </summary>
-        private GameplayClockContainer masterClock { get; }
+        private readonly GameplayClockContainer masterClock;
 
         /// <summary>
         /// The player clocks.
