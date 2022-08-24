@@ -81,6 +81,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             private readonly CompositeDrawable restrictTo;
 
+            private readonly BindableBool disabled = new BindableBool();
+
             /// <summary>
             /// <para>
             /// Percentage of playfield to extend blinds over. Basically moves the origin points where the blinds start.
@@ -98,11 +100,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 this.restrictTo = restrictTo;
                 this.beatmap = beatmap;
+                disabled.BindTo(disabledBind);
 
                 targetBreakMultiplier = 0;
                 easing = 1;
 
-                disabledBind.BindValueChanged(disable => Alpha = disable.NewValue ? 0.3f : 1.0f);
+                disabled.BindValueChanged(disable => Alpha = disable.NewValue ? 0.3f : 1.0f);
             }
 
             [BackgroundDependencyLoader]
