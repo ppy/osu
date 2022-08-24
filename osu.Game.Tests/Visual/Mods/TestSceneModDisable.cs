@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Mods
         {
             AddStep($"move mouse to mod {typeof(T)}", () =>
             {
-                foreach (var i in player.ChildrenOfType<ModIcon>())
+                foreach (var i in player.ChildrenOfType<ClickableModIcon>())
                 {
                     if (i.Mod is T)
                     {
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Mods
                 Mod = new OsuModFlashlight(),
                 PassCondition = () =>
                 {
-                    foreach (var i in player.ChildrenOfType<ModIcon>())
+                    foreach (var i in player.ChildrenOfType<ClickableModIcon>())
                     {
                         if (i.Mod is OsuModFlashlight dmod)
                         {
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Mods
                 Mod = new OsuModFlashlight(),
                 PassCondition = () =>
                 {
-                    foreach (var i in player.ChildrenOfType<ModIcon>())
+                    foreach (var i in player.ChildrenOfType<ClickableModIcon>())
                     {
                         if (i.Mod is OsuModFlashlight dmod)
                         {
