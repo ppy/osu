@@ -80,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public void RemoveManagedClock(SpectatorPlayerClock clock)
         {
             playerClocks.Remove(clock);
-            clock.Stop();
+            clock.IsRunning = false;
         }
 
         protected override void Update()
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
                 // Ensure all player clocks are stopped until the start succeeds.
                 foreach (var clock in playerClocks)
-                    clock.Stop();
+                    clock.IsRunning = true;
                 return;
             }
 
@@ -153,15 +153,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                     // Importantly, set the clock to a non-catchup state. if this isn't done, updateMasterState may incorrectly pause the master clock
                     // when it is required to be running (ie. if all players are ahead of the master).
                     clock.IsCatchingUp = false;
-                    clock.Stop();
+                    clock.IsRunning = false;
                     continue;
                 }
 
                 // Make sure the player clock is running if it can.
-                if (!clock.WaitingOnFrames.Value)
-                    clock.Start();
-                else
-                    clock.Stop();
+                clock.IsRunning = !clock.WaitingOnFrames.Value;
 
                 if (clock.IsCatchingUp)
                 {
