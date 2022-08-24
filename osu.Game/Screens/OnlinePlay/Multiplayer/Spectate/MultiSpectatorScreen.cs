@@ -187,8 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                                         .DefaultIfEmpty(0)
                                         .Min();
 
-            masterClockContainer.StartTime = startTime;
-            masterClockContainer.Reset(true);
+            masterClockContainer.Reset(startTime, true);
         }
 
         protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState)
