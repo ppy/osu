@@ -11,17 +11,11 @@ namespace osu.Game.Rulesets.Mods
     public interface ICanBeToggledDuringReplay : IApplicableMod
     {
         /// <summary>
-        /// A property to get whether the mod has been disabled.
+        /// A property to get whether the mod has been disabled, can register event handle in constructor.
         /// </summary>
         BindableBool IsDisabled
         {
             get;
         }
-
-        /// <summary>
-        /// The method will run once when gameloading.
-        /// Register event <see cref="Bindable{T}.BindValueChanged(System.Action{ValueChangedEvent{T}}, bool)"/> for <see cref="IsDisabled"/> to handle toggle logic.
-        /// </summary>
-        void DisableToggleEvent();
     }
 }

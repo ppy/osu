@@ -93,10 +93,6 @@ namespace osu.Game.Rulesets.Mods
             applyRateAdjustment(playfield.Clock.CurrentTime);
         }
 
-        public void DisableToggleEvent()
-        {
-        }
-
         /// <summary>
         /// Adjust the rate along the specified ramp.
         /// </summary>

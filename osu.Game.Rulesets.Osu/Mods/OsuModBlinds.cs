@@ -49,10 +49,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
-        public void DisableToggleEvent()
-        {
-        }
-
         /// <summary>
         /// Element for the Blinds mod drawing 2 black boxes covering the whole screen which resize inside a restricted area with some leniency.
         /// </summary>

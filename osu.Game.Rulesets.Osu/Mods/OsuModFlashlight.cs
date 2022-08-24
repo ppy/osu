@@ -63,10 +63,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 s.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
         }
 
-        public void DisableToggleEvent()
-        {
-        }
-
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
             private readonly double followDelay;

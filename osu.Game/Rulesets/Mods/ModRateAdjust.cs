@@ -27,11 +27,9 @@ namespace osu.Game.Rulesets.Mods
 
         public double ApplyToRate(double time, double rate) => rate * SpeedChange.Value;
 
-        private double speedChange;
-
-        public void DisableToggleEvent()
+        protected ModRateAdjust()
         {
-            speedChange = SpeedChange.Value;
+            double speedChange = SpeedChange.Value;
 
             IsDisabled.BindValueChanged(disable =>
             {
