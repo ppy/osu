@@ -36,14 +36,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public event Action? ReadyToStart;
 
         /// <summary>
-        /// The master clock which is used to control the timing of all player clocks clocks.
-        /// </summary>
-        public GameplayClockContainer MasterClock { get; }
-
-        /// <summary>
         /// The catch-up state of the master clock.
         /// </summary>
         public IBindable<MasterClockState> MasterState => masterState;
+
+        public double CurrentMasterTime => masterClock.CurrentTime;
+
+        /// <summary>
+        /// The master clock which is used to control the timing of all player clocks clocks.
+        /// </summary>
+        private GameplayClockContainer masterClock { get; }
 
         /// <summary>
         /// The player clocks.
@@ -57,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public SpectatorSyncManager(GameplayClockContainer master)
         {
-            MasterClock = master;
+            masterClock = master;
         }
 
         /// <summary>
@@ -66,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <returns>The newly created <see cref="SpectatorPlayerClock"/>.</returns>
         public SpectatorPlayerClock CreateManagedClock()
         {
-            var clock = new SpectatorPlayerClock(MasterClock);
+            var clock = new SpectatorPlayerClock(masterClock);
             playerClocks.Add(clock);
             return clock;
         }
@@ -142,7 +144,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
                 // How far this player's clock is out of sync, compared to the master clock.
                 // A negative value means the player is running fast (ahead); a positive value means the player is running behind (catching up).
-                double timeDelta = MasterClock.CurrentTime - clock.CurrentTime;
+                double timeDelta = masterClock.CurrentTime - clock.CurrentTime;
 
                 // Check that the player clock isn't too far ahead.
                 // This is a quiet case in which the catchup is done by the master clock, so IsCatchingUp is not set on the player clock.

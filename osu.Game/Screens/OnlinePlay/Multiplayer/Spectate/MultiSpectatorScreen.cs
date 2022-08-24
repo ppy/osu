@@ -169,7 +169,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (!isCandidateAudioSource(currentAudioSource?.GameplayClock))
             {
                 currentAudioSource = instances.Where(i => isCandidateAudioSource(i.GameplayClock))
-                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.MasterClock.CurrentTime))
+                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.CurrentMasterTime))
                                               .FirstOrDefault();
 
                 foreach (var instance in instances)
