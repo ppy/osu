@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create content", () =>
             {
-                Child = bpmDisplay = new BpmDisplay()
+                Child = bpmDisplay = new BpmDisplay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
