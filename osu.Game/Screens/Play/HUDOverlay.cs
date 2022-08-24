@@ -264,8 +264,11 @@ namespace osu.Game.Screens.Play
 
         protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
-            (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
-            (drawableRuleset as ICanAttachKeyCounter)?.Attach(clicksPerSecondCalculator);
+            if (drawableRuleset is ICanAttachHUDPieces attachTarget)
+            {
+                attachTarget.Attach(KeyCounter);
+                attachTarget.Attach(clicksPerSecondCalculator);
+            }
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
