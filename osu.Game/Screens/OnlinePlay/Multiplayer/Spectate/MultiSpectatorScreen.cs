@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
@@ -47,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer = null!;
-        private ISyncManager syncManager = null!;
+        private SpectatorSyncManager syncManager = null!;
         private PlayerGrid grid = null!;
         private MultiSpectatorLeaderboard leaderboard = null!;
         private PlayerArea? currentAudioSource;
@@ -80,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             InternalChildren = new[]
             {
-                (Drawable)(syncManager = new CatchUpSyncManager(masterClockContainer)),
+                (Drawable)(syncManager = new SpectatorSyncManager(masterClockContainer)),
                 masterClockContainer.WithChild(new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -168,7 +169,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (!isCandidateAudioSource(currentAudioSource?.GameplayClock))
             {
                 currentAudioSource = instances.Where(i => isCandidateAudioSource(i.GameplayClock))
-                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.MasterClock.CurrentTime))
+                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.CurrentMasterTime))
                                               .FirstOrDefault();
 
                 foreach (var instance in instances)
@@ -176,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
         }
 
-        private bool isCandidateAudioSource(ISpectatorPlayerClock? clock)
+        private bool isCandidateAudioSource(SpectatorPlayerClock? clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
 
         private void onReadyToStart()
@@ -198,6 +199,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private void onMasterStateChanged(ValueChangedEvent<MasterClockState> state)
         {
+            Logger.Log($"{nameof(MultiSpectatorScreen)}'s master clock become {state.NewValue}");
+
             switch (state.NewValue)
             {
                 case MasterClockState.Synchronised:

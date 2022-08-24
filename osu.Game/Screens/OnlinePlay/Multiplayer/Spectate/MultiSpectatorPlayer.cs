@@ -15,14 +15,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     public class MultiSpectatorPlayer : SpectatorPlayer
     {
         private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>(true);
-        private readonly ISpectatorPlayerClock spectatorPlayerClock;
+        private readonly SpectatorPlayerClock spectatorPlayerClock;
 
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorPlayer"/>.
         /// </summary>
         /// <param name="score">The score containing the player's replay.</param>
         /// <param name="spectatorPlayerClock">The clock controlling the gameplay running state.</param>
-        public MultiSpectatorPlayer(Score score, ISpectatorPlayerClock spectatorPlayerClock)
+        public MultiSpectatorPlayer(Score score, SpectatorPlayerClock spectatorPlayerClock)
             : base(score, new PlayerConfiguration { AllowUserInteraction = false })
         {
             this.spectatorPlayerClock = spectatorPlayerClock;
@@ -40,9 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override void Update()
         {
             // The player clock's running state is controlled externally, but the local pausing state needs to be updated to start/stop gameplay.
-            CatchUpSpectatorPlayerClock catchUpClock = (CatchUpSpectatorPlayerClock)GameplayClockContainer.SourceClock;
-
-            if (catchUpClock.IsRunning)
+            if (GameplayClockContainer.SourceClock.IsRunning)
                 GameplayClockContainer.Start();
             else
                 GameplayClockContainer.Stop();
