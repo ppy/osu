@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Mods
         private readonly BindableNumber<int> current = new BindableNumber<int>();
 
         private ModSettingChangeTracker? settingChangeTracker;
-        private const float multiplier_value_area_width = 56;
+        private const float bpm_value_area_width = 56;
         private const float transition_duration = 200;
         private readonly Box underlayBackground;
         private readonly Box contentBackground;
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.Y,
-                        Width = multiplier_value_area_width + ModSelectPanel.CORNER_RADIUS
+                        Width = bpm_value_area_width + ModSelectPanel.CORNER_RADIUS
                     },
                     new GridContainer
                     {
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Mods
                         ColumnDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.Absolute, multiplier_value_area_width)
+                            new Dimension(GridSizeMode.Absolute, bpm_value_area_width)
                         },
                         Content = new[]
                         {
