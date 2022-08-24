@@ -6,8 +6,10 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -25,19 +27,26 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestBpmDisplay()
         {
-            BpmDisplay bpmDisplay = null!;
+            RollingCounter<int> counter = null!;
+            OsuSpriteText dashText = null!;
 
-            int getDisplayedBpm() => bpmDisplay.ChildrenOfType<RollingCounter<int>>().Single().Current.Value;
+            int getDisplayedBpm() => counter.Current.Value;
 
             AddStep("create content", () =>
             {
-                Child = bpmDisplay = new BpmDisplay
+                BpmDisplay bpmDisplay = new BpmDisplay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 };
+                Child = bpmDisplay;
+                counter = bpmDisplay.ChildrenOfType<RollingCounter<int>>().Single();
+                dashText = bpmDisplay.ChildrenOfType<OsuSpriteText>().Single(t => t.Text == "-");
             });
-            AddUntilStep("display hidden", () => bpmDisplay.Alpha == 0f);
+
+            AddUntilStep("display hidden", () => counter.Alpha == 0f);
+            AddAssert("dash shown", () => Precision.AlmostEquals(dashText.Alpha, 1f));
+
             AddStep("load beatmap", () =>
             {
                 var beatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
@@ -48,7 +57,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                 });
                 Beatmap.Value = CreateWorkingBeatmap(beatmap);
             });
-            AddUntilStep("display shown", () => bpmDisplay.Alpha == 1f);
+
+            AddUntilStep("display shown", () => Precision.AlmostEquals(counter.Alpha, 1f));
+            AddUntilStep("dash hidden", () => dashText.Alpha == 0f);
+
             AddAssert("bpm is 128", () => getDisplayedBpm() == 128);
             AddStep("select DT", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });
             AddAssert("bpm is 192", () => getDisplayedBpm() == 192); //128*1.5
