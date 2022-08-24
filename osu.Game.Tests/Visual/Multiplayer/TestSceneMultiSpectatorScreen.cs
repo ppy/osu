@@ -390,7 +390,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for player load", () => spectatorScreen.AllPlayersLoaded);
 
-            AddUntilStep($"wait for clock running", () => getInstance(PLAYER_1_ID).SpectatorPlayerClock.IsRunning);
+            AddUntilStep("wait for clock running", () => getInstance(PLAYER_1_ID).SpectatorPlayerClock.IsRunning);
 
             assertNotCatchingUp(PLAYER_1_ID);
             assertRunning(PLAYER_1_ID);
