@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -14,7 +13,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// </summary>
     public class MultiSpectatorPlayer : SpectatorPlayer
     {
-        private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>(true);
         private readonly SpectatorPlayerClock spectatorPlayerClock;
 
         /// <summary>
@@ -31,8 +29,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [BackgroundDependencyLoader]
         private void load()
         {
-            spectatorPlayerClock.WaitingOnFrames.BindTo(waitingOnFrames);
-
             HUDOverlay.PlayerSettingsOverlay.Expire();
             HUDOverlay.HoldToQuit.Expire();
         }
@@ -53,7 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             base.UpdateAfterChildren();
 
             // This is required because the frame stable clock is set to WaitingOnFrames = false for one frame.
-            waitingOnFrames.Value = DrawableRuleset.FrameStableClock.WaitingOnFrames.Value || Score.Replay.Frames.Count == 0;
+            spectatorPlayerClock.WaitingOnFrames = DrawableRuleset.FrameStableClock.WaitingOnFrames.Value || Score.Replay.Frames.Count == 0;
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)

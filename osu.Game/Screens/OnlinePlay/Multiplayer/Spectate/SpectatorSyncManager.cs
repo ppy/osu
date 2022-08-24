@@ -111,7 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (playerClocks.Count == 0)
                 return false;
 
-            int readyCount = playerClocks.Count(s => !s.WaitingOnFrames.Value);
+            int readyCount = playerClocks.Count(s => !s.WaitingOnFrames);
 
             if (readyCount == playerClocks.Count)
                 return performStart();
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 }
 
                 // Make sure the player clock is running if it can.
-                clock.IsRunning = !clock.WaitingOnFrames.Value;
+                clock.IsRunning = !clock.WaitingOnFrames;
 
                 if (clock.IsCatchingUp)
                 {
