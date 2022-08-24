@@ -535,6 +535,9 @@ namespace osu.Game.Rulesets.Scoring
         {
             extractScoringValues(scoreInfo.Statistics, out current, out maximum);
             current.MaxCombo = scoreInfo.MaxCombo;
+
+            if (scoreInfo.MaximumStatistics.Count > 0)
+                extractScoringValues(scoreInfo.MaximumStatistics, out _, out maximum);
         }
 
         /// <summary>
