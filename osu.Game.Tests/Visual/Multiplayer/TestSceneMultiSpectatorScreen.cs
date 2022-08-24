@@ -473,13 +473,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddAssert($"{userId} {(muted ? "is" : "is not")} muted", () => getInstance(userId).Mute == muted);
 
         private void assertRunning(int userId)
-            => AddAssert($"{userId} clock running", () => getInstance(userId).GameplayClock.IsRunning);
+            => AddAssert($"{userId} clock running", () => getInstance(userId).SpectatorPlayerClock.IsRunning);
 
         private void assertNotCatchingUp(int userId)
-            => AddAssert($"{userId} in sync", () => !getInstance(userId).GameplayClock.IsCatchingUp);
+            => AddAssert($"{userId} in sync", () => !getInstance(userId).SpectatorPlayerClock.IsCatchingUp);
 
         private void waitForCatchup(int userId)
-            => AddUntilStep($"{userId} not catching up", () => !getInstance(userId).GameplayClock.IsCatchingUp);
+            => AddUntilStep($"{userId} not catching up", () => !getInstance(userId).SpectatorPlayerClock.IsCatchingUp);
 
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 
