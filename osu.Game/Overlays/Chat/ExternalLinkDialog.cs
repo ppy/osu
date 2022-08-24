@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Chat
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"No! Copy the URL instead!",
+                    Text = @"Copy URL to the clipboard instead.",
                     Action = copyExternalLinkAction
                 },
                 new PopupDialogCancelButton
