@@ -4,11 +4,9 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -47,11 +45,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer = null!;
-        private ISyncManager syncManager = null!;
+        private SpectatorSyncManager syncManager = null!;
         private PlayerGrid grid = null!;
         private MultiSpectatorLeaderboard leaderboard = null!;
         private PlayerArea? currentAudioSource;
-        private bool canStartMasterClock;
 
         private readonly Room room;
         private readonly MultiplayerRoomUser[] users;
@@ -76,50 +73,54 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             FillFlowContainer leaderboardFlow;
             Container scoreDisplayContainer;
 
-            masterClockContainer = CreateMasterGameplayClockContainer(Beatmap.Value);
-
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
-                (Drawable)(syncManager = new CatchUpSyncManager(masterClockContainer)),
-                masterClockContainer.WithChild(new GridContainer
+                masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                    Content = new[]
+                    Child = new GridContainer
                     {
-                        new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                        Content = new[]
                         {
-                            scoreDisplayContainer = new Container
+                            new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
-                            },
-                        },
-                        new Drawable[]
-                        {
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                                Content = new[]
+                                scoreDisplayContainer = new Container
                                 {
-                                    new Drawable[]
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y
+                                },
+                            },
+                            new Drawable[]
+                            {
+                                new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                    Content = new[]
                                     {
-                                        leaderboardFlow = new FillFlowContainer
+                                        new Drawable[]
                                         {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Vertical,
-                                            Spacing = new Vector2(5)
-                                        },
-                                        grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                                            leaderboardFlow = new FillFlowContainer
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Vertical,
+                                                Spacing = new Vector2(5)
+                                            },
+                                            grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                })
+                },
+                syncManager = new SpectatorSyncManager(masterClockContainer)
+                {
+                    ReadyToStart = performInitialSeek,
+                }
             };
 
             for (int i = 0; i < Users.Count; i++)
@@ -156,9 +157,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             base.LoadComplete();
 
             masterClockContainer.Reset();
-
-            syncManager.ReadyToStart += onReadyToStart;
-            syncManager.MasterState.BindValueChanged(onMasterStateChanged, true);
         }
 
         protected override void Update()
@@ -168,7 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (!isCandidateAudioSource(currentAudioSource?.GameplayClock))
             {
                 currentAudioSource = instances.Where(i => isCandidateAudioSource(i.GameplayClock))
-                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.MasterClock.CurrentTime))
+                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.CurrentMasterTime))
                                               .FirstOrDefault();
 
                 foreach (var instance in instances)
@@ -176,10 +174,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
         }
 
-        private bool isCandidateAudioSource(ISpectatorPlayerClock? clock)
-            => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
+        private bool isCandidateAudioSource(SpectatorPlayerClock? clock)
+            => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames;
 
-        private void onReadyToStart()
+        private void performInitialSeek()
         {
             // Seek the master clock to the gameplay time.
             // This is chosen as the first available frame in the players' replays, which matches the seek by each individual SpectatorPlayer.
@@ -191,25 +189,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             masterClockContainer.StartTime = startTime;
             masterClockContainer.Reset(true);
-
-            // Although the clock has been started, this flag is set to allow for later synchronisation state changes to also be able to start it.
-            canStartMasterClock = true;
-        }
-
-        private void onMasterStateChanged(ValueChangedEvent<MasterClockState> state)
-        {
-            switch (state.NewValue)
-            {
-                case MasterClockState.Synchronised:
-                    if (canStartMasterClock)
-                        masterClockContainer.Start();
-
-                    break;
-
-                case MasterClockState.TooFarAhead:
-                    masterClockContainer.Stop();
-                    break;
-            }
         }
 
         protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState)
@@ -251,7 +230,5 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             return base.OnBackButton();
         }
-
-        protected virtual MasterGameplayClockContainer CreateMasterGameplayClockContainer(WorkingBeatmap beatmap) => new MasterGameplayClockContainer(beatmap, 0);
     }
 }
