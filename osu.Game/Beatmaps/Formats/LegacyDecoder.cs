@@ -188,9 +188,8 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             public override bool IsRedundant(ControlPoint? existing)
-                => existing is LegacyDifficultyControlPoint existingLegacyDifficulty
-                   && base.IsRedundant(existing)
-                   && GenerateTicks == existingLegacyDifficulty.GenerateTicks;
+                => base.IsRedundant(existing)
+                   && GenerateTicks == ((existing as LegacyDifficultyControlPoint)?.GenerateTicks ?? true);
 
             public override void CopyFrom(ControlPoint other)
             {
