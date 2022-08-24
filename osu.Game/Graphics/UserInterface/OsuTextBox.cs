@@ -56,6 +56,14 @@ namespace osu.Game.Graphics.UserInterface
         private bool selectionStarted;
         private double sampleLastPlaybackTime;
 
+        private enum SelectionSampleType
+        {
+            Character,
+            Word,
+            All,
+            Deselect
+        }
+
         public OsuTextBox()
         {
             Height = 40;
@@ -133,16 +141,19 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnTextSelectionChanged(selectionType);
 
-            if (selectionType == TextSelectionType.Word)
+            switch (selectionType)
             {
-                if (!selectionStarted)
-                    playSelectSample(selectionType);
-                else
-                    playSelectSample();
-            }
-            else
-            {
-                playSelectSample(selectionType);
+                case TextSelectionType.Character:
+                    playSelectSample(SelectionSampleType.Character);
+                    break;
+
+                case TextSelectionType.Word:
+                    playSelectSample(selectionStarted ? SelectionSampleType.Character : SelectionSampleType.Word);
+                    break;
+
+                case TextSelectionType.All:
+                    playSelectSample(SelectionSampleType.All);
+                    break;
             }
 
             selectionStarted = true;
@@ -150,15 +161,16 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnTextDeselected()
         {
-            if (selectionStarted)
-                playSelectSample(TextSelectionType.Deselect);
+            base.OnTextDeselected();
+
+            if (!selectionStarted) return;
+
+            playSelectSample(SelectionSampleType.Deselect);
 
             selectionStarted = false;
-
-            base.OnTextDeselected();
         }
 
-        private void playSelectSample(TextSelectionType selectionType = TextSelectionType.Character)
+        private void playSelectSample(SelectionSampleType selectionType)
         {
             if (Time.Current < sampleLastPlaybackTime + 15) return;
 
@@ -167,15 +179,15 @@ namespace osu.Game.Graphics.UserInterface
 
             switch (selectionType)
             {
-                case TextSelectionType.All:
+                case SelectionSampleType.All:
                     channel = selectAllSample?.GetChannel();
                     break;
 
-                case TextSelectionType.Word:
+                case SelectionSampleType.Word:
                     channel = selectWordSample?.GetChannel();
                     break;
 
-                case TextSelectionType.Deselect:
+                case SelectionSampleType.Deselect:
                     channel = deselectSample?.GetChannel();
                     break;
 
