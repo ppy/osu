@@ -24,8 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private const double default_follow_delay = 120;
 
-        private readonly Bindable<bool> isDisabled = new Bindable<bool>();
-        public bool IsDisable => isDisabled.Value;
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         [SettingSource("Follow delay", "Milliseconds until the flashlight reaches the cursor")]
         public BindableNumber<double> FollowDelay { get; } = new BindableDouble(default_follow_delay)
@@ -56,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private OsuFlashlight flashlight = null!;
 
-        protected override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(this, isDisabled);
+        protected override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(this, IsDisabled);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
@@ -64,44 +63,36 @@ namespace osu.Game.Rulesets.Osu.Mods
                 s.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
         }
 
-        public void OnToggle()
+        public void DisableToggleEvent()
         {
-            if (isDisabled.Value)
-            {
-                flashlight.Alpha = 1f;
-                isDisabled.Value = false;
-            }
-            else
-            {
-                flashlight.Alpha = 0.3f;
-                isDisabled.Value = true;
-            }
         }
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
             private readonly double followDelay;
 
-            private readonly Bindable<bool> isDisable;
+            private readonly BindableBool isDisabled;
 
-            public OsuFlashlight(OsuModFlashlight modFlashlight, Bindable<bool> isDisableBind)
+            public OsuFlashlight(OsuModFlashlight modFlashlight, BindableBool isDisableBind)
                 : base(modFlashlight)
             {
                 followDelay = modFlashlight.FollowDelay.Value;
 
                 FlashlightSize = new Vector2(0, GetSizeFor(0));
 
-                isDisable = isDisableBind;
+                isDisabled = isDisableBind;
 
-                isDisable.BindValueChanged(disable =>
+                isDisabled.BindValueChanged(disable =>
                 {
                     if (disable.NewValue) this.TransformTo(nameof(FlashlightDim), 0.0f, 50);
+
+                    Alpha = disable.NewValue ? 0.3f : 1.0f;
                 }, true);
             }
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
             {
-                if (isDisable.Value)
+                if (isDisabled.Value)
                     return;
                 // If a slider is in a tracking state, a further dim should be applied to the (remaining) visible portion of the playfield over a brief duration.
                 this.TransformTo(nameof(FlashlightDim), e.NewValue ? 0.8f : 0.0f, 50);

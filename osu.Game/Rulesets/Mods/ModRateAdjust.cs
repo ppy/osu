@@ -13,8 +13,7 @@ namespace osu.Game.Rulesets.Mods
 
         public abstract BindableNumber<double> SpeedChange { get; }
 
-        private readonly Bindable<bool> isDisabled = new Bindable<bool>();
-        public bool IsDisable => isDisabled.Value;
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         public virtual void ApplyToTrack(IAdjustableAudioComponent track)
         {
@@ -30,19 +29,14 @@ namespace osu.Game.Rulesets.Mods
 
         private double speedChange;
 
-        public void OnToggle()
+        public void DisableToggleEvent()
         {
-            if (isDisabled.Value)
+            speedChange = SpeedChange.Value;
+
+            IsDisabled.BindValueChanged(disable =>
             {
-                SpeedChange.Value = speedChange;
-                isDisabled.Value = false;
-            }
-            else
-            {
-                speedChange = SpeedChange.Value;
-                SpeedChange.Value = 1.0;
-                isDisabled.Value = true;
-            }
+                SpeedChange.Value = disable.NewValue ? 1.0 : speedChange;
+            });
         }
 
         public override Type[] IncompatibleMods => new[] { typeof(ModTimeRamp), typeof(ModAdaptiveSpeed), typeof(ModRateAdjust) };

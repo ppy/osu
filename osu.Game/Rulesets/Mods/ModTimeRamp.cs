@@ -37,8 +37,7 @@ namespace osu.Game.Rulesets.Mods
         private double finalRateTime;
         private double beginRampTime;
 
-        private readonly Bindable<bool> isDisabled = new Bindable<bool>();
-        public bool IsDisable => isDisabled.Value;
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         public BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
@@ -91,29 +90,17 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            if (!isDisabled.Value)
-            {
-                applyRateAdjustment(playfield.Clock.CurrentTime);
-            }
+            applyRateAdjustment(playfield.Clock.CurrentTime);
         }
 
-        public void OnToggle()
+        public void DisableToggleEvent()
         {
-            if (isDisabled.Value)
-            {
-                isDisabled.Value = false;
-            }
-            else
-            {
-                SpeedChange.Value = InitialRate.Value;
-                isDisabled.Value = true;
-            }
         }
 
         /// <summary>
         /// Adjust the rate along the specified ramp.
         /// </summary>
-        private void applyRateAdjustment(double time) => SpeedChange.Value = ApplyToRate(time);
+        private void applyRateAdjustment(double time) => SpeedChange.Value = !IsDisabled.Value ? ApplyToRate(time) : InitialRate.Value;
 
         private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
         {

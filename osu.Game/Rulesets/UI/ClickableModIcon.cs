@@ -107,9 +107,9 @@ namespace osu.Game.Rulesets.UI
 
                 if (mod is ICanBeToggledDuringReplay dmod)
                 {
-                    dmod.OnToggle();
+                    dmod.IsDisabled.Toggle();
 
-                    Colour = dmod.IsDisable ? OsuColour.Gray(0.7f) : Colour = Color4.White;
+                    Colour = dmod.IsDisabled.Value ? OsuColour.Gray(0.7f) : Colour = Color4.White;
                 }
             };
         }

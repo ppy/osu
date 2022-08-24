@@ -35,12 +35,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private DrawableOsuBlinds blinds = null!;
 
-        private readonly Bindable<bool> isDisabled = new Bindable<bool>();
-        public bool IsDisable => isDisabled.Value;
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield, drawableRuleset.Beatmap));
+            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield, drawableRuleset.Beatmap, IsDisabled));
         }
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
@@ -50,18 +49,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
-        public void OnToggle()
+        public void DisableToggleEvent()
         {
-            if (isDisabled.Value)
-            {
-                blinds.Alpha = 1f;
-                isDisabled.Value = false;
-            }
-            else
-            {
-                blinds.Alpha = 0.3f;
-                isDisabled.Value = true;
-            }
         }
 
         /// <summary>
@@ -105,13 +94,15 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// </summary>
             private const float leniency = 0.1f;
 
-            public DrawableOsuBlinds(CompositeDrawable restrictTo, Beatmap<OsuHitObject> beatmap)
+            public DrawableOsuBlinds(CompositeDrawable restrictTo, Beatmap<OsuHitObject> beatmap, BindableBool disabledBind)
             {
                 this.restrictTo = restrictTo;
                 this.beatmap = beatmap;
 
                 targetBreakMultiplier = 0;
                 easing = 1;
+
+                disabledBind.BindValueChanged(disable => Alpha = disable.NewValue ? 0.3f : 1.0f);
             }
 
             [BackgroundDependencyLoader]
