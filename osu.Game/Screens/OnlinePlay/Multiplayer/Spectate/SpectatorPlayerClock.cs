@@ -83,8 +83,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             ElapsedFrameTime = 0;
             FramesPerSecond = 0;
 
-            masterClock.ProcessFrame();
-
             if (IsRunning)
             {
                 double elapsedSource = masterClock.ElapsedFrameTime;
