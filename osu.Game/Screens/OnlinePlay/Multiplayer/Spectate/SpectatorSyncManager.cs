@@ -91,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
                 // Ensure all player clocks are stopped until the start succeeds.
                 foreach (var clock in playerClocks)
-                    clock.IsRunning = true;
+                    clock.IsRunning = false;
                 return;
             }
 
