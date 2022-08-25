@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using FFmpeg.AutoGen;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -14,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class CognitionEvaluator
     {
-        private const double cognition_window_size = 2000;
+        private const double cognition_window_size = 3000;
 
         private const double note_density_difficulty_multiplier = 1.0;
 
@@ -32,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
 
             List<OsuDifficultyHitObject> pastVisibleObjects = retrievePastVisibleObjects(currObj);
-            List<OsuDifficultyHitObject> currentVisibleObjects = retrieveCurrentVisibleObjects(currObj);
+            //List<OsuDifficultyHitObject> currentVisibleObjects = retrieveCurrentVisibleObjects(currObj);
 
             // Rather than note density being the number of on-screen objects visible at the current object,
             // consider it as how many objects the current object has been visible for.
@@ -42,16 +41,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             foreach (var loopObj in pastVisibleObjects)
             {
-                var prevLoopObj = (OsuDifficultyHitObject)loopObj.Previous(0);
-
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 80) / 15);
+                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 90) / 15);
 
                 // Objects that are arranged in a mostly-linear fashion should be easy to read (such as circles in a stream).
                 //if (loopObj.Angle.IsNotNull() && prevLoopObj.Angle.IsNotNull())
                 //   loopDifficulty *= 1 - Math.Pow(Math.Sin(0.5 * loopObj.Angle.Value), 5);
+
+                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
+                loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 pastObjectDifficultyInfluence += loopDifficulty;
             }
@@ -67,7 +67,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 var timeDifficultyFactor = 1200 / pastObjectDifficultyInfluence;
 
-                hiddenDifficulty += 12 * timeSpentInvisible / timeDifficultyFactor;
+                hiddenDifficulty += Math.Pow(2 * timeSpentInvisible / timeDifficultyFactor, 1.6);
+
+                if (isRhythmChange)
+                    hiddenDifficulty *= 1.1;
+
                 hiddenDifficulty += 2 * currVelocity;
             }
 
@@ -129,6 +133,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double fadeOutDuration = baseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
 
             return (fadeOutStartTime + fadeOutDuration) - (baseObject.StartTime - baseObject.TimePreempt);
+        }
+
+        private static double getTimeNerfFactor(double deltaTime)
+        {
+            return Math.Clamp(2 - (deltaTime / 1500), 0, 1);
         }
 
         private static double logistic(double x) => 1 / (1 + Math.Pow(Math.E, -x));
