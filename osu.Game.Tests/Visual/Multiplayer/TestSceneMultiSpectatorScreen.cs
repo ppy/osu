@@ -400,7 +400,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for clock running", () => getInstance(PLAYER_1_ID).SpectatorPlayerClock.IsRunning);
 
             assertNotCatchingUp(PLAYER_1_ID);
-            assertRunning(PLAYER_1_ID);
+            waitForRunning(PLAYER_1_ID);
         }
 
         private void loadSpectateScreen(bool waitForPlayerLoad = true, Action<WorkingBeatmap>? applyToBeatmap = null)
@@ -485,6 +485,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void assertRunning(int userId)
             => AddAssert($"{nameof(assertRunning)}({userId})", () => getInstance(userId).SpectatorPlayerClock.IsRunning);
+
+        private void waitForRunning(int userId)
+            => AddUntilStep($"{nameof(waitForRunning)}({userId})", () => getInstance(userId).SpectatorPlayerClock.IsRunning);
 
         private void assertNotCatchingUp(int userId)
             => AddAssert($"{nameof(assertNotCatchingUp)}({userId})", () => !getInstance(userId).SpectatorPlayerClock.IsCatchingUp);
