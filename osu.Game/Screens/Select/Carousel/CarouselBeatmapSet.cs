@@ -99,6 +99,13 @@ namespace osu.Game.Screens.Select.Carousel
 
                 case SortMode.Difficulty:
                     return compareUsingAggregateMax(otherSet, b => b.StarRating);
+
+                case SortMode.DateSubmitted:
+                    // Beatmaps which have no submitted date should already be filtered away in this mode.
+                    if (BeatmapSet.DateSubmitted == null || otherSet.BeatmapSet.DateSubmitted == null)
+                        return 0;
+
+                    return otherSet.BeatmapSet.DateSubmitted.Value.CompareTo(BeatmapSet.DateSubmitted.Value);
             }
         }
 
@@ -122,7 +129,12 @@ namespace osu.Game.Screens.Select.Carousel
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
-            Filtered.Value = Items.All(i => i.Filtered.Value);
+            bool match = Items.All(i => i.Filtered.Value);
+
+            match &= criteria.Sort != SortMode.DateRanked || BeatmapSet?.DateRanked != null;
+            match &= criteria.Sort != SortMode.DateSubmitted || BeatmapSet?.DateSubmitted != null;
+
+            Filtered.Value = match;
         }
 
         public override string ToString() => BeatmapSet.ToString();
