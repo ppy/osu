@@ -8,14 +8,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModMagnetised : CursorBasedHitObjectPositionMod, IApplicableToDrawableRuleset<OsuHitObject>
+    internal class OsuModMagnetised : CursorBasedHitObjectPositionMod
     {
         public override string Name => "Magnetised";
         public override string Acronym => "MG";

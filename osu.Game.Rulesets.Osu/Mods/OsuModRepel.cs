@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
@@ -15,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModRepel : CursorBasedHitObjectPositionMod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    internal class OsuModRepel : CursorBasedHitObjectPositionMod
     {
         public override string Name => "Repel";
         public override string Acronym => "RP";
