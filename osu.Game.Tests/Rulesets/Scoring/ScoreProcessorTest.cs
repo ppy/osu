@@ -357,13 +357,13 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
         private class TestRuleset : Ruleset
         {
-            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new System.NotImplementedException();
+            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
 
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new System.NotImplementedException();
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
 
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new System.NotImplementedException();
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
 
-            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new System.NotImplementedException();
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
 
             public override string Description => string.Empty;
             public override string ShortName => string.Empty;
