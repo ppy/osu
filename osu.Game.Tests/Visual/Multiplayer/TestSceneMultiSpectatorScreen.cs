@@ -278,7 +278,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // Send frames for both players, with more frames for player 2.
             sendFrames(PLAYER_1_ID, 5);
-            sendFrames(PLAYER_2_ID, 40);
+            sendFrames(PLAYER_2_ID, 20);
 
             // While both players are running, one of them should be un-muted.
             waitUntilPaused(PLAYER_1_ID, false);
@@ -452,6 +452,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
+        /// <summary>
+        /// Send new frames on behalf of a user.
+        /// Frames will last for count * 100 milliseconds.
+        /// </summary>
         private void sendFrames(int userId, int count = 10) => sendFrames(new[] { userId }, count);
 
         private void sendFrames(int[] userIds, int count = 10)
@@ -464,7 +468,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         private void waitUntilPaused(int userId, bool state)
-            => AddUntilStep($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().IsRunning != state);
+            => AddUntilStep($"{nameof(waitUntilPaused)}({userId}, {state})", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().IsRunning != state);
 
         private void checkPausedInstant(int userId, bool state)
         {
@@ -474,19 +478,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             // AddAssert($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
         }
 
-        private void assertOnePlayerNotMuted() => AddAssert("one player not muted", () => spectatorScreen.ChildrenOfType<PlayerArea>().Count(p => !p.Mute) == 1);
+        private void assertOnePlayerNotMuted() => AddAssert(nameof(assertOnePlayerNotMuted), () => spectatorScreen.ChildrenOfType<PlayerArea>().Count(p => !p.Mute) == 1);
 
         private void assertMuted(int userId, bool muted)
-            => AddAssert($"{userId} {(muted ? "is" : "is not")} muted", () => getInstance(userId).Mute == muted);
+            => AddAssert($"{nameof(assertMuted)}({userId}, {muted})", () => getInstance(userId).Mute == muted);
 
         private void assertRunning(int userId)
-            => AddAssert($"{userId} clock running", () => getInstance(userId).SpectatorPlayerClock.IsRunning);
+            => AddAssert($"{nameof(assertRunning)}({userId})", () => getInstance(userId).SpectatorPlayerClock.IsRunning);
 
         private void assertNotCatchingUp(int userId)
-            => AddAssert($"{userId} in sync", () => !getInstance(userId).SpectatorPlayerClock.IsCatchingUp);
+            => AddAssert($"{nameof(assertNotCatchingUp)}({userId})", () => !getInstance(userId).SpectatorPlayerClock.IsCatchingUp);
 
         private void waitForCatchup(int userId)
-            => AddUntilStep($"{userId} not catching up", () => !getInstance(userId).SpectatorPlayerClock.IsCatchingUp);
+            => AddUntilStep($"{nameof(waitForCatchup)}({userId})", () => !getInstance(userId).SpectatorPlayerClock.IsCatchingUp);
 
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 
