@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play
 
         private Box redFlashLayer = null!;
 
-        private Track? track;
+        private Track track = null!;
 
         private AudioFilter failLowPassFilter = null!;
         private AudioFilter failHighPassFilter = null!;
@@ -153,15 +153,17 @@ namespace osu.Game.Screens.Play
 
         public void RemoveFilters(bool resetTrackFrequency = true)
         {
-            if (filtersRemoved)
-                return;
+            if (filtersRemoved) return;
 
             filtersRemoved = true;
 
-            if (resetTrackFrequency)
-                track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+            if (!started)
+                return;
 
-            track?.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
+            if (resetTrackFrequency)
+                track.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+
+            track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             if (filters.Parent == null)
                 return;
