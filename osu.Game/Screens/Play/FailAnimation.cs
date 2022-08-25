@@ -105,6 +105,7 @@ namespace osu.Game.Screens.Play
         }
 
         private bool started;
+        private bool filtersRemoved;
 
         /// <summary>
         /// Start the fail animation playing.
@@ -113,6 +114,7 @@ namespace osu.Game.Screens.Play
         public void Start()
         {
             if (started) throw new InvalidOperationException("Animation cannot be started more than once.");
+            if (filtersRemoved) throw new InvalidOperationException("Animation cannot be started after filters have been removed.");
 
             started = true;
 
@@ -155,6 +157,11 @@ namespace osu.Game.Screens.Play
 
         public void RemoveFilters(bool resetTrackFrequency = true)
         {
+            if (filtersRemoved)
+                return;
+
+            filtersRemoved = true;
+
             if (resetTrackFrequency)
                 track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
 
