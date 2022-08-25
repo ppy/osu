@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Scoring
         IgnoreHit,
 
         /// <summary>
-        /// A special result used as a padding value for legacy rulesets. It is a hit type and affects combo, but does not contribute to score.
+        /// A special result used as a padding value for legacy rulesets. It is a hit type and affects combo, but does not affect the base score (does not affect accuracy).
         /// </summary>
         /// <remarks>
         /// DO NOT USE.
