@@ -142,8 +142,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 case NotifyCollectionChangedAction.Remove:
                     foreach (var point in e.OldItems.Cast<PathControlPoint>())
                     {
-                        Pieces.RemoveAll(p => p.ControlPoint == point);
-                        Connections.RemoveAll(c => c.ControlPoint == point);
+                        foreach (var piece in Pieces.Where(p => p.ControlPoint == point))
+                            piece.RemoveAndDisposeImmediately();
+                        foreach (var connection in Connections.Where(c => c.ControlPoint == point))
+                            connection.RemoveAndDisposeImmediately();
                     }
 
                     // If removing before the end of the path,
