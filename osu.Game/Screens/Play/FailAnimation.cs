@@ -153,8 +153,6 @@ namespace osu.Game.Screens.Play
 
         public void RemoveFilters(bool resetTrackFrequency = true)
         {
-            if (filtersRemoved) return;
-
             filtersRemoved = true;
 
             if (!started)
