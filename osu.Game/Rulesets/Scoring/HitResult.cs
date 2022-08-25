@@ -175,6 +175,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static bool AffectsAccuracy(this HitResult result)
         {
+            // LegacyComboIncrease is a special type which is neither a basic, tick, bonus, or accuracy-affecting result.
             if (result == HitResult.LegacyComboIncrease)
                 return false;
 
@@ -186,6 +187,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static bool IsBasic(this HitResult result)
         {
+            // LegacyComboIncrease is a special type which is neither a basic, tick, bonus, or accuracy-affecting result.
             if (result == HitResult.LegacyComboIncrease)
                 return false;
 
@@ -250,6 +252,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static bool IsScorable(this HitResult result)
         {
+            // LegacyComboIncrease is not actually scorable (in terms of usable by rulesets for that purpose), but needs to be defined as such to be correctly included in statistics output.
             if (result == HitResult.LegacyComboIncrease)
                 return true;
 
