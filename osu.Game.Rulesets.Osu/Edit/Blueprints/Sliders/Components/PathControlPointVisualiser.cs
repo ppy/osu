@@ -142,9 +142,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 case NotifyCollectionChangedAction.Remove:
                     foreach (var point in e.OldItems.Cast<PathControlPoint>())
                     {
-                        foreach (var piece in Pieces.Where(p => p.ControlPoint == point))
+                        foreach (var piece in Pieces.Where(p => p.ControlPoint == point).ToArray())
                             piece.RemoveAndDisposeImmediately();
-                        foreach (var connection in Connections.Where(c => c.ControlPoint == point))
+                        foreach (var connection in Connections.Where(c => c.ControlPoint == point).ToArray())
                             connection.RemoveAndDisposeImmediately();
                     }
 
