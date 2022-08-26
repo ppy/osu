@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -30,17 +29,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 IEnumerable<Mod> modInstances = mods.Select(mod => mod.CreateInstance());
 
-                foreach (var mod in modInstances)
+                foreach (var modToCheck in modInstances)
                 {
-                    var modIncompatibilities = mod.IncompatibleMods;
+                    var incompatibleMods = modToCheck.IncompatibleMods;
 
-                    foreach (var incompatibleModType in modIncompatibilities)
+                    foreach (var incompatible in incompatibleMods)
                     {
-                        var incompatibleMod = modInstances.First(m => incompatibleModType.IsInstanceOfType(m));
-                        Assert.That(
-                            incompatibleMod.IncompatibleMods.Any(m => m.IsInstanceOfType(mod)),
-                            $"{mod} has {incompatibleMod} in it's incompatible mods, but {incompatibleMod} does not have {mod} in it's incompatible mods."
-                        );
+                        foreach (var incompatibleMod in modInstances.Where(m => incompatible.IsInstanceOfType(m)))
+                        {
+                            Assert.That(
+                                incompatibleMod.IncompatibleMods.Any(m => m.IsInstanceOfType(modToCheck)),
+                                $"{modToCheck} has {incompatibleMod} in it's incompatible mods, but {incompatibleMod} does not have {modToCheck} in it's incompatible mods."
+                            );
+                        }
                     }
                 }
             });
