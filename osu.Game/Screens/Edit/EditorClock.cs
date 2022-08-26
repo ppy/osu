@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit
 
             this.beatDivisor = beatDivisor ?? new BindableBeatDivisor();
 
-            underlyingClock = new FramedBeatmapClock(applyOffsets: true);
+            underlyingClock = new FramedBeatmapClock(applyOffsets: true) { IsCoupled = false };
             AddInternal(underlyingClock);
         }
 
@@ -222,21 +222,7 @@ namespace osu.Game.Screens.Edit
 
         public void ProcessFrame()
         {
-            // EditorClock wasn't being added in many places. This gives us more certainty that it is.
-            Debug.Assert(underlyingClock.LoadState > LoadState.NotLoaded);
-
-            underlyingClock.ProcessFrame();
-
-            playbackFinished = CurrentTime >= TrackLength;
-
-            if (playbackFinished)
-            {
-                if (IsRunning)
-                    underlyingClock.Stop();
-
-                if (CurrentTime > TrackLength)
-                    underlyingClock.Seek(TrackLength);
-            }
+            // Noop to ensure an external consumer doesn't process the internal clock an extra time.
         }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
@@ -253,17 +239,25 @@ namespace osu.Game.Screens.Edit
 
         public IClock Source => underlyingClock.Source;
 
-        public bool IsCoupled
-        {
-            get => underlyingClock.IsCoupled;
-            set => underlyingClock.IsCoupled = value;
-        }
-
         private const double transform_time = 300;
 
         protected override void Update()
         {
             base.Update();
+
+            // EditorClock wasn't being added in many places. This gives us more certainty that it is.
+            Debug.Assert(underlyingClock.LoadState > LoadState.NotLoaded);
+
+            playbackFinished = CurrentTime >= TrackLength;
+
+            if (playbackFinished)
+            {
+                if (IsRunning)
+                    underlyingClock.Stop();
+
+                if (CurrentTime > TrackLength)
+                    underlyingClock.Seek(TrackLength);
+            }
 
             updateSeekingState();
         }
