@@ -12,13 +12,24 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that prevents itself and its children from getting rotated, scaled or flipped with its Parent.
     /// </summary>
-    public class UprightUnscaledContainer : Container
+    public class UprightUnstretchedContainer : Container
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        public UprightUnscaledContainer()
+        /// <summary>
+        /// Controls how much this container scales compared to its parent (default is 1.0f).
+        /// </summary>
+        public float ScalingFactor { get; set; }
+
+        /// <summary>
+        /// Controls the scaling of this container.
+        /// </summary>
+        public ScaleMode Scaling { get; set; }
+
+        public UprightUnstretchedContainer()
         {
+            Scaling = ScaleMode.NoScaling;
             InternalChild = content = new GrowToFitContainer();
             AddLayout(layout);
         }
@@ -31,7 +42,7 @@ namespace osu.Game.Graphics.Containers
 
             if (!layout.IsValid)
             {
-                keepUprightAndUnscaled();
+                keepUprightAndUnstretched();
                 layout.Validate();
             }
         }
@@ -39,7 +50,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Keeps the drawable upright and unstretched preventing it from being rotated, sheared, scaled or flipped with its Parent.
         /// </summary>
-        private void keepUprightAndUnscaled()
+        private void keepUprightAndUnstretched()
         {
             // Decomposes the inverse of the parent FrawInfo.Matrix into rotation, shear and scale.
             var parentMatrix = Parent.DrawInfo.Matrix;
@@ -58,13 +69,32 @@ namespace osu.Game.Graphics.Containers
             Matrix3 m = Matrix3.CreateRotationZ(-angle);
             reversedParrent *= m;
 
-            // Extract shear and scale.
+            // Extract shear.
+            float alpha = reversedParrent.M21 / reversedParrent.M22;
+            Shear = new Vector2(-alpha, 0);
+
+            // Etract scale.
             float sx = reversedParrent.M11;
             float sy = reversedParrent.M22;
-            float alpha = reversedParrent.M21 / reversedParrent.M22;
 
-            Scale = new Vector2(sx, sy);
-            Shear = new Vector2(-alpha, 0);
+            Vector3 parentScale = parentMatrix.ExtractScale();
+
+            float usedScale = 1.0f;
+
+            switch (Scaling)
+            {
+                case ScaleMode.Horizontal:
+                    usedScale = parentScale.X;
+                    break;
+
+                case ScaleMode.Vertical:
+                    usedScale = parentScale.Y;
+                    break;
+            }
+
+            usedScale = 1.0f + (usedScale - 1.0f) * ScalingFactor;
+
+            Scale = new Vector2(sx * usedScale, sy * usedScale);
         }
 
         /// <summary>
@@ -90,5 +120,25 @@ namespace osu.Game.Graphics.Containers
                 Width = Math.Max(content.Width, Width);
             }
         }
+    }
+
+    public enum ScaleMode
+    {
+        /// <summary>
+        /// Prevent this container from scaling.
+        /// </summary>
+        NoScaling,
+
+        /// <summary>
+        /// Scale This container (vertically and horizontally) with the vertical axis of its parent
+        /// preserving the aspect ratio of the container.
+        /// </summary>
+        Vertical,
+
+        /// <summary>
+        /// Scales This container (vertically and horizontally) with the horizontal axis of its parent
+        /// preserving the aspect ratio of the container.
+        /// </summary>
+        Horizontal,
     }
 }
