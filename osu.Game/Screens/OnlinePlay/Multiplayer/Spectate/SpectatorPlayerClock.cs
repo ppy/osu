@@ -77,7 +77,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             if (IsRunning)
             {
-                double elapsedSource = masterClock.ElapsedFrameTime;
+                // When in catch-up mode, the source is usually not running.
+                // In such a case, its elapsed time may be zero, which would cause catch-up to get stuck.
+                // To avoid this, use a constant 16ms elapsed time for now. Probably not too correct, but this whole logic isn't too correct anyway.
+                // Clamping is required to ensure that player clocks don't get too far ahead if ProcessFrame is run multiple times.
+                double elapsedSource = masterClock.ElapsedFrameTime != 0 ? masterClock.ElapsedFrameTime : Math.Clamp(masterClock.CurrentTime - CurrentTime, 0, 16);
                 double elapsed = elapsedSource * Rate;
 
                 CurrentTime += elapsed;
