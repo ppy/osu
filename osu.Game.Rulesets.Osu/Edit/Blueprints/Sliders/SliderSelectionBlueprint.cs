@@ -251,34 +251,31 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             HitObject.Position += first;
         }
 
-        private void splitControlPoints(List<PathControlPoint> toSplit)
+        private void splitControlPoints(List<PathControlPoint> controlPointsToSplitAt)
         {
             // Arbitrary gap in milliseconds to put between split slider pieces
             const double split_gap = 100;
 
             // Ensure that there are any points to be split
-            if (toSplit.Count == 0)
+            if (controlPointsToSplitAt.Count == 0)
                 return;
 
             editorBeatmap.SelectedHitObjects.Clear();
 
-            foreach (var c in toSplit)
+            foreach (var splitPoint in controlPointsToSplitAt)
             {
-                if (c == controlPoints[0] || c == controlPoints[^1] || c.Type is null)
+                if (splitPoint == controlPoints[0] || splitPoint == controlPoints[^1] || splitPoint.Type is null)
                     continue;
 
                 // Split off the section of slider before this control point so the remaining control points to split are in the latter part of the slider.
-                var splitControlPoints = controlPoints.TakeWhile(current => current != c).ToList();
+                int index = controlPoints.IndexOf(splitPoint);
 
-                if (splitControlPoints.Count == 0)
+                if (index <= 0)
                     continue;
 
-                foreach (var current in splitControlPoints)
-                {
-                    controlPoints.Remove(current);
-                }
-
-                splitControlPoints.Add(c);
+                // Extract the split portion and remove from the original slider.
+                var splitControlPoints = controlPoints.Take(index + 1).ToList();
+                controlPoints.RemoveRange(0, index);
 
                 // Turn the control points which were split off into a new slider.
                 var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
@@ -314,8 +311,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
             }
 
-            // The path will have a non-zero offset if the head is removed, but sliders don't support this behaviour since the head is positioned at the slider's position
-            // So the slider needs to be offset by this amount instead, and all control points offset backwards such that the path is re-positioned at (0, 0)
+            // Once all required pieces have been split off, the original slider has the final split.
+            // As a final step, we must reset its control points to have an origin of (0,0).
             Vector2 first = controlPoints[0].Position;
             foreach (var c in controlPoints)
                 c.Position -= first;
