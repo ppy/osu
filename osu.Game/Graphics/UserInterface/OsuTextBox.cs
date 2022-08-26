@@ -170,41 +170,6 @@ namespace osu.Game.Graphics.UserInterface
             selectionStarted = false;
         }
 
-        private void playSelectSample(SelectionSampleType selectionType)
-        {
-            if (Time.Current < sampleLastPlaybackTime + 15) return;
-
-            SampleChannel? channel;
-            double pitch = 0.98 + RNG.NextDouble(0.04);
-
-            switch (selectionType)
-            {
-                case SelectionSampleType.All:
-                    channel = selectAllSample?.GetChannel();
-                    break;
-
-                case SelectionSampleType.Word:
-                    channel = selectWordSample?.GetChannel();
-                    break;
-
-                case SelectionSampleType.Deselect:
-                    channel = deselectSample?.GetChannel();
-                    break;
-
-                default:
-                    channel = selectCharSample?.GetChannel();
-                    pitch += (SelectedText.Length / (double)Text.Length) * 0.15f;
-                    break;
-            }
-
-            if (channel == null) return;
-
-            channel.Frequency.Value = pitch;
-            channel.Play();
-
-            sampleLastPlaybackTime = Time.Current;
-        }
-
         protected override void OnImeComposition(string newComposition, int removedTextLength, int addedTextLength, bool caretMoved)
         {
             base.OnImeComposition(newComposition, removedTextLength, addedTextLength, caretMoved);
@@ -293,6 +258,41 @@ namespace osu.Game.Graphics.UserInterface
             CaretWidth = CaretWidth,
             SelectionColour = SelectionColour,
         };
+
+        private void playSelectSample(SelectionSampleType selectionType)
+        {
+            if (Time.Current < sampleLastPlaybackTime + 15) return;
+
+            SampleChannel? channel;
+            double pitch = 0.98 + RNG.NextDouble(0.04);
+
+            switch (selectionType)
+            {
+                case SelectionSampleType.All:
+                    channel = selectAllSample?.GetChannel();
+                    break;
+
+                case SelectionSampleType.Word:
+                    channel = selectWordSample?.GetChannel();
+                    break;
+
+                case SelectionSampleType.Deselect:
+                    channel = deselectSample?.GetChannel();
+                    break;
+
+                default:
+                    channel = selectCharSample?.GetChannel();
+                    pitch += (SelectedText.Length / (double)Text.Length) * 0.15f;
+                    break;
+            }
+
+            if (channel == null) return;
+
+            channel.Frequency.Value = pitch;
+            channel.Play();
+
+            sampleLastPlaybackTime = Time.Current;
+        }
 
         private void playTextAddedSample() => textAddedSamples[RNG.Next(0, textAddedSamples.Length)]?.Play();
 
