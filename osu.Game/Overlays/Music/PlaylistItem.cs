@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,86 +10,90 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistItem : OsuRearrangeableListItem<BeatmapSetInfo>, IFilterable
+    public class PlaylistItem : OsuRearrangeableListItem<Live<BeatmapSetInfo>>, IFilterable
     {
-        public readonly Bindable<BeatmapSetInfo> SelectedSet = new Bindable<BeatmapSetInfo>();
+        public readonly Bindable<Live<BeatmapSetInfo>> SelectedSet = new Bindable<Live<BeatmapSetInfo>>();
 
-        public Action<BeatmapSetInfo> RequestSelection;
+        public Action<Live<BeatmapSetInfo>> RequestSelection;
 
         private TextFlowContainer text;
-        private IEnumerable<Drawable> titleSprites;
+        private ITextPart titlePart;
 
-        private ILocalisedBindableString title;
-        private ILocalisedBindableString artist;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
-        private Color4 selectedColour;
-        private Color4 artistColour;
-
-        public PlaylistItem(BeatmapSetInfo item)
+        public PlaylistItem(Live<BeatmapSetInfo> item)
             : base(item)
         {
             Padding = new MarginPadding { Left = 5 };
-
-            FilterTerms = item.Metadata.SearchableTerms;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationManager localisation)
+        private void load()
         {
-            selectedColour = colours.Yellow;
-            artistColour = colours.Gray9;
             HandleColour = colours.Gray5;
-
-            title = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title));
-            artist = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            artist.BindValueChanged(_ => recreateText(), true);
-
-            SelectedSet.BindValueChanged(set =>
+            Model.PerformRead(m =>
             {
-                if (set.OldValue?.Equals(Model) != true && set.NewValue?.Equals(Model) != true)
-                    return;
+                var metadata = m.Metadata;
 
-                foreach (Drawable s in titleSprites)
-                    s.FadeColour(set.NewValue.Equals(Model) ? selectedColour : Color4.White, FADE_DURATION);
-            }, true);
+                var title = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+                var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
+
+                titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
+                titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
+
+                text.AddText(@"  "); // to separate the title from the artist.
+                text.AddText(artist, sprite =>
+                {
+                    sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
+                    sprite.Colour = colours.Gray9;
+                    sprite.Padding = new MarginPadding { Top = 1 };
+                });
+
+                SelectedSet.BindValueChanged(set =>
+                {
+                    bool newSelected = set.NewValue?.Equals(Model) == true;
+
+                    if (newSelected == selected)
+                        return;
+
+                    selected = newSelected;
+                    updateSelectionState(false);
+                });
+
+                updateSelectionState(true);
+            });
         }
 
-        protected override Drawable CreateContent() => text = new OsuTextFlowContainer
+        private bool selected;
+
+        private void updateSelectionState(bool instant)
+        {
+            foreach (Drawable s in titlePart.Drawables)
+                s.FadeColour(selected ? colours.Yellow : Color4.White, instant ? 0 : FADE_DURATION);
+        }
+
+        protected override Drawable CreateContent() => new DelayedLoadWrapper(text = new OsuTextFlowContainer
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
-        };
-
-        private void recreateText()
-        {
-            text.Clear();
-
-            // space after the title to put a space between the title and artist
-            titleSprites = text.AddText(title.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular)).OfType<SpriteText>();
-
-            text.AddText(artist.Value, sprite =>
-            {
-                sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
-                sprite.Colour = artistColour;
-                sprite.Padding = new MarginPadding { Top = 1 };
-            });
-        }
+        });
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -110,7 +116,7 @@ namespace osu.Game.Overlays.Music
             }
         }
 
-        public IEnumerable<string> FilterTerms { get; }
+        public IEnumerable<LocalisableString> FilterTerms => Model.PerformRead(m => m.Metadata.GetSearchableTerms()).Select(s => (LocalisableString)s).ToArray();
 
         private bool matchingFilter = true;
 

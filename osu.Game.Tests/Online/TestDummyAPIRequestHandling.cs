@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
@@ -42,7 +44,7 @@ namespace osu.Game.Tests.Online
 
             AddAssert("response event fired", () => response != null);
 
-            AddAssert("request has response", () => request.Result == response);
+            AddAssert("request has response", () => request.Response == response);
         }
 
         [Test]

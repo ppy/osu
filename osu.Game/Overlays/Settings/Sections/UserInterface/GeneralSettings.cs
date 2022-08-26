@@ -1,16 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override string Header => "General";
+        protected override LocalisableString Header => UserInterfaceStrings.GeneralHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -19,32 +23,29 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Rotate cursor when dragging",
+                    LabelText = UserInterfaceStrings.CursorRotation,
                     Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
-                new SettingsSlider<float, SizeSlider>
+                new SettingsSlider<float, SizeSlider<float>>
                 {
-                    LabelText = "Menu cursor size",
+                    LabelText = UserInterfaceStrings.MenuCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Parallax",
+                    LabelText = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
-                new SettingsSlider<float, TimeSlider>
+                new SettingsSlider<double, TimeSlider>
                 {
-                    LabelText = "Hold-to-confirm activation time",
-                    Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
+                    ClassicDefault = 0,
+                    LabelText = UserInterfaceStrings.HoldToConfirmActivationTime,
+                    Current = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay),
+                    Keywords = new[] { @"delay" },
                     KeyboardStep = 50
                 },
             };
-        }
-
-        private class TimeSlider : OsuSliderBar<float>
-        {
-            public override string TooltipText => Current.Value.ToString("N0") + "ms";
         }
     }
 }

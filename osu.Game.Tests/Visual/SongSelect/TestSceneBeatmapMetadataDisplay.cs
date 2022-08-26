@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,10 +33,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         private readonly TestBeatmapDifficultyCache testDifficultyCache = new TestBeatmapDifficultyCache();
 
         [Test]
-        public void TestLocal([Values("Beatmap", "Some long title and stuff")]
-                              string title,
-                              [Values("Trial", "Some1's very hardest difficulty")]
-                              string version)
+        public void TestLocal(
+            [Values("Beatmap", "Some long title and stuff")]
+            string title,
+            [Values("Trial", "Some1's very hardest difficulty")]
+            string version)
         {
             showMetadataForBeatmap(() => CreateWorkingBeatmap(new Beatmap
             {
@@ -44,8 +47,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Title = title,
                     },
-                    Version = version,
-                    StarDifficulty = RNG.NextDouble(0, 10),
+                    DifficultyName = version,
+                    StarRating = RNG.NextDouble(0, 10),
                 }
             }));
         }
@@ -63,8 +66,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Title = "Heavy beatmap",
                     },
-                    Version = "10k objects",
-                    StarDifficulty = 99.99f,
+                    DifficultyName = "10k objects",
+                    StarRating = 99.99f,
                 }
             }));
 
@@ -76,7 +79,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             showMetadataForBeatmap(() =>
             {
-                var allBeatmapSets = manager.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
+                var allBeatmapSets = manager.GetAllUsableBeatmapSets();
                 if (allBeatmapSets.Count == 0)
                     return manager.DefaultBeatmap;
 
@@ -87,11 +90,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
-        private void showMetadataForBeatmap(Func<WorkingBeatmap> getBeatmap)
+        private void showMetadataForBeatmap(Func<IWorkingBeatmap> getBeatmap)
         {
             AddStep("setup display", () =>
             {
-                var randomMods = Ruleset.Value.CreateInstance().GetAllMods().OrderBy(_ => RNG.Next()).Take(5).ToList();
+                var randomMods = Ruleset.Value.CreateInstance().CreateAllMods().OrderBy(_ => RNG.Next()).Take(5).ToList();
 
                 OsuLogo logo = new OsuLogo { Scale = new Vector2(0.15f) };
 
@@ -139,12 +142,12 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             }
 
-            public override async Task<StarDifficulty> GetDifficultyAsync(BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo = null, IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
+            public override async Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo rulesetInfo = null, IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
             {
                 if (blockCalculation)
-                    await calculationBlocker.Task;
+                    await calculationBlocker.Task.ConfigureAwait(false);
 
-                return await base.GetDifficultyAsync(beatmapInfo, rulesetInfo, mods, cancellationToken);
+                return await base.GetDifficultyAsync(beatmapInfo, rulesetInfo, mods, cancellationToken).ConfigureAwait(false);
             }
         }
     }

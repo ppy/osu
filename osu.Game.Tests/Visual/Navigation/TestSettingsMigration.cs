@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -9,9 +11,12 @@ namespace osu.Game.Tests.Visual.Navigation
 {
     public class TestSettingsMigration : OsuGameTestScene
     {
-        public override void RecycleLocalStorage()
+        public override void RecycleLocalStorage(bool isDisposing)
         {
-            base.RecycleLocalStorage();
+            base.RecycleLocalStorage(isDisposing);
+
+            if (isDisposing)
+                return;
 
             using (var config = new OsuConfigManager(LocalStorage))
             {

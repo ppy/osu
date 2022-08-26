@@ -1,8 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
@@ -11,15 +13,15 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Database;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
@@ -38,6 +40,9 @@ namespace osu.Game.Overlays.Toolbar
 
         [Resolved]
         private TextureStore textures { get; set; }
+
+        [Resolved]
+        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
 
         public void SetIcon(string texture) =>
             SetIcon(new Sprite
@@ -76,10 +81,9 @@ namespace osu.Game.Overlays.Toolbar
         protected FillFlowContainer Flow;
 
         [Resolved]
-        private KeyBindingStore keyBindings { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected ToolbarButton()
-            : base(HoverSampleSet.Toolbar)
         {
             Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;
@@ -159,28 +163,7 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        private readonly Cached tooltipKeyBinding = new Cached();
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            keyBindings.KeyBindingChanged += () => tooltipKeyBinding.Invalidate();
-            updateKeyBindingTooltip();
-        }
-
-        private void updateKeyBindingTooltip()
-        {
-            if (tooltipKeyBinding.IsValid)
-                return;
-
-            var binding = keyBindings.Query().Find(b => (GlobalAction)b.Action == Hotkey);
-            var keyBindingString = binding?.KeyCombination.ReadableString();
-            keyBindingTooltip.Text = !string.IsNullOrEmpty(keyBindingString) ? $" ({keyBindingString})" : string.Empty;
-
-            tooltipKeyBinding.Validate();
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => false;
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -195,6 +178,7 @@ namespace osu.Game.Overlays.Toolbar
 
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
+
             return base.OnHover(e);
         }
 
@@ -204,19 +188,34 @@ namespace osu.Game.Overlays.Toolbar
             tooltipContainer.FadeOut(100);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (action == Hotkey)
+            if (e.Action == Hotkey && !e.Repeat)
             {
-                Click();
+                TriggerClick();
                 return true;
             }
 
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        private void updateKeyBindingTooltip()
+        {
+            if (Hotkey == null) return;
+
+            var realmKeyBinding = realm.Realm.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value);
+
+            if (realmKeyBinding != null)
+            {
+                string keyBindingString = keyCombinationProvider.GetReadableString(realmKeyBinding.KeyCombination);
+
+                if (!string.IsNullOrEmpty(keyBindingString))
+                    keyBindingTooltip.Text = $" ({keyBindingString})";
+            }
         }
     }
 

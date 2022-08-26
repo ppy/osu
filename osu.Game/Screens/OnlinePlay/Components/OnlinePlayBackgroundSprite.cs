@@ -1,21 +1,23 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class OnlinePlayBackgroundSprite : OnlinePlayComposite
     {
-        private readonly BeatmapSetCoverType beatmapSetCoverType;
+        protected readonly BeatmapSetCoverType BeatmapSetCoverType;
         private UpdateableBeatmapBackgroundSprite sprite;
 
         public OnlinePlayBackgroundSprite(BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
         {
-            this.beatmapSetCoverType = beatmapSetCoverType;
+            BeatmapSetCoverType = beatmapSetCoverType;
         }
 
         [BackgroundDependencyLoader]
@@ -23,16 +25,17 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             InternalChild = sprite = CreateBackgroundSprite();
 
-            Playlist.CollectionChanged += (_, __) => updateBeatmap();
+            CurrentPlaylistItem.BindValueChanged(_ => updateBeatmap());
+            Playlist.CollectionChanged += (_, _) => updateBeatmap();
 
             updateBeatmap();
         }
 
         private void updateBeatmap()
         {
-            sprite.Beatmap.Value = Playlist.FirstOrDefault()?.Beatmap.Value;
+            sprite.Beatmap.Value = CurrentPlaylistItem.Value?.Beatmap ?? Playlist.GetCurrentItem()?.Beatmap;
         }
 
-        protected virtual UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(beatmapSetCoverType) { RelativeSizeAxes = Axes.Both };
+        protected virtual UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType) { RelativeSizeAxes = Axes.Both };
     }
 }

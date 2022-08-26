@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -24,9 +26,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            scoreProcessor = new ScoreProcessor();
+            scoreProcessor = new ScoreProcessor(new CatchRuleset());
 
-            SetContents(() => new CatchComboDisplay
+            SetContents(_ => new CatchComboDisplay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

@@ -1,9 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,46 +13,52 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
+using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsMatchSettingsOverlay : RoomTestScene
+    public class TestScenePlaylistsMatchSettingsOverlay : OnlinePlayTestScene
     {
-        [Cached(Type = typeof(IRoomManager))]
-        private TestRoomManager roomManager = new TestRoomManager();
+        protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
         private TestRoomSettings settings;
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            settings = new TestRoomSettings
-            {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible }
-            };
+        protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new TestDependencies();
 
-            Child = settings;
-        });
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("create overlay", () =>
+            {
+                SelectedRoom.Value = new Room();
+
+                Child = settings = new TestRoomSettings(SelectedRoom.Value)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    State = { Value = Visibility.Visible }
+                };
+            });
+        }
 
         [Test]
         public void TestButtonEnabledOnlyWithNameAndBeatmap()
         {
             AddStep("clear name and beatmap", () =>
             {
-                Room.Name.Value = "";
-                Room.Playlist.Clear();
+                SelectedRoom.Value.Name.Value = "";
+                SelectedRoom.Value.Playlist.Clear();
             });
 
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set name", () => Room.Name.Value = "Room name");
+            AddStep("set name", () => SelectedRoom.Value.Name.Value = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } }));
+            AddStep("set beatmap", () => SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
-            AddStep("clear name", () => Room.Name.Value = "");
+            AddStep("clear name", () => SelectedRoom.Value.Name.Value = "");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
         }
 
@@ -67,12 +74,12 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
-                Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo));
 
-                roomManager.CreateRequested = r =>
+                RoomManager.CreateRequested = r =>
                 {
                     createdRoom = r;
-                    return true;
+                    return string.Empty;
                 };
             });
 
@@ -82,34 +89,64 @@ namespace osu.Game.Tests.Visual.Playlists
         }
 
         [Test]
-        public void TestCreationFailureDisplaysError()
+        public void TestInvalidBeatmapError()
         {
-            bool fail;
+            const string not_found_prefix = "beatmaps not found:";
+
+            string errorMessage = null;
 
             AddStep("setup", () =>
             {
-                Room.Name.Value = "Test Room";
-                Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                var beatmap = CreateBeatmap(Ruleset.Value).BeatmapInfo;
 
-                fail = true;
-                roomManager.CreateRequested = _ => !fail;
+                SelectedRoom.Value.Name.Value = "Test Room";
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(beatmap));
+
+                errorMessage = $"{not_found_prefix} {beatmap.OnlineID}";
+
+                RoomManager.CreateRequested = _ => errorMessage;
+            });
+
+            AddAssert("error not displayed", () => !settings.ErrorText.IsPresent);
+            AddAssert("playlist item valid", () => SelectedRoom.Value.Playlist[0].Valid.Value);
+
+            AddStep("create room", () => settings.ApplyButton.Action.Invoke());
+
+            AddAssert("error displayed", () => settings.ErrorText.IsPresent);
+            AddAssert("error has custom text", () => settings.ErrorText.Text != errorMessage);
+            AddAssert("playlist item marked invalid", () => !SelectedRoom.Value.Playlist[0].Valid.Value);
+        }
+
+        [Test]
+        public void TestCreationFailureDisplaysError()
+        {
+            const string error_message = "failed";
+
+            string failText = error_message;
+
+            AddStep("setup", () =>
+            {
+                SelectedRoom.Value.Name.Value = "Test Room";
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo));
+
+                RoomManager.CreateRequested = _ => failText;
             });
             AddAssert("error not displayed", () => !settings.ErrorText.IsPresent);
 
             AddStep("create room", () => settings.ApplyButton.Action.Invoke());
             AddAssert("error displayed", () => settings.ErrorText.IsPresent);
-            AddAssert("error has correct text", () => settings.ErrorText.Text == TestRoomManager.FAILED_TEXT);
+            AddAssert("error has correct text", () => settings.ErrorText.Text == error_message);
 
             AddStep("create room no fail", () =>
             {
-                fail = false;
+                failText = string.Empty;
                 settings.ApplyButton.Action.Invoke();
             });
 
             AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
         }
 
-        private class TestRoomSettings : PlaylistsMatchSettingsOverlay
+        private class TestRoomSettings : PlaylistsRoomSettingsOverlay
         {
             public TriangleButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
 
@@ -117,13 +154,21 @@ namespace osu.Game.Tests.Visual.Playlists
             public OsuDropdown<TimeSpan> DurationField => ((MatchSettings)Settings).DurationField;
 
             public OsuSpriteText ErrorText => ((MatchSettings)Settings).ErrorText;
+
+            public TestRoomSettings(Room room)
+                : base(room)
+            {
+            }
         }
 
-        private class TestRoomManager : IRoomManager
+        private class TestDependencies : OnlinePlayTestSceneDependencies
         {
-            public const string FAILED_TEXT = "failed";
+            protected override IRoomManager CreateRoomManager() => new TestRoomManager();
+        }
 
-            public Func<Room, bool> CreateRequested;
+        protected class TestRoomManager : IRoomManager
+        {
+            public Func<Room, string> CreateRequested;
 
             public event Action RoomsUpdated
             {
@@ -135,18 +180,26 @@ namespace osu.Game.Tests.Visual.Playlists
 
             public IBindableList<Room> Rooms => null;
 
+            public void AddOrUpdateRoom(Room room) => throw new NotImplementedException();
+
+            public void RemoveRoom(Room room) => throw new NotImplementedException();
+
+            public void ClearRooms() => throw new NotImplementedException();
+
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
             {
                 if (CreateRequested == null)
                     return;
 
-                if (!CreateRequested.Invoke(room))
-                    onError?.Invoke(FAILED_TEXT);
+                string error = CreateRequested.Invoke(room);
+
+                if (!string.IsNullOrEmpty(error))
+                    onError?.Invoke(error);
                 else
                     onSuccess?.Invoke(room);
             }
 
-            public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => throw new NotImplementedException();
+            public void JoinRoom(Room room, string password, Action<Room> onSuccess = null, Action<string> onError = null) => throw new NotImplementedException();
 
             public void PartRoom() => throw new NotImplementedException();
         }

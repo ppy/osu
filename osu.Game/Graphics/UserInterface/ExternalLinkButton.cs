@@ -1,35 +1,50 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Overlays;
+using osu.Game.Overlays.OSD;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ExternalLinkButton : CompositeDrawable, IHasTooltip
+    public class ExternalLinkButton : CompositeDrawable, IHasTooltip, IHasContextMenu
     {
-        public string Link { get; set; }
+        public string? Link { get; set; }
 
         private Color4 hoverColour;
 
         [Resolved]
-        private GameHost host { get; set; }
+        private GameHost host { get; set; } = null!;
 
-        public ExternalLinkButton(string link = null)
+        [Resolved]
+        private OnScreenDisplay? onScreenDisplay { get; set; }
+
+        private readonly SpriteIcon linkIcon;
+
+        public ExternalLinkButton(string? link = null)
         {
             Link = link;
             Size = new Vector2(12);
-            InternalChild = new SpriteIcon
+            InternalChildren = new Drawable[]
             {
-                Icon = FontAwesome.Solid.ExternalLinkAlt,
-                RelativeSizeAxes = Axes.Both
+                linkIcon = new SpriteIcon
+                {
+                    Icon = FontAwesome.Solid.ExternalLinkAlt,
+                    RelativeSizeAxes = Axes.Both
+                },
+                new HoverClickSounds()
             };
         }
 
@@ -41,13 +56,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            InternalChild.FadeColour(hoverColour, 500, Easing.OutQuint);
+            linkIcon.FadeColour(hoverColour, 500, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            InternalChild.FadeColour(Color4.White, 500, Easing.OutQuint);
+            linkIcon.FadeColour(Color4.White, 500, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -58,6 +73,36 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        public string TooltipText => "view in browser";
+        public LocalisableString TooltipText => "view in browser";
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (Link != null)
+                {
+                    items.Add(new OsuMenuItem("Open", MenuItemType.Standard, () => host.OpenUrlExternally(Link)));
+                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, copyUrl));
+                }
+
+                return items.ToArray();
+            }
+        }
+
+        private void copyUrl()
+        {
+            host.GetClipboard()?.SetText(Link);
+            onScreenDisplay?.Display(new CopyUrlToast(ToastStrings.UrlCopied));
+        }
+
+        private class CopyUrlToast : Toast
+        {
+            public CopyUrlToast(LocalisableString value)
+                : base(UserInterfaceStrings.GeneralHeader, value, "")
+            {
+            }
+        }
     }
 }

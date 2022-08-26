@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.Containers
@@ -25,8 +27,6 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool UserScrolling { get; private set; }
 
-        public void CancelUserScroll() => UserScrolling = false;
-
         public UserTrackingScrollContainer()
         {
         }
@@ -40,6 +40,12 @@ namespace osu.Game.Graphics.Containers
         {
             UserScrolling = true;
             base.OnUserScroll(value, animated, distanceDecay);
+        }
+
+        public new void ScrollIntoView(Drawable target, bool animated = true)
+        {
+            UserScrolling = false;
+            base.ScrollIntoView(target, animated);
         }
 
         public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)

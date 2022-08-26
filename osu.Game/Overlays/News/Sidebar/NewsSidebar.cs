@@ -1,92 +1,43 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Framework.Graphics.Shapes;
 using osuTK;
 using System.Linq;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
-    public class NewsSidebar : CompositeDrawable
+    public class NewsSidebar : OverlaySidebar
     {
         [Cached]
         public readonly Bindable<APINewsSidebar> Metadata = new Bindable<APINewsSidebar>();
 
         private FillFlowContainer<MonthSection> monthsFlow;
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        protected override Drawable CreateContent() => new FillFlowContainer
         {
-            RelativeSizeAxes = Axes.Y;
-            Width = 250;
-            InternalChildren = new Drawable[]
+            Direction = FillDirection.Vertical,
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Spacing = new Vector2(0, 20),
+            Children = new Drawable[]
             {
-                new Box
+                new YearsPanel(),
+                monthsFlow = new FillFlowContainer<MonthSection>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = OsuScrollContainer.SCROLL_BAR_HEIGHT,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Colour = colourProvider.Background3,
-                    Alpha = 0.5f
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Right = -3 }, // Compensate for scrollbar margin
-                    Child = new OsuScrollContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Right = 3 }, // Addeded 3px back
-                            Child = new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding
-                                {
-                                    Vertical = 20,
-                                    Left = 50,
-                                    Right = 30
-                                },
-                                Child = new FillFlowContainer
-                                {
-                                    Direction = FillDirection.Vertical,
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Spacing = new Vector2(0, 20),
-                                    Children = new Drawable[]
-                                    {
-                                        new YearsPanel(),
-                                        monthsFlow = new FillFlowContainer<MonthSection>
-                                        {
-                                            AutoSizeAxes = Axes.Y,
-                                            RelativeSizeAxes = Axes.X,
-                                            Direction = FillDirection.Vertical,
-                                            Spacing = new Vector2(0, 10)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 10)
                 }
-            };
-        }
+            }
+        };
 
         protected override void LoadComplete()
         {
@@ -107,19 +58,17 @@ namespace osu.Game.Overlays.News.Sidebar
             if (allPosts?.Any() != true)
                 return;
 
-            var lookup = metadata.NewValue.NewsPosts.ToLookup(post => post.PublishedAt.Month);
+            var lookup = metadata.NewValue.NewsPosts.ToLookup(post => (post.PublishedAt.Month, post.PublishedAt.Year));
 
             var keys = lookup.Select(kvp => kvp.Key);
-            var sortedKeys = keys.OrderByDescending(k => k).ToList();
-
-            var year = metadata.NewValue.CurrentYear;
+            var sortedKeys = keys.OrderByDescending(k => k.Year).ThenByDescending(k => k.Month).ToList();
 
             for (int i = 0; i < sortedKeys.Count; i++)
             {
-                var month = sortedKeys[i];
-                var posts = lookup[month];
+                var key = sortedKeys[i];
+                var posts = lookup[key];
 
-                monthsFlow.Add(new MonthSection(month, year, posts)
+                monthsFlow.Add(new MonthSection(key.Month, key.Year, posts)
                 {
                     Expanded = { Value = i == 0 }
                 });

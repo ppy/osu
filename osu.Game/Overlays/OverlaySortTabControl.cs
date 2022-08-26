@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -18,6 +20,7 @@ using JetBrains.Annotations;
 using System;
 using osu.Framework.Extensions;
 using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays
 {
@@ -54,7 +57,7 @@ namespace osu.Game.Overlays
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                        Text = @"Sort by"
+                        Text = SortStrings.Default
                     },
                     CreateControl().With(c =>
                     {
@@ -143,10 +146,12 @@ namespace osu.Game.Overlays
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                            Text = (value as Enum)?.GetDescription() ?? value.ToString()
+                            Text = (value as Enum)?.GetLocalisableDescription() ?? value.ToString()
                         }
                     }
                 });
+
+                AddInternal(new HoverClickSounds(HoverSampleSet.TabSelect));
             }
 
             protected override void LoadComplete()

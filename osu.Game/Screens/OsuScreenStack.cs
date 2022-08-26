@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -29,6 +31,13 @@ namespace osu.Game.Screens
             ScreenExited += ScreenChanged;
         }
 
+        public void PushSynchronously(OsuScreen screen)
+        {
+            LoadComponent(screen);
+
+            Push(screen);
+        }
+
         private void screenPushed(IScreen prev, IScreen next)
         {
             if (LoadState < LoadState.Ready)
@@ -51,6 +60,6 @@ namespace osu.Game.Screens
         }
 
         private void setParallax(IScreen next) =>
-            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((IOsuScreen)next)?.BackgroundParallaxAmount ?? 1.0f;
+            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * (((IOsuScreen)next)?.BackgroundParallaxAmount ?? 1.0f);
     }
 }

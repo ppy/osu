@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -40,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("last connection displayed", () =>
             {
-                var lastConnection = visualiser.Connections.Last(c => c.ControlPoint.Position.Value == new Vector2(300));
+                var lastConnection = visualiser.Connections.Last(c => c.ControlPoint.Position == new Vector2(300));
                 return lastConnection.DrawWidth > 50;
             });
         }
@@ -166,21 +168,21 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             AddStep($"move mouse to control point {index}", () =>
             {
-                Vector2 position = slider.Path.ControlPoints[index].Position.Value;
+                Vector2 position = slider.Path.ControlPoints[index].Position;
                 InputManager.MoveMouseTo(visualiser.Pieces[0].Parent.ToScreenSpace(position));
             });
         }
 
         private void assertControlPointPathType(int controlPointIndex, PathType? type)
         {
-            AddAssert($"point {controlPointIndex} is {type}", () => slider.Path.ControlPoints[controlPointIndex].Type.Value == type);
+            AddAssert($"point {controlPointIndex} is {type}", () => slider.Path.ControlPoints[controlPointIndex].Type == type);
         }
 
         private void addContextMenuItemStep(string contextMenuText)
         {
             AddStep($"click context menu item \"{contextMenuText}\"", () =>
             {
-                MenuItem item = visualiser.ContextMenuItems[1].Items.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
+                MenuItem item = visualiser.ContextMenuItems.FirstOrDefault(menuItem => menuItem.Text.Value == "Curve type")?.Items.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
 
                 item?.Action?.Value();
             });

@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -52,6 +54,26 @@ namespace osu.Game.Graphics.Containers
         public OsuScrollContainer(Direction scrollDirection = Direction.Vertical)
             : base(scrollDirection)
         {
+        }
+
+        /// <summary>
+        /// Scrolls a <see cref="Drawable"/> into view.
+        /// </summary>
+        /// <param name="d">The <see cref="Drawable"/> to scroll into view.</param>
+        /// <param name="animated">Whether to animate the movement.</param>
+        /// <param name="extraScroll">An added amount to scroll beyond the requirement to bring the target into view.</param>
+        public void ScrollIntoView(Drawable d, bool animated = true, float extraScroll = 0)
+        {
+            float childPos0 = GetChildPosInContent(d);
+            float childPos1 = GetChildPosInContent(d, d.DrawSize);
+
+            float minPos = Math.Min(childPos0, childPos1);
+            float maxPos = Math.Max(childPos0, childPos1);
+
+            if (minPos < Current || (minPos > Current && d.DrawSize[ScrollDim] > DisplayableContent))
+                ScrollTo(minPos - extraScroll, animated);
+            else if (maxPos > Current + DisplayableContent)
+                ScrollTo(maxPos - DisplayableContent + extraScroll, animated);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -141,12 +163,12 @@ namespace osu.Game.Graphics.Containers
                 Child = box = new Box { RelativeSizeAxes = Axes.Both };
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            [BackgroundDependencyLoader(true)]
+            private void load(OverlayColourProvider? colourProvider, OsuColour colours)
             {
                 Colour = defaultColour = colours.Gray8;
                 hoverColour = colours.GrayF;
-                highlightColour = colours.Green;
+                highlightColour = colourProvider?.Highlight1 ?? colours.Green;
             }
 
             public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)

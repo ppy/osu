@@ -4,6 +4,8 @@
 using System;
 using System.Runtime.InteropServices;
 
+// ReSharper disable IdentifierTypo
+
 namespace osu.Desktop.Windows
 {
     internal class WindowsKey
@@ -17,7 +19,7 @@ namespace osu.Desktop.Windows
         private const int wm_syskeyup = 261;
 
         //Resharper disable once NotAccessedField.Local
-        private static LowLevelKeyboardProcDelegate keyboardHookDelegate; // keeping a reference alive for the GC
+        private static LowLevelKeyboardProcDelegate? keyboardHookDelegate; // keeping a reference alive for the GC
         private static IntPtr keyHook;
 
         [StructLayout(LayoutKind.Explicit)]

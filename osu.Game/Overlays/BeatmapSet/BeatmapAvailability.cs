@@ -1,23 +1,26 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapAvailability : Container
     {
-        private BeatmapSetInfo beatmapSet;
+        private APIBeatmapSet beatmapSet;
 
-        private bool downloadDisabled => BeatmapSet?.OnlineInfo.Availability?.DownloadDisabled ?? false;
-        private bool hasExternalLink => !string.IsNullOrEmpty(BeatmapSet?.OnlineInfo.Availability?.ExternalLink);
+        private bool downloadDisabled => BeatmapSet?.Availability.DownloadDisabled ?? false;
+        private bool hasExternalLink => !string.IsNullOrEmpty(BeatmapSet?.Availability.ExternalLink);
 
         private readonly LinkFlowContainer textContainer;
 
@@ -44,7 +47,7 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             get => beatmapSet;
 
@@ -69,14 +72,14 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             textContainer.Clear();
             textContainer.AddParagraph(downloadDisabled
-                ? "This beatmap is currently not available for download."
-                : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.", t => t.Colour = Color4.Orange);
+                ? BeatmapsetsStrings.AvailabilityDisabled
+                : BeatmapsetsStrings.AvailabilityPartsRemoved, t => t.Colour = Color4.Orange);
 
             if (hasExternalLink)
             {
                 textContainer.NewParagraph();
                 textContainer.NewParagraph();
-                textContainer.AddLink("Check here for more information.", BeatmapSet.OnlineInfo.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 10));
+                textContainer.AddLink(BeatmapsetsStrings.AvailabilityMoreInfo, BeatmapSet.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 10));
             }
         }
     }

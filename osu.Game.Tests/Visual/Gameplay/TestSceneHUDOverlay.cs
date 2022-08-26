@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -8,30 +10,49 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning;
+using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneHUDOverlay : OsuManualInputManagerTestScene
     {
+        private OsuConfigManager localConfig;
+
         private HUDOverlay hudOverlay;
 
         [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
+        [Cached]
+        private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
+
+        [Cached(typeof(IGameplayClock))]
+        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
         private FillFlowContainer<KeyCounter> keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().First();
 
-        [Resolved]
-        private OsuConfigManager config { get; set; }
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(localConfig = new OsuConfigManager(LocalStorage));
+        }
+
+        [SetUp]
+        public void SetUp() => Schedule(() => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always));
 
         [Test]
         public void TestComboCounterIncrementing()
@@ -84,11 +105,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             createNew();
 
-            HUDVisibilityMode originalConfigValue = HUDVisibilityMode.HideDuringGameplay;
-
-            AddStep("get original config value", () => originalConfigValue = config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
-
-            AddStep("set hud to never show", () => config.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
+            AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
 
             AddUntilStep("wait for fade", () => !hideTarget.IsPresent);
 
@@ -97,37 +114,28 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("stop trigering", () => InputManager.ReleaseKey(Key.ControlLeft));
             AddUntilStep("wait for fade", () => !hideTarget.IsPresent);
-
-            AddStep("set original config value", () => config.SetValue(OsuSetting.HUDVisibilityMode, originalConfigValue));
         }
 
         [Test]
         public void TestExternalHideDoesntAffectConfig()
         {
-            HUDVisibilityMode originalConfigValue = HUDVisibilityMode.HideDuringGameplay;
-
             createNew();
 
-            AddStep("get original config value", () => originalConfigValue = config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
-
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
-            AddAssert("config unchanged", () => originalConfigValue == config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
+            AddAssert("config unchanged", () => localConfig.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode).IsDefault);
 
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
-            AddAssert("config unchanged", () => originalConfigValue == config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
+            AddAssert("config unchanged", () => localConfig.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode).IsDefault);
         }
 
         [Test]
         public void TestChangeHUDVisibilityOnHiddenKeyCounter()
         {
-            bool keyCounterVisibleValue = false;
-
             createNew();
-            AddStep("save keycounter visible value", () => keyCounterVisibleValue = config.Get<bool>(OsuSetting.KeyOverlay));
 
-            AddStep("set keycounter visible false", () =>
+            AddStep("hide key overlay", () =>
             {
-                config.SetValue(OsuSetting.KeyOverlay, false);
+                localConfig.SetValue(OsuSetting.KeyOverlay, false);
                 hudOverlay.KeyCounter.AlwaysVisible.Value = false;
             });
 
@@ -138,8 +146,41 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
             AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
             AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
+        }
 
-            AddStep("return value", () => config.SetValue(OsuSetting.KeyOverlay, keyCounterVisibleValue));
+        [Test]
+        public void TestHiddenHUDDoesntBlockComponentUpdates()
+        {
+            int updateCount = 0;
+
+            AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
+
+            createNew();
+
+            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
+
+            AddStep("bind on update", () =>
+            {
+                hudOverlay.ChildrenOfType<BarHitErrorMeter>().First().OnUpdate += _ => updateCount++;
+            });
+
+            AddUntilStep("wait for updates", () => updateCount > 0);
+        }
+
+        [Test]
+        public void TestHiddenHUDDoesntBlockSkinnableComponentsLoad()
+        {
+            AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
+
+            createNew();
+
+            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
+
+            AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Reload());
+            AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().ComponentsLoaded);
         }
 
         private void createNew(Action<HUDOverlay> action = null)
@@ -157,6 +198,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 Child = hudOverlay;
             });
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            localConfig?.Dispose();
+            base.Dispose(isDisposing);
         }
     }
 }

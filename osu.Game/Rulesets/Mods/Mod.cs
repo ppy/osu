@@ -9,9 +9,9 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
-using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.UI;
 using osu.Game.Utils;
 
@@ -21,36 +21,21 @@ namespace osu.Game.Rulesets.Mods
     /// The base class for gameplay modifiers.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public abstract class Mod : IMod, IEquatable<Mod>, IJsonSerializable
+    public abstract class Mod : IMod, IEquatable<Mod>, IDeepCloneable<Mod>
     {
-        /// <summary>
-        /// The name of this mod.
-        /// </summary>
         [JsonIgnore]
         public abstract string Name { get; }
 
-        /// <summary>
-        /// The shortened name of this mod.
-        /// </summary>
         public abstract string Acronym { get; }
 
-        /// <summary>
-        /// The icon of this mod.
-        /// </summary>
         [JsonIgnore]
         public virtual IconUsage? Icon => null;
 
-        /// <summary>
-        /// The type of this mod.
-        /// </summary>
         [JsonIgnore]
         public virtual ModType Type => ModType.Fun;
 
-        /// <summary>
-        /// The user readable description of this mod.
-        /// </summary>
         [JsonIgnore]
-        public abstract string Description { get; }
+        public abstract LocalisableString Description { get; }
 
         /// <summary>
         /// The tooltip to display for this mod when used in a <see cref="ModIcon"/>.
@@ -107,10 +92,16 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool HasImplementation => this is IApplicableMod;
 
-        /// <summary>
-        /// Returns if this mod is ranked.
-        /// </summary>
         [JsonIgnore]
+        public virtual bool UserPlayable => true;
+
+        [JsonIgnore]
+        public virtual bool ValidForMultiplayer => true;
+
+        [JsonIgnore]
+        public virtual bool ValidForMultiplayerAsFreeMod => true;
+
+        [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override and set UserPlayable to false.")] // Can be removed 20211009
         public virtual bool Ranked => false;
 
         /// <summary>
@@ -125,10 +116,26 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual Type[] IncompatibleMods => Array.Empty<Type>();
 
+        private IReadOnlyList<IBindable>? settingsBacking;
+
+        /// <summary>
+        /// A list of the all <see cref="IBindable"/> settings within this mod.
+        /// </summary>
+        internal IReadOnlyList<IBindable> Settings =>
+            settingsBacking ??= this.GetSettingsSourceProperties()
+                                    .Select(p => p.Item2.GetValue(this))
+                                    .Cast<IBindable>()
+                                    .ToList();
+
+        /// <summary>
+        /// Whether all settings in this mod are set to their default state.
+        /// </summary>
+        protected virtual bool UsesDefaultConfiguration => Settings.All(s => s.IsDefault);
+
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
-        public virtual Mod CreateCopy()
+        public virtual Mod DeepClone()
         {
             var result = (Mod)Activator.CreateInstance(GetType());
             result.CopyFrom(this);
@@ -187,15 +194,39 @@ namespace osu.Game.Rulesets.Mods
             if (ReferenceEquals(this, other)) return true;
 
             return GetType() == other.GetType() &&
-                   this.GetSettingsSourceProperties().All(pair =>
-                       EqualityComparer<object>.Default.Equals(
-                           ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(this)),
-                           ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(other))));
+                   Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+
+            hashCode.Add(GetType());
+
+            foreach (var setting in Settings)
+                hashCode.Add(setting.GetUnderlyingSettingValue());
+
+            return hashCode.ToHashCode();
         }
 
         /// <summary>
         /// Reset all custom settings for this mod back to their defaults.
         /// </summary>
         public virtual void ResetSettingsToDefaults() => CopyFrom((Mod)Activator.CreateInstance(GetType()));
+
+        private class ModSettingsEqualityComparer : IEqualityComparer<IBindable>
+        {
+            public static ModSettingsEqualityComparer Default { get; } = new ModSettingsEqualityComparer();
+
+            public bool Equals(IBindable x, IBindable y)
+            {
+                object xValue = x.GetUnderlyingSettingValue();
+                object yValue = y.GetUnderlyingSettingValue();
+
+                return EqualityComparer<object>.Default.Equals(xValue, yValue);
+            }
+
+            public int GetHashCode(IBindable obj) => obj.GetUnderlyingSettingValue().GetHashCode();
+        }
     }
 }

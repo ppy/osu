@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -37,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 Beatmap.Value.Track.Start();
             });
 
-            AddStep("Load playfield", () => SetContents(() => new TaikoPlayfield(new ControlPointInfo())
+            AddStep("Load playfield", () => SetContents(_ => new TaikoPlayfield
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,

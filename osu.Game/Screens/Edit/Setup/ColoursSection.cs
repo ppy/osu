@@ -1,19 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Skinning;
-using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
     internal class ColoursSection : SetupSection
     {
-        public override LocalisableString Title => "Colours";
+        public override LocalisableString Title => EditorSetupStrings.ColoursHeader;
 
         private LabelledColourPalette comboColours;
 
@@ -24,14 +24,14 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 comboColours = new LabelledColourPalette
                 {
-                    Label = "Hitcircle / Slider Combos",
-                    ColourNamePrefix = "Combo"
+                    Label = EditorSetupStrings.HitCircleSliderCombos,
+                    FixedLabelWidth = LABEL_WIDTH,
+                    ColourNamePrefix = EditorSetupStrings.ComboColourPrefix
                 }
             };
 
-            var colours = Beatmap.BeatmapSkin?.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
-            if (colours != null)
-                comboColours.Colours.AddRange(colours);
+            if (Beatmap.BeatmapSkin != null)
+                comboColours.Colours.BindTo(Beatmap.BeatmapSkin.ComboColours);
         }
     }
 }

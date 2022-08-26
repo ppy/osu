@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -18,6 +18,8 @@ namespace osu.Game.Online
 {
     public class HubClientConnector : IHubClientConnector
     {
+        public const string SERVER_SHUTDOWN_MESSAGE = "Server is shutting down.";
+
         /// <summary>
         /// Invoked whenever a new hub connection is built, to configure it before it's started.
         /// </summary>
@@ -26,6 +28,7 @@ namespace osu.Game.Online
         private readonly string clientName;
         private readonly string endpoint;
         private readonly string versionHash;
+        private readonly bool preferMessagePack;
         private readonly IAPIProvider api;
 
         /// <summary>
@@ -51,28 +54,38 @@ namespace osu.Game.Online
         /// <param name="endpoint">The endpoint to the hub.</param>
         /// <param name="api"> An API provider used to react to connection state changes.</param>
         /// <param name="versionHash">The hash representing the current game version, used for verification purposes.</param>
-        public HubClientConnector(string clientName, string endpoint, IAPIProvider api, string versionHash)
+        /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
+        public HubClientConnector(string clientName, string endpoint, IAPIProvider api, string versionHash, bool preferMessagePack = true)
         {
             this.clientName = clientName;
             this.endpoint = endpoint;
             this.api = api;
             this.versionHash = versionHash;
+            this.preferMessagePack = preferMessagePack;
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(state =>
-            {
-                switch (state.NewValue)
-                {
-                    case APIState.Failing:
-                    case APIState.Offline:
-                        Task.Run(() => disconnect(true));
-                        break;
+            apiState.BindValueChanged(_ => Task.Run(connectIfPossible), true);
+        }
 
-                    case APIState.Online:
-                        Task.Run(connect);
-                        break;
-                }
-            }, true);
+        public Task Reconnect()
+        {
+            Logger.Log($"{clientName} reconnecting...", LoggingTarget.Network);
+            return Task.Run(connectIfPossible);
+        }
+
+        private async Task connectIfPossible()
+        {
+            switch (apiState.Value)
+            {
+                case APIState.Failing:
+                case APIState.Offline:
+                    await disconnect(true);
+                    break;
+
+                case APIState.Online:
+                    await connect();
+                    break;
+            }
         }
 
         private async Task connect()
@@ -116,10 +129,7 @@ namespace osu.Game.Online
                     }
                     catch (Exception e)
                     {
-                        Logger.Log($"{clientName} connection error: {e}", LoggingTarget.Network);
-
-                        // retry on any failure.
-                        await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
+                        await handleErrorAndDelay(e, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -129,22 +139,49 @@ namespace osu.Game.Online
             }
         }
 
+        /// <summary>
+        /// Handles an exception and delays an async flow.
+        /// </summary>
+        private async Task handleErrorAndDelay(Exception exception, CancellationToken cancellationToken)
+        {
+            Logger.Log($"{clientName} connect attempt failed: {exception.Message}", LoggingTarget.Network);
+            await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
+        }
+
         private HubConnection buildConnection(CancellationToken cancellationToken)
         {
             var builder = new HubConnectionBuilder()
                 .WithUrl(endpoint, options =>
                 {
+                    // Use HttpClient.DefaultProxy once on net6 everywhere.
+                    // The credential setter can also be removed at this point.
+                    options.Proxy = WebRequest.DefaultWebProxy;
+                    if (options.Proxy != null)
+                        options.Proxy.Credentials = CredentialCache.DefaultCredentials;
+
                     options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
                     options.Headers.Add("OsuVersionHash", versionHash);
                 });
 
-            if (RuntimeInfo.SupportsJIT)
-                builder.AddMessagePackProtocol();
+            if (RuntimeInfo.SupportsJIT && preferMessagePack)
+            {
+                builder.AddMessagePackProtocol(options =>
+                {
+                    options.SerializerOptions = SignalRUnionWorkaroundResolver.OPTIONS;
+                });
+            }
             else
             {
                 // eventually we will precompile resolvers for messagepack, but this isn't working currently
                 // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
-                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+                builder.AddNewtonsoftJsonProtocol(options =>
+                {
+                    options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.PayloadSerializerSettings.Converters = new List<JsonConverter>
+                    {
+                        new SignalRDerivedTypeWorkaroundJsonConverter(),
+                    };
+                });
             }
 
             var newConnection = builder.Build();
@@ -155,17 +192,18 @@ namespace osu.Game.Online
             return newConnection;
         }
 
-        private Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
+        private async Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
         {
             isConnected.Value = false;
 
-            Logger.Log(ex != null ? $"{clientName} lost connection: {ex}" : $"{clientName} disconnected", LoggingTarget.Network);
+            if (ex != null)
+                await handleErrorAndDelay(ex, cancellationToken).ConfigureAwait(false);
+            else
+                Logger.Log($"{clientName} disconnected", LoggingTarget.Network);
 
             // make sure a disconnect wasn't triggered (and this is still the active connection).
             if (!cancellationToken.IsCancellationRequested)
-                Task.Run(connect, default);
-
-            return Task.CompletedTask;
+                await Task.Run(connect, default).ConfigureAwait(false);
         }
 
         private async Task disconnect(bool takeLock)

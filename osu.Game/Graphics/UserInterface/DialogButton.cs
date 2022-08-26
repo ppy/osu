@@ -1,25 +1,28 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
-using osuTK;
-using osuTK.Graphics;
+#nullable disable
+
+using System;
+using osu.Framework;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Effects;
-using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DialogButton : OsuClickableContainer
+    public class DialogButton : OsuClickableContainer, IStateful<SelectionState>
     {
         private const float idle_width = 0.8f;
         private const float hover_width = 0.9f;
@@ -27,10 +30,26 @@ namespace osu.Game.Graphics.UserInterface
         private const float hover_duration = 500;
         private const float click_duration = 200;
 
-        public readonly BindableBool Selected = new BindableBool();
+        public event Action<SelectionState> StateChanged;
+
+        private SelectionState state;
+
+        public SelectionState State
+        {
+            get => state;
+            set
+            {
+                if (state == value)
+                    return;
+
+                state = value;
+                StateChanged?.Invoke(value);
+            }
+        }
+
+        protected readonly Container ColourContainer;
 
         private readonly Container backgroundContainer;
-        private readonly Container colourContainer;
         private readonly Container glowContainer;
         private readonly Box leftGlow;
         private readonly Box centerGlow;
@@ -39,7 +58,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly SpriteText spriteText;
         private Vector2 hoverSpacing => new Vector2(3f, 0f);
 
-        public DialogButton()
+        public DialogButton(HoverSampleSet sampleSet = HoverSampleSet.Button)
+            : base(sampleSet)
         {
             RelativeSizeAxes = Axes.X;
 
@@ -96,7 +116,7 @@ namespace osu.Game.Graphics.UserInterface
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        colourContainer = new Container
+                        ColourContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
@@ -153,7 +173,7 @@ namespace osu.Game.Graphics.UserInterface
 
             updateGlow();
 
-            Selected.ValueChanged += selectionChanged;
+            StateChanged += selectionChanged;
         }
 
         private Color4 buttonColour;
@@ -165,7 +185,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 buttonColour = value;
                 updateGlow();
-                colourContainer.Colour = value;
+                ColourContainer.Colour = value;
             }
         }
 
@@ -213,15 +233,15 @@ namespace osu.Game.Graphics.UserInterface
                 Alpha = 0.05f
             };
 
-            colourContainer.Add(flash);
+            ColourContainer.Add(flash);
             flash.FadeOutFromOne(100).Expire();
 
             clickAnimating = true;
-            colourContainer.ResizeWidthTo(colourContainer.Width * 1.05f, 100, Easing.OutQuint)
+            ColourContainer.ResizeWidthTo(ColourContainer.Width * 1.05f, 100, Easing.OutQuint)
                            .OnComplete(_ =>
                            {
                                clickAnimating = false;
-                               Selected.TriggerChange();
+                               StateChanged?.Invoke(State);
                            });
 
             return base.OnClick(e);
@@ -229,21 +249,21 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            colourContainer.ResizeWidthTo(hover_width * 0.98f, click_duration * 4, Easing.OutQuad);
+            ColourContainer.ResizeWidthTo(hover_width * 0.98f, click_duration * 4, Easing.OutQuad);
             return base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (Selected.Value)
-                colourContainer.ResizeWidthTo(hover_width, click_duration, Easing.In);
+            if (State == SelectionState.Selected)
+                ColourContainer.ResizeWidthTo(hover_width, click_duration, Easing.In);
             base.OnMouseUp(e);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            Selected.Value = true;
+            State = SelectionState.Selected;
 
             return true;
         }
@@ -251,23 +271,23 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            Selected.Value = false;
+            State = SelectionState.NotSelected;
         }
 
-        private void selectionChanged(ValueChangedEvent<bool> args)
+        private void selectionChanged(SelectionState newState)
         {
             if (clickAnimating)
                 return;
 
-            if (args.NewValue)
+            if (newState == SelectionState.Selected)
             {
                 spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
-                colourContainer.ResizeWidthTo(hover_width, hover_duration, Easing.OutElastic);
+                ColourContainer.ResizeWidthTo(hover_width, hover_duration, Easing.OutElastic);
                 glowContainer.FadeIn(hover_duration, Easing.OutQuint);
             }
             else
             {
-                colourContainer.ResizeWidthTo(idle_width, hover_duration, Easing.OutElastic);
+                ColourContainer.ResizeWidthTo(idle_width, hover_duration, Easing.OutElastic);
                 spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
                 glowContainer.FadeOut(hover_duration, Easing.OutQuint);
             }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -29,15 +31,15 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestVariousSpinners(bool autoplay)
         {
             string term = autoplay ? "Hit" : "Miss";
-            AddStep($"{term} Big", () => SetContents(() => testSingle(2, autoplay)));
-            AddStep($"{term} Medium", () => SetContents(() => testSingle(5, autoplay)));
-            AddStep($"{term} Small", () => SetContents(() => testSingle(7, autoplay)));
+            AddStep($"{term} Big", () => SetContents(_ => testSingle(2, autoplay)));
+            AddStep($"{term} Medium", () => SetContents(_ => testSingle(5, autoplay)));
+            AddStep($"{term} Small", () => SetContents(_ => testSingle(7, autoplay)));
         }
 
         [Test]
         public void TestSpinningSamplePitchShift()
         {
-            AddStep("Add spinner", () => SetContents(() => testSingle(5, true, 4000)));
+            AddStep("Add spinner", () => SetContents(_ => testSingle(5, true, 4000)));
             AddUntilStep("Pitch starts low", () => getSpinningSample().Frequency.Value < 0.8);
             AddUntilStep("Pitch increases", () => getSpinningSample().Frequency.Value > 0.8);
 
@@ -48,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(true)]
         public void TestLongSpinner(bool autoplay)
         {
-            AddStep("Very long spinner", () => SetContents(() => testSingle(5, autoplay, 4000)));
+            AddStep("Very long spinner", () => SetContents(_ => testSingle(5, autoplay, 4000)));
             AddUntilStep("Wait for completion", () => drawableSpinner.Result.HasResult);
             AddUntilStep("Check correct progress", () => drawableSpinner.Progress == (autoplay ? 1 : 0));
         }
@@ -57,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(true)]
         public void TestSuperShortSpinner(bool autoplay)
         {
-            AddStep("Very short spinner", () => SetContents(() => testSingle(5, autoplay, 200)));
+            AddStep("Very short spinner", () => SetContents(_ => testSingle(5, autoplay, 200)));
             AddUntilStep("Wait for completion", () => drawableSpinner.Result.HasResult);
             AddUntilStep("Short spinner implicitly completes", () => drawableSpinner.Progress == 1);
         }
@@ -85,8 +87,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Scale = new Vector2(0.75f)
             };
 
-            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(new[] { drawableSpinner });
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObject>())
+                mod.ApplyToDrawableHitObject(drawableSpinner);
 
             return drawableSpinner;
         }

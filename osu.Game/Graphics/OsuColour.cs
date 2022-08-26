@@ -1,10 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics
@@ -14,30 +21,54 @@ namespace osu.Game.Graphics
         public static Color4 Gray(float amt) => new Color4(amt, amt, amt, 1f);
         public static Color4 Gray(byte amt) => new Color4(amt, amt, amt, 255);
 
+        /// <summary>
+        /// Retrieves the colour for a <see cref="DifficultyRating"/>.
+        /// </summary>
+        /// <remarks>
+        /// Sourced from the @diff-{rating} variables in https://github.com/ppy/osu-web/blob/71fbab8936d79a7929d13854f5e854b4f383b236/resources/assets/less/variables.less.
+        /// </remarks>
         public Color4 ForDifficultyRating(DifficultyRating difficulty, bool useLighterColour = false)
         {
             switch (difficulty)
             {
                 case DifficultyRating.Easy:
-                    return Green;
+                    return Color4Extensions.FromHex("4ebfff");
 
-                default:
                 case DifficultyRating.Normal:
-                    return Blue;
+                    return Color4Extensions.FromHex("66ff91");
 
                 case DifficultyRating.Hard:
-                    return Yellow;
+                    return Color4Extensions.FromHex("f7e85d");
 
                 case DifficultyRating.Insane:
-                    return Pink;
+                    return Color4Extensions.FromHex("ff7e68");
 
                 case DifficultyRating.Expert:
-                    return useLighterColour ? PurpleLight : Purple;
+                    return Color4Extensions.FromHex("fe3c71");
 
                 case DifficultyRating.ExpertPlus:
-                    return useLighterColour ? Gray9 : Gray0;
+                    return Color4Extensions.FromHex("6662dd");
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(difficulty));
             }
         }
+
+        public Color4 ForStarDifficulty(double starDifficulty) => ColourUtils.SampleFromLinearGradient(new[]
+        {
+            (0.1f, Color4Extensions.FromHex("aaaaaa")),
+            (0.1f, Color4Extensions.FromHex("4290fb")),
+            (1.25f, Color4Extensions.FromHex("4fc0ff")),
+            (2.0f, Color4Extensions.FromHex("4fffd5")),
+            (2.5f, Color4Extensions.FromHex("7cff4f")),
+            (3.3f, Color4Extensions.FromHex("f6f05c")),
+            (4.2f, Color4Extensions.FromHex("ff8068")),
+            (4.9f, Color4Extensions.FromHex("ff4e6f")),
+            (5.8f, Color4Extensions.FromHex("c645b8")),
+            (6.7f, Color4Extensions.FromHex("6563de")),
+            (7.7f, Color4Extensions.FromHex("18158e")),
+            (9.0f, Color4.Black),
+        }, (float)Math.Round(starDifficulty, 2, MidpointRounding.AwayFromZero));
 
         /// <summary>
         /// Retrieves the colour for a <see cref="ScoreRank"/>.
@@ -95,6 +126,93 @@ namespace osu.Game.Graphics
         }
 
         /// <summary>
+        /// Retrieves a colour for the given <see cref="BeatmapOnlineStatus"/>.
+        /// A <see langword="null"/> value indicates that a "background" shade from the local <see cref="OverlayColourProvider"/>
+        /// (or another fallback colour) should be used.
+        /// </summary>
+        /// <remarks>
+        /// Sourced from web: https://github.com/ppy/osu-web/blob/007eebb1916ed5cb6a7866d82d8011b1060a945e/resources/assets/less/layout.less#L36-L50
+        /// </remarks>
+        public static Color4? ForBeatmapSetOnlineStatus(BeatmapOnlineStatus status)
+        {
+            switch (status)
+            {
+                case BeatmapOnlineStatus.LocallyModified:
+                    return Color4.OrangeRed;
+
+                case BeatmapOnlineStatus.Ranked:
+                case BeatmapOnlineStatus.Approved:
+                    return Color4Extensions.FromHex(@"b3ff66");
+
+                case BeatmapOnlineStatus.Loved:
+                    return Color4Extensions.FromHex(@"ff66ab");
+
+                case BeatmapOnlineStatus.Qualified:
+                    return Color4Extensions.FromHex(@"66ccff");
+
+                case BeatmapOnlineStatus.Pending:
+                    return Color4Extensions.FromHex(@"ffd966");
+
+                case BeatmapOnlineStatus.WIP:
+                    return Color4Extensions.FromHex(@"ff9966");
+
+                case BeatmapOnlineStatus.Graveyard:
+                    return Color4.Black;
+
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the main accent colour for a <see cref="ModType"/>.
+        /// </summary>
+        public Color4 ForModType(ModType modType)
+        {
+            switch (modType)
+            {
+                case ModType.Automation:
+                    return Blue1;
+
+                case ModType.DifficultyIncrease:
+                    return Red1;
+
+                case ModType.DifficultyReduction:
+                    return Lime1;
+
+                case ModType.Conversion:
+                    return Purple1;
+
+                case ModType.Fun:
+                    return Pink1;
+
+                case ModType.System:
+                    return Gray7;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(modType), modType, "Unknown mod type");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the main accent colour for a <see cref="RoomCategory"/>.
+        /// </summary>
+        public Color4? ForRoomCategory(RoomCategory roomCategory)
+        {
+            switch (roomCategory)
+            {
+                case RoomCategory.Spotlight:
+                    return SpotlightColour;
+
+                case RoomCategory.FeaturedArtist:
+                    return FeaturedArtistColour;
+
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
         /// Returns a foreground text colour that is supposed to contrast well with
         /// the supplied <paramref name="backgroundColour"/>.
         /// </summary>
@@ -105,6 +223,9 @@ namespace osu.Game.Graphics
             float brightness = 0.299f * backgroundColour.R + 0.587f * backgroundColour.G + 0.114f * backgroundColour.B;
             return Gray(brightness > 0.5f ? 0.2f : 0.9f);
         }
+
+        public readonly Color4 TeamColourRed = Color4Extensions.FromHex("#AA1414");
+        public readonly Color4 TeamColourBlue = Color4Extensions.FromHex("#1462AA");
 
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
         public readonly Color4 PurpleLighter = Color4Extensions.FromHex(@"eeeeff");
@@ -146,12 +267,12 @@ namespace osu.Game.Graphics
         public readonly Color4 GreySkyDark = Color4Extensions.FromHex(@"303d47");
         public readonly Color4 GreySkyDarker = Color4Extensions.FromHex(@"21272c");
 
-        public readonly Color4 Seafoam = Color4Extensions.FromHex(@"05ffa2");
-        public readonly Color4 GreySeafoamLighter = Color4Extensions.FromHex(@"9ebab1");
-        public readonly Color4 GreySeafoamLight = Color4Extensions.FromHex(@"4d7365");
-        public readonly Color4 GreySeafoam = Color4Extensions.FromHex(@"33413c");
-        public readonly Color4 GreySeafoamDark = Color4Extensions.FromHex(@"2c3532");
-        public readonly Color4 GreySeafoamDarker = Color4Extensions.FromHex(@"1e2422");
+        public readonly Color4 SeaFoam = Color4Extensions.FromHex(@"05ffa2");
+        public readonly Color4 GreySeaFoamLighter = Color4Extensions.FromHex(@"9ebab1");
+        public readonly Color4 GreySeaFoamLight = Color4Extensions.FromHex(@"4d7365");
+        public readonly Color4 GreySeaFoam = Color4Extensions.FromHex(@"33413c");
+        public readonly Color4 GreySeaFoamDark = Color4Extensions.FromHex(@"2c3532");
+        public readonly Color4 GreySeaFoamDarker = Color4Extensions.FromHex(@"1e2422");
 
         public readonly Color4 Cyan = Color4Extensions.FromHex(@"05f4fd");
         public readonly Color4 GreyCyanLighter = Color4Extensions.FromHex(@"77b1b3");
@@ -198,9 +319,58 @@ namespace osu.Game.Graphics
         public readonly Color4 GrayE = Color4Extensions.FromHex(@"eee");
         public readonly Color4 GrayF = Color4Extensions.FromHex(@"fff");
 
-        // in latest editor design logic, need to figure out where these sit...
+        #region "Basic" colour theme
+
+        // Reference: https://www.figma.com/file/VIkXMYNPMtQem2RJg9k2iQ/Asset%2FColours?node-id=1838%3A3
+
+        // Note that the colours in this region are also defined in `OverlayColourProvider` as `Colour{0,1,2,3,4}`.
+        // The difference as to which should be used where comes down to context.
+        // If the colour in question is supposed to always match the view in which it is displayed theme-wise, use `OverlayColourProvider`.
+        // If the colour usage is special and in general differs from the surrounding view in choice of hue, use the `OsuColour` constants.
+
+        public readonly Color4 Pink0 = Color4Extensions.FromHex(@"ff99c7");
+        public readonly Color4 Pink1 = Color4Extensions.FromHex(@"ff66ab");
+        public readonly Color4 Pink2 = Color4Extensions.FromHex(@"eb4791");
+        public readonly Color4 Pink3 = Color4Extensions.FromHex(@"cc3378");
+        public readonly Color4 Pink4 = Color4Extensions.FromHex(@"6b2e49");
+
+        public readonly Color4 Purple0 = Color4Extensions.FromHex(@"b299ff");
+        public readonly Color4 Purple1 = Color4Extensions.FromHex(@"8c66ff");
+        public readonly Color4 Purple2 = Color4Extensions.FromHex(@"7047eb");
+        public readonly Color4 Purple3 = Color4Extensions.FromHex(@"5933cc");
+        public readonly Color4 Purple4 = Color4Extensions.FromHex(@"3d2e6b");
+
+        public readonly Color4 Blue0 = Color4Extensions.FromHex(@"99ddff");
+        public readonly Color4 Blue1 = Color4Extensions.FromHex(@"66ccff");
+        public readonly Color4 Blue2 = Color4Extensions.FromHex(@"47b4eb");
+        public readonly Color4 Blue3 = Color4Extensions.FromHex(@"3399cc");
+        public readonly Color4 Blue4 = Color4Extensions.FromHex(@"2e576b");
+
+        public readonly Color4 Green0 = Color4Extensions.FromHex(@"99ffa2");
+        public readonly Color4 Green1 = Color4Extensions.FromHex(@"66ff73");
+        public readonly Color4 Green2 = Color4Extensions.FromHex(@"47eb55");
+        public readonly Color4 Green3 = Color4Extensions.FromHex(@"33cc40");
+        public readonly Color4 Green4 = Color4Extensions.FromHex(@"2e6b33");
+
+        public readonly Color4 Lime0 = Color4Extensions.FromHex(@"ccff99");
         public readonly Color4 Lime1 = Color4Extensions.FromHex(@"b2ff66");
+        public readonly Color4 Lime2 = Color4Extensions.FromHex(@"99eb47");
+        public readonly Color4 Lime3 = Color4Extensions.FromHex(@"7fcc33");
+        public readonly Color4 Lime4 = Color4Extensions.FromHex(@"4c6b2e");
+
+        public readonly Color4 Orange0 = Color4Extensions.FromHex(@"ffe699");
         public readonly Color4 Orange1 = Color4Extensions.FromHex(@"ffd966");
+        public readonly Color4 Orange2 = Color4Extensions.FromHex(@"ebc247");
+        public readonly Color4 Orange3 = Color4Extensions.FromHex(@"cca633");
+        public readonly Color4 Orange4 = Color4Extensions.FromHex(@"6b5c2e");
+
+        public readonly Color4 Red0 = Color4Extensions.FromHex(@"ff9b9b");
+        public readonly Color4 Red1 = Color4Extensions.FromHex(@"ff6666");
+        public readonly Color4 Red2 = Color4Extensions.FromHex(@"eb4747");
+        public readonly Color4 Red3 = Color4Extensions.FromHex(@"cc3333");
+        public readonly Color4 Red4 = Color4Extensions.FromHex(@"6b2e2e");
+
+        #endregion
 
         // Content Background
         public readonly Color4 B5 = Color4Extensions.FromHex(@"222a28");
@@ -214,5 +384,8 @@ namespace osu.Game.Graphics
         public readonly Color4 ChatBlue = Color4Extensions.FromHex(@"17292e");
 
         public readonly Color4 ContextMenuGray = Color4Extensions.FromHex(@"223034");
+
+        public Color4 SpotlightColour => Green2;
+        public Color4 FeaturedArtistColour => Blue2;
     }
 }

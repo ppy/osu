@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,6 +14,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -33,13 +36,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             spinnerBlink = source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value != true;
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
                 new Sprite
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.Centre,
                     Texture = source.GetTexture("spinner-background"),
+                    Colour = source.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SpinnerBackground)?.Value ?? new Color4(100, 100, 100, 255),
                     Scale = new Vector2(SPRITE_SCALE),
                     Y = SPINNER_Y_CENTRE,
                 },
@@ -66,6 +70,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.TopLeft,
                         Scale = new Vector2(SPRITE_SCALE)
                     }
+                },
+                ApproachCircle = new Sprite
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.Centre,
+                    Texture = source.GetTexture("spinner-approachcircle"),
+                    Scale = new Vector2(SPRITE_SCALE * 1.86f),
+                    Y = SPINNER_Y_CENTRE,
                 }
             });
         }
@@ -79,10 +91,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             Spinner spinner = d.HitObject;
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                 this.FadeOut();
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2))
                 this.FadeInFromZero(spinner.TimeFadeIn / 2);
         }
 
@@ -93,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             // careful: need to call this exactly once for all calculations in a frame
             // as the function has a random factor in it
-            var metreHeight = getMetreHeight(DrawableSpinner.Progress);
+            float metreHeight = getMetreHeight(DrawableSpinner.Progress);
 
             // hack to make the metre blink up from below than down from above.
             // move down the container to be able to apply masking for the metre,

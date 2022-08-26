@@ -1,20 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
-using osu.Game.Beatmaps;
+using osu.Framework.Localisation;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
     public class DrawablePopularBeatmapList : DrawableBeatmapList
     {
-        public DrawablePopularBeatmapList(List<BeatmapSetInfo> beatmaps)
-            : base(beatmaps)
+        public DrawablePopularBeatmapList(List<APIBeatmapSet> beatmapSets)
+            : base(beatmapSets)
         {
         }
 
-        protected override DashboardBeatmapPanel CreateBeatmapPanel(BeatmapSetInfo setInfo) => new DashboardPopularBeatmapPanel(setInfo);
+        protected override DashboardBeatmapPanel CreateBeatmapPanel(APIBeatmapSet beatmapSet) => new DashboardPopularBeatmapPanel(beatmapSet);
 
-        protected override string Title => "Popular Beatmaps";
+        protected override LocalisableString Title => HomeStrings.UserBeatmapsPopular;
     }
 }

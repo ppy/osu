@@ -1,11 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -52,18 +55,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            SelectedItems.CollectionChanged += (selectedObjects, args) =>
+            SelectedItems.CollectionChanged += (_, args) =>
             {
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        foreach (var o in args.NewItems)
+                        foreach (object o in args.NewItems)
                             SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Select();
 
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        foreach (var o in args.OldItems)
+                        foreach (object o in args.OldItems)
                             SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Deselect();
 
                         break;
@@ -72,6 +75,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             SelectionHandler = CreateSelectionHandler();
             SelectionHandler.DeselectAll = deselectAll;
+            SelectionHandler.SelectedItems.BindTo(SelectedItems);
 
             AddRangeInternal(new[]
             {
@@ -94,6 +98,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Creates a <see cref="SelectionBlueprint{T}"/> for a specific item.
         /// </summary>
         /// <param name="item">The item to create the overlay for.</param>
+        [CanBeNull]
         protected virtual SelectionBlueprint<T> CreateBlueprintFor(T item) => null;
 
         protected virtual DragBox CreateDragBox(Action<RectangleF> performSelect) => new DragBox(performSelect);
@@ -106,11 +111,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             bool selectionPerformed = performMouseDownActions(e);
+            bool movementPossible = prepareSelectionMovement();
+
+            // check if selection has occurred
+            if (selectionPerformed)
+            {
+                // only unmodified right click should show context menu
+                bool shouldShowContextMenu = e.Button == MouseButton.Right && !e.ShiftPressed && !e.AltPressed && !e.SuperPressed;
+
+                // stop propagation if not showing context menu
+                return !shouldShowContextMenu;
+            }
 
             // even if a selection didn't occur, a drag event may still move the selection.
-            prepareSelectionMovement();
-
-            return selectionPerformed || e.Button == MouseButton.Left;
+            return e.Button == MouseButton.Left && movementPossible;
         }
 
         protected SelectionBlueprint<T> ClickedBlueprint { get; private set; }
@@ -226,11 +240,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public bool OnPressed(PlatformAction action)
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            switch (action.ActionType)
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
             {
-                case PlatformActionType.SelectAll:
+                case PlatformAction.SelectAll:
                     SelectAll();
                     return true;
             }
@@ -238,7 +255,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public void OnReleased(PlatformAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
         }
 
@@ -425,19 +442,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Attempts to begin the movement of any selected blueprints.
         /// </summary>
-        private void prepareSelectionMovement()
+        /// <returns>Whether a movement is possible.</returns>
+        private bool prepareSelectionMovement()
         {
             if (!SelectionHandler.SelectedBlueprints.Any())
-                return;
+                return false;
 
             // Any selected blueprint that is hovered can begin the movement of the group, however only the first item (according to SortForMovement) is used for movement.
             // A special case is added for when a click selection occurred before the drag
             if (!clickSelectionBegan && !SelectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
-                return;
+                return false;
 
             // Movement is tracked from the blueprint of the earliest item, since it only makes sense to distance snap from that item
             movementBlueprints = SortForMovement(SelectionHandler.SelectedBlueprints).ToArray();
             movementBlueprintOriginalPositions = movementBlueprints.Select(m => m.ScreenSpaceSelectionPoint).ToArray();
+            return true;
         }
 
         /// <summary>
@@ -464,12 +483,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (snapProvider != null)
             {
                 // check for positional snap for every object in selection (for things like object-object snapping)
-                for (var i = 0; i < movementBlueprintOriginalPositions.Length; i++)
+                for (int i = 0; i < movementBlueprintOriginalPositions.Length; i++)
                 {
                     Vector2 originalPosition = movementBlueprintOriginalPositions[i];
                     var testPosition = originalPosition + distanceTravelled;
 
-                    var positionalResult = snapProvider.SnapScreenSpacePositionToValidPosition(testPosition);
+                    var positionalResult = snapProvider.FindSnappedPositionAndTime(testPosition, SnapType.NearbyObjects);
 
                     if (positionalResult.ScreenSpacePosition == testPosition) continue;
 
@@ -488,7 +507,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 movePosition = movementBlueprintOriginalPositions.First() + distanceTravelled;
 
             // Retrieve a snapped position.
-            var result = snapProvider?.SnapScreenSpacePositionToValidTime(movePosition);
+            var result = snapProvider?.FindSnappedPositionAndTime(movePosition, ~SnapType.NearbyObjects);
 
             if (result == null)
             {

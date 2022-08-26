@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Compatibility methods to convert osu!stable colours to osu!lazer-compatible ones. Should be used for legacy skins only.
+    /// Compatibility methods to apply osu!stable quirks to colours. Should be used for legacy skins only.
     /// </summary>
     public static class LegacyColourCompatibility
     {

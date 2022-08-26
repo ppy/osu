@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,38 +21,38 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             base.LoadComplete();
 
-            AddStep("show pear", () => SetContents(() => createDrawableFruit(0)));
-            AddStep("show grape", () => SetContents(() => createDrawableFruit(1)));
-            AddStep("show pineapple / apple", () => SetContents(() => createDrawableFruit(2)));
-            AddStep("show raspberry / orange", () => SetContents(() => createDrawableFruit(3)));
+            AddStep("show pear", () => SetContents(_ => createDrawableFruit(0)));
+            AddStep("show grape", () => SetContents(_ => createDrawableFruit(1)));
+            AddStep("show pineapple / apple", () => SetContents(_ => createDrawableFruit(2)));
+            AddStep("show raspberry / orange", () => SetContents(_ => createDrawableFruit(3)));
 
-            AddStep("show banana", () => SetContents(createDrawableBanana));
+            AddStep("show banana", () => SetContents(_ => createDrawableBanana()));
 
-            AddStep("show droplet", () => SetContents(() => createDrawableDroplet()));
-            AddStep("show tiny droplet", () => SetContents(createDrawableTinyDroplet));
+            AddStep("show droplet", () => SetContents(_ => createDrawableDroplet()));
+            AddStep("show tiny droplet", () => SetContents(_ => createDrawableTinyDroplet()));
 
-            AddStep("show hyperdash pear", () => SetContents(() => createDrawableFruit(0, true)));
-            AddStep("show hyperdash grape", () => SetContents(() => createDrawableFruit(1, true)));
-            AddStep("show hyperdash pineapple / apple", () => SetContents(() => createDrawableFruit(2, true)));
-            AddStep("show hyperdash raspberry / orange", () => SetContents(() => createDrawableFruit(3, true)));
+            AddStep("show hyperdash pear", () => SetContents(_ => createDrawableFruit(0, true)));
+            AddStep("show hyperdash grape", () => SetContents(_ => createDrawableFruit(1, true)));
+            AddStep("show hyperdash pineapple / apple", () => SetContents(_ => createDrawableFruit(2, true)));
+            AddStep("show hyperdash raspberry / orange", () => SetContents(_ => createDrawableFruit(3, true)));
 
-            AddStep("show hyperdash droplet", () => SetContents(() => createDrawableDroplet(true)));
+            AddStep("show hyperdash droplet", () => SetContents(_ => createDrawableDroplet(true)));
         }
 
-        private Drawable createDrawableFruit(int indexInBeatmap, bool hyperdash = false) =>
+        private Drawable createDrawableFruit(int indexInBeatmap, bool hyperDash = false) =>
             new TestDrawableCatchHitObjectSpecimen(new DrawableFruit(new Fruit
             {
                 IndexInBeatmap = indexInBeatmap,
-                HyperDashBindable = { Value = hyperdash }
+                HyperDashBindable = { Value = hyperDash }
             }));
 
         private Drawable createDrawableBanana() =>
             new TestDrawableCatchHitObjectSpecimen(new DrawableBanana(new Banana()));
 
-        private Drawable createDrawableDroplet(bool hyperdash = false) =>
+        private Drawable createDrawableDroplet(bool hyperDash = false) =>
             new TestDrawableCatchHitObjectSpecimen(new DrawableDroplet(new Droplet
             {
-                HyperDashBindable = { Value = hyperdash }
+                HyperDashBindable = { Value = hyperDash }
             }));
 
         private Drawable createDrawableTinyDroplet() => new TestDrawableCatchHitObjectSpecimen(new DrawableTinyDroplet(new TinyDroplet()));

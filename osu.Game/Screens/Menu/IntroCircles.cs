@@ -1,6 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -15,10 +19,16 @@ namespace osu.Game.Screens.Menu
 
         protected override string BeatmapFile => "circles.osz";
 
-        private const double delay_step_one = 2300;
-        private const double delay_step_two = 600;
+        public const double TRACK_START_DELAY = 600;
+
+        private const double delay_for_menu = 2900;
 
         private Sample welcome;
+
+        public IntroCircles([CanBeNull] Func<MainMenu> createNextScreen = null)
+            : base(createNextScreen)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -41,8 +51,8 @@ namespace osu.Game.Screens.Menu
 
                     PrepareMenuLoad();
 
-                    Scheduler.AddDelayed(LoadMenu, delay_step_one);
-                }, delay_step_two);
+                    Scheduler.AddDelayed(LoadMenu, delay_for_menu - TRACK_START_DELAY);
+                }, TRACK_START_DELAY);
 
                 logo.ScaleTo(1);
                 logo.FadeIn();
@@ -50,10 +60,10 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             this.FadeOut(300);
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
     }
 }

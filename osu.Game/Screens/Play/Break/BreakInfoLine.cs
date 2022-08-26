@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Utils;
@@ -25,7 +28,7 @@ namespace osu.Game.Screens.Play.Break
 
         private readonly string prefix;
 
-        public BreakInfoLine(string name, string prefix = @"")
+        public BreakInfoLine(LocalisableString name, string prefix = @"")
         {
             this.prefix = prefix;
 
@@ -55,7 +58,7 @@ namespace osu.Game.Screens.Play.Break
 
         private void currentValueChanged(ValueChangedEvent<T> e)
         {
-            var newText = prefix + Format(e.NewValue);
+            string newText = prefix + Format(e.NewValue);
 
             if (valueText.Text == newText)
                 return;
@@ -63,7 +66,7 @@ namespace osu.Game.Screens.Play.Break
             valueText.Text = newText;
         }
 
-        protected virtual string Format(T count)
+        protected virtual LocalisableString Format(T count)
         {
             if (count is Enum countEnum)
                 return countEnum.GetDescription();
@@ -81,11 +84,11 @@ namespace osu.Game.Screens.Play.Break
 
     public class PercentageBreakInfoLine : BreakInfoLine<double>
     {
-        public PercentageBreakInfoLine(string name, string prefix = "")
+        public PercentageBreakInfoLine(LocalisableString name, string prefix = "")
             : base(name, prefix)
         {
         }
 
-        protected override string Format(double count) => count.FormatAccuracy();
+        protected override LocalisableString Format(double count) => count.FormatAccuracy();
     }
 }

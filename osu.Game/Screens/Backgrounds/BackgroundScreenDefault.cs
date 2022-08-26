@@ -1,18 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
+using osu.Framework.Logging;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -22,14 +25,16 @@ namespace osu.Game.Screens.Backgrounds
 
         private int currentDisplay;
         private const int background_count = 7;
-        private IBindable<User> user;
+        private IBindable<APIUser> user;
         private Bindable<Skin> skin;
-        private Bindable<BackgroundSource> mode;
+        private Bindable<BackgroundSource> source;
         private Bindable<IntroSequence> introSequence;
         private readonly SeasonalBackgroundLoader seasonalBackgroundLoader = new SeasonalBackgroundLoader();
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        protected virtual bool AllowStoryboardBackground => true;
 
         public BackgroundScreenDefault(bool animateOnEnter = true)
             : base(animateOnEnter)
@@ -41,24 +46,61 @@ namespace osu.Game.Screens.Backgrounds
         {
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
-            mode = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
+            source = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
 
             AddInternal(seasonalBackgroundLoader);
 
-            user.ValueChanged += _ => Next();
-            skin.ValueChanged += _ => Next();
-            mode.ValueChanged += _ => Next();
-            beatmap.ValueChanged += _ => Next();
-            introSequence.ValueChanged += _ => Next();
-            seasonalBackgroundLoader.SeasonalBackgroundChanged += Next;
-
+            // Load first background asynchronously as part of BDL load.
             currentDisplay = RNG.Next(0, background_count);
-
             Next();
         }
 
-        private void display(Background newBackground)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            user.ValueChanged += _ => Scheduler.AddOnce(next);
+            skin.ValueChanged += _ => Scheduler.AddOnce(next);
+            source.ValueChanged += _ => Scheduler.AddOnce(next);
+            beatmap.ValueChanged += _ => Scheduler.AddOnce(next);
+            introSequence.ValueChanged += _ => Scheduler.AddOnce(next);
+            seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Scheduler.AddOnce(next);
+
+            // helper function required for AddOnce usage.
+            void next() => Next();
+        }
+
+        private ScheduledDelegate nextTask;
+        private CancellationTokenSource cancellationTokenSource;
+
+        /// <summary>
+        /// Request loading the next background.
+        /// </summary>
+        /// <returns>Whether a new background was queued for load. May return false if the current background is still valid.</returns>
+        public virtual bool Next()
+        {
+            var nextBackground = createBackground();
+
+            // in the case that the background hasn't changed, we want to avoid cancelling any tasks that could still be loading.
+            if (nextBackground == background)
+                return false;
+
+            Logger.Log("🌅 Background change queued");
+
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+
+            nextTask?.Cancel();
+            nextTask = Scheduler.AddDelayed(() =>
+            {
+                LoadComponentAsync(nextBackground, displayNext, cancellationTokenSource.Token);
+            }, 100);
+
+            return true;
+        }
+
+        private void displayNext(Background newBackground)
         {
             background?.FadeOut(800, Easing.InOutSine);
             background?.Expire();
@@ -67,76 +109,55 @@ namespace osu.Game.Screens.Backgrounds
             currentDisplay++;
         }
 
-        private ScheduledDelegate nextTask;
-        private CancellationTokenSource cancellationTokenSource;
-
-        public void Next()
-        {
-            nextTask?.Cancel();
-            cancellationTokenSource?.Cancel();
-            cancellationTokenSource = new CancellationTokenSource();
-            nextTask = Scheduler.AddDelayed(() => LoadComponentAsync(createBackground(), display, cancellationTokenSource.Token), 100);
-        }
-
         private Background createBackground()
         {
-            Background newBackground;
-            string backgroundName;
+            // seasonal background loading gets highest priority.
+            Background newBackground = seasonalBackgroundLoader.LoadNextBackground();
 
-            var seasonalBackground = seasonalBackgroundLoader.LoadNextBackground();
-
-            if (seasonalBackground != null)
+            if (newBackground == null && user.Value?.IsSupporter == true)
             {
-                seasonalBackground.Depth = currentDisplay;
-                return seasonalBackground;
-            }
-
-            switch (introSequence.Value)
-            {
-                case IntroSequence.Welcome:
-                    backgroundName = "Intro/Welcome/menu-background";
-                    break;
-
-                default:
-                    backgroundName = $@"Menu/menu-background-{currentDisplay % background_count + 1}";
-                    break;
-            }
-
-            if (user.Value?.IsSupporter ?? false)
-            {
-                switch (mode.Value)
+                switch (source.Value)
                 {
                     case BackgroundSource.Beatmap:
-                        newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
-                        break;
+                    case BackgroundSource.BeatmapWithStoryboard:
+                    {
+                        if (source.Value == BackgroundSource.BeatmapWithStoryboard && AllowStoryboardBackground)
+                            newBackground = new BeatmapBackgroundWithStoryboard(beatmap.Value, getBackgroundTextureName());
+                        newBackground ??= new BeatmapBackground(beatmap.Value, getBackgroundTextureName());
 
-                    default:
-                        newBackground = new SkinnedBackground(skin.Value, backgroundName);
+                        break;
+                    }
+
+                    case BackgroundSource.Skin:
+                        // default skins should use the default background rotation, which won't be the case if a SkinBackground is created for them.
+                        if (skin.Value is DefaultSkin || skin.Value is DefaultLegacySkin)
+                            break;
+
+                        newBackground = new SkinBackground(skin.Value, getBackgroundTextureName());
                         break;
                 }
             }
-            else
-                newBackground = new Background(backgroundName);
 
+            // this method is called in many cases where the background might not necessarily need to change.
+            // if an equivalent background is currently being shown, we don't want to load it again.
+            if (newBackground?.Equals(background) == true)
+                return background;
+
+            newBackground ??= new Background(getBackgroundTextureName());
             newBackground.Depth = currentDisplay;
 
             return newBackground;
         }
 
-        private class SkinnedBackground : Background
+        private string getBackgroundTextureName()
         {
-            private readonly Skin skin;
-
-            public SkinnedBackground(Skin skin, string fallbackTextureName)
-                : base(fallbackTextureName)
+            switch (introSequence.Value)
             {
-                this.skin = skin;
-            }
+                case IntroSequence.Welcome:
+                    return @"Intro/Welcome/menu-background";
 
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Sprite.Texture = skin.GetTexture("menu-background") ?? Sprite.Texture;
+                default:
+                    return $@"Menu/menu-background-{currentDisplay % background_count + 1}";
             }
         }
     }

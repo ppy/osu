@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,9 +10,12 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets.Mods;
+using osu.Game.Online.Spectator;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
@@ -28,6 +33,11 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private SpectatorClient spectatorClient { get; set; }
+
+        private TaskCompletionSource<bool> scoreSubmissionSource;
+
         protected SubmittingPlayer(PlayerConfiguration configuration = null)
             : base(configuration)
         {
@@ -44,9 +54,9 @@ namespace osu.Game.Screens.Play
             // Token request construction should happen post-load to allow derived classes to potentially prepare DI backings that are used to create the request.
             var tcs = new TaskCompletionSource<bool>();
 
-            if (Mods.Value.Any(m => m is ModAutoplay))
+            if (Mods.Value.Any(m => !m.UserPlayable))
             {
-                handleTokenFailure(new InvalidOperationException("Autoplay loaded."));
+                handleTokenFailure(new InvalidOperationException("Non-user playable mod selected."));
                 return false;
             }
 
@@ -73,7 +83,10 @@ namespace osu.Game.Screens.Play
 
             api.Queue(req);
 
-            tcs.Task.Wait();
+            // Generally a timeout would not happen here as APIAccess will timeout first.
+            if (!tcs.Task.Wait(60000))
+                handleTokenFailure(new InvalidOperationException("Token retrieval timed out (request never run)"));
+
             return true;
 
             void handleTokenFailure(Exception exception)
@@ -107,27 +120,41 @@ namespace osu.Game.Screens.Play
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
-            // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
-            if (token == null)
-                return;
+            score.ScoreInfo.Date = DateTimeOffset.Now;
 
-            var tcs = new TaskCompletionSource<bool>();
-            var request = CreateSubmissionRequest(score, token.Value);
+            await submitScore(score).ConfigureAwait(false);
+        }
 
-            request.Success += s =>
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        protected override void StartGameplay()
+        {
+            base.StartGameplay();
+
+            // User expectation is that last played should be updated when entering the gameplay loop
+            // from multiplayer / playlists / solo.
+            realm.WriteAsync(r =>
             {
-                score.ScoreInfo.OnlineScoreID = s.ID;
-                tcs.SetResult(true);
-            };
+                var realmBeatmap = r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID);
+                if (realmBeatmap != null)
+                    realmBeatmap.LastPlayed = DateTimeOffset.Now;
+            });
 
-            request.Failure += e =>
+            spectatorClient.BeginPlaying(GameplayState, Score);
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            bool exiting = base.OnExiting(e);
+
+            if (LoadedBeatmapSuccessfully)
             {
-                Logger.Error(e, "Failed to submit score");
-                tcs.SetResult(false);
-            };
+                submitScore(Score.DeepClone());
+                spectatorClient.EndPlaying(GameplayState);
+            }
 
-            api.Queue(request);
-            await tcs.Task.ConfigureAwait(false);
+            return exiting;
         }
 
         /// <summary>
@@ -144,5 +171,39 @@ namespace osu.Game.Screens.Play
         /// <param name="score">The score to be submitted.</param>
         /// <param name="token">The submission token.</param>
         protected abstract APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token);
+
+        private Task submitScore(Score score)
+        {
+            // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
+            if (token == null)
+                return Task.CompletedTask;
+
+            if (scoreSubmissionSource != null)
+                return scoreSubmissionSource.Task;
+
+            // if the user never hit anything, this score should not be counted in any way.
+            if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
+                return Task.CompletedTask;
+
+            scoreSubmissionSource = new TaskCompletionSource<bool>();
+            var request = CreateSubmissionRequest(score, token.Value);
+
+            request.Success += s =>
+            {
+                score.ScoreInfo.OnlineID = s.ID;
+                score.ScoreInfo.Position = s.Position;
+
+                scoreSubmissionSource.SetResult(true);
+            };
+
+            request.Failure += e =>
+            {
+                Logger.Error(e, $"Failed to submit score ({e.Message})");
+                scoreSubmissionSource.SetResult(false);
+            };
+
+            api.Queue(request);
+            return scoreSubmissionSource.Task;
+        }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,11 +13,31 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuTabDropdown<T> : OsuDropdown<T>
+    public class OsuTabDropdown<T> : OsuDropdown<T>, IHasAccentColour
     {
+        private Color4 accentColour;
+
+        public Color4 AccentColour
+        {
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+
+                if (IsLoaded)
+                    propagateAccentColour();
+            }
+        }
+
         public OsuTabDropdown()
         {
             RelativeSizeAxes = Axes.X;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            propagateAccentColour();
         }
 
         protected override DropdownMenu CreateMenu() => new OsuTabDropdownMenu();
@@ -26,6 +48,18 @@ namespace osu.Game.Graphics.UserInterface
             Origin = Anchor.TopRight
         };
 
+        private void propagateAccentColour()
+        {
+            if (Menu is OsuDropdownMenu dropdownMenu)
+            {
+                dropdownMenu.HoverColour = accentColour;
+                dropdownMenu.SelectionColour = accentColour.Opacity(0.5f);
+            }
+
+            if (Header is OsuTabDropdownHeader tabDropdownHeader)
+                tabDropdownHeader.AccentColour = accentColour;
+        }
+
         private class OsuTabDropdownMenu : OsuDropdownMenu
         {
             public OsuTabDropdownMenu()
@@ -34,10 +68,10 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.TopRight;
 
                 BackgroundColour = Color4.Black.Opacity(0.7f);
-                MaxHeight = 400;
+                MaxHeight = 200;
             }
 
-            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item) { AccentColour = AccentColour };
+            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item);
 
             private class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
             {
@@ -49,15 +83,18 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected class OsuTabDropdownHeader : OsuDropdownHeader
+        protected class OsuTabDropdownHeader : OsuDropdownHeader, IHasAccentColour
         {
-            public override Color4 AccentColour
+            private Color4 accentColour;
+
+            public Color4 AccentColour
             {
-                get => base.AccentColour;
+                get => accentColour;
                 set
                 {
-                    base.AccentColour = value;
-                    Foreground.Colour = value;
+                    accentColour = value;
+                    BackgroundColourHover = value;
+                    updateColour();
                 }
             }
 
@@ -93,14 +130,19 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override bool OnHover(HoverEvent e)
             {
-                Foreground.Colour = BackgroundColour;
+                updateColour();
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                Foreground.Colour = BackgroundColourHover;
+                updateColour();
                 base.OnHoverLost(e);
+            }
+
+            private void updateColour()
+            {
+                Foreground.Colour = IsHovered ? BackgroundColour : BackgroundColourHover;
             }
         }
     }

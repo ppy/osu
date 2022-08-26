@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -13,21 +16,14 @@ using osu.Game.Screens.Edit.Compose;
 
 namespace osu.Game.Tests.Visual
 {
-    [Cached(Type = typeof(IPlacementHandler))]
     public abstract class PlacementBlueprintTestScene : OsuManualInputManagerTestScene, IPlacementHandler
     {
         protected readonly Container HitObjectContainer;
-        private PlacementBlueprint currentBlueprint;
+        protected PlacementBlueprint CurrentBlueprint { get; private set; }
 
         protected PlacementBlueprintTestScene()
         {
-            Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize = 2;
+            base.Content.Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -36,10 +32,17 @@ namespace osu.Game.Tests.Visual
 
             dependencies.CacheAs(new EditorClock());
 
-            var playable = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            var playable = GetPlayableBeatmap();
             dependencies.CacheAs(new EditorBeatmap(playable));
 
             return dependencies;
+        }
+
+        protected virtual IBeatmap GetPlayableBeatmap()
+        {
+            var playable = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            playable.Difficulty.CircleSize = 2;
+            return playable;
         }
 
         protected override void LoadComplete()
@@ -63,9 +66,9 @@ namespace osu.Game.Tests.Visual
 
         protected void ResetPlacement()
         {
-            if (currentBlueprint != null)
-                Remove(currentBlueprint);
-            Add(currentBlueprint = CreateBlueprint());
+            if (CurrentBlueprint != null)
+                Remove(CurrentBlueprint);
+            Add(CurrentBlueprint = CreateBlueprint());
         }
 
         public void Delete(HitObject hitObject)
@@ -76,7 +79,7 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            currentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(currentBlueprint));
+            CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
         }
 
         protected virtual SnapResult SnapForBlueprint(PlacementBlueprint blueprint) =>

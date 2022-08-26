@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
+using System;
 using System.Diagnostics;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
 
@@ -15,25 +15,42 @@ namespace osu.Game.Rulesets.Objects.Pooling
     /// <typeparam name="TEntry">The <see cref="LifetimeEntry"/> type storing state and controlling this drawable.</typeparam>
     public abstract class PoolableDrawableWithLifetime<TEntry> : PoolableDrawable where TEntry : LifetimeEntry
     {
+        private TEntry? entry;
+
         /// <summary>
         /// The entry holding essential state of this <see cref="PoolableDrawableWithLifetime{TEntry}"/>.
         /// </summary>
-        public TEntry? Entry { get; private set; }
+        /// <remarks>
+        /// If a non-null value is set before loading is started, the entry is applied when the loading is completed.
+        /// It is not valid to set an entry while this <see cref="PoolableDrawableWithLifetime{TEntry}"/> is loading.
+        /// </remarks>
+        public TEntry? Entry
+        {
+            get => entry;
+            set
+            {
+                if (LoadState == LoadState.NotLoaded)
+                    entry = value;
+                else if (value != null)
+                    Apply(value);
+                else if (HasEntryApplied)
+                    free();
+            }
+        }
 
         /// <summary>
         /// Whether <see cref="Entry"/> is applied to this <see cref="PoolableDrawableWithLifetime{TEntry}"/>.
-        /// When an initial entry is specified in the constructor, <see cref="Entry"/> is set but not applied until loading is completed.
+        /// When an <see cref="Entry"/> is set during initialization, it is not applied until loading is completed.
         /// </summary>
         protected bool HasEntryApplied { get; private set; }
 
-        // Drawable's lifetime gets out of sync with entry's lifetime if entry's lifetime is modified.
-        // We cannot delegate getter to `Entry.LifetimeStart` because it is incompatible with `LifetimeManagementContainer` due to how lifetime change is detected.
         public override double LifetimeStart
         {
             get => base.LifetimeStart;
             set
             {
-                base.LifetimeStart = value;
+                if (Entry == null && LifetimeStart != value)
+                    throw new InvalidOperationException($"Cannot modify lifetime of {nameof(PoolableDrawableWithLifetime<TEntry>)} when entry is not set");
 
                 if (Entry != null)
                     Entry.LifetimeStart = value;
@@ -45,7 +62,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
             get => base.LifetimeEnd;
             set
             {
-                base.LifetimeEnd = value;
+                if (Entry == null && LifetimeEnd != value)
+                    throw new InvalidOperationException($"Cannot modify lifetime of {nameof(PoolableDrawableWithLifetime<TEntry>)} when entry is not set");
 
                 if (Entry != null)
                     Entry.LifetimeEnd = value;
@@ -64,9 +82,9 @@ namespace osu.Game.Rulesets.Objects.Pooling
         {
             base.LoadAsyncComplete();
 
-            // Apply the initial entry given in the constructor.
+            // Apply the initial entry.
             if (Entry != null && !HasEntryApplied)
-                Apply(Entry);
+                apply(Entry);
         }
 
         /// <summary>
@@ -75,17 +93,10 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </summary>
         public void Apply(TEntry entry)
         {
-            if (HasEntryApplied)
-                free();
+            if (LoadState == LoadState.Loading)
+                throw new InvalidOperationException($"Cannot apply a new {nameof(TEntry)} while currently loading.");
 
-            Entry = entry;
-
-            base.LifetimeStart = entry.LifetimeStart;
-            base.LifetimeEnd = entry.LifetimeEnd;
-
-            OnApply(entry);
-
-            HasEntryApplied = true;
+            apply(entry);
         }
 
         protected sealed override void FreeAfterUse()
@@ -111,17 +122,39 @@ namespace osu.Game.Rulesets.Objects.Pooling
         {
         }
 
+        private void apply(TEntry entry)
+        {
+            if (HasEntryApplied)
+                free();
+
+            this.entry = entry;
+            entry.LifetimeChanged += setLifetimeFromEntry;
+            setLifetimeFromEntry(entry);
+
+            OnApply(entry);
+
+            HasEntryApplied = true;
+        }
+
         private void free()
         {
             Debug.Assert(Entry != null && HasEntryApplied);
 
             OnFree(Entry);
 
-            Entry = null;
+            Entry.LifetimeChanged -= setLifetimeFromEntry;
+            entry = null;
             base.LifetimeStart = double.MinValue;
             base.LifetimeEnd = double.MaxValue;
 
             HasEntryApplied = false;
+        }
+
+        private void setLifetimeFromEntry(LifetimeEntry entry)
+        {
+            Debug.Assert(entry == Entry);
+            base.LifetimeStart = entry.LifetimeStart;
+            base.LifetimeEnd = entry.LifetimeEnd;
         }
     }
 }

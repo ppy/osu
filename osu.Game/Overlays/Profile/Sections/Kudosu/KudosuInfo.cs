@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osuTK;
 using osu.Framework.Graphics;
@@ -10,16 +12,19 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Users;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Game.Resources.Localisation.Web;
+using osu.Framework.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public class KudosuInfo : Container
     {
-        private readonly Bindable<User> user = new Bindable<User>();
+        private readonly Bindable<APIUser> user = new Bindable<APIUser>();
 
-        public KudosuInfo(Bindable<User> user)
+        public KudosuInfo(Bindable<APIUser> user)
         {
             this.user.BindTo(user);
             CountSection total;
@@ -37,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         private class CountTotal : CountSection
         {
             public CountTotal()
-                : base("Total Kudosu Earned")
+                : base(UsersStrings.ShowExtraKudosuTotal)
             {
                 DescriptionText.AddText("Based on how much of a contribution the user has made to beatmap moderation. See ");
                 DescriptionText.AddLink("this page", "https://osu.ppy.sh/wiki/Kudosu");
@@ -53,10 +58,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
             public new int Count
             {
-                set => valueText.Text = value.ToString("N0");
+                set => valueText.Text = value.ToLocalisableString("N0");
             }
 
-            public CountSection(string header)
+            public CountSection(LocalisableString header)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;

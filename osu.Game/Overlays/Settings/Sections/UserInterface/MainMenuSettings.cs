@@ -1,20 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public class MainMenuSettings : SettingsSubsection
     {
-        protected override string Header => "Main Menu";
+        protected override LocalisableString Header => UserInterfaceStrings.MainMenuHeader;
 
-        private IBindable<User> user;
+        private IBindable<APIUser> user;
 
         private SettingsEnumDropdown<BackgroundSource> backgroundSourceDropdown;
 
@@ -27,27 +31,27 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Interface voices",
+                    LabelText = UserInterfaceStrings.InterfaceVoices,
                     Current = config.GetBindable<bool>(OsuSetting.MenuVoice)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "osu! music theme",
+                    LabelText = UserInterfaceStrings.OsuMusicTheme,
                     Current = config.GetBindable<bool>(OsuSetting.MenuMusic)
                 },
                 new SettingsEnumDropdown<IntroSequence>
                 {
-                    LabelText = "Intro sequence",
+                    LabelText = UserInterfaceStrings.IntroSequence,
                     Current = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
                 },
                 backgroundSourceDropdown = new SettingsEnumDropdown<BackgroundSource>
                 {
-                    LabelText = "Background source",
+                    LabelText = UserInterfaceStrings.BackgroundSource,
                     Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
                 },
                 new SettingsEnumDropdown<SeasonalBackgroundMode>
                 {
-                    LabelText = "Seasonal backgrounds",
+                    LabelText = UserInterfaceStrings.SeasonalBackgrounds,
                     Current = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode),
                 }
             };
@@ -59,9 +63,10 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
             user.BindValueChanged(u =>
             {
-                const string not_supporter_note = "Changes to this setting will only apply with an active osu!supporter tag.";
-
-                backgroundSourceDropdown.WarningText = u.NewValue?.IsSupporter != true ? not_supporter_note : string.Empty;
+                if (u.NewValue?.IsSupporter != true)
+                    backgroundSourceDropdown.SetNoticeText(UserInterfaceStrings.NotSupporterNote, true);
+                else
+                    backgroundSourceDropdown.ClearNoticeText();
             }, true);
         }
     }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Reflection;
 using NUnit.Framework;
@@ -10,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -47,7 +50,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             foreach (var p in typeof(OsuIcon).GetProperties(BindingFlags.Public | BindingFlags.Static))
             {
-                var propValue = p.GetValue(null);
+                object propValue = p.GetValue(null);
                 Debug.Assert(propValue != null);
 
                 flow.Add(new Icon($"{nameof(OsuIcon)}.{p.Name}", (IconUsage)propValue));
@@ -59,7 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class Icon : Container, IHasTooltip
         {
-            public string TooltipText { get; }
+            public LocalisableString TooltipText { get; }
 
             public SpriteIcon SpriteIcon { get; }
 

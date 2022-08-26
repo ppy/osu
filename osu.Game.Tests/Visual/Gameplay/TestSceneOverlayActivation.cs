@@ -1,9 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Bindables;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 
@@ -18,7 +19,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             base.SetUpSteps();
 
             AddUntilStep("gameplay has started",
-                () => Player.GameplayClockContainer.GameplayClock.CurrentTime > Player.DrawableRuleset.GameplayStartTime);
+                () => Player.GameplayClockContainer.CurrentTime > Player.DrawableRuleset.GameplayStartTime);
         }
 
         [Test]
@@ -66,7 +67,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected class OverlayTestPlayer : TestPlayer
         {
             public new OverlayActivation OverlayActivationMode => base.OverlayActivationMode.Value;
-            public new Bindable<bool> LocalUserPlaying => base.LocalUserPlaying;
         }
     }
 }

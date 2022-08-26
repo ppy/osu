@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using osu.Framework.IO.Network;
@@ -16,9 +18,14 @@ namespace osu.Game.Online.API
         /// </summary>
         protected virtual string FileExtension { get; } = @".tmp";
 
+        protected APIDownloadRequest()
+        {
+            base.Success += () => Success?.Invoke(filename);
+        }
+
         protected override WebRequest CreateWebRequest()
         {
-            var file = Path.GetTempFileName();
+            string file = Path.GetTempFileName();
 
             File.Move(file, filename = Path.ChangeExtension(file, FileExtension));
 
@@ -37,12 +44,6 @@ namespace osu.Game.Online.API
             this.filename = filename;
 
             TriggerSuccess();
-        }
-
-        internal override void TriggerSuccess()
-        {
-            base.TriggerSuccess();
-            Success?.Invoke(filename);
         }
 
         public event APIProgressHandler Progressed;

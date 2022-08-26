@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using System.Linq;
 using DeepEqual.Syntax;
@@ -31,11 +33,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var beatmap = decodeAsJson(normal);
             var meta = beatmap.BeatmapInfo.Metadata;
-            Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID);
+            Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet?.OnlineID);
             Assert.AreEqual("Soleily", meta.Artist);
             Assert.AreEqual("Soleily", meta.ArtistUnicode);
             Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", meta.AudioFile);
-            Assert.AreEqual("Gamu", meta.AuthorString);
+            Assert.AreEqual("Gamu", meta.Author.Username);
             Assert.AreEqual("machinetop_background.jpg", meta.BackgroundFile);
             Assert.AreEqual(164471, meta.PreviewTime);
             Assert.AreEqual(string.Empty, meta.Source);
@@ -50,12 +52,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var beatmap = decodeAsJson(normal);
             var beatmapInfo = beatmap.BeatmapInfo;
             Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
-            Assert.AreEqual(false, beatmapInfo.Countdown);
             Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
             Assert.AreEqual(false, beatmapInfo.SpecialStyle);
-            Assert.IsTrue(beatmapInfo.RulesetID == 0);
+            Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);
             Assert.AreEqual(false, beatmapInfo.LetterboxInBreaks);
             Assert.AreEqual(false, beatmapInfo.WidescreenStoryboard);
+            Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);
+            Assert.AreEqual(0, beatmapInfo.CountdownOffset);
         }
 
         [Test]
@@ -83,7 +86,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeDifficulty()
         {
             var beatmap = decodeAsJson(normal);
-            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            var difficulty = beatmap.Difficulty;
             Assert.AreEqual(6.5f, difficulty.DrainRate);
             Assert.AreEqual(4, difficulty.CircleSize);
             Assert.AreEqual(8, difficulty.OverallDifficulty);
@@ -101,7 +104,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             processor.PreProcess();
             foreach (var o in converted.HitObjects)
-                o.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
+                o.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty);
             processor.PostProcess();
 
             var beatmap = converted.Serialize().Deserialize<Beatmap>();

@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
 using osu.Game.Utils;
 using osuTK.Graphics;
 
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         // override any external colour changes with banananana
-        Color4 IHasComboInformation.GetComboColour(IReadOnlyList<Color4> comboColours) => getBananaColour();
+        Color4 IHasComboInformation.GetComboColour(ISkin skin) => getBananaColour();
 
         private Color4 getBananaColour()
         {

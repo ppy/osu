@@ -1,13 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
@@ -15,6 +19,9 @@ namespace osu.Game.Tests.Beatmaps
 {
     public class TestBeatmap : Beatmap
     {
+        private static int onlineSetID;
+        private static int onlineBeatmapID;
+
         public TestBeatmap(RulesetInfo ruleset, bool withHitObjects = true)
         {
             var baseBeatmap = CreateBeatmap();
@@ -27,21 +34,15 @@ namespace osu.Game.Tests.Beatmaps
                 HitObjects = baseBeatmap.HitObjects;
 
             BeatmapInfo.Ruleset = ruleset;
-            BeatmapInfo.RulesetID = ruleset.ID ?? 0;
-            BeatmapInfo.BeatmapSet.Metadata = BeatmapInfo.Metadata;
-            BeatmapInfo.BeatmapSet.Beatmaps = new List<BeatmapInfo> { BeatmapInfo };
             BeatmapInfo.Length = 75000;
-            BeatmapInfo.OnlineInfo = new BeatmapOnlineInfo();
-            BeatmapInfo.BeatmapSet.OnlineInfo = new BeatmapSetOnlineInfo
-            {
-                Status = BeatmapSetOnlineStatus.Ranked,
-                Covers = new BeatmapSetOnlineCovers
-                {
-                    Cover = "https://assets.ppy.sh/beatmaps/163112/covers/cover.jpg",
-                    Card = "https://assets.ppy.sh/beatmaps/163112/covers/card.jpg",
-                    List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg"
-                }
-            };
+            BeatmapInfo.OnlineInfo = new APIBeatmap();
+            BeatmapInfo.OnlineID = Interlocked.Increment(ref onlineBeatmapID);
+            BeatmapInfo.Status = BeatmapOnlineStatus.Ranked;
+
+            Debug.Assert(BeatmapInfo.BeatmapSet != null);
+
+            BeatmapInfo.BeatmapSet.Beatmaps.Add(BeatmapInfo);
+            BeatmapInfo.BeatmapSet.OnlineID = Interlocked.Increment(ref onlineSetID);
         }
 
         protected virtual Beatmap CreateBeatmap() => createTestBeatmap();

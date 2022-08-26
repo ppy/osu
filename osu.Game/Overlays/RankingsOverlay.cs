@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,7 +17,7 @@ namespace osu.Game.Overlays
 {
     public class RankingsOverlay : TabbableOnlineOverlay<RankingsOverlayHeader, RankingsScope>
     {
-        protected Bindable<Country> Country => Header.Country;
+        protected Bindable<CountryCode> Country => Header.Country;
 
         private APIRequest lastRequest;
 
@@ -23,7 +25,10 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> parentRuleset { get; set; }
+
+        [Cached]
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public RankingsOverlay()
             : base(OverlayColourScheme.Green)
@@ -39,7 +44,7 @@ namespace osu.Game.Overlays
             Country.BindValueChanged(_ =>
             {
                 // if a country is requested, force performance scope.
-                if (Country.Value != null)
+                if (!Country.IsDefault)
                     Header.Current.Value = RankingsScope.Performance;
 
                 Scheduler.AddOnce(triggerTabChanged);
@@ -54,11 +59,24 @@ namespace osu.Game.Overlays
             });
         }
 
+        private bool requiresRulesetUpdate = true;
+
+        protected override void PopIn()
+        {
+            if (requiresRulesetUpdate)
+            {
+                ruleset.Value = parentRuleset.Value;
+                requiresRulesetUpdate = false;
+            }
+
+            base.PopIn();
+        }
+
         protected override void OnTabChanged(RankingsScope tab)
         {
             // country filtering is only valid for performance scope.
             if (Header.Current.Value != RankingsScope.Performance)
-                Country.Value = null;
+                Country.SetDefault();
 
             Scheduler.AddOnce(triggerTabChanged);
         }
@@ -67,9 +85,9 @@ namespace osu.Game.Overlays
 
         protected override RankingsOverlayHeader CreateHeader() => new RankingsOverlayHeader();
 
-        public void ShowCountry(Country requested)
+        public void ShowCountry(CountryCode requested)
         {
-            if (requested == null)
+            if (requested == default)
                 return;
 
             Show();
@@ -110,7 +128,7 @@ namespace osu.Game.Overlays
             switch (Header.Current.Value)
             {
                 case RankingsScope.Performance:
-                    return new GetUserRankingsRequest(ruleset.Value, country: Country.Value?.FlagName);
+                    return new GetUserRankingsRequest(ruleset.Value, countryCode: Country.Value);
 
                 case RankingsScope.Country:
                     return new GetCountryRankingsRequest(ruleset.Value);
@@ -127,19 +145,27 @@ namespace osu.Game.Overlays
             switch (request)
             {
                 case GetUserRankingsRequest userRequest:
+                    if (userRequest.Response == null)
+                        return null;
+
                     switch (userRequest.Type)
                     {
                         case UserRankingsType.Performance:
-                            return new PerformanceTable(1, userRequest.Result.Users);
+                            return new PerformanceTable(1, userRequest.Response.Users);
 
                         case UserRankingsType.Score:
-                            return new ScoresTable(1, userRequest.Result.Users);
+                            return new ScoresTable(1, userRequest.Response.Users);
                     }
 
                     return null;
 
                 case GetCountryRankingsRequest countryRequest:
-                    return new CountriesTable(1, countryRequest.Result.Countries);
+                {
+                    if (countryRequest.Response == null)
+                        return null;
+
+                    return new CountriesTable(1, countryRequest.Response.Countries);
+                }
             }
 
             return null;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -70,6 +72,17 @@ namespace osu.Game.Overlays.Changelog
                         Height = 2,
                         Colour = colourProvider.Background6,
                         Margin = new MarginPadding { Top = 30 },
+                    },
+                    new ChangelogSupporterPromo
+                    {
+                        Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 2,
+                        Colour = colourProvider.Background6,
+                        Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
                     },
                     comments = new CommentsContainer()
                 };

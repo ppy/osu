@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -25,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         private readonly APIRecentActivity activity;
 
@@ -118,7 +120,13 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     };
 
                 default:
-                    return Empty();
+                    return new RecentActivityIcon(activity)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 11,
+                        FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2, Vertical = 2 }
+                    };
             }
         }
 
@@ -216,7 +224,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         private void addBeatmapsetLink()
             => content.AddLink(activity.Beatmapset?.Title, LinkAction.OpenBeatmapSet, getLinkArgument(activity.Beatmapset?.Url), creationParameters: t => t.Font = getLinkFont());
 
-        private string getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.APIEndpointUrl}{url}").Argument;
+        private string getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.APIEndpointUrl}{url}").Argument.ToString();
 
         private FontUsage getLinkFont(FontWeight fontWeight = FontWeight.Regular)
             => OsuFont.GetFont(size: font_size, weight: fontWeight, italics: true);

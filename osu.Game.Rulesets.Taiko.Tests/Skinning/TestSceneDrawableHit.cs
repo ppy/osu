@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -17,25 +19,25 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddStep("Centre hit", () => SetContents(() => new DrawableHit(createHitAtCurrentTime())
+            AddStep("Centre hit", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Centre hit (strong)", () => SetContents(() => new DrawableHit(createHitAtCurrentTime(true))
+            AddStep("Centre hit (strong)", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime(true))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Rim hit", () => SetContents(() => new DrawableHit(createHitAtCurrentTime())
+            AddStep("Rim hit", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Rim hit (strong)", () => SetContents(() => new DrawableHit(createHitAtCurrentTime(true))
+            AddStep("Rim hit (strong)", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime(true))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

@@ -1,25 +1,26 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
-using System.Diagnostics;
-using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -81,15 +82,17 @@ namespace osu.Game.Rulesets.UI
         private readonly List<Playfield> nestedPlayfields = new List<Playfield>();
 
         /// <summary>
+        /// Whether this <see cref="Playfield"/> is nested in another <see cref="Playfield"/>.
+        /// </summary>
+        public bool IsNested { get; private set; }
+
+        /// <summary>
         /// Whether judgements should be displayed by this and and all nested <see cref="Playfield"/>s.
         /// </summary>
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
         [Resolved(CanBeNull = true)]
         private IReadOnlyList<Mod> mods { get; set; }
-
-        [Resolved]
-        private ISampleStore sampleStore { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
@@ -210,6 +213,8 @@ namespace osu.Game.Rulesets.UI
         /// <param name="otherPlayfield">The <see cref="Playfield"/> to add.</param>
         protected void AddNested(Playfield otherPlayfield)
         {
+            otherPlayfield.IsNested = true;
+
             otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
 
             otherPlayfield.NewResult += (d, r) => NewResult?.Invoke(d, r);
@@ -233,7 +238,7 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            if (mods != null)
+            if (!IsNested && mods != null)
             {
                 foreach (var mod in mods)
                 {
@@ -260,8 +265,23 @@ namespace osu.Game.Rulesets.UI
         {
             var entry = addHitObjectEntry(hitObject);
 
+            preloadSamples(hitObject);
+
             HitObjectContainer.Add(entry);
             OnHitObjectAdded(hitObject);
+        }
+
+        private void preloadSamples(HitObject hitObject)
+        {
+            // prepare sample pools ahead of time so we're not initialising at runtime.
+            foreach (var sample in hitObject.Samples)
+                prepareSamplePool(hitObject.SampleControlPoint.ApplyTo(sample));
+
+            foreach (var sample in hitObject.AuxiliarySamples)
+                prepareSamplePool(hitObject.SampleControlPoint.ApplyTo(sample));
+
+            foreach (var nestedObject in hitObject.NestedHitObjects)
+                preloadSamples(nestedObject);
         }
 
         /// <summary>
@@ -333,7 +353,7 @@ namespace osu.Game.Rulesets.UI
         /// </param>
         /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
         /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
-        protected void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
+        public void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
             where TObject : HitObject
             where TDrawable : DrawableHitObject, new()
             => RegisterPool<TObject, TDrawable>(new DrawablePool<TDrawable>(initialSize, maximumSize));
@@ -355,6 +375,34 @@ namespace osu.Game.Rulesets.UI
 
         DrawableHitObject IPooledHitObjectProvider.GetPooledDrawableRepresentation(HitObject hitObject, DrawableHitObject parent)
         {
+            var pool = prepareDrawableHitObjectPool(hitObject);
+
+            return (DrawableHitObject)pool?.Get(d =>
+            {
+                var dho = (DrawableHitObject)d;
+
+                if (!dho.IsInitialized)
+                {
+                    onNewDrawableHitObject(dho);
+
+                    // If this is the first time this DHO is being used, then apply the DHO mods.
+                    // This is done before Apply() so that the state is updated once when the hitobject is applied.
+                    if (mods != null)
+                    {
+                        foreach (var m in mods.OfType<IApplicableToDrawableHitObject>())
+                            m.ApplyToDrawableHitObject(dho);
+                    }
+                }
+
+                var entry = addHitObjectEntry(hitObject);
+
+                dho.ParentHitObject = parent;
+                dho.Apply(entry);
+            });
+        }
+
+        private IDrawablePool prepareDrawableHitObjectPool(HitObject hitObject)
+        {
             var lookupType = hitObject.GetType();
 
             IDrawablePool pool;
@@ -372,38 +420,20 @@ namespace osu.Game.Rulesets.UI
                 }
             }
 
-            return (DrawableHitObject)pool?.Get(d =>
-            {
-                var dho = (DrawableHitObject)d;
-
-                if (!dho.IsInitialized)
-                {
-                    onNewDrawableHitObject(dho);
-
-                    // If this is the first time this DHO is being used, then apply the DHO mods.
-                    // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                    if (mods != null)
-                    {
-                        foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
-                            m.ApplyToDrawableHitObjects(dho.Yield());
-                    }
-                }
-
-                var entry = addHitObjectEntry(hitObject);
-
-                dho.ParentHitObject = parent;
-                dho.Apply(entry);
-            });
+            return pool;
         }
 
         private readonly Dictionary<ISampleInfo, DrawablePool<PoolableSkinnableSample>> samplePools = new Dictionary<ISampleInfo, DrawablePool<PoolableSkinnableSample>>();
 
-        public PoolableSkinnableSample GetPooledSample(ISampleInfo sampleInfo)
-        {
-            if (!samplePools.TryGetValue(sampleInfo, out var existingPool))
-                AddInternal(samplePools[sampleInfo] = existingPool = new DrawableSamplePool(sampleInfo, 1));
+        public PoolableSkinnableSample GetPooledSample(ISampleInfo sampleInfo) => prepareSamplePool(sampleInfo).Get();
 
-            return existingPool.Get();
+        private DrawablePool<PoolableSkinnableSample> prepareSamplePool(ISampleInfo sampleInfo)
+        {
+            if (samplePools.TryGetValue(sampleInfo, out var pool)) return pool;
+
+            AddInternal(samplePools[sampleInfo] = pool = new DrawableSamplePool(sampleInfo, 1));
+
+            return pool;
         }
 
         private class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>

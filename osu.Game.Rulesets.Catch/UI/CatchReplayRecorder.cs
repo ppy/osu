@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Replays;
@@ -21,6 +23,6 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         protected override ReplayFrame HandleFrame(Vector2 mousePosition, List<CatchAction> actions, ReplayFrame previousFrame)
-            => new CatchReplayFrame(Time.Current, playfield.CatcherArea.MovableCatcher.X, actions.Contains(CatchAction.Dash), previousFrame as CatchReplayFrame);
+            => new CatchReplayFrame(Time.Current, playfield.Catcher.X, actions.Contains(CatchAction.Dash), previousFrame as CatchReplayFrame);
     }
 }

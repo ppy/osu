@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Overlays.News;
 using osu.Framework.Graphics;
@@ -29,7 +31,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestControl()
         {
-            AddAssert("Front page selected", () => header.Current.Value == "frontpage");
+            AddAssert("Front page selected", () => header.Current.Value == NewsHeader.FrontPageString);
             AddAssert("1 tab total", () => header.TabCount == 1);
 
             AddStep("Set article 1", () => header.SetArticle("1"));
@@ -41,7 +43,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("2 tabs total", () => header.TabCount == 2);
 
             AddStep("Set front page", () => header.SetFrontPage());
-            AddAssert("Front page selected", () => header.Current.Value == "frontpage");
+            AddAssert("Front page selected", () => header.Current.Value == NewsHeader.FrontPageString);
             AddAssert("1 tab total", () => header.TabCount == 1);
         }
 

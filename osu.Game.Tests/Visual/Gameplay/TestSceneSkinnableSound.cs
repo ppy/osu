@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -10,11 +13,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -24,19 +25,18 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestSkinSourceContainer skinSource;
         private PausableSkinnableSound skinnableSound;
 
-        [SetUp]
+        [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("setup hierarchy", () =>
             {
-                Children = new Drawable[]
+                Child = skinSource = new TestSkinSourceContainer
                 {
-                    skinSource = new TestSkinSourceContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = skinnableSound = new PausableSkinnableSound(new SampleInfo("Gameplay/normal-sliderslide"))
-                    },
+                    RelativeSizeAxes = Axes.Both,
                 };
+
+                // has to be added after the hierarchy above else the `ISkinSource` dependency won't be cached.
+                skinSource.Add(skinnableSound = new PausableSkinnableSound(new SampleInfo("Gameplay/normal-sliderslide")));
             });
         }
 
@@ -131,7 +131,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Cached(typeof(ISkinSource))]
-        [Cached(typeof(ISamplePlaybackDisabler))]
         private class TestSkinSourceContainer : Container, ISkinSource, ISamplePlaybackDisabler
         {
             [Resolved]
@@ -147,6 +146,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => source?.GetTexture(componentName, wrapModeS, wrapModeT);
             public ISample GetSample(ISampleInfo sampleInfo) => source?.GetSample(sampleInfo);
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source?.GetConfig<TLookup, TValue>(lookup);
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : source?.FindProvider(lookupFunction);
+            public IEnumerable<ISkin> AllSources => new[] { this }.Concat(source?.AllSources ?? Enumerable.Empty<ISkin>());
 
             public void TriggerSourceChanged()
             {

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using Newtonsoft.Json;
 using osu.Framework.Graphics;
@@ -16,6 +18,8 @@ namespace osu.Game.Skinning
     public class SkinnableTargetComponentsContainer : Container, ISkinnableDrawable
     {
         public bool IsEditable => false;
+
+        public bool UsesFixedAnchor { get; set; }
 
         private readonly Action<Container> applyDefaults;
 

@@ -1,15 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Batches;
-using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
@@ -25,6 +27,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
     public class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
     {
         private const int max_sprites = 2048;
+
+        /// <summary>
+        /// An exponentiating factor to ease the trail fade.
+        /// </summary>
+        protected virtual float FadeExponent => 1.7f;
 
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
         private int currentIndex;
@@ -61,8 +68,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(IRenderer renderer, ShaderManager shaders)
         {
+            texture ??= renderer.WhitePixel;
             shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
         }
 
@@ -72,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             resetTime();
         }
 
-        private Texture texture = Texture.WhitePixel;
+        private Texture texture;
 
         public Texture Texture
         {
@@ -133,6 +141,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         protected virtual bool InterpolateMovements => true;
 
         protected virtual float IntervalMultiplier => 1.0f;
+        protected virtual bool AvoidDrawingNearCursor => false;
 
         private Vector2? lastPosition;
         private readonly InputResampler resampler = new InputResampler();
@@ -141,43 +150,45 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Vector2 pos = e.ScreenSpaceMousePosition;
+            AddTrail(e.ScreenSpaceMousePosition);
+            return base.OnMouseMove(e);
+        }
 
-            if (lastPosition == null)
+        protected void AddTrail(Vector2 position)
+        {
+            if (InterpolateMovements)
             {
-                lastPosition = pos;
-                resampler.AddPosition(lastPosition.Value);
-                return base.OnMouseMove(e);
-            }
-
-            foreach (Vector2 pos2 in resampler.AddPosition(pos))
-            {
-                Trace.Assert(lastPosition.HasValue);
-
-                if (InterpolateMovements)
+                if (!lastPosition.HasValue)
                 {
-                    // ReSharper disable once PossibleInvalidOperationException
+                    lastPosition = position;
+                    resampler.AddPosition(lastPosition.Value);
+                    return;
+                }
+
+                foreach (Vector2 pos2 in resampler.AddPosition(position))
+                {
+                    Trace.Assert(lastPosition.HasValue);
+
                     Vector2 pos1 = lastPosition.Value;
                     Vector2 diff = pos2 - pos1;
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
                     float interval = partSize.X / 2.5f * IntervalMultiplier;
+                    float stopAt = distance - (AvoidDrawingNearCursor ? interval : 0);
 
-                    for (float d = interval; d < distance; d += interval)
+                    for (float d = interval; d < stopAt; d += interval)
                     {
                         lastPosition = pos1 + direction * d;
                         addPart(lastPosition.Value);
                     }
                 }
-                else
-                {
-                    lastPosition = pos2;
-                    addPart(lastPosition.Value);
-                }
             }
-
-            return base.OnMouseMove(e);
+            else
+            {
+                lastPosition = position;
+                addPart(lastPosition.Value);
+            }
         }
 
         private void addPart(Vector2 screenSpacePosition)
@@ -206,13 +217,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private Texture texture;
 
             private float time;
+            private float fadeExponent;
 
             private readonly TrailPart[] parts = new TrailPart[max_sprites];
             private Vector2 size;
-
             private Vector2 originPosition;
 
-            private readonly QuadBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites, 1);
+            private IVertexBatch<TexturedTrailVertex> vertexBatch;
 
             public TrailDrawNode(CursorTrail source)
                 : base(source)
@@ -227,6 +238,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 texture = Source.texture;
                 size = Source.partSize;
                 time = Source.time;
+                fadeExponent = Source.FadeExponent;
 
                 originPosition = Vector2.Zero;
 
@@ -243,14 +255,17 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Source.parts.CopyTo(parts, 0);
             }
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            public override void Draw(IRenderer renderer)
             {
-                base.Draw(vertexAction);
+                base.Draw(renderer);
+
+                vertexBatch ??= renderer.CreateQuadBatch<TexturedTrailVertex>(max_sprites, 1);
 
                 shader.Bind();
                 shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
+                shader.GetUniform<float>("g_FadeExponent").UpdateValue(ref fadeExponent);
 
-                texture.TextureGL.Bind();
+                texture.Bind();
 
                 RectangleF textureRect = texture.GetTextureRect();
 
@@ -307,7 +322,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch.Dispose();
+                vertexBatch?.Dispose();
             }
         }
 

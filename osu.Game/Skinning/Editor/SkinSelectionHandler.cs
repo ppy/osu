@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,14 +72,16 @@ namespace osu.Game.Skinning.Editor
             if (anchor.HasFlagFast(Anchor.x1)) scale.X = 0;
             if (anchor.HasFlagFast(Anchor.y1)) scale.Y = 0;
 
-            bool shouldAspectLock =
-                // for now aspect lock scale adjustments that occur at corners..
-                (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
-                // ..or if any of the selection have been rotated.
-                // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
-                || SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation, 0));
-
-            if (shouldAspectLock)
+            // for now aspect lock scale adjustments that occur at corners..
+            if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
+            {
+                // project scale vector along diagonal
+                Vector2 diag = (selectionRect.TopLeft - selectionRect.BottomRight).Normalized();
+                scale = Vector2.Dot(scale, diag) * diag;
+            }
+            // ..or if any of the selection have been rotated.
+            // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
+            else if (SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation, 0)))
             {
                 if (anchor.HasFlagFast(Anchor.x1))
                     // if dragging from the horizontal centre, only a vertical component is available.
@@ -95,8 +99,8 @@ namespace osu.Game.Skinning.Editor
 
             // scale adjust applied to each individual item should match that of the quad itself.
             var scaledDelta = new Vector2(
-                adjustedRect.Width / selectionRect.Width,
-                adjustedRect.Height / selectionRect.Height
+                MathF.Max(adjustedRect.Width / selectionRect.Width, 0),
+                MathF.Max(adjustedRect.Height / selectionRect.Height, 0)
             );
 
             foreach (var b in SelectedBlueprints)
@@ -124,22 +128,21 @@ namespace osu.Game.Skinning.Editor
             return true;
         }
 
-        public override bool HandleFlip(Direction direction)
+        public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
             var selectionQuad = getSelectionQuad();
+            Vector2 scaleFactor = direction == Direction.Horizontal ? new Vector2(-1, 1) : new Vector2(1, -1);
 
             foreach (var b in SelectedBlueprints)
             {
                 var drawableItem = (Drawable)b.Item;
 
-                var flippedPosition = GetFlippedPosition(direction, selectionQuad, b.ScreenSpaceSelectionPoint);
+                var flippedPosition = GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
 
                 updateDrawablePosition(drawableItem, flippedPosition);
 
-                drawableItem.Scale *= new Vector2(
-                    direction == Direction.Horizontal ? -1 : 1,
-                    direction == Direction.Vertical ? -1 : 1
-                );
+                drawableItem.Scale *= scaleFactor;
+                drawableItem.Rotation -= drawableItem.Rotation % 180 * 2;
             }
 
             return true;
@@ -149,12 +152,20 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var c in SelectedBlueprints)
             {
-                Drawable drawable = (Drawable)c.Item;
+                var item = c.Item;
+                Drawable drawable = (Drawable)item;
+
                 drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
+
+                if (item.UsesFixedAnchor) continue;
+
+                ApplyClosestAnchor(drawable);
             }
 
             return true;
         }
+
+        public static void ApplyClosestAnchor(Drawable drawable) => applyAnchor(drawable, getClosestAnchor(drawable));
 
         protected override void OnSelectionChanged()
         {
@@ -163,6 +174,8 @@ namespace osu.Game.Skinning.Editor
             SelectionBox.CanRotate = true;
             SelectionBox.CanScaleX = true;
             SelectionBox.CanScaleY = true;
+            SelectionBox.CanFlipX = true;
+            SelectionBox.CanFlipY = true;
             SelectionBox.CanReverse = false;
         }
 
@@ -171,20 +184,33 @@ namespace osu.Game.Skinning.Editor
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
+            var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchors())
+            {
+                State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) }
+            };
+
             yield return new OsuMenuItem("Anchor")
             {
-                Items = createAnchorItems(d => d.Anchor, applyAnchor).ToArray()
+                Items = createAnchorItems((d, a) => d.UsesFixedAnchor && ((Drawable)d).Anchor == a, applyFixedAnchors)
+                        .Prepend(closestItem)
+                        .ToArray()
             };
 
             yield return new OsuMenuItem("Origin")
             {
-                Items = createAnchorItems(d => d.Origin, applyOrigin).ToArray()
+                Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
             };
+
+            yield return new OsuMenuItem("Reset position", MenuItemType.Standard, () =>
+            {
+                foreach (var blueprint in SelectedBlueprints)
+                    ((Drawable)blueprint.Item).Position = Vector2.Zero;
+            });
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<ISkinnableDrawable, Anchor, bool> checkFunction, Action<Anchor> applyFunction)
             {
                 var displayableAnchors = new[]
                 {
@@ -198,12 +224,11 @@ namespace osu.Game.Skinning.Editor
                     Anchor.BottomCentre,
                     Anchor.BottomRight,
                 };
-
                 return displayableAnchors.Select(a =>
                 {
                     return new TernaryStateRadioMenuItem(a.ToString(), MenuItemType.Standard, _ => applyFunction(a))
                     {
-                        State = { Value = GetStateFromSelection(selection, c => checkFunction((Drawable)c.Item) == a) }
+                        State = { Value = GetStateFromSelection(selection, c => checkFunction(c.Item, a)) }
                     };
                 });
             }
@@ -215,15 +240,21 @@ namespace osu.Game.Skinning.Editor
                 drawable.Parent.ToLocalSpace(screenSpacePosition) - drawable.AnchorPosition;
         }
 
-        private void applyOrigin(Anchor anchor)
+        private void applyOrigins(Anchor origin)
         {
             foreach (var item in SelectedItems)
             {
                 var drawable = (Drawable)item;
 
+                if (origin == drawable.Origin) continue;
+
                 var previousOrigin = drawable.OriginPosition;
-                drawable.Origin = anchor;
+                drawable.Origin = origin;
                 drawable.Position += drawable.OriginPosition - previousOrigin;
+
+                if (item.UsesFixedAnchor) continue;
+
+                ApplyClosestAnchor(drawable);
             }
         }
 
@@ -234,16 +265,84 @@ namespace osu.Game.Skinning.Editor
         private Quad getSelectionQuad() =>
             GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
-        private void applyAnchor(Anchor anchor)
+        private void applyFixedAnchors(Anchor anchor)
         {
             foreach (var item in SelectedItems)
             {
                 var drawable = (Drawable)item;
 
-                var previousAnchor = drawable.AnchorPosition;
-                drawable.Anchor = anchor;
-                drawable.Position -= drawable.AnchorPosition - previousAnchor;
+                item.UsesFixedAnchor = true;
+                applyAnchor(drawable, anchor);
             }
+        }
+
+        private void applyClosestAnchors()
+        {
+            foreach (var item in SelectedItems)
+            {
+                item.UsesFixedAnchor = false;
+                ApplyClosestAnchor((Drawable)item);
+            }
+        }
+
+        private static Anchor getClosestAnchor(Drawable drawable)
+        {
+            var parent = drawable.Parent;
+
+            if (parent == null)
+                return drawable.Anchor;
+
+            var screenPosition = getScreenPosition();
+
+            var absolutePosition = parent.ToLocalSpace(screenPosition);
+            var factor = parent.RelativeToAbsoluteFactor;
+
+            var result = default(Anchor);
+
+            static Anchor getAnchorFromPosition(float xOrY, Anchor anchor0, Anchor anchor1, Anchor anchor2)
+            {
+                if (xOrY >= 2 / 3f)
+                    return anchor2;
+
+                if (xOrY >= 1 / 3f)
+                    return anchor1;
+
+                return anchor0;
+            }
+
+            result |= getAnchorFromPosition(absolutePosition.X / factor.X, Anchor.x0, Anchor.x1, Anchor.x2);
+            result |= getAnchorFromPosition(absolutePosition.Y / factor.Y, Anchor.y0, Anchor.y1, Anchor.y2);
+
+            return result;
+
+            Vector2 getScreenPosition()
+            {
+                var quad = drawable.ScreenSpaceDrawQuad;
+                var origin = drawable.Origin;
+
+                var pos = quad.TopLeft;
+
+                if (origin.HasFlagFast(Anchor.x2))
+                    pos.X += quad.Width;
+                else if (origin.HasFlagFast(Anchor.x1))
+                    pos.X += quad.Width / 2f;
+
+                if (origin.HasFlagFast(Anchor.y2))
+                    pos.Y += quad.Height;
+                else if (origin.HasFlagFast(Anchor.y1))
+                    pos.Y += quad.Height / 2f;
+
+                return pos;
+            }
+        }
+
+        private static void applyAnchor(Drawable drawable, Anchor anchor)
+        {
+            if (anchor == drawable.Anchor) return;
+
+            var previousAnchor = drawable.AnchorPosition;
+            drawable.Anchor = anchor;
+            drawable.Position -= drawable.AnchorPosition - previousAnchor;
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)

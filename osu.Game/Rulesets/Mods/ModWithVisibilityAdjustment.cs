@@ -14,12 +14,12 @@ namespace osu.Game.Rulesets.Mods
     /// A <see cref="Mod"/> which applies visibility adjustments to <see cref="DrawableHitObject"/>s
     /// with an optional increased visibility adjustment depending on the user's "increase first object visibility" setting.
     /// </summary>
-    public abstract class ModWithVisibilityAdjustment : Mod, IReadFromConfig, IApplicableToBeatmap, IApplicableToDrawableHitObjects
+    public abstract class ModWithVisibilityAdjustment : Mod, IReadFromConfig, IApplicableToBeatmap, IApplicableToDrawableHitObject
     {
         /// <summary>
         /// The first adjustable object.
         /// </summary>
-        protected HitObject FirstObject { get; private set; }
+        protected HitObject? FirstObject { get; private set; }
 
         /// <summary>
         /// Whether the visibility of <see cref="FirstObject"/> should be increased.
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mods
         {
             FirstObject = getFirstAdjustableObjectRecursive(beatmap.HitObjects);
 
-            HitObject getFirstAdjustableObjectRecursive(IReadOnlyList<HitObject> hitObjects)
+            HitObject? getFirstAdjustableObjectRecursive(IReadOnlyList<HitObject> hitObjects)
             {
                 foreach (var h in hitObjects)
                 {
@@ -73,19 +73,16 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public virtual void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public virtual void ApplyToDrawableHitObject(DrawableHitObject dho)
         {
-            foreach (var dho in drawables)
+            dho.ApplyCustomUpdateState += (o, state) =>
             {
-                dho.ApplyCustomUpdateState += (o, state) =>
-                {
-                    // Increased visibility is applied to the entire first object, including all of its nested hitobjects.
-                    if (IncreaseFirstObjectVisibility.Value && isObjectEqualToOrNestedIn(o.HitObject, FirstObject))
-                        ApplyIncreasedVisibilityState(o, state);
-                    else
-                        ApplyNormalVisibilityState(o, state);
-                };
-            }
+                // Increased visibility is applied to the entire first object, including all of its nested hitobjects.
+                if (IncreaseFirstObjectVisibility.Value && isObjectEqualToOrNestedIn(o.HitObject, FirstObject))
+                    ApplyIncreasedVisibilityState(o, state);
+                else
+                    ApplyNormalVisibilityState(o, state);
+            };
         }
 
         /// <summary>
@@ -94,7 +91,7 @@ namespace osu.Game.Rulesets.Mods
         /// <param name="toCheck">The <see cref="HitObject"/> to check.</param>
         /// <param name="target">The <see cref="HitObject"/> which may be equal to or contain <paramref name="toCheck"/> as a nested object.</param>
         /// <returns>Whether <paramref name="toCheck"/> is equal to or nested within <paramref name="target"/>.</returns>
-        private bool isObjectEqualToOrNestedIn(HitObject toCheck, HitObject target)
+        private bool isObjectEqualToOrNestedIn(HitObject toCheck, HitObject? target)
         {
             if (target == null)
                 return false;

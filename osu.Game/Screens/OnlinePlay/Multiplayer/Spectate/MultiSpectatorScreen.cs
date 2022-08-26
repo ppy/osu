@@ -3,14 +3,19 @@
 
 using System;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Spectate;
+using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -22,89 +27,135 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         // Isolates beatmap/ruleset to this screen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        // We are managing our own adjustments. For now, this happens inside the Player instances themselves.
+        public override bool? AllowTrackAdjustments => false;
+
         /// <summary>
         /// Whether all spectating players have finished loading.
         /// </summary>
         public bool AllPlayersLoaded => instances.All(p => p?.PlayerLoaded == true);
 
-        [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
+        protected override UserActivity InitialActivity => new UserActivity.SpectatingMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         private readonly PlayerArea[] instances;
-        private MasterGameplayClockContainer masterClockContainer;
-        private ISyncManager syncManager;
-        private PlayerGrid grid;
-        private MultiSpectatorLeaderboard leaderboard;
-        private PlayerArea currentAudioSource;
+        private MasterGameplayClockContainer masterClockContainer = null!;
+        private SpectatorSyncManager syncManager = null!;
+        private PlayerGrid grid = null!;
+        private MultiSpectatorLeaderboard leaderboard = null!;
+        private PlayerArea? currentAudioSource;
+
+        private readonly Room room;
+        private readonly MultiplayerRoomUser[] users;
 
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorScreen"/>.
         /// </summary>
-        /// <param name="userIds">The players to spectate.</param>
-        public MultiSpectatorScreen(int[] userIds)
-            : base(userIds.Take(PlayerGrid.MAX_PLAYERS).ToArray())
+        /// <param name="room">The room.</param>
+        /// <param name="users">The players to spectate.</param>
+        public MultiSpectatorScreen(Room room, MultiplayerRoomUser[] users)
+            : base(users.Select(u => u.UserID).ToArray())
         {
-            instances = new PlayerArea[UserIds.Count];
+            this.room = room;
+            this.users = users;
+
+            instances = new PlayerArea[Users.Count];
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Container leaderboardContainer;
-            masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0);
+            FillFlowContainer leaderboardFlow;
+            Container scoreDisplayContainer;
 
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
-                (Drawable)(syncManager = new CatchUpSyncManager(masterClockContainer)),
-                masterClockContainer.WithChild(new GridContainer
+                masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new[]
+                    Child = new GridContainer
                     {
-                        new Dimension(GridSizeMode.AutoSize)
-                    },
-                    Content = new[]
-                    {
-                        new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                        Content = new[]
                         {
-                            leaderboardContainer = new Container
+                            new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Y,
-                                AutoSizeAxes = Axes.X
+                                scoreDisplayContainer = new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y
+                                },
                             },
-                            grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                            new Drawable[]
+                            {
+                                new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                    Content = new[]
+                                    {
+                                        new Drawable[]
+                                        {
+                                            leaderboardFlow = new FillFlowContainer
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Vertical,
+                                                Spacing = new Vector2(5)
+                                            },
+                                            grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                })
+                },
+                syncManager = new SpectatorSyncManager(masterClockContainer)
+                {
+                    ReadyToStart = performInitialSeek,
+                }
             };
 
-            for (int i = 0; i < UserIds.Count; i++)
-            {
-                grid.Add(instances[i] = new PlayerArea(UserIds[i], masterClockContainer.GameplayClock));
-                syncManager.AddPlayerClock(instances[i].GameplayClock);
-            }
+            for (int i = 0; i < Users.Count; i++)
+                grid.Add(instances[i] = new PlayerArea(Users[i], syncManager.CreateManagedClock()));
 
-            // Todo: This is not quite correct - it should be per-user to adjust for other mod combinations.
-            var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
-            var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
-            scoreProcessor.ApplyBeatmap(playableBeatmap);
-
-            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, UserIds.ToArray())
+            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(users)
             {
                 Expanded = { Value = true },
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-            }, leaderboardContainer.Add);
+            }, _ =>
+            {
+                foreach (var instance in instances)
+                    leaderboard.AddClock(instance.UserId, instance.GameplayClock);
+
+                leaderboardFlow.Insert(0, leaderboard);
+
+                if (leaderboard.TeamScores.Count == 2)
+                {
+                    LoadComponentAsync(new MatchScoreDisplay
+                    {
+                        Team1Score = { BindTarget = leaderboard.TeamScores.First().Value },
+                        Team2Score = { BindTarget = leaderboard.TeamScores.Last().Value },
+                    }, scoreDisplayContainer.Add);
+                }
+            });
+
+            LoadComponentAsync(new GameplayChatDisplay(room)
+            {
+                Expanded = { Value = true },
+            }, chat => leaderboardFlow.Insert(1, chat));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            masterClockContainer.Stop();
             masterClockContainer.Reset();
         }
 
@@ -115,7 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (!isCandidateAudioSource(currentAudioSource?.GameplayClock))
             {
                 currentAudioSource = instances.Where(i => isCandidateAudioSource(i.GameplayClock))
-                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.MasterClock.CurrentTime))
+                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.CurrentMasterTime))
                                               .FirstOrDefault();
 
                 foreach (var instance in instances)
@@ -123,33 +174,60 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
         }
 
-        private bool isCandidateAudioSource([CanBeNull] ISpectatorPlayerClock clock)
-            => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
+        private bool isCandidateAudioSource(SpectatorPlayerClock? clock)
+            => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames;
 
-        protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
+        private void performInitialSeek()
+        {
+            // Seek the master clock to the gameplay time.
+            // This is chosen as the first available frame in the players' replays, which matches the seek by each individual SpectatorPlayer.
+            double startTime = instances.Where(i => i.Score != null)
+                                        .SelectMany(i => i.Score.AsNonNull().Replay.Frames)
+                                        .Select(f => f.Time)
+                                        .DefaultIfEmpty(0)
+                                        .Min();
+
+            masterClockContainer.StartTime = startTime;
+            masterClockContainer.Reset(true);
+        }
+
+        protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState)
         {
         }
 
-        protected override void StartGameplay(int userId, GameplayState gameplayState)
+        protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState)
+            => instances.Single(i => i.UserId == userId).LoadScore(spectatorGameplayState.Score);
+
+        protected override void EndGameplay(int userId, SpectatorState state)
         {
+            // Allowed passed/failed users to complete their remaining replay frames.
+            // The failed state isn't really possible in multiplayer (yet?) but is added here just for safety in case it starts being used.
+            if (state.State == SpectatedUserState.Passed || state.State == SpectatedUserState.Failed)
+                return;
+
+            // we could also potentially receive EndGameplay with "Playing" state, at which point we can only early-return and hope it's a passing player.
+            // todo: this shouldn't exist, but it's here as a hotfix for an issue with multi-spectator screen not proceeding to results screen.
+            // see: https://github.com/ppy/osu/issues/19593
+            if (state.State == SpectatedUserState.Playing)
+                return;
+
+            RemoveUser(userId);
+
             var instance = instances.Single(i => i.UserId == userId);
 
-            instance.LoadScore(gameplayState.Score);
-
-            syncManager.AddPlayerClock(instance.GameplayClock);
-            leaderboard.AddClock(instance.UserId, instance.GameplayClock);
-        }
-
-        protected override void EndGameplay(int userId)
-        {
-            RemoveUser(userId);
-            leaderboard.RemoveClock(userId);
+            instance.FadeColour(colours.Gray4, 400, Easing.OutQuint);
+            syncManager.RemoveManagedClock(instance.GameplayClock);
         }
 
         public override bool OnBackButton()
         {
-            // On a manual exit, set the player state back to idle.
-            multiplayerClient.ChangeState(MultiplayerUserState.Idle);
+            if (multiplayerClient.Room == null)
+                return base.OnBackButton();
+
+            // On a manual exit, set the player back to idle unless gameplay has finished.
+            if (multiplayerClient.Room.State != MultiplayerRoomState.Open)
+                multiplayerClient.ChangeState(MultiplayerUserState.Idle);
+
             return base.OnBackButton();
         }
     }

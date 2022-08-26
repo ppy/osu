@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
-using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
@@ -22,9 +24,9 @@ namespace osu.Game.Screens.Select
         {
             foreach (Match match in query_syntax_regex.Matches(query))
             {
-                var key = match.Groups["key"].Value.ToLower();
+                string key = match.Groups["key"].Value.ToLowerInvariant();
                 var op = parseOperator(match.Groups["op"].Value);
-                var value = match.Groups["value"].Value;
+                string value = match.Groups["value"].Value;
 
                 if (tryParseKeywordCriteria(criteria, key, value, op))
                     query = query.Replace(match.ToString(), "");
@@ -37,6 +39,7 @@ namespace osu.Game.Screens.Select
         {
             switch (key)
             {
+                case "star":
                 case "stars":
                     return TryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0.01d / 2);
 
@@ -50,6 +53,9 @@ namespace osu.Game.Screens.Select
                 case "cs":
                     return TryUpdateCriteriaRange(ref criteria.CircleSize, op, value);
 
+                case "od":
+                    return TryUpdateCriteriaRange(ref criteria.OverallDifficulty, op, value);
+
                 case "bpm":
                     return TryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.01d / 2);
 
@@ -60,8 +66,7 @@ namespace osu.Game.Screens.Select
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
                 case "status":
-                    return TryUpdateCriteriaRange(ref criteria.OnlineStatus, op, value,
-                        (string s, out BeatmapSetOnlineStatus val) => Enum.TryParse(value, true, out val));
+                    return TryUpdateCriteriaRange(ref criteria.OnlineStatus, op, value, tryParseEnum);
 
                 case "creator":
                     return TryUpdateCriteriaText(ref criteria.Creator, op, value);
@@ -115,6 +120,14 @@ namespace osu.Game.Screens.Select
 
         private static bool tryParseInt(string value, out int result) =>
             int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
+
+        private static bool tryParseEnum<TEnum>(string value, out TEnum result) where TEnum : struct
+        {
+            if (Enum.TryParse(value, true, out result)) return true;
+
+            value = Enum.GetNames(typeof(TEnum)).FirstOrDefault(name => name.StartsWith(value, true, CultureInfo.InvariantCulture));
+            return Enum.TryParse(value, true, out result);
+        }
 
         /// <summary>
         /// Attempts to parse a keyword filter with the specified <paramref name="op"/> and textual <paramref name="value"/>.
@@ -299,10 +312,10 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateLengthRange(FilterCriteria criteria, Operator op, string val)
         {
-            if (!tryParseDoubleWithPoint(val.TrimEnd('m', 's', 'h'), out var length))
+            if (!tryParseDoubleWithPoint(val.TrimEnd('m', 's', 'h'), out double length))
                 return false;
 
-            var scale = getLengthScale(val);
+            int scale = getLengthScale(val);
             return tryUpdateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
         }
     }

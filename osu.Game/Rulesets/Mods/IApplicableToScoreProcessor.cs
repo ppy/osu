@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     public interface IApplicableToScoreProcessor : IApplicableMod
     {
         /// <summary>
-        /// Provide a <see cref="ScoreProcessor"/> to a mod. Called once on initialisation of a play instance.
+        /// Provides a loaded <see cref="ScoreProcessor"/> to a mod. Called once on initialisation of a play instance.
         /// </summary>
         void ApplyToScoreProcessor(ScoreProcessor scoreProcessor);
 

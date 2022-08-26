@@ -1,9 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+#nullable disable
+
+using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects
@@ -21,18 +25,21 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public float DistanceToHyperDash { get; set; }
 
-        public readonly Bindable<bool> HyperDashBindable = new Bindable<bool>();
+        private HitObjectProperty<bool> hyperDash;
+
+        public Bindable<bool> HyperDashBindable => hyperDash.Bindable;
 
         /// <summary>
         /// Whether this fruit can initiate a hyperdash.
         /// </summary>
-        public bool HyperDash => HyperDashBindable.Value;
+        public bool HyperDash => hyperDash.Value;
 
         private CatchHitObject hyperDashTarget;
 
         /// <summary>
         /// The target fruit if we are to initiate a hyperdash.
         /// </summary>
+        [JsonIgnore]
         public CatchHitObject HyperDashTarget
         {
             get => hyperDashTarget;
@@ -43,6 +50,6 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        Color4 IHasComboInformation.GetComboColour(IReadOnlyList<Color4> comboColours) => comboColours[(IndexInBeatmap + 1) % comboColours.Count];
+        Color4 IHasComboInformation.GetComboColour(ISkin skin) => IHasComboInformation.GetSkinComboColour(this, skin, IndexInBeatmap + 1);
     }
 }

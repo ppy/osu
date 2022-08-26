@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +10,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Lists;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
-using osu.Game.Extensions;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -43,7 +45,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// The maximum span of time that may be visible by the length of the scrolling axes.
         /// </summary>
-        private const double time_span_max = 10000;
+        private const double time_span_max = 20000;
 
         /// <summary>
         /// The step increase/decrease of the span of time visible by the length of the scrolling axes.
@@ -116,48 +118,41 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (RelativeScaleBeatLengths)
             {
-                IReadOnlyList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
-                double maxDuration = 0;
+                baseBeatLength = Beatmap.GetMostCommonBeatLength();
 
-                for (int i = 0; i < timingPoints.Count; i++)
-                {
-                    if (timingPoints[i].Time > lastObjectTime)
-                        break;
-
-                    double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastObjectTime;
-                    double duration = endTime - timingPoints[i].Time;
-
-                    if (duration > maxDuration)
-                    {
-                        maxDuration = duration;
-                        // The slider multiplier is post-multiplied to determine the final velocity, but for relative scale beat lengths
-                        // the multiplier should not affect the effective timing point (the longest in the beatmap), so it is factored out here
-                        baseBeatLength = timingPoints[i].BeatLength / Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
-                    }
-                }
+                // The slider multiplier is post-multiplied to determine the final velocity, but for relative scale beat lengths
+                // the multiplier should not affect the effective timing point (the longest in the beatmap), so it is factored out here
+                baseBeatLength /= Beatmap.Difficulty.SliderMultiplier;
             }
 
             // Merge sequences of timing and difficulty control points to create the aggregate "multiplier" control point
             var lastTimingPoint = new TimingControlPoint();
-            var lastDifficultyPoint = new DifficultyControlPoint();
+            var lastEffectPoint = new EffectControlPoint();
             var allPoints = new SortedList<ControlPoint>(Comparer<ControlPoint>.Default);
+
             allPoints.AddRange(Beatmap.ControlPointInfo.TimingPoints);
-            allPoints.AddRange(Beatmap.ControlPointInfo.DifficultyPoints);
+            allPoints.AddRange(Beatmap.ControlPointInfo.EffectPoints);
 
             // Generate the timing points, making non-timing changes use the previous timing change and vice-versa
             var timingChanges = allPoints.Select(c =>
             {
-                if (c is TimingControlPoint timingPoint)
-                    lastTimingPoint = timingPoint;
-                else if (c is DifficultyControlPoint difficultyPoint)
-                    lastDifficultyPoint = difficultyPoint;
+                switch (c)
+                {
+                    case TimingControlPoint timingPoint:
+                        lastTimingPoint = timingPoint;
+                        break;
+
+                    case EffectControlPoint difficultyPoint:
+                        lastEffectPoint = difficultyPoint;
+                        break;
+                }
 
                 return new MultiplierControlPoint(c.Time)
                 {
-                    Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier,
+                    Velocity = Beatmap.Difficulty.SliderMultiplier,
                     BaseBeatLength = baseBeatLength,
                     TimingPoint = lastTimingPoint,
-                    DifficultyPoint = lastDifficultyPoint
+                    EffectPoint = lastEffectPoint
                 };
             });
 
@@ -171,7 +166,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             ControlPoints.AddRange(timingChanges);
 
             if (ControlPoints.Count == 0)
-                ControlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
+                ControlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.Difficulty.SliderMultiplier });
         }
 
         protected override void LoadComplete()
@@ -188,19 +183,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <param name="amount">The amount to adjust by. Greater than 0 if the scroll speed should be increased, less than 0 if it should be decreased.</param>
         protected virtual void AdjustScrollSpeed(int amount) => this.TransformBindableTo(TimeRange, TimeRange.Value - amount * time_span_step, 200, Easing.OutQuint);
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (!UserScrollSpeedAdjustment)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.IncreaseScrollSpeed:
-                    scheduleScrollSpeedAdjustment(1);
+                    AdjustScrollSpeed(1);
                     return true;
 
                 case GlobalAction.DecreaseScrollSpeed:
-                    scheduleScrollSpeedAdjustment(-1);
+                    AdjustScrollSpeed(-1);
                     return true;
             }
 
@@ -209,16 +204,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private ScheduledDelegate scheduledScrollSpeedAdjustment;
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
             scheduledScrollSpeedAdjustment?.Cancel();
             scheduledScrollSpeedAdjustment = null;
-        }
-
-        private void scheduleScrollSpeedAdjustment(int amount)
-        {
-            scheduledScrollSpeedAdjustment?.Cancel();
-            scheduledScrollSpeedAdjustment = this.BeginKeyRepeat(Scheduler, () => AdjustScrollSpeed(amount));
         }
 
         private class LocalScrollingInfo : IScrollingInfo

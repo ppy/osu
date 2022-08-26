@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osu.Framework.Input.Events;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users
 {
@@ -25,7 +28,7 @@ namespace osu.Game.Users
         private SpriteIcon statusIcon;
         private OsuSpriteText statusMessage;
 
-        protected ExtendedUserPanel(User user)
+        protected ExtendedUserPanel(APIUser user)
             : base(user)
         {
         }
@@ -48,15 +51,12 @@ namespace osu.Game.Users
             statusIcon.FinishTransforms();
         }
 
-        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar
-        {
-            User = User,
-            OpenOnClick = { Value = false }
-        };
+        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
 
-        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.Country)
+        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.CountryCode)
         {
-            Size = new Vector2(39, 26)
+            Size = new Vector2(36, 26),
+            Action = Action,
         };
 
         protected SpriteIcon CreateStatusIcon() => statusIcon = new SpriteIcon

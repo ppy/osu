@@ -1,11 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -95,14 +98,17 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert(@"no stream selected", () => changelog.Header.Streams.Current.Value == null);
         }
 
-        [Test]
-        public void ShowWithBuild()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void ShowWithBuild(bool isSupporter)
         {
+            AddStep(@"set supporter", () => dummyAPI.LocalUser.Value.IsSupporter = isSupporter);
             showBuild(() => new APIChangelogBuild
             {
                 Version = "2018.712.0",
                 DisplayVersion = "2018.712.0",
                 UpdateStream = streams[OsuGameBase.CLIENT_STREAM_NAME],
+                CreatedAt = new DateTime(2018, 7, 12),
                 ChangelogEntries = new List<APIChangelogEntry>
                 {
                     new APIChangelogEntry
@@ -155,6 +161,8 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
             AddAssert(@"correct build displayed", () => changelog.Current.Value.Version == "2018.712.0");
             AddAssert(@"correct stream selected", () => changelog.Header.Streams.Current.Value.Id == 5);
+            AddUntilStep(@"wait for content load", () => changelog.ChildrenOfType<ChangelogSupporterPromo>().Any());
+            AddAssert(@"supporter promo showed", () => changelog.ChildrenOfType<ChangelogSupporterPromo>().First().Alpha == (isSupporter ? 0 : 1));
         }
 
         [Test]
@@ -164,6 +172,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Version = "2019.920.0",
                 DisplayVersion = "2019.920.0",
+                CreatedAt = new DateTime(2019, 9, 20),
                 UpdateStream = new APIUpdateStream
                 {
                     Name = "Test",

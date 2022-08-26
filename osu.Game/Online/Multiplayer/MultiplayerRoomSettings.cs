@@ -1,14 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
 using MessagePack;
-using osu.Game.Online.API;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -17,42 +12,44 @@ namespace osu.Game.Online.Multiplayer
     public class MultiplayerRoomSettings : IEquatable<MultiplayerRoomSettings>
     {
         [Key(0)]
-        public int BeatmapID { get; set; }
-
-        [Key(1)]
-        public int RulesetID { get; set; }
-
-        [Key(2)]
-        public string BeatmapChecksum { get; set; } = string.Empty;
-
-        [Key(3)]
         public string Name { get; set; } = "Unnamed room";
 
-        [NotNull]
-        [Key(4)]
-        public IEnumerable<APIMod> RequiredMods { get; set; } = Enumerable.Empty<APIMod>();
-
-        [NotNull]
-        [Key(5)]
-        public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
-
-        [Key(6)]
+        [Key(1)]
         public long PlaylistItemId { get; set; }
 
-        public bool Equals(MultiplayerRoomSettings other)
-            => BeatmapID == other.BeatmapID
-               && BeatmapChecksum == other.BeatmapChecksum
-               && RequiredMods.SequenceEqual(other.RequiredMods)
-               && AllowedMods.SequenceEqual(other.AllowedMods)
-               && RulesetID == other.RulesetID
-               && Name.Equals(other.Name, StringComparison.Ordinal)
-               && PlaylistItemId == other.PlaylistItemId;
+        [Key(2)]
+        public string Password { get; set; } = string.Empty;
+
+        [Key(3)]
+        public MatchType MatchType { get; set; } = MatchType.HeadToHead;
+
+        [Key(4)]
+        public QueueMode QueueMode { get; set; } = QueueMode.HostOnly;
+
+        [Key(5)]
+        public TimeSpan AutoStartDuration { get; set; }
+
+        [IgnoreMember]
+        public bool AutoStartEnabled => AutoStartDuration != TimeSpan.Zero;
+
+        public bool Equals(MultiplayerRoomSettings? other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
+
+            return Password.Equals(other.Password, StringComparison.Ordinal)
+                   && Name.Equals(other.Name, StringComparison.Ordinal)
+                   && PlaylistItemId == other.PlaylistItemId
+                   && MatchType == other.MatchType
+                   && QueueMode == other.QueueMode
+                   && AutoStartDuration == other.AutoStartDuration;
+        }
 
         public override string ToString() => $"Name:{Name}"
-                                             + $" Beatmap:{BeatmapID} ({BeatmapChecksum})"
-                                             + $" RequiredMods:{string.Join(',', RequiredMods)}"
-                                             + $" AllowedMods:{string.Join(',', AllowedMods)}"
-                                             + $" Ruleset:{RulesetID}"
-                                             + $" Item:{PlaylistItemId}";
+                                             + $" Password:{(string.IsNullOrEmpty(Password) ? "no" : "yes")}"
+                                             + $" Type:{MatchType}"
+                                             + $" Item:{PlaylistItemId}"
+                                             + $" Queue:{QueueMode}"
+                                             + $" Start:{AutoStartDuration}";
     }
 }

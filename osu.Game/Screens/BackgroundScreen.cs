@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
@@ -11,6 +13,9 @@ namespace osu.Game.Screens
 {
     public abstract class BackgroundScreen : Screen, IEquatable<BackgroundScreen>
     {
+        protected const float TRANSITION_LENGTH = 500;
+        private const float x_movement_amount = 50;
+
         private readonly bool animateOnEnter;
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
@@ -26,9 +31,6 @@ namespace osu.Game.Screens
         {
             return other?.GetType() == GetType();
         }
-
-        private const float transition_length = 500;
-        private const float x_movement_amount = 50;
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -48,42 +50,42 @@ namespace osu.Game.Screens
             Scale = new Vector2(1 + x_movement_amount / DrawSize.X * 2);
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
             if (animateOnEnter)
             {
                 this.FadeOut();
                 this.MoveToX(x_movement_amount);
 
-                this.FadeIn(transition_length, Easing.InOutQuart);
-                this.MoveToX(0, transition_length, Easing.InOutQuart);
+                this.FadeIn(TRANSITION_LENGTH, Easing.InOutQuart);
+                this.MoveToX(0, TRANSITION_LENGTH, Easing.InOutQuart);
             }
 
-            base.OnEntering(last);
+            base.OnEntering(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            this.MoveToX(-x_movement_amount, transition_length, Easing.InOutQuart);
-            base.OnSuspending(next);
+            this.MoveToX(-x_movement_amount, TRANSITION_LENGTH, Easing.InOutQuart);
+            base.OnSuspending(e);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             if (IsLoaded)
             {
-                this.FadeOut(transition_length, Easing.OutExpo);
-                this.MoveToX(x_movement_amount, transition_length, Easing.OutExpo);
+                this.FadeOut(TRANSITION_LENGTH, Easing.OutExpo);
+                this.MoveToX(x_movement_amount, TRANSITION_LENGTH, Easing.OutExpo);
             }
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
             if (IsLoaded)
-                this.MoveToX(0, transition_length, Easing.OutExpo);
-            base.OnResuming(last);
+                this.MoveToX(0, TRANSITION_LENGTH, Easing.OutExpo);
+            base.OnResuming(e);
         }
     }
 }

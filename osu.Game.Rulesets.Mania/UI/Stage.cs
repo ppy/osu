@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -147,7 +149,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override bool Remove(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column - firstColumnIndex).Remove(h);
 
-        public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
+        public void Add(BarLine barLine) => base.Add(new DrawableBarLine(barLine));
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {

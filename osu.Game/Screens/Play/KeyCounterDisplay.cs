@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -33,13 +35,20 @@ namespace osu.Game.Screens.Play
 
         public KeyCounterDisplay()
         {
-            AutoSizeAxes = Axes.Both;
-
             InternalChild = KeyFlow = new FillFlowContainer<KeyCounter>
             {
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Don't use autosize as it will shrink to zero when KeyFlow is hidden.
+            // In turn this can cause the display to be masked off screen and never become visible again.
+            Size = KeyFlow.Size;
         }
 
         public override void Add(KeyCounter key)
@@ -148,10 +157,10 @@ namespace osu.Game.Screens.Play
             {
                 switch (e)
                 {
-                    case KeyDownEvent _:
-                    case KeyUpEvent _:
-                    case MouseDownEvent _:
-                    case MouseUpEvent _:
+                    case KeyDownEvent:
+                    case KeyUpEvent:
+                    case MouseDownEvent:
+                    case MouseUpEvent:
                         return Target.Children.Any(c => c.TriggerEvent(e));
                 }
 

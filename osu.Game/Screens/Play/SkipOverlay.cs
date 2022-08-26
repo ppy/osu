@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -12,7 +14,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -37,8 +38,13 @@ namespace osu.Game.Screens.Play
         private FadeContainer fadeContainer;
         private double displayTime;
 
+        private bool isClickable;
+        private bool skipQueued;
+
         [Resolved]
-        private GameplayClock gameplayClock { get; set; }
+        private IGameplayClock gameplayClock { get; set; }
+
+        internal bool IsButtonVisible => fadeContainer.State == Visibility.Visible && buttonContainer.State.Value == Visibility.Visible;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -101,7 +107,7 @@ namespace osu.Game.Screens.Play
         public override void Show()
         {
             base.Show();
-            fadeContainer.Show();
+            fadeContainer.TriggerShow();
         }
 
         protected override void LoadComplete()
@@ -118,44 +124,64 @@ namespace osu.Game.Screens.Play
 
             button.Action = () => RequestSkip?.Invoke();
             displayTime = gameplayClock.CurrentTime;
+
+            fadeContainer.TriggerShow();
+
+            if (skipQueued)
+            {
+                Scheduler.AddDelayed(() => button.TriggerClick(), 200);
+                skipQueued = false;
+            }
+        }
+
+        public void SkipWhenReady()
+        {
+            if (IsLoaded)
+                button.TriggerClick();
+            else
+                skipQueued = true;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            var progress = fadeOutBeginTime <= displayTime ? 1 : Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
+            double progress = fadeOutBeginTime <= displayTime ? 1 : Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
 
             remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-            button.Enabled.Value = progress > 0;
-            buttonContainer.State.Value = progress > 0 ? Visibility.Visible : Visibility.Hidden;
+            isClickable = progress > 0;
+            button.Enabled.Value = isClickable;
+            buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (!e.HasAnyButtonPressed)
-                fadeContainer.Show();
+            if (isClickable && !e.HasAnyButtonPressed)
+                fadeContainer.TriggerShow();
 
             return base.OnMouseMove(e);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
             {
                 case GlobalAction.SkipCutscene:
                     if (!button.Enabled.Value)
                         return false;
 
-                    button.Click();
+                    button.TriggerClick();
                     return true;
             }
 
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
@@ -164,34 +190,45 @@ namespace osu.Game.Screens.Play
             public event Action<Visibility> StateChanged;
 
             private Visibility state;
-            private ScheduledDelegate scheduledHide;
+            private double? nextHideTime;
 
             public override bool IsPresent => true;
+
+            public void TriggerShow()
+            {
+                Show();
+
+                if (!IsHovered && !IsDragged)
+                    nextHideTime = Time.Current + 1000;
+                else
+                    nextHideTime = null;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (nextHideTime != null && nextHideTime <= Time.Current)
+                {
+                    Hide();
+                    nextHideTime = null;
+                }
+            }
 
             public Visibility State
             {
                 get => state;
                 set
                 {
-                    bool stateChanged = value != state;
+                    if (value == state)
+                        return;
 
                     state = value;
-
-                    scheduledHide?.Cancel();
 
                     switch (state)
                     {
                         case Visibility.Visible:
-                            // we may be triggered to become visible multiple times but we only want to transform once.
-                            if (stateChanged)
-                                this.FadeIn(500, Easing.OutExpo);
-
-                            if (!IsHovered && !IsDragged)
-                            {
-                                using (BeginDelayedSequence(1000))
-                                    scheduledHide = Schedule(Hide);
-                            }
-
+                            this.FadeIn(500, Easing.OutExpo);
                             break;
 
                         case Visibility.Hidden:
@@ -212,7 +249,7 @@ namespace osu.Game.Screens.Play
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 Show();
-                scheduledHide?.Cancel();
+                nextHideTime = null;
                 return true;
             }
 
@@ -255,7 +292,7 @@ namespace osu.Game.Screens.Play
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
 
-                sampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
+                sampleConfirm = audio.Samples.Get(@"UI/submit-select");
 
                 Children = new Drawable[]
                 {

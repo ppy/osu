@@ -1,76 +1,70 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Online.Multiplayer;
+#nullable disable
+
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Visual.OnlinePlay;
+using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public abstract class MultiplayerTestScene : RoomTestScene
+    /// <summary>
+    /// The base test scene for all multiplayer components and screens.
+    /// </summary>
+    public abstract class MultiplayerTestScene : OnlinePlayTestScene, IMultiplayerTestSceneDependencies
     {
         public const int PLAYER_1_ID = 55;
         public const int PLAYER_2_ID = 56;
 
-        [Cached(typeof(MultiplayerClient))]
-        public TestMultiplayerClient Client { get; }
+        public TestMultiplayerClient MultiplayerClient => OnlinePlayDependencies.MultiplayerClient;
+        public new TestMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
+        public TestSpectatorClient SpectatorClient => OnlinePlayDependencies?.SpectatorClient;
 
-        [Cached(typeof(IRoomManager))]
-        public TestMultiplayerRoomManager RoomManager { get; }
+        protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
 
-        [Cached]
-        public Bindable<FilterCriteria> Filter { get; }
-
-        [Cached]
-        public OngoingOperationTracker OngoingOperationTracker { get; }
-
-        protected override Container<Drawable> Content => content;
-        private readonly TestMultiplayerRoomContainer content;
+        public bool RoomJoined => MultiplayerClient.RoomJoined;
 
         private readonly bool joinRoom;
 
         protected MultiplayerTestScene(bool joinRoom = true)
         {
             this.joinRoom = joinRoom;
-            base.Content.Add(content = new TestMultiplayerRoomContainer { RelativeSizeAxes = Axes.Both });
-
-            Client = content.Client;
-            RoomManager = content.RoomManager;
-            Filter = content.Filter;
-            OngoingOperationTracker = content.OngoingOperationTracker;
         }
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        protected virtual Room CreateRoom()
         {
-            RoomManager.Schedule(() => RoomManager.PartRoom());
-
-            if (joinRoom)
+            return new Room
             {
-                Room.Name.Value = "test name";
-                Room.Playlist.Add(new PlaylistItem
+                Name = { Value = "test name" },
+                Type = { Value = MatchType.HeadToHead },
+                Playlist =
                 {
-                    Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                    Ruleset = { Value = Ruleset.Value }
-                });
-
-                RoomManager.Schedule(() => RoomManager.CreateRoom(Room));
-            }
-        });
+                    new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
+                    {
+                        RulesetID = Ruleset.Value.OnlineID
+                    }
+                }
+            };
+        }
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             if (joinRoom)
-                AddUntilStep("wait for room join", () => Client.Room != null);
+            {
+                AddStep("join room", () =>
+                {
+                    SelectedRoom.Value = CreateRoom();
+                    RoomManager.CreateRoom(SelectedRoom.Value);
+                });
+
+                AddUntilStep("wait for room join", () => RoomJoined);
+            }
         }
+
+        protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new MultiplayerTestSceneDependencies();
     }
 }

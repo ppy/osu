@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -92,6 +94,15 @@ _**italic with underscore, bold with asterisk**_";
             AddStep("Add Link with title", () =>
             {
                 markdownContainer.Text = "[wikipedia](https://www.wikipedia.org \"The Free Encyclopedia\")";
+            });
+        }
+
+        [Test]
+        public void TestAutoLink()
+        {
+            AddStep("Add autolink", () =>
+            {
+                markdownContainer.Text = "<https://discord.gg/ppy>";
             });
         }
 

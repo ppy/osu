@@ -1,13 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Users;
-using static osu.Game.Users.User;
+using osu.Framework.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
@@ -18,9 +20,9 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         /// <summary>
         /// Text describing the value being plotted on the graph, which will be displayed as a prefix to the value in the history graph tooltip.
         /// </summary>
-        protected abstract string GraphCounterName { get; }
+        protected abstract LocalisableString GraphCounterName { get; }
 
-        protected ChartProfileSubsection(Bindable<User> user, string headerText)
+        protected ChartProfileSubsection(Bindable<APIUser> user, LocalisableString headerText)
             : base(user, headerText)
         {
         }
@@ -44,7 +46,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<User> e)
+        private void onUserChanged(ValueChangedEvent<APIUser> e)
         {
             var values = GetValues(e.NewValue);
 
@@ -61,9 +63,9 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         /// <summary>
         /// Add entries for any missing months (filled with zero values).
         /// </summary>
-        private UserHistoryCount[] fillZeroValues(UserHistoryCount[] historyEntries)
+        private APIUserHistoryCount[] fillZeroValues(APIUserHistoryCount[] historyEntries)
         {
-            var filledHistoryEntries = new List<UserHistoryCount>();
+            var filledHistoryEntries = new List<APIUserHistoryCount>();
 
             foreach (var entry in historyEntries)
             {
@@ -71,7 +73,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
                 while (lastFilled?.Date.AddMonths(1) < entry.Date)
                 {
-                    filledHistoryEntries.Add(lastFilled = new UserHistoryCount
+                    filledHistoryEntries.Add(lastFilled = new APIUserHistoryCount
                     {
                         Count = 0,
                         Date = lastFilled.Date.AddMonths(1)
@@ -84,6 +86,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             return filledHistoryEntries.ToArray();
         }
 
-        protected abstract UserHistoryCount[] GetValues(User user);
+        protected abstract APIUserHistoryCount[] GetValues(APIUser user);
     }
 }

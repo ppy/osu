@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -34,7 +36,7 @@ namespace osu.Game.Graphics.Containers
         protected virtual bool DimMainContent => true;
 
         [Resolved(CanBeNull = true)]
-        private OsuGame game { get; set; }
+        private IOverlayManager overlayManager { get; set; }
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
@@ -50,8 +52,8 @@ namespace osu.Game.Graphics.Containers
 
         protected override void LoadComplete()
         {
-            if (game != null)
-                OverlayActivationMode.BindTo(game.OverlayActivationMode);
+            if (overlayManager != null)
+                OverlayActivationMode.BindTo(overlayManager.OverlayActivationMode);
 
             OverlayActivationMode.BindValueChanged(mode =>
             {
@@ -88,9 +90,12 @@ namespace osu.Game.Graphics.Containers
             base.OnMouseUp(e);
         }
 
-        public virtual bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
             {
                 case GlobalAction.Back:
                     Hide();
@@ -103,14 +108,14 @@ namespace osu.Game.Graphics.Containers
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
-        private bool playedPopInSound;
-
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
+            bool didChange = state.NewValue != state.OldValue;
+
             switch (state.NewValue)
             {
                 case Visibility.Visible:
@@ -121,20 +126,17 @@ namespace osu.Game.Graphics.Containers
                         return;
                     }
 
-                    samplePopIn?.Play();
-                    playedPopInSound = true;
+                    if (didChange)
+                        samplePopIn?.Play();
 
-                    if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
+                    if (BlockScreenWideMouse && DimMainContent) overlayManager?.ShowBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
-                    if (playedPopInSound)
-                    {
+                    if (didChange)
                         samplePopOut?.Play();
-                        playedPopInSound = false;
-                    }
 
-                    if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
+                    if (BlockScreenWideMouse) overlayManager?.HideBlockingOverlay(this);
                     break;
             }
 
@@ -150,7 +152,7 @@ namespace osu.Game.Graphics.Containers
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            game?.RemoveBlockingOverlay(this);
+            overlayManager?.HideBlockingOverlay(this);
         }
     }
 }

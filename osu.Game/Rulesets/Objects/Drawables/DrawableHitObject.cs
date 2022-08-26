@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -123,8 +125,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
         private readonly BindableList<HitSampleInfo> samplesBindable = new BindableList<HitSampleInfo>();
-        private readonly Bindable<bool> userPositionalHitSounds = new Bindable<bool>();
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
+
+        private readonly Bindable<float> positionalHitsoundsLevel = new Bindable<float>();
+        private readonly Bindable<int> comboIndexWithOffsetsBindable = new Bindable<int>();
 
         protected override bool RequiresChildrenUpdate => true;
 
@@ -156,16 +160,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// If <c>null</c>, a hitobject is expected to be later applied via <see cref="PoolableDrawableWithLifetime{TEntry}.Apply"/> (or automatically via pooling).
         /// </param>
         protected DrawableHitObject([CanBeNull] HitObject initialHitObject = null)
-            : base(initialHitObject != null ? new SyntheticHitObjectEntry(initialHitObject) : null)
         {
-            if (Entry != null)
-                ensureEntryHasResult();
+            if (initialHitObject == null) return;
+
+            Entry = new SyntheticHitObjectEntry(initialHitObject);
+            ensureEntryHasResult();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
-            config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
+            config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
 
             // Explicit non-virtual function call.
             base.AddInternal(Samples = new PausableSkinnableSound());
@@ -184,15 +189,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            comboIndexBindable.BindValueChanged(_ => UpdateComboColour(), true);
+            comboIndexBindable.BindValueChanged(_ => UpdateComboColour());
+            comboIndexWithOffsetsBindable.BindValueChanged(_ => UpdateComboColour(), true);
 
-            updateState(ArmedState.Idle, true);
+            // Apply transforms
+            updateState(State.Value, true);
         }
 
         /// <summary>
         /// Applies a hit object to be represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        [Obsolete("Use either overload of Apply that takes a single argument of type HitObject or HitObjectLifetimeEntry")]
+        [Obsolete("Use either overload of Apply that takes a single argument of type HitObject or HitObjectLifetimeEntry")] // Can be removed 20211021.
         public void Apply([NotNull] HitObject hitObject, [CanBeNull] HitObjectLifetimeEntry lifetimeEntry)
         {
             if (lifetimeEntry != null)
@@ -249,7 +256,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             StartTimeBindable.BindValueChanged(onStartTimeChanged);
 
             if (HitObject is IHasComboInformation combo)
+            {
                 comboIndexBindable.BindTo(combo.ComboIndexBindable);
+                comboIndexWithOffsetsBindable.BindTo(combo.ComboIndexWithOffsetsBindable);
+            }
 
             samplesBindable.BindTo(HitObject.SamplesBindable);
             samplesBindable.BindCollectionChanged(onSamplesChanged, true);
@@ -274,8 +284,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected sealed override void OnFree(HitObjectLifetimeEntry entry)
         {
             StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
+
             if (HitObject is IHasComboInformation combo)
+            {
                 comboIndexBindable.UnbindFrom(combo.ComboIndexBindable);
+                comboIndexWithOffsetsBindable.UnbindFrom(combo.ComboIndexWithOffsetsBindable);
+            }
+
             samplesBindable.UnbindFrom(HitObject.SamplesBindable);
 
             // Changes in start time trigger state updates. When a new hitobject is applied, OnApply() automatically performs a state update anyway.
@@ -403,18 +418,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             clearExistingStateTransforms();
 
-            using (BeginAbsoluteSequence(transformTime, true))
+            using (BeginAbsoluteSequence(transformTime))
                 UpdateInitialTransforms();
 
-            using (BeginAbsoluteSequence(StateUpdateTime, true))
+            using (BeginAbsoluteSequence(StateUpdateTime))
                 UpdateStartTimeStateTransforms();
 
-#pragma warning disable 618
-            using (BeginAbsoluteSequence(StateUpdateTime + (Result?.TimeOffset ?? 0), true))
-                UpdateStateTransforms(newState);
-#pragma warning restore 618
-
-            using (BeginAbsoluteSequence(HitStateUpdateTime, true))
+            using (BeginAbsoluteSequence(HitStateUpdateTime))
                 UpdateHitStateTransforms(newState);
 
             state.Value = newState;
@@ -440,29 +450,19 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Reapplies the current <see cref="ArmedState"/>.
         /// </summary>
-        protected void RefreshStateTransforms() => updateState(State.Value, true);
+        public void RefreshStateTransforms() => updateState(State.Value, true);
 
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
         /// By default, this will fade in the object from zero with no duration.
         /// </summary>
         /// <remarks>
-        /// This is called once before every <see cref="UpdateStateTransforms"/>. This is to ensure a good state in the case
+        /// This is called once before every <see cref="UpdateHitStateTransforms"/>. This is to ensure a good state in the case
         /// the <see cref="JudgementResult.TimeOffset"/> was negative and potentially altered the pre-hit transforms.
         /// </remarks>
         protected virtual void UpdateInitialTransforms()
         {
             this.FadeInFromZero();
-        }
-
-        /// <summary>
-        /// Apply transforms based on the current <see cref="ArmedState"/>. Previous states are automatically cleared.
-        /// In the case of a non-idle <see cref="ArmedState"/>, and if <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
-        /// </summary>
-        /// <param name="state">The new armed state.</param>
-        [Obsolete("Use UpdateStartTimeStateTransforms and UpdateHitStateTransforms instead")] // Can be removed 20210504
-        protected virtual void UpdateStateTransforms(ArmedState state)
-        {
         }
 
         /// <summary>
@@ -516,25 +516,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (!(HitObject is IHasComboInformation combo)) return;
 
-            var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
-            AccentColour.Value = combo.GetComboColour(comboColours);
-        }
-
-        /// <summary>
-        /// Called to retrieve the combo colour. Automatically assigned to <see cref="AccentColour"/>.
-        /// Defaults to using <see cref="IHasComboInformation.ComboIndex"/> to decide on a colour.
-        /// </summary>
-        /// <remarks>
-        /// This will only be called if the <see cref="HitObject"/> implements <see cref="IHasComboInformation"/>.
-        /// </remarks>
-        /// <param name="comboColours">A list of combo colours provided by the beatmap or skin. Can be null if not available.</param>
-        [Obsolete("Unused. Implement IHasComboInformation and IHasComboInformation.GetComboColour() on the HitObject model instead.")] // Can be removed 20210527
-        protected virtual Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
-        {
-            if (!(HitObject is IHasComboInformation combo))
-                throw new InvalidOperationException($"{nameof(HitObject)} must implement {nameof(IHasComboInformation)}");
-
-            return comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
+            AccentColour.Value = combo.GetComboColour(CurrentSkin);
         }
 
         /// <summary>
@@ -552,9 +534,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="position">The lookup X position. Generally should be <see cref="SamplePlaybackPosition"/>.</param>
         protected double CalculateSamplePlaybackBalance(double position)
         {
-            const float balance_adjust_amount = 0.4f;
+            float balanceAdjustAmount = positionalHitsoundsLevel.Value * 2;
+            double returnedValue = balanceAdjustAmount * (position - 0.5f);
 
-            return balance_adjust_amount * (userPositionalHitSounds.Value ? position - 0.5f : 0);
+            return returnedValue;
         }
 
         /// <summary>
@@ -588,7 +571,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (Result != null && Result.HasResult)
             {
-                var endTime = HitObject.GetEndTime();
+                double endTime = HitObject.GetEndTime();
 
                 if (Result.TimeOffset + endTime > Time.Current)
                 {
@@ -630,7 +613,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// The time at which state transforms should be applied that line up to <see cref="HitObject"/>'s StartTime.
-        /// This is used to offset calls to <see cref="UpdateStateTransforms"/>.
+        /// This is used to offset calls to <see cref="UpdateStartTimeStateTransforms"/>.
         /// </summary>
         public double StateUpdateTime => HitObject.StartTime;
 
@@ -748,7 +731,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (HitObject != null)
                 HitObject.DefaultsApplied -= onDefaultsApplied;
 
-            CurrentSkin.SourceChanged -= skinSourceChanged;
+            if (CurrentSkin != null)
+                CurrentSkin.SourceChanged -= skinSourceChanged;
         }
     }
 

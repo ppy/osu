@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,13 +17,14 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
+    [Cached]
     public class SelectionBox : CompositeDrawable
     {
         public const float BORDER_RADIUS = 3;
 
         public Func<float, bool> OnRotation;
         public Func<Vector2, Anchor, bool> OnScale;
-        public Func<Direction, bool> OnFlip;
+        public Func<Direction, bool, bool> OnFlip;
         public Func<bool> OnReverse;
 
         public Action OperationStarted;
@@ -64,7 +67,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private bool canScaleX;
 
         /// <summary>
-        /// Whether vertical scale support should be enabled.
+        /// Whether horizontal scaling support should be enabled.
         /// </summary>
         public bool CanScaleX
         {
@@ -81,7 +84,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private bool canScaleY;
 
         /// <summary>
-        /// Whether horizontal scale support should be enabled.
+        /// Whether vertical scaling support should be enabled.
         /// </summary>
         public bool CanScaleY
         {
@@ -91,6 +94,40 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (canScaleY == value) return;
 
                 canScaleY = value;
+                recreate();
+            }
+        }
+
+        private bool canFlipX;
+
+        /// <summary>
+        /// Whether horizontal flipping support should be enabled.
+        /// </summary>
+        public bool CanFlipX
+        {
+            get => canFlipX;
+            set
+            {
+                if (canFlipX == value) return;
+
+                canFlipX = value;
+                recreate();
+            }
+        }
+
+        private bool canFlipY;
+
+        /// <summary>
+        /// Whether vertical flipping support should be enabled.
+        /// </summary>
+        public bool CanFlipY
+        {
+            get => canFlipY;
+            set
+            {
+                if (canFlipY == value) return;
+
+                canFlipY = value;
                 recreate();
             }
         }
@@ -140,12 +177,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 case Key.G:
                     return CanReverse && runOperationFromHotkey(OnReverse);
-
-                case Key.H:
-                    return CanScaleX && runOperationFromHotkey(() => OnFlip?.Invoke(Direction.Horizontal) ?? false);
-
-                case Key.J:
-                    return CanScaleY && runOperationFromHotkey(() => OnFlip?.Invoke(Direction.Vertical) ?? false);
             }
 
             return base.OnKeyDown(e);
@@ -214,6 +245,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (CanScaleX) addXScaleComponents();
             if (CanScaleX && CanScaleY) addFullScaleComponents();
             if (CanScaleY) addYScaleComponents();
+            if (CanFlipX) addXFlipComponents();
+            if (CanFlipY) addYFlipComponents();
             if (CanRotate) addRotationComponents();
             if (CanReverse) addButton(FontAwesome.Solid.Backward, "Reverse pattern (Ctrl-G)", () => OnReverse?.Invoke());
         }
@@ -231,8 +264,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addYScaleComponents()
         {
-            addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically (Ctrl-J)", () => OnFlip?.Invoke(Direction.Vertical));
-
             addScaleHandle(Anchor.TopCentre);
             addScaleHandle(Anchor.BottomCentre);
         }
@@ -247,10 +278,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addXScaleComponents()
         {
-            addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally (Ctrl-H)", () => OnFlip?.Invoke(Direction.Horizontal));
-
             addScaleHandle(Anchor.CentreLeft);
             addScaleHandle(Anchor.CentreRight);
+        }
+
+        private void addXFlipComponents()
+        {
+            addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally", () => OnFlip?.Invoke(Direction.Horizontal, false));
+        }
+
+        private void addYFlipComponents()
+        {
+            addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically", () => OnFlip?.Invoke(Direction.Vertical, false));
         }
 
         private void addButton(IconUsage icon, string tooltip, Action action)
@@ -270,7 +309,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxScaleHandle
             {
                 Anchor = anchor,
-                HandleDrag = e => OnScale?.Invoke(e.Delta, anchor)
+                HandleScale = (delta, a) => OnScale?.Invoke(delta, a)
             };
 
             handle.OperationStarted += operationStarted;
@@ -283,7 +322,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxRotationHandle
             {
                 Anchor = anchor,
-                HandleDrag = e => OnRotation?.Invoke(convertDragEventToAngleOfRotation(e))
+                HandleRotate = angle => OnRotation?.Invoke(angle)
             };
 
             handle.OperationStarted += operationStarted;

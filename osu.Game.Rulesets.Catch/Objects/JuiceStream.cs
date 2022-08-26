@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -25,25 +28,31 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int RepeatCount { get; set; }
 
-        public double Velocity { get; private set; }
-        public double TickDistance { get; private set; }
+        [JsonIgnore]
+        private double velocityFactor;
+
+        [JsonIgnore]
+        private double tickDistanceFactor;
+
+        [JsonIgnore]
+        public double Velocity => velocityFactor * DifficultyControlPoint.SliderVelocity;
+
+        [JsonIgnore]
+        public double TickDistance => tickDistanceFactor * DifficultyControlPoint.SliderVelocity;
 
         /// <summary>
         /// The length of one span of this <see cref="JuiceStream"/>.
         /// </summary>
         public double SpanDuration => Duration / this.SpanCount();
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
-            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
-
-            Velocity = scoringDistance / timingPoint.BeatLength;
-            TickDistance = scoringDistance / difficulty.SliderTickRate;
+            velocityFactor = base_scoring_distance * difficulty.SliderMultiplier / timingPoint.BeatLength;
+            tickDistanceFactor = base_scoring_distance * difficulty.SliderMultiplier / difficulty.SliderTickRate;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
@@ -113,6 +122,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public float EndX => OriginalX + this.CurvePositionAt(1).X;
 
+        [JsonIgnore]
         public double Duration
         {
             get => this.SpanCount() * Path.Distance / Velocity;
@@ -133,7 +143,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                 if (value != null)
                 {
-                    path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position.Value, c.Type.Value)));
+                    path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position, c.Type)));
                     path.ExpectedDistance.Value = value.ExpectedDistance.Value;
                 }
             }
@@ -141,7 +151,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Distance => Path.Distance;
 
-        public List<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
+        public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
         public double? LegacyLastTickOffset { get; set; }
     }

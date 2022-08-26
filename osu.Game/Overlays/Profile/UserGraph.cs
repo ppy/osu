@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -23,7 +26,7 @@ namespace osu.Game.Overlays.Profile
     /// </summary>
     /// <typeparam name="TKey">Type of data to be used for X-axis of the graph.</typeparam>
     /// <typeparam name="TValue">Type of data to be used for Y-axis of the graph.</typeparam>
-    public abstract class UserGraph<TKey, TValue> : Container, IHasCustomTooltip
+    public abstract class UserGraph<TKey, TValue> : Container, IHasCustomTooltip<UserGraphTooltipContent>
     {
         protected const float FADE_DURATION = 150;
 
@@ -117,11 +120,9 @@ namespace osu.Game.Overlays.Profile
         protected virtual void ShowGraph() => graph.FadeIn(FADE_DURATION, Easing.Out);
         protected virtual void HideGraph() => graph.FadeOut(FADE_DURATION, Easing.Out);
 
-        public ITooltip GetCustomTooltip() => GetTooltip();
+        public ITooltip<UserGraphTooltipContent> GetCustomTooltip() => new UserGraphTooltip();
 
-        protected abstract UserGraphTooltip GetTooltip();
-
-        public object TooltipContent
+        public UserGraphTooltipContent TooltipContent
         {
             get
             {
@@ -133,7 +134,7 @@ namespace osu.Game.Overlays.Profile
             }
         }
 
-        protected abstract object GetTooltipContent(TKey key, TValue value);
+        protected abstract UserGraphTooltipContent GetTooltipContent(TKey key, TValue value);
 
         protected class UserLineGraph : LineGraph
         {
@@ -206,12 +207,12 @@ namespace osu.Game.Overlays.Profile
             }
         }
 
-        protected abstract class UserGraphTooltip : VisibilityContainer, ITooltip
+        private class UserGraphTooltip : VisibilityContainer, ITooltip<UserGraphTooltipContent>
         {
-            protected readonly OsuSpriteText Counter, BottomText;
+            protected readonly OsuSpriteText Label, Counter, BottomText;
             private readonly Box background;
 
-            protected UserGraphTooltip(string tooltipCounterName)
+            public UserGraphTooltip()
             {
                 AutoSizeAxes = Axes.Both;
                 Masking = true;
@@ -237,10 +238,9 @@ namespace osu.Game.Overlays.Profile
                                 Spacing = new Vector2(3, 0),
                                 Children = new Drawable[]
                                 {
-                                    new OsuSpriteText
+                                    Label = new OsuSpriteText
                                     {
                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                                        Text = tooltipCounterName
                                     },
                                     Counter = new OsuSpriteText
                                     {
@@ -267,7 +267,12 @@ namespace osu.Game.Overlays.Profile
                 background.Colour = colours.Gray1;
             }
 
-            public abstract bool SetContent(object content);
+            public void SetContent(UserGraphTooltipContent content)
+            {
+                Label.Text = content.Name;
+                Counter.Text = content.Count;
+                BottomText.Text = content.Time;
+            }
 
             private bool instantMove = true;
 
@@ -289,6 +294,21 @@ namespace osu.Game.Overlays.Profile
             }
 
             protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
+        }
+    }
+
+    public class UserGraphTooltipContent
+    {
+        // todo: could use init-only properties on C# 9 which read better than a constructor.
+        public LocalisableString Name { get; }
+        public LocalisableString Count { get; }
+        public LocalisableString Time { get; }
+
+        public UserGraphTooltipContent(LocalisableString name, LocalisableString count, LocalisableString time)
+        {
+            Name = name;
+            Count = count;
+            Time = time;
         }
     }
 }

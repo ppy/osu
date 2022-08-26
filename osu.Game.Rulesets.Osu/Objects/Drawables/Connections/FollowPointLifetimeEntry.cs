@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Objects;
@@ -11,20 +12,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
     public class FollowPointLifetimeEntry : LifetimeEntry
     {
-        public event Action Invalidated;
+        public event Action? Invalidated;
         public readonly OsuHitObject Start;
 
         public FollowPointLifetimeEntry(OsuHitObject start)
         {
             Start = start;
             LifetimeStart = Start.StartTime;
-
-            bindEvents();
         }
 
-        private OsuHitObject end;
+        private OsuHitObject? end;
 
-        public OsuHitObject End
+        public OsuHitObject? End
         {
             get => end;
             set
@@ -39,34 +38,39 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
         }
 
+        private bool wasBound;
+
         private void bindEvents()
         {
             UnbindEvents();
+
+            if (End == null)
+                return;
 
             // Note: Positions are bound for instantaneous feedback from positional changes from the editor, before ApplyDefaults() is called on hitobjects.
             Start.DefaultsApplied += onDefaultsApplied;
             Start.PositionBindable.ValueChanged += onPositionChanged;
 
-            if (End != null)
-            {
-                End.DefaultsApplied += onDefaultsApplied;
-                End.PositionBindable.ValueChanged += onPositionChanged;
-            }
+            End.DefaultsApplied += onDefaultsApplied;
+            End.PositionBindable.ValueChanged += onPositionChanged;
+
+            wasBound = true;
         }
 
         public void UnbindEvents()
         {
-            if (Start != null)
-            {
-                Start.DefaultsApplied -= onDefaultsApplied;
-                Start.PositionBindable.ValueChanged -= onPositionChanged;
-            }
+            if (!wasBound)
+                return;
 
-            if (End != null)
-            {
-                End.DefaultsApplied -= onDefaultsApplied;
-                End.PositionBindable.ValueChanged -= onPositionChanged;
-            }
+            Debug.Assert(End != null);
+
+            Start.DefaultsApplied -= onDefaultsApplied;
+            Start.PositionBindable.ValueChanged -= onPositionChanged;
+
+            End.DefaultsApplied -= onDefaultsApplied;
+            End.PositionBindable.ValueChanged -= onPositionChanged;
+
+            wasBound = false;
         }
 
         private void onDefaultsApplied(HitObject obj) => refreshLifetimes();
@@ -87,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             // The lifetime start will match the fade-in time of the first follow point.
             float fraction = (int)(FollowPointConnection.SPACING * 1.5) / distanceVector.Length;
-            FollowPointConnection.GetFadeTimes(Start, End, fraction, out var fadeInTime, out _);
+            FollowPointConnection.GetFadeTimes(Start, End, fraction, out double fadeInTime, out _);
 
             LifetimeStart = fadeInTime;
             LifetimeEnd = double.MaxValue; // This will be set by the connection.

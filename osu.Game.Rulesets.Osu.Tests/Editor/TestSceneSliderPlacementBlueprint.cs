@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
@@ -385,10 +387,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void assertControlPointCount(int expected) => AddAssert($"has {expected} control points", () => getSlider().Path.ControlPoints.Count == expected);
 
-        private void assertControlPointType(int index, PathType type) => AddAssert($"control point {index} is {type}", () => getSlider().Path.ControlPoints[index].Type.Value == type);
+        private void assertControlPointType(int index, PathType type) => AddAssert($"control point {index} is {type}", () => getSlider().Path.ControlPoints[index].Type == type);
 
         private void assertControlPointPosition(int index, Vector2 position) =>
-            AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, getSlider().Path.ControlPoints[index].Position.Value, 1));
+            AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, getSlider().Path.ControlPoints[index].Position, 1));
 
         private Slider getSlider() => HitObjectContainer.Count > 0 ? ((DrawableSlider)HitObjectContainer[0]).HitObject : null;
 

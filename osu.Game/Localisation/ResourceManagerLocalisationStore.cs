@@ -1,11 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Resources;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Localisation;
 
@@ -26,7 +30,10 @@ namespace osu.Game.Localisation
 
         public string Get(string lookup)
         {
-            var split = lookup.Split(':');
+            string[] split = lookup.Split(':');
+
+            if (split.Length < 2)
+                return null;
 
             string ns = split[0];
             string key = split[1];
@@ -34,7 +41,29 @@ namespace osu.Game.Localisation
             lock (resourceManagers)
             {
                 if (!resourceManagers.TryGetValue(ns, out var manager))
-                    resourceManagers[ns] = manager = new ResourceManager(ns, GetType().Assembly);
+                {
+                    var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+                    // Traverse backwards through periods in the namespace to find a matching assembly.
+                    string assemblyName = ns;
+
+                    while (!string.IsNullOrEmpty(assemblyName))
+                    {
+                        var matchingAssembly = loadedAssemblies.FirstOrDefault(asm => asm.GetName().Name == assemblyName);
+
+                        if (matchingAssembly != null)
+                        {
+                            resourceManagers[ns] = manager = new ResourceManager(ns, matchingAssembly);
+                            break;
+                        }
+
+                        int lastIndex = Math.Max(0, assemblyName.LastIndexOf('.'));
+                        assemblyName = assemblyName.Substring(0, lastIndex);
+                    }
+                }
+
+                if (manager == null)
+                    return null;
 
                 try
                 {
@@ -49,7 +78,7 @@ namespace osu.Game.Localisation
             }
         }
 
-        public Task<string> GetAsync(string lookup)
+        public Task<string> GetAsync(string lookup, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(Get(lookup));
         }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -60,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// </summary>
         private void updateConnectingPath()
         {
-            Position = slider.StackedPosition + ControlPoint.Position.Value;
+            Position = slider.StackedPosition + ControlPoint.Position;
 
             path.ClearVertices();
 
@@ -69,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 return;
 
             path.AddVertex(Vector2.Zero);
-            path.AddVertex(slider.Path.ControlPoints[nextIndex].Position.Value - ControlPoint.Position.Value);
+            path.AddVertex(slider.Path.ControlPoints[nextIndex].Position - ControlPoint.Position);
 
             path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
         }

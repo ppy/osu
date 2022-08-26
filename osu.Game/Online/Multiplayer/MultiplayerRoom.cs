@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using MessagePack;
 using Newtonsoft.Json;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -39,13 +38,25 @@ namespace osu.Game.Online.Multiplayer
         /// All users currently in this room.
         /// </summary>
         [Key(3)]
-        public List<MultiplayerRoomUser> Users { get; set; } = new List<MultiplayerRoomUser>();
+        public IList<MultiplayerRoomUser> Users { get; set; } = new List<MultiplayerRoomUser>();
 
         /// <summary>
         /// The host of this room, in control of changing room settings.
         /// </summary>
         [Key(4)]
         public MultiplayerRoomUser? Host { get; set; }
+
+        [Key(5)]
+        public MatchRoomState? MatchState { get; set; }
+
+        [Key(6)]
+        public IList<MultiplayerPlaylistItem> Playlist { get; set; } = new List<MultiplayerPlaylistItem>();
+
+        /// <summary>
+        /// The currently-running countdown.
+        /// </summary>
+        [Key(7)]
+        public MultiplayerCountdown? Countdown { get; set; }
 
         [JsonConstructor]
         [SerializationConstructor]

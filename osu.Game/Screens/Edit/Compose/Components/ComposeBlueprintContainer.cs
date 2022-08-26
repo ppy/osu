@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -29,14 +32,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class ComposeBlueprintContainer : EditorBlueprintContainer
     {
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
         protected new EditorSelectionHandler SelectionHandler => (EditorSelectionHandler)base.SelectionHandler;
 
         private PlacementBlueprint currentPlacement;
         private InputManager inputManager;
+
+        /// <remarks>
+        /// Positional input must be received outside the container's bounds,
+        /// in order to handle composer blueprints which are partially offscreen.
+        /// </remarks>
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public ComposeBlueprintContainer(HitObjectComposer composer)
             : base(composer)
@@ -213,7 +220,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementPosition()
         {
-            var snapResult = Composer.SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
+            var snapResult = Composer.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position);
 
             // if no time was found from positional snapping, we should still quantize to the beat.
             snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
@@ -256,9 +263,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (drawable == null)
                 return null;
 
-            return CreateHitObjectBlueprintFor(item).With(b => b.DrawableObject = drawable);
+            return CreateHitObjectBlueprintFor(item)?.With(b => b.DrawableObject = drawable);
         }
 
+        [CanBeNull]
         public virtual HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject) => null;
 
         private void hitObjectAdded(HitObject obj)

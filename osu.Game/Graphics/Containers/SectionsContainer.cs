@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -22,7 +24,8 @@ namespace osu.Game.Graphics.Containers
         where T : Drawable
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();
-        private Drawable lastClickedSection;
+
+        private T lastClickedSection;
 
         public Drawable ExpandableHeader
         {
@@ -144,10 +147,23 @@ namespace osu.Game.Graphics.Containers
             footerHeight = null;
         }
 
-        public void ScrollTo(Drawable section)
+        public void ScrollTo(Drawable target)
         {
-            lastClickedSection = section;
-            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - scrollContainer.DisplayableContent * scroll_y_centre - (FixedHeader?.BoundingBox.Height ?? 0));
+            lastKnownScroll = null;
+
+            // implementation similar to ScrollIntoView but a bit more nuanced.
+            float top = scrollContainer.GetChildPosInContent(target);
+
+            float bottomScrollExtent = scrollContainer.ScrollableExtent;
+            float scrollTarget = top - scrollContainer.DisplayableContent * scroll_y_centre;
+
+            if (scrollTarget > bottomScrollExtent)
+                scrollContainer.ScrollToEnd();
+            else
+                scrollContainer.ScrollTo(scrollTarget);
+
+            if (target is T section)
+                lastClickedSection = section;
         }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
@@ -166,15 +182,21 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            var result = base.OnInvalidate(invalidation, source);
+            bool result = base.OnInvalidate(invalidation, source);
 
             if (source == InvalidationSource.Child && (invalidation & Invalidation.DrawSize) != 0)
             {
-                lastKnownScroll = null;
+                InvalidateScrollPosition();
                 result = true;
             }
 
             return result;
+        }
+
+        protected void InvalidateScrollPosition()
+        {
+            lastKnownScroll = null;
+            lastClickedSection = null;
         }
 
         protected override void UpdateAfterChildren()
@@ -215,7 +237,7 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Height = expandableHeaderSize + fixedHeaderSize;
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
-                var smallestSectionHeight = Children.Count > 0 ? Children.Min(d => d.Height) : 0;
+                float smallestSectionHeight = Children.Count > 0 ? Children.Min(d => d.Height) : 0;
 
                 // scroll offset is our fixed header height if we have it plus 10% of content height
                 // plus 5% to fix floating point errors and to not have a section instantly unselect when scrolling upwards
@@ -224,15 +246,19 @@ namespace osu.Game.Graphics.Containers
 
                 float scrollCentre = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_y_centre + selectionLenienceAboveSection;
 
-                if (Precision.AlmostBigger(0, scrollContainer.Current))
-                    SelectedSection.Value = lastClickedSection as T ?? Children.FirstOrDefault();
+                var presentChildren = Children.Where(c => c.IsPresent);
+
+                if (lastClickedSection != null)
+                    SelectedSection.Value = lastClickedSection;
+                else if (Precision.AlmostBigger(0, scrollContainer.Current))
+                    SelectedSection.Value = presentChildren.FirstOrDefault();
                 else if (Precision.AlmostBigger(scrollContainer.Current, scrollContainer.ScrollableExtent))
-                    SelectedSection.Value = lastClickedSection as T ?? Children.LastOrDefault();
+                    SelectedSection.Value = presentChildren.LastOrDefault();
                 else
                 {
-                    SelectedSection.Value = Children
+                    SelectedSection.Value = presentChildren
                                             .TakeWhile(section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollCentre <= 0)
-                                            .LastOrDefault() ?? Children.FirstOrDefault();
+                                            .LastOrDefault() ?? presentChildren.FirstOrDefault();
                 }
             }
         }
@@ -241,9 +267,13 @@ namespace osu.Game.Graphics.Containers
         {
             if (!Children.Any()) return;
 
-            var newMargin = originalSectionsMargin;
+            // if a fixed header is present, apply top padding for it
+            // to make the scroll container aware of its displayable area.
+            // (i.e. for page up/down to work properly)
+            scrollContainer.Padding = new MarginPadding { Top = FixedHeader?.LayoutSize.Y ?? 0 };
 
-            newMargin.Top += (headerHeight ?? 0);
+            var newMargin = originalSectionsMargin;
+            newMargin.Top += (ExpandableHeader?.LayoutSize.Y ?? 0);
             newMargin.Bottom += (footerHeight ?? 0);
 
             scrollContentContainer.Margin = newMargin;

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -59,7 +61,7 @@ namespace osu.Game.Online.API.Requests
             SearchPlayed played = SearchPlayed.Any,
             SearchExplicit explicitContent = SearchExplicit.Hide)
         {
-            this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
+            this.query = query;
             this.ruleset = ruleset;
             this.cursor = cursor;
 
@@ -78,13 +80,15 @@ namespace osu.Game.Online.API.Requests
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
-            req.AddParameter("q", query);
+
+            if (query != null)
+                req.AddParameter("q", query);
 
             if (General != null && General.Any())
-                req.AddParameter("c", string.Join('.', General.Select(e => e.ToString().ToLowerInvariant())));
+                req.AddParameter("c", string.Join('.', General.Select(e => e.ToString().ToSnakeCase())));
 
-            if (ruleset.ID.HasValue)
-                req.AddParameter("m", ruleset.ID.Value.ToString());
+            if (ruleset.OnlineID >= 0)
+                req.AddParameter("m", ruleset.OnlineID.ToString());
 
             req.AddParameter("s", SearchCategory.ToString().ToLowerInvariant());
 
@@ -107,7 +111,8 @@ namespace osu.Game.Online.API.Requests
 
             req.AddParameter("nsfw", ExplicitContent == SearchExplicit.Show ? "true" : "false");
 
-            req.AddCursor(cursor);
+            if (cursor != null)
+                req.AddCursor(cursor);
 
             return req;
         }

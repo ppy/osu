@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Judgements;
@@ -35,11 +37,11 @@ namespace osu.Game.Rulesets.Objects
             HitObject = hitObject;
 
             startTimeBindable.BindTo(HitObject.StartTimeBindable);
-            startTimeBindable.BindValueChanged(_ => setInitialLifetime(), true);
+            startTimeBindable.BindValueChanged(_ => SetInitialLifetime(), true);
 
             // Subscribe to this event before the DrawableHitObject so that the local callback is invoked before the entry is re-applied as a result of DefaultsApplied.
             // This way, the DrawableHitObject can use OnApply() to overwrite the LifetimeStart that was set inside setInitialLifetime().
-            HitObject.DefaultsApplied += _ => setInitialLifetime();
+            HitObject.DefaultsApplied += _ => SetInitialLifetime();
         }
 
         // The lifetime, as set by the hitobject.
@@ -94,6 +96,6 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Set <see cref="LifetimeEntry.LifetimeStart"/> using <see cref="InitialLifetimeOffset"/>.
         /// </summary>
-        private void setInitialLifetime() => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
+        internal void SetInitialLifetime() => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
     }
 }

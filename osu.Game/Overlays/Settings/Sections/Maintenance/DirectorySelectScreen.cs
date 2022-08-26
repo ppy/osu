@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using System.IO;
 using osu.Framework.Allocation;
@@ -14,6 +16,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -21,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         private TriangleButton selectionButton;
 
-        private DirectorySelector directorySelector;
+        private OsuDirectorySelector directorySelector;
 
         /// <summary>
         /// Text to display in the header to inform the user of what they are selecting.
@@ -62,7 +65,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeafoamDark
+                        Colour = colours.GreySeaFoamDark
                     },
                     new GridContainer
                     {
@@ -82,7 +85,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     cp.Font = OsuFont.Default.With(size: 24);
                                 })
                                 {
-                                    Text = HeaderText.ToString(),
+                                    Text = HeaderText,
                                     TextAnchor = Anchor.TopCentre,
                                     Margin = new MarginPadding(10),
                                     RelativeSizeAxes = Axes.X,
@@ -91,7 +94,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             },
                             new Drawable[]
                             {
-                                directorySelector = new DirectorySelector
+                                directorySelector = new OsuDirectorySelector
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 }
@@ -104,7 +107,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     Origin = Anchor.Centre,
                                     Width = 300,
                                     Margin = new MarginPadding(10),
-                                    Text = "Select directory",
+                                    Text = MaintenanceSettingsStrings.SelectDirectory,
                                     Action = () => OnSelection(directorySelector.CurrentPath.Value)
                                 },
                             }
@@ -123,9 +126,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             base.LoadComplete();
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             this.FadeOut(250);
         }

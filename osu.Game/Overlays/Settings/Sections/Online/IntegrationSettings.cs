@@ -1,15 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class IntegrationSettings : SettingsSubsection
     {
-        protected override string Header => "Integrations";
+        protected override LocalisableString Header => OnlineSettingsStrings.IntegrationsHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -18,7 +22,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             {
                 new SettingsEnumDropdown<DiscordRichPresenceMode>
                 {
-                    LabelText = "Discord Rich Presence",
+                    LabelText = OnlineSettingsStrings.DiscordRichPresence,
                     Current = config.GetBindable<DiscordRichPresenceMode>(OsuSetting.DiscordRichPresence)
                 }
             };

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -26,6 +28,12 @@ namespace osu.Game.Tournament.Tests.Screens
             setMatchDate(TimeSpan.FromSeconds(5));
             setMatchDate(TimeSpan.FromMinutes(4));
             setMatchDate(TimeSpan.FromHours(3));
+        }
+
+        [Test]
+        public void TestNoCurrentMatch()
+        {
+            AddStep("Set null current match", () => Ladder.CurrentMatch.Value = null);
         }
 
         private void setMatchDate(TimeSpan relativeTime)

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -21,22 +26,24 @@ namespace osu.Game.Overlays.Changelog
 
         public ChangelogUpdateStreamControl Streams;
 
-        private const string listing_string = "listing";
+        public static LocalisableString ListingString => LayoutStrings.HeaderChangelogIndex;
+
+        private readonly Bindable<APIUpdateStream> currentStream = new Bindable<APIUpdateStream>();
 
         private Box streamsBackground;
 
         public ChangelogHeader()
         {
-            TabControl.AddItem(listing_string);
+            TabControl.AddItem(ListingString);
             Current.ValueChanged += e =>
             {
-                if (e.NewValue == listing_string)
+                if (e.NewValue == ListingString)
                     ListingSelected?.Invoke();
             };
 
             Build.ValueChanged += showBuild;
 
-            Streams.Current.ValueChanged += e =>
+            currentStream.ValueChanged += e =>
             {
                 if (e.NewValue?.LatestBuild != null && !e.NewValue.Equals(Build.Value?.UpdateStream))
                     Build.Value = e.NewValue.LatestBuild;
@@ -63,8 +70,8 @@ namespace osu.Game.Overlays.Changelog
             }
             else
             {
-                Current.Value = listing_string;
-                Streams.Current.Value = null;
+                Current.Value = ListingString;
+                currentStream.Value = null;
             }
         }
 
@@ -89,7 +96,7 @@ namespace osu.Game.Overlays.Changelog
                         Horizontal = 65,
                         Vertical = 20
                     },
-                    Child = Streams = new ChangelogUpdateStreamControl()
+                    Child = Streams = new ChangelogUpdateStreamControl { Current = currentStream },
                 }
             }
         };
@@ -107,15 +114,15 @@ namespace osu.Game.Overlays.Changelog
             if (Build.Value == null)
                 return;
 
-            Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == Build.Value.UpdateStream.Name);
+            currentStream.Value = Streams.Items.FirstOrDefault(s => s.Name == Build.Value.UpdateStream.Name);
         }
 
         private class ChangelogHeaderTitle : OverlayTitle
         {
             public ChangelogHeaderTitle()
             {
-                Title = "changelog";
-                Description = "track recent dev updates in the osu! ecosystem";
+                Title = PageTitleStrings.MainChangelogControllerDefault;
+                Description = NamedOverlayComponentStrings.ChangelogDescription;
                 IconTexture = "Icons/Hexacons/devtools";
             }
         }

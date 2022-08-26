@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -22,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [CanBeNull]
         public Slider Slider => DrawableSlider?.HitObject;
 
-        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
+        public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         private double animDuration;
 
@@ -97,8 +99,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateHitStateTransforms(state);
 
-            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
-
             switch (state)
             {
                 case ArmedState.Idle:
@@ -154,7 +154,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             while (Math.Abs(aimRotation - Arrow.Rotation) > 180)
                 aimRotation += aimRotation < Arrow.Rotation ? 360 : -360;
 
-            if (!hasRotation)
+            // The clock may be paused in a scenario like the editor.
+            if (!hasRotation || !Clock.IsRunning)
             {
                 Arrow.Rotation = aimRotation;
                 hasRotation = true;

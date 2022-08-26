@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
@@ -18,16 +20,14 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class SeedingScreen : TournamentScreen, IProvideVideo
+    public class SeedingScreen : TournamentMatchScreen
     {
         private Container mainContainer;
-
-        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
 
         private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -50,13 +50,13 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Show first team",
-                            Action = () => currentTeam.Value = currentMatch.Value.Team1.Value,
+                            Action = () => currentTeam.Value = CurrentMatch.Value.Team1.Value,
                         },
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Show second team",
-                            Action = () => currentTeam.Value = currentMatch.Value.Team2.Value,
+                            Action = () => currentTeam.Value = CurrentMatch.Value.Team2.Value,
                         },
                         new SettingsTeamDropdown(LadderInfo.Teams)
                         {
@@ -67,13 +67,10 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 }
             };
 
-            currentMatch.BindValueChanged(matchChanged);
-            currentMatch.BindTo(LadderInfo.CurrentMatch);
-
             currentTeam.BindValueChanged(teamChanged, true);
         }
 
-        private void teamChanged(ValueChangedEvent<TournamentTeam> team)
+        private void teamChanged(ValueChangedEvent<TournamentTeam> team) => Scheduler.AddOnce(() =>
         {
             if (team.NewValue == null)
             {
@@ -82,10 +79,17 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             }
 
             showTeam(team.NewValue);
-        }
+        });
 
-        private void matchChanged(ValueChangedEvent<TournamentMatch> match) =>
-            currentTeam.Value = currentMatch.Value.Team1.Value;
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
+        {
+            base.CurrentMatchChanged(match);
+
+            if (match.NewValue == null)
+                return;
+
+            currentTeam.Value = match.NewValue.Team1.Value;
+        }
 
         private void showTeam(TournamentTeam team)
         {
@@ -117,8 +121,14 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 foreach (var seeding in team.SeedingResults)
                 {
                     fill.Add(new ModRow(seeding.Mod.Value, seeding.Seed.Value));
+
                     foreach (var beatmap in seeding.Beatmaps)
+                    {
+                        if (beatmap.Beatmap == null)
+                            continue;
+
                         fill.Add(new BeatmapScoreRow(beatmap));
+                    }
                 }
             }
 
@@ -126,6 +136,8 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             {
                 public BeatmapScoreRow(SeedingBeatmap beatmap)
                 {
+                    Debug.Assert(beatmap.Beatmap != null);
+
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
 
@@ -139,9 +151,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
-                                new TournamentSpriteText { Text = beatmap.BeatmapInfo.Metadata.Title, Colour = TournamentGame.TEXT_COLOUR, },
+                                new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Title, Colour = TournamentGame.TEXT_COLOUR, },
                                 new TournamentSpriteText { Text = "by", Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
-                                new TournamentSpriteText { Text = beatmap.BeatmapInfo.Metadata.Artist, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
+                                new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Artist, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                             }
                         },
                         new FillFlowContainer
@@ -154,7 +166,8 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Children = new Drawable[]
                             {
                                 new TournamentSpriteText { Text = beatmap.Score.ToString("#,0"), Colour = TournamentGame.TEXT_COLOUR, Width = 80 },
-                                new TournamentSpriteText { Text = "#" + beatmap.Seed.Value.ToString("#,0"), Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
+                                new TournamentSpriteText
+                                    { Text = "#" + beatmap.Seed.Value.ToString("#,0"), Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                             }
                         },
                     };
@@ -179,44 +192,48 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 [BackgroundDependencyLoader]
                 private void load(TextureStore textures)
                 {
+                    FillFlowContainer row;
+
                     InternalChildren = new Drawable[]
                     {
-                        new FillFlowContainer
+                        row = new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(5),
-                            Children = new Drawable[]
-                            {
-                                new Sprite
-                                {
-                                    Texture = textures.Get($"mods/{mods.ToLower()}"),
-                                    Scale = new Vector2(0.5f)
-                                },
-                                new Container
-                                {
-                                    Size = new Vector2(50, 16),
-                                    CornerRadius = 10,
-                                    Masking = true,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = TournamentGame.ELEMENT_BACKGROUND_COLOUR,
-                                        },
-                                        new TournamentSpriteText
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Text = seeding.ToString("#,0"),
-                                            Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR
-                                        },
-                                    }
-                                },
-                            }
                         },
                     };
+
+                    if (!string.IsNullOrEmpty(mods))
+                    {
+                        row.Add(new Sprite
+                        {
+                            Texture = textures.Get($"Mods/{mods.ToLowerInvariant()}"),
+                            Scale = new Vector2(0.5f)
+                        });
+                    }
+
+                    row.Add(new Container
+                    {
+                        Size = new Vector2(50, 16),
+                        CornerRadius = 10,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = TournamentGame.ELEMENT_BACKGROUND_COLOUR,
+                            },
+                            new TournamentSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Text = seeding.ToString("#,0"),
+                                Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR
+                            },
+                        }
+                    });
                 }
             }
         }
@@ -250,7 +267,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 };
 
                 foreach (var p in team.Players)
-                    fill.Add(new RowDisplay(p.Username, p.Statistics?.GlobalRank?.ToString("\\##,0") ?? "-"));
+                    fill.Add(new RowDisplay(p.Username, p.Rank?.ToString("\\##,0") ?? "-"));
             }
 
             internal class RowDisplay : CompositeDrawable

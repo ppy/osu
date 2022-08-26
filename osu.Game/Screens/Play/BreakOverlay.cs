@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -126,7 +128,7 @@ namespace osu.Game.Screens.Play
                 if (!b.HasEffect)
                     continue;
 
-                using (BeginAbsoluteSequence(b.StartTime, true))
+                using (BeginAbsoluteSequence(b.StartTime))
                 {
                     fadeContainer.FadeIn(BREAK_FADE_DURATION);
                     breakArrows.Show(BREAK_FADE_DURATION);
@@ -143,7 +145,7 @@ namespace osu.Game.Screens.Play
 
                     remainingTimeCounter.CountTo(b.Duration).CountTo(0, b.Duration);
 
-                    using (BeginDelayedSequence(b.Duration - BREAK_FADE_DURATION, true))
+                    using (BeginDelayedSequence(b.Duration - BREAK_FADE_DURATION))
                     {
                         fadeContainer.FadeOut(BREAK_FADE_DURATION);
                         breakArrows.Hide(BREAK_FADE_DURATION);

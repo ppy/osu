@@ -9,6 +9,34 @@ namespace osu.Game.Utils
 {
     public static class ZipUtils
     {
+        public static bool IsZipArchive(MemoryStream stream)
+        {
+            try
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+
+                using (var arc = ZipArchive.Open(stream))
+                {
+                    foreach (var entry in arc.Entries)
+                    {
+                        using (entry.OpenEntryStream())
+                        {
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+        }
+
         public static bool IsZipArchive(string path)
         {
             if (!File.Exists(path))

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Framework.Testing;
@@ -57,7 +59,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestInitialVisibility()
         {
-            AddStep("Create header with 0 value", () => createHeader("Header with visible when zero counter", CounterVisibilityState.VisibleWhenZero, 0));
+            AddStep("Create header with 0 value", () => createHeader("Header with visible when zero counter", CounterVisibilityState.VisibleWhenZero));
             AddAssert("Value is 0", () => header.Current.Value == 0);
             AddAssert("Counter is visible", () => header.ChildrenOfType<CounterPill>().First().Alpha == 1);
 

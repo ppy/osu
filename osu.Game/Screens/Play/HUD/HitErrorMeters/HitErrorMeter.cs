@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -22,33 +24,45 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [Resolved]
         private OsuColour colours { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private GameplayClockContainer gameplayClockContainer { get; set; }
+
+        public bool UsesFixedAnchor { get; set; }
+
         [BackgroundDependencyLoader(true)]
         private void load(DrawableRuleset drawableRuleset)
         {
             HitWindows = drawableRuleset?.FirstAvailableHitWindows ?? HitWindows.Empty;
+
+            // This is to allow the visual state to be correct after HUD comes visible after being hidden.
+            AlwaysPresent = true;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            processor.NewJudgement += onNewJudgement;
+            if (gameplayClockContainer != null)
+                gameplayClockContainer.OnSeek += Clear;
+
+            processor.NewJudgement += processorNewJudgement;
         }
 
-        private void onNewJudgement(JudgementResult result)
-        {
-            if (result.HitObject.HitWindows?.WindowFor(HitResult.Miss) == 0)
-                return;
+        // Scheduled as meter implementations are likely going to change/add drawables when reacting to this.
+        private void processorNewJudgement(JudgementResult j) => Schedule(() => OnNewJudgement(j));
 
-            OnNewJudgement(result);
-        }
-
+        /// <summary>
+        /// Fired when a new judgement arrives.
+        /// </summary>
+        /// <param name="judgement">The new judgement.</param>
         protected abstract void OnNewJudgement(JudgementResult judgement);
 
         protected Color4 GetColourForHitResult(HitResult result)
         {
             switch (result)
             {
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
                 case HitResult.Miss:
                     return colours.Red;
 
@@ -61,6 +75,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 case HitResult.Good:
                     return colours.GreenLight;
 
+                case HitResult.SmallTickHit:
+                case HitResult.LargeTickHit:
                 case HitResult.Great:
                     return colours.Blue;
 
@@ -69,12 +85,21 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
+        /// <summary>
+        /// Invoked by <see cref="GameplayClockContainer.OnSeek"/>.
+        /// Any inheritors of <see cref="HitErrorMeter"/> should have this method clear their container that displays the hit error results.
+        /// </summary>
+        public abstract void Clear();
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
             if (processor != null)
-                processor.NewJudgement -= onNewJudgement;
+                processor.NewJudgement -= processorNewJudgement;
+
+            if (gameplayClockContainer != null)
+                gameplayClockContainer.OnSeek -= Clear;
         }
     }
 }

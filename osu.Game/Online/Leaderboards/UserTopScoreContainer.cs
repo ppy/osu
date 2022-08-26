@@ -1,15 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Online.Leaderboards
@@ -24,9 +24,6 @@ namespace osu.Game.Online.Leaderboards
         private readonly Func<TScoreInfo, LeaderboardScore> createScoreDelegate;
 
         protected override bool StartHidden => true;
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
 
         public UserTopScoreContainer(Func<TScoreInfo, LeaderboardScore> createScoreDelegate)
         {
@@ -51,7 +48,7 @@ namespace osu.Game.Online.Leaderboards
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = @"your personal best".ToUpper(),
+                            Text = @"your personal best".ToUpperInvariant(),
                             Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
                         },
                         scoreContainer = new Container

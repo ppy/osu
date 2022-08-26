@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using System.Net.Http;
 using osu.Framework.IO.Network;
@@ -11,11 +13,11 @@ namespace osu.Game.Online.API.Requests
 {
     public class CreateChannelRequest : APIRequest<APIChatChannel>
     {
-        private readonly Channel channel;
+        public readonly Channel Channel;
 
         public CreateChannelRequest(Channel channel)
         {
-            this.channel = channel;
+            Channel = channel;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -24,7 +26,7 @@ namespace osu.Game.Online.API.Requests
             req.Method = HttpMethod.Post;
 
             req.AddParameter("type", $"{ChannelType.PM}");
-            req.AddParameter("target_id", $"{channel.Users.First().Id}");
+            req.AddParameter("target_id", $"{Channel.Users.First().Id}");
 
             return req;
         }

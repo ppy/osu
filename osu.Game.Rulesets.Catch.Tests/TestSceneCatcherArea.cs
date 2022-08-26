@@ -1,12 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -35,12 +36,13 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private ScheduledDelegate addManyFruit;
 
-        private BeatmapDifficulty beatmapDifficulty;
+        private IBeatmapDifficultyInfo beatmapDifficulty;
 
         public TestSceneCatcherArea()
         {
             AddSliderStep<float>("circle size", 0, 8, 5, createCatcher);
             AddToggleStep("hyper dash", t => this.ChildrenOfType<TestCatcherArea>().ForEach(area => area.ToggleHyperDash(t)));
+            AddToggleStep("toggle hit lighting", lighting => config.SetValue(OsuSetting.HitLighting, lighting));
 
             AddStep("catch centered fruit", () => attemptCatch(new Fruit()));
             AddStep("catch many random fruit", () =>
@@ -78,7 +80,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     area.OnNewResult(drawable, new CatchJudgementResult(fruit, new CatchJudgement())
                     {
-                        Type = area.MovableCatcher.CanCatch(fruit) ? HitResult.Great : HitResult.Miss
+                        Type = area.Catcher.CanCatch(fruit) ? HitResult.Great : HitResult.Miss
                     });
 
                     drawable.Expire();
@@ -95,20 +97,14 @@ namespace osu.Game.Rulesets.Catch.Tests
                 CircleSize = circleSize
             };
 
-            SetContents(() =>
+            SetContents(_ =>
             {
-                var droppedObjectContainer = new Container<CaughtObject>
-                {
-                    RelativeSizeAxes = Axes.Both
-                };
-
                 return new CatchInputManager(catchRuleset)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        droppedObjectContainer,
-                        new TestCatcherArea(droppedObjectContainer, beatmapDifficulty)
+                        new TestCatcherArea(beatmapDifficulty)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.TopCentre,
@@ -126,12 +122,18 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
-                : base(droppedObjectContainer, beatmapDifficulty)
+            public TestCatcherArea(IBeatmapDifficultyInfo beatmapDifficulty)
             {
+                var droppedObjectContainer = new DroppedObjectContainer();
+                Add(droppedObjectContainer);
+
+                Catcher = new Catcher(droppedObjectContainer, beatmapDifficulty)
+                {
+                    X = CatchPlayfield.CENTER_X
+                };
             }
 
-            public void ToggleHyperDash(bool status) => MovableCatcher.SetHyperDashState(status ? 2 : 1);
+            public void ToggleHyperDash(bool status) => Catcher.SetHyperDashState(status ? 2 : 1);
         }
     }
 }

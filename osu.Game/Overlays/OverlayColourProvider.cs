@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osuTK;
 using osuTK.Graphics;
@@ -11,18 +13,16 @@ namespace osu.Game.Overlays
     {
         private readonly OverlayColourScheme colourScheme;
 
-        public static OverlayColourProvider Red { get; } = new OverlayColourProvider(OverlayColourScheme.Red);
-        public static OverlayColourProvider Pink { get; } = new OverlayColourProvider(OverlayColourScheme.Pink);
-        public static OverlayColourProvider Orange { get; } = new OverlayColourProvider(OverlayColourScheme.Orange);
-        public static OverlayColourProvider Green { get; } = new OverlayColourProvider(OverlayColourScheme.Green);
-        public static OverlayColourProvider Purple { get; } = new OverlayColourProvider(OverlayColourScheme.Purple);
-        public static OverlayColourProvider Blue { get; } = new OverlayColourProvider(OverlayColourScheme.Blue);
-
         public OverlayColourProvider(OverlayColourScheme colourScheme)
         {
             this.colourScheme = colourScheme;
         }
 
+        // Note that the following five colours are also defined in `OsuColour` as `{colourScheme}{0,1,2,3,4}`.
+        // The difference as to which should be used where comes down to context.
+        // If the colour in question is supposed to always match the view in which it is displayed theme-wise, use `OverlayColourProvider`.
+        // If the colour usage is special and in general differs from the surrounding view in choice of hue, use the `OsuColour` constants.
+        public Color4 Colour0 => getColour(1, 0.8f);
         public Color4 Colour1 => getColour(1, 0.7f);
         public Color4 Colour2 => getColour(0.8f, 0.6f);
         public Color4 Colour3 => getColour(0.6f, 0.5f);
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays
 
         private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(getBaseHue(colourScheme), saturation, lightness, 1));
 
-        // See https://github.com/ppy/osu-web/blob/4218c288292d7c810b619075471eaea8bbb8f9d8/app/helpers.php#L1463
+        // See https://github.com/ppy/osu-web/blob/5a536d217a21582aad999db50a981003d3ad5659/app/helpers.php#L1620-L1628
         private static float getBaseHue(OverlayColourScheme colourScheme)
         {
             switch (colourScheme)
@@ -66,16 +66,25 @@ namespace osu.Game.Overlays
                     return 333 / 360f;
 
                 case OverlayColourScheme.Orange:
-                    return 46 / 360f;
+                    return 45 / 360f;
+
+                case OverlayColourScheme.Lime:
+                    return 90 / 360f;
 
                 case OverlayColourScheme.Green:
-                    return 115 / 360f;
+                    return 125 / 360f;
+
+                case OverlayColourScheme.Aquamarine:
+                    return 160 / 360f;
 
                 case OverlayColourScheme.Purple:
                     return 255 / 360f;
 
                 case OverlayColourScheme.Blue:
                     return 200 / 360f;
+
+                case OverlayColourScheme.Plum:
+                    return 320 / 360f;
             }
         }
     }
@@ -85,8 +94,11 @@ namespace osu.Game.Overlays
         Red,
         Pink,
         Orange,
+        Lime,
         Green,
         Purple,
-        Blue
+        Blue,
+        Plum,
+        Aquamarine
     }
 }

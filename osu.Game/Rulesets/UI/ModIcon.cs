@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -13,6 +15,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -29,12 +33,12 @@ namespace osu.Game.Rulesets.UI
 
         private const float size = 80;
 
-        public virtual string TooltipText => showTooltip ? mod.IconTooltip : null;
+        public virtual LocalisableString TooltipText => showTooltip ? ((mod as Mod)?.IconTooltip ?? mod.Name) : null;
 
-        private Mod mod;
+        private IMod mod;
         private readonly bool showTooltip;
 
-        public Mod Mod
+        public IMod Mod
         {
             get => mod;
             set
@@ -50,14 +54,13 @@ namespace osu.Game.Rulesets.UI
         private OsuColour colours { get; set; }
 
         private Color4 backgroundColour;
-        private Color4 highlightedColour;
 
         /// <summary>
         /// Construct a new instance.
         /// </summary>
         /// <param name="mod">The mod to be displayed</param>
         /// <param name="showTooltip">Whether a tooltip describing the mod should display on hover.</param>
-        public ModIcon(Mod mod, bool showTooltip = true)
+        public ModIcon(IMod mod, bool showTooltip = true)
         {
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
             this.showTooltip = showTooltip;
@@ -104,7 +107,7 @@ namespace osu.Game.Rulesets.UI
             updateMod(mod);
         }
 
-        private void updateMod(Mod value)
+        private void updateMod(IMod value)
         {
             modAcronym.Text = value.Acronym;
             modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;
@@ -120,47 +123,13 @@ namespace osu.Game.Rulesets.UI
                 modAcronym.FadeOut();
             }
 
-            switch (value.Type)
-            {
-                default:
-                case ModType.DifficultyIncrease:
-                    backgroundColour = colours.Yellow;
-                    highlightedColour = colours.YellowLight;
-                    break;
-
-                case ModType.DifficultyReduction:
-                    backgroundColour = colours.Green;
-                    highlightedColour = colours.GreenLight;
-                    break;
-
-                case ModType.Automation:
-                    backgroundColour = colours.Blue;
-                    highlightedColour = colours.BlueLight;
-                    break;
-
-                case ModType.Conversion:
-                    backgroundColour = colours.Purple;
-                    highlightedColour = colours.PurpleLight;
-                    break;
-
-                case ModType.Fun:
-                    backgroundColour = colours.Pink;
-                    highlightedColour = colours.PinkLight;
-                    break;
-
-                case ModType.System:
-                    backgroundColour = colours.Gray6;
-                    highlightedColour = colours.Gray7;
-                    modIcon.Colour = colours.Yellow;
-                    break;
-            }
-
+            backgroundColour = colours.ForModType(value.Type);
             updateColour();
         }
 
         private void updateColour()
         {
-            background.Colour = Selected.Value ? highlightedColour : backgroundColour;
+            background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
         }
     }
 }

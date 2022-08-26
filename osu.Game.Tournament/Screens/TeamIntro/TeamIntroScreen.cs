@@ -1,25 +1,24 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class TeamIntroScreen : TournamentScreen, IProvideVideo
+    public class TeamIntroScreen : TournamentMatchScreen
     {
         private Container mainContainer;
 
-        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
-
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -35,18 +34,16 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     RelativeSizeAxes = Axes.Both,
                 }
             };
-
-            currentMatch.BindValueChanged(matchChanged);
-            currentMatch.BindTo(LadderInfo.CurrentMatch);
         }
 
-        private void matchChanged(ValueChangedEvent<TournamentMatch> match)
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
         {
+            base.CurrentMatchChanged(match);
+
+            mainContainer.Clear();
+
             if (match.NewValue == null)
-            {
-                mainContainer.Clear();
                 return;
-            }
 
             const float y_flag_offset = 292;
 

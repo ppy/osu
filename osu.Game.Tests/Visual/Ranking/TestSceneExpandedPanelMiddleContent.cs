@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,13 +14,15 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Models;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Users;
+using osu.Game.Tests.Resources;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -30,12 +35,23 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestMapWithKnownMapper()
         {
-            var author = new User { Username = "mapper_name" };
+            var author = new RealmUser { Username = "mapper_name" };
 
-            AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
+            AddStep("show example score", () => showPanel(TestResources.CreateTestScoreInfo(createTestBeatmap(author))));
+        }
+
+        [Test]
+        public void TestExcessMods()
+        {
+            AddStep("show excess mods score", () =>
             {
-                Beatmap = createTestBeatmap(author)
-            }));
+                var author = new RealmUser { Username = "mapper_name" };
+
+                var score = TestResources.CreateTestScoreInfo(createTestBeatmap(author));
+                score.Mods = score.BeatmapInfo.Ruleset.CreateInstance().CreateAllMods().ToArray();
+
+                showPanel(score);
+            });
 
             AddAssert("mapper name present", () => this.ChildrenOfType<OsuSpriteText>().Any(spriteText => spriteText.Current.Value == "mapper_name"));
         }
@@ -43,24 +59,46 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestMapWithUnknownMapper()
         {
-            AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
-            {
-                Beatmap = createTestBeatmap(null)
-            }));
+            AddStep("show example score", () => showPanel(TestResources.CreateTestScoreInfo(createTestBeatmap(new RealmUser()))));
 
             AddAssert("mapped by text not present", () =>
                 this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text.ToString(), "mapped", "by")));
+
+            AddAssert("play time displayed", () => this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
         }
 
-        private void showPanel(ScoreInfo score) => Child = new ExpandedPanelMiddleContentContainer(score);
+        [Test]
+        public void TestWithDefaultDate()
+        {
+            AddStep("show autoplay score", () =>
+            {
+                var ruleset = new OsuRuleset();
 
-        private BeatmapInfo createTestBeatmap(User author)
+                var mods = new Mod[] { ruleset.GetAutoplayMod() };
+                var beatmap = createTestBeatmap(new RealmUser());
+
+                var score = TestResources.CreateTestScoreInfo(beatmap);
+
+                score.Mods = mods;
+                score.Date = default;
+
+                showPanel(score);
+            });
+
+            AddAssert("play time not displayed", () => !this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
+        }
+
+        private void showPanel(ScoreInfo score) =>
+            Child = new ExpandedPanelMiddleContentContainer(score);
+
+        private BeatmapInfo createTestBeatmap([NotNull] RealmUser author)
         {
             var beatmap = new TestBeatmap(rulesetStore.GetRuleset(0)).BeatmapInfo;
 
             beatmap.Metadata.Author = author;
             beatmap.Metadata.Title = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap title";
             beatmap.Metadata.Artist = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap artist";
+            beatmap.DifficultyName = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong difficulty name";
 
             return beatmap;
         }

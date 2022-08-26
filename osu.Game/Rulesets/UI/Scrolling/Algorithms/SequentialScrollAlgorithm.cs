@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,7 +34,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 
         public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
         {
-            var objectLength = relativePositionAt(endTime, timeRange) - relativePositionAt(startTime, timeRange);
+            double objectLength = relativePositionAt(endTime, timeRange) - relativePositionAt(startTime, timeRange);
             return (float)(objectLength * scrollLength);
         }
 
@@ -90,7 +92,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
         {
             generatePositionMappings(timeRange);
 
-            var mappingIndex = positionMappings.BinarySearch(search, comparer ?? Comparer<PositionMapping>.Default);
+            int mappingIndex = positionMappings.BinarySearch(search, comparer ?? Comparer<PositionMapping>.Default);
 
             if (mappingIndex < 0)
             {

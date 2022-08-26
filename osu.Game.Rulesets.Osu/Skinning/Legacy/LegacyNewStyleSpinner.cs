@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -55,28 +57,42 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-bottom")
+                        Texture = source.GetTexture("spinner-bottom"),
                     },
                     discTop = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-top")
+                        Texture = source.GetTexture("spinner-top"),
                     },
                     fixedMiddle = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-middle")
+                        Texture = source.GetTexture("spinner-middle"),
                     },
                     spinningMiddle = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-middle2")
-                    }
+                        Texture = source.GetTexture("spinner-middle2"),
+                    },
                 }
             });
+
+            var topProvider = source.FindProvider(s => s.GetTexture("spinner-top") != null);
+
+            if (topProvider is LegacySkinTransformer transformer && !(transformer.Skin is DefaultLegacySkin))
+            {
+                AddInternal(ApproachCircle = new Sprite
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.Centre,
+                    Texture = source.GetTexture("spinner-approachcircle"),
+                    Scale = new Vector2(SPRITE_SCALE * 1.86f),
+                    Y = SPINNER_Y_CENTRE,
+                });
+            }
         }
 
         protected override void UpdateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
@@ -88,17 +104,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 case DrawableSpinner d:
                     Spinner spinner = d.HitObject;
 
-                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                         this.FadeOut();
 
-                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2))
                         this.FadeInFromZero(spinner.TimeFadeIn / 2);
 
-                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                     {
                         fixedMiddle.FadeColour(Color4.White);
 
-                        using (BeginDelayedSequence(spinner.TimePreempt, true))
+                        using (BeginDelayedSequence(spinner.TimePreempt))
                             fixedMiddle.FadeColour(Color4.Red, spinner.Duration);
                     }
 
@@ -110,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     break;
 
-                case DrawableSpinnerBonusTick _:
+                case DrawableSpinnerBonusTick:
                     if (state == ArmedState.Hit)
                         glow.FlashColour(Color4.White, 200);
 

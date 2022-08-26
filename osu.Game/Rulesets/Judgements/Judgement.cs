@@ -1,7 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
@@ -70,14 +71,6 @@ namespace osu.Game.Rulesets.Judgements
         public double MaxHealthIncrease => HealthIncreaseFor(MaxResult);
 
         /// <summary>
-        /// Retrieves the numeric score representation of a <see cref="HitResult"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="HitResult"/> to find the numeric score representation for.</param>
-        /// <returns>The numeric score representation of <paramref name="result"/>.</returns>
-        [Obsolete("Has no effect. Use ToNumericResult(HitResult) (standardised across all rulesets).")] // Can be made non-virtual 20210328
-        protected virtual int NumericResultFor(HitResult result) => ToNumericResult(result);
-
-        /// <summary>
         /// Retrieves the numeric score representation of a <see cref="JudgementResult"/>.
         /// </summary>
         /// <param name="result">The <see cref="JudgementResult"/> to find the numeric score representation for.</param>
@@ -109,10 +102,10 @@ namespace osu.Game.Rulesets.Judgements
                     return -DEFAULT_MAX_HEALTH_INCREASE;
 
                 case HitResult.Miss:
-                    return -DEFAULT_MAX_HEALTH_INCREASE;
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 2;
 
                 case HitResult.Meh:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.05;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.05;
 
                 case HitResult.Ok:
                     return DEFAULT_MAX_HEALTH_INCREASE * 0.5;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
@@ -127,6 +129,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 using (BeginAbsoluteSequence(startTime))
                     spmContainer.FadeIn(drawableSpinner.HitObject.TimeFadeIn);
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableSpinner != null)
+                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

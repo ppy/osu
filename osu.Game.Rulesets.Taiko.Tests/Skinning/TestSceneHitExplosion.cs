@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -22,16 +24,16 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [Test]
         public void TestNormalHit()
         {
-            AddStep("Great", () => SetContents(() => getContentFor(createHit(HitResult.Great))));
-            AddStep("Ok", () => SetContents(() => getContentFor(createHit(HitResult.Ok))));
-            AddStep("Miss", () => SetContents(() => getContentFor(createHit(HitResult.Miss))));
+            AddStep("Great", () => SetContents(_ => getContentFor(createHit(HitResult.Great))));
+            AddStep("Ok", () => SetContents(_ => getContentFor(createHit(HitResult.Ok))));
+            AddStep("Miss", () => SetContents(_ => getContentFor(createHit(HitResult.Miss))));
         }
 
         [TestCase(HitResult.Great)]
         [TestCase(HitResult.Ok)]
         public void TestStrongHit(HitResult type)
         {
-            AddStep("create hit", () => SetContents(() => getContentFor(createStrongHit(type))));
+            AddStep("create hit", () => SetContents(_ => getContentFor(createStrongHit(type))));
             AddStep("visualise second hit",
                 () => this.ChildrenOfType<HitExplosion>()
                           .ForEach(e => e.VisualiseSecondHit(new JudgementResult(new HitObject { StartTime = Time.Current }, new Judgement()))));

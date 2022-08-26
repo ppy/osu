@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
@@ -15,8 +15,10 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObjects, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
     {
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModStrictTracking)).ToArray();
+
         [SettingSource("No slider head accuracy requirement", "Scores sliders proportionally to the number of ticks hit.")]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
 
@@ -25,9 +27,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         [SettingSource("Apply classic note lock", "Applies note lock to the full hit window.")]
         public Bindable<bool> ClassicNoteLock { get; } = new BindableBool(true);
-
-        [SettingSource("Use fixed slider follow circle hit area", "Makes the slider follow circle track its final size at all times.")]
-        public Bindable<bool> FixedFollowCircleHitArea { get; } = new BindableBool(true);
 
         [SettingSource("Always play a slider's tail sample", "Always plays a slider's tail sample regardless of whether it was hit or not.")]
         public Bindable<bool> AlwaysPlayTailSample { get; } = new BindableBool(true);
@@ -54,24 +53,17 @@ namespace osu.Game.Rulesets.Osu.Mods
                 osuRuleset.Playfield.HitPolicy = new ObjectOrderedHitPolicy();
         }
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public void ApplyToDrawableHitObject(DrawableHitObject obj)
         {
-            foreach (var obj in drawables)
+            switch (obj)
             {
-                switch (obj)
-                {
-                    case DrawableSlider slider:
-                        slider.Ball.InputTracksVisualSize = !FixedFollowCircleHitArea.Value;
-                        break;
+                case DrawableSliderHead head:
+                    head.TrackFollowCircle = !NoSliderHeadMovement.Value;
+                    break;
 
-                    case DrawableSliderHead head:
-                        head.TrackFollowCircle = !NoSliderHeadMovement.Value;
-                        break;
-
-                    case DrawableSliderTail tail:
-                        tail.SamplePlaysOnlyOnHit = !AlwaysPlayTailSample.Value;
-                        break;
-                }
+                case DrawableSliderTail tail:
+                    tail.SamplePlaysOnlyOnHit = !AlwaysPlayTailSample.Value;
+                    break;
             }
         }
     }

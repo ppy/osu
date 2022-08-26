@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osuTK;
 using osuTK.Graphics;
 
@@ -48,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             TriggerOperationStarted();
             Action?.Invoke();
-            TriggerOperatoinEnded();
+            TriggerOperationEnded();
             return true;
         }
 
@@ -58,6 +61,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             icon.FadeColour(!IsHeld && IsHovered ? Color4.White : Color4.Black, TRANSFORM_DURATION, Easing.OutQuint);
         }
 
-        public string TooltipText { get; }
+        public LocalisableString TooltipText { get; }
     }
 }

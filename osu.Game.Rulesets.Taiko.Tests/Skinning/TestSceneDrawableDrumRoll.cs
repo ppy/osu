@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -26,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddStep("Drum roll", () => SetContents(() =>
+            AddStep("Drum roll", () => SetContents(_ =>
             {
                 var hoc = new ScrollingHitObjectContainer();
 
@@ -40,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 return hoc;
             }));
 
-            AddStep("Drum roll (strong)", () => SetContents(() =>
+            AddStep("Drum roll (strong)", () => SetContents(_ =>
             {
                 var hoc = new ScrollingHitObjectContainer();
 

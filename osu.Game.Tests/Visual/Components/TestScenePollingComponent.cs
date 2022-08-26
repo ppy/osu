@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osuTK;
@@ -15,6 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Components
 {
+    [HeadlessTest]
     public class TestScenePollingComponent : OsuTestScene
     {
         private Container pollBox;

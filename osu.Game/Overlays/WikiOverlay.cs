@@ -1,16 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Wiki;
-using osu.Game.Overlays.Wiki.Markdown;
 
 namespace osu.Game.Overlays
 {
@@ -30,6 +33,8 @@ namespace osu.Game.Overlays
         private CancellationTokenSource cancellationToken;
 
         private bool displayUpdateRequired = true;
+
+        private WikiArticlePage articlePage;
 
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
@@ -82,17 +87,38 @@ namespace osu.Game.Overlays
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (articlePage != null)
+            {
+                articlePage.SidebarContainer.Height = DrawHeight;
+                articlePage.SidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
+            }
+        }
+
         private void onPathChanged(ValueChangedEvent<string> e)
         {
+            // the path could change as a result of redirecting to a newer location of the same page.
+            // we already have the correct wiki data, so we can safely return here.
+            if (e.NewValue == wikiData.Value?.Path)
+                return;
+
             cancellationToken?.Cancel();
             request?.Cancel();
 
-            request = new GetWikiRequest(e.NewValue);
+            string[] values = e.NewValue.Split('/', 2);
+
+            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var language))
+                request = new GetWikiRequest(values[1], language);
+            else
+                request = new GetWikiRequest(e.NewValue);
 
             Loading.Show();
 
             request.Success += response => Schedule(() => onSuccess(response));
-            request.Failure += _ => Schedule(() => LoadDisplay(Empty()));
+            request.Failure += _ => Schedule(onFail);
 
             api.PerformAsync(request);
         }
@@ -100,6 +126,7 @@ namespace osu.Game.Overlays
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
+            path.Value = response.Path;
 
             if (response.Layout == index_path)
             {
@@ -115,26 +142,19 @@ namespace osu.Game.Overlays
             }
             else
             {
-                LoadDisplay(new WikiMarkdownContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    CurrentPath = $@"{api.WebsiteRootUrl}/wiki/{path.Value}/",
-                    Text = response.Markdown,
-                    DocumentMargin = new MarginPadding(0),
-                    DocumentPadding = new MarginPadding
-                    {
-                        Vertical = 20,
-                        Left = 30,
-                        Right = 50,
-                    },
-                });
+                LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/{path.Value}/", response.Markdown));
             }
+        }
+
+        private void onFail()
+        {
+            LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
+                $"Something went wrong when trying to fetch page \"{path.Value}\".\n\n[Return to the main page](Main_Page)."));
         }
 
         private void showParentPage()
         {
-            var parentPath = string.Join("/", path.Value.Split('/').SkipLast(1));
+            string parentPath = string.Join("/", path.Value.Split('/').SkipLast(1));
             ShowPage(parentPath);
         }
 

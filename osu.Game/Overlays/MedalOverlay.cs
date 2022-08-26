@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -213,7 +215,7 @@ namespace osu.Game.Overlays
             innerSpin.Spin(20000, RotationDirection.Clockwise);
             outerSpin.Spin(40000, RotationDirection.Clockwise);
 
-            using (BeginDelayedSequence(200, true))
+            using (BeginDelayedSequence(200))
             {
                 disc.FadeIn(initial_duration)
                     .ScaleTo(1f, initial_duration * 2, Easing.OutElastic);
@@ -221,7 +223,7 @@ namespace osu.Game.Overlays
                 particleContainer.FadeIn(initial_duration);
                 outerSpin.FadeTo(0.1f, initial_duration * 2);
 
-                using (BeginDelayedSequence(initial_duration + 200, true))
+                using (BeginDelayedSequence(initial_duration + 200))
                 {
                     backgroundStrip.FadeIn(step_duration);
                     leftStrip.ResizeWidthTo(1f, step_duration, Easing.OutQuint);

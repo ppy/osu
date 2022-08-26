@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
@@ -13,7 +15,11 @@ using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Threading;
-using osu.Game.Users;
+using System.Collections.Generic;
+using JetBrains.Annotations;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -25,7 +31,7 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
-        protected readonly IBindable<User> User = new Bindable<User>();
+        protected readonly IBindable<APIUser> User = new Bindable<APIUser>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -35,6 +41,7 @@ namespace osu.Game.Overlays.Comments
         private CancellationTokenSource loadCancellation;
         private int currentPage;
 
+        private FillFlowContainer pinnedContent;
         private FillFlowContainer content;
         private DeletedCommentsCounter deletedCommentsCounter;
         private CommentsShowMoreButton moreButton;
@@ -60,6 +67,25 @@ namespace osu.Game.Overlays.Comments
                     Children = new Drawable[]
                     {
                         commentCounter = new TotalCommentsCounter(),
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background4,
+                                },
+                                pinnedContent = new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                },
+                            },
+                        },
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
@@ -147,7 +173,7 @@ namespace osu.Game.Overlays.Comments
 
         private void refetchComments()
         {
-            clearComments();
+            ClearComments();
             getComments();
         }
 
@@ -160,50 +186,128 @@ namespace osu.Game.Overlays.Comments
             loadCancellation?.Cancel();
             scheduledCommentsLoad?.Cancel();
             request = new GetCommentsRequest(id.Value, type.Value, Sort.Value, currentPage++, 0);
-            request.Success += res => scheduledCommentsLoad = Schedule(() => onSuccess(res));
+            request.Success += res => scheduledCommentsLoad = Schedule(() => OnSuccess(res));
             api.PerformAsync(request);
         }
 
-        private void clearComments()
+        protected void ClearComments()
         {
             currentPage = 1;
             deletedCommentsCounter.Count.Value = 0;
             moreButton.Show();
             moreButton.IsLoading = true;
+            pinnedContent.Clear();
             content.Clear();
+            CommentDictionary.Clear();
         }
 
-        private void onSuccess(CommentBundle response)
+        protected readonly Dictionary<long, DrawableComment> CommentDictionary = new Dictionary<long, DrawableComment>();
+
+        protected void OnSuccess(CommentBundle response)
         {
-            loadCancellation = new CancellationTokenSource();
+            commentCounter.Current.Value = response.Total;
 
-            LoadComponentAsync(new CommentsPage(response)
+            if (!response.Comments.Any())
             {
-                ShowDeleted = { BindTarget = ShowDeleted },
-                Sort = { BindTarget = Sort },
-                Type = { BindTarget = type },
-                CommentableId = { BindTarget = id }
-            }, loaded =>
+                content.Add(new NoCommentsPlaceholder());
+                moreButton.Hide();
+                return;
+            }
+
+            AppendComments(response);
+        }
+
+        /// <summary>
+        /// Appends retrieved comments to the subtree rooted of comments in this page.
+        /// </summary>
+        /// <param name="bundle">The bundle of comments to add.</param>
+        protected void AppendComments([NotNull] CommentBundle bundle)
+        {
+            var topLevelComments = new List<DrawableComment>();
+            var orphaned = new List<Comment>();
+
+            foreach (var comment in bundle.Comments.Concat(bundle.IncludedComments).Concat(bundle.PinnedComments))
             {
-                content.Add(loaded);
+                // Exclude possible duplicated comments.
+                if (CommentDictionary.ContainsKey(comment.Id))
+                    continue;
 
-                deletedCommentsCounter.Count.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+                addNewComment(comment);
+            }
 
-                if (response.HasMore)
+            // Comments whose parents were seen later than themselves can now be added.
+            foreach (var o in orphaned)
+                addNewComment(o);
+
+            if (topLevelComments.Any())
+            {
+                LoadComponentsAsync(topLevelComments, loaded =>
                 {
-                    int loadedTopLevelComments = 0;
-                    content.Children.OfType<FillFlowContainer>().ForEach(p => loadedTopLevelComments += p.Children.OfType<DrawableComment>().Count());
+                    pinnedContent.AddRange(loaded.Where(d => d.Comment.Pinned));
+                    content.AddRange(loaded.Where(d => !d.Comment.Pinned));
 
-                    moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
-                    moreButton.IsLoading = false;
+                    deletedCommentsCounter.Count.Value += topLevelComments.Select(d => d.Comment).Count(c => c.IsDeleted && c.IsTopLevel);
+
+                    if (bundle.HasMore)
+                    {
+                        int loadedTopLevelComments = 0;
+                        pinnedContent.Children.OfType<DrawableComment>().ForEach(_ => loadedTopLevelComments++);
+                        content.Children.OfType<DrawableComment>().ForEach(_ => loadedTopLevelComments++);
+
+                        moreButton.Current.Value = bundle.TopLevelCount - loadedTopLevelComments;
+                        moreButton.IsLoading = false;
+                    }
+                    else
+                    {
+                        moreButton.Hide();
+                    }
+                }, (loadCancellation = new CancellationTokenSource()).Token);
+            }
+
+            void addNewComment(Comment comment)
+            {
+                var drawableComment = getDrawableComment(comment);
+
+                if (comment.ParentId == null)
+                {
+                    // Comments that have no parent are added as top-level comments to the flow.
+                    topLevelComments.Add(drawableComment);
+                }
+                else if (CommentDictionary.TryGetValue(comment.ParentId.Value, out var parentDrawable))
+                {
+                    // The comment's parent has already been seen, so the parent<-> child links can be added.
+                    comment.ParentComment = parentDrawable.Comment;
+                    parentDrawable.Replies.Add(drawableComment);
                 }
                 else
                 {
-                    moreButton.Hide();
+                    // The comment's parent has not been seen yet, so keep it orphaned for the time being. This can occur if the comments arrive out of order.
+                    // Since this comment has now been seen, any further children can be added to it without being orphaned themselves.
+                    orphaned.Add(comment);
                 }
+            }
+        }
 
-                commentCounter.Current.Value = response.Total;
-            }, loadCancellation.Token);
+        private DrawableComment getDrawableComment(Comment comment)
+        {
+            if (CommentDictionary.TryGetValue(comment.Id, out var existing))
+                return existing;
+
+            return CommentDictionary[comment.Id] = new DrawableComment(comment)
+            {
+                ShowDeleted = { BindTarget = ShowDeleted },
+                Sort = { BindTarget = Sort },
+                RepliesRequested = onCommentRepliesRequested
+            };
+        }
+
+        private void onCommentRepliesRequested(DrawableComment drawableComment, int page)
+        {
+            var req = new GetCommentsRequest(id.Value, type.Value, Sort.Value, page, drawableComment.Comment.Id);
+
+            req.Success += response => Schedule(() => AppendComments(response));
+
+            api.PerformAsync(req);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -211,6 +315,26 @@ namespace osu.Game.Overlays.Comments
             request?.Cancel();
             loadCancellation?.Cancel();
             base.Dispose(isDisposing);
+        }
+
+        private class NoCommentsPlaceholder : CompositeDrawable
+        {
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Height = 80;
+                RelativeSizeAxes = Axes.X;
+                AddRangeInternal(new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Margin = new MarginPadding { Left = 50 },
+                        Text = CommentsStrings.Empty
+                    }
+                });
+            }
         }
     }
 }

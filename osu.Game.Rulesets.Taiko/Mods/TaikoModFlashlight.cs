@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
@@ -14,13 +15,30 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModFlashlight : ModFlashlight<TaikoHitObject>
     {
-        public override double ScoreMultiplier => 1.12;
+        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
-        private const float default_flashlight_size = 250;
+        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat
+        {
+            MinValue = 0.5f,
+            MaxValue = 1.5f,
+            Default = 1f,
+            Value = 1f,
+            Precision = 0.1f
+        };
 
-        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield);
+        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
+        public override BindableBool ComboBasedSize { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
 
-        private TaikoPlayfield playfield;
+        public override float DefaultFlashlightSize => 250;
+
+        protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, playfield);
+
+        private TaikoPlayfield playfield = null!;
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
@@ -30,30 +48,27 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private class TaikoFlashlight : Flashlight
         {
-            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
+            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
             private readonly TaikoPlayfield taikoPlayfield;
 
-            public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
+            public TaikoFlashlight(TaikoModFlashlight modFlashlight, TaikoPlayfield taikoPlayfield)
+                : base(modFlashlight)
             {
                 this.taikoPlayfield = taikoPlayfield;
-                FlashlightSize = new Vector2(0, getSizeFor(0));
+                FlashlightSize = getSizeFor(0);
 
                 AddLayout(flashlightProperties);
             }
 
-            private float getSizeFor(int combo)
+            private Vector2 getSizeFor(int combo)
             {
-                if (combo > 200)
-                    return default_flashlight_size * 0.8f;
-                else if (combo > 100)
-                    return default_flashlight_size * 0.9f;
-                else
-                    return default_flashlight_size;
+                // Preserve flashlight size through the playfield's aspect adjustment.
+                return new Vector2(0, GetSizeFor(combo) * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
 
             protected override void OnComboChange(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), getSizeFor(e.NewValue), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
@@ -64,7 +79,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                 if (!flashlightProperties.IsValid)
                 {
-                    FlashlightPosition = taikoPlayfield.HitTarget.ToSpaceOfOtherDrawable(taikoPlayfield.HitTarget.OriginPosition, this);
+                    FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
+
+                    ClearTransforms(targetMember: nameof(FlashlightSize));
+                    FlashlightSize = getSizeFor(Combo.Value);
+
                     flashlightProperties.Validate();
                 }
             }

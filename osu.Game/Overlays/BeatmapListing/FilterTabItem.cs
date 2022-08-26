@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -39,11 +42,18 @@ namespace osu.Game.Overlays.BeatmapListing
                     Font = OsuFont.GetFont(size: 13, weight: FontWeight.Regular),
                     Text = LabelFor(Value)
                 },
-                new HoverClickSounds()
+                new HoverClickSounds(HoverSampleSet.TabSelect)
             });
 
             Enabled.Value = true;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             updateState();
+            FinishTransforms(true);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -66,14 +76,14 @@ namespace osu.Game.Overlays.BeatmapListing
         /// <summary>
         /// Returns the label text to be used for the supplied <paramref name="value"/>.
         /// </summary>
-        protected virtual string LabelFor(T value) => (value as Enum)?.GetDescription() ?? value.ToString();
+        protected virtual LocalisableString LabelFor(T value) => (value as Enum)?.GetLocalisableDescription() ?? value.ToString();
 
         private void updateState()
         {
-            text.FadeColour(IsHovered ? colourProvider.Light1 : getStateColour(), 200, Easing.OutQuint);
+            text.FadeColour(IsHovered ? colourProvider.Light1 : GetStateColour(), 200, Easing.OutQuint);
             text.Font = text.Font.With(weight: Active.Value ? FontWeight.SemiBold : FontWeight.Regular);
         }
 
-        private Color4 getStateColour() => Active.Value ? colourProvider.Content1 : colourProvider.Light2;
+        protected virtual Color4 GetStateColour() => Active.Value ? colourProvider.Content1 : colourProvider.Light2;
     }
 }

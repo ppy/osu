@@ -1,16 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Tests.Visual.Spectator;
 using osu.Game.Users;
@@ -19,53 +22,47 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneCurrentlyPlayingDisplay : OsuTestScene
     {
-        private readonly User streamingUser = new User { Id = 2, Username = "Test user" };
+        private readonly APIUser streamingUser = new APIUser { Id = 2, Username = "Test user" };
 
-        [Cached(typeof(SpectatorClient))]
-        private TestSpectatorClient testSpectatorClient = new TestSpectatorClient();
-
+        private TestSpectatorClient spectatorClient;
         private CurrentlyPlayingDisplay currentlyPlaying;
-
-        [Cached(typeof(UserLookupCache))]
-        private UserLookupCache lookupCache = new TestUserLookupCache();
-
-        private Container nestedContainer;
 
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("add streaming client", () =>
             {
-                nestedContainer?.Remove(testSpectatorClient);
-                Remove(lookupCache);
+                spectatorClient = new TestSpectatorClient();
+                var lookupCache = new TestUserLookupCache();
 
                 Children = new Drawable[]
                 {
                     lookupCache,
-                    nestedContainer = new Container
+                    spectatorClient,
+                    new DependencyProvidingContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        CachedDependencies = new (Type, object)[]
                         {
-                            testSpectatorClient,
-                            currentlyPlaying = new CurrentlyPlayingDisplay
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            }
+                            (typeof(SpectatorClient), spectatorClient),
+                            (typeof(UserLookupCache), lookupCache),
+                            (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Purple)),
+                        },
+                        Child = currentlyPlaying = new CurrentlyPlayingDisplay
+                        {
+                            RelativeSizeAxes = Axes.Both,
                         }
                     },
                 };
             });
-
-            AddStep("Reset players", () => testSpectatorClient.EndPlay(streamingUser.Id));
         }
 
         [Test]
         public void TestBasicDisplay()
         {
-            AddStep("Add playing user", () => testSpectatorClient.StartPlay(streamingUser.Id, 0));
+            AddStep("Add playing user", () => spectatorClient.SendStartPlay(streamingUser.Id, 0));
             AddUntilStep("Panel loaded", () => currentlyPlaying.ChildrenOfType<UserGridPanel>()?.FirstOrDefault()?.User.Id == 2);
-            AddStep("Remove playing user", () => testSpectatorClient.EndPlay(streamingUser.Id));
+            AddStep("Remove playing user", () => spectatorClient.SendEndPlay(streamingUser.Id));
             AddUntilStep("Panel no longer present", () => !currentlyPlaying.ChildrenOfType<UserGridPanel>().Any());
         }
 
@@ -91,13 +88,13 @@ namespace osu.Game.Tests.Visual.Online
                 "pishifat"
             };
 
-            protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
+            protected override Task<APIUser> ComputeValueAsync(int lookup, CancellationToken token = default)
             {
                 // tests against failed lookups
                 if (lookup == 13)
-                    return Task.FromResult<User>(null);
+                    return Task.FromResult<APIUser>(null);
 
-                return Task.FromResult(new User
+                return Task.FromResult(new APIUser
                 {
                     Id = lookup,
                     Username = usernames[lookup % usernames.Length],

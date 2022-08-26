@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -47,6 +49,13 @@ namespace osu.Game.Rulesets.Judgements
             };
         }
 
+        /// <summary>
+        /// Plays the default animation for this judgement piece.
+        /// </summary>
+        /// <remarks>
+        /// The base implementation only handles fade (for all result types) and misses.
+        /// Individual rulesets are recommended to implement their appropriate hit animations.
+        /// </remarks>
         public virtual void PlayAnimation()
         {
             switch (Result)
@@ -60,12 +69,6 @@ namespace osu.Game.Rulesets.Judgements
 
                     this.RotateTo(0);
                     this.RotateTo(40, 800, Easing.InQuint);
-
-                    break;
-
-                default:
-                    this.ScaleTo(0.9f);
-                    this.ScaleTo(1, 500, Easing.OutElastic);
                     break;
             }
 

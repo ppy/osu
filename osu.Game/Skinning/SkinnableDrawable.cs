@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -31,7 +33,7 @@ namespace osu.Game.Skinning
             set => base.AutoSizeAxes = value;
         }
 
-        private readonly ISkinComponent component;
+        protected readonly ISkinComponent Component;
 
         private readonly ConfineMode confineMode;
 
@@ -40,19 +42,16 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="component">The namespace-complete resource name for this skinnable element.</param>
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
-        /// <param name="allowFallback">A conditional to decide whether to allow fallback to the default implementation if a skinned element is not present.</param>
         /// <param name="confineMode">How (if at all) the <see cref="Drawable"/> should be resize to fit within our own bounds.</param>
-        public SkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation = null, Func<ISkinSource, bool> allowFallback = null,
-                                 ConfineMode confineMode = ConfineMode.NoScaling)
-            : this(component, allowFallback, confineMode)
+        public SkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
+            : this(component, confineMode)
         {
             createDefault = defaultImplementation;
         }
 
-        protected SkinnableDrawable(ISkinComponent component, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
-            : base(allowFallback)
+        protected SkinnableDrawable(ISkinComponent component, ConfineMode confineMode = ConfineMode.NoScaling)
         {
-            this.component = component;
+            Component = component;
             this.confineMode = confineMode;
 
             RelativeSizeAxes = Axes.Both;
@@ -76,15 +75,15 @@ namespace osu.Game.Skinning
         /// </summary>
         protected virtual bool ApplySizeRestrictionsToDefault => false;
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin)
         {
-            Drawable = skin.GetDrawableComponent(component);
+            Drawable = skin.GetDrawableComponent(Component);
 
             isDefault = false;
 
-            if (Drawable == null && allowFallback)
+            if (Drawable == null)
             {
-                Drawable = CreateDefault(component);
+                Drawable = CreateDefault(Component);
                 isDefault = true;
             }
 

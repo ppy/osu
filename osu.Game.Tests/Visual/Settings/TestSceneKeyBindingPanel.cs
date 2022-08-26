@@ -1,14 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Overlays.KeyBinding;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -32,6 +35,7 @@ namespace osu.Game.Tests.Visual.Settings
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddUntilStep("wait for load", () => panel.ChildrenOfType<GlobalKeyBindingsSection>().Any());
             AddStep("Scroll to top", () => panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollToTop());
             AddWaitStep("wait for scroll", 5);
         }
@@ -160,7 +164,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 var resetButton = settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First();
 
-                resetButton.Click();
+                resetButton.TriggerClick();
             });
 
             AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
@@ -189,7 +193,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 var resetButton = panel.ChildrenOfType<ResetButton>().First();
 
-                resetButton.Click();
+                resetButton.TriggerClick();
             });
 
             AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
@@ -229,11 +233,27 @@ namespace osu.Game.Tests.Visual.Settings
             AddAssert("first binding selected", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().IsBinding);
         }
 
+        [Test]
+        public void TestFilteringHidesResetSectionButtons()
+        {
+            SearchTextBox searchTextBox = null;
+
+            AddStep("add any search term", () =>
+            {
+                searchTextBox = panel.ChildrenOfType<SearchTextBox>().Single();
+                searchTextBox.Current.Value = "chat";
+            });
+            AddUntilStep("all reset section bindings buttons hidden", () => panel.ChildrenOfType<ResetButton>().All(button => button.Alpha == 0));
+
+            AddStep("clear search term", () => searchTextBox.Current.Value = string.Empty);
+            AddUntilStep("all reset section bindings buttons shown", () => panel.ChildrenOfType<ResetButton>().All(button => button.Alpha == 1));
+        }
+
         private void checkBinding(string name, string keyName)
         {
             AddAssert($"Check {name} is bound to {keyName}", () =>
             {
-                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text == name));
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
                 var firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
 
                 return firstButton.Text.Text == keyName;
@@ -246,7 +266,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep($"Scroll to {name}", () =>
             {
-                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text == name));
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
                 firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
 
                 panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollTo(firstButton);

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -8,7 +10,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -100,6 +101,14 @@ namespace osu.Game.Tests.Gameplay
                 set => ComboIndexBindable.Value = value;
             }
 
+            public Bindable<int> ComboIndexWithOffsetsBindable { get; } = new Bindable<int>();
+
+            public int ComboIndexWithOffsets
+            {
+                get => ComboIndexWithOffsetsBindable.Value;
+                set => ComboIndexWithOffsetsBindable.Value = value;
+            }
+
             public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
 
             public bool LastInCombo
@@ -127,14 +136,8 @@ namespace osu.Game.Tests.Gameplay
             {
                 switch (lookup)
                 {
-                    case GlobalSkinColours global:
-                        switch (global)
-                        {
-                            case GlobalSkinColours.ComboColours:
-                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(ComboColours));
-                        }
-
-                        break;
+                    case SkinComboColourLookup comboColour:
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(ComboColours[comboColour.ColourIndex % ComboColours.Count]));
                 }
 
                 throw new NotImplementedException();

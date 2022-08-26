@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -12,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 
 namespace osu.Game.Graphics.UserInterface
@@ -27,6 +30,10 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool AllowUniqueCharacterSamples => false;
 
         protected override bool AllowClipboardExport => false;
+
+        protected override bool AllowWordNavigation => false;
+
+        protected override bool AllowIme => false;
 
         private readonly CapsWarning warning;
 
@@ -105,7 +112,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private class CapsWarning : SpriteIcon, IHasTooltip
         {
-            public string TooltipText => @"caps lock is active";
+            public LocalisableString TooltipText => "caps lock is active";
 
             public CapsWarning()
             {

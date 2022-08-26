@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -9,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
 using osuTK;
 
@@ -43,9 +46,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Bottom = 10 },
-                                Child = playlist = new DrawableRoomPlaylist(true, false)
+                                Child = playlist = new PlaylistsRoomSettingsPlaylist
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    RelativeSizeAxes = Axes.Both
                                 }
                             }
                         },
@@ -83,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             switch (tab)
             {
-                case BeatmapDetailAreaPlaylistTabItem _:
+                case BeatmapDetailAreaPlaylistTabItem:
                     playlistArea.Show();
                     break;
 

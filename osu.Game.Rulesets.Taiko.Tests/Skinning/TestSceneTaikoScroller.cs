@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -20,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
         public TestSceneTaikoScroller()
         {
-            AddStep("Load scroller", () => SetContents(() =>
+            AddStep("Load scroller", () => SetContents(_ =>
                 new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Scroller), _ => Empty())
                 {
                     Clock = new FramedClock(clock),

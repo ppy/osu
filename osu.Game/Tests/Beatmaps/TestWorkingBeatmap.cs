@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -29,15 +31,13 @@ namespace osu.Game.Tests.Beatmaps
             this.storyboard = storyboard;
         }
 
-        public override bool TrackLoaded => true;
-
         public override bool BeatmapLoaded => true;
 
         protected override IBeatmap GetBeatmap() => beatmap;
 
         protected override Storyboard GetStoryboard() => storyboard ?? base.GetStoryboard();
 
-        protected override ISkin GetSkin() => null;
+        protected internal override ISkin GetSkin() => null;
 
         public override Stream GetStream(string storagePath) => null;
 

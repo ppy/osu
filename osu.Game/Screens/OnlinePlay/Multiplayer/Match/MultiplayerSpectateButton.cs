@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Diagnostics;
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,11 +16,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerSpectateButton : MultiplayerRoomComposite
     {
-        public Action OnSpectateClick
-        {
-            set => button.Action = value;
-        }
-
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
@@ -38,7 +33,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 RelativeSizeAxes = Axes.Both,
                 Size = Vector2.One,
                 Enabled = { Value = true },
+                Action = onClick
             };
+        }
+
+        private void onClick()
+        {
+            var clickOperation = ongoingOperationTracker.BeginOperation();
+
+            Client.ToggleSpectate().ContinueWith(_ => endOperation());
+
+            void endOperation() => clickOperation?.Dispose();
         }
 
         [BackgroundDependencyLoader]
@@ -57,14 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void updateState()
         {
-            var localUser = Client.LocalUser;
-
-            if (localUser == null)
-                return;
-
-            Debug.Assert(Room != null);
-
-            switch (localUser.State)
+            switch (Client.LocalUser?.State)
             {
                 default:
                     button.Text = "Spectate";
@@ -81,7 +79,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            button.Enabled.Value = Client.Room?.State != MultiplayerRoomState.Closed && !operationInProgress.Value;
+            button.Enabled.Value = Client.Room != null
+                                   && Client.Room.State != MultiplayerRoomState.Closed
+                                   && !operationInProgress.Value;
         }
 
         private class ButtonWithTrianglesExposed : TriangleButton

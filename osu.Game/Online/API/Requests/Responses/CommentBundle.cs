@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Newtonsoft.Json;
-using osu.Game.Users;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -24,6 +26,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"included_comments")]
         public List<Comment> IncludedComments { get; set; }
 
+        [JsonProperty(@"pinned_comments")]
+        public List<Comment> PinnedComments { get; set; }
+
         private List<long> userVotes;
 
         [JsonProperty(@"user_votes")]
@@ -39,36 +44,27 @@ namespace osu.Game.Online.API.Requests.Responses
             }
         }
 
-        private List<User> users;
+        private List<APIUser> users;
 
         [JsonProperty(@"users")]
-        public List<User> Users
+        public List<APIUser> Users
         {
             get => users;
             set
             {
                 users = value;
 
-                value.ForEach(u =>
+                foreach (var user in value)
                 {
-                    Comments.ForEach(c =>
+                    foreach (var comment in Comments.Concat(IncludedComments).Concat(PinnedComments))
                     {
-                        if (c.UserId == u.Id)
-                            c.User = u;
+                        if (comment.UserId == user.Id)
+                            comment.User = user;
 
-                        if (c.EditedById == u.Id)
-                            c.EditedUser = u;
-                    });
-
-                    IncludedComments.ForEach(c =>
-                    {
-                        if (c.UserId == u.Id)
-                            c.User = u;
-
-                        if (c.EditedById == u.Id)
-                            c.EditedUser = u;
-                    });
-                });
+                        if (comment.EditedById == user.Id)
+                            comment.EditedUser = user;
+                    }
+                }
             }
         }
 

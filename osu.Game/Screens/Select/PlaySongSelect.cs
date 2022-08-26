@@ -1,6 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
@@ -14,17 +17,17 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
+using osu.Game.Utils;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
     public class PlaySongSelect : SongSelect
     {
-        private bool removeAutoModOnResume;
-        private OsuScreen player;
+        private OsuScreen playerLoader;
 
         [Resolved(CanBeNull = true)]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
 
@@ -39,28 +42,9 @@ namespace osu.Game.Screens.Select
         }
 
         protected void PresentScore(ScoreInfo score) =>
-            FinaliseSelection(score.Beatmap, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
+            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
-
-        private ModAutoplay getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
-
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-
-            player = null;
-
-            if (removeAutoModOnResume)
-            {
-                var autoType = getAutoplayMod()?.GetType();
-
-                if (autoType != null)
-                    Mods.Value = Mods.Value.Where(m => m.GetType() != autoType).ToArray();
-
-                removeAutoModOnResume = false;
-            }
-        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -77,16 +61,22 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(e);
         }
 
+        private IReadOnlyList<Mod> modsAtGameplayStart;
+
+        private ModAutoplay getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
+
         protected override bool OnStart()
         {
-            if (player != null) return false;
+            if (playerLoader != null) return false;
+
+            modsAtGameplayStart = Mods.Value;
 
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
-                var autoplayMod = getAutoplayMod();
+                var autoInstance = getAutoplayMod();
 
-                if (autoplayMod == null)
+                if (autoInstance == null)
                 {
                     notifications?.Post(new SimpleNotification
                     {
@@ -95,20 +85,41 @@ namespace osu.Game.Screens.Select
                     return false;
                 }
 
-                var mods = Mods.Value;
+                var mods = Mods.Value.Append(autoInstance).ToArray();
 
-                if (mods.All(m => m.GetType() != autoplayMod.GetType()))
-                {
-                    Mods.Value = mods.Append(autoplayMod).ToArray();
-                    removeAutoModOnResume = true;
-                }
+                if (!ModUtils.CheckCompatibleSet(mods, out var invalid))
+                    mods = mods.Except(invalid).Append(autoInstance).ToArray();
+
+                Mods.Value = mods;
             }
 
             SampleConfirm?.Play();
 
-            this.Push(player = new PlayerLoader(() => new SoloPlayer()));
-
+            this.Push(playerLoader = new PlayerLoader(createPlayer));
             return true;
+
+            Player createPlayer()
+            {
+                var replayGeneratingMod = Mods.Value.OfType<ICreateReplayData>().FirstOrDefault();
+
+                if (replayGeneratingMod != null)
+                {
+                    return new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods));
+                }
+
+                return new SoloPlayer();
+            }
+        }
+
+        public override void OnResuming(ScreenTransitionEvent e)
+        {
+            base.OnResuming(e);
+
+            if (playerLoader != null)
+            {
+                Mods.Value = modsAtGameplayStart;
+                playerLoader = null;
+            }
         }
     }
 }

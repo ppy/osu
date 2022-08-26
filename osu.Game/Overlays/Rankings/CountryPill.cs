@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -19,13 +22,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class CountryPill : CompositeDrawable, IHasCurrentValue<Country>
+    public class CountryPill : CompositeDrawable, IHasCurrentValue<CountryCode>
     {
         private const int duration = 200;
 
-        private readonly BindableWithCurrent<Country> current = new BindableWithCurrent<Country>();
+        private readonly BindableWithCurrent<CountryCode> current = new BindableWithCurrent<CountryCode>();
 
-        public Bindable<Country> Current
+        public Bindable<CountryCode> Current
         {
             get => current.Current;
             set => current.Current = value;
@@ -42,7 +45,7 @@ namespace osu.Game.Overlays.Rankings
 
             InternalChild = content = new CircularContainer
             {
-                Height = 25,
+                Height = 30,
                 AutoSizeDuration = duration,
                 AutoSizeEasing = Easing.OutQuint,
                 Masking = true,
@@ -58,9 +61,9 @@ namespace osu.Game.Overlays.Rankings
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Y,
                         AutoSizeAxes = Axes.X,
-                        Margin = new MarginPadding { Horizontal = 10 },
+                        Margin = new MarginPadding { Horizontal = 15 },
                         Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(8, 0),
+                        Spacing = new Vector2(15, 0),
                         Children = new Drawable[]
                         {
                             new FillFlowContainer
@@ -70,14 +73,14 @@ namespace osu.Game.Overlays.Rankings
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(3, 0),
+                                Spacing = new Vector2(5, 0),
                                 Children = new Drawable[]
                                 {
                                     flag = new UpdateableFlag
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Size = new Vector2(22, 15)
+                                        Size = new Vector2(28, 20)
                                     },
                                     countryName = new OsuSpriteText
                                     {
@@ -91,7 +94,7 @@ namespace osu.Game.Overlays.Rankings
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Action = () => Current.Value = null
+                                Action = Current.SetDefault,
                             }
                         }
                     }
@@ -128,13 +131,13 @@ namespace osu.Game.Overlays.Rankings
             this.FadeOut(duration, Easing.OutQuint);
         }
 
-        private void onCountryChanged(ValueChangedEvent<Country> country)
+        private void onCountryChanged(ValueChangedEvent<CountryCode> country)
         {
-            if (country.NewValue == null)
+            if (Current.Value == CountryCode.Unknown)
                 return;
 
-            flag.Country = country.NewValue;
-            countryName.Text = country.NewValue.FullName;
+            flag.CountryCode = country.NewValue;
+            countryName.Text = country.NewValue.GetDescription();
         }
 
         private class CloseButton : OsuHoverContainer
@@ -148,7 +151,7 @@ namespace osu.Game.Overlays.Rankings
                 AutoSizeAxes = Axes.Both;
                 Add(icon = new SpriteIcon
                 {
-                    Size = new Vector2(8),
+                    Size = new Vector2(10),
                     Icon = FontAwesome.Solid.Times
                 });
             }

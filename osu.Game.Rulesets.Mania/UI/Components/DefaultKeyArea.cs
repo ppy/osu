@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
@@ -68,7 +71,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                                 AlwaysPresent = true
                             }
                         }
-                    }
+                    },
                 }
             };
 
@@ -101,16 +104,16 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             }
         }
 
-        public bool OnPressed(ManiaAction action)
+        public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action == column.Action.Value)
+            if (e.Action == column.Action.Value)
                 keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint).Then().ScaleTo(1.3f, 250, Easing.OutQuint);
             return false;
         }
 
-        public void OnReleased(ManiaAction action)
+        public void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
-            if (action == column.Action.Value)
+            if (e.Action == column.Action.Value)
                 keyIcon.ScaleTo(1f, 125, Easing.OutQuint);
         }
     }

@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -9,35 +10,31 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Spectator;
+using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
-    public class SpectatorPlayer : Player
+    public abstract class SpectatorPlayer : Player
     {
+        [Resolved]
+        protected SpectatorClient SpectatorClient { get; private set; }
+
         private readonly Score score;
 
         protected override bool CheckModsAllowFailure() => false; // todo: better support starting mid-way through beatmap
 
-        public SpectatorPlayer(Score score)
+        protected SpectatorPlayer(Score score, PlayerConfiguration configuration = null)
+            : base(configuration)
         {
             this.score = score;
         }
 
-        protected override ResultsScreen CreateResults(ScoreInfo score)
-        {
-            return new SpectatorResultsScreen(score);
-        }
-
-        [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            spectatorClient.OnUserBeganPlaying += userBeganPlaying;
-
             AddInternal(new OsuSpriteText
             {
                 Text = $"Watching {score.ScoreInfo.User.Username} playing live!",
@@ -48,44 +45,81 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
+            {
+                if (GameplayClockContainer is MasterGameplayClockContainer master)
+                {
+                    if (master.UserPlaybackRate.Value > 1 && waiting.NewValue)
+                        master.UserPlaybackRate.Value = 1;
+                }
+            }, true);
+        }
+
+        protected override void StartGameplay()
+        {
+            base.StartGameplay();
+
+            // Start gameplay along with the very first arrival frame (the latest one).
+            score.Replay.Frames.Clear();
+            SpectatorClient.OnNewFrames += userSentFrames;
+        }
+
+        private void userSentFrames(int userId, FrameDataBundle bundle)
+        {
+            if (userId != score.ScoreInfo.User.OnlineID)
+                return;
+
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
+            if (!this.IsCurrentScreen())
+                return;
+
+            bool isFirstBundle = score.Replay.Frames.Count == 0;
+
+            foreach (var frame in bundle.Frames)
+            {
+                IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame();
+                convertibleFrame.FromLegacy(frame, GameplayState.Beatmap);
+
+                var convertedFrame = (ReplayFrame)convertibleFrame;
+                convertedFrame.Time = frame.Time;
+                convertedFrame.Header = frame.Header;
+
+                score.Replay.Frames.Add(convertedFrame);
+            }
+
+            if (isFirstBundle && score.Replay.Frames.Count > 0)
+                SetGameplayStartTime(score.Replay.Frames[0].Time);
+        }
+
+        protected override Score CreateScore(IBeatmap beatmap) => score;
+
+        protected override ResultsScreen CreateResults(ScoreInfo score)
+            => new SpectatorResultsScreen(score);
+
         protected override void PrepareReplay()
         {
             DrawableRuleset?.SetReplayScore(score);
         }
 
-        protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            // if we already have frames, start gameplay at the point in time they exist, should they be too far into the beatmap.
-            double? firstFrameTime = score.Replay.Frames.FirstOrDefault()?.Time;
+            SpectatorClient.OnNewFrames -= userSentFrames;
 
-            if (firstFrameTime == null || firstFrameTime <= gameplayStart + 5000)
-                return base.CreateGameplayClockContainer(beatmap, gameplayStart);
-
-            return new MasterGameplayClockContainer(beatmap, firstFrameTime.Value, true);
-        }
-
-        public override bool OnExiting(IScreen next)
-        {
-            spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
-            return base.OnExiting(next);
-        }
-
-        private void userBeganPlaying(int userId, SpectatorState state)
-        {
-            if (userId != score.ScoreInfo.UserID) return;
-
-            Schedule(() =>
-            {
-                if (this.IsCurrentScreen()) this.Exit();
-            });
+            return base.OnExiting(e);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (spectatorClient != null)
-                spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
+            if (SpectatorClient != null)
+                SpectatorClient.OnNewFrames -= userSentFrames;
         }
     }
 }

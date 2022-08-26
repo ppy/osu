@@ -1,8 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Utils;
 
@@ -27,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface
             Current.Value = DisplayedCount = 1.0f;
         }
 
-        protected override string FormatCount(double count) => count.FormatAccuracy();
+        protected override LocalisableString FormatCount(double count) => count.FormatAccuracy();
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
         {

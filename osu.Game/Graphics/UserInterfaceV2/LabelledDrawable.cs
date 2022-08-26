@@ -6,7 +6,9 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -14,15 +16,39 @@ namespace osu.Game.Graphics.UserInterfaceV2
     public abstract class LabelledDrawable<T> : CompositeDrawable
         where T : Drawable
     {
+        private float? fixedLabelWidth;
+
+        /// <summary>
+        /// The fixed width of the label of this <see cref="LabelledDrawable{T}"/>.
+        /// If <c>null</c>, the label portion will auto-size to its content.
+        /// Can be used in layout scenarios where several labels must match in length for the components to be aligned properly.
+        /// </summary>
+        public float? FixedLabelWidth
+        {
+            get => fixedLabelWidth;
+            set
+            {
+                if (fixedLabelWidth == value)
+                    return;
+
+                fixedLabelWidth = value;
+
+                updateLabelWidth();
+            }
+        }
+
         protected const float CONTENT_PADDING_VERTICAL = 10;
         protected const float CONTENT_PADDING_HORIZONTAL = 15;
-        protected const float CORNER_RADIUS = 15;
+
+        public const float CORNER_RADIUS = 15;
 
         /// <summary>
         /// The component that is being displayed.
         /// </summary>
         protected readonly T Component;
 
+        private readonly Box background;
+        private readonly GridContainer grid;
         private readonly OsuTextFlowContainer labelText;
         private readonly OsuTextFlowContainer descriptionText;
 
@@ -40,10 +66,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("1c2125"),
                 },
                 new FillFlowContainer
                 {
@@ -56,7 +81,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Spacing = new Vector2(0, 12),
                     Children = new Drawable[]
                     {
-                        new GridContainer
+                        grid = new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -69,7 +94,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         AutoSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Right = 20 }
+                                        Padding = new MarginPadding
+                                        {
+                                            Right = 20,
+                                            // ensure that the label is always vertically padded even if the component itself isn't.
+                                            // this may become an issue if the label is taller than the component.
+                                            Vertical = padded ? 0 : CONTENT_PADDING_VERTICAL
+                                        }
                                     },
                                     new Container
                                     {
@@ -87,7 +118,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 },
                             },
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                            ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         },
                         descriptionText = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold, italics: true))
                         {
@@ -99,26 +129,45 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     }
                 }
             };
+
+            updateLabelWidth();
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour osuColour)
+        private void updateLabelWidth()
         {
+            if (fixedLabelWidth == null)
+            {
+                grid.ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) };
+                labelText.RelativeSizeAxes = Axes.None;
+                labelText.AutoSizeAxes = Axes.Both;
+            }
+            else
+            {
+                grid.ColumnDimensions = new[] { new Dimension(GridSizeMode.Absolute, fixedLabelWidth.Value) };
+                labelText.AutoSizeAxes = Axes.Y;
+                labelText.RelativeSizeAxes = Axes.X;
+            }
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? colourProvider, OsuColour osuColour)
+        {
+            background.Colour = colourProvider?.Background5 ?? Color4Extensions.FromHex(@"1c2125");
             descriptionText.Colour = osuColour.Yellow;
         }
 
-        public string Label
+        public LocalisableString Label
         {
             set => labelText.Text = value;
         }
 
-        public string Description
+        public LocalisableString Description
         {
             set
             {
                 descriptionText.Text = value;
 
-                if (!string.IsNullOrEmpty(value))
+                if (!string.IsNullOrEmpty(value.ToString()))
                     descriptionText.Show();
                 else
                     descriptionText.Hide();

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
@@ -21,7 +23,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         protected virtual bool AlwaysShowWhenSelected => false;
 
-        protected override bool ShouldBeAlive => (DrawableObject.IsAlive && DrawableObject.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
+        protected override bool ShouldBeAlive => (DrawableObject?.IsAlive == true && DrawableObject.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
 
         protected HitObjectSelectionBlueprint(HitObject hitObject)
             : base(hitObject)

@@ -1,17 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Configuration
@@ -30,7 +32,7 @@ namespace osu.Game.Configuration
     {
         public LocalisableString Label { get; }
 
-        public string Description { get; }
+        public LocalisableString Description { get; }
 
         public int? OrderPosition { get; }
 
@@ -42,10 +44,45 @@ namespace osu.Game.Configuration
         /// </remarks>
         public Type? SettingControlType { get; set; }
 
+        public SettingSourceAttribute(Type declaringType, string label, string? description = null)
+        {
+            Label = getLocalisableStringFromMember(label) ?? string.Empty;
+            Description = getLocalisableStringFromMember(description) ?? string.Empty;
+
+            LocalisableString? getLocalisableStringFromMember(string? member)
+            {
+                if (member == null)
+                    return null;
+
+                var property = declaringType.GetMember(member, BindingFlags.Static | BindingFlags.Public).FirstOrDefault();
+
+                if (property == null)
+                    return null;
+
+                switch (property)
+                {
+                    case FieldInfo f:
+                        return (LocalisableString)f.GetValue(null).AsNonNull();
+
+                    case PropertyInfo p:
+                        return (LocalisableString)p.GetValue(null).AsNonNull();
+
+                    default:
+                        throw new InvalidOperationException($"Member \"{member}\" was not found in type {declaringType} (must be a static field or property)");
+                }
+            }
+        }
+
         public SettingSourceAttribute(string? label, string? description = null)
         {
             Label = label ?? string.Empty;
             Description = description ?? string.Empty;
+        }
+
+        public SettingSourceAttribute(Type declaringType, string label, string description, int orderPosition)
+            : this(declaringType, label, description)
+        {
+            OrderPosition = orderPosition;
         }
 
         public SettingSourceAttribute(string label, string description, int orderPosition)
@@ -85,6 +122,7 @@ namespace osu.Game.Configuration
                         throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} had an unsupported custom control type ({controlType.ReadableName()})");
 
                     var control = (Drawable)Activator.CreateInstance(controlType);
+                    controlType.GetProperty(nameof(SettingsItem<object>.SettingSourceObject))?.SetValue(control, obj);
                     controlType.GetProperty(nameof(SettingsItem<object>.LabelText))?.SetValue(control, attr.Label);
                     controlType.GetProperty(nameof(SettingsItem<object>.TooltipText))?.SetValue(control, attr.Description);
                     controlType.GetProperty(nameof(SettingsItem<object>.Current))?.SetValue(control, value);
@@ -149,7 +187,7 @@ namespace osu.Game.Configuration
                         break;
 
                     case IBindable bindable:
-                        var dropdownType = typeof(SettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
+                        var dropdownType = typeof(ModSettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
                         var dropdown = (Drawable)Activator.CreateInstance(dropdownType);
 
                         dropdownType.GetProperty(nameof(SettingsDropdown<object>.LabelText))?.SetValue(dropdown, attr.Label);
@@ -166,9 +204,54 @@ namespace osu.Game.Configuration
             }
         }
 
+        private static readonly ConcurrentDictionary<Type, (SettingSourceAttribute, PropertyInfo)[]> property_info_cache = new ConcurrentDictionary<Type, (SettingSourceAttribute, PropertyInfo)[]>();
+
+        /// <summary>
+        /// Returns the underlying value of the given mod setting object.
+        /// Can be used for serialization and equality comparison purposes.
+        /// </summary>
+        /// <param name="setting">A <see cref="SettingSourceAttribute"/> bindable.</param>
+        public static object GetUnderlyingSettingValue(this object setting)
+        {
+            switch (setting)
+            {
+                case Bindable<double> d:
+                    return d.Value;
+
+                case Bindable<int> i:
+                    return i.Value;
+
+                case Bindable<float> f:
+                    return f.Value;
+
+                case Bindable<bool> b:
+                    return b.Value;
+
+                case IBindable u:
+                    // An unknown (e.g. enum) generic type.
+                    var valueMethod = u.GetType().GetProperty(nameof(IBindable<int>.Value));
+                    Debug.Assert(valueMethod != null);
+                    return valueMethod.GetValue(u);
+
+                default:
+                    // fall back for non-bindable cases.
+                    return setting;
+            }
+        }
+
         public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetSettingsSourceProperties(this object obj)
         {
-            foreach (var property in obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
+            var type = obj.GetType();
+
+            if (!property_info_cache.TryGetValue(type, out var properties))
+                property_info_cache[type] = properties = getSettingsSourceProperties(type).ToArray();
+
+            return properties;
+        }
+
+        private static IEnumerable<(SettingSourceAttribute, PropertyInfo)> getSettingsSourceProperties(Type type)
+        {
+            foreach (var property in type.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
             {
                 var attr = property.GetCustomAttribute<SettingSourceAttribute>(true);
 
@@ -183,5 +266,17 @@ namespace osu.Game.Configuration
             => obj.GetSettingsSourceProperties()
                   .OrderBy(attr => attr.Item1)
                   .ToArray();
+
+        private class ModSettingsEnumDropdown<T> : SettingsEnumDropdown<T>
+            where T : struct, Enum
+        {
+            protected override OsuDropdown<T> CreateDropdown() => new ModDropdownControl();
+
+            private class ModDropdownControl : DropdownControl
+            {
+                // Set menu's max height low enough to workaround nested scroll issues (see https://github.com/ppy/osu-framework/issues/4536).
+                protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 100);
+            }
+        }
     }
 }

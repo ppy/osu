@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -28,7 +31,7 @@ namespace osu.Game.Graphics.UserInterface
         /// Array of button codes which should trigger the click sound.
         /// If this optional parameter is omitted or set to <code>null</code>, the click sound will only be played on left click.
         /// </param>
-        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal, MouseButton[] buttons = null)
+        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Default, MouseButton[] buttons = null)
             : base(sampleSet)
         {
             this.buttons = buttons ?? new[] { MouseButton.Left };
@@ -37,7 +40,10 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(ClickEvent e)
         {
             if (buttons.Contains(e.Button) && Contains(e.ScreenSpaceMousePosition))
-                sampleClick?.Play();
+            {
+                sampleClick.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
+                sampleClick.Play();
+            }
 
             return base.OnClick(e);
         }
@@ -45,7 +51,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Samples.Get($@"UI/generic-select{SampleSet.GetDescription()}");
+            sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select")
+                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
         }
     }
 }

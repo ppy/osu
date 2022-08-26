@@ -5,23 +5,19 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModMirror : Mod, IApplicableToBeatmap
+    public class ManiaModMirror : ModMirror, IApplicableToBeatmap
     {
-        public override string Name => "Mirror";
-        public override string Acronym => "MR";
-        public override ModType Type => ModType.Conversion;
-        public override string Description => "Notes are flipped horizontally.";
-        public override double ScoreMultiplier => 1;
-        public override bool Ranked => true;
+        public override LocalisableString Description => "Notes are flipped horizontally.";
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            var availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
+            int availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
 
             beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = availableColumns - 1 - h.Column);
         }

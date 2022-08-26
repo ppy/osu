@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,6 +22,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public PalpableCatchHitObject HitObject { get; private set; }
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
         public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
+        public Bindable<int> IndexInBeatmap { get; } = new Bindable<int>();
 
         public Vector2 DisplaySize => Size * Scale;
 
@@ -51,6 +54,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             Rotation = objectState.DisplayRotation;
             AccentColour.Value = objectState.AccentColour.Value;
             HyperDash.Value = objectState.HyperDash.Value;
+            IndexInBeatmap.Value = objectState.IndexInBeatmap.Value;
         }
 
         protected override void FreeAfterUse()

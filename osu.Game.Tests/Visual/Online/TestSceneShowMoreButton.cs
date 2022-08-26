@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Allocation;
@@ -32,19 +34,19 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            AddStep("click button", () => button.Click());
+            AddStep("click button", () => button.TriggerClick());
 
             AddAssert("action fired once", () => fireCount == 1);
             AddAssert("is in loading state", () => button.IsLoading);
 
-            AddStep("click button", () => button.Click());
+            AddStep("click button", () => button.TriggerClick());
 
             AddAssert("action not fired", () => fireCount == 1);
             AddAssert("is in loading state", () => button.IsLoading);
 
             AddUntilStep("wait for loaded", () => !button.IsLoading);
 
-            AddStep("click button", () => button.Click());
+            AddStep("click button", () => button.TriggerClick());
 
             AddAssert("action fired twice", () => fireCount == 2);
             AddAssert("is in loading state", () => button.IsLoading);

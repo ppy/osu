@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
@@ -16,7 +18,7 @@ namespace osu.Game.Tournament.Tests.Components
 
         public TestSceneMatchScoreDisplay()
         {
-            Add(new MatchScoreDisplay
+            Add(new TournamentMatchScoreDisplay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

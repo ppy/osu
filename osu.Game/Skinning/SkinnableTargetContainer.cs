@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
@@ -18,6 +21,12 @@ namespace osu.Game.Skinning
 
         private readonly BindableList<ISkinnableDrawable> components = new BindableList<ISkinnableDrawable>();
 
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks; // ensure that components are loaded even if the target container is hidden (ie. due to user toggle).
+
+        public bool ComponentsLoaded { get; private set; }
+
+        private CancellationTokenSource cancellationSource;
+
         public SkinnableTargetContainer(SkinnableTarget target)
         {
             Target = target;
@@ -30,8 +39,12 @@ namespace osu.Game.Skinning
         {
             ClearInternal();
             components.Clear();
+            ComponentsLoaded = false;
 
             content = CurrentSkin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetComponentsContainer;
+
+            cancellationSource?.Cancel();
+            cancellationSource = null;
 
             if (content != null)
             {
@@ -39,8 +52,11 @@ namespace osu.Game.Skinning
                 {
                     AddInternal(wrapper);
                     components.AddRange(wrapper.Children.OfType<ISkinnableDrawable>());
-                });
+                    ComponentsLoaded = true;
+                }, (cancellationSource = new CancellationTokenSource()).Token);
             }
+            else
+                ComponentsLoaded = true;
         }
 
         /// <inheritdoc cref="ISkinnableTarget"/>
@@ -73,9 +89,9 @@ namespace osu.Game.Skinning
             components.Remove(component);
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin)
         {
-            base.SkinChanged(skin, allowFallback);
+            base.SkinChanged(skin);
 
             Reload();
         }

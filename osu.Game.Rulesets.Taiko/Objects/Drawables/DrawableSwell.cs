@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -12,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
@@ -184,9 +187,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 nextTick?.TriggerResult(true);
 
-                var numHits = ticks.Count(r => r.IsHit);
+                int numHits = ticks.Count(r => r.IsHit);
 
-                var completion = (float)numHits / HitObject.RequiredHits;
+                float completion = (float)numHits / HitObject.RequiredHits;
 
                 expandingRing
                     .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
@@ -227,7 +230,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.UpdateStartTimeStateTransforms();
 
-            using (BeginDelayedSequence(-ring_appear_offset, true))
+            using (BeginDelayedSequence(-ring_appear_offset))
                 targetRing.ScaleTo(target_ring_scale, 400, Easing.OutQuint);
         }
 
@@ -266,13 +269,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool? lastWasCentre;
 
-        public override bool OnPressed(TaikoAction action)
+        public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
             // Don't handle keys before the swell starts
             if (Time.Current < HitObject.StartTime)
                 return false;
 
-            var isCentre = action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre;
+            bool isCentre = e.Action == TaikoAction.LeftCentre || e.Action == TaikoAction.RightCentre;
 
             // Ensure alternating centre and rim hits
             if (lastWasCentre == isCentre)

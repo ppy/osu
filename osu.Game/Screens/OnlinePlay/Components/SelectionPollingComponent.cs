@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
+#nullable disable
+
 using System.Threading.Tasks;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
@@ -15,56 +13,41 @@ namespace osu.Game.Screens.OnlinePlay.Components
     /// </summary>
     public class SelectionPollingComponent : RoomPollingComponent
     {
-        [Resolved]
-        private Bindable<Room> selectedRoom { get; set; }
+        private readonly Room room;
 
-        [Resolved]
-        private IRoomManager roomManager { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load()
+        public SelectionPollingComponent(Room room)
         {
-            selectedRoom.BindValueChanged(_ =>
-            {
-                if (IsLoaded)
-                    PollImmediately();
-            });
+            this.room = room;
         }
 
-        private GetRoomRequest pollReq;
+        private GetRoomRequest lastPollRequest;
 
         protected override Task Poll()
         {
             if (!API.IsLoggedIn)
                 return base.Poll();
 
-            if (selectedRoom.Value?.RoomID.Value == null)
+            if (room.RoomID.Value == null)
                 return base.Poll();
 
             var tcs = new TaskCompletionSource<bool>();
 
-            pollReq?.Cancel();
-            pollReq = new GetRoomRequest(selectedRoom.Value.RoomID.Value.Value);
+            lastPollRequest?.Cancel();
 
-            pollReq.Success += result =>
+            var req = new GetRoomRequest(room.RoomID.Value.Value);
+
+            req.Success += result =>
             {
-                // existing rooms need to be ordered by their position because the received of NotifyRoomsReceives expects to be able to sort them based on this order.
-                var rooms = new List<Room>(roomManager.Rooms.OrderBy(r => r.Position.Value));
-
-                int index = rooms.FindIndex(r => r.RoomID.Value == result.RoomID.Value);
-
-                if (index < 0)
-                    return;
-
-                rooms[index] = result;
-
-                NotifyRoomsReceived(rooms);
+                result.RemoveExpiredPlaylistItems();
+                RoomManager.AddOrUpdateRoom(result);
                 tcs.SetResult(true);
             };
 
-            pollReq.Failure += _ => tcs.SetResult(false);
+            req.Failure += _ => tcs.SetResult(false);
 
-            API.Queue(pollReq);
+            API.Queue(req);
+
+            lastPollRequest = req;
 
             return tcs.Task;
         }

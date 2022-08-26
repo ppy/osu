@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Configuration;
@@ -42,18 +45,22 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             InternalChild = fadeContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling)
+                Children = new[]
+                {
+                    cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
+                    new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
+                }
             };
         }
 
         [Resolved(canBeNull: true)]
-        private GameplayBeatmap beatmap { get; set; }
+        private GameplayState state { get; set; }
 
         [Resolved]
         private OsuConfigManager config { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, OsuRulesetConfigManager rulesetConfig)
+        private void load(OsuRulesetConfigManager rulesetConfig)
         {
             rulesetConfig?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
         }
@@ -91,10 +98,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             float scale = userCursorScale.Value;
 
-            if (autoCursorScale.Value && beatmap != null)
+            if (autoCursorScale.Value && state != null)
             {
                 // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
-                scale *= GetScaleForCircleSize(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
+                scale *= GetScaleForCircleSize(state.Beatmap.Difficulty.CircleSize);
             }
 
             cursorScale.Value = scale;
@@ -115,9 +122,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 (ActiveCursor as OsuCursor)?.Contract();
         }
 
-        public bool OnPressed(OsuAction action)
+        public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
@@ -129,9 +136,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             return false;
         }
 
-        public void OnReleased(OsuAction action)
+        public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
