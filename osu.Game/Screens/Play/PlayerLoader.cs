@@ -123,6 +123,8 @@ namespace osu.Game.Screens.Play
 
         private EpilepsyWarning? epilepsyWarning;
 
+        private bool quickRestart;
+
         [Resolved(CanBeNull = true)]
         private INotificationOverlay? notificationOverlay { get; set; }
 
@@ -361,6 +363,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
+            CurrentPlayer.Configuration.AutomaticallySkipIntro = quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
@@ -375,8 +378,9 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void restartRequested()
+        private void restartRequested(bool quickRestartRequested)
         {
+            quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
         }
