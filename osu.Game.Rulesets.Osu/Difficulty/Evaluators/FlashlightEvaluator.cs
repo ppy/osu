@@ -78,7 +78,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     result += stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
 
-                    if (currentObj.Angle != null && osuCurrent.Angle != null) {
+                    if (currentObj.Angle != null && osuCurrent.Angle != null)
+                    {
                         double roundedAngle = Math.Round(MathUtils.RadiansToDegrees(currentObj.Angle.Value) / 2.0) * 2.0;
 
                         if (roundedAngle == initialRoundedAngle)
