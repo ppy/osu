@@ -260,6 +260,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (toSplit.Count == 0)
                 return;
 
+            editorBeatmap.SelectedHitObjects.Clear();
+
             foreach (var c in toSplit)
             {
                 if (c == controlPoints[0] || c == controlPoints[^1] || c.Type is null)
@@ -318,8 +320,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             foreach (var c in controlPoints)
                 c.Position -= first;
             HitObject.Position += first;
-
-            editorBeatmap.SelectedHitObjects.Clear();
         }
 
         private void convertToStream()
