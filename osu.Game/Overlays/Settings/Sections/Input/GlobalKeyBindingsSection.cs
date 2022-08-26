@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -23,6 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         public GlobalKeyBindingsSection(GlobalActionContainer manager)
         {
             Add(new DefaultBindingsSubsection(manager));
+            Add(new OverlayBindingsSubsection(manager));
             Add(new AudioControlKeyBindingsSubsection(manager));
             Add(new SongSelectKeyBindingSubsection(manager));
             Add(new InGameKeyBindingsSubsection(manager));
@@ -37,6 +36,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 : base(null)
             {
                 Defaults = manager.GlobalKeyBindings;
+            }
+        }
+
+        private class OverlayBindingsSubsection : KeyBindingsSubsection
+        {
+            protected override LocalisableString Header => InputSettingsStrings.OverlaysSection;
+
+            public OverlayBindingsSubsection(GlobalActionContainer manager)
+                : base(null)
+            {
+                Defaults = manager.OverlayKeyBindings;
             }
         }
 

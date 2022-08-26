@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
         public override string Name => "Blinds";
-        public override string Description => "Play with blinds on your screen.";
+        public override LocalisableString Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
         public override IconUsage? Icon => FontAwesome.Solid.Adjust;

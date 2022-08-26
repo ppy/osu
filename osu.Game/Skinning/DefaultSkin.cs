@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
@@ -54,7 +53,7 @@ namespace osu.Game.Skinning
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
-                var sample = Samples?.Get(lookup) ?? resources.AudioManager.Samples.Get(lookup);
+                var sample = Samples?.Get(lookup) ?? resources.AudioManager?.Samples.Get(lookup);
                 if (sample != null)
                     return sample;
             }
