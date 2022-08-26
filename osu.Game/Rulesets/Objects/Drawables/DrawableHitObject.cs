@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -123,9 +125,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
         private readonly BindableList<HitSampleInfo> samplesBindable = new BindableList<HitSampleInfo>();
-        private readonly Bindable<bool> userPositionalHitSounds = new Bindable<bool>();
-
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
+
+        private readonly Bindable<float> positionalHitsoundsLevel = new Bindable<float>();
         private readonly Bindable<int> comboIndexWithOffsetsBindable = new Bindable<int>();
 
         protected override bool RequiresChildrenUpdate => true;
@@ -168,7 +170,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
-            config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
+            config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
 
             // Explicit non-virtual function call.
             base.AddInternal(Samples = new PausableSkinnableSound());
@@ -448,7 +450,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Reapplies the current <see cref="ArmedState"/>.
         /// </summary>
-        protected void RefreshStateTransforms() => updateState(State.Value, true);
+        public void RefreshStateTransforms() => updateState(State.Value, true);
 
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
@@ -532,9 +534,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="position">The lookup X position. Generally should be <see cref="SamplePlaybackPosition"/>.</param>
         protected double CalculateSamplePlaybackBalance(double position)
         {
-            const float balance_adjust_amount = 0.4f;
+            float balanceAdjustAmount = positionalHitsoundsLevel.Value * 2;
+            double returnedValue = balanceAdjustAmount * (position - 0.5f);
 
-            return balance_adjust_amount * (userPositionalHitSounds.Value ? position - 0.5f : 0);
+            return returnedValue;
         }
 
         /// <summary>
@@ -568,7 +571,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (Result != null && Result.HasResult)
             {
-                var endTime = HitObject.GetEndTime();
+                double endTime = HitObject.GetEndTime();
 
                 if (Result.TimeOffset + endTime > Time.Current)
                 {

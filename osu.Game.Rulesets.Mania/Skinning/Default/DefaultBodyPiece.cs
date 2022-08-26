@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -86,20 +88,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = foregroundBuffer = new BufferedContainer
+                InternalChild = foregroundBuffer = new BufferedContainer(cachedFrameBuffer: true)
                 {
                     Blending = BlendingParameters.Additive,
                     RelativeSizeAxes = Axes.Both,
-                    CacheDrawnFrameBuffer = true,
                     Children = new Drawable[]
                     {
                         new Box { RelativeSizeAxes = Axes.Both },
-                        subtractionBuffer = new BufferedContainer
+                        subtractionBuffer = new BufferedContainer(cachedFrameBuffer: true)
                         {
                             RelativeSizeAxes = Axes.Both,
                             // This is needed because we're blending with another object
                             BackgroundColour = Color4.White.Opacity(0),
-                            CacheDrawnFrameBuffer = true,
                             // The 'hole' is achieved by subtracting the result of this container with the parent
                             Blending = new BlendingParameters { AlphaEquation = BlendingEquation.ReverseSubtract },
                             Child = subtractionLayer = new CircularContainer

@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using JetBrains.Annotations;
 
 namespace osu.Game.Localisation
 {
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public enum Language
     {
         [Description(@"English")]
@@ -110,6 +112,11 @@ namespace osu.Game.Localisation
         // zh_hk,
 
         [Description(@"繁體中文（台灣）")]
-        zh_tw
+        zh_hant,
+
+#if DEBUG
+        [Description(@"Debug (show raw keys)")]
+        debug
+#endif
     }
 }

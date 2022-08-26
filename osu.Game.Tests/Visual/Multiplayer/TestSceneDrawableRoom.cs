@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -10,14 +12,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -32,9 +37,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestMultipleStatuses()
         {
+            FillFlowContainer rooms = null;
+
             AddStep("create rooms", () =>
             {
-                Child = new FillFlowContainer
+                Child = rooms = new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -43,78 +50,95 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
-                        createDrawableRoom(new Room
+                        createLoungeRoom(new Room
                         {
-                            Name = { Value = "Flyte's Trash Playlist" },
+                            Name = { Value = "Multiplayer room" },
                             Status = { Value = new RoomStatusOpen() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                            Type = { Value = MatchType.HeadToHead },
                             Playlist =
                             {
-                                new PlaylistItem
+                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
                                 {
-                                    Beatmap =
+                                    BeatmapInfo =
                                     {
-                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                        {
-                                            BeatmapInfo =
-                                            {
-                                                StarDifficulty = 2.5
-                                            }
-                                        }.BeatmapInfo,
+                                        StarRating = 2.5
                                     }
-                                }
+                                }.BeatmapInfo)
                             }
                         }),
-                        createDrawableRoom(new Room
+                        createLoungeRoom(new Room
                         {
-                            Name = { Value = "Room 2" },
+                            Name = { Value = "Multiplayer room" },
+                            Status = { Value = new RoomStatusOpen() },
+                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                            Type = { Value = MatchType.HeadToHead },
+                            Playlist =
+                            {
+                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
+                                {
+                                    BeatmapInfo =
+                                    {
+                                        StarRating = 2.5,
+                                        Metadata =
+                                        {
+                                            Artist = "very very very very very very very very very long artist",
+                                            ArtistUnicode = "very very very very very very very very very long artist",
+                                            Title = "very very very very very very very very very very very long title",
+                                            TitleUnicode = "very very very very very very very very very very very long title",
+                                        }
+                                    }
+                                }.BeatmapInfo)
+                            }
+                        }),
+                        createLoungeRoom(new Room
+                        {
+                            Name = { Value = "Playlist room with multiple beatmaps" },
                             Status = { Value = new RoomStatusPlaying() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Playlist =
                             {
-                                new PlaylistItem
+                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
                                 {
-                                    Beatmap =
+                                    BeatmapInfo =
                                     {
-                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                        {
-                                            BeatmapInfo =
-                                            {
-                                                StarDifficulty = 2.5
-                                            }
-                                        }.BeatmapInfo,
+                                        StarRating = 2.5
                                     }
-                                },
-                                new PlaylistItem
+                                }.BeatmapInfo),
+                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
                                 {
-                                    Beatmap =
+                                    BeatmapInfo =
                                     {
-                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                        {
-                                            BeatmapInfo =
-                                            {
-                                                StarDifficulty = 4.5
-                                            }
-                                        }.BeatmapInfo,
+                                        StarRating = 4.5
                                     }
-                                }
+                                }.BeatmapInfo)
                             }
                         }),
-                        createDrawableRoom(new Room
+                        createLoungeRoom(new Room
                         {
-                            Name = { Value = "Room 3" },
+                            Name = { Value = "Finished room" },
                             Status = { Value = new RoomStatusEnded() },
                             EndDate = { Value = DateTimeOffset.Now },
                         }),
-                        createDrawableRoom(new Room
+                        createLoungeRoom(new Room
                         {
-                            Name = { Value = "Room 4 (spotlight)" },
+                            Name = { Value = "Spotlight room" },
                             Status = { Value = new RoomStatusOpen() },
                             Category = { Value = RoomCategory.Spotlight },
+                        }),
+                        createLoungeRoom(new Room
+                        {
+                            Name = { Value = "Featured artist room" },
+                            Status = { Value = new RoomStatusOpen() },
+                            Category = { Value = RoomCategory.FeaturedArtist },
                         }),
                     }
                 };
             });
+
+            AddUntilStep("wait for panel load", () => rooms.Count == 6);
+            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Currently playing", StringComparison.Ordinal)) == 2);
+            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)) == 4);
         }
 
         [Test]
@@ -123,12 +147,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             DrawableRoom drawableRoom = null;
             Room room = null;
 
-            AddStep("create room", () => Child = drawableRoom = createDrawableRoom(room = new Room
+            AddStep("create room", () => Child = drawableRoom = createLoungeRoom(room = new Room
             {
                 Name = { Value = "Room with password" },
                 Status = { Value = new RoomStatusOpen() },
                 Type = { Value = MatchType.HeadToHead },
             }));
+
+            AddUntilStep("wait for panel load", () => drawableRoom.ChildrenOfType<DrawableRoomParticipantsList>().Any());
 
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
 
@@ -139,13 +165,46 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
         }
 
-        private DrawableRoom createDrawableRoom(Room room)
+        [Test]
+        public void TestMultiplayerRooms()
         {
-            room.Host.Value ??= new User { Username = "peppy", Id = 2 };
+            AddStep("create rooms", () => Child = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(5),
+                Children = new[]
+                {
+                    new DrawableMatchRoom(new Room
+                    {
+                        Name = { Value = "A host-only room" },
+                        QueueMode = { Value = QueueMode.HostOnly },
+                        Type = { Value = MatchType.HeadToHead }
+                    }),
+                    new DrawableMatchRoom(new Room
+                    {
+                        Name = { Value = "An all-players, team-versus room" },
+                        QueueMode = { Value = QueueMode.AllPlayers },
+                        Type = { Value = MatchType.TeamVersus }
+                    }),
+                    new DrawableMatchRoom(new Room
+                    {
+                        Name = { Value = "A round-robin room" },
+                        QueueMode = { Value = QueueMode.AllPlayersRoundRobin },
+                        Type = { Value = MatchType.HeadToHead }
+                    }),
+                }
+            });
+        }
+
+        private DrawableRoom createLoungeRoom(Room room)
+        {
+            room.Host.Value ??= new APIUser { Username = "peppy", Id = 2 };
 
             if (room.RecentParticipants.Count == 0)
             {
-                room.RecentParticipants.AddRange(Enumerable.Range(0, 20).Select(i => new User
+                room.RecentParticipants.AddRange(Enumerable.Range(0, 20).Select(i => new APIUser
                 {
                     Id = i,
                     Username = $"User {i}"

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Timing;
@@ -20,6 +21,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
@@ -86,9 +88,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 if (firstObject == null)
                     return false;
 
-                var skinnable = firstObject.ApproachCircle.Child as SkinnableDrawable;
+                var skinnable = firstObject.ApproachCircle;
 
-                if (skin == null && skinnable?.Drawable is Sprite)
+                if (skin == null && skinnable?.Drawable is DefaultApproachCircle)
                     // check for default skin provider
                     return true;
 

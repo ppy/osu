@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,17 +29,17 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The minimum health target at an HP drain rate of 0.
         /// </summary>
-        private const double min_health_target = 0.95;
+        private const double min_health_target = 0.99;
 
         /// <summary>
         /// The minimum health target at an HP drain rate of 5.
         /// </summary>
-        private const double mid_health_target = 0.70;
+        private const double mid_health_target = 0.9;
 
         /// <summary>
         /// The minimum health target at an HP drain rate of 10.
         /// </summary>
-        private const double max_health_target = 0.30;
+        private const double max_health_target = 0.4;
 
         private IBeatmap beatmap;
 
@@ -100,7 +102,7 @@ namespace osu.Game.Rulesets.Scoring
                        .First()
             )));
 
-            targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, min_health_target, mid_health_target, max_health_target);
+            targetMinimumHealth = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, min_health_target, mid_health_target, max_health_target);
 
             // Add back a portion of the amount of HP to be drained, depending on the lenience requested.
             targetMinimumHealth += drainLenience * (1 - targetMinimumHealth);

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -28,6 +30,10 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool AllowUniqueCharacterSamples => false;
 
         protected override bool AllowClipboardExport => false;
+
+        protected override bool AllowWordNavigation => false;
+
+        protected override bool AllowIme => false;
 
         private readonly CapsWarning warning;
 

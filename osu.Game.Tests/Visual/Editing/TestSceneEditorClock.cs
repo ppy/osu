@@ -6,7 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Tests.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -14,6 +16,9 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public class TestSceneEditorClock : EditorClockTestScene
     {
+        [Cached]
+        private EditorBeatmap editorBeatmap = new EditorBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo));
+
         public TestSceneEditorClock()
         {
             Add(new FillFlowContainer
@@ -37,9 +42,10 @@ namespace osu.Game.Tests.Visual.Editing
             });
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
             // ensure that music controller does not change this beatmap due to it
             // completing naturally as part of the test.
@@ -51,15 +57,15 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("reset clock", () => Clock.Seek(0));
 
-            AddStep("start clock", Clock.Start);
+            AddStep("start clock", () => Clock.Start());
             AddAssert("clock running", () => Clock.IsRunning);
 
             AddStep("seek near end", () => Clock.Seek(Clock.TrackLength - 250));
             AddUntilStep("clock stops", () => !Clock.IsRunning);
 
-            AddAssert("clock stopped at end", () => Clock.CurrentTime == Clock.TrackLength);
+            AddUntilStep("clock stopped at end", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
 
-            AddStep("start clock again", Clock.Start);
+            AddStep("start clock again", () => Clock.Start());
             AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
         }
 
@@ -68,32 +74,32 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("reset clock", () => Clock.Seek(0));
 
-            AddStep("stop clock", Clock.Stop);
+            AddStep("stop clock", () => Clock.Stop());
             AddAssert("clock stopped", () => !Clock.IsRunning);
 
             AddStep("seek exactly to end", () => Clock.Seek(Clock.TrackLength));
-            AddAssert("clock stopped at end", () => Clock.CurrentTime == Clock.TrackLength);
+            AddAssert("clock stopped at end", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
 
-            AddStep("start clock again", Clock.Start);
+            AddStep("start clock again", () => Clock.Start());
             AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
         }
 
         [Test]
         public void TestClampWhenSeekOutsideBeatmapBounds()
         {
-            AddStep("stop clock", Clock.Stop);
+            AddStep("stop clock", () => Clock.Stop());
 
             AddStep("seek before start time", () => Clock.Seek(-1000));
-            AddAssert("time is clamped to 0", () => Clock.CurrentTime == 0);
+            AddAssert("time is clamped to 0", () => Clock.CurrentTime, () => Is.EqualTo(0));
 
             AddStep("seek beyond track length", () => Clock.Seek(Clock.TrackLength + 1000));
-            AddAssert("time is clamped to track length", () => Clock.CurrentTime == Clock.TrackLength);
+            AddAssert("time is clamped to track length", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
 
             AddStep("seek smoothly before start time", () => Clock.SeekSmoothlyTo(-1000));
-            AddAssert("time is clamped to 0", () => Clock.CurrentTime == 0);
+            AddUntilStep("time is clamped to 0", () => Clock.CurrentTime, () => Is.EqualTo(0));
 
             AddStep("seek smoothly beyond track length", () => Clock.SeekSmoothlyTo(Clock.TrackLength + 1000));
-            AddAssert("time is clamped to track length", () => Clock.CurrentTime == Clock.TrackLength);
+            AddUntilStep("time is clamped to track length", () => Clock.CurrentTime, () => Is.EqualTo(Clock.TrackLength));
         }
 
         protected override void Dispose(bool isDisposing)

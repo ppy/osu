@@ -1,24 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.IO;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
     internal class ResourcesSection : SetupSection
     {
-        private LabelledTextBox audioTrackTextBox;
-        private LabelledTextBox backgroundTextBox;
+        private LabelledFileChooser audioTrackChooser;
+        private LabelledFileChooser backgroundChooser;
 
-        public override LocalisableString Title => "Resources";
+        public override LocalisableString Title => EditorSetupStrings.ResourcesHeader;
 
         [Resolved]
         private MusicController music { get; set; }
@@ -29,8 +30,8 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private IBindable<WorkingBeatmap> working { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private Editor editor { get; set; }
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; }
 
         [Resolved]
         private SetupScreenHeader header { get; set; }
@@ -40,94 +41,115 @@ namespace osu.Game.Screens.Edit.Setup
         {
             Children = new Drawable[]
             {
-                backgroundTextBox = new FileChooserLabelledTextBox(".jpg", ".jpeg", ".png")
+                backgroundChooser = new LabelledFileChooser(".jpg", ".jpeg", ".png")
                 {
-                    Label = "Background",
+                    Label = GameplaySettingsStrings.BackgroundHeader,
                     FixedLabelWidth = LABEL_WIDTH,
-                    PlaceholderText = "Click to select a background image",
-                    Current = { Value = working.Value.Metadata.BackgroundFile },
                     TabbableContentContainer = this
                 },
-                audioTrackTextBox = new FileChooserLabelledTextBox(".mp3", ".ogg")
+                audioTrackChooser = new LabelledFileChooser(".mp3", ".ogg")
                 {
-                    Label = "Audio Track",
+                    Label = EditorSetupStrings.AudioTrack,
                     FixedLabelWidth = LABEL_WIDTH,
-                    PlaceholderText = "Click to select a track",
-                    Current = { Value = working.Value.Metadata.AudioFile },
                     TabbableContentContainer = this
                 },
             };
 
-            backgroundTextBox.Current.BindValueChanged(backgroundChanged);
-            audioTrackTextBox.Current.BindValueChanged(audioTrackChanged);
+            if (!string.IsNullOrEmpty(working.Value.Metadata.BackgroundFile))
+                backgroundChooser.Current.Value = new FileInfo(working.Value.Metadata.BackgroundFile);
+
+            if (!string.IsNullOrEmpty(working.Value.Metadata.AudioFile))
+                audioTrackChooser.Current.Value = new FileInfo(working.Value.Metadata.AudioFile);
+
+            backgroundChooser.Current.BindValueChanged(backgroundChanged);
+            audioTrackChooser.Current.BindValueChanged(audioTrackChanged);
+
+            updatePlaceholderText();
         }
 
-        public bool ChangeBackgroundImage(string path)
+        public bool ChangeBackgroundImage(FileInfo source)
         {
-            var info = new FileInfo(path);
-
-            if (!info.Exists)
+            if (!source.Exists)
                 return false;
 
             var set = working.Value.BeatmapSetInfo;
 
+            var destination = new FileInfo($@"bg{source.Extension}");
+
             // remove the previous background for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
+            var oldFile = set.GetFile(working.Value.Metadata.BackgroundFile);
 
-            using (var stream = info.OpenRead())
+            using (var stream = source.OpenRead())
             {
                 if (oldFile != null)
-                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
-                else
-                    beatmaps.AddFile(set, stream, info.Name);
+                    beatmaps.DeleteFile(set, oldFile);
+
+                beatmaps.AddFile(set, stream, destination.Name);
             }
 
-            working.Value.Metadata.BackgroundFile = info.Name;
+            editorBeatmap.SaveState();
+
+            working.Value.Metadata.BackgroundFile = destination.Name;
             header.Background.UpdateBackground();
 
             return true;
         }
 
-        public bool ChangeAudioTrack(string path)
+        public bool ChangeAudioTrack(FileInfo source)
         {
-            var info = new FileInfo(path);
-
-            if (!info.Exists)
+            if (!source.Exists)
                 return false;
 
             var set = working.Value.BeatmapSetInfo;
 
+            var destination = new FileInfo($@"audio{source.Extension}");
+
             // remove the previous audio track for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.AudioFile);
+            var oldFile = set.GetFile(working.Value.Metadata.AudioFile);
 
-            using (var stream = info.OpenRead())
+            using (var stream = source.OpenRead())
             {
                 if (oldFile != null)
-                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
-                else
-                    beatmaps.AddFile(set, stream, info.Name);
+                    beatmaps.DeleteFile(set, oldFile);
+
+                beatmaps.AddFile(set, stream, destination.Name);
             }
 
-            working.Value.Metadata.AudioFile = info.Name;
+            working.Value.Metadata.AudioFile = destination.Name;
 
+            editorBeatmap.SaveState();
             music.ReloadCurrentTrack();
 
-            editor?.UpdateClockSource();
             return true;
         }
 
-        private void backgroundChanged(ValueChangedEvent<string> filePath)
+        private void backgroundChanged(ValueChangedEvent<FileInfo> file)
         {
-            if (!ChangeBackgroundImage(filePath.NewValue))
-                backgroundTextBox.Current.Value = filePath.OldValue;
+            if (!ChangeBackgroundImage(file.NewValue))
+                backgroundChooser.Current.Value = file.OldValue;
+
+            updatePlaceholderText();
         }
 
-        private void audioTrackChanged(ValueChangedEvent<string> filePath)
+        private void audioTrackChanged(ValueChangedEvent<FileInfo> file)
         {
-            if (!ChangeAudioTrack(filePath.NewValue))
-                audioTrackTextBox.Current.Value = filePath.OldValue;
+            if (!ChangeAudioTrack(file.NewValue))
+                audioTrackChooser.Current.Value = file.OldValue;
+
+            updatePlaceholderText();
+        }
+
+        private void updatePlaceholderText()
+        {
+            audioTrackChooser.Text = audioTrackChooser.Current.Value == null
+                ? EditorSetupStrings.ClickToSelectTrack
+                : EditorSetupStrings.ClickToReplaceTrack;
+
+            backgroundChooser.Text = backgroundChooser.Current.Value == null
+                ? EditorSetupStrings.ClickToSelectBackground
+                : EditorSetupStrings.ClickToReplaceBackground;
         }
     }
 }

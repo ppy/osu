@@ -1,15 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.ComponentModel.DataAnnotations.Schema;
 using osu.Game.Database;
 
 namespace osu.Game.Configuration
 {
     [Table("Settings")]
-    public class DatabasedSetting : IHasPrimaryKey
+    public class DatabasedSetting : IHasPrimaryKey // can be removed 20220315.
     {
         public int ID { get; set; }
+
+        public bool IsManaged => ID > 0;
 
         public int? RulesetID { get; set; }
 

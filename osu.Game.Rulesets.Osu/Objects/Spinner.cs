@@ -1,13 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -31,7 +38,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public int MaximumBonusSpins { get; protected set; } = 1;
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        public override Vector2 StackOffset => Vector2.Zero;
+
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
@@ -43,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             double secondsDuration = Duration / 1000;
 
-            double minimumRotationsPerSecond = stable_matching_fudge * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
+            double minimumRotationsPerSecond = stable_matching_fudge * IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
 
             SpinsRequired = (int)(secondsDuration * minimumRotationsPerSecond);
             MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration);
@@ -70,5 +79,20 @@ namespace osu.Game.Rulesets.Osu.Objects
         public override Judgement CreateJudgement() => new OsuJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        public override IList<HitSampleInfo> AuxiliarySamples => CreateSpinningSamples();
+
+        public HitSampleInfo[] CreateSpinningSamples()
+        {
+            var referenceSample = Samples.FirstOrDefault();
+
+            if (referenceSample == null)
+                return Array.Empty<HitSampleInfo>();
+
+            return new[]
+            {
+                SampleControlPoint.ApplyTo(referenceSample).With("spinnerspin")
+            };
+        }
     }
 }

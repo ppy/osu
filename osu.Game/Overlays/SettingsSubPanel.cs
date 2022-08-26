@@ -1,16 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -34,18 +34,18 @@ namespace osu.Game.Overlays
 
         protected override bool DimMainContent => false; // dimming is handled by main overlay
 
-        private class BackButton : OsuButton
+        public class BackButton : SidebarButton
         {
+            private Container content;
+
             [BackgroundDependencyLoader]
             private void load()
             {
-                Size = new Vector2(Sidebar.DEFAULT_WIDTH);
-
-                BackgroundColour = Color4.Black;
+                Size = new Vector2(SettingsSidebar.DEFAULT_WIDTH);
 
                 AddRange(new Drawable[]
                 {
-                    new Container
+                    content = new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -70,6 +70,11 @@ namespace osu.Game.Overlays
                         }
                     }
                 });
+            }
+
+            protected override void UpdateState()
+            {
+                content.FadeColour(IsHovered ? ColourProvider.Light1 : ColourProvider.Light3, FADE_DURATION, Easing.OutQuint);
             }
         }
     }

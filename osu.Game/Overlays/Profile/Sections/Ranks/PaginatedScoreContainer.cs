@@ -1,9 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests;
-using osu.Game.Users;
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,19 +13,18 @@ using System.Collections.Generic;
 using osu.Game.Online.API;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedProfileSubsection<APILegacyScoreInfo>
+    public class PaginatedScoreContainer : PaginatedProfileSubsection<SoloScoreInfo>
     {
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, LocalisableString headerText)
+        public PaginatedScoreContainer(ScoreType type, Bindable<APIUser> user, LocalisableString headerText)
             : base(user, headerText)
         {
             this.type = type;
-
-            ItemsPerPage = 5;
         }
 
         [BackgroundDependencyLoader]
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
-        protected override int GetCount(User user)
+        protected override int GetCount(APIUser user)
         {
             switch (type)
             {
@@ -46,33 +46,36 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 case ScoreType.Recent:
                     return user.ScoresRecentCount;
 
+                case ScoreType.Pinned:
+                    return user.ScoresPinnedCount;
+
                 default:
                     return 0;
             }
         }
 
-        protected override void OnItemsReceived(List<APILegacyScoreInfo> items)
+        protected override void OnItemsReceived(List<SoloScoreInfo> items)
         {
-            if (VisiblePages == 0)
+            if (CurrentPage == null || CurrentPage?.Offset == 0)
                 drawableItemIndex = 0;
 
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
-            new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
+        protected override APIRequest<List<SoloScoreInfo>> CreateRequest(PaginationParameters pagination) =>
+            new GetUserScoresRequest(User.Value.Id, type, pagination);
 
         private int drawableItemIndex;
 
-        protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
+        protected override Drawable CreateDrawableItem(SoloScoreInfo model)
         {
             switch (type)
             {
                 default:
-                    return new DrawableProfileScore(model.CreateScoreInfo(Rulesets));
+                    return new DrawableProfileScore(model);
 
                 case ScoreType.Best:
-                    return new DrawableProfileWeightedScore(model.CreateScoreInfo(Rulesets), Math.Pow(0.95, drawableItemIndex++));
+                    return new DrawableProfileWeightedScore(model, Math.Pow(0.95, drawableItemIndex++));
             }
         }
     }

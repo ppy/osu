@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -11,10 +13,10 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Models;
 
@@ -28,7 +30,7 @@ namespace osu.Game.Tournament.IPC
         protected IAPIProvider API { get; private set; }
 
         [Resolved]
-        protected RulesetStore Rulesets { get; private set; }
+        protected IRulesetStore Rulesets { get; private set; }
 
         [Resolved]
         private GameHost host { get; set; }
@@ -46,7 +48,7 @@ namespace osu.Game.Tournament.IPC
         [BackgroundDependencyLoader]
         private void load()
         {
-            var stablePath = stableInfo.StablePath ?? findStablePath();
+            string stablePath = stableInfo.StablePath ?? findStablePath();
             initialiseIPCStorage(stablePath);
         }
 
@@ -78,8 +80,8 @@ namespace osu.Game.Tournament.IPC
                             using (var stream = IPCStorage.GetStream(file_ipc_filename))
                             using (var sr = new StreamReader(stream))
                             {
-                                var beatmapId = int.Parse(sr.ReadLine().AsNonNull());
-                                var mods = int.Parse(sr.ReadLine().AsNonNull());
+                                int beatmapId = int.Parse(sr.ReadLine().AsNonNull());
+                                int mods = int.Parse(sr.ReadLine().AsNonNull());
 
                                 if (lastBeatmapId != beatmapId)
                                 {
@@ -87,14 +89,14 @@ namespace osu.Game.Tournament.IPC
 
                                     lastBeatmapId = beatmapId;
 
-                                    var existing = ladder.CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.BeatmapInfo != null);
+                                    var existing = ladder.CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.Beatmap != null);
 
                                     if (existing != null)
-                                        Beatmap.Value = existing.BeatmapInfo;
+                                        Beatmap.Value = existing.Beatmap;
                                     else
                                     {
-                                        beatmapLookupRequest = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
-                                        beatmapLookupRequest.Success += b => Beatmap.Value = b.ToBeatmap(Rulesets);
+                                        beatmapLookupRequest = new GetBeatmapRequest(new APIBeatmap { OnlineID = beatmapId });
+                                        beatmapLookupRequest.Success += b => Beatmap.Value = new TournamentBeatmap(b);
                                         API.Queue(beatmapLookupRequest);
                                     }
                                 }
@@ -187,10 +189,10 @@ namespace osu.Game.Tournament.IPC
         [CanBeNull]
         private string findStablePath()
         {
-            var stableInstallPath = findFromEnvVar() ??
-                                    findFromRegistry() ??
-                                    findFromLocalAppData() ??
-                                    findFromDotFolder();
+            string stableInstallPath = findFromEnvVar() ??
+                                       findFromRegistry() ??
+                                       findFromLocalAppData() ??
+                                       findFromDotFolder();
 
             Logger.Log($"Stable path for tourney usage: {stableInstallPath}");
             return stableInstallPath;

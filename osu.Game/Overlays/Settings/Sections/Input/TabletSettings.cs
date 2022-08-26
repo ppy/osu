@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Game.Localisation;
@@ -20,6 +23,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class TabletSettings : SettingsSubsection
     {
+        public TabletAreaSelection AreaSelection { get; private set; }
+
         private readonly ITabletHandler tabletHandler;
 
         private readonly Bindable<bool> enabled = new BindableBool(true);
@@ -93,11 +98,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Origin = Anchor.TopCentre,
                             Text = TabletSettingsStrings.NoTabletDetected,
                         },
-                        new SettingsNoticeText(colours)
+                        new LinkFlowContainer(cp => cp.Colour = colours.Yellow)
                         {
                             TextAnchor = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                         }.With(t =>
                         {
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
@@ -105,8 +112,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 t.NewLine();
                                 t.AddText("If your tablet is not detected, please read ");
                                 t.AddLink("this FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
-                                    ? @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Windows-FAQ"
-                                    : @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Linux-FAQ");
+                                    ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
+                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux");
                                 t.AddText(" for troubleshooting steps.");
                             }
                         }),
@@ -121,7 +128,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new TabletAreaSelection(tabletHandler)
+                        AreaSelection = new TabletAreaSelection(tabletHandler)
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 300,
@@ -163,7 +170,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             LabelText = TabletSettingsStrings.Rotation,
                             Current = rotation
                         },
-                        new RotationPresetButtons(tabletHandler),
+                        new RotationPresetButtons(tabletHandler)
+                        {
+                            Padding = new MarginPadding
+                            {
+                                Horizontal = SettingsPanel.CONTENT_MARGINS
+                            }
+                        },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,

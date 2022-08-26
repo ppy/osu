@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -156,21 +158,24 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("clean up", () => drawableRuleset.NewResult -= onNewResult);
         }
 
-        private void createTest(IBeatmap beatmap, int poolSize, Func<IFrameBasedClock> createClock = null) => AddStep("create test", () =>
+        private void createTest(IBeatmap beatmap, int poolSize, Func<IFrameBasedClock> createClock = null)
         {
-            var ruleset = new TestPoolingRuleset();
-
-            drawableRuleset = (TestDrawablePoolingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
-            drawableRuleset.FrameStablePlayback = true;
-            drawableRuleset.PoolSize = poolSize;
-
-            Child = new Container
+            AddStep("create test", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                Clock = createClock?.Invoke() ?? new FramedOffsetClock(Clock, false) { Offset = -Clock.CurrentTime },
-                Child = drawableRuleset
-            };
-        });
+                var ruleset = new TestPoolingRuleset();
+
+                drawableRuleset = (TestDrawablePoolingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
+                drawableRuleset.FrameStablePlayback = true;
+                drawableRuleset.PoolSize = poolSize;
+
+                Child = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Clock = createClock?.Invoke() ?? new FramedOffsetClock(Clock, false) { Offset = -Clock.CurrentTime },
+                    Child = drawableRuleset
+                };
+            });
+        }
 
         #region Ruleset
 
@@ -182,7 +187,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap, this);
 
-            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new NotImplementedException();
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
 
             public override string Description { get; } = string.Empty;
 

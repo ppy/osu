@@ -1,6 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osuTK;
@@ -10,7 +14,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
-using osu.Game.IO;
+using osu.Game.Database;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Storyboards.Drawables
@@ -49,14 +54,18 @@ namespace osu.Game.Storyboards.Drawables
 
         private double? lastEventEndTime;
 
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        public IReadOnlyList<Mod> Mods { get; }
+
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        public DrawableStoryboard(Storyboard storyboard)
+        public DrawableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods = null)
         {
             Storyboard = storyboard;
+            Mods = mods ?? Array.Empty<Mod>();
 
             Size = new Vector2(640, 480);
 
@@ -76,12 +85,12 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(FileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken, GameHost host)
+        private void load(IGameplayClock clock, CancellationToken? cancellationToken, GameHost host, RealmAccess realm)
         {
             if (clock != null)
                 Clock = clock;
 
-            dependencies.Cache(new TextureStore(host.CreateTextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
+            dependencies.Cache(new TextureStore(host.Renderer, host.CreateTextureLoaderStore(new RealmFileStore(realm, host.Storage).Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
             {

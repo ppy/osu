@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Audio;
@@ -67,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Objects
             }
         }
 
-        public List<IList<HitSampleInfo>> NodeSamples { get; set; }
+        public IList<IList<HitSampleInfo>> NodeSamples { get; set; }
 
         /// <summary>
         /// The head note of the hold.
@@ -84,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// </summary>
         private double tickSpacing = 50;
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 

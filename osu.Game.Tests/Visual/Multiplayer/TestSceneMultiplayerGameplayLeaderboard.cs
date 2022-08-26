@@ -1,159 +1,59 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
-using osu.Framework.Utils;
-using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Spectator;
-using osu.Game.Replays.Legacy;
-using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Tests.Visual.OnlinePlay;
-using osu.Game.Tests.Visual.Spectator;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerGameplayLeaderboard : MultiplayerTestScene
+    public class TestSceneMultiplayerGameplayLeaderboard : MultiplayerGameplayLeaderboardTestScene
     {
-        private static IEnumerable<int> users => Enumerable.Range(0, 16);
-
-        public new TestMultiplayerSpectatorClient SpectatorClient => (TestMultiplayerSpectatorClient)OnlinePlayDependencies?.SpectatorClient;
-
-        private MultiplayerGameplayLeaderboard leaderboard;
-        private OsuConfigManager config;
-
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override MultiplayerRoomUser CreateUser(int userId)
         {
-            Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
+            var user = base.CreateUser(userId);
+
+            if (userId == TOTAL_USERS - 1)
+                user.Mods = new[] { new APIMod(new OsuModNoFail()) };
+
+            return user;
         }
 
-        [SetUpSteps]
-        public override void SetUpSteps()
+        protected override MultiplayerGameplayLeaderboard CreateLeaderboard()
         {
-            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).Result);
-
-            AddStep("create leaderboard", () =>
+            return new TestLeaderboard(MultiplayerUsers.ToArray())
             {
-                leaderboard?.Expire();
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            };
+        }
 
-                OsuScoreProcessor scoreProcessor;
-                Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
-
-                var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
-                var multiplayerUsers = new List<MultiplayerRoomUser>();
-
-                foreach (var user in users)
-                {
-                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
-                    multiplayerUsers.Add(OnlinePlayDependencies.Client.AddUser(new User { Id = user }, true));
-                }
-
-                Children = new Drawable[]
-                {
-                    scoreProcessor = new OsuScoreProcessor(),
-                };
-
-                scoreProcessor.ApplyBeatmap(playableBeatmap);
-
-                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, multiplayerUsers.ToArray())
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }, Add);
+        [Test]
+        public void TestPerUserMods()
+        {
+            AddStep("first user has no mods", () => Assert.That(((TestLeaderboard)Leaderboard).UserMods[0], Is.Empty));
+            AddStep("last user has NF mod", () =>
+            {
+                Assert.That(((TestLeaderboard)Leaderboard).UserMods[TOTAL_USERS - 1], Has.One.Items);
+                Assert.That(((TestLeaderboard)Leaderboard).UserMods[TOTAL_USERS - 1].Single(), Is.TypeOf<OsuModNoFail>());
             });
-
-            AddUntilStep("wait for load", () => leaderboard.IsLoaded);
-            AddUntilStep("wait for user population", () => Client.CurrentMatchPlayingUserIds.Count > 0);
         }
 
-        [Test]
-        public void TestScoreUpdates()
+        private class TestLeaderboard : MultiplayerGameplayLeaderboard
         {
-            AddRepeatStep("update state", () => SpectatorClient.RandomlyUpdateState(), 100);
-            AddToggleStep("switch compact mode", expanded => leaderboard.Expanded.Value = expanded);
-        }
+            public Dictionary<int, IReadOnlyList<Mod>> UserMods => UserScores.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ScoreProcessor.Mods);
 
-        [Test]
-        public void TestUserQuit()
-        {
-            foreach (var user in users)
-                AddStep($"mark user {user} quit", () => Client.RemoveUser(LookupCache.GetUserAsync(user).Result.AsNonNull()));
-        }
-
-        [Test]
-        public void TestChangeScoringMode()
-        {
-            AddRepeatStep("update state", () => SpectatorClient.RandomlyUpdateState(), 5);
-            AddStep("change to classic", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Classic));
-            AddStep("change to standardised", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised));
-        }
-
-        protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new TestDependencies();
-
-        protected class TestDependencies : MultiplayerTestSceneDependencies
-        {
-            protected override TestSpectatorClient CreateSpectatorClient() => new TestMultiplayerSpectatorClient();
-        }
-
-        public class TestMultiplayerSpectatorClient : TestSpectatorClient
-        {
-            private readonly Dictionary<int, FrameHeader> lastHeaders = new Dictionary<int, FrameHeader>();
-
-            public void RandomlyUpdateState()
+            public TestLeaderboard(MultiplayerRoomUser[] users)
+                : base(users)
             {
-                foreach (var userId in PlayingUsers)
-                {
-                    if (RNG.NextBool())
-                        continue;
-
-                    if (!lastHeaders.TryGetValue(userId, out var header))
-                    {
-                        lastHeaders[userId] = header = new FrameHeader(new ScoreInfo
-                        {
-                            Statistics = new Dictionary<HitResult, int>
-                            {
-                                [HitResult.Miss] = 0,
-                                [HitResult.Meh] = 0,
-                                [HitResult.Great] = 0
-                            }
-                        });
-                    }
-
-                    switch (RNG.Next(0, 3))
-                    {
-                        case 0:
-                            header.Combo = 0;
-                            header.Statistics[HitResult.Miss]++;
-                            break;
-
-                        case 1:
-                            header.Combo++;
-                            header.MaxCombo = Math.Max(header.MaxCombo, header.Combo);
-                            header.Statistics[HitResult.Meh]++;
-                            break;
-
-                        default:
-                            header.Combo++;
-                            header.MaxCombo = Math.Max(header.MaxCombo, header.Combo);
-                            header.Statistics[HitResult.Great]++;
-                            break;
-                    }
-
-                    ((ISpectatorClient)this).UserSentFrames(userId, new FrameDataBundle(header, new[] { new LegacyReplayFrame(Time.Current, 0, 0, ReplayButtonState.None) }));
-                }
             }
         }
     }

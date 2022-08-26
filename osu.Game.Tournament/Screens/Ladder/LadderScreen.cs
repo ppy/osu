@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -9,8 +11,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.Platform;
-using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Editors;
@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Ladder
 {
-    public class LadderScreen : TournamentScreen, IProvideVideo
+    public class LadderScreen : TournamentScreen
     {
         protected Container<DrawableTournamentMatch> MatchesContainer;
         private Container<Path> paths;
@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Screens.Ladder
         protected Container Content;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, Storage storage)
+        private void load()
         {
             normalPathColour = Color4Extensions.FromHex("#66D1FF");
             losersPathColour = Color4Extensions.FromHex("#FFC700");
@@ -75,7 +75,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             foreach (var match in LadderInfo.Matches)
                 addMatch(match);
 
-            LadderInfo.Rounds.CollectionChanged += (_, __) => layout.Invalidate();
+            LadderInfo.Rounds.CollectionChanged += (_, _) => layout.Invalidate();
             LadderInfo.Matches.CollectionChanged += (_, args) =>
             {
                 switch (args.Action)

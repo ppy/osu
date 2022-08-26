@@ -1,9 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore.Storage;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
 
@@ -13,7 +18,7 @@ namespace osu.Game.Database
     {
         private readonly Storage storage;
 
-        private const string database_name = @"client";
+        public const string DATABASE_NAME = @"client.db";
 
         private ThreadLocal<OsuDbContext> threadContexts;
 
@@ -139,10 +144,19 @@ namespace osu.Game.Database
             threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
         }
 
-        protected virtual OsuDbContext CreateContext() => new OsuDbContext(storage.GetDatabaseConnectionString(database_name))
+        protected virtual OsuDbContext CreateContext() => new OsuDbContext(CreateDatabaseConnectionString(DATABASE_NAME, storage))
         {
             Database = { AutoTransactionsEnabled = false }
         };
+
+        public void CreateBackup(string backupFilename)
+        {
+            Logger.Log($"Creating full EF database backup at {backupFilename}", LoggingTarget.Database);
+
+            using (var source = storage.GetStream(DATABASE_NAME, mode: FileMode.Open))
+            using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                source.CopyTo(destination);
+        }
 
         public void ResetDatabase()
         {
@@ -152,7 +166,24 @@ namespace osu.Game.Database
 
                 try
                 {
-                    storage.DeleteDatabase(database_name);
+                    int attempts = 10;
+
+                    // Retry logic taken from MigratableStorage.AttemptOperation.
+                    while (true)
+                    {
+                        try
+                        {
+                            storage.Delete(DATABASE_NAME);
+                            return;
+                        }
+                        catch (Exception)
+                        {
+                            if (attempts-- == 0)
+                                throw;
+                        }
+
+                        Thread.Sleep(250);
+                    }
                 }
                 catch
                 {
@@ -163,10 +194,25 @@ namespace osu.Game.Database
 
         public void FlushConnections()
         {
-            foreach (var context in threadContexts.Values)
-                context.Dispose();
+            if (threadContexts != null)
+            {
+                foreach (var context in threadContexts.Values)
+                    context.Dispose();
+            }
 
             recycleThreadContexts();
+        }
+
+        public static string CreateDatabaseConnectionString(string filename, Storage storage) => string.Concat("Data Source=", storage.GetFullPath($@"{filename}", true));
+
+        private readonly ManualResetEventSlim migrationComplete = new ManualResetEventSlim();
+
+        public void SetMigrationCompletion() => migrationComplete.Set();
+
+        public void WaitForMigrationCompletion()
+        {
+            if (!migrationComplete.Wait(300000))
+                throw new TimeoutException("Migration took too long (likely stuck).");
         }
     }
 }

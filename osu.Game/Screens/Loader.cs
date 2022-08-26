@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -12,6 +14,7 @@ using osu.Game.Screens.Menu;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
 
@@ -49,24 +52,46 @@ namespace osu.Game.Screens
             switch (introSequence)
             {
                 case IntroSequence.Circles:
-                    return new IntroCircles();
+                    return new IntroCircles(createMainMenu);
 
                 case IntroSequence.Welcome:
-                    return new IntroWelcome();
+                    return new IntroWelcome(createMainMenu);
 
                 default:
-                    return new IntroTriangles();
+                    return new IntroTriangles(createMainMenu);
             }
+
+            MainMenu createMainMenu() => new MainMenu();
         }
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
-        public override void OnEntering(IScreen last)
+        [Resolved(canBeNull: true)]
+        private DatabaseContextFactory efContextFactory { get; set; }
+
+        private EFToRealmMigrator realmMigrator;
+
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             LoadComponentAsync(precompiler = CreateShaderPrecompiler(), AddInternal);
-            LoadComponentAsync(loadableScreen = CreateLoadableScreen());
+
+            // A non-null context factory means there's still content to migrate.
+            if (efContextFactory != null)
+            {
+                LoadComponentAsync(realmMigrator = new EFToRealmMigrator(), AddInternal);
+                realmMigrator.MigrationCompleted.ContinueWith(_ => Schedule(() =>
+                {
+                    // Delay initial screen loading to ensure that the migration is in a complete and sane state
+                    // before the intro screen may import the game intro beatmap.
+                    LoadComponentAsync(loadableScreen = CreateLoadableScreen());
+                }));
+            }
+            else
+            {
+                LoadComponentAsync(loadableScreen = CreateLoadableScreen());
+            }
 
             LoadComponentAsync(spinner = new LoadingSpinner(true, true)
             {
@@ -84,7 +109,7 @@ namespace osu.Game.Screens
 
         private void checkIfLoaded()
         {
-            if (loadableScreen.LoadState != LoadState.Ready || !precompiler.FinishedCompiling)
+            if (loadableScreen?.LoadState != LoadState.Ready || !precompiler.FinishedCompiling)
             {
                 Schedule(checkIfLoaded);
                 return;

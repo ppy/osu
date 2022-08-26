@@ -6,7 +6,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
-using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -21,10 +20,13 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public MaintenanceSection()
         {
-            FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
-                new GeneralSettings()
+                new BeatmapSettings(),
+                new SkinSettings(),
+                new CollectionsSettings(),
+                new ScoreSettings(),
+                new ModPresetSettings()
             };
         }
     }

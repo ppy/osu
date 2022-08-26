@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -37,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             Child
                 .FadeTo(flash_opacity, EarlyActivationMilliseconds, Easing.OutQuint)
                 .Then()
-                .FadeOut(timingPoint.BeatLength - fade_length, Easing.OutSine);
+                .FadeOut(Math.Max(fade_length, timingPoint.BeatLength - fade_length), Easing.OutSine);
         }
     }
 }

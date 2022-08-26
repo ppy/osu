@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Specialized;
 using System.Linq;
@@ -9,8 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -21,29 +21,28 @@ namespace osu.Game.Tournament.Components
 {
     public class TournamentBeatmapPanel : CompositeDrawable
     {
-        public readonly BeatmapInfo Beatmap;
-        private readonly string mod;
+        public readonly TournamentBeatmap Beatmap;
 
-        private const float horizontal_padding = 10;
-        private const float vertical_padding = 10;
+        private readonly string mod;
 
         public const float HEIGHT = 50;
 
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Box flash;
 
-        public TournamentBeatmapPanel(BeatmapInfo beatmap, string mod = null)
+        public TournamentBeatmapPanel(TournamentBeatmap beatmap, string mod = null)
         {
             if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
 
             Beatmap = beatmap;
             this.mod = mod;
+
             Width = 400;
             Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, TextureStore textures)
+        private void load(LadderInfo ladder)
         {
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(ladder.CurrentMatch);
@@ -57,11 +56,11 @@ namespace osu.Game.Tournament.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                new UpdateableBeatmapSetCover
+                new UpdateableOnlineBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
-                    BeatmapSet = Beatmap.BeatmapSet,
+                    OnlineInfo = Beatmap,
                 },
                 new FillFlowContainer
                 {
@@ -74,9 +73,7 @@ namespace osu.Game.Tournament.Components
                     {
                         new TournamentSpriteText
                         {
-                            Text = new RomanisableString(
-                                $"{Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist} - {Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title}",
-                                $"{Beatmap.Metadata.Artist} - {Beatmap.Metadata.Title}"),
+                            Text = Beatmap.GetDisplayTitleRomanisable(false, false),
                             Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                         },
                         new FillFlowContainer
@@ -93,7 +90,7 @@ namespace osu.Game.Tournament.Components
                                 },
                                 new TournamentSpriteText
                                 {
-                                    Text = Beatmap.Metadata.AuthorString,
+                                    Text = Beatmap.Metadata.Author.Username,
                                     Padding = new MarginPadding { Right = 20 },
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },
@@ -105,7 +102,7 @@ namespace osu.Game.Tournament.Components
                                 },
                                 new TournamentSpriteText
                                 {
-                                    Text = Beatmap.Version,
+                                    Text = Beatmap.DifficultyName,
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },
                             }
@@ -149,7 +146,7 @@ namespace osu.Game.Tournament.Components
 
         private void updateState()
         {
-            var found = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap.OnlineBeatmapID);
+            var found = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap.OnlineID);
 
             bool doFlash = found != choice;
             choice = found;

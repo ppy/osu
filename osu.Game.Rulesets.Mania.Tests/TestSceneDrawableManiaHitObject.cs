@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -58,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddStep("Hold key", () =>
             {
                 clock.CurrentTime = 0;
-                note.OnPressed(ManiaAction.Key1);
+                note.OnPressed(new KeyBindingPressEvent<ManiaAction>(GetContainingInputManager().CurrentState, ManiaAction.Key1));
             });
             AddStep("progress time", () => clock.CurrentTime = 500);
             AddAssert("head is visible", () => note.Head.Alpha == 1);

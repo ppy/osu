@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
@@ -49,14 +51,14 @@ namespace osu.Game.Skinning
 
             public ITexturedCharacterGlyph Get(string fontName, char character)
             {
-                var lookup = getLookupName(character);
+                string lookup = getLookupName(character);
 
                 var texture = skin.GetTexture($"{fontName}-{lookup}");
 
                 if (texture == null)
                     return null;
 
-                return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, null), texture, 1f / texture.ScaleAdjust);
+                return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 1f / texture.ScaleAdjust);
             }
 
             private static string getLookupName(char character)

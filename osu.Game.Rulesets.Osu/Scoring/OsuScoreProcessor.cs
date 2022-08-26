@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
@@ -11,6 +13,13 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     public class OsuScoreProcessor : ScoreProcessor
     {
+        public OsuScoreProcessor()
+            : base(new OsuRuleset())
+        {
+        }
+
+        protected override double ClassicScoreMultiplier => 36;
+
         protected override HitEvent CreateHitEvent(JudgementResult result)
             => base.CreateHitEvent(result).With((result as OsuHitCircleJudgementResult)?.CursorPositionAtHit);
 
@@ -18,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             switch (hitObject)
             {
-                case HitCircle _:
+                case HitCircle:
                     return new OsuHitCircleJudgementResult(hitObject, judgement);
 
                 default:

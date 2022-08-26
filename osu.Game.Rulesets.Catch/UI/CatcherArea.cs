@@ -1,15 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Catch.Judgements;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osuTK;
 
@@ -71,18 +72,6 @@ namespace osu.Game.Rulesets.Catch.UI
         public void OnNewResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
             Catcher.OnNewResult(hitObject, result);
-
-            if (!result.Type.IsScorable())
-                return;
-
-            if (hitObject.HitObject.LastInCombo)
-            {
-                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
-                    Catcher.Explode();
-                else
-                    Catcher.Drop();
-            }
-
             comboDisplay.OnNewResult(hitObject, result);
         }
 
@@ -131,10 +120,10 @@ namespace osu.Game.Rulesets.Catch.UI
             lastHyperDashState = Catcher.HyperDashing;
         }
 
-        public void SetCatcherPosition(float X)
+        public void SetCatcherPosition(float x)
         {
             float lastPosition = Catcher.X;
-            float newPosition = Math.Clamp(X, 0, CatchPlayfield.WIDTH);
+            float newPosition = Math.Clamp(x, 0, CatchPlayfield.WIDTH);
 
             Catcher.X = newPosition;
 
@@ -144,9 +133,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 Catcher.VisualDirection = Direction.Left;
         }
 
-        public bool OnPressed(CatchAction action)
+        public bool OnPressed(KeyBindingPressEvent<CatchAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case CatchAction.MoveLeft:
                     currentDirection--;
@@ -164,9 +153,9 @@ namespace osu.Game.Rulesets.Catch.UI
             return false;
         }
 
-        public void OnReleased(CatchAction action)
+        public void OnReleased(KeyBindingReleaseEvent<CatchAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case CatchAction.MoveLeft:
                     currentDirection++;

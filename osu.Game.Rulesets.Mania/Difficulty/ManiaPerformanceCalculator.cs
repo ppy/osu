@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,112 +15,64 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
-        protected new ManiaDifficultyAttributes Attributes => (ManiaDifficultyAttributes)base.Attributes;
-
-        private Mod[] mods;
-
-        // Score after being scaled by non-difficulty-increasing mods
-        private double scaledScore;
-
         private int countPerfect;
         private int countGreat;
         private int countGood;
         private int countOk;
         private int countMeh;
         private int countMiss;
+        private double scoreAccuracy;
 
-        public ManiaPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
-            : base(ruleset, attributes, score)
+        public ManiaPerformanceCalculator()
+            : base(new ManiaRuleset())
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
         {
-            mods = Score.Mods;
-            scaledScore = Score.TotalScore;
-            countPerfect = Score.Statistics.GetValueOrDefault(HitResult.Perfect);
-            countGreat = Score.Statistics.GetValueOrDefault(HitResult.Great);
-            countGood = Score.Statistics.GetValueOrDefault(HitResult.Good);
-            countOk = Score.Statistics.GetValueOrDefault(HitResult.Ok);
-            countMeh = Score.Statistics.GetValueOrDefault(HitResult.Meh);
-            countMiss = Score.Statistics.GetValueOrDefault(HitResult.Miss);
+            var maniaAttributes = (ManiaDifficultyAttributes)attributes;
 
-            IEnumerable<Mod> scoreIncreaseMods = Ruleset.GetModsFor(ModType.DifficultyIncrease);
-
-            double scoreMultiplier = 1.0;
-            foreach (var m in mods.Where(m => !scoreIncreaseMods.Contains(m)))
-                scoreMultiplier *= m.ScoreMultiplier;
-
-            // Scale score up, so it's comparable to other keymods
-            scaledScore *= 1.0 / scoreMultiplier;
+            countPerfect = score.Statistics.GetValueOrDefault(HitResult.Perfect);
+            countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
+            countGood = score.Statistics.GetValueOrDefault(HitResult.Good);
+            countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
+            countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
+            countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+            scoreAccuracy = customAccuracy;
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
             // The specific number has no intrinsic meaning and can be adjusted as needed.
-            double multiplier = 0.8;
+            double multiplier = 8.0;
 
-            if (mods.Any(m => m is ModNoFail))
-                multiplier *= 0.9;
-            if (mods.Any(m => m is ModEasy))
+            if (score.Mods.Any(m => m is ModNoFail))
+                multiplier *= 0.75;
+            if (score.Mods.Any(m => m is ModEasy))
                 multiplier *= 0.5;
 
-            double strainValue = computeStrainValue();
-            double accValue = computeAccuracyValue(strainValue);
-            double totalValue =
-                Math.Pow(
-                    Math.Pow(strainValue, 1.1) +
-                    Math.Pow(accValue, 1.1), 1.0 / 1.1
-                ) * multiplier;
+            double difficultyValue = computeDifficultyValue(maniaAttributes);
+            double totalValue = difficultyValue * multiplier;
 
-            if (categoryDifficulty != null)
+            return new ManiaPerformanceAttributes
             {
-                categoryDifficulty["Strain"] = strainValue;
-                categoryDifficulty["Accuracy"] = accValue;
-            }
-
-            return totalValue;
+                Difficulty = difficultyValue,
+                Total = totalValue
+            };
         }
 
-        private double computeStrainValue()
+        private double computeDifficultyValue(ManiaDifficultyAttributes attributes)
         {
-            // Obtain strain difficulty
-            double strainValue = Math.Pow(5 * Math.Max(1, Attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
+            double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2) // Star rating to pp curve
+                                     * Math.Max(0, 5 * scoreAccuracy - 4) // From 80% accuracy, 1/20th of total pp is awarded per additional 1% accuracy
+                                     * (1 + 0.1 * Math.Min(1, totalHits / 1500)); // Length bonus, capped at 1500 notes
 
-            // Longer maps are worth more
-            strainValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
-
-            if (scaledScore <= 500000)
-                strainValue = 0;
-            else if (scaledScore <= 600000)
-                strainValue *= (scaledScore - 500000) / 100000 * 0.3;
-            else if (scaledScore <= 700000)
-                strainValue *= 0.3 + (scaledScore - 600000) / 100000 * 0.25;
-            else if (scaledScore <= 800000)
-                strainValue *= 0.55 + (scaledScore - 700000) / 100000 * 0.20;
-            else if (scaledScore <= 900000)
-                strainValue *= 0.75 + (scaledScore - 800000) / 100000 * 0.15;
-            else
-                strainValue *= 0.90 + (scaledScore - 900000) / 100000 * 0.1;
-
-            return strainValue;
-        }
-
-        private double computeAccuracyValue(double strainValue)
-        {
-            if (Attributes.GreatHitWindow <= 0)
-                return 0;
-
-            // Lots of arbitrary values from testing.
-            // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accuracyValue = Math.Max(0.0, 0.2 - (Attributes.GreatHitWindow - 34) * 0.006667)
-                                   * strainValue
-                                   * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
-
-            // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
-            // accuracyValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
-
-            return accuracyValue;
+            return difficultyValue;
         }
 
         private double totalHits => countPerfect + countOk + countGreat + countGood + countMeh + countMiss;
+
+        /// <summary>
+        /// Accuracy used to weight judgements independently from the score's actual accuracy.
+        /// </summary>
+        private double customAccuracy => (countPerfect * 320 + countGreat * 300 + countGood * 200 + countOk * 100 + countMeh * 50) / (totalHits * 320);
     }
 }

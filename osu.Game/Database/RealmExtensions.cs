@@ -1,51 +1,76 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using AutoMapper;
-using osu.Game.Input.Bindings;
+using System;
 using Realms;
 
 namespace osu.Game.Database
 {
     public static class RealmExtensions
     {
-        private static readonly IMapper mapper = new MapperConfiguration(c =>
-        {
-            c.ShouldMapField = fi => false;
-            c.ShouldMapProperty = pi => pi.SetMethod != null && pi.SetMethod.IsPublic;
-
-            c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
-        }).CreateMapper();
-
         /// <summary>
-        /// Create a detached copy of the each item in the collection.
+        /// Perform a write operation against the provided realm instance.
         /// </summary>
-        /// <param name="items">A list of managed <see cref="RealmObject"/>s to detach.</param>
-        /// <typeparam name="T">The type of object.</typeparam>
-        /// <returns>A list containing non-managed copies of provided items.</returns>
-        public static List<T> Detach<T>(this IEnumerable<T> items) where T : RealmObject
+        /// <remarks>
+        /// This will automatically start a transaction if not already in one.
+        /// </remarks>
+        /// <param name="realm">The realm to operate on.</param>
+        /// <param name="function">The write operation to run.</param>
+        public static void Write(this Realm realm, Action<Realm> function)
         {
-            var list = new List<T>();
+            Transaction? transaction = null;
 
-            foreach (var obj in items)
-                list.Add(obj.Detach());
+            try
+            {
+                if (!realm.IsInTransaction)
+                    transaction = realm.BeginWrite();
 
-            return list;
+                function(realm);
+
+                transaction?.Commit();
+            }
+            finally
+            {
+                transaction?.Dispose();
+            }
         }
 
         /// <summary>
-        /// Create a detached copy of the item.
+        /// Perform a write operation against the provided realm instance.
         /// </summary>
-        /// <param name="item">The managed <see cref="RealmObject"/> to detach.</param>
-        /// <typeparam name="T">The type of object.</typeparam>
-        /// <returns>A non-managed copy of provided item. Will return the provided item if already detached.</returns>
-        public static T Detach<T>(this T item) where T : RealmObject
+        /// <remarks>
+        /// This will automatically start a transaction if not already in one.
+        /// </remarks>
+        /// <param name="realm">The realm to operate on.</param>
+        /// <param name="function">The write operation to run.</param>
+        public static T Write<T>(this Realm realm, Func<Realm, T> function)
         {
-            if (!item.IsManaged)
-                return item;
+            Transaction? transaction = null;
 
-            return mapper.Map<T>(item);
+            try
+            {
+                if (!realm.IsInTransaction)
+                    transaction = realm.BeginWrite();
+
+                var result = function(realm);
+
+                transaction?.Commit();
+
+                return result;
+            }
+            finally
+            {
+                transaction?.Dispose();
+            }
         }
+
+        /// <summary>
+        /// Whether the provided change set has changes to the top level collection.
+        /// </summary>
+        /// <remarks>
+        /// Realm subscriptions fire on both collection and property changes (including *all* nested properties).
+        /// Quite often we only care about changes at a collection level. This can be used to guard and early-return when no such changes are in a callback.
+        /// </remarks>
+        public static bool HasCollectionChanges(this ChangeSet changes) => changes.InsertedIndices.Length > 0 || changes.DeletedIndices.Length > 0 || changes.Moves.Length > 0;
     }
 }

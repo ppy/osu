@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,14 +16,14 @@ using osuTK;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class CountryFilter : CompositeDrawable, IHasCurrentValue<Country>
+    public class CountryFilter : CompositeDrawable, IHasCurrentValue<CountryCode>
     {
         private const int duration = 200;
         private const int height = 70;
 
-        private readonly BindableWithCurrent<Country> current = new BindableWithCurrent<Country>();
+        private readonly BindableWithCurrent<CountryCode> current = new BindableWithCurrent<CountryCode>();
 
-        public Bindable<Country> Current
+        public Bindable<CountryCode> Current
         {
             get => current.Current;
             set => current.Current = value;
@@ -87,9 +89,9 @@ namespace osu.Game.Overlays.Rankings
             Current.BindValueChanged(onCountryChanged, true);
         }
 
-        private void onCountryChanged(ValueChangedEvent<Country> country)
+        private void onCountryChanged(ValueChangedEvent<CountryCode> country)
         {
-            if (country.NewValue == null)
+            if (Current.Value == CountryCode.Unknown)
             {
                 countryPill.Collapse();
                 this.ResizeHeightTo(0, duration, Easing.OutQuint);

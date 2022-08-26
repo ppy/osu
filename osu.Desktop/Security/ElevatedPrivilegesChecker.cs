@@ -19,7 +19,7 @@ namespace osu.Desktop.Security
     public class ElevatedPrivilegesChecker : Component
     {
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; } = null!;
 
         private bool elevated;
 
@@ -73,10 +73,10 @@ namespace osu.Desktop.Security
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours)
             {
                 Icon = FontAwesome.Solid.ShieldAlt;
-                IconBackgound.Colour = colours.YellowDark;
+                IconBackground.Colour = colours.YellowDark;
             }
         }
     }

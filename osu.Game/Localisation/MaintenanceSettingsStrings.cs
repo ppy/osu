@@ -30,6 +30,11 @@ namespace osu.Game.Localisation
         public static LocalisableString DeleteAllBeatmaps => new TranslatableString(getKey(@"delete_all_beatmaps"), @"Delete ALL beatmaps");
 
         /// <summary>
+        /// "Delete ALL beatmap videos"
+        /// </summary>
+        public static LocalisableString DeleteAllBeatmapVideos => new TranslatableString(getKey(@"delete_all_beatmap_videos"), @"Delete ALL beatmap videos");
+
+        /// <summary>
         /// "Import scores from stable"
         /// </summary>
         public static LocalisableString ImportScoresFromStable => new TranslatableString(getKey(@"import_scores_from_stable"), @"Import scores from stable");
@@ -68,6 +73,16 @@ namespace osu.Game.Localisation
         /// "Restore all recently deleted beatmaps"
         /// </summary>
         public static LocalisableString RestoreAllRecentlyDeletedBeatmaps => new TranslatableString(getKey(@"restore_all_recently_deleted_beatmaps"), @"Restore all recently deleted beatmaps");
+
+        /// <summary>
+        /// "Delete ALL mod presets"
+        /// </summary>
+        public static LocalisableString DeleteAllModPresets => new TranslatableString(getKey(@"delete_all_mod_presets"), @"Delete ALL mod presets");
+
+        /// <summary>
+        /// "Restore all recently deleted mod presets"
+        /// </summary>
+        public static LocalisableString RestoreAllRecentlyDeletedModPresets => new TranslatableString(getKey(@"restore_all_recently_deleted_mod_presets"), @"Restore all recently deleted mod presets");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

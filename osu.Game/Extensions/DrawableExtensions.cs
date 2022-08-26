@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
@@ -14,28 +13,31 @@ namespace osu.Game.Extensions
 {
     public static class DrawableExtensions
     {
-        public const double REPEAT_INTERVAL = 70;
-        public const double INITIAL_DELAY = 250;
-
         /// <summary>
-        /// Helper method that is used while <see cref="IKeyBindingHandler"/> doesn't support repetitions of <see cref="IKeyBindingHandler{T}.OnPressed"/>.
-        /// Simulates repetitions by continually invoking a delegate according to the default key repeat rate.
+        /// Shakes this drawable.
         /// </summary>
-        /// <remarks>
-        /// The returned delegate can be cancelled to stop repeat events from firing (usually in <see cref="IKeyBindingHandler{T}.OnReleased"/>).
-        /// </remarks>
-        /// <param name="handler">The <see cref="IKeyBindingHandler{T}"/> which is handling the repeat.</param>
-        /// <param name="scheduler">The <see cref="Scheduler"/> to schedule repetitions on.</param>
-        /// <param name="action">The <see cref="Action"/> to be invoked once immediately and with every repetition.</param>
-        /// <param name="initialRepeatDelay">The delay imposed on the first repeat. Defaults to <see cref="INITIAL_DELAY"/>.</param>
-        /// <returns>A <see cref="ScheduledDelegate"/> which can be cancelled to stop the repeat events from firing.</returns>
-        public static ScheduledDelegate BeginKeyRepeat(this IKeyBindingHandler handler, Scheduler scheduler, Action action, double initialRepeatDelay = INITIAL_DELAY)
+        /// <param name="target">The target to shake.</param>
+        /// <param name="shakeDuration">The length of a single shake.</param>
+        /// <param name="shakeMagnitude">Pixels of displacement per shake.</param>
+        /// <param name="maximumLength">The maximum length the shake should last.</param>
+        public static void Shake(this Drawable target, double shakeDuration = 80, float shakeMagnitude = 8, double? maximumLength = null)
         {
-            action();
+            // if we don't have enough time, don't bother shaking.
+            if (maximumLength < shakeDuration * 2)
+                return;
 
-            ScheduledDelegate repeatDelegate = new ScheduledDelegate(action, handler.Time.Current + initialRepeatDelay, REPEAT_INTERVAL);
-            scheduler.Add(repeatDelegate);
-            return repeatDelegate;
+            var sequence = target.MoveToX(shakeMagnitude, shakeDuration / 2, Easing.OutSine).Then()
+                                 .MoveToX(-shakeMagnitude, shakeDuration, Easing.InOutSine).Then();
+
+            // if we don't have enough time for the second shake, skip it.
+            if (!maximumLength.HasValue || maximumLength >= shakeDuration * 4)
+            {
+                sequence = sequence
+                           .MoveToX(shakeMagnitude, shakeDuration, Easing.InOutSine).Then()
+                           .MoveToX(-shakeMagnitude, shakeDuration, Easing.InOutSine).Then();
+            }
+
+            sequence.MoveToX(0, shakeDuration / 2, Easing.InSine);
         }
 
         /// <summary>
@@ -59,7 +61,17 @@ namespace osu.Game.Extensions
             component.Origin = info.Origin;
 
             if (component is ISkinnableDrawable skinnable)
+            {
                 skinnable.UsesFixedAnchor = info.UsesFixedAnchor;
+
+                foreach (var (_, property) in component.GetSettingsSourceProperties())
+                {
+                    if (!info.Settings.TryGetValue(property.Name.ToSnakeCase(), out object settingValue))
+                        continue;
+
+                    skinnable.CopyAdjustedSetting((IBindable)property.GetValue(component), settingValue);
+                }
+            }
 
             if (component is Container container)
             {

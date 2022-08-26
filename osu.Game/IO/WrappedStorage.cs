@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -60,7 +62,7 @@ namespace osu.Game.IO
         {
             string localRoot = GetFullPath(string.Empty);
 
-            foreach (var path in paths)
+            foreach (string path in paths)
                 yield return Path.GetRelativePath(localRoot, UnderlyingStorage.GetFullPath(path));
         }
 
@@ -70,12 +72,11 @@ namespace osu.Game.IO
         public override Stream GetStream(string path, FileAccess access = FileAccess.Read, FileMode mode = FileMode.OpenOrCreate) =>
             UnderlyingStorage.GetStream(MutatePath(path), access, mode);
 
-        public override string GetDatabaseConnectionString(string name) =>
-            UnderlyingStorage.GetDatabaseConnectionString(MutatePath(name));
+        public override void Move(string from, string to) => UnderlyingStorage.Move(MutatePath(from), MutatePath(to));
 
-        public override void DeleteDatabase(string name) => UnderlyingStorage.DeleteDatabase(MutatePath(name));
+        public override bool OpenFileExternally(string filename) => UnderlyingStorage.OpenFileExternally(MutatePath(filename));
 
-        public override void OpenPathInNativeExplorer(string path) => UnderlyingStorage.OpenPathInNativeExplorer(MutatePath(path));
+        public override bool PresentFileExternally(string filename) => UnderlyingStorage.PresentFileExternally(MutatePath(filename));
 
         public override Storage GetStorageForDirectory(string path)
         {

@@ -6,8 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.Rooms;
 
-#nullable enable
-
 namespace osu.Game.Screens.OnlinePlay
 {
     [Cached(typeof(IRoomManager))]

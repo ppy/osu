@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -8,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -18,14 +19,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Schedule
 {
-    public class ScheduleScreen : TournamentScreen // IProvidesVideo
+    public class ScheduleScreen : TournamentScreen
     {
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Container mainContainer;
         private LadderInfo ladder;
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, Storage storage)
+        private void load(LadderInfo ladder)
         {
             this.ladder = ladder;
 

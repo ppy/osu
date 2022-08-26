@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Timing;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -20,7 +23,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private double increment;
 
         private GameplayClockContainer gameplayClockContainer;
-        private GameplayClock gameplayClock;
+        private IFrameBasedClock gameplayClock;
 
         private const double skip_time = 6000;
 
@@ -31,7 +34,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             increment = skip_time;
 
             var working = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
-            working.LoadTrack();
 
             Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0)
             {
@@ -50,7 +52,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
 
             gameplayClockContainer.Start();
-            gameplayClock = gameplayClockContainer.GameplayClock;
+            gameplayClock = gameplayClockContainer;
         });
 
         [Test]

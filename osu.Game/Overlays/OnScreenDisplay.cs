@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
@@ -95,13 +97,13 @@ namespace osu.Game.Overlays
         /// Displays the provided <see cref="Toast"/> temporarily.
         /// </summary>
         /// <param name="toast"></param>
-        public void Display(Toast toast)
+        public void Display(Toast toast) => Schedule(() =>
         {
             box.Child = toast;
             DisplayTemporarily(box);
-        }
+        });
 
-        private void displayTrackedSettingChange(SettingDescription description) => Schedule(() => Display(new TrackedSettingToast(description)));
+        private void displayTrackedSettingChange(SettingDescription description) => Scheduler.AddOnce(Display, new TrackedSettingToast(description));
 
         private TransformSequence<Drawable> fadeIn;
         private ScheduledDelegate fadeOut;

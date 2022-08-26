@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -16,10 +18,12 @@ using osu.Game.Rulesets.Mods;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Extensions;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Details
@@ -38,16 +42,16 @@ namespace osu.Game.Screens.Select.Details
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
 
-        private BeatmapInfo beatmap;
+        private IBeatmapInfo beatmapInfo;
 
-        public BeatmapInfo Beatmap
+        public IBeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (value == beatmap) return;
+                if (value == beatmapInfo) return;
 
-                beatmap = value;
+                beatmapInfo = value;
 
                 updateStatistics();
             }
@@ -62,10 +66,10 @@ namespace osu.Game.Screens.Select.Details
                 Children = new[]
                 {
                     FirstValue = new StatisticRow(), // circle size/key amount
-                    HpDrain = new StatisticRow { Title = "HP Drain" },
-                    Accuracy = new StatisticRow { Title = "Accuracy" },
-                    ApproachRate = new StatisticRow { Title = "Approach Rate" },
-                    starDifficulty = new StatisticRow(10, true) { Title = "Star Difficulty" },
+                    HpDrain = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsDrain },
+                    Accuracy = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAccuracy },
+                    ApproachRate = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAr },
+                    starDifficulty = new StatisticRow(10, true) { Title = BeatmapsetsStrings.ShowStatsStars },
                 },
             };
         }
@@ -92,11 +96,8 @@ namespace osu.Game.Screens.Select.Details
             modSettingChangeTracker?.Dispose();
 
             modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
-            modSettingChangeTracker.SettingChanged += m =>
+            modSettingChangeTracker.SettingChanged += _ =>
             {
-                if (!(m is IApplicableToDifficulty))
-                    return;
-
                 debouncedStatisticsUpdate?.Cancel();
                 debouncedStatisticsUpdate = Scheduler.AddDelayed(updateStatistics, 100);
             };
@@ -106,28 +107,28 @@ namespace osu.Game.Screens.Select.Details
 
         private void updateStatistics()
         {
-            BeatmapDifficulty baseDifficulty = Beatmap?.BaseDifficulty;
+            IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
             BeatmapDifficulty adjustedDifficulty = null;
 
             if (baseDifficulty != null && mods.Value.Any(m => m is IApplicableToDifficulty))
             {
-                adjustedDifficulty = baseDifficulty.Clone();
+                adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
 
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(adjustedDifficulty);
             }
 
-            switch (Beatmap?.Ruleset?.ID ?? 0)
+            switch (BeatmapInfo?.Ruleset.OnlineID)
             {
                 case 3:
                     // Account for mania differences locally for now
                     // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes
-                    FirstValue.Title = "Key Count";
+                    FirstValue.Title = BeatmapsetsStrings.ShowStatsCsMania;
                     FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, null);
                     break;
 
                 default:
-                    FirstValue.Title = "Circle Size";
+                    FirstValue.Title = BeatmapsetsStrings.ShowStatsCs;
                     FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
                     break;
             }
@@ -145,17 +146,23 @@ namespace osu.Game.Screens.Select.Details
         {
             starDifficultyCancellationSource?.Cancel();
 
-            if (Beatmap == null)
+            if (BeatmapInfo == null)
                 return;
 
             starDifficultyCancellationSource = new CancellationTokenSource();
 
-            var normalStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
-            var moddedStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+            var normalStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            var moddedStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
 
-            Task.WhenAll(normalStarDifficulty, moddedStarDifficulty).ContinueWith(_ => Schedule(() =>
+            Task.WhenAll(normalStarDifficultyTask, moddedStarDifficultyTask).ContinueWith(_ => Schedule(() =>
             {
-                starDifficulty.Value = ((float)normalStarDifficulty.Result.Stars, (float)moddedStarDifficulty.Result.Stars);
+                var normalDifficulty = normalStarDifficultyTask.GetResultSafely();
+                var moddedDifficulty = moddedStarDifficultyTask.GetResultSafely();
+
+                if (normalDifficulty == null || moddedDifficulty == null)
+                    return;
+
+                starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
 

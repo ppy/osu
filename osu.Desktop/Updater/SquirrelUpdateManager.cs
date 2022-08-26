@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,14 +17,15 @@ using osu.Game.Overlays.Notifications;
 using osuTK;
 using osuTK.Graphics;
 using Squirrel;
-using LogLevel = Splat.LogLevel;
+using Squirrel.SimpleSplat;
 
 namespace osu.Desktop.Updater
 {
+    [SupportedOSPlatform("windows")]
     public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
-        private UpdateManager updateManager;
-        private NotificationOverlay notificationOverlay;
+        private UpdateManager? updateManager;
+        private INotificationOverlay notificationOverlay = null!;
 
         public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
@@ -34,24 +36,28 @@ namespace osu.Desktop.Updater
         /// </summary>
         private bool updatePending;
 
-        [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification)
-        {
-            notificationOverlay = notification;
+        private readonly SquirrelLogger squirrelLogger = new SquirrelLogger();
 
-            Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
+        [BackgroundDependencyLoader]
+        private void load(INotificationOverlay notifications)
+        {
+            notificationOverlay = notifications;
+
+            SquirrelLocator.CurrentMutable.Register(() => squirrelLogger, typeof(ILogger));
         }
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
 
-        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
+        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification? notification = null)
         {
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
 
+            const string? github_token = null; // TODO: populate.
+
             try
             {
-                updateManager ??= await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true).ConfigureAwait(false);
+                updateManager ??= new GithubUpdateManager(@"https://github.com/ppy/osu", false, github_token, @"osulazer");
 
                 var info = await updateManager.CheckForUpdate(!useDeltaPatching).ConfigureAwait(false);
 
@@ -103,7 +109,10 @@ namespace osu.Desktop.Updater
                     }
                     else
                     {
+                        // In the case of an error, a separate notification will be displayed.
                         notification.State = ProgressNotificationState.Cancelled;
+                        notification.Close();
+
                         Logger.Error(e, @"update failed!");
                     }
                 }
@@ -134,7 +143,7 @@ namespace osu.Desktop.Updater
         private class UpdateCompleteNotification : ProgressCompletionNotification
         {
             [Resolved]
-            private OsuGame game { get; set; }
+            private OsuGame game { get; set; } = null!;
 
             public UpdateCompleteNotification(SquirrelUpdateManager updateManager)
             {
@@ -143,7 +152,7 @@ namespace osu.Desktop.Updater
                 Activated = () =>
                 {
                     updateManager.PrepareUpdateAsync()
-                                 .ContinueWith(_ => updateManager.Schedule(() => game?.GracefullyExit()));
+                                 .ContinueWith(_ => updateManager.Schedule(() => game.AttemptExit()));
                     return true;
                 };
             }
@@ -183,13 +192,26 @@ namespace osu.Desktop.Updater
                     }
                 });
             }
+
+            public override void Close()
+            {
+                // cancelling updates is not currently supported by the underlying updater.
+                // only allow dismissing for now.
+
+                switch (State)
+                {
+                    case ProgressNotificationState.Cancelled:
+                        base.Close();
+                        break;
+                }
+            }
         }
 
-        private class SquirrelLogger : Splat.ILogger, IDisposable
+        private class SquirrelLogger : ILogger, IDisposable
         {
-            public LogLevel Level { get; set; } = LogLevel.Info;
+            public Squirrel.SimpleSplat.LogLevel Level { get; set; } = Squirrel.SimpleSplat.LogLevel.Info;
 
-            public void Write(string message, LogLevel logLevel)
+            public void Write(string message, Squirrel.SimpleSplat.LogLevel logLevel)
             {
                 if (logLevel < Level)
                     return;

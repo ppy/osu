@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -13,9 +15,16 @@ namespace osu.Game.Tests.Visual.Components
 {
     public class TestScenePreviewTrackManager : OsuTestScene, IPreviewTrackOwner
     {
-        private readonly TestPreviewTrackManager trackManager = new TestPreviewTrackManager();
+        private readonly IAdjustableAudioComponent gameTrackAudio = new AudioAdjustments();
+
+        private readonly TestPreviewTrackManager trackManager;
 
         private AudioManager audio;
+
+        public TestScenePreviewTrackManager()
+        {
+            trackManager = new TestPreviewTrackManager(gameTrackAudio);
+        }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -151,19 +160,19 @@ namespace osu.Game.Tests.Visual.Components
                     audio.VolumeTrack.Value = 1;
             });
 
-            AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
+            AddAssert("game not muted", () => gameTrackAudio.AggregateVolume.Value != 0);
 
             AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
             AddUntilStep("wait loaded", () => track.IsLoaded);
             AddStep("start track", () => track.Start());
-            AddAssert("game is muted", () => audio.Tracks.AggregateVolume.Value == 0);
+            AddAssert("game is muted", () => gameTrackAudio.AggregateVolume.Value == 0);
 
             if (stopAnyPlaying)
                 AddStep("stop any playing", () => trackManager.StopAnyPlaying(owner));
             else
                 AddStep("stop track", () => track.Stop());
 
-            AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
+            AddAssert("game not muted", () => gameTrackAudio.AggregateVolume.Value != 0);
         }
 
         [Test]
@@ -181,7 +190,7 @@ namespace osu.Game.Tests.Visual.Components
             AddAssert("track stopped", () => !track.IsRunning);
         }
 
-        private TestPreviewTrackManager.TestPreviewTrack getTrack() => (TestPreviewTrackManager.TestPreviewTrack)trackManager.Get(null);
+        private TestPreviewTrackManager.TestPreviewTrack getTrack() => (TestPreviewTrackManager.TestPreviewTrack)trackManager.Get(CreateAPIBeatmapSet());
 
         private TestPreviewTrackManager.TestPreviewTrack getOwnedTrack()
         {
@@ -224,7 +233,12 @@ namespace osu.Game.Tests.Visual.Components
 
             public new PreviewTrack CurrentTrack => base.CurrentTrack;
 
-            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
+            public TestPreviewTrackManager(IAdjustableAudioComponent mainTrackAdjustments)
+                : base(mainTrackAdjustments)
+            {
+            }
+
+            protected override TrackManagerPreviewTrack CreatePreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
 
             public override bool UpdateSubTree()
             {
@@ -240,7 +254,7 @@ namespace osu.Game.Tests.Visual.Components
 
                 public new Track Track => base.Track;
 
-                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
+                public TestPreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
                     : base(beatmapSetInfo, trackManager)
                 {
                     this.trackManager = trackManager;

@@ -1,12 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
 using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.UserInterface
@@ -28,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, SessionStatics statics)
+        private void load(AudioManager audio)
         {
             sampleHover = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-hover")
                           ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-hover");

@@ -2,131 +2,83 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Localisation;
 using osu.Framework.Testing;
-using osu.Game.Database;
+using osu.Game.Models;
 using osu.Game.Users;
+using osu.Game.Utils;
+using Realms;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A realm model containing metadata for a beatmap.
+    /// </summary>
+    /// <remarks>
+    /// This is currently stored against each beatmap difficulty, even when it is duplicated.
+    /// It is also provided via <see cref="BeatmapSetInfo"/> for convenience and historical purposes.
+    /// A future effort could see this converted to an <see cref="EmbeddedObject"/> or potentially de-duped
+    /// and shared across multiple difficulties in the same set, if required.
+    ///
+    /// Note that difficulty name is not stored in this metadata but in <see cref="BeatmapInfo"/>.
+    /// </remarks>
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey
+    [MapTo("BeatmapMetadata")]
+    public class BeatmapMetadata : RealmObject, IBeatmapMetadataInfo, IDeepCloneable<BeatmapMetadata>
     {
-        public int ID { get; set; }
-
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [JsonProperty("title_unicode")]
-        public string TitleUnicode { get; set; }
+        public string TitleUnicode { get; set; } = string.Empty;
 
-        public string Artist { get; set; }
+        public string Artist { get; set; } = string.Empty;
 
         [JsonProperty("artist_unicode")]
-        public string ArtistUnicode { get; set; }
+        public string ArtistUnicode { get; set; } = string.Empty;
 
-        [JsonIgnore]
-        public List<BeatmapInfo> Beatmaps { get; set; }
+        public RealmUser Author { get; set; } = null!;
 
-        [JsonIgnore]
-        public List<BeatmapSetInfo> BeatmapSets { get; set; }
-
-        /// <summary>
-        /// Helper property to deserialize a username to <see cref="User"/>.
-        /// </summary>
-        [JsonProperty(@"user_id")]
-        [Column("AuthorID")]
-        public int AuthorID
-        {
-            get => Author?.Id ?? 1;
-            set
-            {
-                Author ??= new User();
-                Author.Id = value;
-            }
-        }
-
-        /// <summary>
-        /// Helper property to deserialize a username to <see cref="User"/>.
-        /// </summary>
-        [JsonProperty(@"creator")]
-        [Column("Author")]
-        public string AuthorString
-        {
-            get => Author?.Username;
-            set
-            {
-                Author ??= new User();
-                Author.Username = value;
-            }
-        }
-
-        /// <summary>
-        /// The author of the beatmaps in this set.
-        /// </summary>
-        [JsonIgnore]
-        public User Author;
-
-        public string Source { get; set; }
+        public string Source { get; set; } = string.Empty;
 
         [JsonProperty(@"tags")]
-        public string Tags { get; set; }
+        public string Tags { get; set; } = string.Empty;
 
         /// <summary>
         /// The time in milliseconds to begin playing the track for preview purposes.
         /// If -1, the track should begin playing at 40% of its length.
         /// </summary>
-        public int PreviewTime { get; set; }
+        public int PreviewTime { get; set; } = -1;
 
-        public string AudioFile { get; set; }
-        public string BackgroundFile { get; set; }
+        public string AudioFile { get; set; } = string.Empty;
+        public string BackgroundFile { get; set; } = string.Empty;
 
-        public override string ToString()
+        public BeatmapMetadata(RealmUser? user = null)
         {
-            string author = Author == null ? string.Empty : $"({Author})";
-            return $"{Artist} - {Title} {author}".Trim();
+            Author = user ?? new RealmUser();
         }
 
-        public RomanisableString ToRomanisableString()
+        [UsedImplicitly] // Realm
+        private BeatmapMetadata()
         {
-            string author = Author == null ? string.Empty : $"({Author})";
-            var artistUnicode = string.IsNullOrEmpty(ArtistUnicode) ? Artist : ArtistUnicode;
-            var titleUnicode = string.IsNullOrEmpty(TitleUnicode) ? Title : TitleUnicode;
-
-            return new RomanisableString($"{artistUnicode} - {titleUnicode} {author}".Trim(), $"{Artist} - {Title} {author}".Trim());
         }
 
-        [JsonIgnore]
-        public string[] SearchableTerms => new[]
-        {
-            Author?.Username,
-            Artist,
-            ArtistUnicode,
-            Title,
-            TitleUnicode,
-            Source,
-            Tags
-        }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+        IUser IBeatmapMetadataInfo.Author => Author;
 
-        public bool Equals(BeatmapMetadata other)
-        {
-            if (other == null)
-                return false;
+        public override string ToString() => this.GetDisplayTitle();
 
-            return Title == other.Title
-                   && TitleUnicode == other.TitleUnicode
-                   && Artist == other.Artist
-                   && ArtistUnicode == other.ArtistUnicode
-                   && AuthorString == other.AuthorString
-                   && Source == other.Source
-                   && Tags == other.Tags
-                   && PreviewTime == other.PreviewTime
-                   && AudioFile == other.AudioFile
-                   && BackgroundFile == other.BackgroundFile;
-        }
+        public BeatmapMetadata DeepClone() => new BeatmapMetadata(Author.DeepClone())
+        {
+            Title = Title,
+            TitleUnicode = TitleUnicode,
+            Artist = Artist,
+            ArtistUnicode = ArtistUnicode,
+            Source = Source,
+            Tags = Tags,
+            PreviewTime = PreviewTime,
+            AudioFile = AudioFile,
+            BackgroundFile = BackgroundFile
+        };
     }
 }

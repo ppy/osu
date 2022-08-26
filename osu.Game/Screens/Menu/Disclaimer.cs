@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -14,9 +16,9 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Menu
 {
@@ -34,10 +36,10 @@ namespace osu.Game.Screens.Menu
 
         private readonly OsuScreen nextScreen;
 
-        private readonly Bindable<User> currentUser = new Bindable<User>();
+        private readonly Bindable<APIUser> currentUser = new Bindable<APIUser>();
         private FillFlowContainer fill;
 
-        private readonly List<Drawable> expendableText = new List<Drawable>();
+        private readonly List<ITextPart> expendableText = new List<ITextPart>();
 
         public Disclaimer(OsuScreen nextScreen = null)
         {
@@ -97,7 +99,7 @@ namespace osu.Game.Screens.Menu
 
             textFlow.AddText("this is osu!", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular));
 
-            expendableText.AddRange(textFlow.AddText("lazer", t =>
+            expendableText.Add(textFlow.AddText("lazer", t =>
             {
                 t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular);
                 t.Colour = colours.PinkLight;
@@ -114,7 +116,7 @@ namespace osu.Game.Screens.Menu
                 t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold);
                 t.Colour = colours.Pink;
             });
-            expendableText.AddRange(textFlow.AddText(" coming to osu!", formatRegular));
+            expendableText.Add(textFlow.AddText(" coming to osu!", formatRegular));
             textFlow.AddText(".", formatRegular);
 
             textFlow.NewParagraph();
@@ -146,16 +148,17 @@ namespace osu.Game.Screens.Menu
                     supportFlow.AddText(" to help support osu!'s development", formatSemiBold);
                 }
 
-                heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
+                supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
+                    heart = t;
+
                     t.Padding = new MarginPadding { Left = 5, Top = 3 };
                     t.Font = t.Font.With(size: 20);
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
-                }).First();
 
-                if (IsLoaded)
-                    animateHeart();
+                    Schedule(() => heart?.FlashColour(Color4.White, 750, Easing.OutQuint).Loop());
+                });
 
                 if (supportFlow.IsPresent)
                     supportFlow.FadeInFromZero(500);
@@ -168,12 +171,20 @@ namespace osu.Game.Screens.Menu
             if (nextScreen != null)
                 LoadComponentAsync(nextScreen);
 
-            ((IBindable<User>)currentUser).BindTo(api.LocalUser);
+            ((IBindable<APIUser>)currentUser).BindTo(api.LocalUser);
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnSuspending(e);
+
+            // Once this screen has finished being displayed, we don't want to unnecessarily handle user change events.
+            currentUser.UnbindAll();
+        }
+
+        public override void OnEntering(ScreenTransitionEvent e)
+        {
+            base.OnEntering(e);
 
             icon.RotateTo(10);
             icon.FadeOut();
@@ -193,7 +204,7 @@ namespace osu.Game.Screens.Menu
                 using (BeginDelayedSequence(520 + 160))
                 {
                     fill.MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
-                    Schedule(() => expendableText.ForEach(t =>
+                    Schedule(() => expendableText.SelectMany(t => t.Drawables).ForEach(t =>
                     {
                         t.FadeOut(100);
                         t.ScaleTo(new Vector2(0, 1), 100, Easing.OutQuart);
@@ -206,14 +217,12 @@ namespace osu.Game.Screens.Menu
             foreach (var c in textFlow.Children)
                 c.FadeTo(0.001f).Delay(delay += 20).FadeIn(500);
 
-            animateHeart();
-
             this
                 .FadeInFromZero(500)
                 .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
-                .Finally(d =>
+                .Finally(_ =>
                 {
                     if (nextScreen != null)
                         this.Push(nextScreen);
@@ -243,11 +252,6 @@ namespace osu.Game.Screens.Menu
             };
 
             return tips[RNG.Next(0, tips.Length)];
-        }
-
-        private void animateHeart()
-        {
-            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
     }
 }

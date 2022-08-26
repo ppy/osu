@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -8,7 +10,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -56,7 +57,7 @@ namespace osu.Game.Tests.Skins
         {
             AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => config.SetValue(OsuSetting.BeatmapSkins, allowBeatmapLookups));
 
-            ISkin expected() => allowBeatmapLookups ? (ISkin)beatmapSource : userSource;
+            ISkin expected() => allowBeatmapLookups ? beatmapSource : userSource;
 
             AddAssert("Check lookup is from correct source", () => requester.FindProvider(s => s.GetDrawableComponent(new TestSkinComponent()) != null) == expected());
         }
@@ -77,7 +78,7 @@ namespace osu.Game.Tests.Skins
         public class BeatmapSkinSource : LegacyBeatmapSkin
         {
             public BeatmapSkinSource()
-                : base(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo, null, null)
+                : base(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo, null)
             {
             }
 

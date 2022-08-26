@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -150,7 +152,7 @@ namespace osu.Game.Overlays.Comments
                                                         {
                                                             Alpha = Comment.IsDeleted ? 1 : 0,
                                                             Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                                            Text = "deleted"
+                                                            Text = CommentsStrings.Deleted
                                                         }
                                                     }
                                                 },
@@ -362,15 +364,15 @@ namespace osu.Game.Overlays.Comments
 
         private void updateButtonsState()
         {
-            var loadedReplesCount = loadedReplies.Count;
-            var hasUnloadedReplies = loadedReplesCount != Comment.RepliesCount;
+            int loadedRepliesCount = loadedReplies.Count;
+            bool hasUnloadedReplies = loadedRepliesCount != Comment.RepliesCount;
 
-            loadRepliesButton.FadeTo(hasUnloadedReplies && loadedReplesCount == 0 ? 1 : 0);
-            showMoreButton.FadeTo(hasUnloadedReplies && loadedReplesCount > 0 ? 1 : 0);
-            showRepliesButton.FadeTo(loadedReplesCount != 0 ? 1 : 0);
+            loadRepliesButton.FadeTo(hasUnloadedReplies && loadedRepliesCount == 0 ? 1 : 0);
+            showMoreButton.FadeTo(hasUnloadedReplies && loadedRepliesCount > 0 ? 1 : 0);
+            showRepliesButton.FadeTo(loadedRepliesCount != 0 ? 1 : 0);
 
             if (Comment.IsTopLevel)
-                chevronButton.FadeTo(loadedReplesCount != 0 ? 1 : 0);
+                chevronButton.FadeTo(loadedRepliesCount != 0 ? 1 : 0);
 
             showMoreButton.IsLoading = loadRepliesButton.IsLoading = false;
         }

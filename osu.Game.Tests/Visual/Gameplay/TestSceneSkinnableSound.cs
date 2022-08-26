@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +13,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestSkinSourceContainer skinSource;
         private PausableSkinnableSound skinnableSound;
 
-        [SetUp]
+        [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("setup hierarchy", () =>
@@ -131,7 +131,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Cached(typeof(ISkinSource))]
-        [Cached(typeof(ISamplePlaybackDisabler))]
         private class TestSkinSourceContainer : Container, ISkinSource, ISamplePlaybackDisabler
         {
             [Resolved]

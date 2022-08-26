@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -182,7 +184,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = createBeatmap();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
-            beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2;
+            beatmap.Difficulty.SliderMultiplier = 2;
 
             createTest(beatmap, d => d.RelativeScaleBeatLengthsOverride = true);
             AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 5000);
@@ -196,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = createBeatmap();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
-            beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2;
+            beatmap.Difficulty.SliderMultiplier = 2;
 
             createTest(beatmap);
             AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 2000);
@@ -261,27 +263,30 @@ namespace osu.Game.Tests.Visual.Gameplay
             return beatmap;
         }
 
-        private void createTest(IBeatmap beatmap, Action<TestDrawableScrollingRuleset> overrideAction = null) => AddStep("create test", () =>
+        private void createTest(IBeatmap beatmap, Action<TestDrawableScrollingRuleset> overrideAction = null)
         {
-            var ruleset = new TestScrollingRuleset();
-
-            drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
-            drawableRuleset.FrameStablePlayback = false;
-
-            overrideAction?.Invoke(drawableRuleset);
-
-            Child = new Container
+            AddStep("create test", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Y,
-                Height = 0.75f,
-                Width = 400,
-                Masking = true,
-                Clock = new FramedClock(testClock),
-                Child = drawableRuleset
-            };
-        });
+                var ruleset = new TestScrollingRuleset();
+
+                drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
+                drawableRuleset.FrameStablePlayback = false;
+
+                overrideAction?.Invoke(drawableRuleset);
+
+                Child = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    Height = 0.75f,
+                    Width = 400,
+                    Masking = true,
+                    Clock = new FramedClock(testClock),
+                    Child = drawableRuleset
+                };
+            });
+        }
 
         #region Ruleset
 
@@ -293,7 +298,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap, null);
 
-            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new NotImplementedException();
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
 
             public override string Description { get; } = string.Empty;
 
@@ -320,8 +325,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 switch (h)
                 {
-                    case TestPooledHitObject _:
-                    case TestPooledParentHitObject _:
+                    case TestPooledHitObject:
+                    case TestPooledParentHitObject:
                         return null;
 
                     case TestParentHitObject p:

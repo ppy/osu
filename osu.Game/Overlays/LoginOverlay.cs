@@ -1,29 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Overlays.Settings.Sections.General;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
-using System;
+using osu.Game.Overlays.Login;
 
 namespace osu.Game.Overlays
 {
     public class LoginOverlay : OsuFocusedOverlayContainer
     {
-        private LoginSettings settingsSection;
+        private LoginPanel panel;
 
         private const float transition_time = 400;
-
-        /// <summary>
-        /// Provide a source for the toolbar height.
-        /// </summary>
-        public Func<float> GetToolbarHeight;
 
         public LoginOverlay()
         {
@@ -56,7 +52,7 @@ namespace osu.Game.Overlays
                             AutoSizeEasing = Easing.OutQuint,
                             Children = new Drawable[]
                             {
-                                settingsSection = new LoginSettings
+                                panel = new LoginPanel
                                 {
                                     Padding = new MarginPadding(10),
                                     RequestHide = Hide,
@@ -81,25 +77,18 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            settingsSection.Bounding = true;
+            panel.Bounding = true;
             this.FadeIn(transition_time, Easing.OutQuint);
 
-            GetContainingInputManager().ChangeFocus(settingsSection);
+            ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(panel));
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            settingsSection.Bounding = false;
+            panel.Bounding = false;
             this.FadeOut(transition_time);
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
     }
 }

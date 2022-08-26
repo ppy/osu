@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
+using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
 
@@ -31,5 +34,15 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// The cached <see cref="OnlinePlayBeatmapAvailabilityTracker"/>.
         /// </summary>
         OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker { get; }
+
+        /// <summary>
+        /// The cached <see cref="UserLookupCache"/>.
+        /// </summary>
+        TestUserLookupCache UserLookupCache { get; }
+
+        /// <summary>
+        /// The cached <see cref="BeatmapLookupCache"/>.
+        /// </summary>
+        BeatmapLookupCache BeatmapLookupCache { get; }
     }
 }

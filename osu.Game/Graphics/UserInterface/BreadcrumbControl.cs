@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osuTK;
 using osu.Framework;
@@ -33,8 +35,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 foreach (var t in TabContainer.Children.OfType<BreadcrumbTabItem>())
                 {
-                    var tIndex = TabContainer.IndexOf(t);
-                    var tabIndex = TabContainer.IndexOf(TabMap[index.NewValue]);
+                    int tIndex = TabContainer.IndexOf(t);
+                    int tabIndex = TabContainer.IndexOf(TabMap[index.NewValue]);
 
                     t.State = tIndex > tabIndex ? Visibility.Hidden : Visibility.Visible;
                     t.Chevron.FadeTo(tIndex >= tabIndex ? 0f : 1f, 500, Easing.OutQuint);

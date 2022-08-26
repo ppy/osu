@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,6 +18,9 @@ namespace osu.Game.Screens.Select.Carousel
         public const float MAX_HEIGHT = 80;
 
         public override bool IsPresent => base.IsPresent || Item?.Visible == true;
+
+        public override bool HandlePositionalInput => Item?.Visible == true;
+        public override bool PropagatePositionalInputSubTree => Item?.Visible == true;
 
         public readonly CarouselHeader Header;
 
@@ -48,7 +53,7 @@ namespace osu.Game.Screens.Select.Carousel
 
                     if (item is CarouselGroup group)
                     {
-                        foreach (var c in group.Children)
+                        foreach (var c in group.Items)
                             c.Filtered.ValueChanged -= onStateChange;
                     }
                 }
@@ -112,7 +117,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (Item is CarouselGroup group)
             {
-                foreach (var c in group.Children)
+                foreach (var c in group.Items)
                     c.Filtered.ValueChanged += onStateChange;
             }
         }

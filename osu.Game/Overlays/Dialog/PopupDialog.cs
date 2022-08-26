@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,6 +12,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -42,9 +45,9 @@ namespace osu.Game.Overlays.Dialog
             set => icon.Icon = value;
         }
 
-        private string headerText;
+        private LocalisableString headerText;
 
-        public string HeaderText
+        public LocalisableString HeaderText
         {
             get => headerText;
             set
@@ -57,9 +60,9 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
-        private string bodyText;
+        private LocalisableString bodyText;
 
-        public string BodyText
+        public LocalisableString BodyText
         {
             get => bodyText;
             set
@@ -87,17 +90,17 @@ namespace osu.Game.Overlays.Dialog
                         if (actionInvoked) return;
 
                         actionInvoked = true;
-                        action?.Invoke();
 
+                        // Hide the dialog before running the action.
+                        // This is important as the code which is performed may check for a dialog being present (ie. `OsuGame.PerformFromScreen`)
+                        // and we don't want it to see the already dismissed dialog.
                         Hide();
+
+                        action?.Invoke();
                     };
                 }
             }
         }
-
-        // We always want dialogs to show their appear animation, so we request they start hidden.
-        // Normally this would not be required, but is here due to the manual Show() call that occurs before LoadComplete().
-        protected override bool StartHidden => true;
 
         protected PopupDialog()
         {
@@ -211,14 +214,19 @@ namespace osu.Game.Overlays.Dialog
             };
 
             // It's important we start in a visible state so our state fires on hide, even before load.
-            // This is used by the DialogOverlay to know when the dialog was dismissed.
+            // This is used by the dialog overlay to know when the dialog was dismissed.
             Show();
         }
 
         /// <summary>
         /// Programmatically clicks the first <see cref="PopupDialogOkButton"/>.
         /// </summary>
-        public void PerformOkAction() => Buttons.OfType<PopupDialogOkButton>().First().TriggerClick();
+        public void PerformOkAction() => PerformAction<PopupDialogOkButton>();
+
+        /// <summary>
+        /// Programmatically clicks the first button of the provided type.
+        /// </summary>
+        public void PerformAction<T>() where T : PopupDialogButton => Buttons.OfType<T>().First().TriggerClick();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -262,7 +270,7 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopOut()
         {
-            if (!actionInvoked && content.IsPresent)
+            if (!actionInvoked)
                 // In the case a user did not choose an action before a hide was triggered, press the last button.
                 // This is presumed to always be a sane default "cancel" action.
                 buttonsContainer.Last().TriggerClick();

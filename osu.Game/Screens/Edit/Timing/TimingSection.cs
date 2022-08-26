@@ -1,21 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Timing
 {
     internal class TimingSection : Section<TimingControlPoint>
     {
-        private SettingsSlider<double> bpmSlider;
-        private SettingsEnumDropdown<TimeSignatures> timeSignature;
+        private LabelledTimeSignature timeSignature;
         private BPMTextBox bpmTextEntry;
 
         [BackgroundDependencyLoader]
@@ -23,27 +21,40 @@ namespace osu.Game.Screens.Edit.Timing
         {
             Flow.AddRange(new Drawable[]
             {
+                new TapTimingControl(),
                 bpmTextEntry = new BPMTextBox(),
-                bpmSlider = new BPMSlider(),
-                timeSignature = new SettingsEnumDropdown<TimeSignatures>
+                timeSignature = new LabelledTimeSignature
                 {
-                    LabelText = "Time Signature"
-                },
+                    Label = "Time Signature"
+                }
             });
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            bpmTextEntry.Current.BindValueChanged(_ => saveChanges());
+            timeSignature.Current.BindValueChanged(_ => saveChanges());
+
+            void saveChanges()
+            {
+                if (!isRebinding) ChangeHandler?.SaveState();
+            }
+        }
+
+        private bool isRebinding;
 
         protected override void OnControlPointChanged(ValueChangedEvent<TimingControlPoint> point)
         {
             if (point.NewValue != null)
             {
-                bpmSlider.Current = point.NewValue.BeatLengthBindable;
-                bpmSlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+                isRebinding = true;
 
                 bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
-                // no need to hook change handler here as it's the same bindable as above
-
                 timeSignature.Current = point.NewValue.TimeSignatureBindable;
-                timeSignature.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+
+                isRebinding = false;
             }
         }
 
@@ -66,7 +77,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 Label = "BPM";
 
-                OnCommit += (val, isNew) =>
+                OnCommit += (_, isNew) =>
                 {
                     if (!isNew) return;
 
@@ -100,51 +111,6 @@ namespace osu.Game.Screens.Edit.Timing
                     beatLengthBindable.UnbindBindings();
                     beatLengthBindable.BindTo(value);
                 }
-            }
-        }
-
-        private class BPMSlider : SettingsSlider<double>
-        {
-            private const double sane_minimum = 60;
-            private const double sane_maximum = 240;
-
-            private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
-
-            private readonly BindableDouble bpmBindable = new BindableDouble(60000 / TimingControlPoint.DEFAULT_BEAT_LENGTH)
-            {
-                MinValue = sane_minimum,
-                MaxValue = sane_maximum,
-            };
-
-            public BPMSlider()
-            {
-                beatLengthBindable.BindValueChanged(beatLength => updateCurrent(beatLengthToBpm(beatLength.NewValue)), true);
-                bpmBindable.BindValueChanged(bpm => beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
-
-                base.Current = bpmBindable;
-
-                TransferValueOnCommit = true;
-            }
-
-            public override Bindable<double> Current
-            {
-                get => base.Current;
-                set
-                {
-                    // incoming will be beat length, not bpm
-                    beatLengthBindable.UnbindBindings();
-                    beatLengthBindable.BindTo(value);
-                }
-            }
-
-            private void updateCurrent(double newValue)
-            {
-                // we use a more sane range for the slider display unless overridden by the user.
-                // if a value comes in outside our range, we should expand temporarily.
-                bpmBindable.MinValue = Math.Min(newValue, sane_minimum);
-                bpmBindable.MaxValue = Math.Max(newValue, sane_maximum);
-
-                bpmBindable.Value = newValue;
             }
         }
 

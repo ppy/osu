@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -64,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Set beatmap", () => Beatmap.Value = new DummyWorkingBeatmap(Audio, null)
             {
-                BeatmapInfo = { OnlineBeatmapID = hasOnlineId ? 1234 : (int?)null }
+                BeatmapInfo = { OnlineID = hasOnlineId ? 1234 : -1 }
             });
 
             AddStep("Run command", () => Add(new NowPlayingCommand()));

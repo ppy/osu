@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModBlockFail : Mod, IApplicableFailOverride, IApplicableToHUD, IReadFromConfig
     {
-        private Bindable<bool> showHealthBar;
+        private readonly Bindable<bool> showHealthBar = new Bindable<bool>();
 
         /// <summary>
         /// We never fail, 'yo.
@@ -20,12 +20,12 @@ namespace osu.Game.Rulesets.Mods
 
         public void ReadFromConfig(OsuConfigManager config)
         {
-            showHealthBar = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail);
+            config.BindWith(OsuSetting.ShowHealthDisplayWhenCantFail, showHealthBar);
         }
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
-            overlay.ShowHealthbar.BindTo(showHealthBar);
+            overlay.ShowHealthBar.BindTo(showHealthBar);
         }
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -264,7 +266,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 },
                 BeatmapInfo =
                 {
-                    BaseDifficulty = new BeatmapDifficulty
+                    Difficulty = new BeatmapDifficulty
                     {
                         SliderTickRate = 4,
                         OverallDifficulty = 10,
@@ -306,7 +308,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 },
                 BeatmapInfo =
                 {
-                    BaseDifficulty = new BeatmapDifficulty { SliderTickRate = tick_rate },
+                    Difficulty = new BeatmapDifficulty { SliderTickRate = tick_rate },
                     Ruleset = new ManiaRuleset().RulesetInfo
                 },
             };
@@ -383,12 +385,12 @@ namespace osu.Game.Rulesets.Mania.Tests
                     },
                     BeatmapInfo =
                     {
-                        BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                        Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
                         Ruleset = new ManiaRuleset().RulesetInfo
                     },
                 };
 
-                beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
+                beatmap.ControlPointInfo.Add(0, new EffectControlPoint { ScrollSpeed = 0.1f });
             }
 
             AddStep("load player", () =>

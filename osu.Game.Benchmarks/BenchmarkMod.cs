@@ -9,14 +9,14 @@ namespace osu.Game.Benchmarks
 {
     public class BenchmarkMod : BenchmarkTest
     {
-        private OsuModDoubleTime mod;
+        private OsuModDoubleTime mod = null!;
 
         [Params(1, 10, 100)]
         public int Times { get; set; }
 
-        [GlobalSetup]
-        public void GlobalSetup()
+        public override void SetUp()
         {
+            base.SetUp();
             mod = new OsuModDoubleTime();
         }
 

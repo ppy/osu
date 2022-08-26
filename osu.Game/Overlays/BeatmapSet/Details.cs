@@ -1,11 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Select.Details;
 using osuTK;
@@ -21,9 +24,9 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly AdvancedStats advanced;
         private readonly DetailBox ratingBox;
 
-        private BeatmapSetInfo beatmapSet;
+        private APIBeatmapSet beatmapSet;
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             get => beatmapSet;
             set
@@ -37,23 +40,23 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private BeatmapInfo beatmap;
+        private IBeatmapInfo beatmapInfo;
 
-        public BeatmapInfo Beatmap
+        public IBeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (value == beatmap) return;
+                if (value == beatmapInfo) return;
 
-                basic.Beatmap = advanced.Beatmap = beatmap = value;
+                basic.BeatmapInfo = advanced.BeatmapInfo = beatmapInfo = value;
             }
         }
 
         private void updateDisplay()
         {
-            Ratings.Metrics = BeatmapSet?.Metrics;
-            ratingBox.Alpha = BeatmapSet?.OnlineInfo?.Status > 0 ? 1 : 0;
+            Ratings.Ratings = BeatmapSet?.Ratings;
+            ratingBox.Alpha = BeatmapSet?.Status > 0 ? 1 : 0;
         }
 
         public Details()

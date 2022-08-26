@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.IPC;
-using osu.Game.Tournament.Models;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
@@ -91,7 +92,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc)
+        private void load(MatchIPCInfo ipc)
         {
             score1.BindValueChanged(_ => updateScores());
             score1.BindTo(ipc.Score1);
@@ -114,7 +115,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             var winningBar = score1.Value > score2.Value ? score1Bar : score2Bar;
             var losingBar = score1.Value <= score2.Value ? score1Bar : score2Bar;
 
-            var diff = Math.Max(score1.Value, score2.Value) - Math.Min(score1.Value, score2.Value);
+            int diff = Math.Max(score1.Value, score2.Value) - Math.Min(score1.Value, score2.Value);
 
             losingBar.ResizeWidthTo(0, 400, Easing.OutQuint);
             winningBar.ResizeWidthTo(Math.Min(0.4f, MathF.Pow(diff / 1500000f, 0.5f) / 2), 400, Easing.OutQuint);
@@ -127,7 +128,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             score2Text.X = Math.Max(5 + score2Text.DrawWidth / 2, score2Bar.DrawWidth);
         }
 
-        private class MatchScoreCounter : ScoreCounter
+        private class MatchScoreCounter : CommaSeparatedScoreCounter
         {
             private OsuSpriteText displayedSpriteText;
 

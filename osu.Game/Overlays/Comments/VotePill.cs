@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -67,7 +69,7 @@ namespace osu.Game.Overlays.Comments
             AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
             hoverLayer.Colour = Color4.Black.Opacity(0.5f);
 
-            var ownComment = api.LocalUser.Value.Id == comment.UserId;
+            bool ownComment = api.LocalUser.Value.Id == comment.UserId;
 
             if (!ownComment)
                 Action = onAction;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,9 +100,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual void RecreateGraph()
         {
-            var newColumns = new BufferedContainer<Column>
+            var newColumns = new BufferedContainer<Column>(cachedFrameBuffer: true)
             {
-                CacheDrawnFrameBuffer = true,
                 RedrawOnScale = false,
                 RelativeSizeAxes = Axes.Both,
             };
@@ -165,7 +166,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            var max = values.Max();
+            int max = values.Max();
 
             float step = values.Length / (float)ColumnCount;
 

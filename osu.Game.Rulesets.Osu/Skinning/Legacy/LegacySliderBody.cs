@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Skinning;
 using osu.Game.Utils;
 using osuTK.Graphics;
 
@@ -14,6 +17,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     {
         protected override DrawableSliderPath CreateSliderPath() => new LegacyDrawableSliderPath();
 
+        protected override Color4 GetBodyAccentColour(ISkinSource skin, Color4 hitObjectAccentColour)
+        {
+            // legacy skins use a constant value for slider track alpha, regardless of the source colour.
+            return base.GetBodyAccentColour(skin, hitObjectAccentColour).Opacity(0.7f);
+        }
+
         private class LegacyDrawableSliderPath : DrawableSliderPath
         {
             private const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
@@ -21,8 +30,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             protected new float CalculatedBorderPortion
                 // Roughly matches osu!stable's slider border portions.
                 => base.CalculatedBorderPortion * 0.77f;
-
-            public new Color4 AccentColour => new Color4(base.AccentColour.R, base.AccentColour.G, base.AccentColour.B, 0.7f);
 
             protected override Color4 ColourAt(float position)
             {

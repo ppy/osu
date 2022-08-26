@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -8,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
@@ -105,14 +106,14 @@ namespace osu.Game.Tournament.Screens.MapPool
             ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
 
-        private void beatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
+        private void beatmapChanged(ValueChangedEvent<TournamentBeatmap> beatmap)
         {
             if (CurrentMatch.Value == null || CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) < 2)
                 return;
 
             // if bans have already been placed, beatmap changes result in a selection being made autoamtically
-            if (beatmap.NewValue.OnlineBeatmapID != null)
-                addForBeatmap(beatmap.NewValue.OnlineBeatmapID.Value);
+            if (beatmap.NewValue.OnlineID > 0)
+                addForBeatmap(beatmap.NewValue.OnlineID);
         }
 
         private void setMode(TeamColour colour, ChoiceType choiceType)
@@ -147,11 +148,11 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             if (map != null)
             {
-                if (e.Button == MouseButton.Left && map.Beatmap.OnlineBeatmapID != null)
-                    addForBeatmap(map.Beatmap.OnlineBeatmapID.Value);
+                if (e.Button == MouseButton.Left && map.Beatmap.OnlineID > 0)
+                    addForBeatmap(map.Beatmap.OnlineID);
                 else
                 {
-                    var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap.OnlineBeatmapID);
+                    var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap.OnlineID);
 
                     if (existing != null)
                     {
@@ -179,7 +180,7 @@ namespace osu.Game.Tournament.Screens.MapPool
             if (CurrentMatch.Value == null)
                 return;
 
-            if (CurrentMatch.Value.Round.Value.Beatmaps.All(b => b.BeatmapInfo.OnlineBeatmapID != beatmapId))
+            if (CurrentMatch.Value.Round.Value.Beatmaps.All(b => b.Beatmap.OnlineID != beatmapId))
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
 
@@ -245,7 +246,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                         flowCount = 1;
                     }
 
-                    currentFlow.Add(new TournamentBeatmapPanel(b.BeatmapInfo, b.Mods)
+                    currentFlow.Add(new TournamentBeatmapPanel(b.Beatmap, b.Mods)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,

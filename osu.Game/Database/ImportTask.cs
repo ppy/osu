@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.IO;
+using osu.Framework.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Utils;
 using SharpCompress.Common;
@@ -11,7 +10,7 @@ using SharpCompress.Common;
 namespace osu.Game.Database
 {
     /// <summary>
-    /// An encapsulated import task to be imported to an <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
+    /// An encapsulated import task to be imported to an <see cref="RealmArchiveModelImporter{TModel}"/>.
     /// </summary>
     public class ImportTask
     {
@@ -34,7 +33,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Construct a new import task from a stream.
+        /// Construct a new import task from a stream. The provided stream will be disposed after reading.
         /// </summary>
         public ImportTask(Stream stream, string filename)
         {
@@ -47,10 +46,29 @@ namespace osu.Game.Database
         /// </summary>
         public ArchiveReader GetReader()
         {
-            if (Stream != null)
-                return new ZipArchiveReader(Stream, Path);
+            return Stream != null
+                ? getReaderFrom(Stream)
+                : getReaderFrom(Path);
+        }
 
-            return getReaderFrom(Path);
+        /// <summary>
+        /// Creates an <see cref="ArchiveReader"/> from a stream.
+        /// </summary>
+        /// <param name="stream">A seekable stream containing the archive content.</param>
+        /// <returns>A reader giving access to the archive's content.</returns>
+        private ArchiveReader getReaderFrom(Stream stream)
+        {
+            if (!(stream is MemoryStream memoryStream))
+            {
+                // This isn't used in any current path. May need to reconsider for performance reasons (ie. if we don't expect the incoming stream to be copied out).
+                memoryStream = new MemoryStream(stream.ReadAllBytesToArray());
+                stream.Dispose();
+            }
+
+            if (ZipUtils.IsZipArchive(memoryStream))
+                return new ZipArchiveReader(memoryStream, Path);
+
+            return new LegacyByteArrayReader(memoryStream.ToArray(), Path);
         }
 
         /// <summary>

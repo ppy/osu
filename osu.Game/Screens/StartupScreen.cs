@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens
@@ -15,8 +17,6 @@ namespace osu.Game.Screens
         public override bool HideOverlaysOnEnter => true;
 
         public override bool CursorVisible => false;
-
-        public override bool AllowTrackAdjustments => false;
 
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
     }

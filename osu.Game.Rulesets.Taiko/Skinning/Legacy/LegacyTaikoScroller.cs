@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -25,10 +27,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayBeatmap gameplayBeatmap)
+        private void load(GameplayState gameplayState)
         {
-            if (gameplayBeatmap != null)
-                ((IBindable<JudgementResult>)LastResult).BindTo(gameplayBeatmap.LastJudgementResult);
+            if (gameplayState != null)
+                ((IBindable<JudgementResult>)LastResult).BindTo(gameplayState.LastJudgementResult);
         }
 
         private bool passing;

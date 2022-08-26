@@ -1,16 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using MessagePack;
 using Newtonsoft.Json;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
-using osu.Game.Users;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -40,7 +38,7 @@ namespace osu.Game.Online.Multiplayer
         public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
 
         [IgnoreMember]
-        public User? User { get; set; }
+        public APIUser? User { get; set; }
 
         [JsonConstructor]
         public MultiplayerRoomUser(int userId)
@@ -48,9 +46,10 @@ namespace osu.Game.Online.Multiplayer
             UserID = userId;
         }
 
-        public bool Equals(MultiplayerRoomUser other)
+        public bool Equals(MultiplayerRoomUser? other)
         {
             if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
             return UserID == other.UserID;
         }
@@ -64,5 +63,21 @@ namespace osu.Game.Online.Multiplayer
         }
 
         public override int GetHashCode() => UserID.GetHashCode();
+
+        /// <summary>
+        /// Whether this user has finished loading and can start gameplay.
+        /// </summary>
+        public bool CanStartGameplay()
+        {
+            switch (State)
+            {
+                case MultiplayerUserState.Loaded:
+                case MultiplayerUserState.ReadyForGameplay:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
     }
 }

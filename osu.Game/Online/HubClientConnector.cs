@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -18,6 +18,8 @@ namespace osu.Game.Online
 {
     public class HubClientConnector : IHubClientConnector
     {
+        public const string SERVER_SHUTDOWN_MESSAGE = "Server is shutting down.";
+
         /// <summary>
         /// Invoked whenever a new hub connection is built, to configure it before it's started.
         /// </summary>
@@ -62,20 +64,28 @@ namespace osu.Game.Online
             this.preferMessagePack = preferMessagePack;
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(state =>
-            {
-                switch (state.NewValue)
-                {
-                    case APIState.Failing:
-                    case APIState.Offline:
-                        Task.Run(() => disconnect(true));
-                        break;
+            apiState.BindValueChanged(_ => Task.Run(connectIfPossible), true);
+        }
 
-                    case APIState.Online:
-                        Task.Run(connect);
-                        break;
-                }
-            }, true);
+        public Task Reconnect()
+        {
+            Logger.Log($"{clientName} reconnecting...", LoggingTarget.Network);
+            return Task.Run(connectIfPossible);
+        }
+
+        private async Task connectIfPossible()
+        {
+            switch (apiState.Value)
+            {
+                case APIState.Failing:
+                case APIState.Offline:
+                    await disconnect(true);
+                    break;
+
+                case APIState.Online:
+                    await connect();
+                    break;
+            }
         }
 
         private async Task connect()
@@ -134,7 +144,7 @@ namespace osu.Game.Online
         /// </summary>
         private async Task handleErrorAndDelay(Exception exception, CancellationToken cancellationToken)
         {
-            Logger.Log($"{clientName} connection error: {exception}", LoggingTarget.Network);
+            Logger.Log($"{clientName} connect attempt failed: {exception.Message}", LoggingTarget.Network);
             await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
         }
 
@@ -143,6 +153,12 @@ namespace osu.Game.Online
             var builder = new HubConnectionBuilder()
                 .WithUrl(endpoint, options =>
                 {
+                    // Use HttpClient.DefaultProxy once on net6 everywhere.
+                    // The credential setter can also be removed at this point.
+                    options.Proxy = WebRequest.DefaultWebProxy;
+                    if (options.Proxy != null)
+                        options.Proxy.Credentials = CredentialCache.DefaultCredentials;
+
                     options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
                     options.Headers.Add("OsuVersionHash", versionHash);
                 });
@@ -161,9 +177,10 @@ namespace osu.Game.Online
                 builder.AddNewtonsoftJsonProtocol(options =>
                 {
                     options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    // TODO: This should only be required to be `TypeNameHandling.Auto`.
-                    // See usage in osu-server-spectator for further documentation as to why this is required.
-                    options.PayloadSerializerSettings.TypeNameHandling = TypeNameHandling.All;
+                    options.PayloadSerializerSettings.Converters = new List<JsonConverter>
+                    {
+                        new SignalRDerivedTypeWorkaroundJsonConverter(),
+                    };
                 });
             }
 

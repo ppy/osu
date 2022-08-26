@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -68,9 +71,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             });
         }
 
-        public override bool OnPressed(ManiaAction action) => false; // Handled by the hold note
+        public override bool OnPressed(KeyBindingPressEvent<ManiaAction> e) => false; // Handled by the hold note
 
-        public override void OnReleased(ManiaAction action)
+        public override void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
         }
     }

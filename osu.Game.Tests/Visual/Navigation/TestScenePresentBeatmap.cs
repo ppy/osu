@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
@@ -20,30 +22,30 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestFromMainMenu()
         {
             var firstImport = importBeatmap(1);
-            var secondimport = importBeatmap(3);
+            var secondImport = importBeatmap(3);
 
             presentAndConfirm(firstImport);
             returnToMenu();
-            presentAndConfirm(secondimport);
+            presentAndConfirm(secondImport);
             returnToMenu();
             presentSecondDifficultyAndConfirm(firstImport, 1);
             returnToMenu();
-            presentSecondDifficultyAndConfirm(secondimport, 3);
+            presentSecondDifficultyAndConfirm(secondImport, 3);
         }
 
         [Test]
         public void TestFromMainMenuDifferentRuleset()
         {
             var firstImport = importBeatmap(1);
-            var secondimport = importBeatmap(3, new ManiaRuleset().RulesetInfo);
+            var secondImport = importBeatmap(3, new ManiaRuleset().RulesetInfo);
 
             presentAndConfirm(firstImport);
             returnToMenu();
-            presentAndConfirm(secondimport);
+            presentAndConfirm(secondImport);
             returnToMenu();
             presentSecondDifficultyAndConfirm(firstImport, 1);
             returnToMenu();
-            presentSecondDifficultyAndConfirm(secondimport, 3);
+            presentSecondDifficultyAndConfirm(secondImport, 3);
         }
 
         [Test]
@@ -52,17 +54,17 @@ namespace osu.Game.Tests.Visual.Navigation
             var firstImport = importBeatmap(1);
             presentAndConfirm(firstImport);
 
-            var secondimport = importBeatmap(3);
-            presentAndConfirm(secondimport);
+            var secondImport = importBeatmap(3);
+            presentAndConfirm(secondImport);
 
             // Test presenting same beatmap more than once
-            presentAndConfirm(secondimport);
+            presentAndConfirm(secondImport);
 
             presentSecondDifficultyAndConfirm(firstImport, 1);
-            presentSecondDifficultyAndConfirm(secondimport, 3);
+            presentSecondDifficultyAndConfirm(secondImport, 3);
 
             // Test presenting same beatmap more than once
-            presentSecondDifficultyAndConfirm(secondimport, 3);
+            presentSecondDifficultyAndConfirm(secondImport, 3);
         }
 
         [Test]
@@ -71,11 +73,11 @@ namespace osu.Game.Tests.Visual.Navigation
             var firstImport = importBeatmap(1);
             presentAndConfirm(firstImport);
 
-            var secondimport = importBeatmap(3, new ManiaRuleset().RulesetInfo);
-            presentAndConfirm(secondimport);
+            var secondImport = importBeatmap(3, new ManiaRuleset().RulesetInfo);
+            presentAndConfirm(secondImport);
 
             presentSecondDifficultyAndConfirm(firstImport, 1);
-            presentSecondDifficultyAndConfirm(secondimport, 3);
+            presentSecondDifficultyAndConfirm(secondImport, 3);
         }
 
         private void returnToMenu()
@@ -96,37 +98,35 @@ namespace osu.Game.Tests.Visual.Navigation
             BeatmapSetInfo imported = null;
             AddStep($"import beatmap {i}", () =>
             {
-                var difficulty = new BeatmapDifficulty();
                 var metadata = new BeatmapMetadata
                 {
                     Artist = "SomeArtist",
-                    AuthorString = "SomeAuthor",
+                    Author = { Username = "SomeAuthor" },
                     Title = $"import {i}"
                 };
 
                 imported = Game.BeatmapManager.Import(new BeatmapSetInfo
                 {
                     Hash = Guid.NewGuid().ToString(),
-                    OnlineBeatmapSetID = i,
-                    Metadata = metadata,
-                    Beatmaps = new List<BeatmapInfo>
+                    OnlineID = i,
+                    Beatmaps =
                     {
                         new BeatmapInfo
                         {
-                            OnlineBeatmapID = i * 1024,
+                            OnlineID = i * 1024,
                             Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                         new BeatmapInfo
                         {
-                            OnlineBeatmapID = i * 2048,
+                            OnlineID = i * 2048,
                             Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                     }
-                }).Result;
+                })?.Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);
@@ -139,18 +139,18 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapSetInfo.ID == getImport().ID);
-            AddAssert("correct ruleset selected", () => Game.Ruleset.Value.ID == getImport().Beatmaps.First().Ruleset.ID);
+            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapSetInfo.MatchesOnlineID(getImport()));
+            AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Beatmaps.First().Ruleset));
         }
 
         private void presentSecondDifficultyAndConfirm(Func<BeatmapSetInfo> getImport, int importedID)
         {
-            Predicate<BeatmapInfo> pred = b => b.OnlineBeatmapID == importedID * 2048;
+            Predicate<BeatmapInfo> pred = b => b.OnlineID == importedID * 2048;
             AddStep("present difficulty", () => Game.PresentBeatmap(getImport(), pred));
 
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineBeatmapID == importedID * 2048);
-            AddAssert("correct ruleset selected", () => Game.Ruleset.Value.ID == getImport().Beatmaps.First().Ruleset.ID);
+            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineID == importedID * 2048);
+            AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Beatmaps.First().Ruleset));
         }
     }
 }

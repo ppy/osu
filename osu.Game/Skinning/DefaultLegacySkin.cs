@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.IO.Stores;
@@ -12,14 +14,28 @@ namespace osu.Game.Skinning
 {
     public class DefaultLegacySkin : LegacySkin
     {
+        public static SkinInfo CreateInfo() => new SkinInfo
+        {
+            ID = Skinning.SkinInfo.CLASSIC_SKIN, // this is temporary until database storage is decided upon.
+            Name = "osu!classic",
+            Creator = "team osu!",
+            Protected = true,
+            InstantiationInfo = typeof(DefaultLegacySkin).GetInvariantInstantiationInfo()
+        };
+
         public DefaultLegacySkin(IStorageResourceProvider resources)
-            : this(Info, resources)
+            : this(CreateInfo(), resources)
         {
         }
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public DefaultLegacySkin(SkinInfo skin, IStorageResourceProvider resources)
-            : base(skin, new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy"), resources, string.Empty)
+            : base(
+                skin,
+                resources,
+                // In the case of the actual default legacy skin (ie. the fallback one, which a user hasn't applied any modifications to) we want to use the game provided resources.
+                skin.Protected ? new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy") : null
+            )
         {
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
             Configuration.CustomComboColours = new List<Color4>
@@ -32,13 +48,5 @@ namespace osu.Game.Skinning
 
             Configuration.LegacyVersion = 2.7m;
         }
-
-        public static SkinInfo Info { get; } = new SkinInfo
-        {
-            ID = SkinInfo.CLASSIC_SKIN, // this is temporary until database storage is decided upon.
-            Name = "osu!classic",
-            Creator = "team osu!",
-            InstantiationInfo = typeof(DefaultLegacySkin).GetInvariantInstantiationInfo()
-        };
     }
 }

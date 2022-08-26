@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Overlays.Profile.Sections.Kudosu;
 using System.Collections.Generic;
 using System;
@@ -44,7 +46,7 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.GreySeafoam;
+            background.Colour = colours.GreySeaFoam;
         }
 
         private readonly IEnumerable<APIKudosuHistory> items = new[]

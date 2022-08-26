@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -8,10 +10,10 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.Testing.Input;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -20,6 +22,7 @@ using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osu.Game.Tests.Gameplay;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -28,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestSceneGameplayCursor : OsuSkinnableTestScene
     {
         [Cached]
-        private GameplayBeatmap gameplayBeatmap;
+        private GameplayState gameplayState;
 
         private OsuCursorContainer lastContainer;
 
@@ -39,7 +42,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public TestSceneGameplayCursor()
         {
-            gameplayBeatmap = new GameplayBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
+            var ruleset = new OsuRuleset();
+            gameplayState = TestGameplayState.Create(ruleset);
 
             AddStep("change background colour", () =>
             {
@@ -56,8 +60,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddSliderStep("circle size", 0f, 10f, 0f, val =>
             {
                 config.SetValue(OsuSetting.AutoCursorSize, true);
-                gameplayBeatmap.BeatmapInfo.BaseDifficulty.CircleSize = val;
-                Scheduler.AddOnce(() => loadContent(false));
+                gameplayState.Beatmap.Difficulty.CircleSize = val;
+                Scheduler.AddOnce(loadContent);
             });
 
             AddStep("test cursor container", () => loadContent(false));
@@ -72,10 +76,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestSizing(int circleSize, float userScale)
         {
             AddStep($"set user scale to {userScale}", () => config.SetValue(OsuSetting.GameplayCursorSize, userScale));
-            AddStep($"adjust cs to {circleSize}", () => gameplayBeatmap.BeatmapInfo.BaseDifficulty.CircleSize = circleSize);
+            AddStep($"adjust cs to {circleSize}", () => gameplayState.Beatmap.Difficulty.CircleSize = circleSize);
             AddStep("turn on autosizing", () => config.SetValue(OsuSetting.AutoCursorSize, true));
 
-            AddStep("load content", () => loadContent());
+            AddStep("load content", loadContent);
 
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == OsuCursorContainer.GetScaleForCircleSize(circleSize) * userScale);
 
@@ -95,7 +99,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("load content", () => loadContent(false, () => new SkinProvidingContainer(new TopLeftCursorSkin())));
         }
 
-        private void loadContent(bool automated = true, Func<SkinProvidingContainer> skinProvider = null)
+        private void loadContent() => loadContent(false);
+
+        private void loadContent(bool automated, Func<SkinProvidingContainer> skinProvider = null)
         {
             SetContents(_ =>
             {
@@ -113,7 +119,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             public Drawable GetDrawableComponent(ISkinComponent component) => null;
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
             public ISample GetSample(ISampleInfo sampleInfo) => null;
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {
@@ -143,9 +148,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                     pressed = value;
                     if (value)
-                        OnPressed(OsuAction.LeftButton);
+                        OnPressed(new KeyBindingPressEvent<OsuAction>(GetContainingInputManager().CurrentState, OsuAction.LeftButton));
                     else
-                        OnReleased(OsuAction.LeftButton);
+                        OnReleased(new KeyBindingReleaseEvent<OsuAction>(GetContainingInputManager().CurrentState, OsuAction.LeftButton));
                 }
             }
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
@@ -12,26 +14,54 @@ using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
 {
-    /// <summary>
-    /// A Beatmap containing converted HitObjects.
-    /// </summary>
     public class Beatmap<T> : IBeatmap<T>
         where T : HitObject
     {
-        public BeatmapInfo BeatmapInfo { get; set; } = new BeatmapInfo
+        private BeatmapDifficulty difficulty = new BeatmapDifficulty();
+
+        public BeatmapDifficulty Difficulty
         {
-            Metadata = new BeatmapMetadata
+            get => difficulty;
+            set
             {
-                Artist = @"Unknown",
-                Title = @"Unknown",
-                AuthorString = @"Unknown Creator",
-            },
-            Version = @"Normal",
-            BaseDifficulty = new BeatmapDifficulty()
-        };
+                difficulty = value;
+
+                if (beatmapInfo != null)
+                    beatmapInfo.Difficulty = difficulty.Clone();
+            }
+        }
+
+        private BeatmapInfo beatmapInfo;
+
+        public BeatmapInfo BeatmapInfo
+        {
+            get => beatmapInfo;
+            set
+            {
+                beatmapInfo = value;
+
+                if (beatmapInfo?.Difficulty != null)
+                    Difficulty = beatmapInfo.Difficulty.Clone();
+            }
+        }
+
+        public Beatmap()
+        {
+            beatmapInfo = new BeatmapInfo
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Artist = @"Unknown",
+                    Title = @"Unknown",
+                    Author = { Username = @"Unknown Creator" },
+                },
+                DifficultyName = @"Normal",
+                Difficulty = Difficulty,
+            };
+        }
 
         [JsonIgnore]
-        public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
+        public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
         public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
 
@@ -62,8 +92,12 @@ namespace osu.Game.Beatmaps
                                     if (t.Time > lastTime)
                                         return (beatLength: t.BeatLength, 0);
 
-                                    var nextTime = i == ControlPointInfo.TimingPoints.Count - 1 ? lastTime : ControlPointInfo.TimingPoints[i + 1].Time;
-                                    return (beatLength: t.BeatLength, duration: nextTime - t.Time);
+                                    // osu-stable forced the first control point to start at 0.
+                                    // This is reproduced here to maintain compatibility around osu!mania scroll speed and song select display.
+                                    double currentTime = i == 0 ? 0 : t.Time;
+                                    double nextTime = i == ControlPointInfo.TimingPoints.Count - 1 ? lastTime : ControlPointInfo.TimingPoints[i + 1].Time;
+
+                                    return (beatLength: t.BeatLength, duration: nextTime - currentTime);
                                 })
                                 // Aggregate durations into a set of (beatLength, duration) tuples for each beat length
                                 .GroupBy(t => Math.Round(t.beatLength * 1000) / 1000)

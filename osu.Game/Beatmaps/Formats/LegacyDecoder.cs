@@ -27,9 +27,9 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseStreamInto(LineBufferedReader stream, T output)
         {
-            Section section = Section.None;
+            Section section = Section.General;
 
-            string line;
+            string? line;
 
             while ((line = stream.ReadLine()) != null)
             {
@@ -47,10 +47,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (line.StartsWith('[') && line.EndsWith(']'))
                 {
                     if (!Enum.TryParse(line[1..^1], out section))
-                    {
                         Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
-                        section = Section.None;
-                    }
 
                     OnBeginNewSection(section);
                     continue;
@@ -62,7 +59,7 @@ namespace osu.Game.Beatmaps.Formats
                 }
                 catch (Exception e)
                 {
-                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
+                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}");
                 }
             }
         }
@@ -89,7 +86,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected string StripComments(string line)
         {
-            var index = line.AsSpan().IndexOf("//".AsSpan());
+            int index = line.AsSpan().IndexOf("//".AsSpan());
             if (index > 0)
                 return line.Substring(0, index);
 
@@ -135,7 +132,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
         {
-            var split = line.Split(separator, 2);
+            string[] split = line.Split(separator, 2);
 
             return new KeyValuePair<string, string>
             (
@@ -146,9 +143,8 @@ namespace osu.Game.Beatmaps.Formats
 
         protected string CleanFilename(string path) => path.Trim('"').ToStandardisedPath();
 
-        protected enum Section
+        public enum Section
         {
-            None,
             General,
             Editor,
             Metadata,
@@ -164,7 +160,7 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         [Obsolete("Do not use unless you're a legacy ruleset and 100% sure.")]
-        public class LegacyDifficultyControlPoint : DifficultyControlPoint
+        public class LegacyDifficultyControlPoint : DifficultyControlPoint, IEquatable<LegacyDifficultyControlPoint>
         {
             /// <summary>
             /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
@@ -181,7 +177,7 @@ namespace osu.Game.Beatmaps.Formats
 
             public LegacyDifficultyControlPoint()
             {
-                SpeedMultiplierBindable.Precision = double.Epsilon;
+                SliderVelocityBindable.Precision = double.Epsilon;
             }
 
             public override void CopyFrom(ControlPoint other)
@@ -190,9 +186,20 @@ namespace osu.Game.Beatmaps.Formats
 
                 BpmMultiplier = ((LegacyDifficultyControlPoint)other).BpmMultiplier;
             }
+
+            public override bool Equals(ControlPoint? other)
+                => other is LegacyDifficultyControlPoint otherLegacyDifficultyControlPoint
+                   && Equals(otherLegacyDifficultyControlPoint);
+
+            public bool Equals(LegacyDifficultyControlPoint? other)
+                => base.Equals(other)
+                   && BpmMultiplier == other.BpmMultiplier;
+
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), BpmMultiplier);
         }
 
-        internal class LegacySampleControlPoint : SampleControlPoint
+        internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
         {
             public int CustomSampleBank;
 
@@ -206,7 +213,7 @@ namespace osu.Game.Beatmaps.Formats
                 return baseInfo;
             }
 
-            public override bool IsRedundant(ControlPoint existing)
+            public override bool IsRedundant(ControlPoint? existing)
                 => base.IsRedundant(existing)
                    && existing is LegacySampleControlPoint existingSample
                    && CustomSampleBank == existingSample.CustomSampleBank;
@@ -217,6 +224,17 @@ namespace osu.Game.Beatmaps.Formats
 
                 CustomSampleBank = ((LegacySampleControlPoint)other).CustomSampleBank;
             }
+
+            public override bool Equals(ControlPoint? other)
+                => other is LegacySampleControlPoint otherLegacySampleControlPoint
+                   && Equals(otherLegacySampleControlPoint);
+
+            public bool Equals(LegacySampleControlPoint? other)
+                => base.Equals(other)
+                   && CustomSampleBank == other.CustomSampleBank;
+
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank);
         }
     }
 }

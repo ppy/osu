@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
@@ -27,6 +30,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private Color4 enabledColour;
         private Color4 disabledColour;
+
+        private Sample? sampleChecked;
+        private Sample? sampleUnchecked;
 
         public SwitchButton()
         {
@@ -66,14 +72,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? colourProvider, OsuColour colours, AudioManager audio)
         {
-            enabledColour = colours.BlueDark;
-            disabledColour = colours.Gray3;
+            enabledColour = colourProvider?.Highlight1 ?? colours.BlueDark;
+            disabledColour = colourProvider?.Background3 ?? colours.Gray3;
 
             switchContainer.Colour = enabledColour;
             fill.Colour = disabledColour;
+
+            sampleChecked = audio.Samples.Get(@"UI/check-on");
+            sampleUnchecked = audio.Samples.Get(@"UI/check-off");
         }
 
         protected override void LoadComplete()
@@ -104,6 +113,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
             base.OnHoverLost(e);
         }
 
+        protected override void OnUserChange(bool value)
+        {
+            base.OnUserChange(value);
+
+            if (value)
+                sampleChecked?.Play();
+            else
+                sampleUnchecked?.Play();
+        }
+
         private void updateBorder()
         {
             circularContainer.TransformBorderTo((Current.Value ? enabledColour : disabledColour).Lighten(IsHovered ? 0.3f : 0));
@@ -111,7 +130,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private class CircularBorderContainer : CircularContainer
         {
-            public void TransformBorderTo(SRGBColour colour)
+            public void TransformBorderTo(ColourInfo colour)
                 => this.TransformTo(nameof(BorderColour), colour, 250, Easing.OutQuint);
         }
     }

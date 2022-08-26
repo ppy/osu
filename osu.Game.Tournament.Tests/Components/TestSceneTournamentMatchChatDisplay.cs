@@ -1,15 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
-using osu.Game.Users;
 
 namespace osu.Game.Tournament.Tests.Components
 {
@@ -18,23 +20,23 @@ namespace osu.Game.Tournament.Tests.Components
         private readonly Channel testChannel = new Channel();
         private readonly Channel testChannel2 = new Channel();
 
-        private readonly User admin = new User
+        private readonly APIUser admin = new APIUser
         {
             Username = "HappyStick",
             Id = 2,
             Colour = "f2ca34"
         };
 
-        private readonly User redUser = new User
+        private readonly TournamentUser redUser = new TournamentUser
         {
             Username = "BanchoBot",
-            Id = 3,
+            OnlineID = 3,
         };
 
-        private readonly User blueUser = new User
+        private readonly TournamentUser blueUser = new TournamentUser
         {
             Username = "Zallius",
-            Id = 4,
+            OnlineID = 4,
         };
 
         [Cached]
@@ -57,11 +59,11 @@ namespace osu.Game.Tournament.Tests.Components
             {
                 Team1 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<User> { redUser } }
+                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { redUser } }
                 },
                 Team2 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<User> { blueUser } }
+                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { blueUser } }
                 }
             };
 
@@ -80,19 +82,19 @@ namespace osu.Game.Tournament.Tests.Components
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = redUser,
+                Sender = redUser.ToAPIUser(),
                 Content = "I am team red."
             }));
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = redUser,
+                Sender = redUser.ToAPIUser(),
                 Content = "I plan to win!"
             }));
 
             AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
-                Sender = blueUser,
+                Sender = blueUser.ToAPIUser(),
                 Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
             }));
 

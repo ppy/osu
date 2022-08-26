@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,7 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
@@ -79,7 +81,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [CanBeNull]
-        public User User { get; }
+        public APIUser User { get; }
 
         /// <summary>
         /// Whether this score is the local user or a replay player (and should be focused / always visible).
@@ -101,7 +103,7 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         /// <param name="user">The score's player.</param>
         /// <param name="tracked">Whether the player is the local user or a replay player.</param>
-        public GameplayLeaderboardScore([CanBeNull] User user, bool tracked)
+        public GameplayLeaderboardScore([CanBeNull] APIUser user, bool tracked)
         {
             User = user;
             Tracked = tracked;

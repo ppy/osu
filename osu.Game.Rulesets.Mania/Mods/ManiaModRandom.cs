@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -14,15 +15,15 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModRandom : ModRandom, IApplicableToBeatmap
     {
-        public override string Description => @"Shuffle around the keys!";
+        public override LocalisableString Description => @"Shuffle around the keys!";
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             Seed.Value ??= RNG.Next();
             var rng = new Random((int)Seed.Value);
 
-            var availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
-            var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(item => rng.Next()).ToList();
+            int availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
+            var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(_ => rng.Next()).ToList();
 
             beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
         }

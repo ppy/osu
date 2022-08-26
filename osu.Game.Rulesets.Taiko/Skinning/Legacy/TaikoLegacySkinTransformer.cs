@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             hasExplosion = new Lazy<bool>(() => GetTexture(getHitName(TaikoSkinComponents.TaikoExplosionGreat)) != null);
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponent component)
         {
             if (component is GameplaySkinComponent<HitResult>)
             {
@@ -56,6 +56,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                     case TaikoSkinComponents.DrumRollTick:
                         return this.GetAnimation("sliderscorepoint", false, false);
+
+                    case TaikoSkinComponents.Swell:
+                        // todo: support taiko legacy swell (https://github.com/ppy/osu/issues/13601).
+                        return null;
 
                     case TaikoSkinComponents.HitTarget:
                         if (GetTexture("taikobigcircle") != null)
@@ -91,7 +95,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                     case TaikoSkinComponents.TaikoExplosionOk:
                     case TaikoSkinComponents.TaikoExplosionGreat:
-                        var hitName = getHitName(taikoComponent.Component);
+                        string hitName = getHitName(taikoComponent.Component);
                         var hitSprite = this.GetAnimation(hitName, true, false);
 
                         if (hitSprite != null)
@@ -119,6 +123,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                     case TaikoSkinComponents.Mascot:
                         return new DrawableTaikoMascot();
+
+                    default:
+                        throw new UnsupportedSkinComponentException(component);
                 }
             }
 
@@ -142,7 +149,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             throw new ArgumentOutOfRangeException(nameof(component), $"Invalid component type: {component}");
         }
 
-        public override ISample GetSample(ISampleInfo sampleInfo)
+        public override ISample? GetSample(ISampleInfo sampleInfo)
         {
             if (sampleInfo is HitSampleInfo hitSampleInfo)
                 return base.GetSample(new LegacyTaikoSampleInfo(hitSampleInfo));
@@ -162,11 +169,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             {
                 get
                 {
-                    foreach (var name in base.LookupNames)
+                    foreach (string name in base.LookupNames)
                         yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
-
-                    foreach (var name in base.LookupNames)
-                        yield return name;
                 }
             }
         }

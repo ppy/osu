@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -58,10 +60,8 @@ namespace osu.Game.Skinning
             return base.CreateChildDependencies(parent);
         }
 
-        protected override void OnSourceChanged()
+        protected override void RefreshSources()
         {
-            ResetSources();
-
             // Populate a local list first so we can adjust the returned order as we go.
             var sources = new List<ISkin>();
 
@@ -91,8 +91,7 @@ namespace osu.Game.Skinning
             else
                 sources.Add(rulesetResourcesSkin);
 
-            foreach (var skin in sources)
-                AddSource(skin);
+            SetSources(sources);
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)

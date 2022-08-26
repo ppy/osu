@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -9,6 +11,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
@@ -91,16 +94,16 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 direction.Value == ScrollingDirection.Up ? dimPoint : brightPoint);
         }
 
-        public bool OnPressed(ManiaAction action)
+        public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action == this.action.Value)
+            if (e.Action == action.Value)
                 backgroundOverlay.FadeTo(1, 50, Easing.OutQuint).Then().FadeTo(0.5f, 250, Easing.OutQuint);
             return false;
         }
 
-        public void OnReleased(ManiaAction action)
+        public void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
-            if (action == this.action.Value)
+            if (e.Action == action.Value)
                 backgroundOverlay.FadeTo(0, 250, Easing.OutQuint);
         }
     }

@@ -3,36 +3,69 @@
 
 using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Runtime.Versioning;
+using osu.Desktop.LegacyIpc;
 using osu.Framework;
 using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Tournament;
+using SDL2;
+using Squirrel;
 
 namespace osu.Desktop
 {
     public static class Program
     {
+#if DEBUG
+        private const string base_game_name = @"osu-development";
+#else
         private const string base_game_name = @"osu";
+#endif
+
+        private static LegacyTcpIpcProvider? legacyIpc;
 
         [STAThread]
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
+            // run Squirrel first, as the app may exit after these run
+            if (OperatingSystem.IsWindows())
+            {
+                var windowsVersion = Environment.OSVersion.Version;
+
+                // While .NET 6 still supports Windows 7 and above, we are limited by realm currently, as they choose to only support 8.1 and higher.
+                // See https://www.mongodb.com/docs/realm/sdk/dotnet/#supported-platforms
+                if (windowsVersion.Major < 6 || (windowsVersion.Major == 6 && windowsVersion.Minor <= 2))
+                {
+                    // If users running in compatibility mode becomes more of a common thing, we may want to provide better guidance or even consider
+                    // disabling it ourselves.
+                    // We could also better detect compatibility mode if required:
+                    // https://stackoverflow.com/questions/10744651/how-i-can-detect-if-my-application-is-running-under-compatibility-mode#comment58183249_10744730
+                    SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
+                        "Your operating system is too old to run osu!",
+                        "This version of osu! requires at least Windows 8.1 to run.\n"
+                        + "Please upgrade your operating system or consider using an older version of osu!.\n\n"
+                        + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!", IntPtr.Zero);
+                    return;
+                }
+
+                setupSquirrel();
+            }
+
             // Back up the cwd before DesktopGameHost changes it
-            var cwd = Environment.CurrentDirectory;
+            string cwd = Environment.CurrentDirectory;
 
             string gameName = base_game_name;
             bool tournamentClient = false;
 
-            foreach (var arg in args)
+            foreach (string arg in args)
             {
-                var split = arg.Split('=');
+                string[] split = arg.Split('=');
 
-                var key = split[0];
-                var val = split.Length > 1 ? split[1] : string.Empty;
+                string key = split[0];
+                string val = split.Length > 1 ? split[1] : string.Empty;
 
                 switch (key)
                 {
@@ -52,56 +85,93 @@ namespace osu.Desktop
                 }
             }
 
-            using (DesktopGameHost host = Host.GetSuitableHost(gameName, true))
+            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = true }))
             {
-                host.ExceptionThrown += handleException;
-
                 if (!host.IsPrimaryInstance)
                 {
-                    if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
-                    {
-                        var importer = new ArchiveImportIPCChannel(host);
-
-                        foreach (var file in args)
-                        {
-                            Console.WriteLine(@"Importing {0}", file);
-                            if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
-                                throw new TimeoutException(@"IPC took too long to send");
-                        }
-
-                        return 0;
-                    }
+                    if (trySendIPCMessage(host, cwd, args))
+                        return;
 
                     // we want to allow multiple instances to be started when in debug.
                     if (!DebugUtils.IsDebugBuild)
-                        return 0;
+                    {
+                        Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
+                        return;
+                    }
+                }
+
+                if (host.IsPrimaryInstance)
+                {
+                    try
+                    {
+                        Logger.Log("Starting legacy IPC provider...");
+                        legacyIpc = new LegacyTcpIpcProvider();
+                        legacyIpc.Bind();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "Failed to start legacy IPC provider");
+                    }
                 }
 
                 if (tournamentClient)
                     host.Run(new TournamentGame());
                 else
                     host.Run(new OsuGameDesktop(args));
-
-                return 0;
             }
         }
 
-        private static int allowableExceptions = DebugUtils.IsDebugBuild ? 0 : 1;
-
-        /// <summary>
-        /// Allow a maximum of one unhandled exception, per second of execution.
-        /// </summary>
-        /// <param name="arg"></param>
-        private static bool handleException(Exception arg)
+        private static bool trySendIPCMessage(IIpcHost host, string cwd, string[] args)
         {
-            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
+            if (args.Length == 1 && args[0].StartsWith(OsuGameBase.OSU_PROTOCOL, StringComparison.Ordinal))
+            {
+                var osuSchemeLinkHandler = new OsuSchemeLinkIPCChannel(host);
+                if (!osuSchemeLinkHandler.HandleLinkAsync(args[0]).Wait(3000))
+                    throw new IPCTimeoutException(osuSchemeLinkHandler.GetType());
 
-            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
+                return true;
+            }
 
-            // restore the stock of allowable exceptions after a short delay.
-            Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
+            if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
+            {
+                var importer = new ArchiveImportIPCChannel(host);
 
-            return continueExecution;
+                foreach (string file in args)
+                {
+                    Console.WriteLine(@"Importing {0}", file);
+                    if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
+                        throw new IPCTimeoutException(importer.GetType());
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static void setupSquirrel()
+        {
+            SquirrelAwareApp.HandleEvents(onInitialInstall: (_, tools) =>
+            {
+                tools.CreateShortcutForThisExe();
+                tools.CreateUninstallerRegistryEntry();
+            }, onAppUpdate: (_, tools) =>
+            {
+                tools.CreateUninstallerRegistryEntry();
+            }, onAppUninstall: (_, tools) =>
+            {
+                tools.RemoveShortcutForThisExe();
+                tools.RemoveUninstallerRegistryEntry();
+            }, onEveryRun: (_, _, _) =>
+            {
+                // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
+                // causes the right-click context menu to function incorrectly.
+                //
+                // This may turn out to be non-required after an alternative solution is implemented.
+                // see https://github.com/clowd/Clowd.Squirrel/issues/24
+                // tools.SetProcessAppUserModelId();
+            });
         }
     }
 }

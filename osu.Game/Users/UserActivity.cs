@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
@@ -27,13 +29,13 @@ namespace osu.Game.Users
 
         public abstract class InGame : UserActivity
         {
-            public BeatmapInfo Beatmap { get; }
+            public IBeatmapInfo BeatmapInfo { get; }
 
-            public RulesetInfo Ruleset { get; }
+            public IRulesetInfo Ruleset { get; }
 
-            protected InGame(BeatmapInfo info, RulesetInfo ruleset)
+            protected InGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
             {
-                Beatmap = info;
+                BeatmapInfo = beatmapInfo;
                 Ruleset = ruleset;
             }
 
@@ -42,37 +44,47 @@ namespace osu.Game.Users
 
         public class InMultiplayerGame : InGame
         {
-            public InMultiplayerGame(BeatmapInfo beatmap, RulesetInfo ruleset)
-                : base(beatmap, ruleset)
+            public InMultiplayerGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
             {
             }
 
             public override string Status => $@"{base.Status} with others";
         }
 
+        public class SpectatingMultiplayerGame : InGame
+        {
+            public SpectatingMultiplayerGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+
+            public override string Status => $"Watching others {base.Status.ToLowerInvariant()}";
+        }
+
         public class InPlaylistGame : InGame
         {
-            public InPlaylistGame(BeatmapInfo beatmap, RulesetInfo ruleset)
-                : base(beatmap, ruleset)
+            public InPlaylistGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
             {
             }
         }
 
         public class InSoloGame : InGame
         {
-            public InSoloGame(BeatmapInfo info, RulesetInfo ruleset)
-                : base(info, ruleset)
+            public InSoloGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
             {
             }
         }
 
         public class Editing : UserActivity
         {
-            public BeatmapInfo Beatmap { get; }
+            public IBeatmapInfo BeatmapInfo { get; }
 
-            public Editing(BeatmapInfo info)
+            public Editing(IBeatmapInfo info)
             {
-                Beatmap = info;
+                BeatmapInfo = info;
             }
 
             public override string Status => @"Editing a beatmap";

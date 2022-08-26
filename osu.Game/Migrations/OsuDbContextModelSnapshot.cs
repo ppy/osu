@@ -81,6 +81,8 @@ namespace osu.Game.Migrations
 
                     b.Property<int>("RulesetID");
 
+                    b.Property<bool>("SamplesMatchPlaybackRate");
+
                     b.Property<bool>("SpecialStyle");
 
                     b.Property<float>("StackLeniency");

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +10,12 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -27,6 +28,7 @@ using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Select;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -35,48 +37,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
-        private List<BeatmapInfo> beatmaps;
+        private IList<BeatmapInfo> beatmaps => importedBeatmapSet?.PerformRead(s => s.Beatmaps) ?? new List<BeatmapInfo>();
 
         private TestMultiplayerMatchSongSelect songSelect;
+
+        private Live<BeatmapSetInfo> importedBeatmapSet;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
 
-            beatmaps = new List<BeatmapInfo>();
-
-            for (int i = 0; i < 8; ++i)
-            {
-                int beatmapId = 10 * 10 + i;
-
-                int length = RNG.Next(30000, 200000);
-                double bpm = RNG.NextSingle(80, 200);
-
-                beatmaps.Add(new BeatmapInfo
-                {
-                    Ruleset = rulesets.GetRuleset(i % 4),
-                    OnlineBeatmapID = beatmapId,
-                    Length = length,
-                    BPM = bpm,
-                    BaseDifficulty = new BeatmapDifficulty()
-                });
-            }
-
-            manager.Import(new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = 10,
-                Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                Metadata = new BeatmapMetadata
-                {
-                    Artist = "Some Artist",
-                    Title = "Some Beatmap",
-                    AuthorString = "Some Author"
-                },
-                Beatmaps = beatmaps,
-                DateAdded = DateTimeOffset.UtcNow
-            }).Wait();
+            importedBeatmapSet = manager.Import(TestResources.CreateTestBeatmapSetInfo(8, rulesets.AvailableRulesets.ToArray()));
         }
 
         public override void SetUpSteps()
@@ -91,7 +65,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value)));
-            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen());
+            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
         }
 
         [Test]
@@ -100,7 +74,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             BeatmapInfo selectedBeatmap = null;
 
             AddStep("select beatmap",
-                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.Where(beatmap => beatmap.RulesetID == new OsuRuleset().LegacyID).ElementAt(1)));
+                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.Where(beatmap => beatmap.Ruleset.OnlineID == new OsuRuleset().LegacyID).ElementAt(1)));
             AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
 
             AddStep("exit song select", () => songSelect.Exit());
@@ -132,12 +106,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("change ruleset", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
             AddStep("select beatmap",
-                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First(beatmap => beatmap.RulesetID == new TaikoRuleset().LegacyID)));
+                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == new TaikoRuleset().LegacyID)));
+
             AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
+            AddUntilStep("wait for ongoing operation to complete", () => !OnlinePlayDependencies.OngoingOperationTracker.InProgress.Value);
+
             AddStep("set mods", () => SelectedMods.Value = new[] { new TaikoModDoubleTime() });
 
             AddStep("confirm selection", () => songSelect.FinaliseSelection());
-            AddStep("exit song select", () => songSelect.Exit());
+
+            AddUntilStep("song select exited", () => !songSelect.IsCurrentScreen());
 
             AddAssert("beatmap not changed", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
             AddAssert("ruleset not changed", () => Ruleset.Value.Equals(new TaikoRuleset().RulesetInfo));
@@ -159,7 +137,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void assertHasFreeModButton(Type type, bool hasButton = true)
         {
             AddAssert($"{type.ReadableName()} {(hasButton ? "displayed" : "not displayed")} in freemod overlay",
-                () => songSelect.ChildrenOfType<FreeModSelectOverlay>().Single().ChildrenOfType<ModButton>().All(b => b.Mod.GetType() != type));
+                () => this.ChildrenOfType<FreeModSelectOverlay>()
+                          .Single()
+                          .ChildrenOfType<ModPanel>()
+                          .Where(panel => !panel.Filtered.Value)
+                          .All(b => b.Mod.GetType() != type));
         }
 
         private class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect
@@ -171,7 +153,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             public new BeatmapCarousel Carousel => base.Carousel;
 
             public TestMultiplayerMatchSongSelect(Room room, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
-                : base(room, beatmap, ruleset)
+                : base(room, null, beatmap, ruleset)
             {
             }
         }

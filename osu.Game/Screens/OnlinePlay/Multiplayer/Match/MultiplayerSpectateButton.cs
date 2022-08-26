@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,11 +16,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerSpectateButton : MultiplayerRoomComposite
     {
-        public Action OnSpectateClick
-        {
-            set => button.Action = value;
-        }
-
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
@@ -37,7 +33,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 RelativeSizeAxes = Axes.Both,
                 Size = Vector2.One,
                 Enabled = { Value = true },
+                Action = onClick
             };
+        }
+
+        private void onClick()
+        {
+            var clickOperation = ongoingOperationTracker.BeginOperation();
+
+            Client.ToggleSpectate().ContinueWith(_ => endOperation());
+
+            void endOperation() => clickOperation?.Dispose();
         }
 
         [BackgroundDependencyLoader]

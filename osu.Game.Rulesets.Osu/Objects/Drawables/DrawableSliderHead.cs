@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
@@ -18,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [CanBeNull]
         public Slider Slider => DrawableSlider?.HitObject;
 
-        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
+        public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         public override bool DisplayResult => HitObject?.JudgeAsNormalHitCircle ?? base.DisplayResult;
 

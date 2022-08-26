@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         /// <param name="onConfirm">An action to perform on confirmation.</param>
         /// <param name="onCancel">An optional action to perform on cancel.</param>
-        public ConfirmExitDialog(Action onConfirm, Action onCancel = null)
+        public ConfirmExitDialog(Action onConfirm, Action? onCancel = null)
         {
             HeaderText = "Are you sure you want to exit osu!?";
             BodyText = "Last chance to turn back";

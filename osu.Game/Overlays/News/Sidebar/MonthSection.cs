@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -18,21 +20,25 @@ using System.Diagnostics;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Platform;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
     public class MonthSection : CompositeDrawable
     {
+        public int Year { get; private set; }
+        public int Month { get; private set; }
+        public readonly BindableBool Expanded = new BindableBool();
+
         private const int animation_duration = 250;
         private Sample sampleOpen;
         private Sample sampleClose;
 
-        public readonly BindableBool Expanded = new BindableBool();
-
         public MonthSection(int month, int year, IEnumerable<APINewsPost> posts)
         {
             Debug.Assert(posts.All(p => p.PublishedAt.Month == month && p.PublishedAt.Year == year));
+
+            Year = year;
+            Month = month;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -124,7 +130,6 @@ namespace osu.Game.Overlays.News.Sidebar
             private readonly APINewsPost post;
 
             public PostButton(APINewsPost post)
-                : base(HoverSampleSet.Submit)
             {
                 this.post = post;
 

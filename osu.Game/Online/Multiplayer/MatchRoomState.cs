@@ -5,8 +5,6 @@ using System;
 using MessagePack;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 
-#nullable enable
-
 namespace osu.Game.Online.Multiplayer
 {
     /// <summary>
@@ -16,7 +14,6 @@ namespace osu.Game.Online.Multiplayer
     [Serializable]
     [MessagePackObject]
     [Union(0, typeof(TeamVersusRoomState))] // IMPORTANT: Add rules to SignalRUnionWorkaroundResolver for new derived types.
-    // TODO: abstract breaks json serialisation. attention will be required for iOS support (unless we get messagepack AOT working instead).
     public abstract class MatchRoomState
     {
     }

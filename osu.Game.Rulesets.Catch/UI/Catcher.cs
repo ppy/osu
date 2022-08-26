@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -57,14 +59,19 @@ namespace osu.Game.Rulesets.Catch.UI
         public bool CatchFruitOnPlate { get; set; } = true;
 
         /// <summary>
-        /// The relative space to cover in 1 millisecond. based on 1 game pixel per millisecond as in osu-stable.
+        /// The speed of the catcher when the catcher is dashing.
         /// </summary>
-        public const double BASE_SPEED = 1.0;
+        public const double BASE_DASH_SPEED = 1.0;
 
         /// <summary>
-        /// The current speed of the catcher.
+        /// The speed of the catcher when the catcher is not dashing.
         /// </summary>
-        public double Speed => (Dashing ? 1 : 0.5) * BASE_SPEED * hyperDashModifier;
+        public const double BASE_WALK_SPEED = 0.5;
+
+        /// <summary>
+        /// The current speed of the catcher with the hyper-dash modifier applied.
+        /// </summary>
+        public double Speed => (Dashing ? BASE_DASH_SPEED : BASE_WALK_SPEED) * hyperDashModifier;
 
         /// <summary>
         /// The amount by which caught fruit should be scaled down to fit on the plate.
@@ -124,7 +131,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
         private readonly DrawablePool<CaughtDroplet> caughtDropletPool;
 
-        public Catcher([NotNull] DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] DroppedObjectContainer droppedObjectTarget, IBeatmapDifficultyInfo difficulty = null)
         {
             this.droppedObjectTarget = droppedObjectTarget;
 
@@ -172,7 +179,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Calculates the scale of the catcher based off the provided beatmap difficulty.
         /// </summary>
-        private static Vector2 calculateScale(BeatmapDifficulty difficulty) => new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
+        private static Vector2 calculateScale(IBeatmapDifficultyInfo difficulty) => new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
 
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
@@ -184,7 +191,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
         /// <param name="difficulty">The beatmap difficulty.</param>
-        public static float CalculateCatchWidth(BeatmapDifficulty difficulty) => CalculateCatchWidth(calculateScale(difficulty));
+        public static float CalculateCatchWidth(IBeatmapDifficultyInfo difficulty) => CalculateCatchWidth(calculateScale(difficulty));
 
         /// <summary>
         /// Determine if this catcher can catch a <see cref="CatchHitObject"/> in the current position.
@@ -205,6 +212,7 @@ namespace osu.Game.Rulesets.Catch.UI
             catchResult.CatcherAnimationState = CurrentState;
             catchResult.CatcherHyperDash = HyperDashing;
 
+            // Ignore JuiceStreams and BananaShowers
             if (!(drawableObject is DrawablePalpableCatchHitObject palpableObject)) return;
 
             var hitObject = palpableObject.HitObject;
@@ -226,11 +234,11 @@ namespace osu.Game.Rulesets.Catch.UI
             if (result.IsHit && hitObject.HyperDash)
             {
                 var target = hitObject.HyperDashTarget;
-                var timeDifference = target.StartTime - hitObject.StartTime;
+                double timeDifference = target.StartTime - hitObject.StartTime;
                 double positionDifference = target.EffectiveX - X;
-                var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
+                double velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
-                SetHyperDashState(Math.Abs(velocity), target.EffectiveX);
+                SetHyperDashState(Math.Abs(velocity) / BASE_DASH_SPEED, target.EffectiveX);
             }
             else
                 SetHyperDashState();
@@ -239,6 +247,14 @@ namespace osu.Game.Rulesets.Catch.UI
                 CurrentState = hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle;
             else if (!(hitObject is Banana))
                 CurrentState = CatcherAnimationState.Fail;
+
+            if (palpableObject.HitObject.LastInCombo)
+            {
+                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
+                    Explode();
+                else
+                    Drop();
+            }
         }
 
         public void OnRevertResult(DrawableCatchHitObject drawableObject, JudgementResult result)
@@ -266,7 +282,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <param name="targetPosition">When this catcher crosses this position, this catcher ends hyper-dashing.</param>
         public void SetHyperDashState(double modifier = 1, float targetPosition = -1)
         {
-            var wasHyperDashing = HyperDashing;
+            bool wasHyperDashing = HyperDashing;
 
             if (modifier <= 1 || X == targetPosition)
             {
@@ -373,13 +389,13 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             switch (source)
             {
-                case Fruit _:
+                case Fruit:
                     return caughtFruitPool.Get();
 
-                case Banana _:
+                case Banana:
                     return caughtBananaPool.Get();
 
-                case Droplet _:
+                case Droplet:
                     return caughtDropletPool.Get();
 
                 default:

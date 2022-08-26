@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.IO.Network;
 using osu.Game.Online.API.Requests.Responses;
@@ -8,14 +10,14 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserScoresRequest : PaginatedAPIRequest<List<APILegacyScoreInfo>>
+    public class GetUserScoresRequest : PaginatedAPIRequest<List<SoloScoreInfo>>
     {
         private readonly long userId;
         private readonly ScoreType type;
         private readonly RulesetInfo ruleset;
 
-        public GetUserScoresRequest(long userId, ScoreType type, int page = 0, int itemsPerPage = 5, RulesetInfo ruleset = null)
-            : base(page, itemsPerPage)
+        public GetUserScoresRequest(long userId, ScoreType type, PaginationParameters pagination, RulesetInfo ruleset = null)
+            : base(pagination)
         {
             this.userId = userId;
             this.type = type;
@@ -39,6 +41,7 @@ namespace osu.Game.Online.API.Requests
     {
         Best,
         Firsts,
-        Recent
+        Recent,
+        Pinned
     }
 }

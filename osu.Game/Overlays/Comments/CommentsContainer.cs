@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
@@ -13,10 +15,11 @@ using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Threading;
-using osu.Game.Users;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -28,7 +31,7 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
-        protected readonly IBindable<User> User = new Bindable<User>();
+        protected readonly IBindable<APIUser> User = new Bindable<APIUser>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -248,8 +251,8 @@ namespace osu.Game.Overlays.Comments
                     if (bundle.HasMore)
                     {
                         int loadedTopLevelComments = 0;
-                        pinnedContent.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
-                        content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
+                        pinnedContent.Children.OfType<DrawableComment>().ForEach(_ => loadedTopLevelComments++);
+                        content.Children.OfType<DrawableComment>().ForEach(_ => loadedTopLevelComments++);
 
                         moreButton.Current.Value = bundle.TopLevelCount - loadedTopLevelComments;
                         moreButton.IsLoading = false;
@@ -317,7 +320,7 @@ namespace osu.Game.Overlays.Comments
         private class NoCommentsPlaceholder : CompositeDrawable
         {
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load()
             {
                 Height = 80;
                 RelativeSizeAxes = Axes.X;
@@ -328,7 +331,7 @@ namespace osu.Game.Overlays.Comments
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Margin = new MarginPadding { Left = 50 },
-                        Text = @"No comments yet."
+                        Text = CommentsStrings.Empty
                     }
                 });
             }

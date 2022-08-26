@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -9,19 +11,18 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Models;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament
 {
+    [Cached]
     public class TournamentGame : TournamentGameBase
     {
         public static ColourInfo GetTeamColour(TeamColour teamColour) => teamColour == TeamColour.Red ? COLOUR_RED : COLOUR_BLUE;
@@ -60,71 +61,54 @@ namespace osu.Game.Tournament
 
             loadingSpinner.Show();
 
-            BracketLoadTask.ContinueWith(_ => LoadComponentsAsync(new[]
+            BracketLoadTask.ContinueWith(t => Schedule(() =>
             {
-                new Container
+                if (t.IsFaulted)
                 {
-                    CornerRadius = 10,
-                    Depth = float.MinValue,
-                    Position = new Vector2(5),
-                    Masking = true,
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = OsuColour.Gray(0.2f),
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new TourneyButton
-                        {
-                            Text = "Save Changes",
-                            Width = 140,
-                            Height = 50,
-                            Padding = new MarginPadding
-                            {
-                                Top = 10,
-                                Left = 10,
-                            },
-                            Margin = new MarginPadding
-                            {
-                                Right = 10,
-                                Bottom = 10,
-                            },
-                            Action = SaveChanges,
-                        },
-                    }
-                },
-                heightWarning = new WarningBox("Please make the window wider")
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Margin = new MarginPadding(20),
-                },
-                new OsuContextMenuContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new TournamentSceneManager()
+                    loadingSpinner.Hide();
+                    loadingSpinner.Expire();
+
+                    Logger.Error(t.Exception, "Couldn't load bracket with error");
+                    Add(new WarningBox($"Your {BRACKET_FILENAME} file could not be parsed. Please check runtime.log for more details."));
+
+                    return;
                 }
-            }, drawables =>
-            {
-                loadingSpinner.Hide();
-                loadingSpinner.Expire();
 
-                AddRange(drawables);
-
-                windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
+                LoadComponentsAsync(new[]
                 {
-                    var minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
-                    heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
-                }), true);
-
-                windowMode.BindValueChanged(mode => ScheduleAfterChildren(() =>
+                    new SaveChangesOverlay
+                    {
+                        Depth = float.MinValue,
+                    },
+                    heightWarning = new WarningBox("Please make the window wider")
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Margin = new MarginPadding(20),
+                    },
+                    new OsuContextMenuContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Child = new TournamentSceneManager()
+                    }
+                }, drawables =>
                 {
-                    windowMode.Value = WindowMode.Windowed;
-                }), true);
+                    loadingSpinner.Hide();
+                    loadingSpinner.Expire();
+
+                    AddRange(drawables);
+
+                    windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
+                    {
+                        int minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
+                        heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
+                    }), true);
+
+                    windowMode.BindValueChanged(_ => ScheduleAfterChildren(() =>
+                    {
+                        windowMode.Value = WindowMode.Windowed;
+                    }), true);
+                });
             }));
         }
     }

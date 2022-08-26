@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Screens.Select.Details;
@@ -38,29 +40,26 @@ namespace osu.Game.Tests.Visual.Online
             var secondSet = createSet();
 
             AddStep("set first set", () => details.BeatmapSet = firstSet);
-            AddAssert("ratings set", () => details.Ratings.Metrics == firstSet.Metrics);
+            AddAssert("ratings set", () => details.Ratings.Ratings == firstSet.Ratings);
 
             AddStep("set second set", () => details.BeatmapSet = secondSet);
-            AddAssert("ratings set", () => details.Ratings.Metrics == secondSet.Metrics);
+            AddAssert("ratings set", () => details.Ratings.Ratings == secondSet.Ratings);
 
-            static BeatmapSetInfo createSet() => new BeatmapSetInfo
+            static APIBeatmapSet createSet() => new APIBeatmapSet
             {
-                Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).Select(_ => RNG.Next(10)).ToArray() },
-                Beatmaps = new List<BeatmapInfo>
+                Beatmaps = new[]
                 {
-                    new BeatmapInfo
+                    new APIBeatmap
                     {
-                        Metrics = new BeatmapMetrics
+                        FailTimes = new APIFailTimes
                         {
                             Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
                             Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
                         },
                     }
                 },
-                OnlineInfo = new BeatmapSetOnlineInfo
-                {
-                    Status = BeatmapSetOnlineStatus.Ranked
-                }
+                Ratings = Enumerable.Range(0, 11).Select(_ => RNG.Next(10)).ToArray(),
+                Status = BeatmapOnlineStatus.Ranked
             };
         }
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
@@ -74,10 +76,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             public override void PlayAnimation()
             {
-                base.PlayAnimation();
-
                 if (Result != HitResult.Miss)
-                    JudgementText.ScaleTo(new Vector2(0.8f, 1)).Then().ScaleTo(new Vector2(1.2f, 1), 1800, Easing.OutQuint);
+                {
+                    JudgementText
+                        .ScaleTo(new Vector2(0.8f, 1))
+                        .ScaleTo(new Vector2(1.2f, 1), 1800, Easing.OutQuint);
+                }
+
+                base.PlayAnimation();
             }
         }
     }

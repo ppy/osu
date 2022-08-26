@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -14,9 +16,9 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class SetPanelBackground : BufferedContainer
     {
-        public SetPanelBackground(WorkingBeatmap working)
+        public SetPanelBackground(IWorkingBeatmap working)
+            : base(cachedFrameBuffer: true)
         {
-            CacheDrawnFrameBuffer = true;
             RedrawOnScale = false;
 
             Children = new Drawable[]

@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
@@ -34,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
         }
 
-        public override bool OnPressed(TaikoAction action) => false;
+        public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
 
         protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollTick),
             _ => new TickPiece());

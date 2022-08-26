@@ -1,18 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Database;
+using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.Chat.Tabs;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
 {
@@ -59,19 +63,45 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        private readonly IAPIProvider api;
 
         [Resolved]
         private UserLookupCache users { get; set; }
 
         public readonly BindableBool HighPollRate = new BindableBool();
 
-        public ChannelManager()
-        {
-            CurrentChannel.ValueChanged += currentChannelChanged;
+        private readonly IBindable<bool> isIdle = new BindableBool();
 
-            HighPollRate.BindValueChanged(enabled => TimeBetweenPolls.Value = enabled.NewValue ? 1000 : 6000, true);
+        public ChannelManager(IAPIProvider api)
+        {
+            this.api = api;
+            CurrentChannel.ValueChanged += currentChannelChanged;
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(IdleTracker idleTracker)
+        {
+            HighPollRate.BindValueChanged(updatePollRate);
+            isIdle.BindValueChanged(updatePollRate, true);
+
+            if (idleTracker != null)
+                isIdle.BindTo(idleTracker.IsIdle);
+        }
+
+        private void updatePollRate(ValueChangedEvent<bool> valueChangedEvent)
+        {
+            // Polling will eventually be replaced with websocket, but let's avoid doing these background operations as much as possible for now.
+            // The only loss will be delayed PM/message highlight notifications.
+            int millisecondsBetweenPolls = HighPollRate.Value ? 1000 : 60000;
+
+            if (isIdle.Value)
+                millisecondsBetweenPolls *= 10;
+
+            if (TimeBetweenPolls.Value != millisecondsBetweenPolls)
+            {
+                TimeBetweenPolls.Value = millisecondsBetweenPolls;
+                Logger.Log($"Chat is now polling every {TimeBetweenPolls.Value} ms");
+            }
         }
 
         /// <summary>
@@ -91,7 +121,7 @@ namespace osu.Game.Online.Chat
         /// Opens a new private channel.
         /// </summary>
         /// <param name="user">The user the private channel is opened with.</param>
-        public void OpenPrivateChannel(User user)
+        public void OpenPrivateChannel(APIUser user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -103,10 +133,14 @@ namespace osu.Game.Online.Chat
                                    ?? JoinChannel(new Channel(user));
         }
 
-        private void currentChannelChanged(ValueChangedEvent<Channel> e)
+        private void currentChannelChanged(ValueChangedEvent<Channel> channel)
         {
-            if (!(e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel))
-                JoinChannel(e.NewValue);
+            bool isSelectorChannel = channel.NewValue is ChannelListing.ChannelListingChannel;
+
+            if (!isSelectorChannel)
+                JoinChannel(channel.NewValue);
+
+            Logger.Log($"Current channel changed to {channel.NewValue}");
         }
 
         /// <summary>
@@ -218,7 +252,7 @@ namespace osu.Game.Online.Chat
             if (target == null)
                 return;
 
-            var parameters = text.Split(' ', 2);
+            string[] parameters = text.Split(' ', 2);
             string command = parameters[0];
             string content = parameters.Length == 2 ? parameters[1] : string.Empty;
 
@@ -256,8 +290,36 @@ namespace osu.Game.Online.Chat
                     JoinChannel(channel);
                     break;
 
+                case "chat":
+                case "msg":
+                case "query":
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        target.AddNewMessages(new ErrorMessage($"Usage: /{command} [user]"));
+                        break;
+                    }
+
+                    // Check if the user has joined the requested channel already.
+                    // This uses the channel name for comparison as the PM user's username is unavailable after a restart.
+                    var privateChannel = JoinedChannels.FirstOrDefault(
+                        c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Name.Equals(content, StringComparison.OrdinalIgnoreCase));
+
+                    if (privateChannel != null)
+                    {
+                        CurrentChannel.Value = privateChannel;
+                        break;
+                    }
+
+                    var request = new GetUserRequest(content);
+                    request.Success += OpenPrivateChannel;
+                    request.Failure += e => target.AddNewMessages(
+                        new ErrorMessage(e.InnerException?.Message == @"NotFound" ? $"User '{content}' was not found." : $"Could not fetch user '{content}'."));
+
+                    api.Queue(request);
+                    break;
+
                 case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /np"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np"));
                     break;
 
                 default:
@@ -278,7 +340,7 @@ namespace osu.Game.Online.Chat
         {
             var req = new ListChannelsRequest();
 
-            var joinDefaults = JoinedChannels.Count == 0;
+            bool joinDefaults = JoinedChannels.Count == 0;
 
             req.Success += channels =>
             {
@@ -307,7 +369,7 @@ namespace osu.Game.Online.Chat
         /// right now it caps out at 50 messages and therefore only returns one channel's worth of content.
         /// </summary>
         /// <param name="channel">The channel </param>
-        private void fetchInitalMessages(Channel channel)
+        private void fetchInitialMessages(Channel channel)
         {
             if (channel.Id <= 0 || channel.MessagesLoaded) return;
 
@@ -387,9 +449,17 @@ namespace osu.Game.Online.Chat
                         return channel;
 
                     case ChannelType.PM:
+                        Logger.Log($"Attempting to join PM channel {channel}");
+
                         var createRequest = new CreateChannelRequest(channel);
+                        createRequest.Failure += e =>
+                        {
+                            Logger.Log($"Failed to join PM channel {channel} ({e.Message})");
+                        };
                         createRequest.Success += resChannel =>
                         {
+                            Logger.Log($"Joined PM channel {channel} ({resChannel.ChannelID})");
+
                             if (resChannel.ChannelID.HasValue)
                             {
                                 channel.Id = resChannel.ChannelID.Value;
@@ -403,9 +473,19 @@ namespace osu.Game.Online.Chat
                         break;
 
                     default:
+                        Logger.Log($"Attempting to join public channel {channel}");
+
                         var req = new JoinChannelRequest(channel);
-                        req.Success += () => joinChannel(channel, fetchInitialMessages);
-                        req.Failure += ex => LeaveChannel(channel);
+                        req.Success += () =>
+                        {
+                            Logger.Log($"Joined public channel {channel}");
+                            joinChannel(channel, fetchInitialMessages);
+                        };
+                        req.Failure += e =>
+                        {
+                            Logger.Log($"Failed to join public channel {channel} ({e.Message})");
+                            LeaveChannel(channel);
+                        };
                         api.Queue(req);
                         return channel;
                 }
@@ -413,7 +493,7 @@ namespace osu.Game.Online.Chat
             else
             {
                 if (fetchInitialMessages)
-                    fetchInitalMessages(channel);
+                    this.fetchInitialMessages(channel);
             }
 
             CurrentChannel.Value ??= channel;
@@ -481,11 +561,12 @@ namespace osu.Game.Online.Chat
                 else if (lastClosedChannel.Type == ChannelType.PM)
                 {
                     // Try to get user in order to open PM chat
-                    users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(u =>
+                    users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(task =>
                     {
-                        if (u.Result == null) return;
+                        var user = task.GetResultSafely();
 
-                        Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(u.Result)));
+                        if (user != null)
+                            Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(user)));
                     });
                 }
 
@@ -561,7 +642,7 @@ namespace osu.Game.Online.Chat
             var req = new MarkChannelAsReadRequest(channel, message);
 
             req.Success += () => channel.LastReadId = message.Id;
-            req.Failure += e => Logger.Error(e, $"Failed to mark channel {channel} up to '{message}' as read");
+            req.Failure += e => Logger.Log($"Failed to mark channel {channel} up to '{message}' as read ({e.Message})", LoggingTarget.Network);
 
             api.Queue(req);
         }
