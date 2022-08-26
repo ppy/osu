@@ -14,7 +14,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
@@ -249,6 +249,7 @@ namespace osu.Game.Skinning
 
         #region IResourceStorageProvider
 
+        IRenderer IStorageResourceProvider.Renderer => host.Renderer;
         AudioManager IStorageResourceProvider.AudioManager => audio;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<byte[]> IStorageResourceProvider.Files => userFiles;
@@ -271,6 +272,8 @@ namespace osu.Game.Skinning
         public IEnumerable<string> HandledExtensions => skinImporter.HandledExtensions;
 
         public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => skinImporter.Import(notification, tasks);
+
+        public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) => skinImporter.ImportAsUpdate(notification, task, original);
 
         public Task<Live<SkinInfo>> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => skinImporter.Import(task, batchImport, cancellationToken);
 

@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(scoreManager = new ScoreManager(rulesets, () => beatmapManager, LocalStorage, Realm, Scheduler, API));
             Dependencies.Cache(Realm);
 

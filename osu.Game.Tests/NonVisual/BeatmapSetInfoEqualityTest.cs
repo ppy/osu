@@ -37,6 +37,23 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [Test]
+        public void TestAudioEqualityCaseSensitivity()
+        {
+            var beatmapSetA = TestResources.CreateTestBeatmapSetInfo(1);
+            var beatmapSetB = TestResources.CreateTestBeatmapSetInfo(1);
+
+            // empty by default so let's set it..
+            beatmapSetA.Beatmaps.First().Metadata.AudioFile = "audio.mp3";
+            beatmapSetB.Beatmaps.First().Metadata.AudioFile = "audio.mp3";
+
+            addAudioFile(beatmapSetA, "abc", "AuDiO.mP3");
+            addAudioFile(beatmapSetB, "abc", "audio.mp3");
+
+            Assert.AreNotEqual(beatmapSetA, beatmapSetB);
+            Assert.IsTrue(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
+        }
+
+        [Test]
         public void TestAudioEqualitySameHash()
         {
             var beatmapSetA = TestResources.CreateTestBeatmapSetInfo(1);
@@ -62,9 +79,45 @@ namespace osu.Game.Tests.NonVisual
             Assert.IsTrue(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
         }
 
-        private static void addAudioFile(BeatmapSetInfo beatmapSetInfo, string hash = null)
+        [Test]
+        public void TestAudioEqualityBeatmapInfoSameHash()
         {
-            beatmapSetInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = hash ?? Guid.NewGuid().ToString() }, "audio.mp3"));
+            var beatmapSet = TestResources.CreateTestBeatmapSetInfo(2);
+
+            addAudioFile(beatmapSet);
+
+            var beatmap1 = beatmapSet.Beatmaps.First();
+            var beatmap2 = beatmapSet.Beatmaps.Last();
+
+            Assert.AreNotEqual(beatmap1, beatmap2);
+            Assert.IsTrue(beatmap1.AudioEquals(beatmap2));
+        }
+
+        [Test]
+        public void TestAudioEqualityBeatmapInfoDifferentHash()
+        {
+            var beatmapSet = TestResources.CreateTestBeatmapSetInfo(2);
+
+            const string filename1 = "audio1.mp3";
+            const string filename2 = "audio2.mp3";
+
+            addAudioFile(beatmapSet, filename: filename1);
+            addAudioFile(beatmapSet, filename: filename2);
+
+            var beatmap1 = beatmapSet.Beatmaps.First();
+            var beatmap2 = beatmapSet.Beatmaps.Last();
+
+            Assert.AreNotEqual(beatmap1, beatmap2);
+
+            beatmap1.Metadata.AudioFile = filename1;
+            beatmap2.Metadata.AudioFile = filename2;
+
+            Assert.IsFalse(beatmap1.AudioEquals(beatmap2));
+        }
+
+        private static void addAudioFile(BeatmapSetInfo beatmapSetInfo, string hash = null, string filename = null)
+        {
+            beatmapSetInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = hash ?? Guid.NewGuid().ToString() }, filename ?? "audio.mp3"));
         }
 
         [Test]

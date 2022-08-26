@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -10,6 +8,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mania.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Mods
@@ -22,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override string Description => @"Replaces all hold notes with normal notes.";
+        public override LocalisableString Description => @"Replaces all hold notes with normal notes.";
 
         public override IconUsage? Icon => FontAwesome.Solid.DotCircle;
 

@@ -26,7 +26,6 @@ using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
-using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -78,7 +77,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool PauseOnFocusLost => true;
 
-        public Action RestartRequested;
+        public Action<bool> RestartRequested;
 
         private bool isRestarting;
 
@@ -100,9 +99,6 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private MusicController musicController { get; set; }
-
-        [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
 
         public GameplayState GameplayState { get; private set; }
 
@@ -253,6 +249,9 @@ namespace osu.Game.Screens.Play
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
             GameplayClockContainer.Add(rulesetSkinProvider);
 
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
             rulesetSkinProvider.AddRange(new Drawable[]
             {
                 failAnimationLayer = new FailAnimation(DrawableRuleset)
@@ -267,13 +266,8 @@ namespace osu.Game.Screens.Play
                 },
                 FailOverlay = new FailOverlay
                 {
-                    SaveReplay = () =>
-                    {
-                        Score.ScoreInfo.Passed = false;
-                        Score.ScoreInfo.Rank = ScoreRank.F;
-                        return prepareAndImportScore();
-                    },
-                    OnRetry = Restart,
+                    SaveReplay = prepareAndImportScore,
+                    OnRetry = () => Restart(),
                     OnQuit = () => PerformExit(true),
                 },
                 new HotkeyExitOverlay
@@ -288,6 +282,9 @@ namespace osu.Game.Screens.Play
                 },
             });
 
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
             if (Configuration.AllowRestart)
             {
                 rulesetSkinProvider.Add(new HotkeyRetryOverlay
@@ -297,7 +294,7 @@ namespace osu.Game.Screens.Play
                         if (!this.IsCurrentScreen()) return;
 
                         fadeOut(true);
-                        Restart();
+                        Restart(true);
                     },
                 });
             }
@@ -333,7 +330,7 @@ namespace osu.Game.Screens.Play
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
 
             // bind clock into components that require it
-            DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
+            ((IBindable<bool>)DrawableRuleset.IsPaused).BindTo(GameplayClockContainer.IsPaused);
 
             DrawableRuleset.NewResult += r =>
             {
@@ -374,6 +371,9 @@ namespace osu.Game.Screens.Play
 
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
+
+            if (Configuration.AutomaticallySkipIntro)
+                skipIntroOverlay.SkipWhenReady();
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
@@ -444,7 +444,7 @@ namespace osu.Game.Screens.Play
                     {
                         OnResume = Resume,
                         Retries = RestartCount,
-                        OnRetry = Restart,
+                        OnRetry = () => Restart(),
                         OnQuit = () => PerformExit(true),
                     },
                 },
@@ -478,7 +478,7 @@ namespace osu.Game.Screens.Play
 
         private void updateSampleDisabledState()
         {
-            samplePlaybackDisabled.Value = DrawableRuleset.FrameStableClock.IsCatchingUp.Value || GameplayClockContainer.GameplayClock.IsPaused.Value;
+            samplePlaybackDisabled.Value = DrawableRuleset.FrameStableClock.IsCatchingUp.Value || GameplayClockContainer.IsPaused.Value;
         }
 
         private void updatePauseOnFocusLostState()
@@ -651,7 +651,8 @@ namespace osu.Game.Screens.Play
         /// Restart gameplay via a parent <see cref="PlayerLoader"/>.
         /// <remarks>This can be called from a child screen in order to trigger the restart process.</remarks>
         /// </summary>
-        public void Restart()
+        /// <param name="quickRestart">Whether a quick restart was requested (skipping intro etc.).</param>
+        public void Restart(bool quickRestart = false)
         {
             if (!Configuration.AllowRestart)
                 return;
@@ -663,7 +664,7 @@ namespace osu.Game.Screens.Play
             musicController.Stop();
 
             sampleRestart?.Play();
-            RestartRequested?.Invoke();
+            RestartRequested?.Invoke(quickRestart);
 
             PerformExit(false);
         }
@@ -831,7 +832,6 @@ namespace osu.Game.Screens.Play
                 return false;
 
             GameplayState.HasFailed = true;
-            Score.ScoreInfo.Passed = false;
 
             updateGameplayState();
 
@@ -844,14 +844,21 @@ namespace osu.Game.Screens.Play
             failAnimationLayer.Start();
 
             if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
-                Restart();
+                Restart(true);
 
             return true;
         }
 
-        // Called back when the transform finishes
+        /// <summary>
+        /// Invoked when the fail animation has finished.
+        /// </summary>
         private void onFailComplete()
         {
+            // fail completion is a good point to mark a score as failed,
+            // since the last judgement that caused the fail only applies to score processor after onFail.
+            // todo: this should probably be handled better.
+            ScoreProcessor.FailScore(Score.ScoreInfo);
+
             GameplayClockContainer.Stop();
 
             FailOverlay.Retries = RestartCount;
@@ -874,7 +881,7 @@ namespace osu.Game.Screens.Play
         private double? lastPauseActionTime;
 
         protected bool PauseCooldownActive =>
-            lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
+            lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + pause_cooldown;
 
         /// <summary>
         /// A set of conditionals which defines whether the current game state and configuration allows for
@@ -912,7 +919,7 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Stop();
             PauseOverlay.Show();
-            lastPauseActionTime = GameplayClockContainer.GameplayClock.CurrentTime;
+            lastPauseActionTime = GameplayClockContainer.CurrentTime;
             return true;
         }
 
@@ -1002,7 +1009,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual void StartGameplay()
         {
-            if (GameplayClockContainer.GameplayClock.IsRunning)
+            if (GameplayClockContainer.IsRunning)
                 throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
 
             GameplayClockContainer.Reset(true);
@@ -1028,15 +1035,7 @@ namespace osu.Game.Screens.Play
 
                 // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
                 if (prepareScoreForDisplayTask == null)
-                {
-                    Score.ScoreInfo.Passed = false;
-                    Score.ScoreInfo.Rank = ScoreRank.F;
-                }
-
-                // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
-                // To resolve test failures, forcefully end playing synchronously when this screen exits.
-                // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
-                spectatorClient.EndPlaying(GameplayState);
+                    ScoreProcessor.FailScore(Score.ScoreInfo);
             }
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.

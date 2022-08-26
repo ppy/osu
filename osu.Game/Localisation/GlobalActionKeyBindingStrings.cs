@@ -150,6 +150,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleNotifications => new TranslatableString(getKey(@"toggle_notifications"), @"Toggle notifications");
 
         /// <summary>
+        /// "Toggle profile"
+        /// </summary>
+        public static LocalisableString ToggleProfile => new TranslatableString(getKey(@"toggle_profile"), @"Toggle profile");
+
+        /// <summary>
         /// "Pause gameplay"
         /// </summary>
         public static LocalisableString PauseGameplay => new TranslatableString(getKey(@"pause_gameplay"), @"Pause gameplay");
@@ -273,6 +278,11 @@ namespace osu.Game.Localisation
         /// "Toggle skin editor"
         /// </summary>
         public static LocalisableString ToggleSkinEditor => new TranslatableString(getKey(@"toggle_skin_editor"), @"Toggle skin editor");
+
+        /// <summary>
+        /// "Toggle FPS counter"
+        /// </summary>
+        public static LocalisableString ToggleFPSCounter => new TranslatableString(getKey(@"toggle_fps_counter"), @"Toggle FPS counter");
 
         /// <summary>
         /// "Previous volume meter"

@@ -20,8 +20,14 @@ namespace osu.Game.Screens.Select.Filter
         [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.ArtistTracksBpm))]
         BPM,
 
+        [Description("Date Submitted")]
+        DateSubmitted,
+
         [Description("Date Added")]
         DateAdded,
+
+        [Description("Date Ranked")]
+        DateRanked,
 
         [Description("Last Played")]
         LastPlayed,
