@@ -299,7 +299,7 @@ namespace osu.Game.Screens.Select
 
                     // If a direct selection couldn't be made, it's feasible that the difficulty name (or beatmap metadata) changed.
                     // Let's attempt to follow set-level selection anyway.
-                    SelectBeatmap(sender[changes.NewModifiedIndices.First()].Beatmaps.First());
+                    SelectBeatmap(sender[modifiedAndInserted.First()].Beatmaps.First());
                 }
             }
         }
