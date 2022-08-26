@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     if (currentObj.Angle != null && osuCurrent.Angle != null) {
                         double roundedAngle = Math.Round(MathUtils.RadiansToDegrees(currentObj.Angle.Value) / 2.0) * 2.0;
-                        
+
                         if (roundedAngle == initialRoundedAngle)
                             angleRepeatCount++;
                     }
