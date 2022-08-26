@@ -363,7 +363,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private Player player => Stack.CurrentScreen as Player;
 
         private double currentFrameStableTime
-            => player.ChildrenOfType<FrameStabilityContainer>().First().FrameStableClock.CurrentTime;
+            => player.ChildrenOfType<FrameStabilityContainer>().First().CurrentTime;
 
         private void waitForPlayer() => AddUntilStep("wait for player", () => (Stack.CurrentScreen as Player)?.IsLoaded == true);
 

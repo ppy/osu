@@ -16,6 +16,8 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Scoring;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -126,6 +128,8 @@ namespace osu.Game.Rulesets.Scoring
         private bool beatmapApplied;
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
+        private readonly Dictionary<HitResult, int> maximumResultCounts = new Dictionary<HitResult, int>();
+
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
 
@@ -400,8 +404,6 @@ namespace osu.Game.Rulesets.Scoring
             return ScoreRank.D;
         }
 
-        public int GetStatistic(HitResult result) => scoreResultCounts.GetValueOrDefault(result);
-
         /// <summary>
         /// Resets this ScoreProcessor to a default state.
         /// </summary>
@@ -410,12 +412,18 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.Reset(storeResults);
 
-            scoreResultCounts.Clear();
             hitEvents.Clear();
             lastHitObject = null;
 
             if (storeResults)
+            {
                 maximumScoringValues = currentScoringValues;
+
+                maximumResultCounts.Clear();
+                maximumResultCounts.AddRange(scoreResultCounts);
+            }
+
+            scoreResultCounts.Clear();
 
             currentScoringValues = default;
             currentMaximumScoringValues = default;
@@ -423,6 +431,7 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = 0;
             Accuracy.Value = 1;
             Combo.Value = 0;
+            Rank.Disabled = false;
             Rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
         }
@@ -439,10 +448,43 @@ namespace osu.Game.Rulesets.Scoring
             score.HitEvents = hitEvents;
 
             foreach (var result in HitResultExtensions.ALL_TYPES)
-                score.Statistics[result] = GetStatistic(result);
+                score.Statistics[result] = scoreResultCounts.GetValueOrDefault(result);
+
+            foreach (var result in HitResultExtensions.ALL_TYPES)
+                score.MaximumStatistics[result] = maximumResultCounts.GetValueOrDefault(result);
 
             // Populate total score after everything else.
             score.TotalScore = (long)Math.Round(ComputeFinalScore(ScoringMode.Standardised, score));
+        }
+
+        /// <summary>
+        /// Populates the given score with remaining statistics as "missed" and marks it with <see cref="ScoreRank.F"/> rank.
+        /// </summary>
+        public void FailScore(ScoreInfo score)
+        {
+            if (Rank.Value == ScoreRank.F)
+                return;
+
+            score.Passed = false;
+            Rank.Value = ScoreRank.F;
+
+            Debug.Assert(maximumResultCounts != null);
+
+            if (maximumResultCounts.TryGetValue(HitResult.LargeTickHit, out int maximumLargeTick))
+                scoreResultCounts[HitResult.LargeTickMiss] = maximumLargeTick - scoreResultCounts.GetValueOrDefault(HitResult.LargeTickHit);
+
+            if (maximumResultCounts.TryGetValue(HitResult.SmallTickHit, out int maximumSmallTick))
+                scoreResultCounts[HitResult.SmallTickMiss] = maximumSmallTick - scoreResultCounts.GetValueOrDefault(HitResult.SmallTickHit);
+
+            int maximumBonusOrIgnore = maximumResultCounts.Where(kvp => kvp.Key.IsBonus() || kvp.Key == HitResult.IgnoreHit).Sum(kvp => kvp.Value);
+            int currentBonusOrIgnore = scoreResultCounts.Where(kvp => kvp.Key.IsBonus() || kvp.Key == HitResult.IgnoreHit).Sum(kvp => kvp.Value);
+            scoreResultCounts[HitResult.IgnoreMiss] = maximumBonusOrIgnore - currentBonusOrIgnore;
+
+            int maximumBasic = maximumResultCounts.SingleOrDefault(kvp => kvp.Key.IsBasic()).Value;
+            int currentBasic = scoreResultCounts.Where(kvp => kvp.Key.IsBasic() && kvp.Key != HitResult.Miss).Sum(kvp => kvp.Value);
+            scoreResultCounts[HitResult.Miss] = maximumBasic - currentBasic;
+
+            PopulateScore(score);
         }
 
         public override void ResetFromReplayFrame(ReplayFrame frame)
@@ -494,6 +536,9 @@ namespace osu.Game.Rulesets.Scoring
         {
             extractScoringValues(scoreInfo.Statistics, out current, out maximum);
             current.MaxCombo = scoreInfo.MaxCombo;
+
+            if (scoreInfo.MaximumStatistics.Count > 0)
+                extractScoringValues(scoreInfo.MaximumStatistics, out _, out maximum);
         }
 
         /// <summary>
@@ -549,7 +594,8 @@ namespace osu.Game.Rulesets.Scoring
 
                 if (result.IsBonus())
                     current.BonusScore += count * Judgement.ToNumericResult(result);
-                else
+
+                if (result.AffectsAccuracy())
                 {
                     // The maximum result of this judgement if it wasn't a miss.
                     // E.g. For a GOOD judgement, the max result is either GREAT/PERFECT depending on which one the ruleset uses (osu!: GREAT, osu!mania: PERFECT).
@@ -598,7 +644,10 @@ namespace osu.Game.Rulesets.Scoring
 
     public enum ScoringMode
     {
+        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.StandardisedScoreDisplay))]
         Standardised,
+
+        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.ClassicScoreDisplay))]
         Classic
     }
 }

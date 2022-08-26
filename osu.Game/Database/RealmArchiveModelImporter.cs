@@ -174,6 +174,8 @@ namespace osu.Game.Database
             return imported;
         }
 
+        public virtual Task<Live<TModel>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, TModel original) => throw new NotImplementedException();
+
         /// <summary>
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
         /// Note that this bypasses the UI flow and should only be used for special cases or testing.
@@ -338,7 +340,7 @@ namespace osu.Game.Database
                     // import to store
                     realm.Add(item);
 
-                    PostImport(item, realm);
+                    PostImport(item, realm, batchImport);
 
                     transaction.Commit();
                 }
@@ -483,7 +485,8 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The model prepared for import.</param>
         /// <param name="realm">The current realm context.</param>
-        protected virtual void PostImport(TModel model, Realm realm)
+        /// <param name="batchImport">Whether the import was part of a batch.</param>
+        protected virtual void PostImport(TModel model, Realm realm, bool batchImport)
         {
         }
 

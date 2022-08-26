@@ -11,8 +11,10 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Configuration;
@@ -35,6 +37,9 @@ namespace osu.Game.Tests.Gameplay
     {
         [Resolved]
         private OsuConfigManager config { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [Test]
         public void TestRetrieveTopLevelSample()
@@ -69,11 +74,9 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                working.LoadTrack();
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(working, 0)
                 {
-                    IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
@@ -96,14 +99,12 @@ namespace osu.Game.Tests.Gameplay
             AddStep("create container", () =>
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                working.LoadTrack();
 
                 const double start_time = 1000;
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(working, start_time)
                 {
                     StartTime = start_time,
-                    IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
                         Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
@@ -138,7 +139,7 @@ namespace osu.Game.Tests.Gameplay
 
                 beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
-                    Clock = gameplayContainer.GameplayClock
+                    Clock = gameplayContainer
                 });
             });
 
@@ -204,6 +205,7 @@ namespace osu.Game.Tests.Gameplay
 
         #region IResourceStorageProvider
 
+        public IRenderer Renderer => host.Renderer;
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
         public new IResourceStore<byte[]> Resources => base.Resources;

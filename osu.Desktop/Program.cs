@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.IO;
 using System.Runtime.Versioning;
@@ -21,9 +19,13 @@ namespace osu.Desktop
 {
     public static class Program
     {
+#if DEBUG
+        private const string base_game_name = @"osu-development";
+#else
         private const string base_game_name = @"osu";
+#endif
 
-        private static LegacyTcpIpcProvider legacyIpc;
+        private static LegacyTcpIpcProvider? legacyIpc;
 
         [STAThread]
         public static void Main(string[] args)
@@ -37,9 +39,15 @@ namespace osu.Desktop
                 // See https://www.mongodb.com/docs/realm/sdk/dotnet/#supported-platforms
                 if (windowsVersion.Major < 6 || (windowsVersion.Major == 6 && windowsVersion.Minor <= 2))
                 {
+                    // If users running in compatibility mode becomes more of a common thing, we may want to provide better guidance or even consider
+                    // disabling it ourselves.
+                    // We could also better detect compatibility mode if required:
+                    // https://stackoverflow.com/questions/10744651/how-i-can-detect-if-my-application-is-running-under-compatibility-mode#comment58183249_10744730
                     SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
                         "Your operating system is too old to run osu!",
-                        "This version of osu! requires at least Windows 8.1 to run.\nPlease upgrade your operating system or consider using an older version of osu!.", IntPtr.Zero);
+                        "This version of osu! requires at least Windows 8.1 to run.\n"
+                        + "Please upgrade your operating system or consider using an older version of osu!.\n\n"
+                        + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!", IntPtr.Zero);
                     return;
                 }
 
