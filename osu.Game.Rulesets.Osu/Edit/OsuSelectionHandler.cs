@@ -371,6 +371,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Position = firstHitObject.Position,
                 NewCombo = firstHitObject.NewCombo,
                 SampleControlPoint = firstHitObject.SampleControlPoint,
+                Samples = firstHitObject.Samples,
             };
 
             if (mergedHitObject.Path.ControlPoints.Count == 0)
