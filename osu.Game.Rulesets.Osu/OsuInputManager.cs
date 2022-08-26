@@ -84,6 +84,7 @@ namespace osu.Game.Rulesets.Osu
                     KeyBindingContainer.TriggerPressed(action);
             }
 
+            // Allows doubletap when streaming by making the main cursor not be pressed
             if (dragMode)
             {
                 e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
