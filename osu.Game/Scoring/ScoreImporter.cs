@@ -73,6 +73,9 @@ namespace osu.Game.Scoring
 
             if (string.IsNullOrEmpty(model.StatisticsJson))
                 model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
+
+            if (string.IsNullOrEmpty(model.MaximumStatisticsJson))
+                model.MaximumStatisticsJson = JsonConvert.SerializeObject(model.MaximumStatistics);
         }
 
         protected override void PostImport(ScoreInfo model, Realm realm, bool batchImport)
