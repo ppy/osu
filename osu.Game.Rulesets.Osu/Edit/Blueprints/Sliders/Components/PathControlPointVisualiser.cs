@@ -107,14 +107,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private bool splitSelected()
         {
-            List<PathControlPoint> toSplit = Pieces.Where(p => p.IsSelected.Value && isSplittable(p)).Select(p => p.ControlPoint).ToList();
+            List<PathControlPoint> controlPointsToSplitAt = Pieces.Where(p => p.IsSelected.Value && isSplittable(p)).Select(p => p.ControlPoint).ToList();
 
             // Ensure that there are any points to be split
-            if (toSplit.Count == 0)
+            if (controlPointsToSplitAt.Count == 0)
                 return false;
 
             changeHandler?.BeginChange();
-            SplitControlPointsRequested?.Invoke(toSplit);
+            SplitControlPointsRequested?.Invoke(controlPointsToSplitAt);
             changeHandler?.EndChange();
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
