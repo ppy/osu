@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 using osuTK.Input;
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
@@ -169,11 +170,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestSimpleMergeHitSound()
+        public void TestSimpleMergeSample()
         {
             HitCircle? circle1 = null;
             HitCircle? circle2 = null;
-            double sliderStartTime = 0;
+
 
             AddStep("select first two circles", () =>
             {
@@ -182,83 +183,31 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 EditorClock.Seek(circle1.StartTime);
                 EditorBeatmap.SelectedHitObjects.Add(circle1);
                 EditorBeatmap.SelectedHitObjects.Add(circle2);
-                sliderStartTime = circle1.StartTime;
             });
 
             mergeSelection();
 
-            AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
-                (pos: circle1.Position, pathType: PathType.Linear),
-                (pos: circle2.Position, pathType: null)));
-
-            AddStep("start editor clock", () =>
-            {
-                EditorClock.Seek(sliderStartTime);
-                EditorClock.Start();
-            });
-
-            AddStep("stop editor clock", () =>
-            {
-                EditorClock.Stop();
-            });
-
-            AddStep("undo", () => Editor.Undo());
-            AddAssert("merged objects restored", () => circle1 is not null && circle2 is not null && objectsRestored(circle1, circle2));
+            AddAssert("samples exist", () => sliderSampleExist());
         }
 
         [Test]
-        public void TestMergeCircleSliderHitsound()
+        public void TestSliderCircleMergeSample()
         {
-            HitCircle? circle1 = null;
             Slider? slider = null;
-            HitCircle? circle2 = null;
-            double sliderStartTime = 0;
+            HitCircle? circle = null;
 
-            AddStep("select a circle, slider, circle", () =>
+            AddStep("select a slider followed by a circle", () =>
             {
-                circle1 = (HitCircle)EditorBeatmap.HitObjects.First(h => h is HitCircle);
-                slider = (Slider)EditorBeatmap.HitObjects.First(h => h is Slider && h.StartTime > circle1.StartTime);
-                circle2 = (HitCircle)EditorBeatmap.HitObjects.First(h => h is HitCircle && h.StartTime > slider.StartTime);
-                EditorClock.Seek(circle1.StartTime);
-                EditorBeatmap.SelectedHitObjects.Add(circle1);
+                slider = (Slider)EditorBeatmap.HitObjects.First(h => h is Slider);
+                circle = (HitCircle)EditorBeatmap.HitObjects.First(h => h is HitCircle && h.StartTime > slider.StartTime);
+                EditorClock.Seek(slider.StartTime);
                 EditorBeatmap.SelectedHitObjects.Add(slider);
-                EditorBeatmap.SelectedHitObjects.Add(circle2);
-                sliderStartTime = circle1.StartTime;
+                EditorBeatmap.SelectedHitObjects.Add(circle);
             });
 
             mergeSelection();
 
-            AddAssert("slider created", () =>
-            {
-                if (circle1 is null || circle2 is null || slider is null)
-                    return false;
-
-                var controlPoints = slider.Path.ControlPoints;
-                (Vector2, PathType?)[] args = new (Vector2, PathType?)[controlPoints.Count + 2];
-                args[0] = (circle1.Position, PathType.Linear);
-
-                for (int i = 0; i < controlPoints.Count; i++)
-                {
-                    args[i + 1] = (controlPoints[i].Position + slider.Position, i == controlPoints.Count - 1 ? PathType.Linear : controlPoints[i].Type);
-                }
-
-                args[^1] = (circle2.Position, null);
-                return sliderCreatedFor(args);
-            });
-
-            AddStep("start editor clock", () =>
-            {
-                EditorClock.Seek(sliderStartTime);
-                EditorClock.Start();
-            });
-
-            AddStep("stop editor clock", () =>
-            {
-                EditorClock.Stop();
-            });
-
-            AddStep("undo", () => Editor.Undo());
-            AddAssert("merged objects restored", () => circle1 is not null && circle2 is not null && objectsRestored(circle1, circle2));
+            AddAssert("samples exist", () => sliderSampleExist());
         }
 
         private void mergeSelection()
@@ -299,6 +248,19 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 if (EditorBeatmap.HitObjects.Contains(hitObject))
                     return false;
             }
+
+            return true;
+        }
+
+        private bool sliderSampleExist()
+        {
+            if (EditorBeatmap.SelectedHitObjects.Count != 1)
+                return false;
+
+            var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
+
+            if (mergedSlider.Samples[0] is null)
+                return false;
 
             return true;
         }
