@@ -35,10 +35,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.Add(drawable);
         }
 
-        public override bool Remove(SelectionBlueprint<HitObject> drawable)
+        public override bool Remove(SelectionBlueprint<HitObject> drawable, bool disposeImmediately)
         {
             SortInternal();
-            return base.Remove(drawable);
+            return base.Remove(drawable, disposeImmediately);
         }
 
         protected override int Compare(Drawable x, Drawable y)

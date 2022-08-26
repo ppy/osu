@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual
         protected void ResetPlacement()
         {
             if (CurrentBlueprint != null)
-                Remove(CurrentBlueprint);
+                Remove(CurrentBlueprint, true);
             Add(CurrentBlueprint = CreateBlueprint());
         }
 
