@@ -834,16 +834,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             for (int i = 0; i < makeThisManyGroups; i++)
             {
                 for (int j = 0; j < haveThisManySetsInGroup; j++)
-                {
-                    var testBeatmap = createTestBeatmapSet(i * haveThisManySetsInGroup + j + 1);
-                    var rulesetID = i % 3;
-                    testBeatmap.Beatmaps.ForEach(b =>
-                    {
-                        b.Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID);
-                        b.RulesetID = rulesetID;
-                    });
-                    sets.Add(testBeatmap);
-                }
+                    sets.Add(TestResources.CreateTestBeatmapSetInfo(i * haveThisManySetsInGroup + j + 1));
             }
 
             loadBeatmaps(sets);
@@ -852,7 +843,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 1; i < makeThisManyGroups; i++)
             {
-                var rulesetID = i % 3;
+                int rulesetID = i % 3;
                 AddStep($"Toggle filter to ruleset {rulesetID}", () =>
                 {
                     carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID) }, false);
@@ -869,14 +860,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 1; i <= 40; i++)
             {
-                var testBeatmap = createTestBeatmapSet(i);
-                var rulesetID = (i - 1) / 10;
-                testBeatmap.Beatmaps.ForEach(b =>
-                {
-                    b.Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID);
-                    b.RulesetID = rulesetID;
-                });
-                sets.Add(testBeatmap);
+                sets.Add(TestResources.CreateTestBeatmapSetInfo(i));
             }
 
             loadBeatmaps(sets);
