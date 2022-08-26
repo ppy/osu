@@ -277,7 +277,7 @@ namespace osu.Game.Screens.Select
 
                 if (selectedSetMarkedDeleted && modifiedAndInserted.Any())
                 {
-                    // If it is no longer valid, make the bold assumption that an updated version will be available in the modified indices.
+                    // If it is no longer valid, make the bold assumption that an updated version will be available in the modified/inserted indices.
                     // This relies on the full update operation being in a single transaction, so please don't change that.
                     foreach (int i in modifiedAndInserted)
                     {
