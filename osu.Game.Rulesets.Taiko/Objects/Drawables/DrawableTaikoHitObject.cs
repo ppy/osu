@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             isProxied = true;
 
-            nonProxiedContent.Remove(Content);
+            nonProxiedContent.Remove(Content, false);
             proxiedContent.Add(Content);
         }
 
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             isProxied = false;
 
-            proxiedContent.Remove(Content);
+            proxiedContent.Remove(Content, false);
             nonProxiedContent.Add(Content);
         }
 
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Size = BaseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
             if (MainPiece != null)
-                Content.Remove(MainPiece);
+                Content.Remove(MainPiece, true);
 
             Content.Add(MainPiece = CreateMainPiece());
         }

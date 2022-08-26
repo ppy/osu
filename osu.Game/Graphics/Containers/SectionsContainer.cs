@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.Containers
                 if (value == footer) return;
 
                 if (footer != null)
-                    scrollContainer.Remove(footer);
+                    scrollContainer.Remove(footer, true);
                 footer = value;
                 if (value == null) return;
 

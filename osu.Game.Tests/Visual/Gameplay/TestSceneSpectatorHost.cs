@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             base.TearDownSteps();
             AddStep("stop watching user", () => spectatorClient.StopWatchingUser(dummy_user_id));
-            AddStep("remove test spectator client", () => Remove(spectatorClient));
+            AddStep("remove test spectator client", () => Remove(spectatorClient, false));
         }
     }
 }

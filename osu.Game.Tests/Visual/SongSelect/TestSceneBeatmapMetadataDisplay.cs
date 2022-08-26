@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 OsuLogo logo = new OsuLogo { Scale = new Vector2(0.15f) };
 
-                Remove(testDifficultyCache);
+                Remove(testDifficultyCache, false);
 
                 Children = new Drawable[]
                 {

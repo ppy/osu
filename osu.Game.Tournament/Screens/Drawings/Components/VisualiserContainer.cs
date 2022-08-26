@@ -57,7 +57,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             if (allLines.Count == 0)
                 return;
 
-            Remove(allLines.First());
+            Remove(allLines.First(), true);
             allLines.Remove(allLines.First());
         }
 
