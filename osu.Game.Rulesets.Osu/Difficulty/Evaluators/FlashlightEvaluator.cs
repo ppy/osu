@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                         // Objects further back in time should count less for the nerf.
                         if (roundedAngle == initialRoundedAngle)
-                            angleRepeatCount += 1.0 - 0.1 * i;
+                            angleRepeatCount += Math.Max(1.0 - 0.1 * i, 0.0);
                     }
                 }
 
