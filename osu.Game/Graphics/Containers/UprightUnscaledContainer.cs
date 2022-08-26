@@ -14,8 +14,7 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class UprightAspectMaintainingContainer : Container
     {
-        protected override Container<Drawable> Content => content;
-        private readonly Container content;
+        protected override Container<Drawable> Content { get; }
 
         /// <summary>
         /// Controls how much this container scales compared to its parent (default is 1.0f).
@@ -27,13 +26,13 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public ScaleMode Scaling { get; set; } = ScaleMode.Vertical;
 
+        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawInfo, InvalidationSource.Parent);
+
         public UprightAspectMaintainingContainer()
         {
-            InternalChild = content = new GrowToFitContainer();
+            AddInternal(Content = new GrowToFitContainer());
             AddLayout(layout);
         }
-
-        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawInfo, InvalidationSource.Parent);
 
         protected override void Update()
         {
