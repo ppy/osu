@@ -55,11 +55,13 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     AutoSizeAxes = Axes.Both,
-                    Child = new UprightUnscaledContainer
+                    Child = new UprightUnstretchedContainer
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
+                        Scaling = ScaleMode.Vertical,
+                        ScalingFactor = 0.5f,
                         Child = timeCurrent = new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
@@ -74,11 +76,13 @@ namespace osu.Game.Screens.Play.HUD
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Child = new UprightUnscaledContainer
+                    Child = new UprightUnstretchedContainer
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
+                        Scaling = ScaleMode.Vertical,
+                        ScalingFactor = 0.5f,
                         Child = progress = new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
@@ -93,11 +97,13 @@ namespace osu.Game.Screens.Play.HUD
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     AutoSizeAxes = Axes.Both,
-                    Child = new UprightUnscaledContainer
+                    Child = new UprightUnstretchedContainer
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
+                        Scaling = ScaleMode.Vertical,
+                        ScalingFactor = 0.5f,
                         Child = timeLeft = new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
