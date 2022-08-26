@@ -7,6 +7,7 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double min_velocity = 0.5;
         private const double slider_multiplier = 1.3;
 
-        private const double min_grid_multiplier = 0.35;
+        private const double min_angle_multiplier = 0.2;
 
         /// <summary>
         /// Evaluates the difficulty of memorising and hitting an object, based on:
@@ -46,6 +47,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             OsuDifficultyHitObject lastObj = osuCurrent;
 
+            int angleRepeatCount = 0;
+
+            // We want to round angles to make abusing the nerf a bit harder.
+            double initialRoundedAngle = 0.0;
+            if (osuCurrent.Angle != null)
+                initialRoundedAngle = Math.Round(MathUtils.RadiansToDegrees(osuCurrent.Angle.Value) / 2.0) * 2.0;
+
             // This is iterating backwards in time from the current object.
             for (int i = 0; i < Math.Min(current.Index, 10); i++)
             {
@@ -69,6 +77,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.OpacityAt(currentHitObject.StartTime, hidden));
 
                     result += stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
+
+                    if (currentObj.Angle != null && osuCurrent.Angle != null) {
+                        double roundedAngle = Math.Round(MathUtils.RadiansToDegrees(currentObj.Angle.Value) / 2.0) * 2.0;
+                        
+                        if (roundedAngle == initialRoundedAngle)
+                            angleRepeatCount++;
+                    }
                 }
 
                 lastObj = currentObj;
@@ -80,15 +95,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (hidden)
                 result *= 1.0 + hidden_bonus;
 
-            // Nerf patterns with angles that are commonly used in grid maps.
-            // 0 deg, 60 deg, 120 deg and 180 deg are commonly used in hexgrid maps.
-            // 0 deg, 45 deg, 90 deg, 135 deg and 180 deg are commonly used in squaregrid maps.
-            if (osuCurrent.Angle != null)
-            {
-                double hexgridMultiplier = 1.0 - Math.Pow(Math.Cos((180 / 60.0) * (double)(osuCurrent.Angle)), 20.0);
-                double squaregridMultiplier = 1.0 - Math.Pow(Math.Cos((180 / 45.0) * (double)(osuCurrent.Angle)), 20.0);
-                result *= (1.0 - min_grid_multiplier) * hexgridMultiplier * squaregridMultiplier + min_grid_multiplier;
-            }
+            // Nerf patterns with repeated angles.
+            result *= min_angle_multiplier + (1.0 - min_angle_multiplier) / (angleRepeatCount + 1.0);
 
             double sliderBonus = 0.0;
 
