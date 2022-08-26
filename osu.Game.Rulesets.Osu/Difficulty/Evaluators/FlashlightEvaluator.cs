@@ -7,7 +7,6 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
