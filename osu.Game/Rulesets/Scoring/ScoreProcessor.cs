@@ -128,8 +128,7 @@ namespace osu.Game.Rulesets.Scoring
         private bool beatmapApplied;
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
-
-        private Dictionary<HitResult, int>? maximumResultCounts;
+        private readonly Dictionary<HitResult, int> maximumResultCounts = new Dictionary<HitResult, int>();
 
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
@@ -405,8 +404,6 @@ namespace osu.Game.Rulesets.Scoring
             return ScoreRank.D;
         }
 
-        public int GetStatistic(HitResult result) => scoreResultCounts.GetValueOrDefault(result);
-
         /// <summary>
         /// Resets this ScoreProcessor to a default state.
         /// </summary>
@@ -421,7 +418,9 @@ namespace osu.Game.Rulesets.Scoring
             if (storeResults)
             {
                 maximumScoringValues = currentScoringValues;
-                maximumResultCounts = new Dictionary<HitResult, int>(scoreResultCounts);
+
+                maximumResultCounts.Clear();
+                maximumResultCounts.AddRange(scoreResultCounts);
             }
 
             scoreResultCounts.Clear();
@@ -449,7 +448,10 @@ namespace osu.Game.Rulesets.Scoring
             score.HitEvents = hitEvents;
 
             foreach (var result in HitResultExtensions.ALL_TYPES)
-                score.Statistics[result] = GetStatistic(result);
+                score.Statistics[result] = scoreResultCounts.GetValueOrDefault(result);
+
+            foreach (var result in HitResultExtensions.ALL_TYPES)
+                score.MaximumStatistics[result] = maximumResultCounts.GetValueOrDefault(result);
 
             // Populate total score after everything else.
             score.TotalScore = (long)Math.Round(ComputeFinalScore(ScoringMode.Standardised, score));
@@ -534,6 +536,9 @@ namespace osu.Game.Rulesets.Scoring
         {
             extractScoringValues(scoreInfo.Statistics, out current, out maximum);
             current.MaxCombo = scoreInfo.MaxCombo;
+
+            if (scoreInfo.MaximumStatistics.Count > 0)
+                extractScoringValues(scoreInfo.MaximumStatistics, out _, out maximum);
         }
 
         /// <summary>
@@ -589,7 +594,8 @@ namespace osu.Game.Rulesets.Scoring
 
                 if (result.IsBonus())
                     current.BonusScore += count * Judgement.ToNumericResult(result);
-                else
+
+                if (result.AffectsAccuracy())
                 {
                     // The maximum result of this judgement if it wasn't a miss.
                     // E.g. For a GOOD judgement, the max result is either GREAT/PERFECT depending on which one the ruleset uses (osu!: GREAT, osu!mania: PERFECT).

@@ -37,8 +37,6 @@ namespace osu.Game.Overlays.Mods
 
             Title = preset.Value.Name;
             Description = preset.Value.Description;
-
-            Action = toggleRequestedByUser;
         }
 
         [BackgroundDependencyLoader]
@@ -54,15 +52,19 @@ namespace osu.Game.Overlays.Mods
             selectedMods.BindValueChanged(_ => selectedModsChanged(), true);
         }
 
-        private void toggleRequestedByUser()
+        protected override void Select()
         {
-            // if the preset is not active at the point of the user click, then set the mods using the preset directly, discarding any previous selections.
+            // if the preset is not active at the point of the user click, then set the mods using the preset directly, discarding any previous selections,
+            // which will also have the side effect of activating the preset (see `updateActiveState()`).
+            selectedMods.Value = Preset.Value.Mods.ToArray();
+        }
+
+        protected override void Deselect()
+        {
             // if the preset is active when the user has clicked it, then it means that the set of active mods is exactly equal to the set of mods in the preset
             // (there are no other active mods than what the preset specifies, and the mod settings match exactly).
             // therefore it's safe to just clear selected mods, since it will have the effect of toggling the preset off.
-            selectedMods.Value = !Active.Value
-                ? Preset.Value.Mods.ToArray()
-                : Array.Empty<Mod>();
+            selectedMods.Value = Array.Empty<Mod>();
         }
 
         private void selectedModsChanged()
