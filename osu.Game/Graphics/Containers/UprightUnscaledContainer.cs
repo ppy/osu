@@ -10,9 +10,9 @@ using System;
 namespace osu.Game.Graphics.Containers
 {
     /// <summary>
-    /// A container that prevents itself and its children from getting rotated, scaled or flipped with its Parent.
+    /// A container that reverts any rotation (and optionally scale) applied by its direct parent.
     /// </summary>
-    public class UprightUnstretchedContainer : Container
+    public class UprightAspectMaintainingContainer : Container
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -20,16 +20,15 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Controls how much this container scales compared to its parent (default is 1.0f).
         /// </summary>
-        public float ScalingFactor { get; set; }
+        public float ScalingFactor { get; set; } = 1;
 
         /// <summary>
         /// Controls the scaling of this container.
         /// </summary>
-        public ScaleMode Scaling { get; set; }
+        public ScaleMode Scaling { get; set; } = ScaleMode.Vertical;
 
-        public UprightUnstretchedContainer()
+        public UprightAspectMaintainingContainer()
         {
-            Scaling = ScaleMode.NoScaling;
             InternalChild = content = new GrowToFitContainer();
             AddLayout(layout);
         }
@@ -52,7 +51,7 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         private void keepUprightAndUnstretched()
         {
-            // Decomposes the inverse of the parent FrawInfo.Matrix into rotation, shear and scale.
+            // Decomposes the inverse of the parent DrawInfo.Matrix into rotation, shear and scale.
             var parentMatrix = Parent.DrawInfo.Matrix;
 
             // Remove Translation.
@@ -130,14 +129,12 @@ namespace osu.Game.Graphics.Containers
         NoScaling,
 
         /// <summary>
-        /// Scale This container (vertically and horizontally) with the vertical axis of its parent
-        /// preserving the aspect ratio of the container.
+        /// Scale uniformly (maintaining aspect ratio) based on the vertical scale of the parent.
         /// </summary>
         Vertical,
 
         /// <summary>
-        /// Scales This container (vertically and horizontally) with the horizontal axis of its parent
-        /// preserving the aspect ratio of the container.
+        /// Scale uniformly (maintaining aspect ratio) based on the horizontal scale of the parent.
         /// </summary>
         Horizontal,
     }
