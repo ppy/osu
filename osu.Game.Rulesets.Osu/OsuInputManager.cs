@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuInputManager : RulesetInputManager<OsuAction>
     {
+        private const int tap_touches_limit = 2;
+
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
         public bool AllowUserPresses
@@ -30,7 +32,7 @@ namespace osu.Game.Rulesets.Osu
         /// </summary>
         public bool AllowUserCursorMovement { get; set; } = true;
 
-        private List<TouchSource> allTapTouchSources = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().ToList();
+        private readonly List<TouchSource> allTapTouchSources = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().ToList();
 
         protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
@@ -55,13 +57,12 @@ namespace osu.Game.Rulesets.Osu
 
         protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
-            int tapTouchesLimit = 2;
             var source = e.Touch.Source;
 
             var cursorTouch = CurrentState.Touch.ActiveSources.Any() ? CurrentState.Touch.ActiveSources.First() : source;
 
             var activeTapTouches = AllowUserCursorMovement ? CurrentState.Touch.ActiveSources.Skip(1) : CurrentState.Touch.ActiveSources;
-            var limitedActiveTapTouches = activeTapTouches.Take(tapTouchesLimit);
+            var limitedActiveTapTouches = activeTapTouches.Take(tap_touches_limit);
 
             bool isTapTouch = activeTapTouches.Contains(source);
 
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Osu
             if (isTapTouch && !limitedActiveTapTouches.Contains(source))
                 return false;
 
-            bool dragMode = limitedActiveTapTouches.Count() >= tapTouchesLimit;
+            bool dragMode = limitedActiveTapTouches.Count() >= tap_touches_limit;
 
             var newActiveTapActions = limitedActiveTapTouches.Select(s => getActionForTouchSource(s));
             var newInactiveTapActions = PressedActions.Where(a => !newActiveTapActions.Contains(a)).ToList();
