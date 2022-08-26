@@ -39,10 +39,10 @@ namespace osu.Game.Screens.Play.HUD
             set => endTime = value;
         }
 
-        private GameplayClock gameplayClock;
+        private IGameplayClock gameplayClock;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, GameplayClock clock)
+        private void load(OsuColour colours, IGameplayClock clock)
         {
             if (clock != null)
                 gameplayClock = clock;

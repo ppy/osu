@@ -4,6 +4,7 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,6 +12,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -77,8 +79,8 @@ namespace osu.Game.Screens.Edit.Setup
         {
             public SetupScreenTitle()
             {
-                Title = "beatmap setup";
-                Description = "change general settings of your beatmap";
+                Title = EditorSetupStrings.BeatmapSetup.ToLower();
+                Description = EditorSetupStrings.BeatmapSetupDescription;
                 IconTexture = "Icons/Hexacons/social";
             }
         }

@@ -10,6 +10,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -23,6 +24,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -231,6 +233,8 @@ namespace osu.Game.Screens.Edit
 
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
             dependencies.CacheAs(editorBeatmap);
+
+            editorBeatmap.UpdateInProgress.BindValueChanged(updateInProgress);
 
             canSave = editorBeatmap.BeatmapInfo.Ruleset.CreateInstance() is ILegacyRuleset;
 
@@ -713,6 +717,27 @@ namespace osu.Game.Screens.Edit
             this.Exit();
         }
 
+        #region Mute from update application
+
+        private ScheduledDelegate temporaryMuteRestorationDelegate;
+        private bool temporaryMuteFromUpdateInProgress;
+
+        private void updateInProgress(ValueChangedEvent<bool> obj)
+        {
+            temporaryMuteFromUpdateInProgress = true;
+            updateSampleDisabledState();
+
+            // Debounce is arbitrarily high enough to avoid flip-flopping the value each other frame.
+            temporaryMuteRestorationDelegate?.Cancel();
+            temporaryMuteRestorationDelegate = Scheduler.AddDelayed(() =>
+            {
+                temporaryMuteFromUpdateInProgress = false;
+                updateSampleDisabledState();
+            }, 50);
+        }
+
+        #endregion
+
         #region Clipboard support
 
         private EditorMenuItem cutMenuItem;
@@ -828,7 +853,9 @@ namespace osu.Game.Screens.Edit
 
         private void updateSampleDisabledState()
         {
-            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value || !(currentScreen is ComposeScreen);
+            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value
+                                           || currentScreen is not ComposeScreen
+                                           || temporaryMuteFromUpdateInProgress;
         }
 
         private void seek(UIEvent e, int direction)
@@ -949,7 +976,7 @@ namespace osu.Game.Screens.Edit
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => editorBeatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => clock;
-        ChannelAmplitudes? IBeatSyncProvider.Amplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : null;
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => Beatmap.Value.TrackLoaded ? Beatmap.Value.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
 
         private class BeatmapEditorToast : Toast
         {
