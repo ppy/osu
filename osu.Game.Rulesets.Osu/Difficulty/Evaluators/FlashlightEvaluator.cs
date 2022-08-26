@@ -49,11 +49,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double angleRepeatCount = 0.0;
 
-            // We want to round angles to make abusing the nerf a bit harder.
-            double initialRoundedAngle = 0.0;
-            if (osuCurrent.Angle != null)
-                initialRoundedAngle = Math.Round(MathUtils.RadiansToDegrees(osuCurrent.Angle.Value) / 2.0) * 2.0;
-
             // This is iterating backwards in time from the current object.
             for (int i = 0; i < Math.Min(current.Index, 10); i++)
             {
@@ -80,10 +75,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     if (currentObj.Angle != null && osuCurrent.Angle != null)
                     {
-                        double roundedAngle = Math.Round(MathUtils.RadiansToDegrees(currentObj.Angle.Value) / 2.0) * 2.0;
-
                         // Objects further back in time should count less for the nerf.
-                        if (roundedAngle == initialRoundedAngle)
+                        if (Math.Abs(currentObj.Angle.Value - osuCurrent.Angle.Value) < 0.02)
                             angleRepeatCount += Math.Max(1.0 - 0.1 * i, 0.0);
                     }
                 }
