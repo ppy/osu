@@ -3,8 +3,10 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -28,6 +30,8 @@ namespace osu.Game.Rulesets.Osu
         /// </summary>
         public bool AllowUserCursorMovement { get; set; } = true;
 
+        private List<TouchSource> allTapTouchSources = new List<TouchSource>();
+
         protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
 
@@ -43,17 +47,63 @@ namespace osu.Game.Rulesets.Osu
             return base.Handle(e);
         }
 
+        private OsuAction getActionForTouchSource(TouchSource source)
+        {
+            int sourceIndex = allTapTouchSources.IndexOf(source);
+            return sourceIndex % 2 == 0 ? OsuAction.RightButton : OsuAction.LeftButton;
+        }
+
         protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
+            var source = e.Touch.Source;
+
             if (!AllowUserCursorMovement)
             {
                 // Still allow for forwarding of the "touch" part, but replace the positional data with that of the mouse.
                 // Primarily relied upon by the "autopilot" osu! mod.
-                var touch = new Touch(e.Touch.Source, CurrentState.Mouse.Position);
+                var touch = new Touch(source, CurrentState.Mouse.Position);
                 e = new TouchStateChangeEvent(e.State, e.Input, touch, e.IsActive, null);
+
+                return base.HandleMouseTouchStateChange(e);
             }
 
-            return base.HandleMouseTouchStateChange(e);
+            int tapTouchesLimit = 2;
+
+            var cursorTouch = CurrentState.Touch.ActiveSources.Any() ? CurrentState.Touch.ActiveSources.First() : source;
+
+            var activeTapTouches = CurrentState.Touch.ActiveSources.Skip(1);
+            var limitedActiveTapTouches = activeTapTouches.Take(tapTouchesLimit);
+
+            bool isTapTouch = activeTapTouches.Contains(source);
+
+            // Limits amount of simultaneous clicks
+            if (isTapTouch && !limitedActiveTapTouches.Contains(source))
+                return false;
+
+            if (isTapTouch && !allTapTouchSources.Contains(source))
+                allTapTouchSources.Add(source);
+
+            bool dragMode = limitedActiveTapTouches.Count() >= tapTouchesLimit;
+
+            var newActiveTapActions = limitedActiveTapTouches.Select(s => getActionForTouchSource(s));
+            var newInactiveTapActions = PressedActions.Where(a => !newActiveTapActions.Contains(a)).ToList();
+
+            foreach (var action in newInactiveTapActions)
+                KeyBindingContainer.TriggerReleased(action);
+
+            if (isTapTouch)
+            {
+                var action = getActionForTouchSource(source);
+                if (!PressedActions.Contains(action))
+                    KeyBindingContainer.TriggerPressed(action);
+            }
+
+            if (dragMode)
+            {
+                e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
+            }
+
+            return source == cursorTouch && base.HandleMouseTouchStateChange(e);
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
