@@ -77,6 +77,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 return sliderCreatedFor(args);
             });
 
+            AddAssert("samples exist", sliderSampleExist);
+
             AddStep("undo", () => Editor.Undo());
             AddAssert("merged objects restored", () => circle1 is not null && circle2 is not null && slider is not null && objectsRestored(circle1, slider, circle2));
         }
@@ -122,6 +124,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 return sliderCreatedFor(args);
             });
 
+            AddAssert("samples exist", sliderSampleExist);
+
             AddAssert("merged slider matches first slider", () =>
             {
                 var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
@@ -164,6 +168,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
                 (pos: circle1.Position, pathType: PathType.Linear),
                 (pos: circle2.Position, pathType: null)));
+
+            AddAssert("samples exist", sliderSampleExist);
 
             AddAssert("spinner not merged", () => EditorBeatmap.HitObjects.Contains(spinner));
         }
@@ -208,6 +214,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             }
 
             return true;
+        }
+
+        private bool sliderSampleExist()
+        {
+            if (EditorBeatmap.SelectedHitObjects.Count != 1)
+                return false;
+
+            var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
+
+            return mergedSlider.Samples[0] is not null;
         }
     }
 }
