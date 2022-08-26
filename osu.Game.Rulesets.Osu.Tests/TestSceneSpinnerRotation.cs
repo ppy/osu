@@ -199,14 +199,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("adjust track rate", () => ((MasterGameplayClockContainer)Player.GameplayClockContainer).UserPlaybackRate.Value = rate);
 
             addSeekStep(1000);
-            AddAssert("progress almost same", () => expectedProgress, () => Is.EqualTo(drawableSpinner.Progress).Within(0.05));
-            AddAssert("spm almost same", () => expectedSpm, () => Is.EqualTo(drawableSpinner.SpinsPerMinute.Value).Within(2.0));
+            AddAssert("progress almost same", () => drawableSpinner.Progress, () => Is.EqualTo(expectedProgress).Within(0.05));
+            AddAssert("spm almost same", () => drawableSpinner.SpinsPerMinute.Value, () => Is.EqualTo(expectedSpm).Within(2.0));
         }
 
         private void addSeekStep(double time)
         {
             AddStep($"seek to {time}", () => Player.GameplayClockContainer.Seek(time));
-            AddUntilStep("wait for seek to finish", () => time, () => Is.EqualTo(Player.DrawableRuleset.FrameStableClock.CurrentTime).Within(100));
+            AddUntilStep("wait for seek to finish", () => Player.DrawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(time).Within(100));
         }
 
         private void transformReplay(Func<Replay, Replay> replayTransformation) => AddStep("set replay", () =>

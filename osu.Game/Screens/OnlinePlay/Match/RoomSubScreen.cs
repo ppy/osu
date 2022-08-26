@@ -485,7 +485,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             if (track != null)
             {
-                Beatmap.Value.PrepareTrackForPreviewLooping();
+                Beatmap.Value.PrepareTrackForPreview(true);
                 music?.EnsurePlayingSomething();
             }
         }

@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Mods
         public virtual ModType Type => ModType.Fun;
 
         [JsonIgnore]
-        public abstract string Description { get; }
+        public abstract LocalisableString Description { get; }
 
         /// <summary>
         /// The tooltip to display for this mod when used in a <see cref="ModIcon"/>.

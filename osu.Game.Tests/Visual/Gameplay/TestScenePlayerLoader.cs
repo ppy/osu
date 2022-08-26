@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -29,6 +30,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Utils;
 using osuTK.Input;
+using SkipOverlay = osu.Game.Screens.Play.SkipOverlay;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -98,7 +100,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void prepareBeatmap()
         {
             var workingBeatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+
+            // Add intro time to test quick retry skipping (TestQuickRetry).
+            workingBeatmap.BeatmapInfo.AudioLeadIn = 60000;
+
+            // Turn on epilepsy warning to test warning display (TestEpilepsyWarning).
             workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
+
             Beatmap.Value = workingBeatmap;
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
@@ -400,6 +408,37 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
+        [Test]
+        public void TestQuickRetry()
+        {
+            TestPlayer getCurrentPlayer() => loader.CurrentPlayer as TestPlayer;
+            bool checkSkipButtonVisible() => player.ChildrenOfType<SkipOverlay>().FirstOrDefault()?.IsButtonVisible == true;
+
+            TestPlayer previousPlayer = null;
+
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+
+            AddUntilStep("wait for current", () => getCurrentPlayer()?.IsCurrentScreen() == true);
+            AddStep("store previous player", () => previousPlayer = getCurrentPlayer());
+
+            AddStep("Restart map normally", () => getCurrentPlayer().Restart());
+            AddUntilStep("wait for load", () => getCurrentPlayer()?.LoadedBeatmapSuccessfully == true);
+
+            AddUntilStep("restart completed", () => getCurrentPlayer() != null && getCurrentPlayer() != previousPlayer);
+            AddStep("store previous player", () => previousPlayer = getCurrentPlayer());
+
+            AddUntilStep("skip button visible", checkSkipButtonVisible);
+
+            AddStep("press quick retry key", () => InputManager.PressKey(Key.Tilde));
+            AddUntilStep("restart completed", () => getCurrentPlayer() != null && getCurrentPlayer() != previousPlayer);
+            AddStep("release quick retry key", () => InputManager.ReleaseKey(Key.Tilde));
+
+            AddUntilStep("wait for player", () => getCurrentPlayer()?.LoadState == LoadState.Ready);
+
+            AddUntilStep("time reached zero", () => getCurrentPlayer()?.GameplayClockContainer.CurrentTime > 0);
+            AddUntilStep("skip button not visible", () => !checkSkipButtonVisible());
+        }
+
         private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();
 
         private class TestPlayerLoader : PlayerLoader
@@ -421,7 +460,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override string Name => string.Empty;
             public override string Acronym => string.Empty;
             public override double ScoreMultiplier => 1;
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
 
             public bool Applied { get; private set; }
 
