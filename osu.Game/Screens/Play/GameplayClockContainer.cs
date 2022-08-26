@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// The adjustable source clock used for gameplay. Should be used for seeks and clock control.
-        /// This is the final clock exposed to gameplay components as an <see cref="IGameplayClock"/>.
+        /// This is the final source exposed to gameplay components <see cref="IGameplayClock"/> via delegation in this class.
         /// </summary>
         protected readonly FramedBeatmapClock GameplayClock;
 
