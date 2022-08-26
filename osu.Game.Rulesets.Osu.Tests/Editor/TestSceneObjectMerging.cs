@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 using osuTK.Input;
-using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
@@ -78,6 +77,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 return sliderCreatedFor(args);
             });
 
+            AddAssert("samples exist", sliderSampleExist);
+
             AddStep("undo", () => Editor.Undo());
             AddAssert("merged objects restored", () => circle1 is not null && circle2 is not null && slider is not null && objectsRestored(circle1, slider, circle2));
         }
@@ -123,6 +124,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 return sliderCreatedFor(args);
             });
 
+            AddAssert("samples exist", sliderSampleExist);
+
             AddAssert("merged slider matches first slider", () =>
             {
                 var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
@@ -166,48 +169,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 (pos: circle1.Position, pathType: PathType.Linear),
                 (pos: circle2.Position, pathType: null)));
 
+            AddAssert("samples exist", sliderSampleExist);
+
             AddAssert("spinner not merged", () => EditorBeatmap.HitObjects.Contains(spinner));
-        }
-
-        [Test]
-        public void TestSimpleMergeSample()
-        {
-            HitCircle? circle1 = null;
-            HitCircle? circle2 = null;
-
-
-            AddStep("select first two circles", () =>
-            {
-                circle1 = (HitCircle)EditorBeatmap.HitObjects.First(h => h is HitCircle);
-                circle2 = (HitCircle)EditorBeatmap.HitObjects.First(h => h is HitCircle && h != circle1);
-                EditorClock.Seek(circle1.StartTime);
-                EditorBeatmap.SelectedHitObjects.Add(circle1);
-                EditorBeatmap.SelectedHitObjects.Add(circle2);
-            });
-
-            mergeSelection();
-
-            AddAssert("samples exist", () => sliderSampleExist());
-        }
-
-        [Test]
-        public void TestSliderCircleMergeSample()
-        {
-            Slider? slider = null;
-            HitCircle? circle = null;
-
-            AddStep("select a slider followed by a circle", () =>
-            {
-                slider = (Slider)EditorBeatmap.HitObjects.First(h => h is Slider);
-                circle = (HitCircle)EditorBeatmap.HitObjects.First(h => h is HitCircle && h.StartTime > slider.StartTime);
-                EditorClock.Seek(slider.StartTime);
-                EditorBeatmap.SelectedHitObjects.Add(slider);
-                EditorBeatmap.SelectedHitObjects.Add(circle);
-            });
-
-            mergeSelection();
-
-            AddAssert("samples exist", () => sliderSampleExist());
         }
 
         private void mergeSelection()
@@ -259,10 +223,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
 
-            if (mergedSlider.Samples[0] is null)
-                return false;
-
-            return true;
+            return mergedSlider.Samples[0] is not null;
         }
     }
 }
