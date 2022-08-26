@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
@@ -19,15 +21,16 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
     public class TestSceneJuiceStreamPlacementBlueprint : CatchPlacementBlueprintTestScene
     {
-        private const double velocity = 0.5;
+        private const double velocity_factor = 0.5;
 
         private JuiceStream lastObject => LastObject?.HitObject as JuiceStream;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override IBeatmap GetPlayableBeatmap()
         {
-            Beatmap.Value.BeatmapInfo.BaseDifficulty.SliderTickRate = 5;
-            Beatmap.Value.BeatmapInfo.BaseDifficulty.SliderMultiplier = velocity * 10;
+            var playable = base.GetPlayableBeatmap();
+            playable.Difficulty.SliderTickRate = 5;
+            playable.Difficulty.SliderMultiplier = velocity_factor * 10;
+            return playable;
         }
 
         [Test]
@@ -42,6 +45,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddAssert("end time is correct", () => Precision.AlmostEquals(lastObject.EndTime, times[1]));
             AddAssert("start position is correct", () => Precision.AlmostEquals(lastObject.OriginalX, positions[0]));
             AddAssert("end position is correct", () => Precision.AlmostEquals(lastObject.EndX, positions[1]));
+            AddAssert("default slider velocity", () => lastObject.DifficultyControlPoint.SliderVelocityBindable.IsDefault);
         }
 
         [Test]
@@ -65,28 +69,21 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         }
 
         [Test]
-        public void TestVelocityLimit()
+        public void TestSliderVelocityChange()
         {
             double[] times = { 100, 300 };
             float[] positions = { 200, 500 };
             addPlacementSteps(times, positions);
-            addPathCheckStep(times, new float[] { 200, 300 });
-        }
+            addPathCheckStep(times, positions);
 
-        [Test]
-        public void TestPreviousVerticesAreFixed()
-        {
-            double[] times = { 100, 300, 500, 700 };
-            float[] positions = { 200, 400, 100, 500 };
-            addPlacementSteps(times, positions);
-            addPathCheckStep(times, new float[] { 200, 300, 200, 300 });
+            AddAssert("slider velocity changed", () => !lastObject.DifficultyControlPoint.SliderVelocityBindable.IsDefault);
         }
 
         [Test]
         public void TestClampedPositionIsRestored()
         {
             double[] times = { 100, 300, 500 };
-            float[] positions = { 200, 200, 0, 250 };
+            float[] positions = { 200, 200, -3000, 250 };
 
             addMoveAndClickSteps(times[0], positions[0]);
             addMoveAndClickSteps(times[1], positions[1]);
@@ -94,15 +91,6 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             addMoveAndClickSteps(times[2], positions[3], true);
 
             addPathCheckStep(times, new float[] { 200, 200, 250 });
-        }
-
-        [Test]
-        public void TestFirstVertexIsFixed()
-        {
-            double[] times = { 100, 200 };
-            float[] positions = { 100, 300 };
-            addPlacementSteps(times, positions);
-            addPathCheckStep(times, new float[] { 100, 150 });
         }
 
         [Test]

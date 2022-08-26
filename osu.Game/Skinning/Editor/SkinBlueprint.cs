@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -146,8 +148,10 @@ namespace osu.Game.Skinning.Editor
             {
                 anchorLine = new Box
                 {
-                    Colour = Color4.Yellow,
                     Height = 2,
+                    Origin = Anchor.CentreLeft,
+                    Colour = Color4.Yellow,
+                    EdgeSmoothness = Vector2.One
                 },
                 originBox = new Box
                 {

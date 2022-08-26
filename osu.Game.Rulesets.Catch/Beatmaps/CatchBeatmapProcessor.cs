@@ -1,14 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -46,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         public void ApplyPositionOffsets(IBeatmap beatmap)
         {
-            var rng = new FastRandom(RNG_SEED);
+            var rng = new LegacyRandom(RNG_SEED);
 
             float? lastPosition = null;
             double lastStartTime = 0;
@@ -98,7 +100,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             initialiseHyperDash(beatmap);
         }
 
-        private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, FastRandom rng)
+        private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, LegacyRandom rng)
         {
             float offsetPosition = hitObject.OriginalX;
             double startTime = hitObject.StartTime;
@@ -146,7 +148,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
         /// <param name="position">The position which the offset should be applied to.</param>
         /// <param name="maxOffset">The maximum offset, cannot exceed 20px.</param>
         /// <param name="rng">The random number generator.</param>
-        private static void applyRandomOffset(ref float position, double maxOffset, FastRandom rng)
+        private static void applyRandomOffset(ref float position, double maxOffset, LegacyRandom rng)
         {
             bool right = rng.NextBool();
             float rand = Math.Min(20, (float)rng.Next(0, Math.Max(0, maxOffset)));
@@ -211,7 +213,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             palpableObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
-            double halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) / 2;
+            double halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.Difficulty) / 2;
 
             // Todo: This is wrong. osu!stable calculated hyperdashes using the full catcher size, excluding the margins.
             // This should theoretically cause impossible scenarios, but practically, likely due to the size of the playfield, it doesn't seem possible.
@@ -233,7 +235,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 int thisDirection = nextObject.EffectiveX > currentObject.EffectiveX ? 1 : -1;
                 double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
                 double distanceToNext = Math.Abs(nextObject.EffectiveX - currentObject.EffectiveX) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
-                float distanceToHyper = (float)(timeToNext * Catcher.BASE_SPEED - distanceToNext);
+                float distanceToHyper = (float)(timeToNext * Catcher.BASE_DASH_SPEED - distanceToNext);
 
                 if (distanceToHyper < 0)
                 {

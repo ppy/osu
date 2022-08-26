@@ -1,15 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 
@@ -34,16 +36,18 @@ namespace osu.Game.Skinning
 
         protected virtual bool AllowTextureLookup(string componentName) => true;
 
-        protected virtual bool AllowSampleLookup(ISampleInfo componentName) => true;
+        protected virtual bool AllowSampleLookup(ISampleInfo sampleInfo) => true;
 
         protected virtual bool AllowConfigurationLookup => true;
 
         protected virtual bool AllowColourLookup => true;
 
+        private readonly object sourceSetLock = new object();
+
         /// <summary>
         /// A dictionary mapping each <see cref="ISkin"/> source to a wrapper which handles lookup allowances.
         /// </summary>
-        private readonly List<(ISkin skin, DisableableSkinSource wrapped)> skinSources = new List<(ISkin, DisableableSkinSource)>();
+        private (ISkin skin, DisableableSkinSource wrapped)[] skinSources = Array.Empty<(ISkin skin, DisableableSkinSource wrapped)>();
 
         /// <summary>
         /// Constructs a new <see cref="SkinProvidingContainer"/> initialised with a single skin source.
@@ -52,7 +56,7 @@ namespace osu.Game.Skinning
             : this()
         {
             if (skin != null)
-                AddSource(skin);
+                SetSources(new[] { skin });
         }
 
         /// <summary>
@@ -168,49 +172,42 @@ namespace osu.Game.Skinning
         }
 
         /// <summary>
-        /// Add a new skin to this provider. Will be added to the end of the lookup order precedence.
+        /// Replace the sources used for lookups in this container.
         /// </summary>
-        /// <param name="skin">The skin to add.</param>
-        protected void AddSource(ISkin skin)
+        /// <remarks>
+        /// This does not implicitly fire a <see cref="SourceChanged"/> event. Consider calling <see cref="TriggerSourceChanged"/> if required.
+        /// </remarks>
+        /// <param name="sources">The new sources.</param>
+        protected void SetSources(IEnumerable<ISkin> sources)
         {
-            skinSources.Add((skin, new DisableableSkinSource(skin, this)));
+            lock (sourceSetLock)
+            {
+                foreach (var skin in skinSources)
+                {
+                    if (skin.skin is ISkinSource source)
+                        source.SourceChanged -= TriggerSourceChanged;
+                }
 
-            if (skin is ISkinSource source)
-                source.SourceChanged += TriggerSourceChanged;
+                skinSources = sources.Select(skin => (skin, new DisableableSkinSource(skin, this))).ToArray();
+
+                foreach (var skin in skinSources)
+                {
+                    if (skin.skin is ISkinSource source)
+                        source.SourceChanged += TriggerSourceChanged;
+                }
+            }
         }
 
         /// <summary>
-        /// Remove a skin from this provider.
-        /// </summary>
-        /// <param name="skin">The skin to remove.</param>
-        protected void RemoveSource(ISkin skin)
-        {
-            if (skinSources.RemoveAll(s => s.skin == skin) == 0)
-                return;
-
-            if (skin is ISkinSource source)
-                source.SourceChanged -= TriggerSourceChanged;
-        }
-
-        /// <summary>
-        /// Clears all skin sources.
-        /// </summary>
-        protected void ResetSources()
-        {
-            foreach (var i in skinSources.ToArray())
-                RemoveSource(i.skin);
-        }
-
-        /// <summary>
-        /// Invoked when any source has changed (either <see cref="ParentSource"/> or a source registered via <see cref="AddSource"/>).
+        /// Invoked after any consumed source change, before the external <see cref="SourceChanged"/> event is fired.
         /// This is also invoked once initially during <see cref="CreateChildDependencies"/> to ensure sources are ready for children consumption.
         /// </summary>
-        protected virtual void OnSourceChanged() { }
+        protected virtual void RefreshSources() { }
 
         protected void TriggerSourceChanged()
         {
             // Expose to implementations, giving them a chance to react before notifying external consumers.
-            OnSourceChanged();
+            RefreshSources();
 
             SourceChanged?.Invoke();
         }
@@ -271,9 +268,9 @@ namespace osu.Game.Skinning
             {
                 switch (lookup)
                 {
-                    case GlobalSkinColours _:
-                    case SkinComboColourLookup _:
-                    case SkinCustomColourLookup _:
+                    case GlobalSkinColours:
+                    case SkinComboColourLookup:
+                    case SkinCustomColourLookup:
                         if (provider.AllowColourLookup)
                             return skin.GetConfig<TLookup, TValue>(lookup);
 

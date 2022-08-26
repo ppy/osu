@@ -1,7 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -17,19 +21,29 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class MultiplayerMatchSongSelect : OnlinePlaySongSelect
     {
         [Resolved]
-        private MultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; } = null!;
 
-        private LoadingLayer loadingLayer;
+        [Resolved]
+        private OngoingOperationTracker operationTracker { get; set; } = null!;
+
+        private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
+        private readonly long? itemToEdit;
+
+        private LoadingLayer loadingLayer = null!;
+        private IDisposable? selectionOperation;
 
         /// <summary>
         /// Construct a new instance of multiplayer song select.
         /// </summary>
         /// <param name="room">The room.</param>
+        /// <param name="itemToEdit">The item to be edited. May be null, in which case a new item will be added to the playlist.</param>
         /// <param name="beatmap">An optional initial beatmap selection to perform.</param>
         /// <param name="ruleset">An optional initial ruleset selection to perform.</param>
-        public MultiplayerMatchSongSelect(Room room, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
+        public MultiplayerMatchSongSelect(Room room, long? itemToEdit = null, WorkingBeatmap? beatmap = null, RulesetInfo? ruleset = null)
             : base(room)
         {
+            this.itemToEdit = itemToEdit;
+
             if (beatmap != null || ruleset != null)
             {
                 Schedule(() =>
@@ -46,27 +60,65 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             AddInternal(loadingLayer = new LoadingLayer(true));
         }
 
-        protected override void SelectItem(PlaylistItem item)
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
+            operationInProgress.BindTo(operationTracker.InProgress);
+            operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
+        }
+
+        private void updateLoadingLayer()
+        {
+            if (operationInProgress.Value)
+                loadingLayer.Show();
+            else
+                loadingLayer.Hide();
+        }
+
+        protected override bool SelectItem(PlaylistItem item)
+        {
+            if (operationInProgress.Value)
+            {
+                Logger.Log($"{nameof(SelectedItem)} aborted due to {nameof(operationInProgress)}");
+                return false;
+            }
+
             // If the client is already in a room, update via the client.
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
             if (client.Room != null)
             {
-                loadingLayer.Show();
+                selectionOperation = operationTracker.BeginOperation();
 
-                client.ChangeSettings(item: item).ContinueWith(t =>
+                var multiplayerItem = new MultiplayerPlaylistItem
                 {
+                    ID = itemToEdit ?? 0,
+                    BeatmapID = item.Beatmap.OnlineID,
+                    BeatmapChecksum = item.Beatmap.MD5Hash,
+                    RulesetID = item.RulesetID,
+                    RequiredMods = item.RequiredMods.ToArray(),
+                    AllowedMods = item.AllowedMods.ToArray()
+                };
+
+                Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
+
+                task.FireAndForget(onSuccess: () =>
+                {
+                    selectionOperation.Dispose();
+
                     Schedule(() =>
                     {
-                        loadingLayer.Hide();
-
-                        if (t.IsCompletedSuccessfully)
+                        // If an error or server side trigger occurred this screen may have already exited by external means.
+                        if (this.IsCurrentScreen())
                             this.Exit();
-                        else
-                        {
-                            Logger.Log($"Could not use current beatmap ({t.Exception?.Message})", level: LogLevel.Important);
-                            Carousel.AllowSelection = true;
-                        }
+                    });
+                }, onError: _ =>
+                {
+                    selectionOperation.Dispose();
+
+                    Schedule(() =>
+                    {
+                        Carousel.AllowSelection = true;
                     });
                 });
             }
@@ -76,10 +128,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Playlist.Add(item);
                 this.Exit();
             }
+
+            return true;
         }
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
-        protected override bool IsValidFreeMod(Mod mod) => base.IsValidFreeMod(mod) && !(mod is ModTimeRamp) && !(mod is ModRateAdjust);
+        protected override bool IsValidMod(Mod mod) => base.IsValidMod(mod) && mod.ValidForMultiplayer;
+
+        protected override bool IsValidFreeMod(Mod mod) => base.IsValidFreeMod(mod) && mod.ValidForMultiplayerAsFreeMod;
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -8,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
@@ -52,7 +55,7 @@ namespace osu.Game.Screens.Edit.Verify
                             if (issue.Time != null)
                             {
                                 clock.Seek(issue.Time.Value);
-                                editor.OnPressed(GlobalAction.EditorComposeMode);
+                                editor.OnPressed(new KeyBindingPressEvent<GlobalAction>(GetContainingInputManager().CurrentState, GlobalAction.EditorComposeMode));
                             }
 
                             if (!issue.HitObjects.Any())

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -10,8 +12,8 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly long userId;
 
-        public GetUserRecentActivitiesRequest(long userId, int page = 0, int itemsPerPage = 5)
-            : base(page, itemsPerPage)
+        public GetUserRecentActivitiesRequest(long userId, PaginationParameters pagination)
+            : base(pagination)
         {
             this.userId = userId;
         }
@@ -22,6 +24,8 @@ namespace osu.Game.Online.API.Requests
     public enum RecentActivityType
     {
         Achievement,
+
+        // ReSharper disable once IdentifierTypo
         BeatmapPlaycount,
         BeatmapsetApprove,
         BeatmapsetDelete,

@@ -10,15 +10,15 @@ using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK.Graphics;
@@ -27,12 +27,6 @@ namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
-        [CanBeNull]
-        protected TextureStore Textures;
-
-        [CanBeNull]
-        protected ISampleStore Samples;
-
         /// <summary>
         /// Whether texture for the keys exists.
         /// Used to determine if the mania ruleset is skinned.
@@ -47,17 +41,11 @@ namespace osu.Game.Skinning
         /// </summary>
         protected virtual bool UseCustomSampleBanks => false;
 
-        public new LegacySkinConfiguration Configuration
-        {
-            get => base.Configuration as LegacySkinConfiguration;
-            set => base.Configuration = value;
-        }
-
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
-            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
+            : this(skin, resources, null)
         {
         }
 
@@ -65,52 +53,34 @@ namespace osu.Game.Skinning
         /// Construct a new legacy skin instance.
         /// </summary>
         /// <param name="skin">The model for this skin.</param>
-        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
         /// <param name="resources">Access to raw game resources.</param>
+        /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
         /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
-            : base(skin, resources)
+        protected LegacySkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage, string configurationFilename = @"skin.ini")
+            : base(skin, resources, storage, configurationFilename)
         {
-            using (var stream = storage?.GetStream(configurationFilename))
-            {
-                if (stream != null)
-                {
-                    using (LineBufferedReader reader = new LineBufferedReader(stream, true))
-                        Configuration = new LegacySkinDecoder().Decode(reader);
-
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    using (LineBufferedReader reader = new LineBufferedReader(stream))
-                    {
-                        var maniaList = new LegacyManiaSkinDecoder().Decode(reader);
-
-                        foreach (var config in maniaList)
-                            maniaConfigurations[config.Keys] = config;
-                    }
-                }
-                else
-                    Configuration = new LegacySkinConfiguration();
-            }
-
-            if (storage != null)
-            {
-                var samples = resources?.AudioManager?.GetSampleStore(storage);
-                if (samples != null)
-                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
-
-                Samples = samples;
-                Textures = new TextureStore(resources?.CreateTextureLoaderStore(storage));
-
-                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
-            }
-
             // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
             hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
                 lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
                 true) != null);
         }
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        protected override void ParseConfigurationStream(Stream stream)
+        {
+            base.ParseConfigurationStream(stream);
+
+            stream.Seek(0, SeekOrigin.Begin);
+
+            using (LineBufferedReader reader = new LineBufferedReader(stream))
+            {
+                var maniaList = new LegacyManiaSkinDecoder().Decode(reader);
+
+                foreach (var config in maniaList)
+                    maniaConfigurations[config.Keys] = config;
+            }
+        }
+
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
             {
@@ -146,7 +116,7 @@ namespace osu.Game.Skinning
 
                     break;
 
-                case LegacySkinConfiguration.LegacySetting legacy:
+                case SkinConfiguration.LegacySetting legacy:
                     return legacySettingLookup<TValue>(legacy);
 
                 default:
@@ -156,7 +126,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private IBindable<TValue> lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
+        private IBindable<TValue>? lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
         {
             if (!maniaConfigurations.TryGetValue(maniaLookup.Keys, out var existing))
                 maniaConfigurations[maniaLookup.Keys] = existing = new LegacyManiaSkinConfiguration(maniaLookup.Keys);
@@ -189,7 +159,7 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.ExplosionScale:
                     Debug.Assert(maniaLookup.TargetColumn != null);
 
-                    if (GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
                         return SkinUtils.As<TValue>(new Bindable<float>(1));
 
                     if (existing.ExplosionWidth[maniaLookup.TargetColumn.Value] != 0)
@@ -236,7 +206,7 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.HoldNoteLightScale:
                     Debug.Assert(maniaLookup.TargetColumn != null);
 
-                    if (GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
                         return SkinUtils.As<TValue>(new Bindable<float>(1));
 
                     if (existing.HoldNoteLightWidth[maniaLookup.TargetColumn.Value] != 0)
@@ -296,41 +266,47 @@ namespace osu.Game.Skinning
         /// <param name="source">The source to retrieve the combo colours from.</param>
         /// <param name="colourIndex">The preferred index for retrieving the combo colour with.</param>
         /// <param name="combo">Information on the combo whose using the returned colour.</param>
-        protected virtual IBindable<Color4> GetComboColour(IHasComboColours source, int colourIndex, IHasComboInformation combo)
+        protected virtual IBindable<Color4>? GetComboColour(IHasComboColours source, int colourIndex, IHasComboInformation combo)
         {
             var colour = source.ComboColours?[colourIndex % source.ComboColours.Count];
             return colour.HasValue ? new Bindable<Color4>(colour.Value) : null;
         }
 
-        private IBindable<Color4> getCustomColour(IHasCustomColours source, string lookup)
+        private IBindable<Color4>? getCustomColour(IHasCustomColours source, string lookup)
             => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
-        private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
-            => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
+        private IBindable<string>? getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
+            => source.ImageLookups.TryGetValue(lookup, out string image) ? new Bindable<string>(image) : null;
 
-        [CanBeNull]
-        private IBindable<TValue> legacySettingLookup<TValue>(LegacySkinConfiguration.LegacySetting legacySetting)
+        private IBindable<TValue>? legacySettingLookup<TValue>(SkinConfiguration.LegacySetting legacySetting)
+            where TValue : notnull
         {
             switch (legacySetting)
             {
-                case LegacySkinConfiguration.LegacySetting.Version:
-                    return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
+                case SkinConfiguration.LegacySetting.Version:
+                    return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? SkinConfiguration.LATEST_VERSION));
 
                 default:
-                    return genericLookup<LegacySkinConfiguration.LegacySetting, TValue>(legacySetting);
+                    return genericLookup<SkinConfiguration.LegacySetting, TValue>(legacySetting);
             }
         }
 
-        [CanBeNull]
-        private IBindable<TValue> genericLookup<TLookup, TValue>(TLookup lookup)
+        private IBindable<TValue>? genericLookup<TLookup, TValue>(TLookup lookup)
+            where TLookup : notnull
+            where TValue : notnull
         {
             try
             {
-                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
+                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out string val))
                 {
                     // special case for handling skins which use 1 or 0 to signify a boolean state.
+                    // ..or in some cases 2 (https://github.com/ppy/osu/issues/18579).
                     if (typeof(TValue) == typeof(bool))
-                        val = val == "1" ? "true" : "false";
+                    {
+                        val = bool.TryParse(val, out bool boolVal)
+                            ? Convert.ChangeType(boolVal, typeof(bool)).ToString()
+                            : Convert.ChangeType(Convert.ToInt32(val), typeof(bool)).ToString();
+                    }
 
                     var bindable = new Bindable<TValue>();
                     if (val != null)
@@ -345,7 +321,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable? GetDrawableComponent(ISkinComponent component)
         {
             if (base.GetDrawableComponent(component) is Drawable c)
                 return c;
@@ -360,14 +336,21 @@ namespace osu.Game.Skinning
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
-                                var combo = container.OfType<LegacyComboCounter>().FirstOrDefault();
 
                                 if (score != null && accuracy != null)
                                 {
                                     accuracy.Y = container.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight).Y;
                                 }
 
-                                var songProgress = container.OfType<SongProgress>().FirstOrDefault();
+                                var songProgress = container.OfType<LegacySongProgress>().FirstOrDefault();
+
+                                if (songProgress != null && accuracy != null)
+                                {
+                                    songProgress.Anchor = Anchor.TopRight;
+                                    songProgress.Origin = Anchor.CentreRight;
+                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 10;
+                                    songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
+                                }
 
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
 
@@ -377,34 +360,17 @@ namespace osu.Game.Skinning
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
                                 }
-
-                                if (songProgress != null)
-                                {
-                                    if (hitError != null) hitError.Y -= SongProgress.MAX_HEIGHT;
-                                    if (combo != null) combo.Y -= SongProgress.MAX_HEIGHT;
-                                }
                             })
                             {
-                                Children = this.HasFont(LegacyFont.Score)
-                                    ? new Drawable[]
-                                    {
-                                        new LegacyComboCounter(),
-                                        new LegacyScoreCounter(),
-                                        new LegacyAccuracyCounter(),
-                                        new LegacyHealthDisplay(),
-                                        new SongProgress(),
-                                        new BarHitErrorMeter(),
-                                    }
-                                    : new Drawable[]
-                                    {
-                                        // TODO: these should fallback to using osu!classic skin textures, rather than doing this.
-                                        new DefaultComboCounter(),
-                                        new DefaultScoreCounter(),
-                                        new DefaultAccuracyCounter(),
-                                        new DefaultHealthDisplay(),
-                                        new SongProgress(),
-                                        new BarHitErrorMeter(),
-                                    }
+                                Children = new Drawable[]
+                                {
+                                    new LegacyComboCounter(),
+                                    new LegacyScoreCounter(),
+                                    new LegacyAccuracyCounter(),
+                                    new LegacyHealthDisplay(),
+                                    new LegacySongProgress(),
+                                    new BarHitErrorMeter(),
+                                }
                             };
 
                             return skinnableTargetWrapper;
@@ -414,7 +380,7 @@ namespace osu.Game.Skinning
 
                 case GameplaySkinComponent<HitResult> resultComponent:
                     // TODO: this should be inside the judgement pieces.
-                    Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component);
+                    Func<Drawable?> createDrawable = () => getJudgementAnimation(resultComponent.Component);
 
                     // kind of wasteful that we throw this away, but should do for now.
                     if (createDrawable() != null)
@@ -427,13 +393,17 @@ namespace osu.Game.Skinning
                             return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
 
-                    break;
-            }
+                    return null;
 
-            return this.GetAnimation(component.LookupName, false, false);
+                case SkinnableSprite.SpriteComponent sprite:
+                    return this.GetAnimation(sprite.LookupName, false, false);
+
+                default:
+                    throw new UnsupportedSkinComponentException(component);
+            }
         }
 
-        private Texture getParticleTexture(HitResult result)
+        private Texture? getParticleTexture(HitResult result)
         {
             switch (result)
             {
@@ -450,7 +420,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private Drawable getJudgementAnimation(HitResult result)
+        private Drawable? getJudgementAnimation(HitResult result)
         {
             switch (result)
             {
@@ -470,17 +440,24 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
+        public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
-            foreach (var name in getFallbackNames(componentName))
+            foreach (string name in getFallbackNames(componentName))
             {
+                // some component names (especially user-controlled ones, like `HitX` in mania)
+                // may contain `@2x` scale specifications.
+                // stable happens to check for that and strip them, so do the same to match stable behaviour.
+                string lookupName = name.Replace(@"@2x", string.Empty);
+
                 float ratio = 2;
-                var texture = Textures?.Get($"{name}@2x", wrapModeS, wrapModeT);
+                string twoTimesFilename = $"{Path.ChangeExtension(lookupName, null)}@2x{Path.GetExtension(lookupName)}";
+
+                var texture = Textures?.Get(twoTimesFilename, wrapModeS, wrapModeT);
 
                 if (texture == null)
                 {
                     ratio = 1;
-                    texture = Textures?.Get(name, wrapModeS, wrapModeT);
+                    texture = Textures?.Get(lookupName, wrapModeS, wrapModeT);
                 }
 
                 if (texture == null)
@@ -493,7 +470,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override ISample GetSample(ISampleInfo sampleInfo)
+        public override ISample? GetSample(ISampleInfo sampleInfo)
         {
             IEnumerable<string> lookupNames;
 
@@ -504,7 +481,7 @@ namespace osu.Game.Skinning
                 lookupNames = sampleInfo.LookupNames.SelectMany(getFallbackNames);
             }
 
-            foreach (var lookup in lookupNames)
+            foreach (string lookup in lookupNames)
             {
                 var sample = Samples?.Get(lookup);
 
@@ -529,7 +506,7 @@ namespace osu.Game.Skinning
                 lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
             }
 
-            foreach (var l in lookupNames)
+            foreach (string l in lookupNames)
                 yield return l;
 
             // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
@@ -545,13 +522,6 @@ namespace osu.Game.Skinning
 
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             yield return componentName.Split('/').Last();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Textures?.Dispose();
-            Samples?.Dispose();
         }
     }
 }

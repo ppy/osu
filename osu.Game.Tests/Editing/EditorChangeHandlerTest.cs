@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
-using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 
@@ -158,7 +161,13 @@ namespace osu.Game.Tests.Editing
 
         private (EditorChangeHandler, EditorBeatmap) createChangeHandler()
         {
-            var beatmap = new EditorBeatmap(new Beatmap());
+            var beatmap = new EditorBeatmap(new OsuBeatmap
+            {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                },
+            });
 
             var changeHandler = new EditorChangeHandler(beatmap);
 

@@ -15,9 +15,34 @@ namespace osu.Game.Localisation
         public static LocalisableString GameplaySectionHeader => new TranslatableString(getKey(@"gameplay_section_header"), @"Gameplay");
 
         /// <summary>
+        /// "Beatmap"
+        /// </summary>
+        public static LocalisableString BeatmapHeader => new TranslatableString(getKey(@"beatmap_header"), @"Beatmap");
+
+        /// <summary>
         /// "General"
         /// </summary>
         public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"General");
+
+        /// <summary>
+        /// "Audio"
+        /// </summary>
+        public static LocalisableString AudioHeader => new TranslatableString(getKey(@"audio"), @"Audio");
+
+        /// <summary>
+        /// "HUD"
+        /// </summary>
+        public static LocalisableString HUDHeader => new TranslatableString(getKey(@"h_u_d"), @"HUD");
+
+        /// <summary>
+        /// "Input"
+        /// </summary>
+        public static LocalisableString InputHeader => new TranslatableString(getKey(@"input"), @"Input");
+
+        /// <summary>
+        /// "Background"
+        /// </summary>
+        public static LocalisableString BackgroundHeader => new TranslatableString(getKey(@"background"), @"Background");
 
         /// <summary>
         /// "Background dim"
@@ -40,11 +65,6 @@ namespace osu.Game.Localisation
         public static LocalisableString HUDVisibilityMode => new TranslatableString(getKey(@"hud_visibility_mode"), @"HUD overlay visibility mode");
 
         /// <summary>
-        /// "Show difficulty graph on progress bar"
-        /// </summary>
-        public static LocalisableString ShowDifficultyGraph => new TranslatableString(getKey(@"show_difficulty_graph"), @"Show difficulty graph on progress bar");
-
-        /// <summary>
         /// "Show health display even when you can't fail"
         /// </summary>
         public static LocalisableString ShowHealthDisplayWhenCantFail => new TranslatableString(getKey(@"show_health_display_when_cant_fail"), @"Show health display even when you can't fail");
@@ -58,11 +78,6 @@ namespace osu.Game.Localisation
         /// "Always show key overlay"
         /// </summary>
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
-
-        /// <summary>
-        /// "Positional hitsounds"
-        /// </summary>
-        public static LocalisableString PositionalHitsounds => new TranslatableString(getKey(@"positional_hitsounds"), @"Positional hitsounds");
 
         /// <summary>
         /// "Always play first combo break sound"
@@ -88,6 +103,31 @@ namespace osu.Game.Localisation
         /// "Increase visibility of first object when visual impairment mods are enabled"
         /// </summary>
         public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"Increase visibility of first object when visual impairment mods are enabled");
+
+        /// <summary>
+        /// "Hide during gameplay"
+        /// </summary>
+        public static LocalisableString HideDuringGameplay => new TranslatableString(getKey(@"hide_during_gameplay"), @"Hide during gameplay");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString AlwaysShowHUD => new TranslatableString(getKey(@"always_show_hud"), @"Always");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString NeverShowHUD => new TranslatableString(getKey(@"never_show_hud"), @"Never");
+
+        /// <summary>
+        /// "Standardised"
+        /// </summary>
+        public static LocalisableString StandardisedScoreDisplay => new TranslatableString(getKey(@"standardised_score_display"), @"Standardised");
+
+        /// <summary>
+        /// "Classic"
+        /// </summary>
+        public static LocalisableString ClassicScoreDisplay => new TranslatableString(getKey(@"classic_score_display"), @"Classic");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

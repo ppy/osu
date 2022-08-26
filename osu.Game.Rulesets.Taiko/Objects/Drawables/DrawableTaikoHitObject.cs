@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
@@ -76,9 +79,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
 
-        public abstract bool OnPressed(TaikoAction action);
+        public abstract bool OnPressed(KeyBindingPressEvent<TaikoAction> e);
 
-        public virtual void OnReleased(TaikoAction action)
+        public virtual void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
         {
         }
 

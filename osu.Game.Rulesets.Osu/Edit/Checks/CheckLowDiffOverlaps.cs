@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
@@ -47,14 +49,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                 if (!(hitObjects[i + 1] is OsuHitObject nextHitObject) || nextHitObject is Spinner)
                     continue;
 
-                var deltaTime = nextHitObject.StartTime - hitObject.GetEndTime();
+                double deltaTime = nextHitObject.StartTime - hitObject.GetEndTime();
                 if (deltaTime >= hitObject.TimeFadeIn + hitObject.TimePreempt)
                     // The objects are not visible at the same time (without mods), hence skipping.
                     continue;
 
-                var distanceSq = (hitObject.StackedEndPosition - nextHitObject.StackedPosition).LengthSquared;
-                var diameter = (hitObject.Radius - overlap_leniency) * 2;
-                var diameterSq = diameter * diameter;
+                float distanceSq = (hitObject.StackedEndPosition - nextHitObject.StackedPosition).LengthSquared;
+                double diameter = (hitObject.Radius - overlap_leniency) * 2;
+                double diameterSq = diameter * diameter;
 
                 bool areOverlapping = distanceSq < diameterSq;
 

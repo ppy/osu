@@ -1,12 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -15,7 +16,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -25,11 +25,11 @@ namespace osu.Game.Overlays
     [Cached]
     public abstract class SettingsPanel : OsuFocusedOverlayContainer
     {
-        public const float CONTENT_MARGINS = 15;
+        public const float CONTENT_MARGINS = 20;
 
         public const float TRANSITION_LENGTH = 600;
 
-        private const float sidebar_width = Sidebar.DEFAULT_WIDTH;
+        private const float sidebar_width = SettingsSidebar.DEFAULT_WIDTH;
 
         /// <summary>
         /// The width of the settings panel content, excluding the sidebar.
@@ -45,19 +45,14 @@ namespace osu.Game.Overlays
 
         protected override Container<Drawable> Content => ContentContainer;
 
-        protected Sidebar Sidebar;
-        private SidebarButton selectedSidebarButton;
+        protected SettingsSidebar Sidebar;
+        private SidebarIconButton selectedSidebarButton;
 
         public SettingsSectionsContainer SectionsContainer { get; private set; }
 
         private SeekLimitedSearchTextBox searchTextBox;
 
         protected override string PopInSampleName => "UI/settings-pop-in";
-
-        /// <summary>
-        /// Provide a source for the toolbar height.
-        /// </summary>
-        public Func<float> GetToolbarHeight;
 
         private readonly bool showSidebar;
 
@@ -68,6 +63,9 @@ namespace osu.Game.Overlays
         private Task sectionsLoadingTask;
 
         public IBindable<SettingsSection> CurrentSection = new Bindable<SettingsSection>();
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         protected SettingsPanel(bool showSidebar)
         {
@@ -94,7 +92,7 @@ namespace osu.Game.Overlays
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(2, 1), // over-extend to the left for transitions
                         RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.Gray(0.05f),
+                        Colour = colourProvider.Background4,
                         Alpha = 1,
                     },
                     loading = new LoadingLayer
@@ -110,24 +108,30 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = CreateHeader(),
                 SelectedSection = { BindTarget = CurrentSection },
-                FixedHeader = searchTextBox = new SeekLimitedSearchTextBox
+                FixedHeader = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    Width = 0.95f,
-                    Margin = new MarginPadding
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding
                     {
-                        Top = 20,
-                        Bottom = 20
+                        Vertical = 20,
+                        Horizontal = CONTENT_MARGINS
                     },
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Child = searchTextBox = new SeekLimitedSearchTextBox
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                    }
                 },
                 Footer = CreateFooter().With(f => f.Alpha = 0)
             });
 
             if (showSidebar)
             {
-                AddInternal(Sidebar = new Sidebar { Width = sidebar_width });
+                AddInternal(Sidebar = new SettingsSidebar { Width = sidebar_width });
             }
 
             CreateSections()?.ForEach(AddSection);
@@ -161,6 +165,7 @@ namespace osu.Game.Overlays
             Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
 
+            searchTextBox.TakeFocus();
             searchTextBox.HoldFocus = true;
         }
 
@@ -193,10 +198,9 @@ namespace osu.Game.Overlays
             base.UpdateAfterChildren();
 
             ContentContainer.Margin = new MarginPadding { Left = Sidebar?.DrawWidth ?? 0 };
-            Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
-        private const double fade_in_duration = 1000;
+        private const double fade_in_duration = 500;
 
         private void loadSections()
         {
@@ -212,7 +216,6 @@ namespace osu.Game.Overlays
                 loading.Hide();
 
                 searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchTerm = term.NewValue, true);
-                searchTextBox.TakeFocus();
 
                 loadSidebarButtons();
             });
@@ -243,7 +246,7 @@ namespace osu.Game.Overlays
                     if (selectedSidebarButton != null)
                         selectedSidebarButton.Selected = false;
 
-                    selectedSidebarButton = Sidebar.Children.FirstOrDefault(b => b.Section == section.NewValue);
+                    selectedSidebarButton = Sidebar.Children.OfType<SidebarIconButton>().FirstOrDefault(b => b.Section == section.NewValue);
 
                     if (selectedSidebarButton != null)
                         selectedSidebarButton.Selected = true;
@@ -251,11 +254,11 @@ namespace osu.Game.Overlays
             });
         }
 
-        private IEnumerable<SidebarButton> createSidebarButtons()
+        private IEnumerable<SidebarIconButton> createSidebarButtons()
         {
             foreach (var section in SectionsContainer)
             {
-                yield return new SidebarButton
+                yield return new SidebarIconButton
                 {
                     Section = section,
                     Action = () =>
@@ -264,7 +267,7 @@ namespace osu.Game.Overlays
                             return;
 
                         SectionsContainer.ScrollTo(section);
-                        Sidebar.State = ExpandedState.Contracted;
+                        Sidebar.Expanded.Value = false;
                     },
                 };
             }
@@ -283,11 +286,7 @@ namespace osu.Game.Overlays
             public string SearchTerm
             {
                 get => SearchContainer.SearchTerm;
-                set
-                {
-                    SearchContainer.SearchTerm = value;
-                    InvalidateScrollPosition();
-                }
+                set => SearchContainer.SearchTerm = value;
             }
 
             protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
@@ -298,13 +297,16 @@ namespace osu.Game.Overlays
                     Direction = FillDirection.Vertical,
                 };
 
-            public SettingsSectionsContainer()
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
             {
                 HeaderBackground = new Box
                 {
-                    Colour = Color4.Black,
+                    Colour = colourProvider.Background4,
                     RelativeSizeAxes = Axes.Both
                 };
+
+                SearchContainer.FilterCompleted += InvalidateScrollPosition;
             }
 
             protected override void UpdateAfterChildren()

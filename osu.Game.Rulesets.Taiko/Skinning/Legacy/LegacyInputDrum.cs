@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Taiko.Audio;
+using osu.Framework.Input.Events;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -18,13 +20,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     /// </summary>
     internal class LegacyInputDrum : Container
     {
+        private Container content;
         private LegacyHalfDrum left;
         private LegacyHalfDrum right;
-        private Container content;
 
         public LegacyInputDrum()
         {
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
@@ -67,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             // because the right half is flipped, we need to position using width - position to get the true "topleft" origin position
             float negativeScaleAdjust = content.Width / ratio;
 
-            if (skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.1m)
+            if (skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value >= 2.1m)
             {
                 left.Centre.Position = new Vector2(0, taiko_bar_y) * ratio;
                 right.Centre.Position = new Vector2(negativeScaleAdjust - 56, taiko_bar_y) * ratio;
@@ -110,9 +113,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             public readonly Sprite Rim;
             public readonly Sprite Centre;
 
-            [Resolved]
-            private DrumSampleContainer sampleContainer { get; set; }
-
             public LegacyHalfDrum(bool flipped)
             {
                 Masking = true;
@@ -140,20 +140,17 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 Centre.Texture = skin.GetTexture(@"taiko-drum-inner");
             }
 
-            public bool OnPressed(TaikoAction action)
+            public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
                 Drawable target = null;
-                var drumSample = sampleContainer.SampleAt(Time.Current);
 
-                if (action == CentreAction)
+                if (e.Action == CentreAction)
                 {
                     target = Centre;
-                    drumSample.Centre?.Play();
                 }
-                else if (action == RimAction)
+                else if (e.Action == RimAction)
                 {
                     target = Rim;
-                    drumSample.Rim?.Play();
                 }
 
                 if (target != null)
@@ -173,7 +170,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 return false;
             }
 
-            public void OnReleased(TaikoAction action)
+            public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
             {
             }
         }

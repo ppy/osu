@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -208,10 +210,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             if (Match.Round.Value == null) return;
 
-            var instaWinAmount = Match.Round.Value.BestOf.Value / 2;
+            int instantWinAmount = Match.Round.Value.BestOf.Value / 2;
 
             Match.Completed.Value = Match.Round.Value.BestOf.Value > 0
-                                    && (Match.Team1Score.Value + Match.Team2Score.Value >= Match.Round.Value.BestOf.Value || Match.Team1Score.Value > instaWinAmount || Match.Team2Score.Value > instaWinAmount);
+                                    && (Match.Team1Score.Value + Match.Team2Score.Value >= Match.Round.Value.BestOf.Value || Match.Team1Score.Value > instantWinAmount || Match.Team2Score.Value > instantWinAmount);
         }
 
         protected override void LoadComplete()
@@ -243,8 +245,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 foreach (var conditional in Match.ConditionalMatches)
                 {
-                    var team1Match = conditional.Acronyms.Contains(Match.Team1Acronym);
-                    var team2Match = conditional.Acronyms.Contains(Match.Team2Acronym);
+                    bool team1Match = conditional.Acronyms.Contains(Match.Team1Acronym);
+                    bool team2Match = conditional.Acronyms.Contains(Match.Team2Acronym);
 
                     if (team1Match && team2Match)
                         Match.Date.Value = conditional.Date.Value;

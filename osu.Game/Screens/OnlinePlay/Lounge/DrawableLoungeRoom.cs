@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -15,6 +16,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Game.Extensions;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
@@ -52,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private void load(AudioManager audio)
         {
             sampleSelect = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
-            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Submit.GetDescription()}-select");
+            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-select");
 
             AddRangeInternal(new Drawable[]
             {
@@ -83,12 +88,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             base.LoadComplete();
 
-            if (matchingFilter)
-                this.FadeInFromZero(transition_duration);
-            else
-                Alpha = 0;
+            Alpha = matchingFilter ? 1 : 0;
+            selectionBox.Alpha = SelectedRoom.Value == Room ? 1 : 0;
 
-            SelectedRoom.BindValueChanged(updateSelectedRoom, true);
+            SelectedRoom.BindValueChanged(updateSelectedRoom);
         }
 
         private void updateSelectedRoom(ValueChangedEvent<Room> selected)
@@ -101,9 +104,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public bool FilteringActive { get; set; }
 
-        public IEnumerable<string> FilterTerms => new[] { Room.Name.Value };
+        public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Room.Name.Value };
 
-        private bool matchingFilter;
+        private bool matchingFilter = true;
 
         public bool MatchingFilter
         {
@@ -122,22 +125,25 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             }
         }
 
-        public Popover GetPopover() => new PasswordEntryPopover(Room) { JoinRequested = lounge.Join };
+        public Popover GetPopover() => new PasswordEntryPopover(Room);
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
             new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
             {
-                lounge?.Open(Room.DeepClone());
+                lounge?.OpenCopy(Room);
             })
         };
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (SelectedRoom.Value != Room)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Select:
                     TriggerClick();
@@ -147,7 +153,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
@@ -178,47 +184,98 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             private readonly Room room;
 
-            public Action<Room, string> JoinRequested;
+            [Resolved(canBeNull: true)]
+            private LoungeSubScreen lounge { get; set; }
+
+            public override bool HandleNonPositionalInput => true;
+
+            protected override bool BlockNonPositionalInput => true;
 
             public PasswordEntryPopover(Room room)
             {
                 this.room = room;
             }
 
-            private OsuPasswordTextBox passwordTextbox;
+            private OsuPasswordTextBox passwordTextBox;
+            private TriangleButton joinButton;
+            private OsuSpriteText errorText;
+            private Sample sampleJoinFail;
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OsuColour colours, AudioManager audio)
             {
                 Child = new FillFlowContainer
                 {
                     Margin = new MarginPadding(10),
                     Spacing = new Vector2(5),
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
+                    Direction = FillDirection.Vertical,
+                    LayoutDuration = 500,
+                    LayoutEasing = Easing.OutQuint,
                     Children = new Drawable[]
                     {
-                        passwordTextbox = new OsuPasswordTextBox
+                        new FillFlowContainer
                         {
-                            Width = 200,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(5),
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                passwordTextBox = new OsuPasswordTextBox
+                                {
+                                    Width = 200,
+                                    PlaceholderText = "password",
+                                },
+                                joinButton = new TriangleButton
+                                {
+                                    Width = 80,
+                                    Text = "Join Room",
+                                }
+                            }
                         },
-                        new TriangleButton
+                        errorText = new OsuSpriteText
                         {
-                            Width = 80,
-                            Text = "Join Room",
-                            Action = () => JoinRequested?.Invoke(room, passwordTextbox.Text)
-                        }
+                            Colour = colours.Red,
+                        },
                     }
                 };
+
+                sampleJoinFail = audio.Samples.Get(@"UI/password-fail");
+
+                joinButton.Action = performJoin;
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
-                passwordTextbox.OnCommit += (_, __) => JoinRequested?.Invoke(room, passwordTextbox.Text);
+                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(passwordTextBox));
+                passwordTextBox.OnCommit += (_, _) => performJoin();
             }
+
+            private void performJoin()
+            {
+                lounge?.Join(room, passwordTextBox.Text, null, joinFailed);
+                GetContainingInputManager().TriggerFocusContention(passwordTextBox);
+            }
+
+            private void joinFailed(string error) => Schedule(() =>
+            {
+                passwordTextBox.Text = string.Empty;
+
+                GetContainingInputManager().ChangeFocus(passwordTextBox);
+
+                errorText.Text = error;
+                errorText
+                    .FadeIn()
+                    .FlashColour(Color4.White, 200)
+                    .Delay(1000)
+                    .FadeOutFromOne(1000, Easing.In);
+
+                Body.Shake();
+
+                sampleJoinFail?.Play();
+            });
         }
     }
 }

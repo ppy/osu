@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
@@ -8,12 +9,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class TimingControlPoint : ControlPoint
+    public class TimingControlPoint : ControlPoint, IEquatable<TimingControlPoint>
     {
         /// <summary>
         /// The time signature at this control point.
         /// </summary>
-        public readonly Bindable<TimeSignatures> TimeSignatureBindable = new Bindable<TimeSignatures>(TimeSignatures.SimpleQuadruple) { Default = TimeSignatures.SimpleQuadruple };
+        public readonly Bindable<TimeSignature> TimeSignatureBindable = new Bindable<TimeSignature>(TimeSignature.SimpleQuadruple);
 
         /// <summary>
         /// Default length of a beat in milliseconds. Used whenever there is no beatmap or track playing.
@@ -35,7 +36,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The time signature at this control point.
         /// </summary>
-        public TimeSignatures TimeSignature
+        public TimeSignature TimeSignature
         {
             get => TimeSignatureBindable.Value;
             set => TimeSignatureBindable.Value = value;
@@ -68,7 +69,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public double BPM => 60000 / BeatLength;
 
         // Timing points are never redundant as they can change the time signature.
-        public override bool IsRedundant(ControlPoint existing) => false;
+        public override bool IsRedundant(ControlPoint? existing) => false;
 
         public override void CopyFrom(ControlPoint other)
         {
@@ -77,5 +78,16 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             base.CopyFrom(other);
         }
+
+        public override bool Equals(ControlPoint? other)
+            => other is TimingControlPoint otherTimingControlPoint
+               && Equals(otherTimingControlPoint);
+
+        public bool Equals(TimingControlPoint? other)
+            => base.Equals(other)
+               && TimeSignature.Equals(other.TimeSignature)
+               && BeatLength.Equals(other.BeatLength);
+
+        public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), TimeSignature, BeatLength);
     }
 }

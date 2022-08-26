@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => @"Difficulty Adjust";
 
-        public override string Description => @"Override a beatmap's difficulty settings.";
+        public override LocalisableString Description => @"Override a beatmap's difficulty settings.";
 
         public override string Acronym => "DA";
 
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override IconUsage? Icon => FontAwesome.Solid.Hammer;
 
-        public override double ScoreMultiplier => 1.0;
+        public override double ScoreMultiplier => 0.5;
 
         public override bool RequiresConfiguration => true;
 
@@ -79,7 +80,7 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
+        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
         {
         }
 

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -12,8 +14,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -25,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private const int width = 310;
         private const int move_offset = 15;
 
-        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
         private readonly TextFlowContainer text;
         private readonly Box background;
@@ -98,7 +100,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.GreySeafoamDarker;
+            background.Colour = colours.GreySeaFoamDarker;
         }
 
         protected override void LoadComplete()
@@ -107,11 +109,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<User> user)
+        private void onUserChanged(ValueChangedEvent<APIUser> user)
         {
             text.Text = string.Empty;
 
-            var usernames = user.NewValue?.PreviousUsernames;
+            string[] usernames = user.NewValue?.PreviousUsernames;
 
             if (usernames?.Any() ?? false)
             {

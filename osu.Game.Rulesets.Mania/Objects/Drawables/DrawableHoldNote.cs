@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -253,12 +256,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 HoldBrokenTime = Time.Current;
         }
 
-        public bool OnPressed(ManiaAction action)
+        public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
             if (AllJudged)
                 return false;
 
-            if (action != Action.Value)
+            if (e.Action != Action.Value)
                 return false;
 
             // do not run any of this logic when rewinding, as it inverts order of presses/releases.
@@ -288,12 +291,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             isHitting.Value = true;
         }
 
-        public void OnReleased(ManiaAction action)
+        public void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
             if (AllJudged)
                 return;
 
-            if (action != Action.Value)
+            if (e.Action != Action.Value)
                 return;
 
             // do not run any of this logic when rewinding, as it inverts order of presses/releases.

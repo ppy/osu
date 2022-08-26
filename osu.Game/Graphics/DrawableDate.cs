@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,7 +12,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Graphics
 {
-    public class DrawableDate : OsuSpriteText, IHasCustomTooltip
+    public class DrawableDate : OsuSpriteText, IHasCustomTooltip<DateTimeOffset>
     {
         private DateTimeOffset date;
 
@@ -75,8 +77,8 @@ namespace osu.Game.Graphics
 
         private void updateTime() => Text = Format();
 
-        public ITooltip GetCustomTooltip() => new DateTooltip();
+        public ITooltip<DateTimeOffset> GetCustomTooltip() => new DateTooltip();
 
-        public object TooltipContent => Date;
+        public DateTimeOffset TooltipContent => Date;
     }
 }

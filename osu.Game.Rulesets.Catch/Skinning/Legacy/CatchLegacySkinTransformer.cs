@@ -1,10 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                         return null;
 
                     case CatchSkinComponents.Catcher:
-                        var version = GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value ?? 1;
+                        decimal version = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value ?? 1;
 
                         if (version < 2.3m)
                         {
@@ -81,7 +82,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                     case CatchSkinComponents.CatchComboCounter:
                         if (providesComboCounter)
-                            return new LegacyCatchComboCounter(Skin);
+                            return new LegacyCatchComboCounter();
 
                         return null;
 
@@ -90,6 +91,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             return new LegacyHitExplosion();
 
                         return null;
+
+                    default:
+                        throw new UnsupportedSkinComponentException(component);
                 }
             }
 

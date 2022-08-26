@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Input.StateChanges;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 
@@ -162,7 +161,7 @@ namespace osu.Game.Rulesets.Replays
             CurrentTime = Math.Clamp(time, frameStart, frameEnd);
 
             // In an important section, a mid-frame time cannot be used and a null is returned instead.
-            return inImportantSection && frameStart < time && time < frameEnd ? null : (double?)CurrentTime;
+            return inImportantSection && frameStart < time && time < frameEnd ? null : CurrentTime;
         }
 
         private double getFrameTime(int index)
@@ -173,6 +172,20 @@ namespace osu.Game.Rulesets.Replays
                 return double.PositiveInfinity;
 
             return Frames[index].Time;
+        }
+
+        public sealed override void CollectPendingInputs(List<IInput> inputs)
+        {
+            base.CollectPendingInputs(inputs);
+
+            CollectReplayInputs(inputs);
+
+            if (CurrentFrame?.Header != null)
+                inputs.Add(new ReplayStatisticsFrameInput { Frame = CurrentFrame });
+        }
+
+        protected virtual void CollectReplayInputs(List<IInput> inputs)
+        {
         }
     }
 }

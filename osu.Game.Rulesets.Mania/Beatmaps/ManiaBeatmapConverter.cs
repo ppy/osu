@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Game.Rulesets.Mania.Objects;
 using System;
 using System.Linq;
@@ -11,8 +13,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
-using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
@@ -31,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private readonly int originalTargetColumns;
 
         // Internal for testing purposes
-        internal FastRandom Random { get; private set; }
+        internal LegacyRandom Random { get; private set; }
 
         private Pattern lastPattern = new Pattern();
 
@@ -42,8 +44,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
 
-            var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
-            var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            double roundedCircleSize = Math.Round(beatmap.Difficulty.CircleSize);
+            double roundedOverallDifficulty = Math.Round(beatmap.Difficulty.OverallDifficulty);
 
             if (IsForCurrentRuleset)
             {
@@ -71,9 +73,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             originalTargetColumns = TargetColumns;
         }
 
-        public static int GetColumnCountForNonConvert(BeatmapInfo beatmap)
+        public static int GetColumnCountForNonConvert(BeatmapInfo beatmapInfo)
         {
-            var roundedCircleSize = Math.Round(beatmap.BaseDifficulty.CircleSize);
+            double roundedCircleSize = Math.Round(beatmapInfo.Difficulty.CircleSize);
             return (int)Math.Max(1, roundedCircleSize);
         }
 
@@ -81,10 +83,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
-            BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
+            IBeatmapDifficultyInfo difficulty = original.Difficulty;
 
             int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
-            Random = new FastRandom(seed);
+            Random = new LegacyRandom(seed);
 
             return base.ConvertBeatmap(original, cancellationToken);
         }
@@ -171,7 +173,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             switch (original)
             {
-                case IHasDistance _:
+                case IHasDistance:
                 {
                     var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
                     conversion = generator;
@@ -227,7 +229,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private class SpecificBeatmapPatternGenerator : Patterns.Legacy.PatternGenerator
         {
-            public SpecificBeatmapPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
+            public SpecificBeatmapPatternGenerator(LegacyRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
                 : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
             {
             }

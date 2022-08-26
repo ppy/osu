@@ -1,14 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Tests.NonVisual
 {
@@ -20,8 +25,10 @@ namespace osu.Game.Tests.NonVisual
         {
             var combinations = new TestLegacyDifficultyCalculator().CreateDifficultyAdjustmentModCombinations();
 
-            Assert.AreEqual(1, combinations.Length);
-            Assert.IsTrue(combinations[0] is ModNoMod);
+            assertCombinations(new[]
+            {
+                new[] { typeof(ModNoMod) }
+            }, combinations);
         }
 
         [Test]
@@ -29,9 +36,11 @@ namespace osu.Game.Tests.NonVisual
         {
             var combinations = new TestLegacyDifficultyCalculator(new ModA()).CreateDifficultyAdjustmentModCombinations();
 
-            Assert.AreEqual(2, combinations.Length);
-            Assert.IsTrue(combinations[0] is ModNoMod);
-            Assert.IsTrue(combinations[1] is ModA);
+            assertCombinations(new[]
+            {
+                new[] { typeof(ModNoMod) },
+                new[] { typeof(ModA) }
+            }, combinations);
         }
 
         [Test]
@@ -39,14 +48,13 @@ namespace osu.Game.Tests.NonVisual
         {
             var combinations = new TestLegacyDifficultyCalculator(new ModA(), new ModB()).CreateDifficultyAdjustmentModCombinations();
 
-            Assert.AreEqual(4, combinations.Length);
-            Assert.IsTrue(combinations[0] is ModNoMod);
-            Assert.IsTrue(combinations[1] is ModA);
-            Assert.IsTrue(combinations[2] is MultiMod);
-            Assert.IsTrue(combinations[3] is ModB);
-
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[0] is ModA);
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[1] is ModB);
+            assertCombinations(new[]
+            {
+                new[] { typeof(ModNoMod) },
+                new[] { typeof(ModA) },
+                new[] { typeof(ModA), typeof(ModB) },
+                new[] { typeof(ModB) }
+            }, combinations);
         }
 
         [Test]
@@ -54,10 +62,12 @@ namespace osu.Game.Tests.NonVisual
         {
             var combinations = new TestLegacyDifficultyCalculator(new ModA(), new ModIncompatibleWithA()).CreateDifficultyAdjustmentModCombinations();
 
-            Assert.AreEqual(3, combinations.Length);
-            Assert.IsTrue(combinations[0] is ModNoMod);
-            Assert.IsTrue(combinations[1] is ModA);
-            Assert.IsTrue(combinations[2] is ModIncompatibleWithA);
+            assertCombinations(new[]
+            {
+                new[] { typeof(ModNoMod) },
+                new[] { typeof(ModA) },
+                new[] { typeof(ModIncompatibleWithA) }
+            }, combinations);
         }
 
         [Test]
@@ -65,22 +75,17 @@ namespace osu.Game.Tests.NonVisual
         {
             var combinations = new TestLegacyDifficultyCalculator(new ModA(), new ModB(), new ModIncompatibleWithA(), new ModIncompatibleWithAAndB()).CreateDifficultyAdjustmentModCombinations();
 
-            Assert.AreEqual(8, combinations.Length);
-            Assert.IsTrue(combinations[0] is ModNoMod);
-            Assert.IsTrue(combinations[1] is ModA);
-            Assert.IsTrue(combinations[2] is MultiMod);
-            Assert.IsTrue(combinations[3] is ModB);
-            Assert.IsTrue(combinations[4] is MultiMod);
-            Assert.IsTrue(combinations[5] is ModIncompatibleWithA);
-            Assert.IsTrue(combinations[6] is MultiMod);
-            Assert.IsTrue(combinations[7] is ModIncompatibleWithAAndB);
-
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[0] is ModA);
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[1] is ModB);
-            Assert.IsTrue(((MultiMod)combinations[4]).Mods[0] is ModB);
-            Assert.IsTrue(((MultiMod)combinations[4]).Mods[1] is ModIncompatibleWithA);
-            Assert.IsTrue(((MultiMod)combinations[6]).Mods[0] is ModIncompatibleWithA);
-            Assert.IsTrue(((MultiMod)combinations[6]).Mods[1] is ModIncompatibleWithAAndB);
+            assertCombinations(new[]
+            {
+                new[] { typeof(ModNoMod) },
+                new[] { typeof(ModA) },
+                new[] { typeof(ModA), typeof(ModB) },
+                new[] { typeof(ModB) },
+                new[] { typeof(ModB), typeof(ModIncompatibleWithA) },
+                new[] { typeof(ModIncompatibleWithA) },
+                new[] { typeof(ModIncompatibleWithA), typeof(ModIncompatibleWithAAndB) },
+                new[] { typeof(ModIncompatibleWithAAndB) },
+            }, combinations);
         }
 
         [Test]
@@ -88,10 +93,12 @@ namespace osu.Game.Tests.NonVisual
         {
             var combinations = new TestLegacyDifficultyCalculator(new ModAofA(), new ModIncompatibleWithAofA()).CreateDifficultyAdjustmentModCombinations();
 
-            Assert.AreEqual(3, combinations.Length);
-            Assert.IsTrue(combinations[0] is ModNoMod);
-            Assert.IsTrue(combinations[1] is ModAofA);
-            Assert.IsTrue(combinations[2] is ModIncompatibleWithAofA);
+            assertCombinations(new[]
+            {
+                new[] { typeof(ModNoMod) },
+                new[] { typeof(ModAofA) },
+                new[] { typeof(ModIncompatibleWithAofA) }
+            }, combinations);
         }
 
         [Test]
@@ -99,17 +106,13 @@ namespace osu.Game.Tests.NonVisual
         {
             var combinations = new TestLegacyDifficultyCalculator(new ModA(), new MultiMod(new ModB(), new ModC())).CreateDifficultyAdjustmentModCombinations();
 
-            Assert.AreEqual(4, combinations.Length);
-            Assert.IsTrue(combinations[0] is ModNoMod);
-            Assert.IsTrue(combinations[1] is ModA);
-            Assert.IsTrue(combinations[2] is MultiMod);
-            Assert.IsTrue(combinations[3] is MultiMod);
-
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[0] is ModA);
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[1] is ModB);
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[2] is ModC);
-            Assert.IsTrue(((MultiMod)combinations[3]).Mods[0] is ModB);
-            Assert.IsTrue(((MultiMod)combinations[3]).Mods[1] is ModC);
+            assertCombinations(new[]
+            {
+                new[] { typeof(ModNoMod) },
+                new[] { typeof(ModA) },
+                new[] { typeof(ModA), typeof(ModB), typeof(ModC) },
+                new[] { typeof(ModB), typeof(ModC) }
+            }, combinations);
         }
 
         [Test]
@@ -117,13 +120,12 @@ namespace osu.Game.Tests.NonVisual
         {
             var combinations = new TestLegacyDifficultyCalculator(new ModA(), new MultiMod(new ModB(), new ModIncompatibleWithA())).CreateDifficultyAdjustmentModCombinations();
 
-            Assert.AreEqual(3, combinations.Length);
-            Assert.IsTrue(combinations[0] is ModNoMod);
-            Assert.IsTrue(combinations[1] is ModA);
-            Assert.IsTrue(combinations[2] is MultiMod);
-
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[0] is ModB);
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[1] is ModIncompatibleWithA);
+            assertCombinations(new[]
+            {
+                new[] { typeof(ModNoMod) },
+                new[] { typeof(ModA) },
+                new[] { typeof(ModB), typeof(ModIncompatibleWithA) }
+            }, combinations);
         }
 
         [Test]
@@ -131,20 +133,35 @@ namespace osu.Game.Tests.NonVisual
         {
             var combinations = new TestLegacyDifficultyCalculator(new ModA(), new MultiMod(new ModA(), new ModB())).CreateDifficultyAdjustmentModCombinations();
 
-            Assert.AreEqual(3, combinations.Length);
-            Assert.IsTrue(combinations[0] is ModNoMod);
-            Assert.IsTrue(combinations[1] is ModA);
-            Assert.IsTrue(combinations[2] is MultiMod);
+            assertCombinations(new[]
+            {
+                new[] { typeof(ModNoMod) },
+                new[] { typeof(ModA) },
+                new[] { typeof(ModA), typeof(ModB) }
+            }, combinations);
+        }
 
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[0] is ModA);
-            Assert.IsTrue(((MultiMod)combinations[2]).Mods[1] is ModB);
+        private void assertCombinations(Type[][] expectedCombinations, Mod[] actualCombinations)
+        {
+            Assert.AreEqual(expectedCombinations.Length, actualCombinations.Length);
+
+            Assert.Multiple(() =>
+            {
+                for (int i = 0; i < expectedCombinations.Length; ++i)
+                {
+                    Type[] expectedTypes = expectedCombinations[i];
+                    Type[] actualTypes = ModUtils.FlattenMod(actualCombinations[i]).Select(m => m.GetType()).ToArray();
+
+                    Assert.That(expectedTypes, Is.EquivalentTo(actualTypes));
+                }
+            });
         }
 
         private class ModA : Mod
         {
             public override string Name => nameof(ModA);
             public override string Acronym => nameof(ModA);
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModIncompatibleWithA), typeof(ModIncompatibleWithAAndB) };
@@ -153,7 +170,7 @@ namespace osu.Game.Tests.NonVisual
         private class ModB : Mod
         {
             public override string Name => nameof(ModB);
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override string Acronym => nameof(ModB);
             public override double ScoreMultiplier => 1;
 
@@ -164,7 +181,7 @@ namespace osu.Game.Tests.NonVisual
         {
             public override string Name => nameof(ModC);
             public override string Acronym => nameof(ModC);
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override double ScoreMultiplier => 1;
         }
 
@@ -172,7 +189,7 @@ namespace osu.Game.Tests.NonVisual
         {
             public override string Name => $"Incompatible With {nameof(ModA)}";
             public override string Acronym => $"Incompatible With {nameof(ModA)}";
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModA) };
@@ -191,7 +208,7 @@ namespace osu.Game.Tests.NonVisual
         {
             public override string Name => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
             public override string Acronym => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
-            public override string Description => string.Empty;
+            public override LocalisableString Description => string.Empty;
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModA), typeof(ModB) };

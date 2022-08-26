@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,20 +18,20 @@ namespace osu.Game.Screens.Select.Details
     {
         private readonly BarGraph retryGraph, failGraph;
 
-        private BeatmapMetrics metrics;
+        private APIFailTimes failTimes;
 
-        public BeatmapMetrics Metrics
+        public APIFailTimes FailTimes
         {
-            get => metrics;
+            get => failTimes;
             set
             {
-                if (value == metrics) return;
+                if (value == failTimes) return;
 
-                metrics = value;
+                failTimes = value;
 
-                var retries = Metrics?.Retries ?? Array.Empty<int>();
-                var fails = Metrics?.Fails ?? Array.Empty<int>();
-                var retriesAndFails = sumRetriesAndFails(retries, fails);
+                int[] retries = FailTimes?.Retries ?? Array.Empty<int>();
+                int[] fails = FailTimes?.Fails ?? Array.Empty<int>();
+                int[] retriesAndFails = sumRetriesAndFails(retries, fails);
 
                 float maxValue = retriesAndFails.Any() ? retriesAndFails.Max() : 0;
                 failGraph.MaxValue = maxValue;
@@ -42,7 +44,7 @@ namespace osu.Game.Screens.Select.Details
 
         private int[] sumRetriesAndFails(int[] retries, int[] fails)
         {
-            var result = new int[Math.Max(retries.Length, fails.Length)];
+            int[] result = new int[Math.Max(retries.Length, fails.Length)];
 
             for (int i = 0; i < retries.Length; ++i)
                 result[i] = retries[i];

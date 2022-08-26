@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -59,9 +61,10 @@ namespace osu.Game.Screens
         Bindable<RulesetInfo> Ruleset { get; }
 
         /// <summary>
-        /// Whether mod track adjustments are allowed to be applied.
+        /// Whether mod track adjustments should be applied on entering this screen.
+        /// A <see langword="null"/> value means that the parent screen's value of this setting will be used.
         /// </summary>
-        bool AllowTrackAdjustments { get; }
+        bool? AllowTrackAdjustments { get; }
 
         /// <summary>
         /// Invoked when the back button has been pressed to close any overlays before exiting this <see cref="IOsuScreen"/>.

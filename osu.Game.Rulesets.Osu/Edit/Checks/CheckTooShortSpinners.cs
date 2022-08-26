@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks.Components;
@@ -19,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            double od = context.Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty;
+            double od = context.Beatmap.Difficulty.OverallDifficulty;
 
             // These are meant to reflect the duration necessary for auto to score at least 1000 points on the spinner.
             // It's difficult to eliminate warnings here, as auto achieving 1000 points depends on the approach angle on some spinners.

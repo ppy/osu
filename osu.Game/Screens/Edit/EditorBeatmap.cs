@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -19,6 +22,17 @@ namespace osu.Game.Screens.Edit
 {
     public class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
     {
+        /// <summary>
+        /// Will become <c>true</c> when a new update is queued, and <c>false</c> when all updates have been applied.
+        /// </summary>
+        /// <remarks>
+        /// This is intended to be used to avoid performing operations (like playback of samples)
+        /// while mutating hitobjects.
+        /// </remarks>
+        public IBindable<bool> UpdateInProgress => updateInProgress;
+
+        private readonly BindableBool updateInProgress = new BindableBool();
+
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> is added to this <see cref="EditorBeatmap"/>.
         /// </summary>
@@ -44,6 +58,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public readonly Bindable<HitObject> PlacementObject = new Bindable<HitObject>();
 
+        private readonly BeatmapInfo beatmapInfo;
         public readonly IBeatmap PlayableBeatmap;
 
         /// <summary>
@@ -66,25 +81,71 @@ namespace osu.Game.Screens.Edit
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null)
+        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
         {
             PlayableBeatmap = playableBeatmap;
-            if (beatmapSkin is Skin skin)
-                BeatmapSkin = new EditorBeatmapSkin(skin);
+            PlayableBeatmap.ControlPointInfo = ConvertControlPoints(PlayableBeatmap.ControlPointInfo);
 
-            beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset?.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
+            this.beatmapInfo = beatmapInfo ?? playableBeatmap.BeatmapInfo;
+
+            if (beatmapSkin is Skin skin)
+            {
+                BeatmapSkin = new EditorBeatmapSkin(skin);
+                BeatmapSkin.BeatmapSkinChanged += SaveState;
+            }
+
+            beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
         }
 
-        public BeatmapInfo BeatmapInfo
+        /// <summary>
+        /// Converts a <see cref="ControlPointInfo"/> such that the resultant <see cref="ControlPointInfo"/> is non-legacy.
+        /// </summary>
+        /// <param name="incoming">The <see cref="ControlPointInfo"/> to convert.</param>
+        /// <returns>The non-legacy <see cref="ControlPointInfo"/>. <paramref name="incoming"/> is returned if already non-legacy.</returns>
+        public static ControlPointInfo ConvertControlPoints(ControlPointInfo incoming)
         {
-            get => PlayableBeatmap.BeatmapInfo;
-            set => PlayableBeatmap.BeatmapInfo = value;
+            // ensure we are not working with legacy control points.
+            // if we leave the legacy points around they will be applied over any local changes on
+            // ApplyDefaults calls. this should eventually be removed once the default logic is moved to the decoder/converter.
+            if (!(incoming is LegacyControlPointInfo))
+                return incoming;
+
+            var newControlPoints = new ControlPointInfo();
+
+            foreach (var controlPoint in incoming.AllControlPoints)
+            {
+                switch (controlPoint)
+                {
+                    case DifficultyControlPoint:
+                    case SampleControlPoint:
+                        // skip legacy types.
+                        continue;
+
+                    default:
+                        newControlPoints.Add(controlPoint.Time, controlPoint);
+                        break;
+                }
+            }
+
+            return newControlPoints;
         }
 
-        public BeatmapMetadata Metadata => PlayableBeatmap.Metadata;
+        public BeatmapInfo BeatmapInfo
+        {
+            get => beatmapInfo;
+            set => throw new InvalidOperationException($"Can't set {nameof(BeatmapInfo)} on {nameof(EditorBeatmap)}");
+        }
+
+        public BeatmapMetadata Metadata => beatmapInfo.Metadata;
+
+        public BeatmapDifficulty Difficulty
+        {
+            get => PlayableBeatmap.Difficulty;
+            set => PlayableBeatmap.Difficulty = value;
+        }
 
         public ControlPointInfo ControlPointInfo
         {
@@ -147,7 +208,7 @@ namespace osu.Game.Screens.Edit
         public void Add(HitObject hitObject)
         {
             // Preserve existing sorting order in the beatmap
-            var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
+            int insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
             Insert(insertionIndex + 1, hitObject);
         }
 
@@ -178,6 +239,8 @@ namespace osu.Game.Screens.Edit
         {
             // updates are debounced regardless of whether a batch is active.
             batchPendingUpdates.Add(hitObject);
+
+            updateInProgress.Value = true;
         }
 
         /// <summary>
@@ -187,6 +250,8 @@ namespace osu.Game.Screens.Edit
         {
             foreach (var h in HitObjects)
                 batchPendingUpdates.Add(h);
+
+            updateInProgress.Value = true;
         }
 
         /// <summary>
@@ -279,6 +344,8 @@ namespace osu.Game.Screens.Edit
             foreach (var h in deletes) HitObjectRemoved?.Invoke(h);
             foreach (var h in inserts) HitObjectAdded?.Invoke(h);
             foreach (var h in updates) HitObjectUpdated?.Invoke(h);
+
+            updateInProgress.Value = false;
         }
 
         /// <summary>
@@ -286,7 +353,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public void Clear() => RemoveRange(HitObjects.ToArray());
 
-        private void processHitObject(HitObject hitObject) => hitObject.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
+        private void processHitObject(HitObject hitObject) => hitObject.ApplyDefaults(ControlPointInfo, PlayableBeatmap.Difficulty);
 
         private void trackStartTime(HitObject hitObject)
         {
@@ -296,7 +363,7 @@ namespace osu.Game.Screens.Edit
                 // For now we'll remove and re-add the hitobject. This is not optimal and can be improved if required.
                 mutableHitObjects.Remove(hitObject);
 
-                var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
+                int insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
                 mutableHitObjects.Insert(insertionIndex + 1, hitObject);
 
                 Update(hitObject);

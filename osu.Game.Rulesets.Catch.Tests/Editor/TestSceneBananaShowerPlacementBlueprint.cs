@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
@@ -26,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         protected override void AddHitObject(DrawableHitObject hitObject)
         {
             // Create nested bananas (but positions are not randomized because beatmap processing is not done).
-            hitObject.HitObject.ApplyDefaults(new ControlPointInfo(), Beatmap.Value.BeatmapInfo.BaseDifficulty);
+            hitObject.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             base.AddHitObject(hitObject);
         }
@@ -54,7 +57,10 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
             AddMoveStep(end_time, 0);
             AddClickStep(MouseButton.Left);
+
             AddMoveStep(start_time, 0);
+            AddAssert("duration is positive", () => ((BananaShower)CurrentBlueprint.HitObject).Duration > 0);
+
             AddClickStep(MouseButton.Right);
             AddAssert("start time is correct", () => Precision.AlmostEquals(LastObject.HitObject.StartTime, start_time));
             AddAssert("end time is correct", () => Precision.AlmostEquals(LastObject.HitObject.GetEndTime(), end_time));

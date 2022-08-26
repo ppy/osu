@@ -2,17 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Game.Database;
 
 namespace osu.Game.IO
 {
     public interface IStorageResourceProvider
     {
         /// <summary>
+        /// The game renderer.
+        /// </summary>
+        IRenderer Renderer { get; }
+
+        /// <summary>
         /// Retrieve the game-wide audio manager.
         /// </summary>
-        AudioManager AudioManager { get; }
+        AudioManager? AudioManager { get; }
 
         /// <summary>
         /// Access game-wide user files.
@@ -23,6 +30,11 @@ namespace osu.Game.IO
         /// Access game-wide resources.
         /// </summary>
         IResourceStore<byte[]> Resources { get; }
+
+        /// <summary>
+        /// Access realm.
+        /// </summary>
+        RealmAccess RealmAccess { get; }
 
         /// <summary>
         /// Create a texture loader store based on an underlying data store.

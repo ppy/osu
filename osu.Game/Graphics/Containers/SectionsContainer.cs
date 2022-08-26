@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -149,13 +151,11 @@ namespace osu.Game.Graphics.Containers
         {
             lastKnownScroll = null;
 
-            float fixedHeaderSize = FixedHeader?.BoundingBox.Height ?? 0;
-
             // implementation similar to ScrollIntoView but a bit more nuanced.
             float top = scrollContainer.GetChildPosInContent(target);
 
-            float bottomScrollExtent = scrollContainer.ScrollableExtent - fixedHeaderSize;
-            float scrollTarget = top - fixedHeaderSize - scrollContainer.DisplayableContent * scroll_y_centre;
+            float bottomScrollExtent = scrollContainer.ScrollableExtent;
+            float scrollTarget = top - scrollContainer.DisplayableContent * scroll_y_centre;
 
             if (scrollTarget > bottomScrollExtent)
                 scrollContainer.ScrollToEnd();
@@ -182,7 +182,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            var result = base.OnInvalidate(invalidation, source);
+            bool result = base.OnInvalidate(invalidation, source);
 
             if (source == InvalidationSource.Child && (invalidation & Invalidation.DrawSize) != 0)
             {
@@ -195,11 +195,8 @@ namespace osu.Game.Graphics.Containers
 
         protected void InvalidateScrollPosition()
         {
-            Schedule(() =>
-            {
-                lastKnownScroll = null;
-                lastClickedSection = null;
-            });
+            lastKnownScroll = null;
+            lastClickedSection = null;
         }
 
         protected override void UpdateAfterChildren()
@@ -240,7 +237,7 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Height = expandableHeaderSize + fixedHeaderSize;
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
-                var smallestSectionHeight = Children.Count > 0 ? Children.Min(d => d.Height) : 0;
+                float smallestSectionHeight = Children.Count > 0 ? Children.Min(d => d.Height) : 0;
 
                 // scroll offset is our fixed header height if we have it plus 10% of content height
                 // plus 5% to fix floating point errors and to not have a section instantly unselect when scrolling upwards
@@ -270,9 +267,13 @@ namespace osu.Game.Graphics.Containers
         {
             if (!Children.Any()) return;
 
-            var newMargin = originalSectionsMargin;
+            // if a fixed header is present, apply top padding for it
+            // to make the scroll container aware of its displayable area.
+            // (i.e. for page up/down to work properly)
+            scrollContainer.Padding = new MarginPadding { Top = FixedHeader?.LayoutSize.Y ?? 0 };
 
-            newMargin.Top += (headerHeight ?? 0);
+            var newMargin = originalSectionsMargin;
+            newMargin.Top += (ExpandableHeader?.LayoutSize.Y ?? 0);
             newMargin.Bottom += (footerHeight ?? 0);
 
             scrollContentContainer.Margin = newMargin;

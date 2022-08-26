@@ -1,16 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -52,11 +57,12 @@ namespace osu.Game.Screens.Ranking
         private Drawable bottomPanel;
         private Container<ScorePanel> detachedPanelContainer;
 
-        private bool fetchedInitialScores;
-        private APIRequest nextPageRequest;
+        private bool lastFetchCompleted;
 
         private readonly bool allowRetry;
         private readonly bool allowWatchingReplay;
+
+        private Sample popInSample;
 
         protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
@@ -68,9 +74,11 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             FillFlowContainer buttons;
+
+            popInSample = audio.Samples.Get(@"UI/overlay-pop-in");
 
             InternalChild = new GridContainer
             {
@@ -169,7 +177,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        player?.Restart();
+                        player?.Restart(true);
                     },
                 });
             }
@@ -191,8 +199,10 @@ namespace osu.Game.Screens.Ranking
         {
             base.Update();
 
-            if (fetchedInitialScores && nextPageRequest == null)
+            if (lastFetchCompleted)
             {
+                APIRequest nextPageRequest = null;
+
                 if (ScorePanelList.IsScrolledToStart)
                     nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
                 else if (ScorePanelList.IsScrolledToEnd)
@@ -200,10 +210,7 @@ namespace osu.Game.Screens.Ranking
 
                 if (nextPageRequest != null)
                 {
-                    // Scheduled after children to give the list a chance to update its scroll position and not potentially trigger a second request too early.
-                    nextPageRequest.Success += () => ScheduleAfterChildren(() => nextPageRequest = null);
-                    nextPageRequest.Failure += _ => ScheduleAfterChildren(() => nextPageRequest = null);
-
+                    lastFetchCompleted = false;
                     api.Queue(nextPageRequest);
                 }
             }
@@ -229,12 +236,12 @@ namespace osu.Game.Screens.Ranking
             foreach (var s in scores)
                 addScore(s);
 
-            fetchedInitialScores = true;
+            lastFetchCompleted = true;
         });
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             ApplyToBackground(b =>
             {
@@ -243,11 +250,13 @@ namespace osu.Game.Screens.Ranking
             });
 
             bottomPanel.FadeTo(1, 250);
+
+            popInSample?.Play();
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             this.FadeOut(100);
@@ -288,7 +297,7 @@ namespace osu.Game.Screens.Ranking
                 detachedPanelContainer.Add(expandedPanel);
 
                 // Move into its original location in the local container first, then to the final location.
-                var origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos).X;
+                float origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos).X;
                 expandedPanel.MoveToX(origLocation)
                              .Then()
                              .MoveToX(StatisticsPanel.SIDE_PADDING, 150, Easing.OutQuint);
@@ -312,10 +321,10 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.Attach(detachedPanel);
 
                 // Move into its original location in the attached container first, then to the final location.
-                var origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos);
-                detachedPanel.MoveTo(origLocation)
+                float origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos).X;
+                detachedPanel.MoveToX(origLocation)
                              .Then()
-                             .MoveTo(new Vector2(0, origLocation.Y), 150, Easing.OutQuint);
+                             .MoveToX(0, 150, Easing.OutQuint);
 
                 // Show contracted panels.
                 foreach (var contracted in ScorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
@@ -329,9 +338,12 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
             {
                 case GlobalAction.Select:
                     statisticsPanel.ToggleVisibility();
@@ -341,7 +353,7 @@ namespace osu.Game.Screens.Ranking
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 

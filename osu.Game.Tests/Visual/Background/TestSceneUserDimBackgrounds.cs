@@ -1,18 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+#nullable disable
+
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -27,16 +30,14 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneUserDimBackgrounds : OsuManualInputManagerTestScene
+    public class TestSceneUserDimBackgrounds : ScreenTestScene
     {
         private DummySongSelect songSelect;
         private TestPlayerLoader playerLoader;
@@ -47,23 +48,22 @@ namespace osu.Game.Tests.Visual.Background
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
+            Dependencies.Cache(Realm);
 
-            manager.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+            manager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
             Beatmap.SetDefault();
         }
 
-        [SetUp]
-        public virtual void SetUp() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            var stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
-            Child = stack;
+            base.SetUpSteps();
 
-            stack.Push(songSelect = new DummySongSelect());
-        });
+            AddStep("push song select", () => Stack.Push(songSelect = new DummySongSelect()));
+        }
 
         /// <summary>
         /// User settings should always be ignored on song select screen.
@@ -229,12 +229,7 @@ namespace osu.Game.Tests.Visual.Background
 
             FadeAccessibleResults results = null;
 
-            AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(new ScoreInfo
-            {
-                User = new User { Username = "osu!" },
-                Beatmap = new TestBeatmap(Ruleset.Value).BeatmapInfo,
-                Ruleset = Ruleset.Value,
-            })));
+            AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(TestResources.CreateTestScoreInfo())));
 
             AddUntilStep("Wait for results is current", () => results.IsCurrentScreen());
 
@@ -286,10 +281,10 @@ namespace osu.Game.Tests.Visual.Background
         private void setupUserSettings()
         {
             AddUntilStep("Song select is current", () => songSelect.IsCurrentScreen());
-            AddUntilStep("Song select has selection", () => songSelect.Carousel?.SelectedBeatmap != null);
+            AddUntilStep("Song select has selection", () => songSelect.Carousel?.SelectedBeatmapInfo != null);
             AddStep("Set default user settings", () =>
             {
-                SelectedMods.Value = SelectedMods.Value.Concat(new[] { new OsuModNoFail() }).ToArray();
+                SelectedMods.Value = new[] { new OsuModNoFail() };
                 songSelect.DimLevel.Value = 0.7f;
                 songSelect.BlurLevel.Value = 0.4f;
             });
@@ -329,7 +324,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundUndimmed() => background.CurrentColour == Color4.White;
 
-            public bool IsUserBlurApplied() => background.CurrentBlur == new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR);
+            public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
 
             public bool IsUserBlurDisabled() => background.CurrentBlur == new Vector2(0);
 
@@ -337,9 +332,9 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundVisible() => background.CurrentAlpha == 1;
 
-            public bool IsBackgroundBlur() => background.CurrentBlur == new Vector2(BACKGROUND_BLUR);
+            public bool IsBackgroundBlur() => Precision.AlmostEquals(background.CurrentBlur, new Vector2(BACKGROUND_BLUR), 0.1f);
 
-            public bool CheckBackgroundBlur(Vector2 expected) => background.CurrentBlur == expected;
+            public bool CheckBackgroundBlur(Vector2 expected) => Precision.AlmostEquals(background.CurrentBlur, expected, 0.1f);
 
             /// <summary>
             /// Make sure every time a screen gets pushed, the background doesn't get replaced
@@ -365,9 +360,9 @@ namespace osu.Game.Tests.Visual.Background
             protected override BackgroundScreen CreateBackground() =>
                 new FadeAccessibleBackground(Beatmap.Value);
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
-                base.OnEntering(last);
+                base.OnEntering(e);
 
                 ApplyToBackground(b => ReplacesBackground.BindTo(b.StoryboardReplacesBackground));
             }
@@ -393,6 +388,9 @@ namespace osu.Game.Tests.Visual.Background
             {
                 while (BlockLoad && !token.IsCancellationRequested)
                     Thread.Sleep(1);
+
+                if (!LoadedBeatmapSuccessfully)
+                    return;
 
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
                 DrawableRuleset.IsPaused.BindTo(IsPaused);
@@ -428,7 +426,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public float CurrentDim => dimmable.DimLevel;
 
-            public Vector2 CurrentBlur => Background.BlurSigma;
+            public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
 
             private TestDimmableBackground dimmable;
 

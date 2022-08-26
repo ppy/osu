@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -37,12 +39,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
             public override void PlayAnimation()
             {
-                base.PlayAnimation();
-
                 switch (Result)
                 {
                     case HitResult.None:
                     case HitResult.Miss:
+                        base.PlayAnimation();
                         break;
 
                     default:
@@ -52,6 +53,8 @@ namespace osu.Game.Rulesets.Mania.UI
                         this.Delay(50)
                             .ScaleTo(0.75f, 250)
                             .FadeOut(200);
+
+                        // osu!mania uses a custom fade length, so the base call is intentionally omitted.
                         break;
                 }
             }

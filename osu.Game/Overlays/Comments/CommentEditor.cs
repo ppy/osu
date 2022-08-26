@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
@@ -115,7 +117,7 @@ namespace osu.Game.Overlays.Comments
                 }
             });
 
-            textBox.OnCommit += (u, v) =>
+            textBox.OnCommit += (_, _) =>
             {
                 if (commitButton.IsBlocked.Value)
                     return;
@@ -175,6 +177,8 @@ namespace osu.Game.Overlays.Comments
 
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
+            private readonly string text;
+
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
 
@@ -184,10 +188,10 @@ namespace osu.Game.Overlays.Comments
 
             public CommitButton(string text)
             {
+                this.text = text;
+
                 AutoSizeAxes = Axes.Both;
                 LoadingAnimationSize = new Vector2(10);
-
-                drawableText.Text = text;
             }
 
             [BackgroundDependencyLoader]
@@ -232,7 +236,8 @@ namespace osu.Game.Overlays.Comments
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Horizontal = 20 }
+                        Margin = new MarginPadding { Horizontal = 20 },
+                        Text = text,
                     }
                 }
             };

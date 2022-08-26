@@ -35,9 +35,14 @@ namespace osu.Game.Localisation
         public static LocalisableString ConfineMouseMode => new TranslatableString(getKey(@"confine_mouse_mode"), @"Confine mouse cursor to window");
 
         /// <summary>
-        /// "Disable mouse wheel during gameplay"
+        /// "Disable mouse wheel adjusting volume during gameplay"
         /// </summary>
-        public static LocalisableString DisableMouseWheel => new TranslatableString(getKey(@"disable_mouse_wheel"), @"Disable mouse wheel during gameplay");
+        public static LocalisableString DisableMouseWheelVolumeAdjust => new TranslatableString(getKey(@"disable_mouse_wheel_volume_adjust"), @"Disable mouse wheel adjusting volume during gameplay");
+
+        /// <summary>
+        /// "Volume can still be adjusted using the mouse wheel by holding "Alt""
+        /// </summary>
+        public static LocalisableString DisableMouseWheelVolumeAdjustTooltip => new TranslatableString(getKey(@"disable_mouse_wheel_volume_adjust_tooltip"), @"Volume can still be adjusted using the mouse wheel by holding ""Alt""");
 
         /// <summary>
         /// "Disable mouse buttons during gameplay"
@@ -58,6 +63,21 @@ namespace osu.Game.Localisation
         /// "This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now."
         /// </summary>
         public static LocalisableString HighPrecisionPlatformWarning => new TranslatableString(getKey(@"high_precision_platform_warning"), @"This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now.");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString AlwaysConfine => new TranslatableString(getKey(@"always_confine"), @"Always");
+
+        /// <summary>
+        /// "During Gameplay"
+        /// </summary>
+        public static LocalisableString ConfineDuringGameplay => new TranslatableString(getKey(@"confine_during_gameplay"), @"During Gameplay");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString NeverConfine => new TranslatableString(getKey(@"never_confine"), @"Never");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

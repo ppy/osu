@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
@@ -67,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
                 Vector2 pointEndPosition = startPosition + fraction * distanceVector;
 
-                GetFadeTimes(start, end, (float)d / distance, out var fadeInTime, out var fadeOutTime);
+                GetFadeTimes(start, end, (float)d / distance, out double fadeInTime, out double fadeOutTime);
 
                 FollowPoint fp;
 

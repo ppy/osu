@@ -1,11 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
-using osu.Game.Users;
 
 namespace osu.Game.Tournament.Models
 {
@@ -36,10 +37,10 @@ namespace osu.Game.Tournament.Models
         {
             get
             {
-                var ranks = Players.Select(p => p.Statistics?.GlobalRank)
-                                   .Where(i => i.HasValue)
-                                   .Select(i => i.Value)
-                                   .ToArray();
+                int[] ranks = Players.Select(p => p.Rank)
+                                     .Where(i => i.HasValue)
+                                     .Select(i => i.Value)
+                                     .ToArray();
 
                 if (ranks.Length == 0)
                     return 0;
@@ -57,7 +58,7 @@ namespace osu.Game.Tournament.Models
         };
 
         [JsonProperty]
-        public BindableList<User> Players { get; set; } = new BindableList<User>();
+        public BindableList<TournamentUser> Players { get; set; } = new BindableList<TournamentUser>();
 
         public TournamentTeam()
         {
@@ -65,14 +66,14 @@ namespace osu.Game.Tournament.Models
             {
                 // use a sane default flag name based on acronym.
                 if (val.OldValue.StartsWith(FlagName.Value, StringComparison.InvariantCultureIgnoreCase))
-                    FlagName.Value = val.NewValue.Length >= 2 ? val.NewValue?.Substring(0, 2).ToUpper() : string.Empty;
+                    FlagName.Value = val.NewValue.Length >= 2 ? val.NewValue?.Substring(0, 2).ToUpperInvariant() : string.Empty;
             };
 
             FullName.ValueChanged += val =>
             {
                 // use a sane acronym based on full name.
                 if (val.OldValue.StartsWith(Acronym.Value, StringComparison.InvariantCultureIgnoreCase))
-                    Acronym.Value = val.NewValue.Length >= 3 ? val.NewValue?.Substring(0, 3).ToUpper() : string.Empty;
+                    Acronym.Value = val.NewValue.Length >= 3 ? val.NewValue?.Substring(0, 3).ToUpperInvariant() : string.Empty;
             };
         }
 

@@ -1,13 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Skinning;
@@ -111,8 +112,8 @@ namespace osu.Game.Tests.Beatmaps
 
             public static readonly Color4 HYPER_DASH_FRUIT_COLOUR = Color4.DarkGoldenrod;
 
-            public TestBeatmapSkin(BeatmapInfo beatmap, bool hasColours)
-                : base(beatmap, new ResourceStore<byte[]>(), null)
+            public TestBeatmapSkin(BeatmapInfo beatmapInfo, bool hasColours)
+                : base(beatmapInfo, null)
             {
                 if (hasColours)
                 {
@@ -141,7 +142,7 @@ namespace osu.Game.Tests.Beatmaps
             public static readonly Color4 HYPER_DASH_FRUIT_COLOUR = Color4.LightCyan;
 
             public TestSkin(bool hasCustomColours)
-                : base(new SkinInfo(), new ResourceStore<byte[]>(), null, string.Empty)
+                : base(new SkinInfo(), null, null)
             {
                 if (hasCustomColours)
                 {

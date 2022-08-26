@@ -3,11 +3,13 @@
 
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
@@ -20,14 +22,28 @@ namespace osu.Game.Skinning
         protected override bool AllowManiaSkin => false;
         protected override bool UseCustomSampleBanks => true;
 
-        public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(createSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), resources, beatmap.Path)
+        /// <summary>
+        /// Construct a new legacy beatmap skin instance.
+        /// </summary>
+        /// <param name="beatmapInfo">The model for this beatmap.</param>
+        /// <param name="resources">Access to raw game resources.</param>
+        public LegacyBeatmapSkin(BeatmapInfo beatmapInfo, IStorageResourceProvider? resources)
+            : base(createSkinInfo(beatmapInfo), resources, createRealmBackedStore(beatmapInfo, resources), beatmapInfo.Path.AsNonNull())
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        private static IResourceStore<byte[]> createRealmBackedStore(BeatmapInfo beatmapInfo, IStorageResourceProvider? resources)
+        {
+            if (resources == null || beatmapInfo.BeatmapSet == null)
+                // should only ever be used in tests.
+                return new ResourceStore<byte[]>();
+
+            return new RealmBackedResourceStore<BeatmapSetInfo>(beatmapInfo.BeatmapSet.ToLive(resources.RealmAccess), resources.Files, resources.RealmAccess);
+        }
+
+        public override Drawable? GetDrawableComponent(ISkinComponent component)
         {
             if (component is SkinnableTargetComponent targetComponent)
             {
@@ -46,11 +62,11 @@ namespace osu.Game.Skinning
             return base.GetDrawableComponent(component);
         }
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
             {
-                case LegacySkinConfiguration.LegacySetting s when s == LegacySkinConfiguration.LegacySetting.Version:
+                case SkinConfiguration.LegacySetting s when s == SkinConfiguration.LegacySetting.Version:
                     // For lookup simplicity, ignore beatmap-level versioning completely.
 
                     // If it is decided that we need this due to beatmaps somehow using it, the default (1.0 specified in LegacySkinDecoder.CreateTemplateObject)
@@ -62,10 +78,10 @@ namespace osu.Game.Skinning
             return base.GetConfig<TLookup, TValue>(lookup);
         }
 
-        protected override IBindable<Color4> GetComboColour(IHasComboColours source, int comboIndex, IHasComboInformation combo)
+        protected override IBindable<Color4>? GetComboColour(IHasComboColours source, int comboIndex, IHasComboInformation combo)
             => base.GetComboColour(source, combo.ComboIndexWithOffsets, combo);
 
-        public override ISample GetSample(ISampleInfo sampleInfo)
+        public override ISample? GetSample(ISampleInfo sampleInfo)
         {
             if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
             {
@@ -76,7 +92,11 @@ namespace osu.Game.Skinning
             return base.GetSample(sampleInfo);
         }
 
-        private static SkinInfo createSkinInfo(BeatmapInfo beatmap) =>
-            new SkinInfo { Name = beatmap.ToString(), Creator = beatmap.Metadata?.AuthorString };
+        private static SkinInfo createSkinInfo(BeatmapInfo beatmapInfo) =>
+            new SkinInfo
+            {
+                Name = beatmapInfo.ToString(),
+                Creator = beatmapInfo.Metadata.Author.Username
+            };
     }
 }

@@ -1,15 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -21,7 +26,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// The spacing between each tick of the beat snapping grid.
         /// </summary>
-        protected float DistanceSpacing { get; private set; }
+        protected float DistanceBetweenTicks { get; private set; }
+
+        protected IBindable<double> DistanceSpacingMultiplier { get; private set; }
 
         /// <summary>
         /// The maximum number of distance snapping intervals allowed.
@@ -30,7 +37,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         /// <summary>
         /// The position which the grid should start.
-        /// The first beat snapping tick is located at <see cref="StartPosition"/> + <see cref="DistanceSpacing"/> away from this point.
+        /// The first beat snapping tick is located at <see cref="StartPosition"/> + <see cref="DistanceBetweenTicks"/> away from this point.
         /// </summary>
         protected readonly Vector2 StartPosition;
 
@@ -39,30 +46,36 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected readonly double StartTime;
 
+        protected readonly double? LatestEndTime;
+
         [Resolved]
         protected OsuColour Colours { get; private set; }
 
         [Resolved]
-        protected IPositionSnapProvider SnapProvider { get; private set; }
+        protected IDistanceSnapProvider SnapProvider { get; private set; }
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        protected EditorBeatmap Beatmap { get; private set; }
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
-        private readonly double? endTime;
+
+        protected readonly HitObject ReferenceObject;
 
         /// <summary>
         /// Creates a new <see cref="DistanceSnapGrid"/>.
         /// </summary>
+        /// <param name="referenceObject">A reference object to gather relevant difficulty values from.</param>
         /// <param name="startPosition">The position at which the grid should start. The first tick is located one distance spacing length away from this point.</param>
         /// <param name="startTime">The snapping time at <see cref="StartPosition"/>.</param>
         /// <param name="endTime">The time at which the snapping grid should end. If null, the grid will continue until the bounds of the screen are exceeded.</param>
-        protected DistanceSnapGrid(Vector2 startPosition, double startTime, double? endTime = null)
+        protected DistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
         {
-            this.endTime = endTime;
+            ReferenceObject = referenceObject;
+            LatestEndTime = endTime;
+
             StartPosition = startPosition;
             StartTime = startTime;
 
@@ -75,21 +88,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            beatDivisor.BindValueChanged(_ => updateSpacing(), true);
+            beatDivisor.BindValueChanged(_ => updateSpacing());
+
+            DistanceSpacingMultiplier = SnapProvider.DistanceSpacingMultiplier.GetBoundCopy();
+            DistanceSpacingMultiplier.BindValueChanged(_ => updateSpacing(), true);
         }
 
         private void updateSpacing()
         {
-            DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(StartTime);
+            float distanceSpacingMultiplier = (float)DistanceSpacingMultiplier.Value;
+            float beatSnapDistance = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject);
 
-            if (endTime == null)
+            DistanceBetweenTicks = beatSnapDistance * distanceSpacingMultiplier;
+
+            if (LatestEndTime == null)
                 MaxIntervals = int.MaxValue;
             else
-            {
-                // +1 is added since a snapped hitobject may have its start time slightly less than the snapped time due to floating point errors
-                double maxDuration = endTime.Value - StartTime + 1;
-                MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(StartTime, DistanceSpacing));
-            }
+                MaxIntervals = (int)((LatestEndTime.Value - StartTime) / SnapProvider.DistanceToDuration(ReferenceObject, beatSnapDistance));
 
             gridCache.Invalidate();
         }
@@ -123,16 +138,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="placementIndex">The 0-based beat index from the point of placement.</param>
         /// <returns>The applicable colour.</returns>
-        protected ColourInfo GetColourForIndexFromPlacement(int placementIndex)
+        protected Color4 GetColourForIndexFromPlacement(int placementIndex)
         {
-            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(StartTime);
-            var beatLength = timingPoint.BeatLength / beatDivisor.Value;
-            var beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / beatLength);
+            var timingPoint = Beatmap.ControlPointInfo.TimingPointAt(StartTime);
+            double beatLength = timingPoint.BeatLength / beatDivisor.Value;
+            int beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / beatLength);
 
             var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 
             int repeatIndex = placementIndex / beatDivisor.Value;
-            return ColourInfo.SingleColour(colour).MultiplyAlpha(0.5f / (repeatIndex + 1));
+            return colour.Opacity(0.5f / (repeatIndex + 1));
         }
     }
 }

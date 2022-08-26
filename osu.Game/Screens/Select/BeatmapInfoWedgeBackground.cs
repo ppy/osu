@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -15,9 +17,9 @@ namespace osu.Game.Screens.Select
 {
     internal class BeatmapInfoWedgeBackground : CompositeDrawable
     {
-        private readonly WorkingBeatmap beatmap;
+        private readonly IWorkingBeatmap beatmap;
 
-        public BeatmapInfoWedgeBackground(WorkingBeatmap beatmap)
+        public BeatmapInfoWedgeBackground(IWorkingBeatmap beatmap)
         {
             this.beatmap = beatmap;
         }
@@ -27,9 +29,8 @@ namespace osu.Game.Screens.Select
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = new BufferedContainer
+            InternalChild = new BufferedContainer(cachedFrameBuffer: true)
             {
-                CacheDrawnFrameBuffer = true,
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {

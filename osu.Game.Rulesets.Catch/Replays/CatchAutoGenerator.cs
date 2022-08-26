@@ -26,9 +26,6 @@ namespace osu.Game.Rulesets.Catch.Replays
             if (Beatmap.HitObjects.Count == 0)
                 return;
 
-            // todo: add support for HT DT
-            const double dash_speed = Catcher.BASE_SPEED;
-            const double movement_speed = dash_speed / 2;
             float lastPosition = CatchPlayfield.CENTER_X;
             double lastTime = 0;
 
@@ -47,8 +44,8 @@ namespace osu.Game.Rulesets.Catch.Replays
                 // The case where positionChange > 0 and timeAvailable == 0 results in PositiveInfinity which provides expected beheaviour.
                 double speedRequired = positionChange == 0 ? 0 : positionChange / timeAvailable;
 
-                bool dashRequired = speedRequired > movement_speed;
-                bool impossibleJump = speedRequired > movement_speed * 2;
+                bool dashRequired = speedRequired > Catcher.BASE_WALK_SPEED;
+                bool impossibleJump = speedRequired > Catcher.BASE_DASH_SPEED;
 
                 // todo: get correct catcher size, based on difficulty CS.
                 const float catcher_width_half = Catcher.BASE_SIZE * 0.3f * 0.5f;
@@ -73,7 +70,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 else if (dashRequired)
                 {
                     // we do a movement in two parts - the dash part then the normal part...
-                    double timeAtNormalSpeed = positionChange / movement_speed;
+                    double timeAtNormalSpeed = positionChange / Catcher.BASE_WALK_SPEED;
                     double timeWeNeedToSave = timeAtNormalSpeed - timeAvailable;
                     double timeAtDashSpeed = timeWeNeedToSave / 2;
 
@@ -86,7 +83,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 }
                 else
                 {
-                    double timeBefore = positionChange / movement_speed;
+                    double timeBefore = positionChange / Catcher.BASE_WALK_SPEED;
 
                     addFrame(h.StartTime - timeBefore, lastPosition);
                     addFrame(h.StartTime, h.EffectiveX);

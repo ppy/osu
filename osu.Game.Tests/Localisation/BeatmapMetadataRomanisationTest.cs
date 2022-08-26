@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 
@@ -19,7 +21,7 @@ namespace osu.Game.Tests.Localisation
                 Title = "Romanised title",
                 TitleUnicode = "Unicode Title"
             };
-            var romanisableString = metadata.ToRomanisableString();
+            var romanisableString = metadata.GetDisplayTitleRomanisable();
 
             Assert.AreEqual(metadata.ToString(), romanisableString.Romanised);
             Assert.AreEqual($"{metadata.ArtistUnicode} - {metadata.TitleUnicode}", romanisableString.Original);
@@ -33,7 +35,7 @@ namespace osu.Game.Tests.Localisation
                 Artist = "Romanised Artist",
                 Title = "Romanised title"
             };
-            var romanisableString = metadata.ToRomanisableString();
+            var romanisableString = metadata.GetDisplayTitleRomanisable();
 
             Assert.AreEqual(romanisableString.Romanised, romanisableString.Original);
         }

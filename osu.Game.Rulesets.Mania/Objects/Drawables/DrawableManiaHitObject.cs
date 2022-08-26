@@ -1,12 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Mania.UI;
@@ -28,11 +29,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         [Resolved(canBeNull: true)]
         private ManiaPlayfield playfield { get; set; }
-
-        /// <summary>
-        /// Gets the samples that are played by this object during gameplay.
-        /// </summary>
-        public ISampleInfo[] GetGameplaySamples() => Samples.Samples;
 
         protected override float SamplePlaybackPosition
         {

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+#nullable disable
+
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osuTK;
+using osu.Game.Resources.Localisation.Web;
 using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -17,22 +17,12 @@ namespace osu.Game.Graphics.UserInterface
         public SearchTextBox()
         {
             Height = 35;
-            Add(new SpriteIcon
-            {
-                Icon = FontAwesome.Solid.Search,
-                Origin = Anchor.CentreRight,
-                Anchor = Anchor.CentreRight,
-                Margin = new MarginPadding { Right = 10 },
-                Size = new Vector2(20),
-            });
-
-            TextFlow.Padding = new MarginPadding { Right = 35 };
-            PlaceholderText = "type to search";
+            PlaceholderText = HomeStrings.SearchPlaceholder;
         }
 
-        public override bool OnPressed(PlatformAction action)
+        public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case PlatformAction.MoveBackwardLine:
                 case PlatformAction.MoveForwardLine:
@@ -43,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
                     return false;
             }
 
-            return base.OnPressed(action);
+            return base.OnPressed(e);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

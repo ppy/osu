@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -8,10 +10,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match.Components;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match
@@ -24,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private readonly IBindable<User> host = new Bindable<User>();
+        private readonly IBindable<APIUser> host = new Bindable<APIUser>();
         private readonly bool allowEdit;
 
         [CanBeNull]
@@ -49,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 {
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(100, 1),
-                    Text = "Edit",
+                    Text = CommonStrings.ButtonsEdit,
                     Action = () => OnEdit?.Invoke()
                 });
             }
@@ -62,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (editButton != null)
                 host.BindValueChanged(h => editButton.Alpha = h.NewValue?.Equals(api.LocalUser.Value) == true ? 1 : 0, true);
 
-            SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap.Value, true);
+            SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap, true);
         }
 
         protected override Drawable CreateBackground() => background = new BackgroundSprite();

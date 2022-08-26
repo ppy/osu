@@ -1,20 +1,32 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+#nullable disable
+
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
-using osu.Game.Users;
+using osu.Game.Tests.Resources;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerTeamResults : ScreenTestScene
     {
+        [Test]
+        public void TestScaling()
+        {
+            // scheduling is needed as scaling the content immediately causes the entire scene to shake badly, for some odd reason.
+            AddSliderStep("scale", 0.5f, 1.6f, 1f, v => Schedule(() =>
+            {
+                Stack.Scale = new Vector2(v);
+                Stack.Size = new Vector2(1f / v);
+            }));
+        }
+
         [TestCase(7483253, 1048576)]
         [TestCase(1048576, 7483253)]
         [TestCase(1048576, 1048576)]
@@ -26,33 +38,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 var rulesetInfo = new OsuRuleset().RulesetInfo;
                 var beatmapInfo = CreateBeatmap(rulesetInfo).BeatmapInfo;
+                var score = TestResources.CreateTestScoreInfo(beatmapInfo);
 
-                var score = new ScoreInfo
+                SortedDictionary<int, BindableLong> teamScores = new SortedDictionary<int, BindableLong>
                 {
-                    Rank = ScoreRank.B,
-                    TotalScore = 987654,
-                    Accuracy = 0.8,
-                    MaxCombo = 500,
-                    Combo = 250,
-                    Beatmap = beatmapInfo,
-                    User = new User { Username = "Test user" },
-                    Date = DateTimeOffset.Now,
-                    OnlineScoreID = 12345,
-                    Ruleset = rulesetInfo,
+                    { 0, new BindableLong(team1Score) },
+                    { 1, new BindableLong(team2Score) }
                 };
 
-                PlaylistItem playlistItem = new PlaylistItem
-                {
-                    BeatmapID = beatmapInfo.ID,
-                };
-
-                SortedDictionary<int, BindableInt> teamScores = new SortedDictionary<int, BindableInt>
-                {
-                    { 0, new BindableInt(team1Score) },
-                    { 1, new BindableInt(team2Score) }
-                };
-
-                Stack.Push(screen = new MultiplayerTeamResultsScreen(score, 1, playlistItem, teamScores));
+                Stack.Push(screen = new MultiplayerTeamResultsScreen(score, 1, new PlaylistItem(beatmapInfo), teamScores));
             });
 
             AddUntilStep("wait for loaded", () => screen.IsLoaded);

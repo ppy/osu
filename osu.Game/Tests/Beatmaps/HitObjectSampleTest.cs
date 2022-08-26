@@ -1,27 +1,34 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Beatmaps
 {
@@ -34,15 +41,15 @@ namespace osu.Game.Tests.Beatmaps
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
 
+        [Resolved]
+        private GameHost host { get; set; }
+
         private readonly SkinInfo userSkinInfo = new SkinInfo();
 
         private readonly BeatmapInfo beatmapInfo = new BeatmapInfo
         {
             BeatmapSet = new BeatmapSetInfo(),
-            Metadata = new BeatmapMetadata
-            {
-                Author = User.SYSTEM_USER
-            }
+            Metadata = new BeatmapMetadata(),
         };
 
         private readonly TestResourceStore userSkinResourceStore = new TestResourceStore();
@@ -79,7 +86,11 @@ namespace osu.Game.Tests.Beatmaps
                         currentTestBeatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
 
                     // populate ruleset for beatmap converters that require it to be present.
-                    currentTestBeatmap.BeatmapInfo.Ruleset = rulesetStore.GetRuleset(currentTestBeatmap.BeatmapInfo.RulesetID);
+                    var ruleset = rulesetStore.GetRuleset(currentTestBeatmap.BeatmapInfo.Ruleset.OnlineID);
+
+                    Debug.Assert(ruleset != null);
+
+                    currentTestBeatmap.BeatmapInfo.Ruleset = ruleset;
                 });
             });
 
@@ -91,23 +102,15 @@ namespace osu.Game.Tests.Beatmaps
         {
             AddStep("setup skins", () =>
             {
-                userSkinInfo.Files = new List<SkinFileInfo>
-                {
-                    new SkinFileInfo
-                    {
-                        Filename = userFile,
-                        FileInfo = new IO.FileInfo { Hash = userFile }
-                    }
-                };
+                userSkinInfo.Files.Clear();
+                if (!string.IsNullOrEmpty(userFile))
+                    userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
 
-                beatmapInfo.BeatmapSet.Files = new List<BeatmapSetFileInfo>
-                {
-                    new BeatmapSetFileInfo
-                    {
-                        Filename = beatmapFile,
-                        FileInfo = new IO.FileInfo { Hash = beatmapFile }
-                    }
-                };
+                Debug.Assert(beatmapInfo.BeatmapSet != null);
+
+                beatmapInfo.BeatmapSet.Files.Clear();
+                if (!string.IsNullOrEmpty(beatmapFile))
+                    beatmapInfo.BeatmapSet.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = beatmapFile }, beatmapFile));
 
                 // Need to refresh the cached skin source to refresh the skin resource store.
                 dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, this));
@@ -125,10 +128,12 @@ namespace osu.Game.Tests.Beatmaps
 
         #region IResourceStorageProvider
 
+        public IRenderer Renderer => host.Renderer;
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => userSkinResourceStore;
         public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
+        RealmAccess IStorageResourceProvider.RealmAccess => null;
 
         #endregion
 
@@ -175,7 +180,7 @@ namespace osu.Game.Tests.Beatmaps
                 return Array.Empty<byte>();
             }
 
-            public Task<byte[]> GetAsync(string name)
+            public Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = default)
             {
                 markLookup(name);
                 return Task.FromResult(Array.Empty<byte>());
@@ -196,22 +201,33 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        private class TestWorkingBeatmap : ClockBackedTestWorkingBeatmap
+        private class TestWorkingBeatmap : ClockBackedTestWorkingBeatmap, IStorageResourceProvider
         {
             private readonly BeatmapInfo skinBeatmapInfo;
-            private readonly IResourceStore<byte[]> resourceStore;
 
             private readonly IStorageResourceProvider resources;
 
-            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> resourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, IStorageResourceProvider resources)
+            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> accessMarkingResourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock,
+                                      IStorageResourceProvider resources)
                 : base(beatmap, storyboard, referenceClock, resources.AudioManager)
             {
                 this.skinBeatmapInfo = skinBeatmapInfo;
-                this.resourceStore = resourceStore;
+                Files = accessMarkingResourceStore;
                 this.resources = resources;
             }
 
-            protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resourceStore, resources);
+            protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, this);
+
+            public IRenderer Renderer => resources.Renderer;
+            public AudioManager AudioManager => resources.AudioManager;
+
+            public IResourceStore<byte[]> Files { get; }
+
+            public IResourceStore<byte[]> Resources => resources.Resources;
+
+            public RealmAccess RealmAccess => resources.RealmAccess;
+
+            public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => resources.CreateTextureLoaderStore(underlyingStore);
         }
     }
 }

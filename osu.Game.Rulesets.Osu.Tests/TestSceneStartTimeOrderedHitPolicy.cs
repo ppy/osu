@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -364,12 +366,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                     HitObjects = hitObjects,
                     BeatmapInfo =
                     {
-                        BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
+                        Difficulty = new BeatmapDifficulty { SliderTickRate = 3 },
                         Ruleset = new OsuRuleset().RulesetInfo
                     },
                 });
-
-                Beatmap.Value.Beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 
@@ -399,6 +399,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public TestSlider()
             {
+                DifficultyControlPoint = new DifficultyControlPoint { SliderVelocity = 0.1f };
+
                 DefaultsApplied += _ =>
                 {
                     HeadCircle.HitWindows = new TestHitWindows();
@@ -412,7 +414,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestSpinner : Spinner
         {
-            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
             {
                 base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
                 SpinsRequired = 1;

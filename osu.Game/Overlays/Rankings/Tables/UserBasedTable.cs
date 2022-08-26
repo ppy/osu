@@ -1,8 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -23,6 +26,31 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected virtual IEnumerable<LocalisableString> GradeColumns => new List<LocalisableString> { RankingsStrings.Statss, RankingsStrings.Stats, RankingsStrings.Stata };
 
+        protected override Drawable CreateRowBackground(UserStatistics item)
+        {
+            var background = base.CreateRowBackground(item);
+
+            // see: https://github.com/ppy/osu-web/blob/9de00a0b874c56893d98261d558d78d76259d81b/resources/views/multiplayer/rooms/_rankings_table.blade.php#L23
+            if (!item.User.Active)
+                background.Alpha = 0.5f;
+
+            return background;
+        }
+
+        protected override Drawable[] CreateRowContent(int index, UserStatistics item)
+        {
+            var content = base.CreateRowContent(index, item);
+
+            // see: https://github.com/ppy/osu-web/blob/9de00a0b874c56893d98261d558d78d76259d81b/resources/views/multiplayer/rooms/_rankings_table.blade.php#L23
+            if (!item.User.Active)
+            {
+                foreach (var d in content)
+                    d.Alpha = 0.5f;
+            }
+
+            return content;
+        }
+
         protected override RankingsTableColumn[] CreateAdditionalHeaders() => new[]
             {
                 new RankingsTableColumn(RankingsStrings.StatAccuracy, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
@@ -31,7 +59,7 @@ namespace osu.Game.Overlays.Rankings.Tables
              .Concat(GradeColumns.Select(grade => new GradeTableColumn(grade, Anchor.Centre, new Dimension(GridSizeMode.AutoSize))))
              .ToArray();
 
-        protected sealed override Country GetCountry(UserStatistics item) => item.User.Country;
+        protected sealed override CountryCode GetCountryCode(UserStatistics item) => item.User.CountryCode;
 
         protected sealed override Drawable CreateFlagContent(UserStatistics item)
         {

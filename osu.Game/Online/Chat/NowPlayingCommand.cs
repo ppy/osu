@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -37,27 +39,27 @@ namespace osu.Game.Online.Chat
             base.LoadComplete();
 
             string verb;
-            BeatmapInfo beatmap;
+            IBeatmapInfo beatmapInfo;
 
             switch (api.Activity.Value)
             {
                 case UserActivity.InGame game:
                     verb = "playing";
-                    beatmap = game.Beatmap;
+                    beatmapInfo = game.BeatmapInfo;
                     break;
 
                 case UserActivity.Editing edit:
                     verb = "editing";
-                    beatmap = edit.Beatmap;
+                    beatmapInfo = edit.BeatmapInfo;
                     break;
 
                 default:
                     verb = "listening to";
-                    beatmap = currentBeatmap.Value.BeatmapInfo;
+                    beatmapInfo = currentBeatmap.Value.BeatmapInfo;
                     break;
             }
 
-            var beatmapString = beatmap.OnlineBeatmapID.HasValue ? $"[{api.WebsiteRootUrl}/b/{beatmap.OnlineBeatmapID} {beatmap}]" : beatmap.ToString();
+            string beatmapString = beatmapInfo.OnlineID > 0 ? $"[{api.WebsiteRootUrl}/b/{beatmapInfo.OnlineID} {beatmapInfo}]" : beatmapInfo.ToString();
 
             channelManager.PostMessage($"is {verb} {beatmapString}", true, target);
             Expire();

@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -20,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
 {
-    public class GameplayScreen : BeatmapInfoScreen, IProvideVideo
+    public class GameplayScreen : BeatmapInfoScreen
     {
         private readonly BindableBool warmup = new BindableBool();
 
@@ -37,7 +38,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private Drawable chroma;
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc, Storage storage)
+        private void load(LadderInfo ladder, MatchIPCInfo ipc)
         {
             this.ipc = ipc;
 
@@ -124,9 +125,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 }
             });
 
-            State.BindTo(ipc.State);
-            State.BindValueChanged(stateChanged, true);
-
             ladder.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
 
             warmup.BindValueChanged(w =>
@@ -134,6 +132,14 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 warmupButton.Alpha = !w.NewValue ? 0.5f : 1;
                 header.ShowScores = !w.NewValue;
             }, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            State.BindTo(ipc.State);
+            State.BindValueChanged(stateChanged, true);
         }
 
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
@@ -159,7 +165,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             {
                 if (state.NewValue == TourneyState.Ranking)
                 {
-                    if (warmup.Value) return;
+                    if (warmup.Value || CurrentMatch.Value == null) return;
 
                     if (ipc.Score1.Value > ipc.Score2.Value)
                         CurrentMatch.Value.Team1Score.Value++;

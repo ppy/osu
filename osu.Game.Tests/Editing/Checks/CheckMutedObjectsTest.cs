@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
@@ -30,7 +33,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             check = new CheckMutedObjects();
 
-            cpi = new ControlPointInfo();
+            cpi = new LegacyControlPointInfo();
             cpi.Add(0, new SampleControlPoint { SampleVolume = volume_regular });
             cpi.Add(1000, new SampleControlPoint { SampleVolume = volume_low });
             cpi.Add(2000, new SampleControlPoint { SampleVolume = volume_muted });
@@ -39,80 +42,80 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestNormalControlPointVolume()
         {
-            var hitcircle = new HitCircle
+            var hitCircle = new HitCircle
             {
                 StartTime = 0,
                 Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
             };
-            hitcircle.ApplyDefaults(cpi, new BeatmapDifficulty());
+            hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            assertOk(new List<HitObject> { hitcircle });
+            assertOk(new List<HitObject> { hitCircle });
         }
 
         [Test]
         public void TestLowControlPointVolume()
         {
-            var hitcircle = new HitCircle
+            var hitCircle = new HitCircle
             {
                 StartTime = 1000,
                 Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
             };
-            hitcircle.ApplyDefaults(cpi, new BeatmapDifficulty());
+            hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            assertLowVolume(new List<HitObject> { hitcircle });
+            assertLowVolume(new List<HitObject> { hitCircle });
         }
 
         [Test]
         public void TestMutedControlPointVolume()
         {
-            var hitcircle = new HitCircle
+            var hitCircle = new HitCircle
             {
                 StartTime = 2000,
                 Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
             };
-            hitcircle.ApplyDefaults(cpi, new BeatmapDifficulty());
+            hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            assertMuted(new List<HitObject> { hitcircle });
+            assertMuted(new List<HitObject> { hitCircle });
         }
 
         [Test]
         public void TestNormalSampleVolume()
         {
             // The sample volume should take precedence over the control point volume.
-            var hitcircle = new HitCircle
+            var hitCircle = new HitCircle
             {
                 StartTime = 2000,
                 Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_regular) }
             };
-            hitcircle.ApplyDefaults(cpi, new BeatmapDifficulty());
+            hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            assertOk(new List<HitObject> { hitcircle });
+            assertOk(new List<HitObject> { hitCircle });
         }
 
         [Test]
         public void TestLowSampleVolume()
         {
-            var hitcircle = new HitCircle
+            var hitCircle = new HitCircle
             {
                 StartTime = 2000,
                 Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_low) }
             };
-            hitcircle.ApplyDefaults(cpi, new BeatmapDifficulty());
+            hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            assertLowVolume(new List<HitObject> { hitcircle });
+            assertLowVolume(new List<HitObject> { hitCircle });
         }
 
         [Test]
         public void TestMutedSampleVolume()
         {
-            var hitcircle = new HitCircle
+            var hitCircle = new HitCircle
             {
                 StartTime = 0,
                 Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_muted) }
             };
-            hitcircle.ApplyDefaults(cpi, new BeatmapDifficulty());
+            hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            assertMuted(new List<HitObject> { hitcircle });
+            assertMuted(new List<HitObject> { hitCircle });
         }
 
         [Test]

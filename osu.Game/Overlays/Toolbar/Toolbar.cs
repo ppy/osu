@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -14,11 +16,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
 using osu.Framework.Input.Bindings;
+using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class Toolbar : VisibilityContainer, IKeyBindingHandler<GlobalAction>
+    public class Toolbar : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
@@ -56,59 +59,137 @@ namespace osu.Game.Overlays.Toolbar
             AlwaysPresent = false;
         }
 
+        [Resolved]
+        private Bindable<RulesetInfo> ruleset { get; set; }
+
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset)
+        private void load(OsuGame osuGame)
         {
             Children = new Drawable[]
             {
                 new ToolbarBackground(),
-                new FillFlowContainer
+                new GridContainer
                 {
-                    Direction = FillDirection.Horizontal,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Children = new Drawable[]
+                    RelativeSizeAxes = Axes.Both,
+                    ColumnDimensions = new[]
                     {
-                        new ToolbarSettingsButton(),
-                        new ToolbarHomeButton
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            Action = () => OnHome?.Invoke()
+                            new Container
+                            {
+                                Name = "Left buttons",
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Depth = float.MinValue,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        Colour = OsuColour.Gray(0.1f),
+                                        RelativeSizeAxes = Axes.Both,
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        Direction = FillDirection.Horizontal,
+                                        RelativeSizeAxes = Axes.Y,
+                                        AutoSizeAxes = Axes.X,
+                                        Children = new Drawable[]
+                                        {
+                                            new ToolbarSettingsButton(),
+                                            new ToolbarHomeButton
+                                            {
+                                                Action = () => OnHome?.Invoke()
+                                            },
+                                        },
+                                    },
+                                }
+                            },
+                            new Container
+                            {
+                                Name = "Ruleset selector",
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    new OsuScrollContainer(Direction.Horizontal)
+                                    {
+                                        ScrollbarVisible = false,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Masking = false,
+                                        Children = new Drawable[]
+                                        {
+                                            rulesetSelector = new ToolbarRulesetSelector()
+                                        }
+                                    },
+                                    new Box
+                                    {
+                                        Colour = ColourInfo.GradientHorizontal(OsuColour.Gray(0.1f).Opacity(0), OsuColour.Gray(0.1f)),
+                                        Width = 50,
+                                        RelativeSizeAxes = Axes.Y,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                    },
+                                }
+                            },
+                            new Container
+                            {
+                                Name = "Right buttons",
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        Colour = OsuColour.Gray(0.1f),
+                                        RelativeSizeAxes = Axes.Both,
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        Direction = FillDirection.Horizontal,
+                                        RelativeSizeAxes = Axes.Y,
+                                        AutoSizeAxes = Axes.X,
+                                        Children = new Drawable[]
+                                        {
+                                            new ToolbarNewsButton(),
+                                            new ToolbarChangelogButton(),
+                                            new ToolbarRankingsButton(),
+                                            new ToolbarBeatmapListingButton(),
+                                            new ToolbarChatButton(),
+                                            new ToolbarSocialButton(),
+                                            new ToolbarWikiButton(),
+                                            new ToolbarMusicButton(),
+                                            //new ToolbarButton
+                                            //{
+                                            //    Icon = FontAwesome.Solid.search
+                                            //},
+                                            userButton = new ToolbarUserButton(),
+                                            new ToolbarClock(),
+                                            new ToolbarNotificationButton(),
+                                        }
+                                    },
+                                }
+                            },
                         },
-                        rulesetSelector = new ToolbarRulesetSelector()
-                    }
-                },
-                new FillFlowContainer
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Direction = FillDirection.Horizontal,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Children = new Drawable[]
-                    {
-                        new ToolbarNewsButton(),
-                        new ToolbarChangelogButton(),
-                        new ToolbarRankingsButton(),
-                        new ToolbarBeatmapListingButton(),
-                        new ToolbarChatButton(),
-                        new ToolbarSocialButton(),
-                        new ToolbarWikiButton(),
-                        new ToolbarMusicButton(),
-                        //new ToolbarButton
-                        //{
-                        //    Icon = FontAwesome.Solid.search
-                        //},
-                        userButton = new ToolbarUserButton(),
-                        new ToolbarNotificationButton(),
                     }
                 }
             };
 
-            // Bound after the selector is added to the hierarchy to give it a chance to load the available rulesets
-            rulesetSelector.Current.BindTo(parentRuleset);
-
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            rulesetSelector.Current.BindTo(ruleset);
         }
 
         public class ToolbarBackground : Container
@@ -176,12 +257,12 @@ namespace osu.Game.Overlays.Toolbar
             this.FadeOut(transition_time, Easing.InQuint);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (OverlayActivationMode.Value == OverlayActivation.Disabled)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.ToggleToolbar:
                     hiddenByUser = State.Value == Visibility.Visible; // set before toggling to allow the operation to always succeed.
@@ -192,7 +273,7 @@ namespace osu.Game.Overlays.Toolbar
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
     }

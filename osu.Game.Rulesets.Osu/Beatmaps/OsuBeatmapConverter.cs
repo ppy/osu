@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -11,6 +13,7 @@ using System.Linq;
 using System.Threading;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
@@ -44,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         LegacyLastTickOffset = (original as IHasLegacyLastTickOffset)?.LegacyLastTickOffset,
                         // prior to v8, speed multipliers don't adjust for how many ticks are generated over the same distance.
                         // this results in more (or less) ticks being generated in <v8 maps for the same time duration.
-                        TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / beatmap.ControlPointInfo.DifficultyPointAt(original.StartTime).SpeedMultiplier : 1
+                        TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(original.StartTime).SliderVelocity : 1
                     }.Yield();
 
                 case IHasDuration endTimeData:

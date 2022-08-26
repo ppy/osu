@@ -1,36 +1,45 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
+#nullable disable
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API;
-using osu.Game.Users;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract class PaginatedProfileSubsection<TModel> : ProfileSubsection
     {
+        /// <summary>
+        /// The number of items displayed per page.
+        /// </summary>
+        protected virtual int ItemsPerPage => 50;
+
+        /// <summary>
+        /// The number of items displayed initially.
+        /// </summary>
+        protected virtual int InitialItemsCount => 5;
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        protected RulesetStore Rulesets { get; private set; }
+        protected PaginationParameters? CurrentPage { get; private set; }
 
-        protected int VisiblePages;
-        protected int ItemsPerPage;
-
-        protected FillFlowContainer ItemsContainer { get; private set; }
+        protected ReverseChildIDFillFlowContainer<Drawable> ItemsContainer { get; private set; }
 
         private APIRequest<List<TModel>> retrievalRequest;
         private CancellationTokenSource loadCancellation;
@@ -39,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private OsuSpriteText missing;
         private readonly LocalisableString? missingText;
 
-        protected PaginatedProfileSubsection(Bindable<User> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
+        protected PaginatedProfileSubsection(Bindable<APIUser> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
             : base(user, headerText, CounterVisibilityState.AlwaysVisible)
         {
             this.missingText = missingText;
@@ -52,11 +61,15 @@ namespace osu.Game.Overlays.Profile.Sections
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                ItemsContainer = new FillFlowContainer
+                // reverse ID flow is required for correct Z-ordering of the items (last item should be front-most).
+                // particularly important in PaginatedBeatmapContainer, as it uses beatmap cards, which have expandable overhanging content.
+                ItemsContainer = new ReverseChildIDFillFlowContainer<Drawable>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(0, 2),
+                    // ensure the container and its contents are in front of the "more" button.
+                    Depth = float.MinValue
                 },
                 moreButton = new ShowMoreButton
                 {
@@ -81,12 +94,12 @@ namespace osu.Game.Overlays.Profile.Sections
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<User> e)
+        private void onUserChanged(ValueChangedEvent<APIUser> e)
         {
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
 
-            VisiblePages = 0;
+            CurrentPage = null;
             ItemsContainer.Clear();
 
             if (e.NewValue != null)
@@ -100,7 +113,9 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             loadCancellation = new CancellationTokenSource();
 
-            retrievalRequest = CreateRequest();
+            CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new PaginationParameters(InitialItemsCount);
+
+            retrievalRequest = CreateRequest(CurrentPage.Value);
             retrievalRequest.Success += UpdateItems;
 
             api.Queue(retrievalRequest);
@@ -110,7 +125,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             OnItemsReceived(items);
 
-            if (!items.Any() && VisiblePages == 1)
+            if (!items.Any() && CurrentPage?.Offset == 0)
             {
                 moreButton.Hide();
                 moreButton.IsLoading = false;
@@ -124,20 +139,21 @@ namespace osu.Game.Overlays.Profile.Sections
             LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
             {
                 missing.Hide();
-                moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
+
+                moreButton.FadeTo(items.Count == CurrentPage?.Limit ? 1 : 0);
                 moreButton.IsLoading = false;
 
                 ItemsContainer.AddRange(drawables);
             }, loadCancellation.Token);
         });
 
-        protected virtual int GetCount(User user) => 0;
+        protected virtual int GetCount(APIUser user) => 0;
 
         protected virtual void OnItemsReceived(List<TModel> items)
         {
         }
 
-        protected abstract APIRequest<List<TModel>> CreateRequest();
+        protected abstract APIRequest<List<TModel>> CreateRequest(PaginationParameters pagination);
 
         protected abstract Drawable CreateDrawableItem(TModel model);
 

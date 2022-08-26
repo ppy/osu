@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -55,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = new Beatmap
             {
-                BeatmapInfo = { BaseDifficulty = { ApproachRate = 9 } },
+                Difficulty = { ApproachRate = 9 },
             };
 
             for (int i = 0; i < 15; i++)

@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 using osuTK;
 
@@ -58,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            RecentParticipants.CollectionChanged += (_, __) => updateParticipants();
+            RecentParticipants.CollectionChanged += (_, _) => updateParticipants();
             updateParticipants();
         }
 
@@ -92,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         private class UserTile : CompositeDrawable
         {
-            public User User
+            public APIUser User
             {
                 get => avatar.User;
                 set => avatar.User = value;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +67,7 @@ namespace osu.Game.Rulesets.UI
 
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        public override IFrameStableClock FrameStableClock => frameStabilityContainer.FrameStableClock;
+        public override IFrameStableClock FrameStableClock => frameStabilityContainer;
 
         private bool frameStablePlayback = true;
 
@@ -133,6 +135,11 @@ namespace osu.Game.Rulesets.UI
                 p.NewResult += (_, r) => NewResult?.Invoke(r);
                 p.RevertResult += (_, r) => RevertResult?.Invoke(r);
             }));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             IsPaused.ValueChanged += paused =>
             {
@@ -373,7 +380,7 @@ namespace osu.Game.Rulesets.UI
         // only show the cursor when within the playfield, by default.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Playfield.ReceivePositionalInputAt(screenSpacePos);
 
-        CursorContainer IProvideCursor.Cursor => Playfield.Cursor;
+        CursorContainer IProvideCursor.MenuCursor => Playfield.Cursor;
 
         public override GameplayCursorContainer Cursor => Playfield.Cursor;
 

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +14,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -57,13 +61,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public bool FilteringActive { get; set; }
 
+        [Resolved]
+        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
+
         private OsuSpriteText text;
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
         private Bindable<bool> isDefault { get; } = new BindableBool(true);
 
-        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(text.Text.ToString());
+        public IEnumerable<LocalisableString> FilterTerms => bindings.Select(b => (LocalisableString)keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text);
 
         public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
         {
@@ -75,72 +82,86 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS };
+            Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
             InternalChildren = new Drawable[]
             {
-                new RestoreDefaultValueButton<bool>
+                new Container
                 {
-                    Current = isDefault,
-                    Action = RestoreDefaults,
-                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = SettingsPanel.CONTENT_MARGINS,
+                    Child = new RestoreDefaultValueButton<bool>
+                    {
+                        Current = isDefault,
+                        Action = RestoreDefaults,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
                 },
-                content = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Masking = true,
-                    CornerRadius = padding,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Radius = 2,
-                        Colour = colours.YellowDark.Opacity(0),
-                        Type = EdgeEffectType.Shadow,
-                        Hollow = true,
-                    },
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
                     Children = new Drawable[]
                     {
-                        new Box
+                        content = new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0.6f,
-                        },
-                        text = new OsuSpriteText
-                        {
-                            Text = action.GetDescription(),
-                            Margin = new MarginPadding(padding),
-                        },
-                        buttons = new FillFlowContainer<KeyButton>
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight
-                        },
-                        cancelAndClearButtons = new FillFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Padding = new MarginPadding(padding) { Top = height + padding * 2 },
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Alpha = 0,
-                            Spacing = new Vector2(5),
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Masking = true,
+                            CornerRadius = padding,
+                            EdgeEffect = new EdgeEffectParameters
+                            {
+                                Radius = 2,
+                                Colour = colourProvider.Highlight1.Opacity(0),
+                                Type = EdgeEffectType.Shadow,
+                                Hollow = true,
+                            },
                             Children = new Drawable[]
                             {
-                                new CancelButton { Action = finalise },
-                                new ClearButton { Action = clear },
-                            },
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background5,
+                                },
+                                text = new OsuSpriteText
+                                {
+                                    Text = action.GetLocalisableDescription(),
+                                    Margin = new MarginPadding(1.5f * padding),
+                                },
+                                buttons = new FillFlowContainer<KeyButton>
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight
+                                },
+                                cancelAndClearButtons = new FillFlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding(padding) { Top = height + padding * 2 },
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Alpha = 0,
+                                    Spacing = new Vector2(5),
+                                    Children = new Drawable[]
+                                    {
+                                        new CancelButton { Action = finalise },
+                                        new ClearButton { Action = clear },
+                                    },
+                                },
+                                new HoverClickSounds()
+                            }
                         }
                     }
-                },
-                new HoverClickSounds()
+                }
             };
 
             foreach (var b in bindings)
@@ -368,13 +389,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateStoreFromButton(KeyButton button)
         {
-            using (var usage = realmFactory.GetForWrite())
+            realm.Run(r =>
             {
-                var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
-                binding.KeyCombinationString = button.KeyBinding.KeyCombinationString;
-
-                usage.Commit();
-            }
+                var binding = r.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
+                r.Write(() => binding.KeyCombinationString = button.KeyBinding.KeyCombinationString);
+            });
         }
 
         private void updateIsDefaultValue()
@@ -386,7 +405,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public CancelButton()
             {
-                Text = CommonStrings.Cancel;
+                Text = CommonStrings.ButtonsCancel;
                 Size = new Vector2(80, 20);
             }
         }
@@ -395,7 +414,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public ClearButton()
             {
-                Text = CommonStrings.Clear;
+                Text = CommonStrings.ButtonsClear;
                 Size = new Vector2(80, 20);
             }
         }
@@ -407,7 +426,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             private readonly Box box;
             public readonly OsuSpriteText Text;
 
-            private Color4 hoverColour;
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; }
+
+            [Resolved]
+            private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
 
             private bool isBinding;
 
@@ -450,7 +473,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     box = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black
                     },
                     Text = new OsuSpriteText
                     {
@@ -458,16 +480,23 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         Margin = new MarginPadding(5),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = keyBinding.KeyCombination.ReadableString(),
                     },
                     new HoverSounds()
                 };
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            protected override void LoadComplete()
             {
-                hoverColour = colours.YellowDark;
+                base.LoadComplete();
+
+                keyCombinationProvider.KeymapChanged += updateKeyCombinationText;
+                updateKeyCombinationText();
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                updateHoverState();
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -486,23 +515,38 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 if (isBinding)
                 {
-                    box.FadeColour(Color4.White, transition_time, Easing.OutQuint);
+                    box.FadeColour(colourProvider.Light2, transition_time, Easing.OutQuint);
                     Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
                 }
                 else
                 {
-                    box.FadeColour(IsHovered ? hoverColour : Color4.Black, transition_time, Easing.OutQuint);
+                    box.FadeColour(IsHovered ? colourProvider.Light4 : colourProvider.Background6, transition_time, Easing.OutQuint);
                     Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
                 }
             }
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
-                if (KeyBinding.RulesetID != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
+                if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
                     return;
 
                 KeyBinding.KeyCombination = newCombination;
-                Text.Text = KeyBinding.KeyCombination.ReadableString();
+                updateKeyCombinationText();
+            }
+
+            private void updateKeyCombinationText()
+            {
+                Scheduler.AddOnce(updateText);
+
+                void updateText() => Text.Text = keyCombinationProvider.GetReadableString(KeyBinding.KeyCombination);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (keyCombinationProvider != null)
+                    keyCombinationProvider.KeymapChanged -= updateKeyCombinationText;
             }
         }
     }

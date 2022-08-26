@@ -5,18 +5,15 @@ using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// A container which fires a callback when a new beat is reached.
-    /// Consumes a parent <see cref="GameplayClock"/> or <see cref="Beatmap"/> (whichever is first available).
+    /// Consumes a parent <see cref="IBeatSyncProvider"/>.
     /// </summary>
     /// <remarks>
     /// This container does not set its own clock to the source used for beat matching.
@@ -28,7 +25,10 @@ namespace osu.Game.Graphics.Containers
     public class BeatSyncedContainer : Container
     {
         private int lastBeat;
-        private TimingControlPoint lastTimingPoint;
+
+        private TimingControlPoint? lastTimingPoint { get; set; }
+
+        protected bool IsKiaiTime { get; private set; }
 
         /// <summary>
         /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes)"/>.
@@ -70,74 +70,44 @@ namespace osu.Game.Graphics.Containers
         public double MinimumBeatLength { get; set; }
 
         /// <summary>
-        /// Whether this container is currently tracking a beatmap's timing data.
+        /// Whether this container is currently tracking a beat sync provider.
         /// </summary>
         protected bool IsBeatSyncedWithTrack { get; private set; }
+
+        [Resolved]
+        protected IBeatSyncProvider BeatSyncSource { get; private set; } = null!;
 
         protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
         }
 
-        [Resolved]
-        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
-
-        [Resolved(canBeNull: true)]
-        protected GameplayClock GameplayClock { get; private set; }
-
-        protected IClock BeatSyncClock
-        {
-            get
-            {
-                if (GameplayClock != null)
-                    return GameplayClock;
-
-                if (Beatmap.Value.TrackLoaded)
-                    return Beatmap.Value.Track;
-
-                return null;
-            }
-        }
-
         protected override void Update()
         {
-            ITrack track = null;
-            IBeatmap beatmap = null;
-
             TimingControlPoint timingPoint;
             EffectControlPoint effectPoint;
 
-            IClock clock = BeatSyncClock;
+            IsBeatSyncedWithTrack = BeatSyncSource.CheckBeatSyncAvailable() && BeatSyncSource.Clock?.IsRunning == true;
 
-            if (clock == null)
-                return;
-
-            double currentTrackTime = clock.CurrentTime;
-
-            if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
-            {
-                track = Beatmap.Value.Track;
-                beatmap = Beatmap.Value.Beatmap;
-            }
-
-            IsBeatSyncedWithTrack = beatmap != null && clock.IsRunning && track?.Length > 0;
+            double currentTrackTime;
 
             if (IsBeatSyncedWithTrack)
             {
-                Debug.Assert(beatmap != null);
+                Debug.Assert(BeatSyncSource.Clock != null);
 
-                timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
-                effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
+                currentTrackTime = BeatSyncSource.Clock.CurrentTime + EarlyActivationMilliseconds;
+
+                timingPoint = BeatSyncSource.ControlPoints?.TimingPointAt(currentTrackTime) ?? TimingControlPoint.DEFAULT;
+                effectPoint = BeatSyncSource.ControlPoints?.EffectPointAt(currentTrackTime) ?? EffectControlPoint.DEFAULT;
             }
             else
             {
                 // this may be the case where the beat syncing clock has been paused.
                 // we still want to show an idle animation, so use this container's time instead.
-                currentTrackTime = Clock.CurrentTime;
+                currentTrackTime = Clock.CurrentTime + EarlyActivationMilliseconds;
+
                 timingPoint = TimingControlPoint.DEFAULT;
                 effectPoint = EffectControlPoint.DEFAULT;
             }
-
-            currentTrackTime += EarlyActivationMilliseconds;
 
             double beatLength = timingPoint.BeatLength / Divisor;
 
@@ -156,7 +126,7 @@ namespace osu.Game.Graphics.Containers
 
             TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
 
-            if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
+            if (ReferenceEquals(timingPoint, lastTimingPoint) && beatIndex == lastBeat)
                 return;
 
             // as this event is sometimes used for sound triggers where `BeginDelayedSequence` has no effect, avoid firing it if too far away from the beat.
@@ -164,11 +134,13 @@ namespace osu.Game.Graphics.Containers
             if (AllowMistimedEventFiring || Math.Abs(TimeSinceLastBeat) < MISTIMED_ALLOWANCE)
             {
                 using (BeginDelayedSequence(-TimeSinceLastBeat))
-                    OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? ChannelAmplitudes.Empty);
+                    OnNewBeat(beatIndex, timingPoint, effectPoint, BeatSyncSource.CurrentAmplitudes);
             }
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;
+
+            IsKiaiTime = effectPoint.KiaiMode;
         }
     }
 }

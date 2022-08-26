@@ -35,11 +35,6 @@ namespace osu.Game.Localisation
         public static LocalisableString ShowFPS => new TranslatableString(getKey(@"show_fps"), @"Show FPS");
 
         /// <summary>
-        /// "Using unlimited frame limiter can lead to stutters, bad performance and overheating. It will not improve perceived latency. "2x refresh rate" is recommended."
-        /// </summary>
-        public static LocalisableString UnlimitedFramesNote => new TranslatableString(getKey(@"unlimited_frames_note"), @"Using unlimited frame limiter can lead to stutters, bad performance and overheating. It will not improve perceived latency. ""2x refresh rate"" is recommended.");
-
-        /// <summary>
         /// "Layout"
         /// </summary>
         public static LocalisableString LayoutHeader => new TranslatableString(getKey(@"layout_header"), @"Layout");
@@ -53,6 +48,11 @@ namespace osu.Game.Localisation
         /// "Resolution"
         /// </summary>
         public static LocalisableString Resolution => new TranslatableString(getKey(@"resolution"), @"Resolution");
+
+        /// <summary>
+        /// "Display"
+        /// </summary>
+        public static LocalisableString Display => new TranslatableString(getKey(@"display"), @"Display");
 
         /// <summary>
         /// "UI scaling"
@@ -105,6 +105,11 @@ namespace osu.Game.Localisation
         public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit lighting");
 
         /// <summary>
+        /// "Screenshots"
+        /// </summary>
+        public static LocalisableString Screenshots => new TranslatableString(getKey(@"screenshots"), @"Screenshots");
+
+        /// <summary>
         /// "Screenshot format"
         /// </summary>
         public static LocalisableString ScreenshotFormat => new TranslatableString(getKey(@"screenshot_format"), @"Screenshot format");
@@ -113,6 +118,26 @@ namespace osu.Game.Localisation
         /// "Show menu cursor in screenshots"
         /// </summary>
         public static LocalisableString ShowCursorInScreenshots => new TranslatableString(getKey(@"show_cursor_in_screenshots"), @"Show menu cursor in screenshots");
+
+        /// <summary>
+        /// "Video"
+        /// </summary>
+        public static LocalisableString VideoHeader => new TranslatableString(getKey(@"video_header"), @"Video");
+
+        /// <summary>
+        /// "Use hardware acceleration"
+        /// </summary>
+        public static LocalisableString UseHardwareAcceleration => new TranslatableString(getKey(@"use_hardware_acceleration"), @"Use hardware acceleration");
+
+        /// <summary>
+        /// "JPG (web-friendly)"
+        /// </summary>
+        public static LocalisableString Jpg => new TranslatableString(getKey(@"jpg_web_friendly"), @"JPG (web-friendly)");
+
+        /// <summary>
+        /// "PNG (lossless)"
+        /// </summary>
+        public static LocalisableString Png => new TranslatableString(getKey(@"png_lossless"), @"PNG (lossless)");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

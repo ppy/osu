@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -17,9 +19,6 @@ namespace osu.Game.Tests.Input
     {
         [Resolved]
         private FrameworkConfigManager frameworkConfigManager { get; set; }
-
-        [Resolved]
-        private OsuConfigManager osuConfigManager { get; set; }
 
         [TestCase(WindowMode.Windowed)]
         [TestCase(WindowMode.Borderless)]

@@ -1,23 +1,24 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class TeamIntroScreen : TournamentMatchScreen, IProvideVideo
+    public class TeamIntroScreen : TournamentMatchScreen
     {
         private Container mainContainer;
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
 

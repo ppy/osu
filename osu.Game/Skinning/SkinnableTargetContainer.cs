@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
@@ -22,6 +25,8 @@ namespace osu.Game.Skinning
 
         public bool ComponentsLoaded { get; private set; }
 
+        private CancellationTokenSource cancellationSource;
+
         public SkinnableTargetContainer(SkinnableTarget target)
         {
             Target = target;
@@ -38,6 +43,9 @@ namespace osu.Game.Skinning
 
             content = CurrentSkin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetComponentsContainer;
 
+            cancellationSource?.Cancel();
+            cancellationSource = null;
+
             if (content != null)
             {
                 LoadComponentAsync(content, wrapper =>
@@ -45,7 +53,7 @@ namespace osu.Game.Skinning
                     AddInternal(wrapper);
                     components.AddRange(wrapper.Children.OfType<ISkinnableDrawable>());
                     ComponentsLoaded = true;
-                });
+                }, (cancellationSource = new CancellationTokenSource()).Token);
             }
             else
                 ComponentsLoaded = true;

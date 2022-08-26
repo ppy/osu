@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -66,7 +68,7 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(star_spacing),
-                    ChildrenEnumerable = Enumerable.Range(0, StarCount).Select(i => CreateStar())
+                    ChildrenEnumerable = Enumerable.Range(0, StarCount).Select(_ => CreateStar())
                 }
             };
         }
@@ -89,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public void ReplayAnimation()
         {
-            var t = current;
+            float t = current;
             ResetCount();
             Current = t;
         }
@@ -105,7 +107,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void animate(float newValue)
         {
-            for (var i = 0; i < stars.Children.Count; i++)
+            for (int i = 0; i < stars.Children.Count; i++)
             {
                 var star = stars.Children[i];
 

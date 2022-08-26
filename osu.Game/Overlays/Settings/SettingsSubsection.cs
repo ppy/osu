@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,11 +27,7 @@ namespace osu.Game.Overlays.Settings
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
 
-        // FilterTerms should contains both original string and localised string for user to search.
-        // Since LocalisableString is unable to get original string at this time (2021-08-14),
-        // only call .ToString() to use localised one.
-        // TODO: Update here when FilterTerms accept LocalisableString.
-        public virtual IEnumerable<string> FilterTerms => new[] { Header.ToString() };
+        public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Header };
 
         public bool MatchingFilter
         {
@@ -46,12 +44,16 @@ namespace osu.Game.Overlays.Settings
 
             FlowContent = new FillFlowContainer
             {
+                Margin = new MarginPadding { Top = SettingsSection.ITEM_SPACING },
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 8),
+                Spacing = new Vector2(0, SettingsSection.ITEM_SPACING),
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
             };
         }
+
+        private const int header_height = 43;
+        private const int header_font_size = 20;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -60,9 +62,9 @@ namespace osu.Game.Overlays.Settings
             {
                 new OsuSpriteText
                 {
-                    Text = Header.ToString().ToUpper(), // TODO: Add localisation support after https://github.com/ppy/osu-framework/pull/4603 is merged.
-                    Margin = new MarginPadding { Vertical = 30, Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS },
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    Text = Header,
+                    Margin = new MarginPadding { Vertical = (header_height - header_font_size) * 0.5f, Horizontal = SettingsPanel.CONTENT_MARGINS },
+                    Font = OsuFont.GetFont(size: header_font_size),
                 },
                 FlowContent
             });

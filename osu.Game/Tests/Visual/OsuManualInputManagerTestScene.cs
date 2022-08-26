@@ -1,10 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Testing;
 using osu.Framework.Testing.Input;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
@@ -12,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
@@ -33,15 +38,11 @@ namespace osu.Game.Tests.Visual
 
         protected OsuManualInputManagerTestScene()
         {
-            MenuCursorContainer cursorContainer;
+            GlobalCursorDisplay cursorDisplay;
 
-            CompositeDrawable mainContent = new PopoverContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both, }
-            };
+            CompositeDrawable mainContent = cursorDisplay = new GlobalCursorDisplay { RelativeSizeAxes = Axes.Both };
 
-            cursorContainer.Child = content = new OsuTooltipContainer(cursorContainer.Cursor)
+            cursorDisplay.Child = content = new OsuTooltipContainer(cursorDisplay.MenuCursor)
             {
                 RelativeSizeAxes = Axes.Both
             };
@@ -117,6 +118,25 @@ namespace osu.Game.Tests.Visual
                         },
                     }
                 },
+            });
+        }
+
+        /// <summary>
+        /// Wait for a button to become enabled, then click it.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        protected void ClickButtonWhenEnabled<T>()
+            where T : Drawable
+        {
+            if (typeof(T) == typeof(Button))
+                AddUntilStep($"wait for {typeof(T).Name} enabled", () => (this.ChildrenOfType<T>().Single() as ClickableContainer)?.Enabled.Value == true);
+            else
+                AddUntilStep($"wait for {typeof(T).Name} enabled", () => this.ChildrenOfType<T>().Single().ChildrenOfType<ClickableContainer>().Single().Enabled.Value);
+
+            AddStep($"click {typeof(T).Name}", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<T>().Single());
+                InputManager.Click(MouseButton.Left);
             });
         }
 

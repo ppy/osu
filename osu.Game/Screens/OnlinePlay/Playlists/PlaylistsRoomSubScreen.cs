@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -10,8 +12,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Input;
-using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -29,13 +31,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         public override string ShortTitle => "playlist";
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
         private readonly IBindable<bool> isIdle = new BindableBool();
 
         private MatchLeaderboard leaderboard;
         private SelectionPollingComponent selectionPollingComponent;
+
+        private FillFlowContainer progressSection;
 
         public PlaylistsRoomSubScreen(Room room)
             : base(room, false) // Editing is temporarily not allowed.
@@ -67,115 +68,163 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     Schedule(() => SelectedItem.Value = Room.Playlist.FirstOrDefault());
                 }
             }, true);
+
+            Room.MaxAttempts.BindValueChanged(_ => progressSection.Alpha = Room.MaxAttempts.Value != null ? 1 : 0, true);
         }
 
-        protected override Drawable CreateMainContent() => new GridContainer
+        protected override Drawable CreateMainContent() => new Container
         {
             RelativeSizeAxes = Axes.Both,
-            Content = new[]
+            Padding = new MarginPadding { Horizontal = 5, Vertical = 10 },
+            Child = new OsuContextMenuContainer
             {
-                new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                Child = new GridContainer
                 {
-                    new Container
+                    RelativeSizeAxes = Axes.Both,
+                    ColumnDimensions = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Right = 5 },
-                        Child = new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Content = new[]
-                            {
-                                new Drawable[] { new OverlinedPlaylistHeader(), },
-                                new Drawable[]
-                                {
-                                    new DrawableRoomPlaylistWithResults
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Items = { BindTarget = Room.Playlist },
-                                        SelectedItem = { BindTarget = SelectedItem },
-                                        RequestShowResults = item =>
-                                        {
-                                            Debug.Assert(RoomId.Value != null);
-                                            ParentScreen?.Push(new PlaylistsResultsScreen(null, RoomId.Value.Value, item, false));
-                                        }
-                                    }
-                                },
-                            },
-                            RowDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.AutoSize),
-                                new Dimension(),
-                            }
-                        }
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Absolute, 10),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Absolute, 10),
+                        new Dimension(),
                     },
-                    null,
-                    new GridContainer
+                    Content = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Content = new[]
+                        new Drawable[]
                         {
-                            new[]
+                            // Playlist items column
+                            new Container
                             {
-                                UserModsSection = new FillFlowContainer
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Right = 5 },
+                                Child = new GridContainer
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Alpha = 0,
-                                    Margin = new MarginPadding { Bottom = 10 },
-                                    Children = new Drawable[]
+                                    RelativeSizeAxes = Axes.Both,
+                                    Content = new[]
                                     {
-                                        new OverlinedHeader("Extra mods"),
-                                        new FillFlowContainer
+                                        new Drawable[] { new OverlinedPlaylistHeader(), },
+                                        new Drawable[]
                                         {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Spacing = new Vector2(10, 0),
+                                            new DrawableRoomPlaylist
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Items = { BindTarget = Room.Playlist },
+                                                SelectedItem = { BindTarget = SelectedItem },
+                                                AllowSelection = true,
+                                                AllowShowingResults = true,
+                                                RequestResults = item =>
+                                                {
+                                                    Debug.Assert(RoomId.Value != null);
+                                                    ParentScreen?.Push(new PlaylistsResultsScreen(null, RoomId.Value.Value, item, false));
+                                                }
+                                            }
+                                        },
+                                    },
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(),
+                                    }
+                                }
+                            },
+                            // Spacer
+                            null,
+                            // Middle column (mods and leaderboard)
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Content = new[]
+                                {
+                                    new[]
+                                    {
+                                        UserModsSection = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Alpha = 0,
+                                            Margin = new MarginPadding { Bottom = 10 },
                                             Children = new Drawable[]
                                             {
-                                                new UserModSelectButton
+                                                new OverlinedHeader("Extra mods"),
+                                                new FillFlowContainer
                                                 {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                    Width = 90,
-                                                    Text = "Select",
-                                                    Action = ShowUserModSelect,
-                                                },
-                                                new ModDisplay
-                                                {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                    Current = UserMods,
-                                                    Scale = new Vector2(0.8f),
-                                                },
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(10, 0),
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new UserModSelectButton
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Width = 90,
+                                                            Text = "Select",
+                                                            Action = ShowUserModSelect,
+                                                        },
+                                                        new ModDisplay
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Current = UserMods,
+                                                            Scale = new Vector2(0.8f),
+                                                        },
+                                                    }
+                                                }
                                             }
-                                        }
-                                    }
+                                        },
+                                    },
+                                    new Drawable[]
+                                    {
+                                        progressSection = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Alpha = 0,
+                                            Margin = new MarginPadding { Bottom = 10 },
+                                            Direction = FillDirection.Vertical,
+                                            Children = new Drawable[]
+                                            {
+                                                new OverlinedHeader("Progress"),
+                                                new RoomLocalUserInfo(),
+                                            }
+                                        },
+                                    },
+                                    new Drawable[]
+                                    {
+                                        new OverlinedHeader("Leaderboard")
+                                    },
+                                    new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
                                 },
+                                RowDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(),
+                                }
                             },
-                            new Drawable[]
+                            // Spacer
+                            null,
+                            // Main right column
+                            new GridContainer
                             {
-                                new OverlinedHeader("Leaderboard")
+                                RelativeSizeAxes = Axes.Both,
+                                Content = new[]
+                                {
+                                    new Drawable[] { new OverlinedHeader("Chat") },
+                                    new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
+                                },
+                                RowDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(),
+                                }
                             },
-                            new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
-                            new Drawable[] { new OverlinedHeader("Chat"), },
-                            new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
                         },
-                        RowDimensions = new[]
-                        {
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.Relative, size: 0.4f, minSize: 120),
-                        }
                     },
-                },
-            },
-            ColumnDimensions = new[]
-            {
-                new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 400),
-                new Dimension(),
-                new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 600),
+                }
             }
         };
 
@@ -201,7 +250,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(Room, SelectedItem.Value)
         {
-            Exited = () => leaderboard.RefreshScores()
+            Exited = () => leaderboard.RefetchScores()
         });
     }
 }

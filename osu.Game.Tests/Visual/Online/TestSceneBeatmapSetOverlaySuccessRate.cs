@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -11,6 +13,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Screens.Select.Details;
@@ -59,45 +62,46 @@ namespace osu.Game.Tests.Visual.Online
             var secondBeatmap = createBeatmap();
 
             AddStep("set first set", () => successRate.Beatmap = firstBeatmap);
-            AddAssert("ratings set", () => successRate.Graph.Metrics == firstBeatmap.Metrics);
+            AddAssert("ratings set", () => successRate.Graph.FailTimes == firstBeatmap.FailTimes);
 
             AddStep("set second set", () => successRate.Beatmap = secondBeatmap);
-            AddAssert("ratings set", () => successRate.Graph.Metrics == secondBeatmap.Metrics);
+            AddAssert("ratings set", () => successRate.Graph.FailTimes == secondBeatmap.FailTimes);
 
-            static BeatmapInfo createBeatmap() => new BeatmapInfo
+            static APIBeatmap createBeatmap() => new APIBeatmap
             {
-                Metrics = new BeatmapMetrics
+                FailTimes = new APIFailTimes
                 {
                     Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
                     Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
-                }
+                },
+                PassCount = RNG.Next(0, 999),
+                PlayCount = RNG.Next(1000, 1999),
             };
         }
 
         [Test]
         public void TestOnlyFailMetrics()
         {
-            AddStep("set beatmap", () => successRate.Beatmap = new BeatmapInfo
+            AddStep("set beatmap", () => successRate.Beatmap = new APIBeatmap
             {
-                Metrics = new BeatmapMetrics
+                FailTimes = new APIFailTimes
                 {
                     Fails = Enumerable.Range(1, 100).ToArray(),
                 }
             });
-            AddAssert("graph max values correct",
-                () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 100));
+
+            AddAssert("graph max values correct", () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 100));
         }
 
         [Test]
         public void TestEmptyMetrics()
         {
-            AddStep("set beatmap", () => successRate.Beatmap = new BeatmapInfo
+            AddStep("set beatmap", () => successRate.Beatmap = new APIBeatmap
             {
-                Metrics = new BeatmapMetrics()
+                FailTimes = new APIFailTimes()
             });
 
-            AddAssert("graph max values correct",
-                () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 0));
+            AddAssert("graph max values correct", () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 0));
         }
 
         private class GraphExposingSuccessRate : SuccessRate

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -12,17 +14,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneStarRatingRangeDisplay : OnlinePlayTestScene
     {
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            SelectedRoom.Value = new Room();
+            base.SetUpSteps();
 
-            Child = new StarRatingRangeDisplay
+            AddStep("create display", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            };
-        });
+                SelectedRoom.Value = new Room();
+
+                Child = new StarRatingRangeDisplay
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                };
+            });
+        }
 
         [Test]
         public void TestRange([Values(0, 2, 3, 4, 6, 7)] double min, [Values(0, 2, 3, 4, 6, 7)] double max)
@@ -31,8 +37,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 SelectedRoom.Value.Playlist.AddRange(new[]
                 {
-                    new PlaylistItem { Beatmap = { Value = new BeatmapInfo { StarDifficulty = min } } },
-                    new PlaylistItem { Beatmap = { Value = new BeatmapInfo { StarDifficulty = max } } },
+                    new PlaylistItem(new BeatmapInfo { StarRating = min }),
+                    new PlaylistItem(new BeatmapInfo { StarRating = max }),
                 });
             });
         }

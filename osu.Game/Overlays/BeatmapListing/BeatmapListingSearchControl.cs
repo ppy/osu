@@ -1,23 +1,26 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osuTK;
-using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osuTK.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -48,17 +51,17 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<SearchExplicit> ExplicitContent => explicitContentFilter.Current;
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             set
             {
-                if (value == null || string.IsNullOrEmpty(value.OnlineInfo.Covers.Cover))
+                if (value == null || string.IsNullOrEmpty(value.Covers.Cover))
                 {
                     beatmapCover.FadeOut(600, Easing.OutQuint);
                     return;
                 }
 
-                beatmapCover.BeatmapSet = value;
+                beatmapCover.OnlineInfo = value;
                 beatmapCover.FadeTo(0.1f, 200, Easing.OutQuint);
             }
         }
@@ -75,7 +78,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchFilterRow<SearchExplicit> explicitContentFilter;
 
         private readonly Box background;
-        private readonly UpdateableBeatmapSetCover beatmapCover;
+        private readonly UpdateableOnlineBeatmapSetCover beatmapCover;
 
         public BeatmapListingSearchControl()
         {
@@ -117,7 +120,7 @@ namespace osu.Game.Overlays.BeatmapListing
                             textBox = new BeatmapSearchTextBox
                             {
                                 RelativeSizeAxes = Axes.X,
-                                TypingStarted = () => TypingStarted?.Invoke(),
+                                TextChanged = () => TypingStarted?.Invoke(),
                             },
                             new ReverseChildIDFillFlowContainer<Drawable>
                             {
@@ -127,7 +130,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Padding = new MarginPadding { Horizontal = 10 },
                                 Children = new Drawable[]
                                 {
-                                    generalFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>(BeatmapsStrings.ListingSearchFiltersGeneral),
+                                    generalFilter = new BeatmapSearchGeneralFilterRow(),
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
                                     categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(BeatmapsStrings.ListingSearchFiltersStatus),
                                     genreFilter = new BeatmapSearchFilterRow<SearchGenre>(BeatmapsStrings.ListingSearchFiltersGenre),
@@ -162,12 +165,12 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public void TakeFocus() => textBox.TakeFocus();
 
-        private class BeatmapSearchTextBox : SearchTextBox
+        private class BeatmapSearchTextBox : BasicSearchTextBox
         {
             /// <summary>
             /// Any time the text box receives key events (even while masked).
             /// </summary>
-            public Action TypingStarted;
+            public Action TextChanged;
 
             protected override Color4 SelectionColour => Color4.Gray;
 
@@ -181,12 +184,21 @@ namespace osu.Game.Overlays.BeatmapListing
                 if (!base.OnKeyDown(e))
                     return false;
 
-                TypingStarted?.Invoke();
+                TextChanged?.Invoke();
+                return true;
+            }
+
+            public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                if (!base.OnPressed(e))
+                    return false;
+
+                TextChanged?.Invoke();
                 return true;
             }
         }
 
-        private class TopSearchBeatmapSetCover : UpdateableBeatmapSetCover
+        private class TopSearchBeatmapSetCover : UpdateableOnlineBeatmapSetCover
         {
             protected override bool TransformImmediately => true;
         }

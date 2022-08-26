@@ -1,8 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using Markdig.Syntax;
-using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Game.Graphics.Containers.Markdown;
 
@@ -10,15 +11,7 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentMarkdownContainer : OsuMarkdownContainer
     {
-        public override MarkdownTextFlowContainer CreateTextFlow() => new CommentMarkdownTextFlowContainer();
-
         protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new CommentMarkdownHeading(headingBlock);
-
-        private class CommentMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
-        {
-            // Don't render image in comment for now
-            protected override void AddImage(LinkInline linkInline) { }
-        }
 
         private class CommentMarkdownHeading : OsuMarkdownHeading
         {
@@ -29,7 +22,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override float GetFontSizeByLevel(int level)
             {
-                var defaultFontSize = base.GetFontSizeByLevel(6);
+                float defaultFontSize = base.GetFontSizeByLevel(6);
 
                 switch (level)
                 {

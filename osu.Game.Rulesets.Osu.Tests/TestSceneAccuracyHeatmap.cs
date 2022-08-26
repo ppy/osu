@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -48,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     Position = new Vector2(100, 300),
                 },
-                accuracyHeatmap = new TestAccuracyHeatmap(new ScoreInfo { Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo })
+                accuracyHeatmap = new TestAccuracyHeatmap(new ScoreInfo { BeatmapInfo = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

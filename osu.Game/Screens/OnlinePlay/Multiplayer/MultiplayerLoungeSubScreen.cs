@@ -1,11 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -25,23 +31,39 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
-        public override void OnResuming(IScreen last)
+        private Dropdown<RoomPermissionsFilter> roomAccessTypeDropdown;
+
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             // Upon having left a room, we don't know whether we were the only participant, and whether the room is now closed as a result of leaving it.
             // To work around this, temporarily remove the room and trigger an immediate listing poll.
-            if (last is MultiplayerMatchSubScreen match)
+            if (e.Last is MultiplayerMatchSubScreen match)
             {
                 RoomManager.RemoveRoom(match.Room);
                 ListingPollingComponent.PollImmediately();
             }
         }
 
+        protected override IEnumerable<Drawable> CreateFilterControls()
+        {
+            roomAccessTypeDropdown = new SlimEnumDropdown<RoomPermissionsFilter>
+            {
+                RelativeSizeAxes = Axes.None,
+                Width = 160,
+            };
+
+            roomAccessTypeDropdown.Current.BindValueChanged(_ => UpdateFilter());
+
+            return base.CreateFilterControls().Prepend(roomAccessTypeDropdown);
+        }
+
         protected override FilterCriteria CreateFilterCriteria()
         {
             var criteria = base.CreateFilterCriteria();
             criteria.Category = @"realtime";
+            criteria.Permissions = roomAccessTypeDropdown.Current.Value;
             return criteria;
         }
 
@@ -79,16 +101,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             private void load()
             {
                 isConnected.BindTo(client.IsConnected);
-                isConnected.BindValueChanged(c => Scheduler.AddOnce(() =>
-                {
-                    if (isConnected.Value && IsLoaded)
-                        PollImmediately();
-                }), true);
+                isConnected.BindValueChanged(_ => Scheduler.AddOnce(poll), true);
+            }
+
+            private void poll()
+            {
+                if (isConnected.Value && IsLoaded)
+                    PollImmediately();
             }
 
             protected override Task Poll()
             {
                 if (!isConnected.Value)
+                    return Task.CompletedTask;
+
+                if (client.Room != null)
                     return Task.CompletedTask;
 
                 return base.Poll();
