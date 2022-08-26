@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
             // This accounts for the clock source potentially taking time to enter a completely stopped state
             Seek(GameplayClock.CurrentTime);
 
-            // The case which cause this to be added is FrameStabilityContainer, which manages its own current and elapsed time.
+            // The case which caused this to be added is FrameStabilityContainer, which manages its own current and elapsed time.
             // Because we generally update our own current time quicker than children can query it (via Start/Seek/Update),
             // this means that the first frame ever exposed to children may have a non-zero current time.
             //
