@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu
 
             bool dragMode = limitedActiveTapTouches.Count() >= tap_touches_limit;
 
-            var newActiveTapActions = limitedActiveTapTouches.Select(s => getActionForTouchSource(s));
+            var newActiveTapActions = limitedActiveTapTouches.Select(getActionForTouchSource);
             var newInactiveTapActions = PressedActions.Where(a => !newActiveTapActions.Contains(a)).ToList();
 
             foreach (var action in newInactiveTapActions)
