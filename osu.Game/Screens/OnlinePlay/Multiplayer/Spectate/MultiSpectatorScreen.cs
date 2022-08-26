@@ -132,7 +132,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }, _ =>
             {
                 foreach (var instance in instances)
-                    leaderboard.AddClock(instance.UserId, instance.GameplayClock);
+                    leaderboard.AddClock(instance.UserId, instance.SpectatorPlayerClock);
 
                 leaderboardFlow.Insert(0, leaderboard);
 
@@ -163,10 +163,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             base.Update();
 
-            if (!isCandidateAudioSource(currentAudioSource?.GameplayClock))
+            if (!isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
             {
-                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.GameplayClock))
-                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.CurrentMasterTime))
+                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock))
+                                              .OrderBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime))
                                               .FirstOrDefault();
 
                 foreach (var instance in instances)
@@ -187,8 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                                         .DefaultIfEmpty(0)
                                         .Min();
 
-            masterClockContainer.StartTime = startTime;
-            masterClockContainer.Reset(true);
+            masterClockContainer.Reset(startTime, true);
         }
 
         protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState)
@@ -216,7 +215,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var instance = instances.Single(i => i.UserId == userId);
 
             instance.FadeColour(colours.Gray4, 400, Easing.OutQuint);
-            syncManager.RemoveManagedClock(instance.GameplayClock);
+            syncManager.RemoveManagedClock(instance.SpectatorPlayerClock);
         }
 
         public override bool OnBackButton()
