@@ -165,11 +165,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             sendFrames(PLAYER_1_ID, 40);
             sendFrames(PLAYER_2_ID, 20);
 
-            waitUntilPaused(PLAYER_2_ID, true);
-            checkPausedInstant(PLAYER_1_ID, false);
+            waitUntilPaused(PLAYER_2_ID);
+            checkRunningInstant(PLAYER_1_ID);
             AddAssert("master clock still running", () => this.ChildrenOfType<MasterGameplayClockContainer>().Single().IsRunning);
 
-            waitUntilPaused(PLAYER_1_ID, true);
+            waitUntilPaused(PLAYER_1_ID);
             AddUntilStep("master clock paused", () => !this.ChildrenOfType<MasterGameplayClockContainer>().Single().IsRunning);
         }
 
@@ -181,13 +181,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // Send frames for one player only, both should remain paused.
             sendFrames(PLAYER_1_ID, 20);
-            checkPausedInstant(PLAYER_1_ID, true);
-            checkPausedInstant(PLAYER_2_ID, true);
+            checkPausedInstant(PLAYER_1_ID);
+            checkPausedInstant(PLAYER_2_ID);
 
             // Send frames for the other player, both should now start playing.
             sendFrames(PLAYER_2_ID, 20);
-            checkPausedInstant(PLAYER_1_ID, false);
-            checkPausedInstant(PLAYER_2_ID, false);
+            checkRunningInstant(PLAYER_1_ID);
+            checkRunningInstant(PLAYER_2_ID);
         }
 
         [Test]
@@ -198,15 +198,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // Send frames for one player only, both should remain paused.
             sendFrames(PLAYER_1_ID, 1000);
-            checkPausedInstant(PLAYER_1_ID, true);
-            checkPausedInstant(PLAYER_2_ID, true);
+            checkPausedInstant(PLAYER_1_ID);
+            checkPausedInstant(PLAYER_2_ID);
 
             // Wait for the start delay seconds...
             AddWaitStep("wait maximum start delay seconds", (int)(SpectatorSyncManager.MAXIMUM_START_DELAY / TimePerAction));
 
             // Player 1 should start playing by itself, player 2 should remain paused.
-            checkPausedInstant(PLAYER_1_ID, false);
-            checkPausedInstant(PLAYER_2_ID, true);
+            checkRunningInstant(PLAYER_1_ID);
+            checkPausedInstant(PLAYER_2_ID);
         }
 
         [Test]
@@ -218,26 +218,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
             // Send initial frames for both players. A few more for player 1.
             sendFrames(PLAYER_1_ID, 20);
             sendFrames(PLAYER_2_ID);
-            checkPausedInstant(PLAYER_1_ID, false);
-            checkPausedInstant(PLAYER_2_ID, false);
+            checkRunningInstant(PLAYER_1_ID);
+            checkRunningInstant(PLAYER_2_ID);
 
             // Eventually player 2 will pause, player 1 must remain running.
-            waitUntilPaused(PLAYER_2_ID, true);
-            checkPausedInstant(PLAYER_1_ID, false);
+            waitUntilPaused(PLAYER_2_ID);
+            checkRunningInstant(PLAYER_1_ID);
 
             // Eventually both players will run out of frames and should pause.
-            waitUntilPaused(PLAYER_1_ID, true);
-            checkPausedInstant(PLAYER_2_ID, true);
+            waitUntilPaused(PLAYER_1_ID);
+            checkPausedInstant(PLAYER_2_ID);
 
             // Send more frames for the first player only. Player 1 should start playing with player 2 remaining paused.
             sendFrames(PLAYER_1_ID, 20);
-            checkPausedInstant(PLAYER_2_ID, true);
-            checkPausedInstant(PLAYER_1_ID, false);
+            checkPausedInstant(PLAYER_2_ID);
+            checkRunningInstant(PLAYER_1_ID);
 
             // Send more frames for the second player. Both should be playing
             sendFrames(PLAYER_2_ID, 20);
-            checkPausedInstant(PLAYER_2_ID, false);
-            checkPausedInstant(PLAYER_1_ID, false);
+            checkRunningInstant(PLAYER_2_ID);
+            checkRunningInstant(PLAYER_1_ID);
         }
 
         [Test]
@@ -249,16 +249,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             // Send initial frames for both players. A few more for player 1.
             sendFrames(PLAYER_1_ID, 1000);
             sendFrames(PLAYER_2_ID, 30);
-            checkPausedInstant(PLAYER_1_ID, false);
-            checkPausedInstant(PLAYER_2_ID, false);
+            checkRunningInstant(PLAYER_1_ID);
+            checkRunningInstant(PLAYER_2_ID);
 
             // Eventually player 2 will run out of frames and should pause.
-            waitUntilPaused(PLAYER_2_ID, true);
+            waitUntilPaused(PLAYER_2_ID);
             AddWaitStep("wait a few more frames", 10);
 
             // Send more frames for player 2. It should unpause.
             sendFrames(PLAYER_2_ID, 1000);
-            checkPausedInstant(PLAYER_2_ID, false);
+            checkRunningInstant(PLAYER_2_ID);
 
             // Player 2 should catch up to player 1 after unpausing.
             waitForCatchup(PLAYER_2_ID);
@@ -281,18 +281,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             sendFrames(PLAYER_2_ID, 20);
 
             // While both players are running, one of them should be un-muted.
-            waitUntilPaused(PLAYER_1_ID, false);
+            waitUntilRunning(PLAYER_1_ID);
             assertOnePlayerNotMuted();
 
             // After player 1 runs out of frames, the un-muted player should always be player 2.
-            waitUntilPaused(PLAYER_1_ID, true);
-            waitUntilPaused(PLAYER_2_ID, false);
+            waitUntilPaused(PLAYER_1_ID);
+            waitUntilRunning(PLAYER_2_ID);
             assertMuted(PLAYER_1_ID, true);
             assertMuted(PLAYER_2_ID, false);
 
             sendFrames(PLAYER_1_ID, 100);
             waitForCatchup(PLAYER_1_ID);
-            waitUntilPaused(PLAYER_2_ID, true);
+            waitUntilPaused(PLAYER_2_ID);
             assertMuted(PLAYER_1_ID, false);
             assertMuted(PLAYER_2_ID, true);
 
@@ -326,7 +326,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             sendFrames(PLAYER_1_ID, 300);
 
             AddWaitStep("wait maximum start delay seconds", (int)(SpectatorSyncManager.MAXIMUM_START_DELAY / TimePerAction));
-            waitUntilPaused(PLAYER_1_ID, false);
+            waitUntilRunning(PLAYER_1_ID);
 
             sendFrames(PLAYER_2_ID, 300);
             AddUntilStep("player 2 playing from correct point in time", () => getPlayer(PLAYER_2_ID).ChildrenOfType<DrawableRuleset>().Single().FrameStableClock.CurrentTime > 30000);
@@ -400,7 +400,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for clock running", () => getInstance(PLAYER_1_ID).SpectatorPlayerClock.IsRunning);
 
             assertNotCatchingUp(PLAYER_1_ID);
-            waitForRunning(PLAYER_1_ID);
+            waitUntilRunning(PLAYER_1_ID);
         }
 
         private void loadSpectateScreen(bool waitForPlayerLoad = true, Action<WorkingBeatmap>? applyToBeatmap = null)
@@ -467,12 +467,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private void waitUntilPaused(int userId, bool state)
-            => AddUntilStep($"{nameof(waitUntilPaused)}({userId}, {state})", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().IsRunning != state);
-
-        private void checkPausedInstant(int userId, bool state)
+        private void checkRunningInstant(int userId)
         {
-            waitUntilPaused(userId, state);
+            waitUntilRunning(userId);
+
+            // Todo: The following should work, but is broken because SpectatorScreen retrieves the WorkingBeatmap via the BeatmapManager, bypassing the test scene clock and running real-time.
+            // AddAssert($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
+        }
+
+        private void checkPausedInstant(int userId)
+        {
+            waitUntilPaused(userId);
 
             // Todo: The following should work, but is broken because SpectatorScreen retrieves the WorkingBeatmap via the BeatmapManager, bypassing the test scene clock and running real-time.
             // AddAssert($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
@@ -486,8 +491,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void assertRunning(int userId)
             => AddAssert($"{nameof(assertRunning)}({userId})", () => getInstance(userId).SpectatorPlayerClock.IsRunning);
 
-        private void waitForRunning(int userId)
-            => AddUntilStep($"{nameof(waitForRunning)}({userId})", () => getInstance(userId).SpectatorPlayerClock.IsRunning);
+        private void waitUntilPaused(int userId)
+            => AddUntilStep($"{nameof(waitUntilPaused)}({userId})", () => !getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().IsRunning);
+
+        private void waitUntilRunning(int userId)
+            => AddUntilStep($"{nameof(waitUntilRunning)}({userId})", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().IsRunning);
 
         private void assertNotCatchingUp(int userId)
             => AddAssert($"{nameof(assertNotCatchingUp)}({userId})", () => !getInstance(userId).SpectatorPlayerClock.IsCatchingUp);
