@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     AutoSizeAxes = Axes.Both,
-                    Child = new UprightUnstretchedContainer
+                    Child = new UprightAspectMaintainingContainer
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Play.HUD
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Child = new UprightUnstretchedContainer
+                    Child = new UprightAspectMaintainingContainer
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Play.HUD
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     AutoSizeAxes = Axes.Both,
-                    Child = new UprightUnstretchedContainer
+                    Child = new UprightAspectMaintainingContainer
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
