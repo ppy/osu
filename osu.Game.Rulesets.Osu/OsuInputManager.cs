@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -23,6 +22,8 @@ namespace osu.Game.Rulesets.Osu
         private const int simultaneous_touches_limit = tap_touches_limit + 1;
 
         private IEnumerable<TouchSource> possibleTapTouches;
+
+        private HashSet<TouchSource> activeTapTouches = new HashSet<TouchSource>();
 
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
@@ -73,25 +74,30 @@ namespace osu.Game.Rulesets.Osu
 
             possibleTapTouches ??= AllowUserCursorMovement ? new TouchSource[] { TouchSource.Touch2, TouchSource.Touch3 } : new TouchSource[] { TouchSource.Touch1, TouchSource.Touch2 };
 
-            var activeSources = CurrentState.Touch.ActiveSources;
-            var activeTapTouches = possibleTapTouches.Where(tap => CurrentState.Touch.IsActive(tap));
-
-            var currentActiveTapActions = activeTapTouches.Select(getActionForTouchSource);
-            var disabledTapActions = PressedActions.Where(a => !currentActiveTapActions.Contains(a)).ToList();
-
             bool isCursorTouch = source == cursor_touch;
             bool isTapTouch = !isCursorTouch;
-
-            foreach (var action in disabledTapActions)
-                KeyBindingContainer.TriggerReleased(action);
 
             if (isTapTouch)
             {
                 var action = getActionForTouchSource(source);
-                if (!PressedActions.Contains(action))
+                if (!activeTapTouches.Contains(source))
+                {
+                    activeTapTouches.Add(source);
                     KeyBindingContainer.TriggerPressed(action);
+                }
             }
 
+            var activeSources = CurrentState.Touch.ActiveSources;
+            var disabledTapTouches = activeTapTouches.Where(tap => !CurrentState.Touch.IsActive(tap));
+
+            if (disabledTapTouches.Any())
+                foreach (var tap in disabledTapTouches.ToList())
+                {
+                    activeTapTouches.Remove(tap);
+                    KeyBindingContainer.TriggerReleased(getActionForTouchSource(tap));
+                }
+
+            // HashSet count implementation is o(1) so this is fine.
             bool doubletapping = activeTapTouches.Count() == tap_touches_limit;
 
             if (doubletapping)
