@@ -363,6 +363,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return;
 
             ChangeHandler?.BeginChange();
+            EditorBeatmap.BeginChange();
 
             // Have an initial slider object.
             var firstHitObject = mergeableObjects[0];
@@ -438,6 +439,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             SelectedItems.Clear();
             SelectedItems.Add(mergedHitObject);
 
+            EditorBeatmap.EndChange();
             ChangeHandler?.EndChange();
         }
 
