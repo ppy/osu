@@ -358,7 +358,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var mergeableObjects = selectedMergeableObjects;
 
-            if (mergeableObjects.Length < 2)
+            if (mergeableObjects.Length < 2 || (mergeableObjects.All(h => h is not Slider)
+                                                && Precision.AlmostBigger(1, Vector2.DistanceSquared(mergeableObjects[0].Position, mergeableObjects[1].Position))))
                 return;
 
             ChangeHandler?.BeginChange();
@@ -445,7 +446,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            if (selectedMergeableObjects.Length > 1)
+            var mergeableObjects = selectedMergeableObjects;
+            if (mergeableObjects.Length > 1 && (mergeableObjects.Any(h => h is Slider)
+                                                || Precision.DefinitelyBigger(Vector2.DistanceSquared(mergeableObjects[0].Position, mergeableObjects[1].Position), 1)))
                 yield return new OsuMenuItem("Merge selection", MenuItemType.Destructive, mergeSelection);
         }
     }
