@@ -46,10 +46,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 90) / 15);
 
-                // Objects that are arranged in a mostly-linear fashion should be easy to read (such as circles in a stream).
-                //if (loopObj.Angle.IsNotNull() && prevLoopObj.Angle.IsNotNull())
-                //   loopDifficulty *= 1 - Math.Pow(Math.Sin(0.5 * loopObj.Angle.Value), 5);
-
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
@@ -76,13 +72,44 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             double preemptDifficulty = 0.0;
+
             if (currObj.preempt < 400)
+            {
                 preemptDifficulty += Math.Pow(400 - currObj.preempt, 1.5) / 14;
 
-            // Buff rhythm on high AR.
-            preemptDifficulty *= RhythmEvaluator.EvaluateDifficultyOf(current, 30);
+                // Buff spacing.
+                preemptDifficulty *= Math.Max(1, 0.3 * currVelocity);
+
+                // Buff rhythm.
+                preemptDifficulty *= RhythmEvaluator.EvaluateDifficultyOf(current, 30);
+
+                // Buff small circles.
+                // Very arbitrary, but lets assume CS5 is when AR11 becomes more uncomfortable.
+                // This is likely going to need adjustments in the future as player meta develops.
+                preemptDifficulty *= 1 + Math.Max((30 - ((OsuHitObject)currObj.BaseObject).Radius) / 20, 0);
+
+                // Nerf repeated angles on high AR.
+                if (current.Index > 1)
+                {
+                    var prevPrevObj = (OsuDifficultyHitObject)current.Previous(1);
+
+                    if (currObj.Angle != null && prevObj.Angle != null)
+                    {
+                        preemptDifficulty *= getAngleDifferenceNerfFactor(Math.Abs(currObj.Angle.Value - prevObj.Angle.Value));
+                    }
+
+                    if (currObj.Angle != null && prevPrevObj.Angle != null)
+                    {
+                        preemptDifficulty *= getAngleDifferenceNerfFactor(Math.Abs(currObj.Angle.Value - prevPrevObj.Angle.Value));
+                    }
+                }
+            }
 
             double difficulty = Math.Max(preemptDifficulty, hiddenDifficulty) + noteDensityDifficulty;
+
+            // While there is slider leniency...
+            if (currObj.BaseObject is Slider)
+                difficulty *= 0.2;
 
             return difficulty;
         }
@@ -139,6 +166,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             return Math.Clamp(2 - (deltaTime / 1500), 0, 1);
         }
+
+        private static double getAngleDifferenceNerfFactor(double angleDifference) => 1 - 1 * Math.Cos(2 * Math.Min(Math.PI / 4, angleDifference));
 
         private static double logistic(double x) => 1 / (1 + Math.Pow(Math.E, -x));
     }
