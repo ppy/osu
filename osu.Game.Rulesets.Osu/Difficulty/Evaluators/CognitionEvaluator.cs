@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 }
             }
 
-            double difficulty = Math.Max(preemptDifficulty, hiddenDifficulty) + noteDensityDifficulty;
+            double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
 
             // While there is slider leniency...
             if (currObj.BaseObject is Slider)
