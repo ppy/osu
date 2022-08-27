@@ -69,17 +69,12 @@ namespace osu.Game.Rulesets.Osu
             bool isTapTouch = source != cursor_touch || !AllowUserCursorMovement;
             bool isCursorTouch = !isTapTouch;
 
-            if (isTapTouch)
+            if (isTapTouch && !activeTapTouches.Contains(source))
             {
-                var action = touchTapActionsDictionary[source];
-                if (!activeTapTouches.Contains(source))
-                {
-                    activeTapTouches.Add(source);
-                    KeyBindingContainer.TriggerPressed(action);
-                }
+                activeTapTouches.Add(source);
+                KeyBindingContainer.TriggerPressed(touchTapActionsDictionary[source]);
             }
 
-            var activeSources = CurrentState.Touch.ActiveSources;
             var disabledTapTouches = activeTapTouches.Where(tap => !CurrentState.Touch.IsActive(tap));
 
             if (disabledTapTouches.Any())
