@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Osu
     public class OsuInputManager : RulesetInputManager<OsuAction>
     {
         private const int tap_touches_limit = 2;
+        private const int simultaneous_touches_limit = tap_touches_limit + 1;
 
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
@@ -32,10 +33,10 @@ namespace osu.Game.Rulesets.Osu
         /// </summary>
         public bool AllowUserCursorMovement { get; set; } = true;
 
-        private readonly Dictionary<TouchSource, int> indexedTouchSources = Enum.GetValues(typeof(TouchSource))
+        private readonly Dictionary<TouchSource, int> numberedTouchSources = Enum.GetValues(typeof(TouchSource))
             .Cast<TouchSource>()
             .Select((v, i) => new { v, i })
-            .ToDictionary(entry => entry.v, entry => entry.i);
+            .ToDictionary(entry => entry.v, entry => entry.i + 1);
 
         protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
@@ -54,28 +55,30 @@ namespace osu.Game.Rulesets.Osu
 
         private OsuAction getActionForTouchSource(TouchSource source)
         {
-            int sourceIndex = indexedTouchSources[source];
-            return sourceIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
+            int sourceNumber = numberedTouchSources[source];
+            return sourceNumber % 2 == 0 ? OsuAction.RightButton : OsuAction.LeftButton;
         }
 
         protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
             var source = e.Touch.Source;
 
-            var cursorTouch = CurrentState.Touch.ActiveSources.Any() ? CurrentState.Touch.ActiveSources.First() : source;
+            int touchNumber = numberedTouchSources[source];
 
-            var activeTapTouches = AllowUserCursorMovement ? CurrentState.Touch.ActiveSources.Skip(1) : CurrentState.Touch.ActiveSources;
+            if (touchNumber > simultaneous_touches_limit)
+                return false;
+
+            var activeSources = CurrentState.Touch.ActiveSources;
+
+            var cursorTouch = activeSources.Any() ? activeSources.First() : source;
+
+            var activeTapTouches = AllowUserCursorMovement ? activeSources.Skip(1) : activeSources;
             var limitedActiveTapTouches = activeTapTouches.Take(tap_touches_limit);
 
             bool isCursorTouch = source == cursorTouch;
             bool isTapTouch = !isCursorTouch;
 
-            bool isInvalidTap = isTapTouch && !limitedActiveTapTouches.Contains(source);
-
-            if (isInvalidTap)
-                return false;
-
-            bool dragMode = limitedActiveTapTouches.Count() >= tap_touches_limit;
+            bool dragMode = limitedActiveTapTouches.Count() == tap_touches_limit;
 
             var newActiveTapActions = limitedActiveTapTouches.Select(getActionForTouchSource);
             var newInactiveTapActions = PressedActions.Where(a => !newActiveTapActions.Contains(a)).ToList();
