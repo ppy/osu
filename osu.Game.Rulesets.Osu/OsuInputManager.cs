@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets.Osu
         public bool AllowUserCursorMovement { get; set; } = true;
 
         private readonly Dictionary<TouchSource, int> numberedTouchSources = Enum.GetValues(typeof(TouchSource))
-            .Cast<TouchSource>()
-            .Select((v, i) => new { v, i })
-            .ToDictionary(entry => entry.v, entry => entry.i + 1);
+                                                                                 .Cast<TouchSource>()
+                                                                                 .Select((v, i) => new { v, i })
+                                                                                 .ToDictionary(entry => entry.v, entry => entry.i + 1);
 
         protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
@@ -75,13 +75,11 @@ namespace osu.Game.Rulesets.Osu
             var activeTapTouches = AllowUserCursorMovement ? activeSources.Skip(1) : activeSources;
             var limitedActiveTapTouches = activeTapTouches.Take(tap_touches_limit);
 
-            bool isCursorTouch = source == cursorTouch;
-            bool isTapTouch = !isCursorTouch;
-
-            bool dragMode = limitedActiveTapTouches.Count() == tap_touches_limit;
-
             var newActiveTapActions = limitedActiveTapTouches.Select(getActionForTouchSource);
             var newInactiveTapActions = PressedActions.Where(a => !newActiveTapActions.Contains(a)).ToList();
+
+            bool isCursorTouch = source == cursorTouch;
+            bool isTapTouch = !isCursorTouch;
 
             foreach (var action in newInactiveTapActions)
                 KeyBindingContainer.TriggerReleased(action);
@@ -93,8 +91,9 @@ namespace osu.Game.Rulesets.Osu
                     KeyBindingContainer.TriggerPressed(action);
             }
 
-            // Allows doubletap when streaming by making the main cursor not be pressed
-            if (dragMode)
+            bool doubletapping = limitedActiveTapTouches.Count() == tap_touches_limit;
+
+            if (doubletapping)
             {
                 e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
             }
