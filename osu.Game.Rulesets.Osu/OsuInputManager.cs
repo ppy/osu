@@ -78,14 +78,15 @@ namespace osu.Game.Rulesets.Osu
             var disabledTapTouches = activeTapTouches.Where(tap => !CurrentState.Touch.IsActive(tap));
 
             if (disabledTapTouches.Any())
+            {
                 foreach (var tap in disabledTapTouches.ToList())
                 {
                     activeTapTouches.Remove(tap);
                     KeyBindingContainer.TriggerReleased(touchTapActionsDictionary[tap]);
                 }
+            }
 
-            // HashSet count implementation is o(1) so this is fine.
-            bool doubletapping = activeTapTouches.Count() == tap_touches_limit;
+            bool doubletapping = activeTapTouches.Count == tap_touches_limit;
 
             if (doubletapping)
             {
