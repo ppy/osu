@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -21,7 +22,12 @@ namespace osu.Game.Rulesets.Osu
         private const int tap_touches_limit = 2;
         private const int simultaneous_touches_limit = tap_touches_limit + 1;
 
-        private HashSet<TouchSource> activeTapTouches = new HashSet<TouchSource>();
+        private readonly HashSet<TouchSource> activeTapTouches = new HashSet<TouchSource>();
+
+        private readonly Dictionary<TouchSource, OsuAction> touchTapActionsDictionary = Enum.GetValues(typeof(TouchSource))
+                                                                                            .Cast<TouchSource>()
+                                                                                            .Take(simultaneous_touches_limit)
+                                                                                            .ToDictionary(source => source, source => (source - TouchSource.Touch1) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
 
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
@@ -51,21 +57,11 @@ namespace osu.Game.Rulesets.Osu
             return base.Handle(e);
         }
 
-        private int getTouchNumber(TouchSource source)
-        {
-            return (int)source + 1;
-        }
-
-        private OsuAction getActionForTouchSource(TouchSource source)
-        {
-            return getTouchNumber(source) % 2 == 0 ? OsuAction.RightButton : OsuAction.LeftButton;
-        }
-
         protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
             var source = e.Touch.Source;
 
-            int touchNumber = getTouchNumber(source);
+            int touchNumber = source - TouchSource.Touch1 + 1;
 
             if (touchNumber > simultaneous_touches_limit)
                 return false;
@@ -75,7 +71,7 @@ namespace osu.Game.Rulesets.Osu
 
             if (isTapTouch)
             {
-                var action = getActionForTouchSource(source);
+                var action = touchTapActionsDictionary[source];
                 if (!activeTapTouches.Contains(source))
                 {
                     activeTapTouches.Add(source);
@@ -90,7 +86,7 @@ namespace osu.Game.Rulesets.Osu
                 foreach (var tap in disabledTapTouches.ToList())
                 {
                     activeTapTouches.Remove(tap);
-                    KeyBindingContainer.TriggerReleased(getActionForTouchSource(tap));
+                    KeyBindingContainer.TriggerReleased(touchTapActionsDictionary[tap]);
                 }
 
             // HashSet count implementation is o(1) so this is fine.
