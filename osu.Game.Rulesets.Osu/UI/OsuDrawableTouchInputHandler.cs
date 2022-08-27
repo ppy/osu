@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private const int tap_touches_limit = 2;
 
         /// <summary>
-        /// The index for the last concurrent able touch. 
+        /// The index for the last concurrent able touch.
         /// </summary>
         private const int last_concurrent_touch_index = tap_touches_limit;
 
