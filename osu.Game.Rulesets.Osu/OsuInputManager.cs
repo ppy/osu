@@ -3,33 +3,21 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu
 {
     public class OsuInputManager : RulesetInputManager<OsuAction>
     {
-        private const TouchSource cursor_touch = TouchSource.Touch1;
-
-        private const int tap_touches_limit = 2;
-        private const int simultaneous_touches_limit = tap_touches_limit + 1;
-
-        private readonly HashSet<TouchSource> activeTapTouches = new HashSet<TouchSource>();
-
-        private readonly Dictionary<TouchSource, OsuAction> touchTapActionsDictionary = Enum.GetValues(typeof(TouchSource))
-                                                                                            .Cast<TouchSource>()
-                                                                                            .Take(simultaneous_touches_limit)
-                                                                                            .ToDictionary(source => source, source => (source - TouchSource.Touch1) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
-
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
+
+        public bool DragMode;
 
         public bool AllowUserPresses
         {
@@ -59,41 +47,15 @@ namespace osu.Game.Rulesets.Osu
 
         protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
-            var source = e.Touch.Source;
-
-            int touchNumber = source - TouchSource.Touch1 + 1;
-
-            if (touchNumber > simultaneous_touches_limit)
+            if (e.Touch.Source != OsuDrawableTouchInputHandler.CURSOR_TOUCH)
                 return false;
 
-            bool isTapTouch = source != cursor_touch || !AllowUserCursorMovement;
-            bool isCursorTouch = !isTapTouch;
-
-            if (isTapTouch && !activeTapTouches.Contains(source))
-            {
-                activeTapTouches.Add(source);
-                KeyBindingContainer.TriggerPressed(touchTapActionsDictionary[source]);
-            }
-
-            var disabledTapTouches = activeTapTouches.Where(tap => !CurrentState.Touch.IsActive(tap));
-
-            if (disabledTapTouches.Any())
-            {
-                foreach (var tap in disabledTapTouches.ToList())
-                {
-                    activeTapTouches.Remove(tap);
-                    KeyBindingContainer.TriggerReleased(touchTapActionsDictionary[tap]);
-                }
-            }
-
-            bool doubletapping = activeTapTouches.Count == tap_touches_limit;
-
-            if (doubletapping)
+            if (DragMode)
             {
                 e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
             }
 
-            return AllowUserCursorMovement && isCursorTouch && base.HandleMouseTouchStateChange(e);
+            return base.HandleMouseTouchStateChange(e);
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
