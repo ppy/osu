@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu
         /// </summary>
         public bool AllowUserCursorMovement { get; set; } = true;
 
-        private readonly List<TouchSource> allTapTouchSources = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().ToList();
+        private readonly List<TouchSource> allTouchSources = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().ToList();
 
         protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu
 
         private OsuAction getActionForTouchSource(TouchSource source)
         {
-            int sourceIndex = allTapTouchSources.IndexOf(source);
+            int sourceIndex = allTouchSources.IndexOf(source);
             return sourceIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
         }
 
