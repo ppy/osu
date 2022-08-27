@@ -17,8 +17,12 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuInputManager : RulesetInputManager<OsuAction>
     {
+        private const TouchSource cursor_touch = TouchSource.Touch1;
+
         private const int tap_touches_limit = 2;
         private const int simultaneous_touches_limit = tap_touches_limit + 1;
+
+        private IEnumerable<TouchSource> possibleTapTouches;
 
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
@@ -32,11 +36,6 @@ namespace osu.Game.Rulesets.Osu
         /// Can be used to block only movement while still accepting button input.
         /// </summary>
         public bool AllowUserCursorMovement { get; set; } = true;
-
-        private readonly Dictionary<TouchSource, int> numberedTouchSources = Enum.GetValues(typeof(TouchSource))
-                                                                                 .Cast<TouchSource>()
-                                                                                 .Select((v, i) => new { v, i })
-                                                                                 .ToDictionary(entry => entry.v, entry => entry.i + 1);
 
         protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
@@ -53,35 +52,37 @@ namespace osu.Game.Rulesets.Osu
             return base.Handle(e);
         }
 
+        private int getTouchNumber(TouchSource source)
+        {
+            return (int)source + 1;
+        }
+
         private OsuAction getActionForTouchSource(TouchSource source)
         {
-            int sourceNumber = numberedTouchSources[source];
-            return sourceNumber % 2 == 0 ? OsuAction.RightButton : OsuAction.LeftButton;
+            return getTouchNumber(source) % 2 == 0 ? OsuAction.RightButton : OsuAction.LeftButton;
         }
 
         protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
             var source = e.Touch.Source;
 
-            int touchNumber = numberedTouchSources[source];
+            int touchNumber = getTouchNumber(source);
 
             if (touchNumber > simultaneous_touches_limit)
                 return false;
 
+            possibleTapTouches ??= AllowUserCursorMovement ? new TouchSource[] { TouchSource.Touch2, TouchSource.Touch3 } : new TouchSource[] { TouchSource.Touch1, TouchSource.Touch2 };
+
             var activeSources = CurrentState.Touch.ActiveSources;
+            var activeTapTouches = possibleTapTouches.Where(tap => CurrentState.Touch.IsActive(tap));
 
-            var cursorTouch = activeSources.Any() ? activeSources.First() : source;
+            var currentActiveTapActions = activeTapTouches.Select(getActionForTouchSource);
+            var disabledTapActions = PressedActions.Where(a => !currentActiveTapActions.Contains(a)).ToList();
 
-            var activeTapTouches = AllowUserCursorMovement ? activeSources.Skip(1) : activeSources;
-            var limitedActiveTapTouches = activeTapTouches.Take(tap_touches_limit);
-
-            var newActiveTapActions = limitedActiveTapTouches.Select(getActionForTouchSource);
-            var newInactiveTapActions = PressedActions.Where(a => !newActiveTapActions.Contains(a)).ToList();
-
-            bool isCursorTouch = source == cursorTouch;
+            bool isCursorTouch = source == cursor_touch;
             bool isTapTouch = !isCursorTouch;
 
-            foreach (var action in newInactiveTapActions)
+            foreach (var action in disabledTapActions)
                 KeyBindingContainer.TriggerReleased(action);
 
             if (isTapTouch)
@@ -91,7 +92,7 @@ namespace osu.Game.Rulesets.Osu
                     KeyBindingContainer.TriggerPressed(action);
             }
 
-            bool doubletapping = limitedActiveTapTouches.Count() == tap_touches_limit;
+            bool doubletapping = activeTapTouches.Count() == tap_touches_limit;
 
             if (doubletapping)
             {
