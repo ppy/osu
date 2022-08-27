@@ -44,6 +44,9 @@ namespace osu.Game.Input.Bindings
         {
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
             new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
+            new KeyBinding(InputKey.C, GlobalAction.SelectContinue),
+            new KeyBinding(InputKey.R, GlobalAction.SelectRetry),
+            new KeyBinding(InputKey.Q, GlobalAction.SelectQuit),
 
             new KeyBinding(InputKey.Left, GlobalAction.SelectPreviousGroup),
             new KeyBinding(InputKey.Right, GlobalAction.SelectNextGroup),
@@ -233,6 +236,15 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNext))]
         SelectNext,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectContinue))]
+        SelectContinue,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectRetry))]
+        SelectRetry,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectQuit))]
+        SelectQuit,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Home))]
         Home,

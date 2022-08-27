@@ -175,6 +175,7 @@ namespace osu.Game.Screens.Play
             var button = new Button
             {
                 Text = text,
+                Name = text,
                 ButtonColour = colour,
                 Origin = Anchor.TopCentre,
                 Anchor = Anchor.TopCentre,
@@ -201,6 +202,15 @@ namespace osu.Game.Screens.Play
                     InternalButtons.SelectNext();
                     return true;
 
+                case GlobalAction.SelectContinue:
+                    return useButtonKeybind("Continue");
+
+                case GlobalAction.SelectRetry:
+                    return useButtonKeybind("Retry");
+
+                case GlobalAction.SelectQuit:
+                    return useButtonKeybind("Quit");
+
                 case GlobalAction.Back:
                     BackAction.Invoke();
                     return true;
@@ -215,6 +225,21 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        private bool useButtonKeybind(string id)
+        {
+            for (int i = 0; i < InternalButtons.Count; i++)
+            {
+                if (InternalButtons[i].Name == id)
+                {
+                    InternalButtons.Select(InternalButtons[i]);
+                    SelectAction.Invoke();
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void updateRetryCount()

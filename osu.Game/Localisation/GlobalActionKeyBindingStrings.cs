@@ -130,6 +130,21 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectNext => new TranslatableString(getKey(@"select_next"), @"Next selection");
 
         /// <summary>
+        /// "Select continue"
+        /// </summary>
+        public static LocalisableString SelectContinue => new TranslatableString(getKey(@"select_continue"), @"Select continue");
+
+        /// <summary>
+        /// "Select retry"
+        /// </summary>
+        public static LocalisableString SelectRetry => new TranslatableString(getKey(@"select_retry"), @"Select retry");
+
+        /// <summary>
+        /// "Select quit"
+        /// </summary>
+        public static LocalisableString SelectQuit => new TranslatableString(getKey(@"select_quit"), @"Select quit");
+
+        /// <summary>
         /// "Select previous group"
         /// </summary>
         public static LocalisableString SelectPreviousGroup => new TranslatableString(getKey(@"select_previous_group"), @"Select previous group");

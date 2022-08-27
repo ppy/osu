@@ -109,6 +109,21 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestResumeWithResumeKeybindOverlay()
+        {
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
+
+            pauseAndConfirm();
+
+            AddStep("press default continue keybind", () => InputManager.PressKey(Key.C));
+
+            confirmPausedWithNoOverlay();
+            AddStep("click to resume", () => InputManager.Click(MouseButton.Left));
+
+            confirmClockRunning(true);
+        }
+
+        [Test]
         public void TestPauseWithResumeOverlay()
         {
             AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
@@ -284,6 +299,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             pauseAndConfirm();
             exitAndConfirm();
+        }
+
+        [Test]
+        public void TestExitKeybindFromPause()
+        {
+            pauseAndConfirm();
+
+            confirmNotExited();
+            AddStep("exit using default keybind", () => InputManager.PressKey(Key.Q));
+            confirmExited();
         }
 
         [Test]
