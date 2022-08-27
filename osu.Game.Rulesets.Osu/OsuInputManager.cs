@@ -64,10 +64,12 @@ namespace osu.Game.Rulesets.Osu
             var activeTapTouches = AllowUserCursorMovement ? CurrentState.Touch.ActiveSources.Skip(1) : CurrentState.Touch.ActiveSources;
             var limitedActiveTapTouches = activeTapTouches.Take(tap_touches_limit);
 
-            bool isTapTouch = activeTapTouches.Contains(source);
+            bool isCursorTouch = source == cursorTouch;
+            bool isTapTouch = !isCursorTouch;
 
-            // Limits amount of simultaneous clicks
-            if (isTapTouch && !limitedActiveTapTouches.Contains(source))
+            bool isInvalidTap = isTapTouch && !limitedActiveTapTouches.Contains(source);
+
+            if (isInvalidTap)
                 return false;
 
             bool dragMode = limitedActiveTapTouches.Count() >= tap_touches_limit;
@@ -91,7 +93,7 @@ namespace osu.Game.Rulesets.Osu
                 e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
             }
 
-            return AllowUserCursorMovement && source == cursorTouch && base.HandleMouseTouchStateChange(e);
+            return AllowUserCursorMovement && isCursorTouch && base.HandleMouseTouchStateChange(e);
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
