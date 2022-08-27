@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Osu
         private const int tap_touches_limit = 2;
         private const int simultaneous_touches_limit = tap_touches_limit + 1;
 
-        private IEnumerable<TouchSource> possibleTapTouches;
-
         private HashSet<TouchSource> activeTapTouches = new HashSet<TouchSource>();
 
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
@@ -72,10 +70,8 @@ namespace osu.Game.Rulesets.Osu
             if (touchNumber > simultaneous_touches_limit)
                 return false;
 
-            possibleTapTouches ??= AllowUserCursorMovement ? new TouchSource[] { TouchSource.Touch2, TouchSource.Touch3 } : new TouchSource[] { TouchSource.Touch1, TouchSource.Touch2 };
-
-            bool isCursorTouch = source == cursor_touch;
-            bool isTapTouch = !isCursorTouch;
+            bool isTapTouch = source != cursor_touch || !AllowUserCursorMovement;
+            bool isCursorTouch = !isTapTouch;
 
             if (isTapTouch)
             {
