@@ -75,13 +75,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currObj.preempt < 400)
             {
-                preemptDifficulty += Math.Pow(400 - currObj.preempt, 1.5) / 14;
+                preemptDifficulty += Math.Pow(400 - currObj.preempt, 1.5) / (10 + (currObj.StrainTime * 0.05));
 
                 // Buff spacing.
-                preemptDifficulty *= Math.Max(1, 0.3 * currVelocity);
+                preemptDifficulty *= 1 + 0.2 * currVelocity;
 
                 // Buff rhythm.
-                preemptDifficulty *= RhythmEvaluator.EvaluateDifficultyOf(current, 30);
+                preemptDifficulty *= Math.Max(1, RhythmEvaluator.EvaluateDifficultyOf(current, 30) - 0.1);
 
                 // Buff small circles.
                 // Very arbitrary, but lets assume CS5 is when AR11 becomes more uncomfortable.
