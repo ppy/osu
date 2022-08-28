@@ -14,8 +14,6 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class UprightAspectMaintainingContainer : Container
     {
-        protected override Container<Drawable> Content { get; }
-
         /// <summary>
         /// Controls how much this container scales compared to its parent (default is 1.0f).
         /// </summary>
@@ -30,7 +28,6 @@ namespace osu.Game.Graphics.Containers
 
         public UprightAspectMaintainingContainer()
         {
-            AddInternal(Content = new GrowToFitContainer());
             AddLayout(layout);
         }
 
@@ -45,6 +42,14 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
+        public override void Add(Drawable drawable)
+        {
+            base.Add(new GrowToFitContainer
+            {
+                Child = drawable
+            });
+        }
+
         /// <summary>
         /// Keeps the drawable upright and unstretched preventing it from being rotated, sheared, scaled or flipped with its Parent.
         /// </summary>
@@ -57,23 +62,23 @@ namespace osu.Game.Graphics.Containers
             parentMatrix.M31 = 0.0f;
             parentMatrix.M32 = 0.0f;
 
-            Matrix3 reversedParrent = parentMatrix.Inverted();
+            Matrix3 reversedParent = parentMatrix.Inverted();
 
             // Extract the rotation.
-            float angle = MathF.Atan2(reversedParrent.M12, reversedParrent.M11);
+            float angle = MathF.Atan2(reversedParent.M12, reversedParent.M11);
             Rotation = MathHelper.RadiansToDegrees(angle);
 
             // Remove rotation from the C matrix so that it only contains shear and scale.
             Matrix3 m = Matrix3.CreateRotationZ(-angle);
-            reversedParrent *= m;
+            reversedParent *= m;
 
             // Extract shear.
-            float alpha = reversedParrent.M21 / reversedParrent.M22;
+            float alpha = reversedParent.M21 / reversedParent.M22;
             Shear = new Vector2(-alpha, 0);
 
             // Etract scale.
-            float sx = reversedParrent.M11;
-            float sy = reversedParrent.M22;
+            float sx = reversedParent.M11;
+            float sy = reversedParent.M22;
 
             Vector3 parentScale = parentMatrix.ExtractScale();
 
@@ -90,32 +95,30 @@ namespace osu.Game.Graphics.Containers
                     break;
             }
 
-            usedScale = 1.0f + (usedScale - 1.0f) * ScalingFactor;
+            if (Scaling != ScaleMode.NoScaling)
+            {
+                if (ScalingFactor < 1.0f)
+                    usedScale = 1.0f + (usedScale - 1.0f) * ScalingFactor;
+                if (ScalingFactor > 1.0f)
+                    usedScale = (usedScale < 1.0f) ? usedScale * (1.0f / ScalingFactor) : usedScale * ScalingFactor;
+            }
 
             Scale = new Vector2(sx * usedScale, sy * usedScale);
         }
 
-        /// <summary>
-        /// A container that grows in size to fit its children and retains its size when its children shrink
-        /// </summary>
-        private class GrowToFitContainer : Container
+        public class GrowToFitContainer : Container
         {
-            protected override Container<Drawable> Content => content;
-            private readonly Container content;
-
-            public GrowToFitContainer()
-            {
-                InternalChild = content = new Container
-                {
-                    AutoSizeAxes = Axes.Both,
-                };
-            }
-
             protected override void Update()
             {
-                base.Update();
-                Height = Math.Max(content.Height, Height);
-                Width = Math.Max(content.Width, Width);
+                if ((Child.RelativeSizeAxes & Axes.X) != 0)
+                    RelativeSizeAxes |= Axes.X;
+                else
+                    Width = Math.Max(Child.Width, Width);
+
+                if ((Child.RelativeSizeAxes & Axes.Y) != 0)
+                    RelativeSizeAxes |= Axes.Y;
+                else
+                    Height = Math.Max(Child.Height, Height);
             }
         }
     }
