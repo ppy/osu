@@ -362,7 +362,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                                                 && Precision.AlmostBigger(1, Vector2.DistanceSquared(mergeableObjects[0].Position, mergeableObjects[1].Position))))
                 return;
 
-            ChangeHandler?.BeginChange();
             EditorBeatmap.BeginChange();
 
             // Have an initial slider object.
@@ -440,7 +439,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             SelectedItems.Add(mergedHitObject);
 
             EditorBeatmap.EndChange();
-            ChangeHandler?.EndChange();
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
