@@ -46,6 +46,14 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.05
         };
 
+        [SettingSource("Final zoom", "The starting zoom level")]
+        public BindableDouble FinalZoom { get; } = new BindableDouble(1.8)
+        {
+            MinValue = 1,
+            MaxValue = 2,
+            Precision = 0.05
+        };
+
         [SettingSource("Final zoom at combo", "The combo count at which point the zoom level stops increasing.", SettingControlType = typeof(SettingsSlider<int, OsuSliderBar<int>>))]
         public BindableInt FinalZoomCombo { get; } = new BindableInt(200)
         {
@@ -54,15 +62,14 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 100
         };
 
-        private readonly BindableDouble currentZoom = new BindableDouble();
-
         private readonly BindableInt currentCombo = new BindableInt();
 
         public void Update(Playfield playfield)
         {
-            double currentScale = Interpolation.ValueAt(Math.Min(Math.Abs(playfield.Clock.ElapsedFrameTime), apply_zoom_duration), playfield.Scale.X, currentZoom.Value, 0, apply_zoom_duration, Easing.Out);
+            double zoom = InitialZoom.Value + (FinalZoom.Value - InitialZoom.Value) * Math.Min(1, ((float)currentCombo.Value / FinalZoomCombo.Value));
+            double scale = Interpolation.ValueAt(Math.Min(Math.Abs(playfield.Clock.ElapsedFrameTime), apply_zoom_duration), playfield.Scale.X, zoom, 0, apply_zoom_duration, Easing.Out);
 
-            playfield.Scale = new Vector2((float)currentScale);
+            playfield.Scale = new Vector2((float)scale);
 
             var position = playfield.Cursor.ActiveCursor.DrawPosition;
             var trackingPosition = Vector2.Clamp(playfield.OriginPosition - position, -playfield.OriginPosition, playfield.OriginPosition);
@@ -79,13 +86,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             currentCombo.BindTo(scoreProcessor.Combo);
-            currentCombo.ValueChanged += e => currentZoom.Value = getZoomForCombo(e.NewValue);
-        }
-
-        private double getZoomForCombo(double combo)
-        {
-            double increaseRatio = combo / 1000;
-            return InitialZoom.Value + increaseRatio;
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
