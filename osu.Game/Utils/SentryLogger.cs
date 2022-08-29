@@ -9,6 +9,7 @@ using System.Net;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Logging;
 using osu.Framework.Statistics;
 using osu.Game.Beatmaps;
@@ -112,8 +113,8 @@ namespace osu.Game.Utils
 
                     scope.Contexts[@"config"] = new
                     {
-                        Game = game.Dependencies.Get<OsuConfigManager>().GetLoggableState()
-                        // TODO: add framework config here. needs some consideration on how to expose.
+                        Game = game.Dependencies.Get<OsuConfigManager>().GetCurrentConfigurationForLogging(),
+                        Framework = game.Dependencies.Get<FrameworkConfigManager>().GetCurrentConfigurationForLogging(),
                     };
 
                     game.Dependencies.Get<RealmAccess>().Run(realm =>
