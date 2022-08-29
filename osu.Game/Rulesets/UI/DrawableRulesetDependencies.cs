@@ -12,7 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -55,15 +55,17 @@ namespace osu.Game.Rulesets.UI
 
             if (resources != null)
             {
-                TextureStore = new TextureStore(parent.Get<GameHost>().CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
-                CacheAs(TextureStore = new FallbackTextureStore(TextureStore, parent.Get<TextureStore>()));
+                var host = parent.Get<GameHost>();
+
+                TextureStore = new TextureStore(host.Renderer, parent.Get<GameHost>().CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
+                CacheAs(TextureStore = new FallbackTextureStore(host.Renderer, TextureStore, parent.Get<TextureStore>()));
 
                 SampleStore = parent.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
                 SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
                 CacheAs(SampleStore = new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
 
-                ShaderManager = new ShaderManager(new NamespacedResourceStore<byte[]>(resources, @"Shaders"));
-                CacheAs(ShaderManager = new FallbackShaderManager(ShaderManager, parent.Get<ShaderManager>()));
+                ShaderManager = new ShaderManager(host.Renderer, new NamespacedResourceStore<byte[]>(resources, @"Shaders"));
+                CacheAs(ShaderManager = new FallbackShaderManager(host.Renderer, ShaderManager, parent.Get<ShaderManager>()));
             }
 
             RulesetConfigManager = parent.Get<IRulesetConfigCache>().GetConfigFor(ruleset);
@@ -170,7 +172,8 @@ namespace osu.Game.Rulesets.UI
             private readonly TextureStore primary;
             private readonly TextureStore fallback;
 
-            public FallbackTextureStore(TextureStore primary, TextureStore fallback)
+            public FallbackTextureStore(IRenderer renderer, TextureStore primary, TextureStore fallback)
+                : base(renderer)
             {
                 this.primary = primary;
                 this.fallback = fallback;
@@ -191,8 +194,8 @@ namespace osu.Game.Rulesets.UI
             private readonly ShaderManager primary;
             private readonly ShaderManager fallback;
 
-            public FallbackShaderManager(ShaderManager primary, ShaderManager fallback)
-                : base(new ResourceStore<byte[]>())
+            public FallbackShaderManager(IRenderer renderer, ShaderManager primary, ShaderManager fallback)
+                : base(renderer, new ResourceStore<byte[]>())
             {
                 this.primary = primary;
                 this.fallback = fallback;

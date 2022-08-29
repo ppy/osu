@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             base.SetUpSteps();
 
             AddUntilStep("gameplay has started",
-                () => Player.GameplayClockContainer.GameplayClock.CurrentTime > Player.DrawableRuleset.GameplayStartTime);
+                () => Player.GameplayClockContainer.CurrentTime > Player.DrawableRuleset.GameplayStartTime);
         }
 
         [Test]

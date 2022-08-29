@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
+        public const double PERFORMANCE_BASE_MULTIPLIER = 1.24; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
@@ -41,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
-            double multiplier = 1.24; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+            double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
@@ -51,10 +53,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(h => h is OsuModRelax))
             {
-                // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
-                effectiveMissCount = Math.Min(effectiveMissCount + countOk + countMeh, totalHits);
+                // https://www.desmos.com/calculator/bc9eybdthb
+                // we use OD13.3 as maximum since it's the value at which great hitwidow becomes 0
+                // this is well beyond currently maximum achievable OD which is 12.17 (DTx2 + DA with OD11)
+                double okMultiplier = Math.Max(0.0, osuAttributes.OverallDifficulty > 0.0 ? 1 - Math.Pow(osuAttributes.OverallDifficulty / 13.33, 1.8) : 1.0);
+                double mehMultiplier = Math.Max(0.0, osuAttributes.OverallDifficulty > 0.0 ? 1 - Math.Pow(osuAttributes.OverallDifficulty / 13.33, 5) : 1.0);
 
-                multiplier *= 0.6;
+                // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
+                effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
             double aimValue = computeAimValue(score, osuAttributes);
@@ -118,13 +124,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeTapValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
+            if (score.Mods.Any(h => h is OsuModRelax))
+                return 0.0;
+
             double tapValue = Math.Pow(5.0 * Math.Max(1.0, attributes.TapDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                tapValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
+                speedValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
-            tapValue *= getComboScalingFactor(attributes);
+            speedValue *= getComboScalingFactor(attributes);
+
+            double approachRateFactor = 0.0;
+            if (attributes.ApproachRate > 10.33)
+                approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
+
+            speedValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
             if (score.Mods.Any(m => m is OsuModBlinds))
             {
@@ -251,14 +266,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
             }
 
-            // Clamp miss count since it's derived from combo and can be higher than total hits and that breaks some calculations
-            comboBasedMissCount = Math.Min(comboBasedMissCount, totalHits);
+            // Clamp miss count to maximum amount of possible breaks
+            comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss);
 
             return Math.Max(countMiss, comboBasedMissCount);
         }
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
         private int totalHits => countGreat + countOk + countMeh + countMiss;
-        private int totalSuccessfulHits => countGreat + countOk + countMeh;
     }
 }
