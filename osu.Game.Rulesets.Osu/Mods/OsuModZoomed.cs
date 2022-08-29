@@ -64,18 +64,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             playfield.Scale = new Vector2((float)currentScale);
 
-            moveDrawablesFollowingCursor(playfield);
-        }
-
-        private Vector2 getTrackingPosition(Playfield playfield)
-        {
             var position = playfield.Cursor.ActiveCursor.DrawPosition;
-            return Vector2.Clamp(playfield.OriginPosition - position, -playfield.OriginPosition, playfield.OriginPosition);
-        }
-
-        private void moveDrawablesFollowingCursor(Playfield playfield)
-        {
-            var trackingPosition = getTrackingPosition(playfield);
+            var trackingPosition = Vector2.Clamp(playfield.OriginPosition - position, -playfield.OriginPosition, playfield.OriginPosition);
 
             if (MovementDelay.Value == 0)
                 playfield.Position = trackingPosition;
