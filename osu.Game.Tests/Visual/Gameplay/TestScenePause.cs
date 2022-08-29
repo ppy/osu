@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Player.OnUpdate += _ =>
                 {
                     double currentTime = Player.GameplayClockContainer.CurrentTime;
-                    alwaysGoingForward &= currentTime >= lastTime;
+                    alwaysGoingForward &= currentTime >= lastTime - 500;
                     lastTime = currentTime;
                 };
             });
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             resumeAndConfirm();
 
-            AddAssert("time didn't go backwards", () => alwaysGoingForward);
+            AddAssert("time didn't go too far backwards", () => alwaysGoingForward);
 
             AddStep("reset offset", () => LocalConfig.SetValue(OsuSetting.AudioOffset, 0.0));
         }
