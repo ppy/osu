@@ -55,11 +55,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource("Final zoom at combo", "The combo count at which point the zoom level stops increasing.", SettingControlType = typeof(SettingsSlider<int, OsuSliderBar<int>>))]
-        public BindableInt FinalZoomCombo { get; } = new BindableInt(200)
+        public BindableInt FinalZoomCombo { get; } = new BindableInt
         {
+            Default = 100,
+            Value = 100,
             MinValue = 0,
-            MaxValue = 300,
-            Precision = 100
+            MaxValue = 500,
         };
 
         private readonly BindableInt currentCombo = new BindableInt();
