@@ -10,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
@@ -188,7 +189,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return false;
 
             // Aspect ratio check
-            if (!isNearlyZero(childScale.X - childScale.Y, 0.0001f))
+            if (!isNearlyZero(childScale.X - childScale.Y))
                 return false;
 
             // ScalingMode check
@@ -237,7 +238,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             return true;
         }
 
-        private bool isNearlyZero(float f, float epsilon = 0.00001f)
+        private bool isNearlyZero(float f, float epsilon = Precision.FLOAT_EPSILON)
         {
             return f < epsilon;
         }
