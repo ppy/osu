@@ -7,33 +7,33 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.IO.Stores;
-using osu.Game.Beatmaps;
-using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.UI;
-using osu.Game.Beatmaps.Legacy;
-using osu.Game.Configuration;
-using osu.Game.Rulesets.Configuration;
-using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
-using osu.Game.Skinning;
-using osu.Game.Users;
-using JetBrains.Annotations;
-using osu.Framework.Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Configuration;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Filter;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
+using osu.Game.Users;
 
 namespace osu.Game.Rulesets
 {
@@ -56,7 +56,8 @@ namespace osu.Game.Rulesets
         /// Ruleset implementations should be updated to support the latest version to ensure they can still be loaded.
         /// </summary>
         /// <remarks>
-        /// When updating a ruleset to support the latest API, you should set this to <see cref="CURRENT_RULESET_API_VERSION"/>.
+        /// Generally, all ruleset implementations should point this directly to <see cref="CURRENT_RULESET_API_VERSION"/>.
+        /// This will ensure that each time you compile a new release, it will pull in the most recent version.
         /// See https://github.com/ppy/osu/wiki/Breaking-Changes for full details on required ongoing changes.
         /// </remarks>
         public virtual string RulesetAPIVersionSupported => string.Empty;

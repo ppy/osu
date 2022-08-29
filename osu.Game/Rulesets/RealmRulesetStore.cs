@@ -119,8 +119,6 @@ namespace osu.Game.Rulesets
                 // Consider rulesets which haven't override the version as up-to-date for now.
                 // At some point (once ruleset devs add versioning), we'll probably want to disallow this for deployed builds.
                 case @"":
-                // Rulesets which are bundled with the game. Saves having to update their versions each bump.
-                case @"internal":
                 // Ruleset is up-to-date, all good.
                 case Ruleset.CURRENT_RULESET_API_VERSION:
                     return true;
