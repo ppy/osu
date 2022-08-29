@@ -77,8 +77,15 @@ namespace osu.Game.Rulesets
                             continue;
                         }
 
-                        var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
+                        var instance = (Activator.CreateInstance(resolvedType) as Ruleset);
+                        var instanceInfo = instance?.RulesetInfo
                                            ?? throw new RulesetLoadException(@"Instantiation failure");
+
+                        if (!checkRulesetUpToDate(instance))
+                        {
+                            throw new ArgumentOutOfRangeException(nameof(instance.RulesetAPIVersionSupported),
+                                $"Ruleset API version is too old (was {instance.RulesetAPIVersionSupported}, expected {Ruleset.CURRENT_RULESET_API_VERSION})");
+                        }
 
                         // If a ruleset isn't up-to-date with the API, it could cause a crash at an arbitrary point of execution.
                         // To eagerly handle cases of missing implementations, enumerate all types here and mark as non-available on throw.
@@ -102,6 +109,23 @@ namespace osu.Game.Rulesets
 
                 availableRulesets.AddRange(detachedRulesets.OrderBy(r => r));
             });
+        }
+
+        private bool checkRulesetUpToDate(Ruleset instance)
+        {
+            switch (instance.RulesetAPIVersionSupported)
+            {
+                // The default `virtual` implementation leaves the version string empty.
+                // Consider rulesets which haven't override the version as up-to-date for now.
+                // At some point (once ruleset devs add versioning), we'll probably want to disallow this for deployed builds.
+                case @"":
+                // Ruleset is up-to-date, all good.
+                case Ruleset.CURRENT_RULESET_API_VERSION:
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         private void testRulesetCompatibility(RulesetInfo rulesetInfo)
