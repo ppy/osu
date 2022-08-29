@@ -57,12 +57,7 @@ namespace osu.Game.Scoring
         /// <param name="scores">The array of <see cref="ScoreInfo"/>s to reorder.</param>
         /// <returns>The given <paramref name="scores"/> ordered by decreasing total score.</returns>
         public IEnumerable<ScoreInfo> OrderByTotalScore(IEnumerable<ScoreInfo> scores)
-        {
-            return scores.Select((score, index) => (score, totalScore: GetTotalScore(score)))
-                         .OrderByDescending(g => g.totalScore)
-                         .ThenBy(g => g.score.OnlineID)
-                         .Select(g => g.score);
-        }
+            => scores.OrderByDescending(s => GetTotalScore(s)).ThenBy(s => s.OnlineID);
 
         /// <summary>
         /// Retrieves a bindable that represents the total score of a <see cref="ScoreInfo"/>.
