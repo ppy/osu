@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 computeSliderCursorPosition(currentSlider);
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
-                TravelDistance = currentSlider.LazyTravelDistance * (float)Math.Pow(1 + currentSlider.RepeatCount / 2.5, 1.0 / 2.5);
+                TravelDistance = currentSlider.LazyTravelDistance * (float)Math.Pow(1 + currentSlider.RepeatCount / 4.0, 1.0 / 4.0);
                 TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, min_delta_time);
             }
 
@@ -304,8 +304,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (i == slider.NestedHitObjects.Count - 1)
                     slider.LazyEndPosition = currCursorPosition;
             }
-
-            slider.LazyTravelDistance *= (float)Math.Pow(1 + slider.RepeatCount / 2.5, 1.0 / 2.5); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
         }
 
         private Vector2 getEndCursorPosition(OsuHitObject hitObject)
