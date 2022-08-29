@@ -452,6 +452,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         private bool canMerge(IReadOnlyList<OsuHitObject> objects) =>
             objects.Count > 1
             && (objects.Any(h => h is Slider)
-                || Precision.DefinitelyBigger(Vector2.DistanceSquared(objects[0].Position, objects[1].Position), 1));
+                || objects.Zip(objects.Skip(1), (h1, h2) => Precision.DefinitelyBigger(Vector2.DistanceSquared(h1.Position, h2.Position), 1)).Any(x => x));
     }
 }
