@@ -20,7 +20,6 @@ namespace osu.Game.Overlays.Mods
     public abstract class ModsEffectDisplay : Container
     {
         public const float HEIGHT = 42;
-        private const float value_area_width = 56;
         private const float transition_duration = 200;
 
         private readonly Box contentBackground;
@@ -37,6 +36,8 @@ namespace osu.Game.Overlays.Mods
         /// Text to display in the left area of the display.
         /// </summary>
         protected abstract LocalisableString Label { get; }
+
+        protected virtual float ValueAreaWidth => 56;
 
         protected override Container<Drawable> Content => content;
 
@@ -59,7 +60,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.Y,
-                        Width = value_area_width + ModSelectPanel.CORNER_RADIUS
+                        Width = ValueAreaWidth + ModSelectPanel.CORNER_RADIUS
                     },
                     new GridContainer
                     {
@@ -68,7 +69,7 @@ namespace osu.Game.Overlays.Mods
                         ColumnDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.Absolute, value_area_width)
+                            new Dimension(GridSizeMode.Absolute, ValueAreaWidth)
                         },
                         Content = new[]
                         {
