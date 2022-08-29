@@ -8,6 +8,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -44,6 +45,17 @@ namespace osu.Game.Screens.Play
         private readonly double skipTargetTime;
 
         private readonly List<Bindable<double>> nonGameplayAdjustments = new List<Bindable<double>>();
+
+        /// <summary>
+        /// Stores the time at which the last <see cref="StopGameplayClock"/> call was triggered.
+        /// This is used to ensure we resume from that precise point in time, ignoring the proceeding frequency ramp.
+        ///
+        /// Optimally, we'd have gameplay ramp down with the frequency, but I believe this was intentionally disabled
+        /// to avoid fails occurring after the pause screen has been shown.
+        ///
+        /// In the future I want to change this.
+        /// </summary>
+        private double? actualStopTime;
 
         public override IEnumerable<double> NonGameplayAdjustments => nonGameplayAdjustments.Select(b => b.Value);
 
@@ -86,10 +98,12 @@ namespace osu.Game.Screens.Play
 
         protected override void StopGameplayClock()
         {
+            actualStopTime = GameplayClock.CurrentTime;
+
             if (IsLoaded)
             {
                 // During normal operation, the source is stopped after performing a frequency ramp.
-                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 0, 200, Easing.Out).OnComplete(_ =>
+                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 0, 2000, Easing.Out).OnComplete(_ =>
                 {
                     if (IsPaused.Value)
                         base.StopGameplayClock();
@@ -108,6 +122,25 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        public override void Seek(double time)
+        {
+            // Safety in case the clock is seeked while stopped.
+            actualStopTime = null;
+
+            base.Seek(time);
+        }
+
+        protected override void PrepareStart()
+        {
+            if (actualStopTime != null)
+            {
+                Seek(actualStopTime.Value);
+                actualStopTime = null;
+            }
+            else
+                base.PrepareStart();
+        }
+
         protected override void StartGameplayClock()
         {
             addSourceClockAdjustments();
@@ -116,7 +149,7 @@ namespace osu.Game.Screens.Play
 
             if (IsLoaded)
             {
-                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 1, 200, Easing.In);
+                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 1, 2000, Easing.In);
             }
             else
             {
@@ -157,6 +190,14 @@ namespace osu.Game.Screens.Play
         }
 
         private bool speedAdjustmentsApplied;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (GameplayClock.ExternalPauseFrequencyAdjust.Value < 1)
+                Logger.Log($"{GameplayClock.CurrentTime}");
+        }
 
         private void addSourceClockAdjustments()
         {
