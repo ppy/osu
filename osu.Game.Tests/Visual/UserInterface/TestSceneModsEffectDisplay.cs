@@ -44,32 +44,24 @@ namespace osu.Game.Tests.Visual.UserInterface
                 background = boxes.First();
             });
 
-            AddStep("set value to default", () => testDisplay.Value = 50);
+            AddStep("set value to default", () => testDisplay.Current.Value = 50);
             AddUntilStep("colours are correct", () => testDisplay.Container.Colour == Color4.White && background.Colour == colourProvider.Background3);
 
-            AddStep("set value to less", () => testDisplay.Value = 40);
+            AddStep("set value to less", () => testDisplay.Current.Value = 40);
             AddUntilStep("colours are correct", () => testDisplay.Container.Colour == colourProvider.Background5 && background.Colour == colours.ForModType(ModType.DifficultyReduction));
 
-            AddStep("set value to bigger", () => testDisplay.Value = 60);
+            AddStep("set value to bigger", () => testDisplay.Current.Value = 60);
             AddUntilStep("colours are correct", () => testDisplay.Container.Colour == colourProvider.Background5 && background.Colour == colours.ForModType(ModType.DifficultyIncrease));
         }
 
-        private class TestDisplay : ModsEffectDisplay
+        private class TestDisplay : ModsEffectDisplay<int>
         {
             private readonly OsuSpriteText text;
 
             public Container<Drawable> Container => Content;
 
             protected override LocalisableString Label => "Test display";
-
-            public int Value
-            {
-                set
-                {
-                    text.Text = value.ToString();
-                    SetColours(value.CompareTo(50));
-                }
-            }
+            protected override ModEffect CalculateEffect(int value) => CalculateForSign(value.CompareTo(50));
 
             public TestDisplay()
             {
@@ -80,8 +72,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 });
             }
 
-            [BackgroundDependencyLoader]
-            private void load() => SetColours(0);
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Current.BindValueChanged(e => text.Text = e.NewValue.ToString(), true);
+            }
         }
     }
 }
