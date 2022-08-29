@@ -124,7 +124,7 @@ namespace osu.Game.Beatmaps
             finalClockSource.ProcessFrame();
         }
 
-        private double totalAppliedOffset
+        public double TotalAppliedOffset
         {
             get
             {
@@ -169,7 +169,7 @@ namespace osu.Game.Beatmaps
 
         public bool Seek(double position)
         {
-            bool success = decoupledClock.Seek(position - totalAppliedOffset);
+            bool success = decoupledClock.Seek(position - TotalAppliedOffset);
             finalClockSource.ProcessFrame();
 
             return success;
