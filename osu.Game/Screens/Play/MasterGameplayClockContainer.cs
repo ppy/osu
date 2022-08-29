@@ -8,7 +8,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -103,7 +102,7 @@ namespace osu.Game.Screens.Play
             if (IsLoaded)
             {
                 // During normal operation, the source is stopped after performing a frequency ramp.
-                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 0, 2000, Easing.Out).OnComplete(_ =>
+                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 0, 200, Easing.Out).OnComplete(_ =>
                 {
                     if (IsPaused.Value)
                         base.StopGameplayClock();
@@ -149,7 +148,7 @@ namespace osu.Game.Screens.Play
 
             if (IsLoaded)
             {
-                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 1, 2000, Easing.In);
+                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 1, 200, Easing.In);
             }
             else
             {
@@ -190,14 +189,6 @@ namespace osu.Game.Screens.Play
         }
 
         private bool speedAdjustmentsApplied;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (GameplayClock.ExternalPauseFrequencyAdjust.Value < 1)
-                Logger.Log($"{GameplayClock.CurrentTime}");
-        }
 
         private void addSourceClockAdjustments()
         {
