@@ -87,19 +87,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             currentCombo.BindTo(scoreProcessor.Combo);
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
-        {
-            switch (rank)
-            {
-                case ScoreRank.X:
-                    return ScoreRank.XH;
-
-                case ScoreRank.S:
-                    return ScoreRank.SH;
-
-                default:
-                    return rank;
-            }
-        }
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 }
