@@ -354,9 +354,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                                                                         .OrderBy(h => h.StartTime)
                                                                         .ToArray();
 
-        private bool canMerge(IReadOnlyList<OsuHitObject> objects) =>
-            objects.Count > 1 && (objects.Any(h => h is Slider) || Precision.DefinitelyBigger(Vector2.DistanceSquared(objects[0].Position, objects[1].Position), 1));
-
         private void mergeSelection()
         {
             var mergeableObjects = selectedMergeableObjects;
@@ -451,5 +448,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (canMerge(selectedMergeableObjects))
                 yield return new OsuMenuItem("Merge selection", MenuItemType.Destructive, mergeSelection);
         }
+
+        private bool canMerge(IReadOnlyList<OsuHitObject> objects) =>
+            objects.Count > 1
+            && (objects.Any(h => h is Slider)
+                || Precision.DefinitelyBigger(Vector2.DistanceSquared(objects[0].Position, objects[1].Position), 1));
     }
 }
