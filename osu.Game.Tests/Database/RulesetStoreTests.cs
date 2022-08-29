@@ -61,14 +61,39 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestRulesetThrowingOnMethods()
+        {
+            RunTestWithRealm((realm, storage) =>
+            {
+                LoadTestRuleset.Version = Ruleset.CURRENT_RULESET_API_VERSION;
+                LoadTestRuleset.HasImplementations = false;
+
+                var ruleset = new LoadTestRuleset();
+                string rulesetShortName = ruleset.RulesetInfo.ShortName;
+
+                realm.Write(r => r.Add(new RulesetInfo(rulesetShortName, ruleset.RulesetInfo.Name, ruleset.RulesetInfo.InstantiationInfo, ruleset.RulesetInfo.OnlineID)
+                {
+                    Available = true,
+                }));
+
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName).Available), Is.True);
+
+                // Availability is updated on construction of a RealmRulesetStore
+                var _ = new RealmRulesetStore(realm, storage);
+
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName).Available), Is.False);
+            });
+        }
+
+        [Test]
         public void TestOutdatedRulesetNotAvailable()
         {
             RunTestWithRealm((realm, storage) =>
             {
-                OutdatedRuleset.Version = "2021.101.0";
-                OutdatedRuleset.HasImplementations = true;
+                LoadTestRuleset.Version = "2021.101.0";
+                LoadTestRuleset.HasImplementations = true;
 
-                var ruleset = new OutdatedRuleset();
+                var ruleset = new LoadTestRuleset();
                 string rulesetShortName = ruleset.RulesetInfo.ShortName;
 
                 realm.Write(r => r.Add(new RulesetInfo(rulesetShortName, ruleset.RulesetInfo.Name, ruleset.RulesetInfo.InstantiationInfo, ruleset.RulesetInfo.OnlineID)
@@ -84,14 +109,14 @@ namespace osu.Game.Tests.Database
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName).Available), Is.False);
 
                 // Simulate the ruleset getting updated
-                OutdatedRuleset.Version = Ruleset.CURRENT_RULESET_API_VERSION;
+                LoadTestRuleset.Version = Ruleset.CURRENT_RULESET_API_VERSION;
                 var __ = new RealmRulesetStore(realm, storage);
 
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName).Available), Is.True);
             });
         }
 
-        private class OutdatedRuleset : Ruleset
+        private class LoadTestRuleset : Ruleset
         {
             public override string RulesetAPIVersionSupported => Version;
 
