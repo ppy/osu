@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
@@ -27,8 +26,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "Big brother is watching your cursor.";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModBarrelRoll) };
-
-        private const int apply_zoom_duration = 1000;
 
         [SettingSource("Delay", "Delay in milliseconds for the view to catch up to the cursor")]
         public BindableInt MovementDelay { get; } = new BindableInt
@@ -68,19 +65,20 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void Update(Playfield playfield)
         {
             double zoom = InitialZoom.Value + (FinalZoom.Value - InitialZoom.Value) * Math.Min(1, ((float)currentCombo.Value / FinalZoomCombo.Value));
-            double scale = Interpolation.ValueAt(Math.Min(Math.Abs(playfield.Clock.ElapsedFrameTime), apply_zoom_duration), playfield.Scale.X, zoom, 0, apply_zoom_duration, Easing.Out);
+            Vector2 position = playfield.OriginPosition - playfield.Cursor.ActiveCursor.DrawPosition;
 
-            playfield.Scale = new Vector2((float)scale);
-
-            var position = playfield.Cursor.ActiveCursor.DrawPosition;
-            var trackingPosition = Vector2.Clamp(playfield.OriginPosition - position, -playfield.OriginPosition, playfield.OriginPosition);
+            playfield.Scale = new Vector2((float)Interpolation.DampContinuously(playfield.Scale.X, zoom, 200, Math.Abs(playfield.Clock.ElapsedFrameTime)));
 
             if (MovementDelay.Value == 0)
-                playfield.Position = trackingPosition;
+            {
+                playfield.Position = position;
+            }
             else
             {
-                playfield.Position = Interpolation.ValueAt(
-                    Math.Min(Math.Abs(playfield.Clock.ElapsedFrameTime), MovementDelay.Value), playfield.Position, trackingPosition, 0, MovementDelay.Value, Easing.Out);
+                playfield.Position = new Vector2(
+                    (float)Interpolation.DampContinuously(playfield.Position.X, position.X, MovementDelay.Value, Math.Abs(playfield.Clock.ElapsedFrameTime)),
+                    (float)Interpolation.DampContinuously(playfield.Position.Y, position.Y, MovementDelay.Value, Math.Abs(playfield.Clock.ElapsedFrameTime))
+                );
             }
         }
 
