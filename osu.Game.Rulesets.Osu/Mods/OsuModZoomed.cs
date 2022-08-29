@@ -40,9 +40,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource("Initial zoom", "The starting zoom level")]
-        public BindableDouble InitialZoom { get; } = new BindableDouble(1.8)
+        public BindableDouble InitialZoom { get; } = new BindableDouble(1.5)
         {
-            MinValue = 1.5,
+            MinValue = 1,
             MaxValue = 2,
             Precision = 0.05
         };
