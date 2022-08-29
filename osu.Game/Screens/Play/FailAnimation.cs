@@ -166,8 +166,7 @@ namespace osu.Game.Screens.Play
             if (filters.Parent == null)
                 return;
 
-            RemoveInternal(filters);
-            filters.Dispose();
+            RemoveInternal(filters, true);
         }
 
         protected override void Update()
