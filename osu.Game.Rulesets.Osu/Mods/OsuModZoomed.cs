@@ -11,7 +11,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -19,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModZoomed : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToDrawableRuleset<OsuHitObject>
+    internal class OsuModZoomed : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor
     {
         public override string Name => "Zoomed";
         public override string Acronym => "ZM";
@@ -58,12 +57,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private readonly BindableDouble currentZoom = new BindableDouble();
 
         private readonly BindableInt currentCombo = new BindableInt();
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            currentZoom.Value = InitialZoom.Value;
-            currentZoom.MaxValue = getZoomForCombo(FinalZoomCombo.Value);
-        }
 
         public void Update(Playfield playfield)
         {
