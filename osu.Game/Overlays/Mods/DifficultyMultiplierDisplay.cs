@@ -3,12 +3,10 @@
 
 #nullable disable
 
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -18,22 +16,17 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
-    public sealed class DifficultyMultiplierDisplay : ModsEffectDisplay, IHasCurrentValue<double>
+    public sealed class DifficultyMultiplierDisplay : ModsEffectDisplay<double>
     {
         protected override LocalisableString Label => DifficultyMultiplierDisplayStrings.DifficultyMultiplier;
-
-        public Bindable<double> Current
-        {
-            get => current.Current;
-            set => current.Current = value;
-        }
-
-        private readonly BindableNumberWithCurrent<double> current = new BindableNumberWithCurrent<double>(1);
+        protected override ModEffect CalculateEffect(double value) => CalculateForSign(value.CompareTo(1d));
 
         private readonly MultiplierCounter multiplierCounter;
 
         public DifficultyMultiplierDisplay()
         {
+            Current.Default = 1d;
+            Current.Value = 1d;
             Add(new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
@@ -63,11 +56,9 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            current.BindValueChanged(e => SetColours(e.NewValue.CompareTo(current.Default)), true);
-
             // required to prevent the counter initially rolling up from 0 to 1
             // due to `Current.Value` having a nonstandard default value of 1.
-            multiplierCounter.SetCountWithoutRolling(current.Value);
+            multiplierCounter.SetCountWithoutRolling(Current.Value);
         }
 
         private class MultiplierCounter : RollingCounter<double>
