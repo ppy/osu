@@ -458,7 +458,7 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Populates the given score with remaining statistics as "missed" and marks it with <see cref="ScoreRank.F"/> rank.
+        /// Populates a failed score, marking it with the <see cref="ScoreRank.F"/> rank.
         /// </summary>
         public void FailScore(ScoreInfo score)
         {
