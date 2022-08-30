@@ -12,15 +12,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Utils;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -255,41 +253,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 return;
 
             var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(HitObject.StartTime);
-            double streamSpacing = timingPoint.BeatLength / beatDivisor.Value;
 
             changeHandler?.BeginChange();
 
-            int i = 0;
-            double time = HitObject.StartTime;
-
-            while (!Precision.DefinitelyBigger(time, HitObject.GetEndTime(), 1))
-            {
-                // positionWithRepeats is a fractional number in the range of [0, HitObject.SpanCount()]
-                // and indicates how many fractional spans of a slider have passed up to time.
-                double positionWithRepeats = (time - HitObject.StartTime) / HitObject.Duration * HitObject.SpanCount();
-                double pathPosition = positionWithRepeats - (int)positionWithRepeats;
-                // every second span is in the reverse direction - need to reverse the path position.
-                if (Precision.AlmostBigger(positionWithRepeats % 2, 1))
-                    pathPosition = 1 - pathPosition;
-
-                Vector2 position = HitObject.Position + HitObject.Path.PositionAt(pathPosition);
-
-                var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
-                samplePoint.Time = time;
-
-                editorBeatmap.Add(new HitCircle
-                {
-                    StartTime = time,
-                    Position = position,
-                    NewCombo = i == 0 && HitObject.NewCombo,
-                    SampleControlPoint = samplePoint,
-                    Samples = HitObject.HeadCircle.Samples.Select(s => s.With()).ToList()
-                });
-
-                i += 1;
-                time = HitObject.StartTime + i * streamSpacing;
-            }
-
+            editorBeatmap.AddRange(OsuHitObjectGenerationUtils.ConvertSliderToStream(HitObject, timingPoint, beatDivisor.Value));
             editorBeatmap.Remove(HitObject);
 
             changeHandler?.EndChange();

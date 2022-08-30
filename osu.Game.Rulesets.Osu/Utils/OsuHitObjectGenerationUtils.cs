@@ -4,10 +4,14 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Utils;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -185,6 +189,49 @@ namespace osu.Game.Rulesets.Osu.Utils
                 length * MathF.Cos(angle),
                 length * MathF.Sin(angle)
             );
+        }
+
+        /// <summary>
+        /// Converts slider to a stream.
+        /// </summary>
+        /// <param name="slider">Slider to convert.</param>
+        /// <param name="timingPoint">Timing point in which the slider is placed.</param>
+        /// <param name="spacing">Beat divisor to place objects on.</param>
+        /// <returns>List of circles.</returns>
+        public static IEnumerable<HitCircle> ConvertSliderToStream(Slider slider, TimingControlPoint timingPoint, int spacing)
+        {
+            double streamSpacing = timingPoint.BeatLength / spacing;
+
+            int i = 0;
+            double time = slider.StartTime;
+
+            while (!Precision.DefinitelyBigger(time, slider.GetEndTime(), 1))
+            {
+                // positionWithRepeats is a fractional number in the range of [0, HitObject.SpanCount()]
+                // and indicates how many fractional spans of a slider have passed up to time.
+                double positionWithRepeats = (time - slider.StartTime) / slider.Duration * slider.SpanCount();
+                double pathPosition = positionWithRepeats - (int)positionWithRepeats;
+                // every second span is in the reverse direction - need to reverse the path position.
+                if (Precision.AlmostBigger(positionWithRepeats % 2, 1))
+                    pathPosition = 1 - pathPosition;
+
+                Vector2 position = slider.Position + slider.Path.PositionAt(pathPosition);
+
+                var samplePoint = (SampleControlPoint)slider.SampleControlPoint.DeepClone();
+                samplePoint.Time = time;
+
+                yield return new HitCircle
+                {
+                    StartTime = time,
+                    Position = position,
+                    NewCombo = i == 0 && slider.NewCombo,
+                    SampleControlPoint = samplePoint,
+                    Samples = slider.HeadCircle.Samples.Select(s => s.With()).ToList()
+                };
+
+                i += 1;
+                time = slider.StartTime + i * streamSpacing;
+            }
         }
     }
 }
