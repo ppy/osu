@@ -11,7 +11,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects
