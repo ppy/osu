@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -26,7 +24,7 @@ namespace osu.Game.Overlays.Notifications
         /// <summary>
         /// User requested close.
         /// </summary>
-        public event Action Closed;
+        public event Action? Closed;
 
         public abstract LocalisableString Text { get; set; }
 
@@ -38,7 +36,7 @@ namespace osu.Game.Overlays.Notifications
         /// <summary>
         /// Run on user activating the notification. Return true to close.
         /// </summary>
-        public Func<bool> Activated;
+        public Func<bool>? Activated;
 
         /// <summary>
         /// Should we show at the top of our section on display?
@@ -212,7 +210,7 @@ namespace osu.Game.Overlays.Notifications
         public class NotificationLight : Container
         {
             private bool pulsate;
-            private Container pulsateLayer;
+            private Container pulsateLayer = null!;
 
             public bool Pulsate
             {
