@@ -32,6 +32,8 @@ namespace osu.Game.Overlays
 
         public Action<Notification>? ForwardNotificationToPermanentStore { get; set; }
 
+        public int UnreadCount => toastFlow.Count(n => !n.WasClosed && !n.Read);
+
         private int runningDepth;
 
         [BackgroundDependencyLoader]

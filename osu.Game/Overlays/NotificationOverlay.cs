@@ -129,6 +129,8 @@ namespace osu.Game.Overlays
 
         public IBindable<int> UnreadCount => unreadCount;
 
+        public int ToastCount => toastTray.UnreadCount;
+
         private readonly BindableInt unreadCount = new BindableInt();
 
         private int runningDepth;
@@ -155,7 +157,10 @@ namespace osu.Game.Overlays
             playDebouncedSample(notification.PopInSampleName);
 
             if (State.Value == Visibility.Hidden)
+            {
                 toastTray.Post(notification);
+                updateCounts();
+            }
             else
                 addPermanently(notification);
         });
@@ -220,7 +225,7 @@ namespace osu.Game.Overlays
 
         private void updateCounts()
         {
-            unreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
+            unreadCount.Value = sections.Select(c => c.UnreadCount).Sum() + toastTray.UnreadCount;
         }
 
         private void markAllRead()
