@@ -90,11 +90,19 @@ namespace osu.Game.Overlays
 
             toastFlow.Insert(depth, notification);
 
-            pendingToastOperations.Add(Scheduler.AddDelayed(() =>
+            pendingToastOperations.Add(scheduleDismissal());
+
+            ScheduledDelegate scheduleDismissal() => Scheduler.AddDelayed(() =>
             {
                 // add notification to permanent overlay unless it was already dismissed by the user.
                 if (notification.WasClosed)
                     return;
+
+                if (notification.IsHovered)
+                {
+                    pendingToastOperations.Add(scheduleDismissal());
+                    return;
+                }
 
                 toastFlow.Remove(notification);
                 AddInternal(notification);
@@ -107,7 +115,7 @@ namespace osu.Game.Overlays
 
                     notification.FadeIn(300, Easing.OutQuint);
                 });
-            }, notification.IsImportant ? 15000 : 3000));
+            }, notification.IsImportant ? 12000 : 2500);
         }
 
         protected override void Update()
