@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Notifications
 
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
-                    NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
+                    MainContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
                     this.FadeOut(200).Finally(_ => Completed());
                     break;
             }
@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.X,
             });
 
-            NotificationContent.Add(progressBar = new ProgressBar
+            MainContent.Add(progressBar = new ProgressBar
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
