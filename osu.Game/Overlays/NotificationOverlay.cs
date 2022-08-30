@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
@@ -35,6 +34,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private AudioManager audio { get; set; } = null!;
 
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
         private readonly IBindable<Visibility> firstRunSetupVisibility = new Bindable<Visibility>();
 
         [BackgroundDependencyLoader]
@@ -49,7 +51,7 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.05f),
+                    Colour = colourProvider.Background4,
                 },
                 new OsuScrollContainer
                 {
