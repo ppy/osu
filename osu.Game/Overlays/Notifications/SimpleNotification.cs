@@ -41,8 +41,6 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        protected Box IconBackground = null!;
-
         private TextFlowContainer? textDrawable;
 
         private SpriteIcon? iconDrawable;
@@ -54,7 +52,7 @@ namespace osu.Game.Overlays.Notifications
 
             IconContent.AddRange(new Drawable[]
             {
-                IconBackground = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
