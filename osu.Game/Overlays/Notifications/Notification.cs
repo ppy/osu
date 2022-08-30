@@ -58,6 +58,11 @@ namespace osu.Game.Overlays.Notifications
 
         protected virtual IconUsage CloseButtonIcon => FontAwesome.Solid.Check;
 
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        private Box background = null!;
+
         protected Notification()
         {
             RelativeSizeAxes = Axes.X;
@@ -73,7 +78,7 @@ namespace osu.Game.Overlays.Notifications
                 },
                 MainContent = new Container
                 {
-                    CornerRadius = 8,
+                    CornerRadius = 6,
                     Masking = true,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -133,14 +138,26 @@ namespace osu.Game.Overlays.Notifications
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
-            MainContent.Add(new Box
+            MainContent.Add(background = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = colourProvider.Background3,
                 Depth = float.MaxValue
             });
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            background.FadeColour(colourProvider.Background2, 200, Easing.OutQuint);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            background.FadeColour(colourProvider.Background3, 200, Easing.OutQuint);
+            base.OnHoverLost(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -193,7 +210,7 @@ namespace osu.Game.Overlays.Notifications
             private void load()
             {
                 RelativeSizeAxes = Axes.Y;
-                Width = 24;
+                Width = 28;
 
                 Children = new Drawable[]
                 {
@@ -216,15 +233,15 @@ namespace osu.Game.Overlays.Notifications
 
             protected override bool OnHover(HoverEvent e)
             {
-                background.FadeIn(200);
-                icon.FadeColour(colourProvider.Content1, 200);
+                background.FadeIn(200, Easing.OutQuint);
+                icon.FadeColour(colourProvider.Content1, 200, Easing.OutQuint);
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                background.FadeOut(200);
-                icon.FadeColour(colourProvider.Foreground1, 200);
+                background.FadeOut(200, Easing.OutQuint);
+                icon.FadeColour(colourProvider.Foreground1, 200, Easing.OutQuint);
                 base.OnHoverLost(e);
             }
         }
