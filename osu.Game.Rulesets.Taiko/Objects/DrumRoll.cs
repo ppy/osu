@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             }
         }
 
-        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
