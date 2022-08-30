@@ -157,12 +157,11 @@ namespace osu.Game.Overlays
             playDebouncedSample(notification.PopInSampleName);
 
             if (State.Value == Visibility.Hidden)
-            {
                 toastTray.Post(notification);
-                updateCounts();
-            }
             else
                 addPermanently(notification);
+
+            updateCounts();
         });
 
         private void addPermanently(Notification notification)
@@ -231,7 +230,6 @@ namespace osu.Game.Overlays
         private void markAllRead()
         {
             sections.Children.ForEach(s => s.MarkAllRead());
-
             updateCounts();
         }
     }
