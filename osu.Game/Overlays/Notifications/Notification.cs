@@ -56,6 +56,8 @@ namespace osu.Game.Overlays.Notifications
 
         public virtual bool Read { get; set; }
 
+        protected virtual IconUsage CloseButtonIcon => FontAwesome.Solid.Check;
+
         protected Notification()
         {
             RelativeSizeAxes = Axes.X;
@@ -116,7 +118,7 @@ namespace osu.Game.Overlays.Notifications
                                             },
                                         }
                                     },
-                                    new CloseButton
+                                    new CloseButton(CloseButtonIcon)
                                     {
                                         Action = Close,
                                         Anchor = Anchor.TopRight,
@@ -177,8 +179,15 @@ namespace osu.Game.Overlays.Notifications
             private SpriteIcon icon = null!;
             private Box background = null!;
 
+            private readonly IconUsage iconUsage;
+
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            public CloseButton(IconUsage iconUsage)
+            {
+                this.iconUsage = iconUsage;
+            }
 
             [BackgroundDependencyLoader]
             private void load()
@@ -198,7 +207,7 @@ namespace osu.Game.Overlays.Notifications
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.Check,
+                        Icon = iconUsage,
                         Size = new Vector2(12),
                         Colour = colourProvider.Foreground1,
                     }

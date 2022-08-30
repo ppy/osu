@@ -61,7 +61,10 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private void updateProgress(float progress) => progressBar.Progress = progress;
+        protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         protected override void LoadComplete()
         {
