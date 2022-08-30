@@ -68,6 +68,7 @@ namespace osu.Game.Overlays
             {
                 toastTray = new NotificationOverlayToastTray
                 {
+                    ForwardNotificationToPermanentStore = addPermanently,
                     Origin = Anchor.TopRight,
                 },
                 mainContent = new Container
@@ -157,26 +158,25 @@ namespace osu.Game.Overlays
             if (notification is IHasCompletionTarget hasCompletionTarget)
                 hasCompletionTarget.CompletionTarget = Post;
 
-            var ourType = notification.GetType();
-
-            int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
-
             playDebouncedSample(notification.PopInSampleName);
 
             if (State.Value == Visibility.Hidden)
-                toastTray.Post(notification, addPermanently);
+                toastTray.Post(notification);
             else
-                addPermanently();
-
-            void addPermanently()
-            {
-                var section = sections.Children.First(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
-
-                section.Add(notification, depth);
-
-                updateCounts();
-            }
+                addPermanently(notification);
         });
+
+        private void addPermanently(Notification notification)
+        {
+            var ourType = notification.GetType();
+            int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
+
+            var section = sections.Children.First(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+
+            section.Add(notification, depth);
+
+            updateCounts();
+        }
 
         protected override void Update()
         {
