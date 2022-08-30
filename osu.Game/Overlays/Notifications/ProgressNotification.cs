@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Notifications
                     Light.Pulsate = false;
                     progressBar.Active = false;
 
-                    iconBackground.FadeColour(ColourInfo.GradientVertical(colourQueued, colourQueued.Lighten(0.5f)), colour_fade_duration);
+                    IconContent.FadeColour(ColourInfo.GradientVertical(colourQueued, colourQueued.Lighten(0.5f)), colour_fade_duration);
                     loadingSpinner.Show();
                     break;
 
@@ -112,14 +112,14 @@ namespace osu.Game.Overlays.Notifications
                     Light.Pulsate = true;
                     progressBar.Active = true;
 
-                    iconBackground.FadeColour(ColourInfo.GradientVertical(colourActive, colourActive.Lighten(0.5f)), colour_fade_duration);
+                    IconContent.FadeColour(ColourInfo.GradientVertical(colourActive, colourActive.Lighten(0.5f)), colour_fade_duration);
                     loadingSpinner.Show();
                     break;
 
                 case ProgressNotificationState.Cancelled:
                     cancellationTokenSource.Cancel();
 
-                    iconBackground.FadeColour(ColourInfo.GradientVertical(Color4.Gray, Color4.Gray.Lighten(0.5f)), colour_fade_duration);
+                    IconContent.FadeColour(ColourInfo.GradientVertical(Color4.Gray, Color4.Gray.Lighten(0.5f)), colour_fade_duration);
                     loadingSpinner.Hide();
 
                     var icon = new SpriteIcon
@@ -168,7 +168,6 @@ namespace osu.Game.Overlays.Notifications
         private Color4 colourActive;
         private Color4 colourCancelled;
 
-        private Box iconBackground = null!;
         private LoadingSpinner loadingSpinner = null!;
 
         private readonly TextFlowContainer textDrawable;
@@ -206,10 +205,10 @@ namespace osu.Game.Overlays.Notifications
 
             IconContent.AddRange(new Drawable[]
             {
-                iconBackground = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
+                    Colour = colourProvider.Background5,
                 },
                 loadingSpinner = new LoadingSpinner
                 {
