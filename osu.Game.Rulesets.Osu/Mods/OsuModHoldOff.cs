@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
@@ -26,6 +28,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTarget), typeof(OsuModStrictTracking) };
 
+        [SettingSource("Beat divisor")]
+        public BindableInt BeatDivisor { get; } = new BindableInt(4)
+        {
+            MinValue = 1,
+            MaxValue = 16
+        };
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var osuBeatmap = (OsuBeatmap)beatmap;
@@ -38,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     var point = beatmap.ControlPointInfo.TimingPointAt(s.StartTime);
                     s.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
-                    newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertSliderToStream(s, point, 4));
+                    newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertSliderToStream(s, point, BeatDivisor.Value));
                 }
                 else
                 {
