@@ -160,6 +160,8 @@ namespace osu.Game.Overlays
 
             int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
 
+            playDebouncedSample(notification.PopInSampleName);
+
             if (State.Value == Visibility.Hidden)
                 toastTray.Post(notification, addPermanently);
             else
@@ -172,7 +174,6 @@ namespace osu.Game.Overlays
                 section.Add(notification, depth);
 
                 updateCounts();
-                playDebouncedSample(notification.PopInSampleName);
             }
         });
 
