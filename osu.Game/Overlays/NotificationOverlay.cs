@@ -38,8 +38,6 @@ namespace osu.Game.Overlays
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private readonly IBindable<Visibility> firstRunSetupVisibility = new Bindable<Visibility>();
-
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
             if (State.Value == Visibility.Visible)
@@ -58,7 +56,7 @@ namespace osu.Game.Overlays
         private Container mainContent = null!;
 
         [BackgroundDependencyLoader]
-        private void load(FirstRunSetupOverlay? firstRunSetup)
+        private void load()
         {
             X = WIDTH;
             Width = WIDTH;
@@ -104,16 +102,13 @@ namespace osu.Game.Overlays
                     }
                 },
             };
-
-            if (firstRunSetup != null)
-                firstRunSetupVisibility.BindTo(firstRunSetup.State);
         }
 
         private ScheduledDelegate? notificationsEnabler;
 
         private void updateProcessingMode()
         {
-            bool enabled = (OverlayActivationMode.Value == OverlayActivation.All && firstRunSetupVisibility.Value != Visibility.Visible) || State.Value == Visibility.Visible;
+            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State.Value == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
@@ -129,7 +124,6 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             State.BindValueChanged(_ => updateProcessingMode());
-            firstRunSetupVisibility.BindValueChanged(_ => updateProcessingMode());
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
