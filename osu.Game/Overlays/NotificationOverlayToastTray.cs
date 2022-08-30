@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Overlays.Notifications;
 using osuTK;
@@ -25,13 +24,13 @@ namespace osu.Game.Overlays
     {
         public bool IsDisplayingToasts => toastFlow.Count > 0;
 
-        private FillFlowContainer toastFlow = null!;
+        private FillFlowContainer<Notification> toastFlow = null!;
         private BufferedContainer toastContentBackground = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        private readonly List<ScheduledDelegate> pendingToastOperations = new List<ScheduledDelegate>();
+        public Action<Notification>? ForwardNotificationToPermanentStore { get; set; }
 
         private int runningDepth;
 
@@ -63,7 +62,7 @@ namespace osu.Game.Overlays
                     postEffectDrawable.AutoSizeAxes = Axes.None;
                     postEffectDrawable.RelativeSizeAxes = Axes.X;
                 })),
-                toastFlow = new FillFlowContainer
+                toastFlow = new FillFlowContainer<Notification>
                 {
                     LayoutDuration = 150,
                     LayoutEasing = Easing.OutQuart,
@@ -76,13 +75,13 @@ namespace osu.Game.Overlays
 
         public void FlushAllToasts()
         {
-            foreach (var d in pendingToastOperations.Where(d => !d.Completed))
-                d.RunTask();
-
-            pendingToastOperations.Clear();
+            foreach (var notification in toastFlow.ToArray())
+            {
+                forwardNotification(notification);
+            }
         }
 
-        public void Post(Notification notification, Action addPermanently)
+        public void Post(Notification notification)
         {
             ++runningDepth;
 
@@ -90,32 +89,45 @@ namespace osu.Game.Overlays
 
             toastFlow.Insert(depth, notification);
 
-            pendingToastOperations.Add(scheduleDismissal());
+            scheduleDismissal();
 
-            ScheduledDelegate scheduleDismissal() => Scheduler.AddDelayed(() =>
+            void scheduleDismissal() => Scheduler.AddDelayed(() =>
             {
-                // add notification to permanent overlay unless it was already dismissed by the user.
+                // Notification dismissed by user.
                 if (notification.WasClosed)
                     return;
 
+                // Notification forwarded away.
+                if (notification.Parent != toastFlow)
+                    return;
+
+                // Notification hovered; delay dismissal.
                 if (notification.IsHovered)
                 {
-                    pendingToastOperations.Add(scheduleDismissal());
+                    scheduleDismissal();
                     return;
                 }
 
-                toastFlow.Remove(notification);
-                AddInternal(notification);
-
-                notification.MoveToOffset(new Vector2(400, 0), NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint);
-                notification.FadeOut(NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint).OnComplete(_ =>
-                {
-                    RemoveInternal(notification);
-                    addPermanently();
-
-                    notification.FadeIn(300, Easing.OutQuint);
-                });
+                // All looks good, forward away!
+                forwardNotification(notification);
             }, notification.IsImportant ? 12000 : 2500);
+        }
+
+        private void forwardNotification(Notification notification)
+        {
+            Debug.Assert(notification.Parent == toastFlow);
+
+            toastFlow.Remove(notification);
+            AddInternal(notification);
+
+            notification.MoveToOffset(new Vector2(400, 0), NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint);
+            notification.FadeOut(NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint).OnComplete(_ =>
+            {
+                RemoveInternal(notification);
+                ForwardNotificationToPermanentStore?.Invoke(notification);
+
+                notification.FadeIn(300, Easing.OutQuint);
+            });
         }
 
         protected override void Update()
