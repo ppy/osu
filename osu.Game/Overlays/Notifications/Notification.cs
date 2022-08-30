@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Notifications
 
         protected override Container<Drawable> Content => content;
 
-        protected Container NotificationContent;
+        protected Container MainContent;
 
         public virtual bool Read { get; set; }
 
@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Notifications
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
                 },
-                NotificationContent = new Container
+                MainContent = new Container
                 {
                     CornerRadius = 8,
                     Masking = true,
@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Notifications
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            NotificationContent.Add(new Box
+            MainContent.Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = colourProvider.Background3,
@@ -157,8 +157,8 @@ namespace osu.Game.Overlays.Notifications
 
             this.FadeInFromZero(200);
 
-            NotificationContent.MoveToX(DrawSize.X);
-            NotificationContent.MoveToX(0, 500, Easing.OutQuint);
+            MainContent.MoveToX(DrawSize.X);
+            MainContent.MoveToX(0, 500, Easing.OutQuint);
         }
 
         public bool WasClosed;
