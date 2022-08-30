@@ -118,6 +118,7 @@ namespace osu.Game.Overlays.Notifications
                                         {
                                             content = new Container
                                             {
+                                                Masking = true,
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
                                             },
