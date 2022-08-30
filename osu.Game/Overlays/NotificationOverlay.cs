@@ -72,6 +72,7 @@ namespace osu.Game.Overlays
                 },
                 mainContent = new Container
                 {
+                    AlwaysPresent = true,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
