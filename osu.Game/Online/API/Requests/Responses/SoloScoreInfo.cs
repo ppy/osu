@@ -77,6 +77,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("maximum_statistics")]
         public Dictionary<HitResult, int> MaximumStatistics { get; set; } = new Dictionary<HitResult, int>();
 
+        /// <summary>
+        /// Used to preserve the total score for legacy scores.
+        /// </summary>
+        [JsonProperty("legacy_total_score")]
+        public int? LegacyTotalScore { get; set; }
+
         #region osu-web API additions (not stored to database).
 
         [JsonProperty("id")]
