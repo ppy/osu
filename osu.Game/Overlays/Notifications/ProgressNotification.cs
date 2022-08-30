@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 progress = value;
-                Scheduler.AddOnce(updateProgress, progress);
+                Scheduler.AddOnce(p => progressBar.Progress = p, progress);
             }
         }
 
@@ -174,7 +174,6 @@ namespace osu.Game.Overlays.Notifications
         {
             Content.Add(textDrawable = new OsuTextFlowContainer
             {
-                Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
             });

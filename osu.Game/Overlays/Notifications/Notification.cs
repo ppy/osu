@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
@@ -46,8 +45,9 @@ namespace osu.Game.Overlays.Notifications
         public virtual string PopInSampleName => "UI/notification-pop-in";
 
         protected NotificationLight Light;
-        private readonly CloseButton closeButton;
+
         protected Container IconContent;
+
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Notifications
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            AddRangeInternal(new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 Light = new NotificationLight
                 {
@@ -79,62 +79,66 @@ namespace osu.Game.Overlays.Notifications
                     AutoSizeEasing = Easing.OutQuint,
                     Children = new Drawable[]
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.White,
-                        },
-                        new Container
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Padding = new MarginPadding(5),
                             AutoSizeAxes = Axes.Y,
-                            Children = new Drawable[]
+                            RowDimensions = new[]
                             {
-                                IconContent = new Container
-                                {
-                                    Size = new Vector2(40),
-                                    Masking = true,
-                                    CornerRadius = 5,
-                                },
-                                content = new Container
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding
-                                    {
-                                        Left = 45,
-                                        Right = 30
-                                    },
-                                }
-                            }
-                        },
-                        closeButton = new CloseButton
-                        {
-                            Alpha = 0,
-                            Action = Close,
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            Margin = new MarginPadding
-                            {
-                                Right = 5
+                                new Dimension(GridSizeMode.AutoSize, minSize: 60)
                             },
-                        }
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(),
+                                new Dimension(GridSizeMode.AutoSize),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    IconContent = new Container
+                                    {
+                                        Width = 40,
+                                        RelativeSizeAxes = Axes.Y,
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding(10),
+                                        Children = new Drawable[]
+                                        {
+                                            content = new Container
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                            },
+                                        }
+                                    },
+                                    new CloseButton
+                                    {
+                                        Action = Close,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                    }
+                                }
+                            },
+                        },
                     }
                 }
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            NotificationContent.Add(new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = colourProvider.Background3,
+                Depth = float.MaxValue
             });
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            closeButton.FadeIn(75);
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            closeButton.FadeOut(75);
-            base.OnHoverLost(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -150,6 +154,7 @@ namespace osu.Game.Overlays.Notifications
             base.LoadComplete();
 
             this.FadeInFromZero(200);
+
             NotificationContent.MoveToX(DrawSize.X);
             NotificationContent.MoveToX(0, 500, Easing.OutQuint);
         }
@@ -169,40 +174,48 @@ namespace osu.Game.Overlays.Notifications
 
         private class CloseButton : OsuClickableContainer
         {
-            private Color4 hoverColour;
+            private SpriteIcon icon = null!;
+            private Box background = null!;
 
-            public CloseButton()
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [BackgroundDependencyLoader]
+            private void load()
             {
-                Colour = OsuColour.Gray(0.2f);
-                AutoSizeAxes = Axes.Both;
+                RelativeSizeAxes = Axes.Y;
+                Width = 24;
 
-                Children = new[]
+                Children = new Drawable[]
                 {
-                    new SpriteIcon
+                    background = new Box
+                    {
+                        Colour = colourProvider.Background4,
+                        Alpha = 0,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    icon = new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.TimesCircle,
-                        Size = new Vector2(20),
+                        Icon = FontAwesome.Solid.Check,
+                        Size = new Vector2(12),
+                        Colour = colourProvider.Foreground1,
                     }
                 };
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                hoverColour = colours.Yellow;
-            }
-
             protected override bool OnHover(HoverEvent e)
             {
-                this.FadeColour(hoverColour, 200);
+                background.FadeIn(200);
+                icon.FadeColour(colourProvider.Content1, 200);
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                this.FadeColour(OsuColour.Gray(0.2f), 200);
+                background.FadeOut(200);
+                icon.FadeColour(colourProvider.Foreground1, 200);
                 base.OnHoverLost(e);
             }
         }
