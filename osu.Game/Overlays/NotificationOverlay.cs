@@ -64,14 +64,8 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.X,
                             Children = new[]
                             {
-                                new NotificationSection(AccountsStrings.NotificationsTitle, "Clear All")
-                                {
-                                    AcceptTypes = new[] { typeof(SimpleNotification) }
-                                },
-                                new NotificationSection(@"Running Tasks", @"Cancel All")
-                                {
-                                    AcceptTypes = new[] { typeof(ProgressNotification) }
-                                }
+                                new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, "Clear All"),
+                                new NotificationSection(@"Running Tasks", new[] { typeof(ProgressNotification) }, @"Cancel All"),
                             }
                         }
                     }
@@ -133,7 +127,7 @@ namespace osu.Game.Overlays
 
             var ourType = notification.GetType();
 
-            var section = sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+            var section = sections.Children.FirstOrDefault(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
             section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
 
             if (notification.IsImportant)
