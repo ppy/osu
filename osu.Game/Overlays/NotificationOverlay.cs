@@ -15,6 +15,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
+using osuTK;
 using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Overlays
@@ -39,6 +40,23 @@ namespace osu.Game.Overlays
 
         private readonly IBindable<Visibility> firstRunSetupVisibility = new Bindable<Visibility>();
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            if (State.Value == Visibility.Visible)
+                return base.ReceivePositionalInputAt(screenSpacePos);
+
+            if (toastTray.IsDisplayingToasts)
+                return toastTray.ReceivePositionalInputAt(screenSpacePos);
+
+            return false;
+        }
+
+        public override bool PropagatePositionalInputSubTree => base.PropagatePositionalInputSubTree || toastTray.IsDisplayingToasts;
+
+        private NotificationOverlayToastTray toastTray = null!;
+
+        private Container mainContent = null!;
+
         [BackgroundDependencyLoader]
         private void load(FirstRunSetupOverlay? firstRunSetup)
         {
@@ -48,30 +66,41 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                new Box
+                toastTray = new NotificationOverlayToastTray
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4,
+                    Origin = Anchor.TopRight,
                 },
-                new OsuScrollContainer
+                mainContent = new Container
                 {
-                    Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
-                        sections = new FillFlowContainer<NotificationSection>
+                        new Box
                         {
-                            Direction = FillDirection.Vertical,
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background4,
+                        },
+                        new OsuScrollContainer
+                        {
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both,
                             Children = new[]
                             {
-                                new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, "Clear All"),
-                                new NotificationSection(@"Running Tasks", new[] { typeof(ProgressNotification) }, @"Cancel All"),
+                                sections = new FillFlowContainer<NotificationSection>
+                                {
+                                    Direction = FillDirection.Vertical,
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                    Children = new[]
+                                    {
+                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, "Clear All"),
+                                        new NotificationSection(@"Running Tasks", new[] { typeof(ProgressNotification) }, @"Cancel All"),
+                                    }
+                                }
                             }
                         }
                     }
-                }
+                },
             };
 
             if (firstRunSetup != null)
@@ -129,14 +158,22 @@ namespace osu.Game.Overlays
 
             var ourType = notification.GetType();
 
-            var section = sections.Children.FirstOrDefault(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
-            section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
+            int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
 
-            if (notification.IsImportant)
-                Show();
+            if (State.Value == Visibility.Hidden)
+                toastTray.Post(notification, addPermanently);
+            else
+                addPermanently();
 
-            updateCounts();
-            playDebouncedSample(notification.PopInSampleName);
+            void addPermanently()
+            {
+                var section = sections.Children.First(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+
+                section.Add(notification, depth);
+
+                updateCounts();
+                playDebouncedSample(notification.PopInSampleName);
+            }
         });
 
         protected override void Update()
@@ -152,7 +189,9 @@ namespace osu.Game.Overlays
             base.PopIn();
 
             this.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
+
+            toastTray.FlushAllToasts();
         }
 
         protected override void PopOut()
@@ -162,7 +201,7 @@ namespace osu.Game.Overlays
             markAllRead();
 
             this.MoveToX(WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
         }
 
         private void notificationClosed()
