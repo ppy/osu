@@ -61,6 +61,8 @@ namespace osu.Game.Overlays.Notifications
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        private readonly Box initialFlash;
+
         private Box background = null!;
 
         protected Notification()
@@ -133,6 +135,12 @@ namespace osu.Game.Overlays.Notifications
                                 }
                             },
                         },
+                        initialFlash = new Box
+                        {
+                            Colour = Color4.White.Opacity(0.8f),
+                            RelativeSizeAxes = Axes.Both,
+                            Blending = BlendingParameters.Additive,
+                        },
                     }
                 }
             };
@@ -177,6 +185,8 @@ namespace osu.Game.Overlays.Notifications
 
             MainContent.MoveToX(DrawSize.X);
             MainContent.MoveToX(0, 500, Easing.OutQuint);
+
+            initialFlash.FadeOutFromOne(2000, Easing.OutQuart);
         }
 
         public bool WasClosed;
