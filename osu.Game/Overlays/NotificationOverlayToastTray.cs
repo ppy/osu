@@ -75,6 +75,12 @@ namespace osu.Game.Overlays
             };
         }
 
+        public void MarkAllRead()
+        {
+            toastFlow.Children.ForEach(n => n.Read = true);
+            InternalChildren.OfType<Notification>().ForEach(n => n.Read = true);
+        }
+
         public void FlushAllToasts()
         {
             foreach (var notification in toastFlow.ToArray())

@@ -230,6 +230,7 @@ namespace osu.Game.Overlays
         private void markAllRead()
         {
             sections.Children.ForEach(s => s.MarkAllRead());
+            toastTray.MarkAllRead();
             updateCounts();
         }
     }
