@@ -4,12 +4,14 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -17,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModZoomed : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor
+    internal class OsuModZoomed : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Zoomed";
         public override string Acronym => "ZM";
@@ -62,26 +64,36 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private readonly BindableInt currentCombo = new BindableInt();
 
+        private PassThroughInputManager inputManager = null!;
+
         public void Update(Playfield playfield)
         {
             double zoom = InitialZoom.Value;
 
-            if (FinalZoomCombo.Value > 0 && currentCombo.Value > 0)
+            if (FinalZoomCombo.Value == 0)
+                zoom = FinalZoom.Value;
+            else if (currentCombo.Value > 0)
                 zoom += (FinalZoom.Value - InitialZoom.Value) * Math.Min(1, ((float)currentCombo.Value / FinalZoomCombo.Value));
 
-            Vector2 position = playfield.OriginPosition - playfield.Cursor.ActiveCursor.DrawPosition;
+            Vector2 mousePosition = inputManager.CurrentState.Mouse.Position;
+            Vector2 cursorPositionAdjust = playfield.OriginPosition - playfield.Parent.ToLocalSpace(mousePosition);
 
-            playfield.Scale = new Vector2((float)Interpolation.DampContinuously(playfield.Scale.X, zoom, 200, Math.Abs(playfield.Clock.ElapsedFrameTime)));
+            // Adjust position only by as much as zoom has been applied.
+            Vector2 playfieldAdjust = (float)(zoom - 1) * cursorPositionAdjust;
+
+            // Zoom feels better when applied over a longer period of time.
+            // If using the `MovementDelay` it's visually abrupt.
+            playfield.Scale = new Vector2((float)Interpolation.DampContinuously(playfield.Scale.X, zoom, 2000, Math.Abs(playfield.Clock.ElapsedFrameTime)));
 
             if (MovementDelay.Value == 0)
             {
-                playfield.Position = position;
+                playfield.Position = playfieldAdjust;
             }
             else
             {
                 playfield.Position = new Vector2(
-                    (float)Interpolation.DampContinuously(playfield.Position.X, position.X, MovementDelay.Value, Math.Abs(playfield.Clock.ElapsedFrameTime)),
-                    (float)Interpolation.DampContinuously(playfield.Position.Y, position.Y, MovementDelay.Value, Math.Abs(playfield.Clock.ElapsedFrameTime))
+                    (float)Interpolation.DampContinuously(playfield.Position.X, playfieldAdjust.X, MovementDelay.Value, Math.Abs(playfield.Clock.ElapsedFrameTime)),
+                    (float)Interpolation.DampContinuously(playfield.Position.Y, playfieldAdjust.Y, MovementDelay.Value, Math.Abs(playfield.Clock.ElapsedFrameTime))
                 );
             }
         }
@@ -92,5 +104,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            inputManager = drawableRuleset.KeyBindingInputManager;
+        }
     }
 }
