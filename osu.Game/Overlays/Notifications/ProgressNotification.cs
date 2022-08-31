@@ -173,7 +173,7 @@ namespace osu.Game.Overlays.Notifications
 
         public ProgressNotification()
         {
-            Content.Add(textDrawable = new OsuTextFlowContainer
+            Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
             {
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
