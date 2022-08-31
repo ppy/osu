@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private OsuInputManager osuInputManager;
         private OsuDrawableTouchInputHandler touchInputHandler;
+        private Vector2 touchPosition;
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -25,15 +26,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                 var drawableRuleset = (DrawableOsuRuleset)Player.DrawableRuleset;
                 osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
                 touchInputHandler = drawableRuleset.TouchInputHandler;
+                touchPosition = touchInputHandler.ScreenSpaceDrawQuad.Centre;
             });
         }
 
         [Test]
         public void TestTouchInput()
         {
-            var position = new Vector2(200);
-
-            var cursorTouch = new Touch(OsuDrawableTouchInputHandler.CURSOR_TOUCH, position);
+            var cursorTouch = new Touch(OsuDrawableTouchInputHandler.CURSOR_TOUCH, touchPosition);
 
             AddStep("Touch", () => InputManager.BeginTouch(cursorTouch));
 
