@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private LeadInPlayer player = null!;
 
-        private const double lenience_ms = 10;
+        private const double lenience_ms = 100;
 
         private const double first_hit_object = 2170;
 

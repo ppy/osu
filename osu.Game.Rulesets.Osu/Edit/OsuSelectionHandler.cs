@@ -358,7 +358,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var mergeableObjects = selectedMergeableObjects;
 
-            if (mergeableObjects.Length < 2)
+            if (!canMerge(mergeableObjects))
                 return;
 
             ChangeHandler?.BeginChange();
@@ -371,6 +371,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Position = firstHitObject.Position,
                 NewCombo = firstHitObject.NewCombo,
                 SampleControlPoint = firstHitObject.SampleControlPoint,
+                Samples = firstHitObject.Samples,
             };
 
             if (mergedHitObject.Path.ControlPoints.Count == 0)
@@ -444,8 +445,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            if (selectedMergeableObjects.Length > 1)
+            if (canMerge(selectedMergeableObjects))
                 yield return new OsuMenuItem("Merge selection", MenuItemType.Destructive, mergeSelection);
         }
+
+        private bool canMerge(IReadOnlyList<OsuHitObject> objects) =>
+            objects.Count > 1
+            && (objects.Any(h => h is Slider)
+                || objects.Zip(objects.Skip(1), (h1, h2) => Precision.DefinitelyBigger(Vector2.DistanceSquared(h1.Position, h2.Position), 1)).Any(x => x));
     }
 }

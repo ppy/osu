@@ -46,5 +46,8 @@ namespace osu.Game.Rulesets.Pippidon
         };
 
         public override Drawable CreateIcon() => new PippidonRulesetIcon(this);
+
+        // Leave this line intact. It will bake the correct version into the ruleset on each build/release.
+        public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
     }
 }
