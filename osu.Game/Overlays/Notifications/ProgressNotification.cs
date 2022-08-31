@@ -57,11 +57,14 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 progress = value;
-                Scheduler.AddOnce(updateProgress, progress);
+                Scheduler.AddOnce(p => progressBar.Progress = p, progress);
             }
         }
 
-        private void updateProgress(float progress) => progressBar.Progress = progress;
+        protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         protected override void LoadComplete()
         {
@@ -100,7 +103,7 @@ namespace osu.Game.Overlays.Notifications
                     Light.Pulsate = false;
                     progressBar.Active = false;
 
-                    iconBackground.FadeColour(ColourInfo.GradientVertical(colourQueued, colourQueued.Lighten(0.5f)), colour_fade_duration);
+                    IconContent.FadeColour(ColourInfo.GradientVertical(colourQueued, colourQueued.Lighten(0.5f)), colour_fade_duration);
                     loadingSpinner.Show();
                     break;
 
@@ -109,14 +112,14 @@ namespace osu.Game.Overlays.Notifications
                     Light.Pulsate = true;
                     progressBar.Active = true;
 
-                    iconBackground.FadeColour(ColourInfo.GradientVertical(colourActive, colourActive.Lighten(0.5f)), colour_fade_duration);
+                    IconContent.FadeColour(ColourInfo.GradientVertical(colourActive, colourActive.Lighten(0.5f)), colour_fade_duration);
                     loadingSpinner.Show();
                     break;
 
                 case ProgressNotificationState.Cancelled:
                     cancellationTokenSource.Cancel();
 
-                    iconBackground.FadeColour(ColourInfo.GradientVertical(Color4.Gray, Color4.Gray.Lighten(0.5f)), colour_fade_duration);
+                    IconContent.FadeColour(ColourInfo.GradientVertical(Color4.Gray, Color4.Gray.Lighten(0.5f)), colour_fade_duration);
                     loadingSpinner.Hide();
 
                     var icon = new SpriteIcon
@@ -138,8 +141,7 @@ namespace osu.Game.Overlays.Notifications
 
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
-                    NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
-                    this.FadeOut(200).Finally(_ => Completed());
+                    Completed();
                     break;
             }
         }
@@ -165,21 +167,19 @@ namespace osu.Game.Overlays.Notifications
         private Color4 colourActive;
         private Color4 colourCancelled;
 
-        private Box iconBackground = null!;
         private LoadingSpinner loadingSpinner = null!;
 
         private readonly TextFlowContainer textDrawable;
 
         public ProgressNotification()
         {
-            Content.Add(textDrawable = new OsuTextFlowContainer
+            Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
             {
-                Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
             });
 
-            NotificationContent.Add(progressBar = new ProgressBar
+            MainContent.Add(progressBar = new ProgressBar
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
@@ -204,10 +204,10 @@ namespace osu.Game.Overlays.Notifications
 
             IconContent.AddRange(new Drawable[]
             {
-                iconBackground = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
+                    Colour = colourProvider.Background5,
                 },
                 loadingSpinner = new LoadingSpinner
                 {
