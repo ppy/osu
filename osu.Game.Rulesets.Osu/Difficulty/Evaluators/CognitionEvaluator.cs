@@ -15,8 +15,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double cognition_window_size = 3000;
 
-        private const double note_density_difficulty_multiplier = 1.0;
-
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
@@ -52,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 pastObjectDifficultyInfluence += loopDifficulty;
             }
 
-            noteDensityDifficulty = Math.Pow(3 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 1)), 2.3) * note_density_difficulty_multiplier;
+            noteDensityDifficulty = Math.Pow(3 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 1)), 2.3);
 
             double hiddenDifficulty = 0;
 
@@ -78,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 preemptDifficulty += Math.Pow(400 - currObj.preempt, 1.5) / (10 + (currObj.StrainTime * 0.05));
 
                 // Buff spacing.
-                preemptDifficulty *= 1 + 0.2 * currVelocity;
+                preemptDifficulty *= 1 + 0.4 * currVelocity;
 
                 // Buff rhythm.
                 preemptDifficulty *= Math.Max(1, RhythmEvaluator.EvaluateDifficultyOf(current, 30) - 0.1);
@@ -88,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // This is likely going to need adjustments in the future as player meta develops.
                 preemptDifficulty *= 1 + Math.Max((30 - ((OsuHitObject)currObj.BaseObject).Radius) / 20, 0);
 
-                // Nerf repeated angles on high AR.
+                // Nerf repeated angles.
                 if (current.Index > 1)
                 {
                     var prevPrevObj = (OsuDifficultyHitObject)current.Previous(1);
@@ -103,9 +101,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         preemptDifficulty *= getAngleDifferenceNerfFactor(Math.Abs(currObj.Angle.Value - prevPrevObj.Angle.Value));
                     }
                 }
+
+                // Nerf constant rhythm.
+                preemptDifficulty *= getConstantRhythmNerfFactor(currObj);
             }
 
-            double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
+            double difficulty = Math.Max(preemptDifficulty, hiddenDifficulty) + noteDensityDifficulty;
 
             // While there is slider leniency...
             if (currObj.BaseObject is Slider)
@@ -162,12 +163,52 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return (fadeOutStartTime + fadeOutDuration) - (baseObject.StartTime - baseObject.TimePreempt);
         }
 
+        private static double getConstantRhythmNerfFactor(OsuDifficultyHitObject current)
+        {
+            // Studies [citation needed] suggest that 33bpm is where humans stop interpreting notes as a part of a beat,
+            // instead interpreting them as individual events. We're gonna use this to both lessen the nerf of this factor,
+            // as well as using it as a convenient limit for how back in time we're gonna look for the calculation.
+            const double time_limit = 1800;
+            const double time_limit_low = 500;
+
+            double constantRhythmCount = 0;
+
+            int index = 0;
+            double currentTimeGap = 0;
+
+            while (currentTimeGap < time_limit)
+            {
+                var loopObj = (OsuDifficultyHitObject)current.Previous(index);
+
+                if (loopObj.IsNull())
+                    break;
+
+                double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - time_limit_low) / (time_limit - time_limit_low), 0, 1);
+
+                if (Math.Abs(current.StrainTime - loopObj.StrainTime) < 10) // constant rhythm, o-o-o-o
+                    constantRhythmCount += 1.0 * longIntervalFactor;
+                else if (Math.Abs(current.StrainTime - loopObj.StrainTime * 2) < 10) // speed up rhythm, o---o-o
+                    constantRhythmCount += 0.33 * longIntervalFactor;
+                else if (Math.Abs(current.StrainTime * 2 - loopObj.StrainTime) < 10) // slow down rhythm, o-o---o
+                    constantRhythmCount += 0.33 * longIntervalFactor;
+                else
+                    break;
+
+                currentTimeGap = current.StartTime - loopObj.StartTime;
+                index++;
+            }
+
+            double difficulty = Math.Pow(Math.Min(1, 2 / constantRhythmCount), 2);
+
+            return difficulty;
+        }
+
         private static double getTimeNerfFactor(double deltaTime)
         {
             return Math.Clamp(2 - (deltaTime / 1500), 0, 1);
         }
 
-        private static double getAngleDifferenceNerfFactor(double angleDifference) => 1 - 1 * Math.Cos(2 * Math.Min(Math.PI / 4, angleDifference));
+        private static double getAngleDifferenceNerfFactor(double angleDifference) => 1 - 0.5 * Math.Cos(1 * Math.Min(Math.PI / 2, angleDifference));
 
         private static double logistic(double x) => 1 / (1 + Math.Pow(Math.E, -x));
     }
