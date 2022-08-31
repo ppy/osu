@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -19,11 +17,11 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneNotificationOverlay : OsuTestScene
     {
-        private NotificationOverlay notificationOverlay;
+        private NotificationOverlay notificationOverlay = null!;
 
         private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
 
-        private SpriteText displayedCount;
+        private SpriteText displayedCount = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -46,7 +44,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestCompleteProgress()
         {
-            ProgressNotification notification = null;
+            ProgressNotification notification = null!;
             AddStep("add progress notification", () =>
             {
                 notification = new ProgressNotification
@@ -64,7 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestCancelProgress()
         {
-            ProgressNotification notification = null;
+            ProgressNotification notification = null!;
             AddStep("add progress notification", () =>
             {
                 notification = new ProgressNotification
@@ -112,7 +110,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep(@"simple #1", sendHelloNotification);
 
-            AddAssert("Is visible", () => notificationOverlay.State.Value == Visibility.Visible);
+            AddAssert("toast displayed", () => notificationOverlay.ToastCount == 1);
+            AddAssert("is not visible", () => notificationOverlay.State.Value == Visibility.Hidden);
 
             checkDisplayedCount(1);
 
@@ -185,7 +184,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         private void checkDisplayedCount(int expected) =>
-            AddAssert($"Displayed count is {expected}", () => notificationOverlay.UnreadCount.Value == expected);
+            AddUntilStep($"Displayed count is {expected}", () => notificationOverlay.UnreadCount.Value == expected);
 
         private void sendDownloadProgress()
         {

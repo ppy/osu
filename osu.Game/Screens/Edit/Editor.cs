@@ -220,7 +220,7 @@ namespace osu.Game.Screens.Edit
             }
 
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
-            clock = new EditorClock(playableBeatmap, beatDivisor) { IsCoupled = false };
+            clock = new EditorClock(playableBeatmap, beatDivisor);
             clock.ChangeSource(loadableBeatmap.Track);
 
             dependencies.CacheAs(clock);
