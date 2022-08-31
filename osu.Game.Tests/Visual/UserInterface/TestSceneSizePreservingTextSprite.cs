@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics;
@@ -20,7 +21,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         private readonly List<UprightAspectMaintainingContainer> childContainers = new List<UprightAspectMaintainingContainer>();
         private readonly OsuSpriteText osuSpriteText = new OsuSpriteText();
         private readonly SizePreservingSpriteText sizePreservingSpriteText = new SizePreservingSpriteText();
-
 
         public TestSceneSizePreservingSpriteText()
             : base(1, 2)
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         protected override void Update()
         {
             base.Update();
-            osuSpriteText.Text = sizePreservingSpriteText.Text = DateTime.Now.ToString();
+            osuSpriteText.Text = sizePreservingSpriteText.Text = DateTime.Now.ToString(CultureInfo.InvariantCulture);
         }
     }
 }
