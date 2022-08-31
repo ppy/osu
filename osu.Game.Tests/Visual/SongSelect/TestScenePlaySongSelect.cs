@@ -6,15 +6,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -24,6 +27,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -411,6 +415,55 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             changeRuleset(0);
             AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmapInfo == null);
+        }
+
+        [Test]
+        public void TestSelectionRetainedOnBeatmapUpdate()
+        {
+            createSongSelect();
+            changeRuleset(0);
+
+            Live<BeatmapSetInfo> original = null!;
+            int originalOnlineSetID = 0;
+
+            AddStep(@"Sort by artist", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Artist));
+
+            AddStep("import original", () =>
+            {
+                original = manager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).GetResultSafely();
+                originalOnlineSetID = original!.Value.OnlineID;
+            });
+
+            // This will move the beatmap set to a different location in the carousel.
+            AddStep("Update original with bogus info", () =>
+            {
+                original.PerformWrite(set =>
+                {
+                    foreach (var beatmap in set.Beatmaps)
+                    {
+                        beatmap.Metadata.Artist = "ZZZZZ";
+                        beatmap.OnlineID = 12804;
+                    }
+                });
+            });
+
+            AddRepeatStep("import other beatmaps", () =>
+            {
+                var testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo();
+
+                foreach (var beatmap in testBeatmapSetInfo.Beatmaps)
+                    beatmap.Metadata.Artist = ((char)RNG.Next('A', 'Z')).ToString();
+
+                manager.Import(testBeatmapSetInfo);
+            }, 10);
+
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == originalOnlineSetID);
+
+            Task<Live<BeatmapSetInfo>> updateTask = null!;
+            AddStep("update beatmap", () => updateTask = manager.ImportAsUpdate(new ProgressNotification(), new ImportTask(TestResources.GetQuickTestBeatmapForImport()), original.Value));
+            AddUntilStep("wait for update completion", () => updateTask.IsCompleted);
+
+            AddUntilStep("retained selection", () => songSelect.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == originalOnlineSetID);
         }
 
         [Test]
