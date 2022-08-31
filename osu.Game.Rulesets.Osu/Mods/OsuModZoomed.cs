@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(OsuModBarrelRoll) };
 
         [SettingSource("Delay", "Delay in milliseconds for the view to catch up to the cursor")]
-        public BindableInt MovementDelay { get; } = new BindableInt
+        public BindableInt MovementDelay { get; } = new BindableInt(200)
         {
             MinValue = 0,
             MaxValue = 1000,
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource("Initial zoom", "The starting zoom level")]
-        public BindableDouble InitialZoom { get; } = new BindableDouble(1.5)
+        public BindableDouble InitialZoom { get; } = new BindableDouble(1)
         {
             MinValue = 1,
             MaxValue = 2,
