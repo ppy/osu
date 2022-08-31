@@ -15,6 +15,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
+using osuTK;
 using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Overlays
@@ -37,10 +38,25 @@ namespace osu.Game.Overlays
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private readonly IBindable<Visibility> firstRunSetupVisibility = new Bindable<Visibility>();
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            if (State.Value == Visibility.Visible)
+                return base.ReceivePositionalInputAt(screenSpacePos);
+
+            if (toastTray.IsDisplayingToasts)
+                return toastTray.ReceivePositionalInputAt(screenSpacePos);
+
+            return false;
+        }
+
+        public override bool PropagatePositionalInputSubTree => base.PropagatePositionalInputSubTree || toastTray.IsDisplayingToasts;
+
+        private NotificationOverlayToastTray toastTray = null!;
+
+        private Container mainContent = null!;
 
         [BackgroundDependencyLoader]
-        private void load(FirstRunSetupOverlay? firstRunSetup)
+        private void load()
         {
             X = WIDTH;
             Width = WIDTH;
@@ -48,47 +64,57 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                new Box
+                toastTray = new NotificationOverlayToastTray
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4,
+                    ForwardNotificationToPermanentStore = addPermanently,
+                    Origin = Anchor.TopRight,
                 },
-                new OsuScrollContainer
+                mainContent = new Container
                 {
-                    Masking = true,
+                    AlwaysPresent = true,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
-                        sections = new FillFlowContainer<NotificationSection>
+                        new Box
                         {
-                            Direction = FillDirection.Vertical,
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background4,
+                        },
+                        new OsuScrollContainer
+                        {
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both,
                             Children = new[]
                             {
-                                new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, "Clear All"),
-                                new NotificationSection(@"Running Tasks", new[] { typeof(ProgressNotification) }, @"Cancel All"),
+                                sections = new FillFlowContainer<NotificationSection>
+                                {
+                                    Direction = FillDirection.Vertical,
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                    Children = new[]
+                                    {
+                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, "Clear All"),
+                                        new NotificationSection(@"Running Tasks", new[] { typeof(ProgressNotification) }, @"Cancel All"),
+                                    }
+                                }
                             }
                         }
                     }
-                }
+                },
             };
-
-            if (firstRunSetup != null)
-                firstRunSetupVisibility.BindTo(firstRunSetup.State);
         }
 
         private ScheduledDelegate? notificationsEnabler;
 
         private void updateProcessingMode()
         {
-            bool enabled = (OverlayActivationMode.Value == OverlayActivation.All && firstRunSetupVisibility.Value != Visibility.Visible) || State.Value == Visibility.Visible;
+            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State.Value == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
             if (enabled)
                 // we want a slight delay before toggling notifications on to avoid the user becoming overwhelmed.
-                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State.Value == Visibility.Visible ? 0 : 1000);
+                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State.Value == Visibility.Visible ? 0 : 100);
             else
                 processingPosts = false;
         }
@@ -98,11 +124,12 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             State.BindValueChanged(_ => updateProcessingMode());
-            firstRunSetupVisibility.BindValueChanged(_ => updateProcessingMode());
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
         public IBindable<int> UnreadCount => unreadCount;
+
+        public int ToastCount => toastTray.UnreadCount;
 
         private readonly BindableInt unreadCount = new BindableInt();
 
@@ -127,17 +154,27 @@ namespace osu.Game.Overlays
             if (notification is IHasCompletionTarget hasCompletionTarget)
                 hasCompletionTarget.CompletionTarget = Post;
 
-            var ourType = notification.GetType();
+            playDebouncedSample(notification.PopInSampleName);
 
-            var section = sections.Children.FirstOrDefault(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
-            section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
-
-            if (notification.IsImportant)
-                Show();
+            if (State.Value == Visibility.Hidden)
+                toastTray.Post(notification);
+            else
+                addPermanently(notification);
 
             updateCounts();
-            playDebouncedSample(notification.PopInSampleName);
         });
+
+        private void addPermanently(Notification notification)
+        {
+            var ourType = notification.GetType();
+            int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
+
+            var section = sections.Children.First(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+
+            section.Add(notification, depth);
+
+            updateCounts();
+        }
 
         protected override void Update()
         {
@@ -152,7 +189,9 @@ namespace osu.Game.Overlays
             base.PopIn();
 
             this.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
+
+            toastTray.FlushAllToasts();
         }
 
         protected override void PopOut()
@@ -162,7 +201,7 @@ namespace osu.Game.Overlays
             markAllRead();
 
             this.MoveToX(WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
         }
 
         private void notificationClosed()
@@ -183,16 +222,16 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void updateCounts()
-        {
-            unreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
-        }
-
         private void markAllRead()
         {
             sections.Children.ForEach(s => s.MarkAllRead());
-
+            toastTray.MarkAllRead();
             updateCounts();
+        }
+
+        private void updateCounts()
+        {
+            unreadCount.Value = sections.Select(c => c.UnreadCount).Sum() + toastTray.UnreadCount;
         }
     }
 }

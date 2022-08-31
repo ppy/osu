@@ -110,7 +110,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep(@"simple #1", sendHelloNotification);
 
-            AddAssert("Is visible", () => notificationOverlay.State.Value == Visibility.Visible);
+            AddAssert("toast displayed", () => notificationOverlay.ToastCount == 1);
+            AddAssert("is not visible", () => notificationOverlay.State.Value == Visibility.Hidden);
 
             checkDisplayedCount(1);
 
@@ -183,7 +184,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         private void checkDisplayedCount(int expected) =>
-            AddAssert($"Displayed count is {expected}", () => notificationOverlay.UnreadCount.Value == expected);
+            AddUntilStep($"Displayed count is {expected}", () => notificationOverlay.UnreadCount.Value == expected);
 
         private void sendDownloadProgress()
         {
