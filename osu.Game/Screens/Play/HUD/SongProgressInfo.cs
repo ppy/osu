@@ -15,9 +15,9 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class SongProgressInfo : Container
     {
-        private OsuSpriteText timeCurrent;
-        private OsuSpriteText timeLeft;
-        private OsuSpriteText progress;
+        private SizePreservingSpriteText timeCurrent;
+        private SizePreservingSpriteText timeLeft;
+        private SizePreservingSpriteText progress;
 
         private double startTime;
         private double endTime;
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Play.HUD
                         AutoSizeAxes = Axes.Both,
                         Scaling = ScaleMode.Vertical,
                         ScalingFactor = 0.5f,
-                        Child = timeCurrent = new OsuSpriteText
+                        Child = timeCurrent = new SizePreservingSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Play.HUD
                         AutoSizeAxes = Axes.Both,
                         Scaling = ScaleMode.Vertical,
                         ScalingFactor = 0.5f,
-                        Child = progress = new OsuSpriteText
+                        Child = progress = new SizePreservingSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play.HUD
                         AutoSizeAxes = Axes.Both,
                         Scaling = ScaleMode.Vertical,
                         ScalingFactor = 0.5f,
-                        Child = timeLeft = new OsuSpriteText
+                        Child = timeLeft = new SizePreservingSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
