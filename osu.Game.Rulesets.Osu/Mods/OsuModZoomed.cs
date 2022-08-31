@@ -64,7 +64,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            double zoom = InitialZoom.Value + (FinalZoom.Value - InitialZoom.Value) * Math.Min(1, ((float)currentCombo.Value / FinalZoomCombo.Value));
+            double zoom = InitialZoom.Value;
+
+            if (FinalZoomCombo.Value > 0 && currentCombo.Value > 0)
+                zoom += (FinalZoom.Value - InitialZoom.Value) * Math.Min(1, ((float)currentCombo.Value / FinalZoomCombo.Value));
+
             Vector2 position = playfield.OriginPosition - playfield.Cursor.ActiveCursor.DrawPosition;
 
             playfield.Scale = new Vector2((float)Interpolation.DampContinuously(playfield.Scale.X, zoom, 200, Math.Abs(playfield.Clock.ElapsedFrameTime)));
