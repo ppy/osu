@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -32,7 +33,8 @@ namespace osu.Game.Overlays
 
         public Action<Notification>? ForwardNotificationToPermanentStore { get; set; }
 
-        public int UnreadCount => toastFlow.Count(n => !n.WasClosed && !n.Read);
+        public int UnreadCount => toastFlow.Count(n => !n.WasClosed && !n.Read)
+                                  + InternalChildren.OfType<Notification>().Count(n => !n.WasClosed && !n.Read);
 
         private int runningDepth;
 
@@ -64,7 +66,7 @@ namespace osu.Game.Overlays
                     postEffectDrawable.AutoSizeAxes = Axes.None;
                     postEffectDrawable.RelativeSizeAxes = Axes.X;
                 })),
-                toastFlow = new FillFlowContainer<Notification>
+                toastFlow = new AlwaysUpdateFillFlowContainer<Notification>
                 {
                     LayoutDuration = 150,
                     LayoutEasing = Easing.OutQuart,
@@ -84,9 +86,7 @@ namespace osu.Game.Overlays
         public void FlushAllToasts()
         {
             foreach (var notification in toastFlow.ToArray())
-            {
                 forwardNotification(notification);
-            }
         }
 
         public void Post(Notification notification)
@@ -125,6 +125,7 @@ namespace osu.Game.Overlays
         {
             Debug.Assert(notification.Parent == toastFlow);
 
+            // Temporarily remove from flow so we can animate the position off to the right.
             toastFlow.Remove(notification);
             AddInternal(notification);
 

@@ -222,16 +222,16 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void updateCounts()
-        {
-            unreadCount.Value = sections.Select(c => c.UnreadCount).Sum() + toastTray.UnreadCount;
-        }
-
         private void markAllRead()
         {
             sections.Children.ForEach(s => s.MarkAllRead());
             toastTray.MarkAllRead();
             updateCounts();
+        }
+
+        private void updateCounts()
+        {
+            unreadCount.Value = sections.Select(c => c.UnreadCount).Sum() + toastTray.UnreadCount;
         }
     }
 }
