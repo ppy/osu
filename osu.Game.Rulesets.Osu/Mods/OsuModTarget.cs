@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource("Metronome ticks", "Whether a metronome beat should play in the background")]
-        public BindableBool Metronome { get; } = new BindableBool(true);
+        public Bindable<bool> Metronome { get; } = new BindableBool(true);
 
         #region Constants
 
