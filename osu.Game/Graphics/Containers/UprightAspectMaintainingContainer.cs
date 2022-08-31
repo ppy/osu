@@ -24,27 +24,6 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public ScaleMode Scaling { get; set; } = ScaleMode.Vertical;
 
-        /// <summary>
-        /// If this is true, all wrapper containers will be set to grow with their content
-        /// and not shrink back, this is used to fix the position of children that change
-        /// in size when using AutoSizeAxes.
-        /// </summary>
-        public bool GrowToFitContent
-        {
-            get => growToFitContent;
-            set
-            {
-                if (growToFitContent != value)
-                {
-                    foreach (GrowToFitContainer c in Children)
-                        c.GrowToFitContentUpdated = true;
-                    growToFitContent = value;
-                }
-            }
-        }
-
-        private bool growToFitContent = true;
-
         private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawInfo, InvalidationSource.Parent);
 
         public UprightAspectMaintainingContainer()
@@ -61,15 +40,6 @@ namespace osu.Game.Graphics.Containers
                 keepUprightAndUnstretched();
                 layout.Validate();
             }
-        }
-
-        public override void Add(Drawable drawable)
-        {
-            var wrapper = new GrowToFitContainer();
-            wrapper.Wrap(drawable);
-            wrapper.AutoSizeAxes = Axes.None;
-            drawable.Origin = drawable.Anchor = Anchor.Centre;
-            base.Add(wrapper);
         }
 
         /// <summary>
@@ -126,60 +96,6 @@ namespace osu.Game.Graphics.Containers
             }
 
             Scale = new Vector2(sx * usedScale, sy * usedScale);
-        }
-
-        public class GrowToFitContainer : Container
-        {
-            private readonly LayoutValue layout = new LayoutValue(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
-
-            private Vector2 maxChildSize;
-
-            public bool GrowToFitContentUpdated { get; set; }
-
-            public GrowToFitContainer()
-            {
-                AddLayout(layout);
-            }
-
-            protected override void Update()
-            {
-                UprightAspectMaintainingContainer parent = (UprightAspectMaintainingContainer)Parent;
-
-                if (!layout.IsValid || GrowToFitContentUpdated)
-                {
-                    if ((Child.RelativeSizeAxes & Axes.X) != 0)
-                        RelativeSizeAxes |= Axes.X;
-                    else
-                    {
-                        if (parent.GrowToFitContent)
-                            Width = Math.Max(Child.Width * Child.Scale.X, maxChildSize.X);
-                        else
-                            Width = Child.Width * Child.Scale.X;
-                    }
-
-                    if ((Child.RelativeSizeAxes & Axes.Y) != 0)
-                        RelativeSizeAxes |= Axes.Y;
-                    else
-                    {
-                        if (parent.GrowToFitContent)
-                            Height = Math.Max(Child.Height * Child.Scale.Y, maxChildSize.Y);
-                        else
-                            Height = Child.Height * Child.Scale.Y;
-                    }
-
-                    // reset max_child_size or update it
-                    if (!parent.GrowToFitContent)
-                        maxChildSize = Child.Size;
-                    else
-                    {
-                        maxChildSize.X = MathF.Max(maxChildSize.X, Child.Size.X);
-                        maxChildSize.Y = MathF.Max(maxChildSize.Y, Child.Size.Y);
-                    }
-
-                    GrowToFitContentUpdated = false;
-                    layout.Validate();
-                }
-            }
         }
     }
 
