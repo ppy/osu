@@ -20,7 +20,7 @@ namespace osu.Game.Database
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            IconBackground.Colour = colours.RedDark;
+            IconContent.Colour = colours.RedDark;
         }
     }
 }
