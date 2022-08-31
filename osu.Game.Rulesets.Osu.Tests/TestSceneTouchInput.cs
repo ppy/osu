@@ -29,13 +29,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 touchPosition = touchInputHandler.ScreenSpaceDrawQuad.Centre;
             });
         }
-
         [Test]
+
         public void TestTouchInput()
         {
-            var cursorTouch = new Touch(OsuDrawableTouchInputHandler.CURSOR_TOUCH, touchPosition);
-
-            AddStep("Touch", () => InputManager.BeginTouch(cursorTouch));
+            AddStep("Touch", () => new Touch(OsuDrawableTouchInputHandler.CURSOR_TOUCH, touchPosition));
 
             AddAssert("Pressed", () => osuInputManager.CurrentState.Touch.IsActive(OsuDrawableTouchInputHandler.CURSOR_TOUCH));
         }
