@@ -265,6 +265,43 @@ namespace osu.Game.Screens.Select
 
             foreach (int i in changes.InsertedIndices)
                 UpdateBeatmapSet(sender[i].Detach());
+
+            if (changes.DeletedIndices.Length > 0)
+            {
+                // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
+                // When an update occurs, the previous beatmap set is either soft or hard deleted.
+                // Check if the current selection was potentially deleted by re-querying its validity.
+                bool selectedSetMarkedDeleted = realm.Run(r => r.Find<BeatmapSetInfo>(SelectedBeatmapSet.ID))?.DeletePending != false;
+
+                int[] modifiedAndInserted = changes.NewModifiedIndices.Concat(changes.InsertedIndices).ToArray();
+
+                if (selectedSetMarkedDeleted && modifiedAndInserted.Any())
+                {
+                    // If it is no longer valid, make the bold assumption that an updated version will be available in the modified/inserted indices.
+                    // This relies on the full update operation being in a single transaction, so please don't change that.
+                    foreach (int i in modifiedAndInserted)
+                    {
+                        var beatmapSetInfo = sender[i];
+
+                        foreach (var beatmapInfo in beatmapSetInfo.Beatmaps)
+                        {
+                            if (!((IBeatmapMetadataInfo)beatmapInfo.Metadata).Equals(SelectedBeatmapInfo.Metadata))
+                                continue;
+
+                            // Best effort matching. We can't use ID because in the update flow a new version will get its own GUID.
+                            if (beatmapInfo.DifficultyName == SelectedBeatmapInfo.DifficultyName)
+                            {
+                                SelectBeatmap(beatmapInfo);
+                                return;
+                            }
+                        }
+                    }
+
+                    // If a direct selection couldn't be made, it's feasible that the difficulty name (or beatmap metadata) changed.
+                    // Let's attempt to follow set-level selection anyway.
+                    SelectBeatmap(sender[modifiedAndInserted.First()].Beatmaps.First());
+                }
+            }
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet changes, Exception error)

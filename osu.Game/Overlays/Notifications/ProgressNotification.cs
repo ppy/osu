@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -24,6 +22,18 @@ namespace osu.Game.Overlays.Notifications
     public class ProgressNotification : Notification, IHasCompletionTarget
     {
         private const float loading_spinner_size = 22;
+
+        public Func<bool>? CancelRequested { get; set; }
+
+        /// <summary>
+        /// The function to post completion notifications back to.
+        /// </summary>
+        public Action<Notification>? CompletionTarget { get; set; }
+
+        /// <summary>
+        /// An action to complete when the completion notification is clicked. Return true to close.
+        /// </summary>
+        public Func<bool>? CompletionClickAction { get; set; }
 
         private LocalisableString text;
 
@@ -142,7 +152,7 @@ namespace osu.Game.Overlays.Notifications
             Text = CompletionText
         };
 
-        protected virtual void Completed()
+        protected void Completed()
         {
             CompletionTarget?.Invoke(CreateCompletionNotification());
             base.Close();
@@ -155,8 +165,8 @@ namespace osu.Game.Overlays.Notifications
         private Color4 colourActive;
         private Color4 colourCancelled;
 
-        private Box iconBackground;
-        private LoadingSpinner loadingSpinner;
+        private Box iconBackground = null!;
+        private LoadingSpinner loadingSpinner = null!;
 
         private readonly TextFlowContainer textDrawable;
 
@@ -221,18 +231,6 @@ namespace osu.Game.Overlays.Notifications
                     break;
             }
         }
-
-        public Func<bool> CancelRequested { get; set; }
-
-        /// <summary>
-        /// The function to post completion notifications back to.
-        /// </summary>
-        public Action<Notification> CompletionTarget { get; set; }
-
-        /// <summary>
-        /// An action to complete when the completion notification is clicked. Return true to close.
-        /// </summary>
-        public Func<bool> CompletionClickAction;
 
         private class ProgressBar : Container
         {
