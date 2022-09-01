@@ -31,9 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         private const int concurrent_touches_limit = last_concurrent_touch_index + 1;
 
-        public readonly HashSet<TouchSource> AllowedTouchSources;
-
-        private readonly IEnumerable<TouchSource> allTouchSources = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>();
+        public readonly HashSet<TouchSource> AllowedTouchSources = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Take(concurrent_touches_limit).ToHashSet();
 
         private readonly Dictionary<TouchSource, OsuAction> touchTapActionsDictionary = new Dictionary<TouchSource, OsuAction>();
 
@@ -47,7 +45,6 @@ namespace osu.Game.Rulesets.Osu.UI
         public OsuDrawableTouchInputHandler(OsuInputManager inputManager)
         {
             osuInputManager = inputManager;
-            AllowedTouchSources = allTouchSources.Take(concurrent_touches_limit).ToHashSet();
             foreach (var source in AllowedTouchSources)
                 touchTapActionsDictionary.Add(source, getTouchIndex(source) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
         }
