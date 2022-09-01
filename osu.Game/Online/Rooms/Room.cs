@@ -161,7 +161,7 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         [JsonProperty("auto_skip")]
-        public readonly Bindable<bool> AutoSkip = new Bindable<bool>(true);
+        public readonly Bindable<bool> AutoSkip = new Bindable<bool>();
 
         public Room()
         {
