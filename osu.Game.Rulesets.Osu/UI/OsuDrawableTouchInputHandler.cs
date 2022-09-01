@@ -15,26 +15,25 @@ namespace osu.Game.Rulesets.Osu.UI
     public class OsuDrawableTouchInputHandler : Drawable
     {
         public const TouchSource CURSOR_TOUCH = TouchSource.Touch1;
-        public const OsuAction CURSOR_TOUCH_ACTION = OsuAction.LeftButton;
 
         /// <summary>
         /// How many taps (taps referring as streaming touch input) can be registered.
         /// </summary>
-        public const int TAP_TOUCHES_LIMIT = 2;
+        private const int tap_touches_limit = 2;
 
         /// <summary>
         /// The index for the last concurrent able touch.
         /// </summary>
-        public const int LAST_CONCURRENT_TOUCH_INDEX = TAP_TOUCHES_LIMIT;
+        private const int last_concurrent_touch_index = tap_touches_limit;
 
         /// <summary>
         /// How many concurrent touches can be registered.
         /// </summary>
-        public const int CONCURRENT_TOUCHES_LIMIT = LAST_CONCURRENT_TOUCH_INDEX + 1;
+        private const int concurrent_touches_limit = last_concurrent_touch_index + 1;
 
-        public readonly HashSet<TouchSource> PossibleTapTouchSources;
+        public readonly HashSet<TouchSource> AllowedTouchSources;
 
-        public readonly IEnumerable<TouchSource> AllTouchSources = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>();
+        private readonly IEnumerable<TouchSource> allTouchSources = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>();
 
         private readonly Dictionary<TouchSource, OsuAction> touchTapActionsDictionary = new Dictionary<TouchSource, OsuAction>();
 
@@ -48,8 +47,8 @@ namespace osu.Game.Rulesets.Osu.UI
         public OsuDrawableTouchInputHandler(OsuInputManager inputManager)
         {
             osuInputManager = inputManager;
-            PossibleTapTouchSources = AllTouchSources.Take(CONCURRENT_TOUCHES_LIMIT).ToHashSet();
-            foreach (var source in PossibleTapTouchSources)
+            AllowedTouchSources = allTouchSources.Take(concurrent_touches_limit).ToHashSet();
+            foreach (var source in AllowedTouchSources)
                 touchTapActionsDictionary.Add(source, getTouchIndex(source) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
         }
 
@@ -63,9 +62,9 @@ namespace osu.Game.Rulesets.Osu.UI
             return !isTapTouch(source);
         }
 
-        private bool isValidTouchInput(TouchSource source, int index)
+        private bool isValidTouchInput(int index)
         {
-            return index <= LAST_CONCURRENT_TOUCH_INDEX;
+            return index <= last_concurrent_touch_index;
         }
 
         protected override bool OnTouchDown(TouchDownEvent e)
@@ -73,9 +72,9 @@ namespace osu.Game.Rulesets.Osu.UI
             var source = e.Touch.Source;
             int sourceIndex = getTouchIndex(source);
 
-            osuInputManager.DragMode = sourceIndex >= LAST_CONCURRENT_TOUCH_INDEX;
+            osuInputManager.DragMode = sourceIndex >= last_concurrent_touch_index;
 
-            if (!isValidTouchInput(source, sourceIndex))
+            if (!isValidTouchInput(sourceIndex))
                 return false;
 
             if (isCursorTouch(source))
@@ -93,14 +92,11 @@ namespace osu.Game.Rulesets.Osu.UI
             var source = e.Touch.Source;
             int sourceIndex = getTouchIndex(source);
 
-            if (!isValidTouchInput(source, sourceIndex))
+            if (!isValidTouchInput(sourceIndex))
                 return;
 
             if (isTapTouch(source))
-            {
-                var touchAction = touchTapActionsDictionary[source];
-                osuInputManager.KeyBindingContainer.TriggerReleased(touchAction);
-            }
+                osuInputManager.KeyBindingContainer.TriggerReleased(touchTapActionsDictionary[source]);
 
             base.OnTouchUp(e);
         }
