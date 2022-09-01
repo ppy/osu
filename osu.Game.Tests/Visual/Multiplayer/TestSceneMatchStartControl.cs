@@ -91,8 +91,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                          break;
 
                                      case StopCountdownRequest:
-                                         multiplayerRoom.Countdown = null;
-                                         raiseRoomUpdated();
+                                         clearRoomCountdown();
                                          break;
                                  }
                              });
@@ -244,14 +243,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("start countdown", () => multiplayerClient.Object.SendMatchRequest(new StartMatchCountdownRequest { Duration = TimeSpan.FromMinutes(1) }).WaitSafely());
-            AddUntilStep("countdown started", () => multiplayerRoom.Countdown != null);
+            AddUntilStep("countdown started", () => multiplayerRoom.ActiveCountdowns.Any());
 
             AddStep("transfer host to local user", () => transferHost(localUser));
             AddUntilStep("local user is host", () => multiplayerRoom.Host?.Equals(multiplayerClient.Object.LocalUser) == true);
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             checkLocalUserState(MultiplayerUserState.Ready);
-            AddAssert("countdown still active", () => multiplayerRoom.Countdown != null);
+            AddAssert("countdown still active", () => multiplayerRoom.ActiveCountdowns.Any());
         }
 
         [Test]
@@ -392,7 +391,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void setRoomCountdown(TimeSpan duration)
         {
-            multiplayerRoom.Countdown = new MatchStartCountdown { TimeRemaining = duration };
+            multiplayerRoom.ActiveCountdowns.Add(new MatchStartCountdown { TimeRemaining = duration });
+            raiseRoomUpdated();
+        }
+
+        private void clearRoomCountdown()
+        {
+            multiplayerRoom.ActiveCountdowns.Clear();
             raiseRoomUpdated();
         }
 
