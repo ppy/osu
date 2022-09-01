@@ -114,6 +114,13 @@ namespace osu.Desktop
 
                     return new SquirrelUpdateManager();
 
+                case RuntimeInfo.Platform.Linux:
+                    Debug.Assert(OperatingSystem.IsLinux());
+
+                    return AppImageUpdateManager.Available
+                        ? new AppImageUpdateManager()
+                        : new SimpleUpdateManager();
+
                 default:
                     return new SimpleUpdateManager();
             }

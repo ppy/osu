@@ -5,29 +5,21 @@ using System;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
-using osu.Game;
-using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osuTK;
-using osuTK.Graphics;
 using Squirrel;
 using Squirrel.SimpleSplat;
 
 namespace osu.Desktop.Updater
 {
     [SupportedOSPlatform("windows")]
-    public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
+    public class SquirrelUpdateManager : AbstractUpdateManager
     {
         private UpdateManager? updateManager;
         private INotificationOverlay notificationOverlay = null!;
 
-        public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
+        public override Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
         private static readonly Logger logger = Logger.GetLogger("updater");
 
@@ -138,73 +130,6 @@ namespace osu.Desktop.Updater
         {
             base.Dispose(isDisposing);
             updateManager?.Dispose();
-        }
-
-        private class UpdateCompleteNotification : ProgressCompletionNotification
-        {
-            [Resolved]
-            private OsuGame game { get; set; } = null!;
-
-            public UpdateCompleteNotification(SquirrelUpdateManager updateManager)
-            {
-                Text = @"Update ready to install. Click to restart!";
-
-                Activated = () =>
-                {
-                    updateManager.PrepareUpdateAsync()
-                                 .ContinueWith(_ => updateManager.Schedule(() => game.AttemptExit()));
-                    return true;
-                };
-            }
-        }
-
-        private class UpdateProgressNotification : ProgressNotification
-        {
-            private readonly SquirrelUpdateManager updateManager;
-
-            public UpdateProgressNotification(SquirrelUpdateManager updateManager)
-            {
-                this.updateManager = updateManager;
-            }
-
-            protected override Notification CreateCompletionNotification()
-            {
-                return new UpdateCompleteNotification(updateManager);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                IconContent.AddRange(new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
-                    },
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.Upload,
-                        Colour = Color4.White,
-                        Size = new Vector2(20),
-                    }
-                });
-            }
-
-            public override void Close()
-            {
-                // cancelling updates is not currently supported by the underlying updater.
-                // only allow dismissing for now.
-
-                switch (State)
-                {
-                    case ProgressNotificationState.Cancelled:
-                        base.Close();
-                        break;
-                }
-            }
         }
 
         private class SquirrelLogger : ILogger, IDisposable
