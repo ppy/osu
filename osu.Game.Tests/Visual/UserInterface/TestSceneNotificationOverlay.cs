@@ -23,9 +23,12 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private SpriteText displayedCount = null!;
 
+        public double TimeToCompleteProgress { get; set; } = 2000;
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            TimeToCompleteProgress = 2000;
             progressingNotifications.Clear();
 
             Content.Children = new Drawable[]
@@ -45,6 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestCompleteProgress()
         {
             ProgressNotification notification = null!;
+
             AddStep("add progress notification", () =>
             {
                 notification = new ProgressNotification
@@ -57,6 +61,30 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("wait completion", () => notification.State == ProgressNotificationState.Completed);
+
+            AddAssert("Completion toast shown", () => notificationOverlay.ToastCount == 1);
+        }
+
+        [Test]
+        public void TestCompleteProgressSlow()
+        {
+            ProgressNotification notification = null!;
+
+            AddStep("Set progress slow", () => TimeToCompleteProgress *= 2);
+            AddStep("add progress notification", () =>
+            {
+                notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                };
+                notificationOverlay.Post(notification);
+                progressingNotifications.Add(notification);
+            });
+
+            AddUntilStep("wait completion", () => notification.State == ProgressNotificationState.Completed);
+
+            AddAssert("Completion toast shown", () => notificationOverlay.ToastCount == 1);
         }
 
         [Test]
@@ -177,7 +205,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
             {
                 if (n.Progress < 1)
-                    n.Progress += (float)(Time.Elapsed / 2000);
+                    n.Progress += (float)(Time.Elapsed / TimeToCompleteProgress);
                 else
                     n.State = ProgressNotificationState.Completed;
             }
