@@ -137,7 +137,9 @@ namespace osu.Game.Overlays
 
         private readonly Scheduler postScheduler = new Scheduler();
 
-        public override bool IsPresent => base.IsPresent || postScheduler.HasPendingTasks;
+        public override bool IsPresent => base.IsPresent
+                                          || postScheduler.HasPendingTasks
+                                          || toastTray.IsDisplayingToasts;
 
         private bool processingPosts = true;
 
