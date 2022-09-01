@@ -7,19 +7,22 @@ using Newtonsoft.Json;
 namespace osu.Game.Online.Multiplayer.Countdown
 {
     /// <summary>
-    /// Request to stop the current countdown.
+    /// Indicates that a countdown started in the <see cref="MultiplayerRoom"/>.
     /// </summary>
     [MessagePackObject]
-    public class StopCountdownRequest : MatchUserRequest
+    public class CountdownStartedEvent : MatchServerEvent
     {
+        /// <summary>
+        /// The countdown that was started.
+        /// </summary>
         [Key(0)]
-        public readonly int ID;
+        public readonly MultiplayerCountdown Countdown;
 
         [JsonConstructor]
         [SerializationConstructor]
-        public StopCountdownRequest(int id)
+        public CountdownStartedEvent(MultiplayerCountdown countdown)
         {
-            ID = id;
+            Countdown = countdown;
         }
     }
 }
