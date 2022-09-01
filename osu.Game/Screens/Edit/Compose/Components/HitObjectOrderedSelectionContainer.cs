@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (result != 0) return result;
             }
 
-            return CompareReverseChildID(y, x);
+            return CompareReverseChildID(x, y);
         }
 
         protected override void Dispose(bool isDisposing)

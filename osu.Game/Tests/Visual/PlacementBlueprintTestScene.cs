@@ -30,10 +30,15 @@ namespace osu.Game.Tests.Visual
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.CacheAs(new EditorClock());
-
             var playable = GetPlayableBeatmap();
-            dependencies.CacheAs(new EditorBeatmap(playable));
+
+            var editorClock = new EditorClock();
+            base.Content.Add(editorClock);
+            dependencies.CacheAs(editorClock);
+
+            var editorBeatmap = new EditorBeatmap(playable);
+            // Not adding to hierarchy as we don't satisfy its dependencies. Probably not good.
+            dependencies.CacheAs(editorBeatmap);
 
             return dependencies;
         }
