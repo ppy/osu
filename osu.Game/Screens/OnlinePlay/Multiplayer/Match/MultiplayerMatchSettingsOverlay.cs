@@ -63,7 +63,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public MatchTypePicker TypePicker;
             public OsuEnumDropdown<QueueMode> QueueModeDropdown;
             public OsuTextBox PasswordTextBox;
-            public OsuCheckbox AutoSkipCheckbox;
             public TriangleButton ApplyButton;
 
             public OsuSpriteText ErrorText;
@@ -250,13 +249,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         LengthLimit = 255,
                                                                     },
                                                                 },
-                                                                new Section("Other")
-                                                                {
-                                                                    Child = AutoSkipCheckbox = new OsuCheckbox
-                                                                    {
-                                                                        LabelText = "Automatically skip the beatmap intro"
-                                                                    }
-                                                                }
                                                             }
                                                         }
                                                     },
@@ -351,7 +343,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 Password.BindValueChanged(password => PasswordTextBox.Text = password.NewValue ?? string.Empty, true);
                 QueueMode.BindValueChanged(mode => QueueModeDropdown.Current.Value = mode.NewValue, true);
                 AutoStartDuration.BindValueChanged(duration => startModeDropdown.Current.Value = (StartMode)(int)duration.NewValue.TotalSeconds, true);
-                AutoSkip.BindValueChanged(autoSkip => AutoSkipCheckbox.Current.Value = autoSkip.NewValue, true);
 
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
                 operationInProgress.BindValueChanged(v =>
@@ -399,8 +390,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                               password: PasswordTextBox.Text,
                               matchType: TypePicker.Current.Value,
                               queueMode: QueueModeDropdown.Current.Value,
-                              autoStartDuration: autoStartDuration,
-                              autoSkip: AutoSkipCheckbox.Current.Value)
+                              autoStartDuration: autoStartDuration)
                           .ContinueWith(t => Schedule(() =>
                           {
                               if (t.IsCompletedSuccessfully)
@@ -416,7 +406,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     room.Password.Value = PasswordTextBox.Current.Value;
                     room.QueueMode.Value = QueueModeDropdown.Current.Value;
                     room.AutoStartDuration.Value = autoStartDuration;
-                    room.AutoSkip.Value = AutoSkipCheckbox.Current.Value;
 
                     if (int.TryParse(MaxParticipantsField.Text, out int max))
                         room.MaxParticipants.Value = max;

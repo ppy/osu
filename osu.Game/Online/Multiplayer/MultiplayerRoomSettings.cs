@@ -29,9 +29,6 @@ namespace osu.Game.Online.Multiplayer
         [Key(5)]
         public TimeSpan AutoStartDuration { get; set; }
 
-        [Key(6)]
-        public bool AutoSkip { get; set; }
-
         [IgnoreMember]
         public bool AutoStartEnabled => AutoStartDuration != TimeSpan.Zero;
 
@@ -45,8 +42,7 @@ namespace osu.Game.Online.Multiplayer
                    && PlaylistItemId == other.PlaylistItemId
                    && MatchType == other.MatchType
                    && QueueMode == other.QueueMode
-                   && AutoStartDuration == other.AutoStartDuration
-                   && AutoSkip == other.AutoSkip;
+                   && AutoStartDuration == other.AutoStartDuration;
         }
 
         public override string ToString() => $"Name:{Name}"
@@ -54,7 +50,6 @@ namespace osu.Game.Online.Multiplayer
                                              + $" Type:{MatchType}"
                                              + $" Item:{PlaylistItemId}"
                                              + $" Queue:{QueueMode}"
-                                             + $" Start:{AutoStartDuration}"
-                                             + $" AutoSkip:{AutoSkip}";
+                                             + $" Start:{AutoStartDuration}";
     }
 }
