@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.05
         };
 
-        [SettingSource("Final zoom", "The starting zoom level")]
+        [SettingSource("Final zoom", "The final zoom level")]
         public BindableDouble FinalZoom { get; } = new BindableDouble(1.8)
         {
             MinValue = 1,
