@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Input;
 using osu.Framework.Testing;
@@ -30,12 +31,36 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
+        private void touch(TouchSource source)
+        {
+            InputManager.BeginTouch(new Touch(source, touchPosition));
+        }
+
+        private void release(TouchSource source)
+        {
+            InputManager.EndTouch(new Touch(source, touchPosition));
+        }
+
         [Test]
         public void TestTouchInput()
         {
-            AddStep("Touch", () => InputManager.BeginTouch(new Touch(OsuDrawableTouchInputHandler.CURSOR_TOUCH, touchPosition)));
+            AddStep("Touch", () => touch(OsuDrawableTouchInputHandler.CURSOR_TOUCH));
 
             AddAssert("Pressed", () => osuInputManager.CurrentState.Touch.IsActive(OsuDrawableTouchInputHandler.CURSOR_TOUCH));
+
+            AddStep("Touch with other finger", () => touch(TouchSource.Touch2));
+
+            AddAssert("Pressed other key", () => osuInputManager.PressedActions.Contains(OsuAction.RightButton));
+
+            AddStep("Touch with another finger (Doubletapping)...", () => touch(TouchSource.Touch3));
+
+            AddAssert("Is dragging", () => osuInputManager.DragMode);
+
+            AddStep("Release", () =>
+            {
+                foreach (var source in touchInputHandler.AllowedTouchSources)
+                    release(source);
+            });
         }
     }
 }
