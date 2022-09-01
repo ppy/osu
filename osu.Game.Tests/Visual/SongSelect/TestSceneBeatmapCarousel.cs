@@ -495,6 +495,43 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestSortingDateSubmitted()
+        {
+            var sets = new List<BeatmapSetInfo>();
+            const string zzz_string = "zzzzz";
+
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+
+                for (int i = 0; i < 20; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo(5);
+
+                    if (i >= 2 && i < 10)
+                        set.DateSubmitted = DateTimeOffset.Now.AddMinutes(i);
+                    if (i < 5)
+                        set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_string);
+
+                    sets.Add(set);
+                }
+            });
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by date submitted", () => carousel.Filter(new FilterCriteria { Sort = SortMode.DateSubmitted }, false));
+            checkVisibleItemCount(diff: false, count: 8);
+            checkVisibleItemCount(diff: true, count: 5);
+            AddStep("Sort by date submitted and string", () => carousel.Filter(new FilterCriteria
+            {
+                Sort = SortMode.DateSubmitted,
+                SearchText = zzz_string
+            }, false));
+            checkVisibleItemCount(diff: false, count: 3);
+            checkVisibleItemCount(diff: true, count: 5);
+        }
+
+        [Test]
         public void TestSorting()
         {
             var sets = new List<BeatmapSetInfo>();
