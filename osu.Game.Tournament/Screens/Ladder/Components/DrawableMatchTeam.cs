@@ -51,6 +51,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             if (ladderInfo.CurrentMatch.Value != null)
                 ladderInfo.CurrentMatch.Value.Current.Value = false;
 
+            if (match.Team1Score.Value == null || match.Team2Score.Value == null)
+            {
+                match.StartMatch();
+            }
+            if (ladderInfo.CurrentMatch.Value.Team1Score.Value.GetValueOrDefault() == 0 && ladderInfo.CurrentMatch.Value.Team2Score.Value.GetValueOrDefault() == 0)
+            {
+                ladderInfo.CurrentMatch.Value.CancelMatchStart();
+            }
             ladderInfo.CurrentMatch.Value = match;
             ladderInfo.CurrentMatch.Value.Current.Value = true;
         }
@@ -153,11 +161,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             if (e.Button == MouseButton.Left)
             {
-                if (score.Value == null)
-                {
-                    match.StartMatch();
-                }
-                else if (!match.Completed.Value)
+                if (!match.Completed.Value)
                     score.Value++;
             }
             else
@@ -172,8 +176,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
                 if (score.Value > 0)
                     score.Value--;
-                else
-                    match.CancelMatchStart();
             }
 
             return false;

@@ -61,7 +61,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             if (match != null)
             {
-                match.StartMatch();
 
                 currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.Team1Score : match.Team2Score);
                 currentTeam.BindTo(teamColour == TeamColour.Red ? match.Team1 : match.Team2);
