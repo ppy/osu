@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework;
@@ -879,17 +878,6 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!trackPlaying, amount);
         }
 
-        private void switchBeatmapOrExit([CanBeNull] BeatmapSetInfo setInfo)
-        {
-            if (setInfo is null || setInfo.Beatmaps.Count() <= 1)
-                this.Exit();
-            var nextBeatmap = setInfo!.Beatmaps.First();
-
-            // Force a refresh of the beatmap (and beatmap set) so the `Change difficulty` list is also updated.
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(nextBeatmap, true);
-            SwitchToDifficulty(Beatmap.Value.BeatmapInfo);
-        }
-
         private void updateLastSavedHash()
         {
             lastSavedHash = changeHandler?.CurrentStateHash;
@@ -914,6 +902,14 @@ namespace osu.Game.Screens.Edit
             new LegacyBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
         }
 
+        /// <summary>
+        /// Beatmaps of the currently edited set, grouped by ruleset and ordered by difficulty.
+        /// </summary>
+        private IOrderedEnumerable<IGrouping<RulesetInfo, BeatmapInfo>> groupedOrderedBeatmaps => Beatmap.Value.BeatmapSetInfo.Beatmaps
+                                                                                                         .OrderBy(b => b.StarRating)
+                                                                                                         .GroupBy(b => b.Ruleset)
+                                                                                                         .OrderBy(group => group.Key);
+
         private void deleteDifficulty()
         {
             if (dialogOverlay == null)
@@ -923,11 +919,19 @@ namespace osu.Game.Screens.Edit
 
             void delete()
             {
-                var current = playableBeatmap.BeatmapInfo;
-                if (current is null) return;
+                BeatmapInfo difficultyToDelete = playableBeatmap.BeatmapInfo;
 
-                beatmapManager.DeleteDifficultyImmediately(current);
-                switchBeatmapOrExit(current.BeatmapSet);
+                var difficultiesBeforeDeletion = groupedOrderedBeatmaps.SelectMany(g => g).ToList();
+
+                beatmapManager.DeleteDifficultyImmediately(difficultyToDelete);
+
+                int deletedIndex = difficultiesBeforeDeletion.IndexOf(difficultyToDelete);
+                // of note, we're still working with the cloned version, so indices are all prior to deletion.
+                BeatmapInfo nextToShow = difficultiesBeforeDeletion[deletedIndex == 0 ? 1 : deletedIndex - 1];
+
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(nextToShow, true);
+
+                SwitchToDifficulty(nextToShow);
             }
         }
 
@@ -960,18 +964,14 @@ namespace osu.Game.Screens.Edit
 
         private EditorMenuItem createDifficultySwitchMenu()
         {
-            var beatmapSet = playableBeatmap.BeatmapInfo.BeatmapSet;
-
-            Debug.Assert(beatmapSet != null);
-
             var difficultyItems = new List<MenuItem>();
 
-            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.Ruleset).OrderBy(group => group.Key))
+            foreach (var rulesetBeatmaps in groupedOrderedBeatmaps)
             {
                 if (difficultyItems.Count > 0)
                     difficultyItems.Add(new EditorMenuItemSpacer());
 
-                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarRating))
+                foreach (var beatmap in rulesetBeatmaps)
                 {
                     bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmap);
                     difficultyItems.Add(new DifficultyMenuItem(beatmap, isCurrentDifficulty, SwitchToDifficulty));
