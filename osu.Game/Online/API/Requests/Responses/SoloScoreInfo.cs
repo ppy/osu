@@ -18,7 +18,7 @@ namespace osu.Game.Online.API.Requests.Responses
     [Serializable]
     public class SoloScoreInfo : IHasOnlineID<long>
     {
-        [JsonProperty("replay")]
+        [JsonProperty("has_replay")]
         public bool HasReplay { get; set; }
 
         [JsonProperty("beatmap_id")]
@@ -83,6 +83,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("legacy_total_score")]
         public int? LegacyTotalScore { get; set; }
 
+        [JsonProperty("legacy_score_id")]
+        public uint? LegacyScoreId { get; set; }
+
         #region osu-web API additions (not stored to database).
 
         [JsonProperty("id")]
@@ -117,7 +120,6 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool ShouldSerializeBeatmapSet() => false;
         public bool ShouldSerializePP() => false;
         public bool ShouldSerializeOnlineID() => false;
-        public bool ShouldSerializeHasReplay() => false;
 
         #endregion
 
