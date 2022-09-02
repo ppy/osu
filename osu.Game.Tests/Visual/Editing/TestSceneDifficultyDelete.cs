@@ -41,27 +41,42 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestDifficultyDelete()
+        public void TestDeleteDifficulties()
         {
-            string lastDiff = null!;
-            AddStep("remember selected difficulty", () => lastDiff = EditorBeatmap.BeatmapInfo.DifficultyName);
+            Guid deletedDifficultyID = Guid.Empty;
+            int countBeforeDeletion = 0;
 
-            AddStep("click File", () => this.ChildrenOfType<DrawableOsuMenuItem>().First().TriggerClick());
-            AddStep("click Delete", () => this.ChildrenOfType<DrawableOsuMenuItem>().Single(deleteMenuItemPredicate).TriggerClick());
-            AddStep("confirm", () => InputManager.Key(Key.Number2));
-
-            AddAssert("difficulty is deleted", () =>
+            for (int i = 0; i < 12; i++)
             {
-                if (lastDiff == null!) throw new NullReferenceException();
+                // Will be reloaded after each deletion.
+                AddUntilStep("wait for editor to load", () => Editor?.ReadyForUse == true);
 
-                var newSet = beatmaps.GetWorkingBeatmap(importedBeatmapSet.Beatmaps.First(), true).BeatmapSetInfo;
-                return newSet.Beatmaps.All(x => x.DifficultyName != lastDiff);
-            });
+                AddStep("store selected difficulty", () =>
+                {
+                    deletedDifficultyID = EditorBeatmap.BeatmapInfo.ID;
+                    countBeforeDeletion = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count;
+                });
+
+                AddStep("click File", () => this.ChildrenOfType<DrawableOsuMenuItem>().First().TriggerClick());
+
+                if (i == 11)
+                {
+                    // last difficulty shouldn't be able to be deleted.
+                    AddAssert("Delete menu item disabled", () => getDeleteMenuItem().Item.Action.Disabled);
+                }
+                else
+                {
+                    AddStep("click delete", () => getDeleteMenuItem().TriggerClick());
+                    AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog != null);
+                    AddStep("confirm", () => InputManager.Key(Key.Number1));
+
+                    AddAssert($"difficulty {i} is deleted", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Select(b => b.ID), () => Does.Not.Contain(deletedDifficultyID));
+                    AddAssert("count decreased by one", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Count, () => Is.EqualTo(countBeforeDeletion - 1));
+                }
+            }
         }
 
-        private bool deleteMenuItemPredicate(DrawableOsuMenuItem item)
-        {
-            return item.ChildrenOfType<SpriteText>().Any(text => text.Text.ToString().StartsWith("Delete", StringComparison.Ordinal));
-        }
+        private DrawableOsuMenuItem getDeleteMenuItem() => this.ChildrenOfType<DrawableOsuMenuItem>()
+                                                               .Single(item => item.ChildrenOfType<SpriteText>().Any(text => text.Text.ToString().StartsWith("Delete", StringComparison.Ordinal)));
     }
 }
