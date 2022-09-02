@@ -879,35 +879,6 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!trackPlaying, amount);
         }
 
-        private void exportBeatmap()
-        {
-            Save();
-            new LegacyBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
-        }
-
-        private void deleteDifficulty()
-        {
-            dialogOverlay?.Push(new PromptForDifficultyDeleteDialog(confirmDifficultyHide, confirmDifficultyDelete, () => { }));
-        }
-
-        private void confirmDifficultyHide()
-        {
-            var current = playableBeatmap.BeatmapInfo;
-            if (current is null) return;
-
-            beatmapManager.Hide(current);
-            switchBeatmapOrExit(current.BeatmapSet);
-        }
-
-        private void confirmDifficultyDelete()
-        {
-            var current = playableBeatmap.BeatmapInfo;
-            if (current is null) return;
-
-            beatmapManager.DeleteDifficultyImmediately(current);
-            switchBeatmapOrExit(current.BeatmapSet);
-        }
-
         private void switchBeatmapOrExit([CanBeNull] BeatmapSetInfo setInfo)
         {
             if (setInfo is null || setInfo.Beatmaps.Count() <= 1)
@@ -946,6 +917,29 @@ namespace osu.Game.Screens.Edit
             fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
             return fileMenuItems;
+        }
+
+        private void exportBeatmap()
+        {
+            Save();
+            new LegacyBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
+        }
+
+        private void deleteDifficulty()
+        {
+            if (dialogOverlay == null)
+                delete();
+            else
+                dialogOverlay.Push(new DeleteDifficultyConfirmationDialog(Beatmap.Value.BeatmapInfo, delete));
+
+            void delete()
+            {
+                var current = playableBeatmap.BeatmapInfo;
+                if (current is null) return;
+
+                beatmapManager.DeleteDifficultyImmediately(current);
+                switchBeatmapOrExit(current.BeatmapSet);
+            }
         }
 
         private EditorMenuItem createDifficultyCreationMenu()
