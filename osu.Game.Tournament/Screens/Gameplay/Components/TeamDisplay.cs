@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private readonly Bindable<string> teamName = new Bindable<string>("???");
 
-        private bool showScore;
+        private bool showScore = true;
 
         public bool ShowScore
         {
@@ -37,9 +37,11 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             }
         }
 
-        public TeamDisplay(TournamentTeam team, TeamColour colour, Bindable<int?> currentTeamScore, int pointsToWin)
+        public TeamDisplay(TournamentTeam team, TeamColour colour, Bindable<int?> currentTeamScore, int pointsToWin, bool showScore)
             : base(team)
         {
+            this.showScore = showScore;
+
             AutoSizeAxes = Axes.Both;
 
             bool flip = colour == TeamColour.Red;

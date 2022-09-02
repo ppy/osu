@@ -283,7 +283,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             if (editorInfo == null || Match is ConditionalTournamentMatch)
                 return false;
 
-            Selected = true;
+            if (e.Button == MouseButton.Left)
+            {
+                Selected = true;
+            }
             return true;
         }
 

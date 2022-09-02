@@ -61,7 +61,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             if (match != null)
             {
-                match.StartMatch();
 
                 currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.Team1Score : match.Team2Score);
                 currentTeam.BindTo(teamColour == TeamColour.Red ? match.Team1 : match.Team2);
@@ -92,9 +91,15 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private void teamChanged(ValueChangedEvent<TournamentTeam> team)
         {
+            bool showScore = true;
+
+            if (teamDisplay != null)
+            {
+                showScore = teamDisplay.ShowScore;
+            }
             InternalChildren = new Drawable[]
             {
-                teamDisplay = new TeamDisplay(team.NewValue, teamColour, currentTeamScore, currentMatch.Value?.PointsToWin ?? 0),
+                teamDisplay = new TeamDisplay(team.NewValue, teamColour, currentTeamScore, currentMatch.Value?.PointsToWin ?? 0, showScore),
             };
         }
     }
