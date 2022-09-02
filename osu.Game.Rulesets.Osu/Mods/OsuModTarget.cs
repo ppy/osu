@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "TP";
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.ModTarget;
-        public override string Description => @"Practice keeping up with the beat of the song.";
+        public override LocalisableString Description => @"Practice keeping up with the beat of the song.";
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
@@ -57,6 +58,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             Default = null,
             Value = null
         };
+
+        [SettingSource("Metronome ticks", "Whether a metronome beat should play in the background")]
+        public Bindable<bool> Metronome { get; } = new BindableBool(true);
 
         #region Constants
 
@@ -336,7 +340,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
+            if (Metronome.Value)
+                drawableRuleset.Overlays.Add(new MetronomeBeat(drawableRuleset.Beatmap.HitObjects.First().StartTime));
         }
 
         #endregion
