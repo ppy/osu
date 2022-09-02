@@ -364,27 +364,26 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Hard-Delete a beatmap difficulty locally.
+        /// Delete a beatmap difficulty immediately.
         /// </summary>
-        /// <remarks><see cref="Hide"/> is generally preferred as it keeps the local beatmap set in sync with the server.</remarks>
-        /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
-        public void DeleteLocal(BeatmapInfo beatmapInfo)
+        /// <remarks>
+        /// There's no undoing this operation, as we don't have a soft-deletion flag on <see cref="BeatmapInfo"/>.
+        /// This may be a future consideration if there's a user requirement for undeleting support.
+        /// </remarks>
+        public void DeleteDifficultyImmediately(BeatmapInfo beatmapInfo)
         {
-            Realm.Run(r =>
+            Realm.Write(r =>
             {
-                using (var transaction = r.BeginWrite())
-                {
-                    if (!beatmapInfo.IsManaged)
-                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                if (!beatmapInfo.IsManaged)
+                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
 
-                    var setInfo = beatmapInfo.BeatmapSet!;
-                    DeleteFile(setInfo, beatmapInfo.File!);
-                    setInfo.Beatmaps.Remove(beatmapInfo);
+                Debug.Assert(beatmapInfo.BeatmapSet != null);
+                Debug.Assert(beatmapInfo.File != null);
 
-                    var liveSetInfo = r.Find<BeatmapSetInfo>(setInfo.ID);
-                    setInfo.CopyChangesToRealm(liveSetInfo);
-                    transaction.Commit();
-                }
+                var setInfo = beatmapInfo.BeatmapSet;
+
+                DeleteFile(setInfo, beatmapInfo.File);
+                setInfo.Beatmaps.Remove(beatmapInfo);
             });
         }
 
