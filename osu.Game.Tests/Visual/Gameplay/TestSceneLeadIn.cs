@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -19,9 +17,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneLeadIn : RateAdjustedBeatmapTestScene
     {
-        private LeadInPlayer player;
+        private LeadInPlayer player = null!;
 
-        private const double lenience_ms = 10;
+        private const double lenience_ms = 100;
 
         private const double first_hit_object = 2170;
 
@@ -36,11 +34,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 BeatmapInfo = { AudioLeadIn = leadIn }
             });
 
-            AddStep("check first frame time", () =>
-            {
-                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
-                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
-            });
+            checkFirstFrameTime(expectedStartTime);
         }
 
         [TestCase(1000, 0)]
@@ -59,11 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
 
-            AddStep("check first frame time", () =>
-            {
-                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
-                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
-            });
+            checkFirstFrameTime(expectedStartTime);
         }
 
         [TestCase(1000, 0, false)]
@@ -97,14 +87,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
 
-            AddStep("check first frame time", () =>
-            {
-                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
-                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
-            });
+            checkFirstFrameTime(expectedStartTime);
         }
 
-        private void loadPlayerWithBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
+        private void checkFirstFrameTime(double expectedStartTime) =>
+            AddAssert("check first frame time", () => player.FirstFrameClockTime, () => Is.EqualTo(expectedStartTime).Within(lenience_ms));
+
+        private void loadPlayerWithBeatmap(IBeatmap beatmap, Storyboard? storyboard = null)
         {
             AddStep("create player", () =>
             {
@@ -126,11 +115,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
 
-            public double GameplayStartTime => DrawableRuleset.GameplayStartTime;
-
             public double FirstHitObjectTime => DrawableRuleset.Objects.First().StartTime;
-
-            public double GameplayClockTime => GameplayClockContainer.GameplayClock.CurrentTime;
 
             protected override void UpdateAfterChildren()
             {
@@ -138,7 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 if (!FirstFrameClockTime.HasValue)
                 {
-                    FirstFrameClockTime = GameplayClockContainer.GameplayClock.CurrentTime;
+                    FirstFrameClockTime = GameplayClockContainer.CurrentTime;
                     AddInternal(new OsuSpriteText
                     {
                         Text = $"GameplayStartTime: {DrawableRuleset.GameplayStartTime} "

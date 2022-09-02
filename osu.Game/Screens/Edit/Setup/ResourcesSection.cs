@@ -4,13 +4,13 @@
 #nullable disable
 
 using System.IO;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledFileChooser audioTrackChooser;
         private LabelledFileChooser backgroundChooser;
 
-        public override LocalisableString Title => "Resources";
+        public override LocalisableString Title => EditorSetupStrings.ResourcesHeader;
 
         [Resolved]
         private MusicController music { get; set; }
@@ -30,8 +30,8 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private IBindable<WorkingBeatmap> working { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private Editor editor { get; set; }
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; }
 
         [Resolved]
         private SetupScreenHeader header { get; set; }
@@ -43,13 +43,13 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 backgroundChooser = new LabelledFileChooser(".jpg", ".jpeg", ".png")
                 {
-                    Label = "Background",
+                    Label = GameplaySettingsStrings.BackgroundHeader,
                     FixedLabelWidth = LABEL_WIDTH,
                     TabbableContentContainer = this
                 },
                 audioTrackChooser = new LabelledFileChooser(".mp3", ".ogg")
                 {
-                    Label = "Audio Track",
+                    Label = EditorSetupStrings.AudioTrack,
                     FixedLabelWidth = LABEL_WIDTH,
                     TabbableContentContainer = this
                 },
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // remove the previous background for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
+            var oldFile = set.GetFile(working.Value.Metadata.BackgroundFile);
 
             using (var stream = source.OpenRead())
             {
@@ -87,6 +87,8 @@ namespace osu.Game.Screens.Edit.Setup
 
                 beatmaps.AddFile(set, stream, destination.Name);
             }
+
+            editorBeatmap.SaveState();
 
             working.Value.Metadata.BackgroundFile = destination.Name;
             header.Background.UpdateBackground();
@@ -105,7 +107,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // remove the previous audio track for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.AudioFile);
+            var oldFile = set.GetFile(working.Value.Metadata.AudioFile);
 
             using (var stream = source.OpenRead())
             {
@@ -117,9 +119,9 @@ namespace osu.Game.Screens.Edit.Setup
 
             working.Value.Metadata.AudioFile = destination.Name;
 
+            editorBeatmap.SaveState();
             music.ReloadCurrentTrack();
 
-            editor?.UpdateClockSource();
             return true;
         }
 
@@ -142,12 +144,12 @@ namespace osu.Game.Screens.Edit.Setup
         private void updatePlaceholderText()
         {
             audioTrackChooser.Text = audioTrackChooser.Current.Value == null
-                ? "Click to select a track"
-                : "Click to replace the track";
+                ? EditorSetupStrings.ClickToSelectTrack
+                : EditorSetupStrings.ClickToReplaceTrack;
 
             backgroundChooser.Text = backgroundChooser.Current.Value == null
-                ? "Click to select a background image"
-                : "Click to replace the background image";
+                ? EditorSetupStrings.ClickToSelectBackground
+                : EditorSetupStrings.ClickToReplaceBackground;
         }
     }
 }

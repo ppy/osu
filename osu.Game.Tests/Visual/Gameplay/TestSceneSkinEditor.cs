@@ -14,6 +14,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 using osuTK.Input;
 
@@ -32,6 +33,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
 
             AddStep("reload skin editor", () =>
             {

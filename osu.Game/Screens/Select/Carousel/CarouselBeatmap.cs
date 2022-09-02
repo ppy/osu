@@ -55,8 +55,6 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(BeatmapInfo.Metadata.Artist) ||
                      criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
 
-            match &= criteria.Sort != SortMode.DateRanked || BeatmapInfo.BeatmapSet?.DateRanked != null;
-
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
             if (match && criteria.SearchTerms.Length > 0)
@@ -76,7 +74,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             if (match)
-                match &= criteria.Collection?.BeatmapHashes.Contains(BeatmapInfo.MD5Hash) ?? true;
+                match &= criteria.CollectionBeatmapMD5Hashes?.Contains(BeatmapInfo.MD5Hash) ?? true;
 
             if (match && criteria.RulesetCriteria != null)
                 match &= criteria.RulesetCriteria.Matches(BeatmapInfo);

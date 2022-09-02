@@ -36,8 +36,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(new ScoreManager(rulesets, () => beatmaps, LocalStorage, Realm, Scheduler, API));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(new ScoreManager(rulesets, () => beatmaps, LocalStorage, Realm, API));
             Dependencies.Cache(Realm);
         }
 

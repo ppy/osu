@@ -21,6 +21,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private bool allowImmediateFocus => host?.OnScreenKeyboardOverlapsGameWindow != true;
 
+        /// <summary>
+        /// Whether the content of the text box should be cleared on the first "back" key press.
+        /// </summary>
+        protected virtual bool ClearTextOnBackKey => true;
+
         public void TakeFocus()
         {
             if (!allowImmediateFocus)
@@ -78,7 +83,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (!HasFocus) return false;
 
-            if (e.Action == GlobalAction.Back)
+            if (ClearTextOnBackKey && e.Action == GlobalAction.Back)
             {
                 if (Text.Length > 0)
                 {

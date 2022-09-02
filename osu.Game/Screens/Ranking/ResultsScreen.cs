@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        player?.Restart();
+                        player?.Restart(true);
                     },
                 });
             }

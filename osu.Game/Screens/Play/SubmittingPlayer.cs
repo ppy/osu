@@ -8,13 +8,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private SpectatorClient spectatorClient { get; set; }
 
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
@@ -80,7 +83,10 @@ namespace osu.Game.Screens.Play
 
             api.Queue(req);
 
-            tcs.Task.WaitSafely();
+            // Generally a timeout would not happen here as APIAccess will timeout first.
+            if (!tcs.Task.Wait(60000))
+                handleTokenFailure(new InvalidOperationException("Token retrieval timed out (request never run)"));
+
             return true;
 
             void handleTokenFailure(Exception exception)
@@ -134,6 +140,8 @@ namespace osu.Game.Screens.Play
                 if (realmBeatmap != null)
                     realmBeatmap.LastPlayed = DateTimeOffset.Now;
             });
+
+            spectatorClient.BeginPlaying(GameplayState, Score);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -141,7 +149,10 @@ namespace osu.Game.Screens.Play
             bool exiting = base.OnExiting(e);
 
             if (LoadedBeatmapSuccessfully)
+            {
                 submitScore(Score.DeepClone());
+                spectatorClient.EndPlaying(GameplayState);
+            }
 
             return exiting;
         }

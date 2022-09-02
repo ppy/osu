@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
@@ -36,9 +35,9 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public override float DefaultFlashlightSize => 350;
 
-        protected override Flashlight CreateFlashlight() => new CatchFlashlight(this, playfield.AsNonNull());
+        protected override Flashlight CreateFlashlight() => new CatchFlashlight(this, playfield);
 
-        private CatchPlayfield? playfield;
+        private CatchPlayfield playfield = null!;
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
