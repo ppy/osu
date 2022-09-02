@@ -20,18 +20,18 @@ namespace osu.Game.Rulesets.Osu.UI
         private const int tap_touches_limit = 2;
 
         /// <summary>
-        /// The index for the last concurrent able touch.
-        /// </summary>
-        private const int last_concurrent_touch_index = tap_touches_limit;
-
-        /// <summary>
         /// How many concurrent touches can be registered.
         /// </summary>
-        private const int concurrent_touches_limit = last_concurrent_touch_index + 1;
+        private const int concurrent_touches_limit = tap_touches_limit + 1;
+
+        /// <summary>
+        /// The index for the last concurrent able touch.
+        /// </summary>
+        private const int last_concurrent_touch_index = concurrent_touches_limit - 1;
 
         public readonly HashSet<TouchSource> AllowedTouchSources = Enum.GetValues(typeof(TouchSource)).Cast<TouchSource>().Take(concurrent_touches_limit).ToHashSet();
 
-        private readonly Dictionary<TouchSource, OsuAction> touchTapActionsDictionary = new Dictionary<TouchSource, OsuAction>();
+        private readonly Dictionary<TouchSource, OsuAction> touchActions = new Dictionary<TouchSource, OsuAction>();
 
         private readonly OsuInputManager osuInputManager;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             osuInputManager = inputManager;
             foreach (var source in AllowedTouchSources)
-                touchTapActionsDictionary.Add(source, getTouchIndex(source) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
+                touchActions.Add(source, getTouchIndex(source) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
         }
 
         private bool isTapTouch(TouchSource source)
@@ -76,9 +76,7 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!isValidTouchInput(sourceIndex))
                 return false;
 
-            var touchAction = touchTapActionsDictionary[source];
-
-            osuInputManager.KeyBindingContainer.TriggerPressed(touchAction);
+            osuInputManager.KeyBindingContainer.TriggerPressed(touchActions[source]);
 
             return true;
         }
@@ -92,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 return;
 
             if (isTapTouch(source))
-                osuInputManager.KeyBindingContainer.TriggerReleased(touchTapActionsDictionary[source]);
+                osuInputManager.KeyBindingContainer.TriggerReleased(touchActions[source]);
 
             base.OnTouchUp(e);
         }
