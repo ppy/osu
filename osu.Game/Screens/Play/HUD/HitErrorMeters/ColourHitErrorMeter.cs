@@ -21,7 +21,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
     {
         private const int animation_duration = 200;
         private const int drawable_judgement_size = 8;
-        private const int spacing = 2;
         private readonly JudgementFlow judgementsFlow;
 
         [SettingSource("Colour hit number", "number of coloured hits")]
@@ -35,23 +34,23 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [SettingSource("Opacity", "Visibility of object")]
         public BindableNumber<float> HitOpacity { get; } = new BindableNumber<float>(1)
         {
-            MinValue = 0,
+            MinValue = 0.01f,
             MaxValue = 1,
             Precision = .01f
         };
 
         [SettingSource("Spacing", "space between hit colour circles")]
-        public BindableNumber<float> HitSpacing { get; } = new BindableNumber<float>(1)
+        public BindableNumber<float> HitSpacing { get; } = new BindableNumber<float>(2)
         {
             MinValue = 0,
-            MaxValue = 1,
-            Precision = .01f
+            MaxValue = 10,
+            Precision = .1f
         };
 
         public ColourHitErrorMeter()
         {
             AutoSizeAxes = Axes.Both;
-            InternalChild = judgementsFlow = new JudgementFlow(HitCircleAmount.Value, HitOpacity.Value);
+            InternalChild = judgementsFlow = new JudgementFlow();
         }
 
         protected override void OnNewJudgement(JudgementResult judgement)
@@ -65,9 +64,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            judgementsFlow.Height = HitCircleAmount.Value * (drawable_judgement_size + spacing) - spacing;
-            judgementsFlow.Alpha = HitOpacity.Value;
-            judgementsFlow.Spacing = new Vector2(0, HitSpacing.Value);
+            HitOpacity.BindValueChanged(_ => judgementsFlow.Alpha = HitOpacity.Value, true);
+            HitSpacing.BindValueChanged(_ => judgementsFlow.Spacing = new Vector2(0, HitSpacing.Value), true);
+            HitSpacing.BindValueChanged(_ => judgementsFlow.Height = HitCircleAmount.Value * (drawable_judgement_size + HitSpacing.Value) - HitSpacing.Value, true);
+            HitCircleAmount.BindValueChanged(_ => judgementsFlow.Height = HitCircleAmount.Value * (drawable_judgement_size + HitSpacing.Value) - HitSpacing.Value, true);
+            HitCircleAmount.BindValueChanged(_ => judgementsFlow.Clear(), true);
         }
 
         public override void Clear() => judgementsFlow.Clear();
@@ -76,10 +77,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 
-            public JudgementFlow(int hitCircleAmount, float opacity)
+            public JudgementFlow()
             {
-                AutoSizeAxes = Axes.X;
-                Spacing = new Vector2(0, spacing);
+                Width = drawable_judgement_size;
                 Direction = FillDirection.Vertical;
                 LayoutDuration = animation_duration;
                 LayoutEasing = Easing.OutQuint;
@@ -97,7 +97,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         internal class HitErrorCircle : Container
         {
             public bool IsRemoved { get; private set; }
-
             private readonly Circle circle;
 
             public HitErrorCircle(Color4 colour, int size)
