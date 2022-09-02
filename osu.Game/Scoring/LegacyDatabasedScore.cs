@@ -25,7 +25,12 @@ namespace osu.Game.Scoring
                 return;
 
             using (var stream = store.GetStream(replayFilename))
+            {
+                if (stream == null)
+                    return;
+
                 Replay = new DatabasedLegacyScoreDecoder(rulesets, beatmaps).Parse(stream).Replay;
+            }
         }
     }
 }

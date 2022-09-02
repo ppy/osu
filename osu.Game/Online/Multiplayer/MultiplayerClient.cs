@@ -265,8 +265,9 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="matchType">The type of the match, if any.</param>
         /// <param name="queueMode">The new queue mode, if any.</param>
         /// <param name="autoStartDuration">The new auto-start countdown duration, if any.</param>
+        /// <param name="autoSkip">The new auto-skip setting.</param>
         public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<QueueMode> queueMode = default,
-                                   Optional<TimeSpan> autoStartDuration = default)
+                                   Optional<TimeSpan> autoStartDuration = default, Optional<bool> autoSkip = default)
         {
             if (Room == null)
                 throw new InvalidOperationException("Must be joined to a match to change settings.");
@@ -278,6 +279,7 @@ namespace osu.Game.Online.Multiplayer
                 MatchType = matchType.GetOr(Room.Settings.MatchType),
                 QueueMode = queueMode.GetOr(Room.Settings.QueueMode),
                 AutoStartDuration = autoStartDuration.GetOr(Room.Settings.AutoStartDuration),
+                AutoSkip = autoSkip.GetOr(Room.Settings.AutoSkip)
             });
         }
 
@@ -739,6 +741,7 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.QueueMode.Value = Room.Settings.QueueMode;
             APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
             APIRoom.CurrentPlaylistItem.Value = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
+            APIRoom.AutoSkip.Value = Room.Settings.AutoSkip;
 
             RoomUpdated?.Invoke();
         }
