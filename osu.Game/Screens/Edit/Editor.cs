@@ -895,29 +895,18 @@ namespace osu.Game.Screens.Edit
             lastSavedHash = changeHandler?.CurrentStateHash;
         }
 
-        private List<MenuItem> createFileMenuItems()
+        private List<MenuItem> createFileMenuItems() => new List<MenuItem>
         {
-            var fileMenuItems = new List<MenuItem>
-            {
-                new EditorMenuItem("Save", MenuItemType.Standard, () => Save())
-            };
-
-            if (RuntimeInfo.IsDesktop)
-                fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
-
-            fileMenuItems.Add(new EditorMenuItemSpacer());
-
-            fileMenuItems.Add(createDifficultyCreationMenu());
-            fileMenuItems.Add(createDifficultySwitchMenu());
-
-            fileMenuItems.Add(new EditorMenuItemSpacer());
-
-            fileMenuItems.Add(new EditorMenuItem("Delete difficulty", MenuItemType.Standard, deleteDifficulty));
-
-            fileMenuItems.Add(new EditorMenuItemSpacer());
-            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
-            return fileMenuItems;
-        }
+            new EditorMenuItem("Save", MenuItemType.Standard, () => Save()),
+            new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+            new EditorMenuItemSpacer(),
+            createDifficultyCreationMenu(),
+            createDifficultySwitchMenu(),
+            new EditorMenuItemSpacer(),
+            new EditorMenuItem("Delete difficulty", MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } },
+            new EditorMenuItemSpacer(),
+            new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit)
+        };
 
         private void exportBeatmap()
         {
