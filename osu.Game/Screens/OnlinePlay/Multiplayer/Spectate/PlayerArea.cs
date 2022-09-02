@@ -38,9 +38,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public readonly int UserId;
 
         /// <summary>
-        /// The <see cref="SpectatorPlayerClock"/> used to control the gameplay running state of a loaded <see cref="Player"/>.
+        /// The <see cref="Spectate.SpectatorPlayerClock"/> used to control the gameplay running state of a loaded <see cref="Player"/>.
         /// </summary>
-        public readonly SpectatorPlayerClock GameplayClock;
+        public readonly SpectatorPlayerClock SpectatorPlayerClock;
 
         /// <summary>
         /// The currently-loaded score.
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public PlayerArea(int userId, SpectatorPlayerClock clock)
         {
             UserId = userId;
-            GameplayClock = clock;
+            SpectatorPlayerClock = clock;
 
             RelativeSizeAxes = Axes.Both;
             Masking = true;
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             stack.Push(new MultiSpectatorPlayerLoader(Score, () =>
             {
-                var player = new MultiSpectatorPlayer(Score, GameplayClock);
+                var player = new MultiSpectatorPlayer(Score, SpectatorPlayerClock);
                 player.OnGameplayStarted += () => OnGameplayStarted?.Invoke();
                 return player;
             }));
