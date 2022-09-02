@@ -804,8 +804,8 @@ namespace osu.Game
                     Children = new Drawable[]
                     {
                         overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                         leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
@@ -857,11 +857,6 @@ namespace osu.Game
                 d.Anchor = Anchor.TopRight;
                 d.Origin = Anchor.TopRight;
             }), rightFloatingOverlayContent.Add, true);
-
-            loadComponentSingleFile(new CollectionManager(Storage)
-            {
-                PostNotification = n => Notifications.Post(n),
-            }, Add, true);
 
             loadComponentSingleFile(legacyImportManager, Add);
 
@@ -1141,6 +1136,13 @@ namespace osu.Game
                 case GlobalAction.ToggleGameplayMouseButtons:
                     var mouseDisableButtons = LocalConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons);
                     mouseDisableButtons.Value = !mouseDisableButtons.Value;
+                    return true;
+
+                case GlobalAction.ToggleProfile:
+                    if (userProfile.State.Value == Visibility.Visible)
+                        userProfile.Hide();
+                    else
+                        ShowUser(API.LocalUser.Value);
                     return true;
 
                 case GlobalAction.RandomSkin:

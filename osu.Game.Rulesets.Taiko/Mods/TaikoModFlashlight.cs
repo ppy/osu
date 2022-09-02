@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
@@ -40,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, playfield);
 
-        private TaikoPlayfield playfield;
+        private TaikoPlayfield playfield = null!;
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
@@ -50,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private class TaikoFlashlight : Flashlight
         {
-            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
+            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
             private readonly TaikoPlayfield taikoPlayfield;
 
             public TaikoFlashlight(TaikoModFlashlight modFlashlight, TaikoPlayfield taikoPlayfield)

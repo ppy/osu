@@ -14,17 +14,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneStarRatingRangeDisplay : OnlinePlayTestScene
     {
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            SelectedRoom.Value = new Room();
+            base.SetUpSteps();
 
-            Child = new StarRatingRangeDisplay
+            AddStep("create display", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            };
-        });
+                SelectedRoom.Value = new Room();
+
+                Child = new StarRatingRangeDisplay
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                };
+            });
+        }
 
         [Test]
         public void TestRange([Values(0, 2, 3, 4, 6, 7)] double min, [Values(0, 2, 3, 4, 6, 7)] double max)

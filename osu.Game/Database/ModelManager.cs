@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
@@ -79,7 +80,7 @@ namespace osu.Game.Database
         /// </summary>
         public void AddFile(TModel item, Stream contents, string filename, Realm realm)
         {
-            var existing = item.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase));
+            var existing = item.GetFile(filename);
 
             if (existing != null)
             {

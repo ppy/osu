@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
-            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.ComputeFinalScore(ScoringMode.Standardised, Score.ScoreInfo));
+            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.ComputeScore(ScoringMode.Standardised, Score.ScoreInfo));
         }
 
         protected override void Dispose(bool isDisposing)

@@ -365,6 +365,11 @@ namespace osu.Game.Tests.Visual
                 }
                 else
                     track = audio?.Tracks.GetVirtual(trackLength);
+
+                // We are guaranteed to have a virtual track.
+                // To ease testability, ensure the track is available from point of construction.
+                // (Usually this would be done by MusicController for us).
+                LoadTrack();
             }
 
             ~ClockBackedTestWorkingBeatmap()

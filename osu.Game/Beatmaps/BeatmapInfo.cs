@@ -20,8 +20,12 @@ using Realms;
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// A single beatmap difficulty.
+    /// A realm model containing metadata for a single beatmap difficulty.
+    /// This should generally include anything which is required to be filtered on at song select, or anything pertaining to storage of beatmaps in the client.
     /// </summary>
+    /// <remarks>
+    /// There are some legacy fields in this model which are not persisted to realm. These are isolated in a code region within the class and should eventually be migrated to `Beatmap`.
+    /// </remarks>
     [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("Beatmap")]
@@ -98,6 +102,14 @@ namespace osu.Game.Beatmaps
 
         public string OnlineMD5Hash { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The last time of a local modification (via the editor).
+        /// </summary>
+        public DateTimeOffset? LastLocalUpdate { get; set; }
+
+        /// <summary>
+        /// The last time online metadata was applied to this beatmap.
+        /// </summary>
         public DateTimeOffset? LastOnlineUpdate { get; set; }
 
         /// <summary>
@@ -117,7 +129,8 @@ namespace osu.Game.Beatmaps
             OnlineID = -1;
             LastOnlineUpdate = null;
             OnlineMD5Hash = string.Empty;
-            Status = BeatmapOnlineStatus.None;
+            if (Status != BeatmapOnlineStatus.LocallyModified)
+                Status = BeatmapOnlineStatus.None;
         }
 
         #region Properties we may not want persisted (but also maybe no harm?)
@@ -194,8 +207,8 @@ namespace osu.Game.Beatmaps
             Debug.Assert(x.BeatmapSet != null);
             Debug.Assert(y.BeatmapSet != null);
 
-            string? fileHashX = x.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(x.Metadata))?.File.Hash;
-            string? fileHashY = y.BeatmapSet.Files.FirstOrDefault(f => f.Filename == getFilename(y.Metadata))?.File.Hash;
+            string? fileHashX = x.BeatmapSet.GetFile(getFilename(x.Metadata))?.File.Hash;
+            string? fileHashY = y.BeatmapSet.GetFile(getFilename(y.Metadata))?.File.Hash;
 
             return fileHashX == fileHashY;
         }

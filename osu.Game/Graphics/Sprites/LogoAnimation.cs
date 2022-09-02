@@ -3,10 +3,9 @@
 
 #nullable disable
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 
@@ -57,11 +56,11 @@ namespace osu.Game.Graphics.Sprites
                 progress = source.animationProgress;
             }
 
-            protected override void Blit(Action<TexturedVertex2D> vertexAction)
+            protected override void Blit(IRenderer renderer)
             {
-                Shader.GetUniform<float>("progress").UpdateValue(ref progress);
+                GetAppropriateShader(renderer).GetUniform<float>("progress").UpdateValue(ref progress);
 
-                base.Blit(vertexAction);
+                base.Blit(renderer);
             }
 
             protected override bool CanDrawOpaqueInterior => false;

@@ -118,7 +118,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                 // another async load might have completed before this one.
                 // if so, do not make any changes.
                 if (loadedPreview != previewTrack)
+                {
+                    loadedPreview.Dispose();
                     return;
+                }
 
                 AddInternal(loadedPreview);
                 toggleLoading(false);
