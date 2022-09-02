@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osuTK.Graphics;
 using osuTK;
 using System.Collections.Generic;
+using osu.Framework.Logging;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -39,10 +40,13 @@ namespace osu.Game.Rulesets.Catch.UI
         private ArrowHitbox leftDashBox = null!;
         private ArrowHitbox rightDashBox = null!;
 
+        // Force input to be prossed even when hidden.
+        public override bool PropagatePositionalInputSubTree => true;
+        public override bool PropagateNonPositionalInputSubTree => true;
+
         [BackgroundDependencyLoader]
         private void load(CatchInputManager catchInputManager, OsuColour colours)
         {
-            Show();
             Debug.Assert(catchInputManager.KeyBindingContainer != null);
 
             keyBindingContainer = catchInputManager.KeyBindingContainer;
@@ -121,7 +125,7 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             // Hide whenever the keyboard is used.
-            PopOut();
+            Hide();
             return false;
         }
 
@@ -143,19 +147,39 @@ namespace osu.Game.Rulesets.Catch.UI
             base.OnMouseUp(e);
         }
 
-        /* I plan to come back to this code to add touch support
-         * protected override void OnTouchMove(TouchMoveEvent e)
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            return true;
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            base.OnDragEnd(e);
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            // I'm not sure if this is posible but let's be safe
+            if (!trackedActions.ContainsKey(e.Button))
+                trackedActions.Add(e.Button, TouchCatchAction.None);
+
+            trackedActions[e.Button] = getTouchCatchActionFromInput(e.ScreenSpaceMousePosition);
+            calculateActiveKeys();
+
+            base.OnDrag(e);
+        }
+        protected override void OnTouchMove(TouchMoveEvent e)
         {
             // I'm not sure if this is posible but let's be safe
             if (!trackedActions.ContainsKey(e.Touch.Source))
                 trackedActions.Add(e.Touch.Source, TouchCatchAction.None);
 
-            trackedActions[e.Touch.Source] = getTouchCatchActionFromInput(e.MousePosition);
+            trackedActions[e.Touch.Source] = getTouchCatchActionFromInput(e.ScreenSpaceTouchDownPosition);
 
             calculateActiveKeys();
 
             base.OnTouchMove(e);
-        }*/
+        }
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
@@ -189,7 +213,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void handleDown(object source, Vector2 position)
         {
-            PopIn();
+            Show();
 
             TouchCatchAction catchAction = getTouchCatchActionFromInput(position);
 
@@ -217,8 +241,10 @@ namespace osu.Game.Rulesets.Catch.UI
             if (leftBox.Contains(inputPosition))
                 return TouchCatchAction.MoveLeft;
             if (rightBox.Contains(inputPosition))
+            {
+                Logger.Log(inputPosition.ToString());
                 return TouchCatchAction.MoveRight;
-
+            }
             return TouchCatchAction.None;
         }
 
@@ -255,18 +281,18 @@ namespace osu.Game.Rulesets.Catch.UI
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            overlay = new Box
-                            {
-                                Alpha = 0,
-                                Colour = colour.Multiply(1.4f).Darken(2.8f),
-                                Blending = BlendingParameters.Additive,
-                                Width = 1,
-                                RelativeSizeAxes = Axes.Both,
-                            },
                             new Box
                             {
                                 Alpha = 0.8f,
                                 Colour = colour,
+                                Width = 1,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            overlay = new Box
+                            {
+                                Alpha = 0,
+                                Colour = colour.Multiply(1.4f),
+                                Blending = BlendingParameters.Additive,
                                 Width = 1,
                                 RelativeSizeAxes = Axes.Both,
                             }
