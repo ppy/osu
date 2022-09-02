@@ -71,11 +71,12 @@ namespace osu.Game.Rulesets.Osu.UI
 
             osuInputManager.DragMode = sourceIndex >= last_concurrent_touch_index;
 
-            if (!isValidTouchInput(sourceIndex))
-                return false;
-
+            // A cursor touch is always a valid touch.
             if (isCursorTouch(source))
                 return base.OnTouchDown(e);
+
+            if (!isValidTouchInput(sourceIndex))
+                return false;
 
             var touchAction = touchTapActionsDictionary[source];
 
