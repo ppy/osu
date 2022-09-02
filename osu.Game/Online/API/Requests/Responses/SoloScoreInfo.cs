@@ -18,7 +18,7 @@ namespace osu.Game.Online.API.Requests.Responses
     [Serializable]
     public class SoloScoreInfo : IHasOnlineID<long>
     {
-        [JsonProperty("replay")]
+        [JsonProperty("has_replay")]
         public bool HasReplay { get; set; }
 
         [JsonProperty("beatmap_id")]
@@ -74,6 +74,18 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics { get; set; } = new Dictionary<HitResult, int>();
 
+        [JsonProperty("maximum_statistics")]
+        public Dictionary<HitResult, int> MaximumStatistics { get; set; } = new Dictionary<HitResult, int>();
+
+        /// <summary>
+        /// Used to preserve the total score for legacy scores.
+        /// </summary>
+        [JsonProperty("legacy_total_score")]
+        public int? LegacyTotalScore { get; set; }
+
+        [JsonProperty("legacy_score_id")]
+        public uint? LegacyScoreId { get; set; }
+
         #region osu-web API additions (not stored to database).
 
         [JsonProperty("id")]
@@ -108,7 +120,6 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool ShouldSerializeBeatmapSet() => false;
         public bool ShouldSerializePP() => false;
         public bool ShouldSerializeOnlineID() => false;
-        public bool ShouldSerializeHasReplay() => false;
 
         #endregion
 
@@ -153,6 +164,7 @@ namespace osu.Game.Online.API.Requests.Responses
             MaxCombo = MaxCombo,
             Rank = Rank,
             Statistics = Statistics,
+            MaximumStatistics = MaximumStatistics,
             Date = EndedAt,
             Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
             Mods = mods,
@@ -174,6 +186,7 @@ namespace osu.Game.Online.API.Requests.Responses
             Passed = score.Passed,
             Mods = score.APIMods,
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+            MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
         };
 
         public long OnlineID => ID ?? -1;
