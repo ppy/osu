@@ -83,7 +83,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Zoom feels better when applied over a longer period of time.
             // If using the `MovementDelay` it's visually abrupt.
-            playfield.Scale = new Vector2((float)Interpolation.DampContinuously(playfield.Scale.X, zoom, 2000, Math.Abs(playfield.Clock.ElapsedFrameTime)));
+            playfield.Scale = FinalZoomCombo.Value == 0
+                ? new Vector2((float)zoom)
+                : new Vector2((float)Interpolation.DampContinuously(playfield.Scale.X, zoom, 2000, Math.Abs(playfield.Clock.ElapsedFrameTime)));
 
             if (MovementDelay.Value == 0)
             {
