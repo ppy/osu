@@ -904,7 +904,7 @@ namespace osu.Game.Screens.Edit
             var current = playableBeatmap.BeatmapInfo;
             if (current is null) return;
 
-            beatmapManager.DeleteLocal(current);
+            beatmapManager.DeleteDifficultyImmediately(current);
             switchBeatmapOrExit(current.BeatmapSet);
         }
 
