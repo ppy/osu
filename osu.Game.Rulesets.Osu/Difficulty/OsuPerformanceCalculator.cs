@@ -270,8 +270,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
             }
 
-            // Clamp miss count since it's derived from combo and can be higher than total hits and that breaks some calculations
-            comboBasedMissCount = Math.Min(comboBasedMissCount, totalHits);
+            // Clamp miss count to maximum amount of possible breaks
+            comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss);
 
             return Math.Max(countMiss, comboBasedMissCount);
         }
