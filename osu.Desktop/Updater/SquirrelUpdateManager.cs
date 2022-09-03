@@ -6,8 +6,6 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Game;
@@ -15,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osuTK;
-using osuTK.Graphics;
 using Squirrel;
 using Squirrel.SimpleSplat;
 
@@ -177,17 +174,11 @@ namespace osu.Desktop.Updater
             {
                 IconContent.AddRange(new Drawable[]
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
-                    },
                     new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.Solid.Upload,
-                        Colour = Color4.White,
                         Size = new Vector2(20),
                     }
                 });
