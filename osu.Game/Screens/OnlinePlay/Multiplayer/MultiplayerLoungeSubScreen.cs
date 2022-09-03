@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             roomAccessTypeDropdown.Current.BindValueChanged(_ => UpdateFilter());
 
-            return base.CreateFilterControls().Prepend(roomAccessTypeDropdown);
+            return base.CreateFilterControls().Append(roomAccessTypeDropdown);
         }
 
         protected override FilterCriteria CreateFilterCriteria()
