@@ -170,7 +170,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
             availableTeams.Add(team);
 
-            RemoveAll(c => c is ScrollingTeam, false);
+            RemoveAll(c => c is ScrollingTeam, true);
             setScrollState(ScrollState.Idle);
         }
 
