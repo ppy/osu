@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual.Background
             => AddStep("create loader", () =>
             {
                 if (backgroundLoader != null)
-                    Remove(backgroundLoader);
+                    Remove(backgroundLoader, true);
 
                 Add(backgroundLoader = new SeasonalBackgroundLoader());
             });
