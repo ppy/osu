@@ -47,20 +47,11 @@ namespace osu.Game.Rulesets.Osu.UI
                 touchActions.Add(source, getTouchIndex(source) % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton);
         }
 
-        private bool isTapTouch(TouchSource source)
-        {
-            return CURSOR_TOUCH != source || !osuInputManager.AllowUserCursorMovement;
-        }
+        private bool isTapTouch(TouchSource source) => source != CURSOR_TOUCH || !osuInputManager.AllowUserCursorMovement;
 
-        private bool isCursorTouch(TouchSource source)
-        {
-            return !isTapTouch(source);
-        }
+        private bool isCursorTouch(TouchSource source) => !isTapTouch(source);
 
-        private bool isValidTouchInput(int index)
-        {
-            return index <= last_concurrent_touch_index;
-        }
+        private bool isValidTouchInput(int index) => index <= last_concurrent_touch_index;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
