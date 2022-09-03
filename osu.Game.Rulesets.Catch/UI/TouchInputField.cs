@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osuTK.Graphics;
 using osuTK;
 using System.Collections.Generic;
-using osu.Framework.Logging;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -174,8 +173,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!trackedActions.ContainsKey(e.Touch.Source))
                 trackedActions.Add(e.Touch.Source, TouchCatchAction.None);
 
-            trackedActions[e.Touch.Source] = getTouchCatchActionFromInput(e.ScreenSpaceTouchDownPosition);
-
+            trackedActions[e.Touch.Source] = getTouchCatchActionFromInput(e.ScreenSpaceTouch.Position);
             calculateActiveKeys();
 
             base.OnTouchMove(e);
@@ -183,7 +181,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
-            handleDown(e.Touch.Source, e.ScreenSpaceTouchDownPosition);
+            handleDown(e.Touch.Source, e.ScreenSpaceTouch.Position);
             return true;
         }
 
@@ -241,10 +239,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (leftBox.Contains(inputPosition))
                 return TouchCatchAction.MoveLeft;
             if (rightBox.Contains(inputPosition))
-            {
-                Logger.Log(inputPosition.ToString());
                 return TouchCatchAction.MoveRight;
-            }
             return TouchCatchAction.None;
         }
 
