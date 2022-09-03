@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.Containers
                 if (value == expandableHeader) return;
 
                 if (expandableHeader != null)
-                    RemoveInternal(expandableHeader);
+                    RemoveInternal(expandableHeader, false);
 
                 expandableHeader = value;
 
@@ -55,6 +55,7 @@ namespace osu.Game.Graphics.Containers
 
                 fixedHeader?.Expire();
                 fixedHeader = value;
+
                 if (value == null) return;
 
                 AddInternal(fixedHeader);
@@ -70,8 +71,10 @@ namespace osu.Game.Graphics.Containers
                 if (value == footer) return;
 
                 if (footer != null)
-                    scrollContainer.Remove(footer);
+                    scrollContainer.Remove(footer, false);
+
                 footer = value;
+
                 if (value == null) return;
 
                 footer.Anchor |= Anchor.y2;

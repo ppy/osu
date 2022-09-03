@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void loadStoryboard(IWorkingBeatmap working)
         {
             if (storyboard != null)
-                storyboardContainer.Remove(storyboard);
+                storyboardContainer.Remove(storyboard, true);
 
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void loadStoryboardNoVideo()
         {
             if (storyboard != null)
-                storyboardContainer.Remove(storyboard);
+                storyboardContainer.Remove(storyboard, true);
 
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
