@@ -35,10 +35,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly OsuInputManager osuInputManager;
 
-        private int getTouchIndex(TouchSource source)
-        {
-            return source - TouchSource.Touch1;
-        }
+        private int getTouchIndex(TouchSource source) => source - TouchSource.Touch1;
 
         public OsuDrawableTouchInputHandler(OsuInputManager inputManager)
         {
