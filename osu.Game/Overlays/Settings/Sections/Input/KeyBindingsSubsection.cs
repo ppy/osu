@@ -37,6 +37,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             string rulesetName = Ruleset?.ShortName;
 
+            var className = this.GetType().Name;
+
             var bindings = realm.Run(r => r.All<RealmKeyBinding>()
                                            .Where(b => b.RulesetName == rulesetName && b.Variant == variant)
                                            .Detach());
@@ -50,7 +52,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     AllowMainMouseButtons = Ruleset != null,
                     Defaults = defaultGroup.Select(d => d.KeyCombination),
-                    RulesetBindings = bindings
+                    RulesetBindings = className == "VariantBindingsSubsection" ? bindings : new List<RealmKeyBinding>()
                 });
             }
 
