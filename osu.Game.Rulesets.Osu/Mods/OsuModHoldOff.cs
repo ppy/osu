@@ -68,7 +68,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 else
                 {
                     double divisor = BeatDivisor.Value;
-                    if (s.Duration / point.BeatLength * divisor > MaxStreamLength.Value)
+                    // dur/BL*div is always lower than actual note count by 1, so using >=, not >.
+                    if (s.Duration / point.BeatLength * divisor >= MaxStreamLength.Value)
                         divisor /= 2d; // making stream slower twice, if it's longer than the limit.
                     newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertSliderToStream(s, point, divisor));
                 }
