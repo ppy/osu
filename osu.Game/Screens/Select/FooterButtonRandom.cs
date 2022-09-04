@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Select
                 {
                     randomSpriteText = new OsuSpriteText
                     {
-                        Font = OsuFont.TorusAlternate,
+                        Font = OsuFont.TorusAlternate.With(size: 16),
                         AlwaysPresent = true,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select
                     },
                     rewindSpriteText = new OsuSpriteText
                     {
-                        Font = OsuFont.TorusAlternate,
+                        Font = OsuFont.TorusAlternate.With(size: 16),
                         AlwaysPresent = true,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

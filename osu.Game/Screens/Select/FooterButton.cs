@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select
     public abstract class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float SHEAR_WIDTH = 7.5f;
-        public const float CORNER_RADIUS = 5;
+        private const float corner_radius = 7;
 
         protected Colour4 BaseColour = Colour4.FromHex("#394642");
         protected Colour4 ColourOnHover = Colour4.FromHex("#394642").Lighten(.1f);
@@ -41,21 +41,27 @@ namespace osu.Game.Screens.Select
 
         protected FillFlowContainer ButtonContentContainer;
         protected readonly Container TextContainer;
-        private readonly Container spriteContainer;
         private readonly SpriteText spriteText;
         private readonly Box box;
 
         protected FooterButton()
         {
-            AutoSizeAxes = Axes.Both;
+            Margin = new MarginPadding
+            {
+                Top = 30
+            };
+            AutoSizeAxes = Axes.X;
+            Height = 100;
             Shear = shear;
-            CornerRadius = CORNER_RADIUS;
+            Origin = Anchor.CentreLeft;
+            CornerRadius = corner_radius;
             Masking = true;
-            EdgeEffect = new EdgeEffectParameters()
+            Margin = new MarginPadding { Left = 5 };
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = new Colour4(0, 0, 0, 50),
-                Radius = 5
+                Radius = corner_radius
             };
 
             Children = new Drawable[]
@@ -78,10 +84,10 @@ namespace osu.Game.Screens.Select
                             Direction = FillDirection.Horizontal,
                             Shear = -shear,
                             AutoSizeAxes = Axes.X,
-                            Height = 70,
+                            Height = 100,
                             Children = new Drawable[]
                             {
-                                spriteContainer = new Container
+                                new Container
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
@@ -92,9 +98,10 @@ namespace osu.Game.Screens.Select
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     AutoSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Top = 5 },
                                     Child = spriteText = new OsuSpriteText
                                     {
-                                        Font = OsuFont.TorusAlternate,
+                                        Font = OsuFont.TorusAlternate.With(size: 16),
                                         AlwaysPresent = true,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
@@ -126,7 +133,7 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnHover(HoverEvent e)
         {
-            box.FadeColour(ColourOnHover, 200, Easing.OutQuint);
+            box.FadeColour(ColourOnHover, 0, Easing.OutQuint);
             Hovered?.Invoke();
             return true;
         }
@@ -137,34 +144,32 @@ namespace osu.Game.Screens.Select
             HoverLost?.Invoke();
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+
+        protected override bool OnClick(ClickEvent e)
         {
-            return base.OnMouseDown(e);
+            this.ScaleTo(.8f, 900, Easing.OutQuint);
+            return base.OnClick(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            box.FadeOut(Footer.TRANSITION_LENGTH, Easing.OutQuint);
+            this.ScaleTo(1.25f, 500, Easing.OutQuint);
+            box.FadeColour(Colour4.White).Then().FadeColour(BaseColour, 300);
             base.OnMouseUp(e);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            box.ClearTransforms();
-            box.Alpha = 1;
-            return base.OnClick(e);
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Action != Hotkey || e.Repeat) return false;
 
-
             TriggerClick();
-
             return true;
         }
 
-        public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
+        public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+            this.ScaleTo(1.25f, 500, Easing.OutQuint);
+            box.FadeColour(Colour4.White).Then().FadeColour(BaseColour, 300);
+        }
     }
 }
