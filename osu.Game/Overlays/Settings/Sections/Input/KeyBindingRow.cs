@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             };
 
             foreach (var b in bindings)
-                buttons.Add(new KeyButton(b));
+                buttons.Add(new KeyButton(b) { RulesetBindings = RulesetBindings });
 
             updateIsDefaultValue();
         }
@@ -206,6 +206,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         public bool AllowMainMouseButtons;
 
         public IEnumerable<KeyCombination> Defaults;
+
+        public List<RealmKeyBinding> RulesetBindings;
 
         private bool isModifier(Key k) => k < Key.F1;
 
@@ -447,6 +449,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             }
 
+            public List<RealmKeyBinding> RulesetBindings;
+
             public KeyButton(RealmKeyBinding keyBinding)
             {
                 if (keyBinding.IsManaged)
@@ -528,6 +532,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
                 if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
+                    return;
+
+                if (RulesetBindings.Select(k => k.KeyCombination).Contains(newCombination))
                     return;
 
                 KeyBinding.KeyCombination = newCombination;
