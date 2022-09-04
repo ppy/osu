@@ -4,10 +4,7 @@
 #nullable disable
 
 using System.Collections.Generic;
-using System.Linq;
 using osuTK;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -18,8 +15,6 @@ namespace osu.Game.Screens.Select
 {
     public class Footer : Container
     {
-        private readonly Box modeLight;
-
         public const float HEIGHT = 50;
 
         public const int TRANSITION_LENGTH = 300;
@@ -40,9 +35,6 @@ namespace osu.Game.Screens.Select
                 button.Action = () => showOverlay(overlay);
             }
 
-            button.Hovered = updateModeLight;
-            button.HoverLost = updateModeLight;
-
             buttons.Add(button);
         }
 
@@ -57,8 +49,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, Easing.OutQuint);
-
         public Footer()
         {
             RelativeSizeAxes = Axes.X;
@@ -71,13 +61,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = Vector2.One,
-                    Colour = Color4.Black.Opacity(0.5f),
-                },
-                modeLight = new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 3,
-                    Position = new Vector2(0, -3),
+                    Colour = Colour4.FromHex("#222A28")
                 },
                 new FillFlowContainer
                 {
@@ -99,8 +83,6 @@ namespace osu.Game.Screens.Select
                     }
                 }
             };
-
-            updateModeLight();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;

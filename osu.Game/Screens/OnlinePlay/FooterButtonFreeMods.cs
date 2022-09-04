@@ -6,7 +6,6 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
@@ -41,8 +40,8 @@ namespace osu.Game.Screens.OnlinePlay
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            SelectedColour = colours.Yellow;
-            DeselectedColour = SelectedColour.Opacity(0.5f);
+            ColourOnHover = colours.Yellow;
+            BaseColour = ColourOnHover.Opacity(0.5f);
             Text = @"freemods";
         }
 

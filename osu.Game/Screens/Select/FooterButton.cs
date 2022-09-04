@@ -6,84 +6,65 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
+    public abstract class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float SHEAR_WIDTH = 7.5f;
+        public const float CORNER_RADIUS = 5;
 
-        protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
+        protected Colour4 BaseColour = Colour4.FromHex("#394642");
+        protected Colour4 ColourOnHover = Colour4.FromHex("#394642").Lighten(.1f);
 
-        public LocalisableString Text
+        private static readonly Vector2 shear = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
+
+        protected LocalisableString Text
         {
-            get => SpriteText?.Text ?? default;
             set
             {
-                if (SpriteText != null)
-                    SpriteText.Text = value;
-            }
-        }
-
-        private Color4 deselectedColour;
-
-        public Color4 DeselectedColour
-        {
-            get => deselectedColour;
-            set
-            {
-                deselectedColour = value;
-                if (light.Colour != SelectedColour)
-                    light.Colour = value;
-            }
-        }
-
-        private Color4 selectedColour;
-
-        public Color4 SelectedColour
-        {
-            get => selectedColour;
-            set
-            {
-                selectedColour = value;
-                box.Colour = selectedColour;
+                if (spriteText != null)
+                    spriteText.Text = value;
             }
         }
 
         protected FillFlowContainer ButtonContentContainer;
         protected readonly Container TextContainer;
-        protected readonly SpriteText SpriteText;
+        private readonly Container spriteContainer;
+        private readonly SpriteText spriteText;
         private readonly Box box;
-        private readonly Box light;
 
-        public FooterButton()
+        protected FooterButton()
         {
             AutoSizeAxes = Axes.Both;
-            Shear = SHEAR;
+            Shear = shear;
+            CornerRadius = CORNER_RADIUS;
+            Masking = true;
+            EdgeEffect = new EdgeEffectParameters()
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = new Colour4(0, 0, 0, 50),
+                Radius = 5
+            };
+
             Children = new Drawable[]
             {
                 box = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     EdgeSmoothness = new Vector2(2, 0),
-                    Colour = Color4.White,
-                    Alpha = 0,
-                },
-                light = new Box
-                {
-                    Height = 4,
-                    EdgeSmoothness = new Vector2(2, 0),
-                    RelativeSizeAxes = Axes.X,
+                    Colour = BaseColour
                 },
                 new Container
                 {
@@ -95,19 +76,25 @@ namespace osu.Game.Screens.Select
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Direction = FillDirection.Horizontal,
-                            Shear = -SHEAR,
+                            Shear = -shear,
                             AutoSizeAxes = Axes.X,
-                            Height = 50,
-                            Spacing = new Vector2(15, 0),
+                            Height = 70,
                             Children = new Drawable[]
                             {
+                                spriteContainer = new Container
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                },
                                 TextContainer = new Container
                                 {
+                                    Colour = Colour4.White,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     AutoSizeAxes = Axes.Both,
-                                    Child = SpriteText = new OsuSpriteText
+                                    Child = spriteText = new OsuSpriteText
                                     {
+                                        Font = OsuFont.TorusAlternate,
                                         AlwaysPresent = true,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
@@ -139,22 +126,19 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnHover(HoverEvent e)
         {
+            box.FadeColour(ColourOnHover, 200, Easing.OutQuint);
             Hovered?.Invoke();
-            light.ScaleTo(new Vector2(1, 2), Footer.TRANSITION_LENGTH, Easing.OutQuint);
-            light.FadeColour(SelectedColour, Footer.TRANSITION_LENGTH, Easing.OutQuint);
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+            box.FadeColour(BaseColour, 500, Easing.OutQuint);
             HoverLost?.Invoke();
-            light.ScaleTo(new Vector2(1, 1), Footer.TRANSITION_LENGTH, Easing.OutQuint);
-            light.FadeColour(DeselectedColour, Footer.TRANSITION_LENGTH, Easing.OutQuint);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            box.FadeTo(0.3f, Footer.TRANSITION_LENGTH * 2, Easing.OutQuint);
             return base.OnMouseDown(e);
         }
 
@@ -168,19 +152,17 @@ namespace osu.Game.Screens.Select
         {
             box.ClearTransforms();
             box.Alpha = 1;
-            box.FadeOut(Footer.TRANSITION_LENGTH * 3, Easing.OutQuint);
             return base.OnClick(e);
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == Hotkey && !e.Repeat)
-            {
-                TriggerClick();
-                return true;
-            }
+            if (e.Action != Hotkey || e.Repeat) return false;
 
-            return false;
+
+            TriggerClick();
+
+            return true;
         }
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }

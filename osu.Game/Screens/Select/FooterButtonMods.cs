@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -42,7 +41,7 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.8f),
-                ExpansionMode = ExpansionMode.AlwaysContracted,
+                ExpansionMode = ExpansionMode.ExpandOnHover,
             });
             ButtonContentContainer.Add(MultiplierText = new OsuSpriteText
             {
@@ -55,11 +54,9 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            SelectedColour = colours.Yellow;
-            DeselectedColour = SelectedColour.Opacity(0.5f);
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
-            Text = @"mods";
+            Text = @"Mods";
             Hotkey = GlobalAction.ToggleModSelection;
         }
 

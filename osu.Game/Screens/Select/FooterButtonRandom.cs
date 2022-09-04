@@ -5,7 +5,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -28,11 +27,8 @@ namespace osu.Game.Screens.Select
         private bool rewindSearch;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            SelectedColour = colours.Green;
-            DeselectedColour = SelectedColour.Opacity(0.5f);
-
             TextContainer.Add(persistentText = new Container
             {
                 Anchor = Anchor.Centre,
@@ -43,17 +39,19 @@ namespace osu.Game.Screens.Select
                 {
                     randomSpriteText = new OsuSpriteText
                     {
+                        Font = OsuFont.TorusAlternate,
                         AlwaysPresent = true,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = "random",
+                        Text = "Random",
                     },
                     rewindSpriteText = new OsuSpriteText
                     {
+                        Font = OsuFont.TorusAlternate,
                         AlwaysPresent = true,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = "rewind",
+                        Text = "Rewind",
                         Alpha = 0f,
                     }
                 }
