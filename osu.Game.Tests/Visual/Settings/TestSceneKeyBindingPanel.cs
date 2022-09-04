@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("click first row with two bindings", () =>
             {
                 multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
-                InputManager.MoveMouseTo(multiBindingRow);
+                InputManager.MoveMouseTo(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First());
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -229,7 +229,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("click first row with two bindings", () =>
             {
                 multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
-                InputManager.MoveMouseTo(multiBindingRow);
+                InputManager.MoveMouseTo(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First());
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("click back binding row", () =>
             {
                 multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().ElementAt(10);
-                InputManager.MoveMouseTo(multiBindingRow);
+                InputManager.MoveMouseTo(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First());
                 InputManager.Click(MouseButton.Left);
             });
 
