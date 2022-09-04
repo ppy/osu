@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -48,6 +47,9 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         private readonly IReadOnlyList<HitEvent> hitEvents;
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         /// <summary>
         /// Creates a new <see cref="HitEventTimingDistributionGraph"/>.
         /// </summary>
@@ -57,7 +59,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit()).ToList();
         }
 
-        private int[] bins;
+        private IDictionary<HitResult, int>[] bins;
         private double binSize;
         private double hitOffset;
 
@@ -69,7 +71,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             if (hitEvents == null || hitEvents.Count == 0)
                 return;
 
-            bins = new int[total_timing_distribution_bins];
+            bins = Enumerable.Range(0, total_timing_distribution_bins).Select(_ => new Dictionary<HitResult, int>()).ToArray<IDictionary<HitResult, int>>();
 
             binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins);
 
@@ -89,7 +91,8 @@ namespace osu.Game.Screens.Ranking.Statistics
         {
             bool roundUp = true;
 
-            Array.Clear(bins, 0, bins.Length);
+            foreach (var bin in bins)
+                bin.Clear();
 
             foreach (var e in hitEvents)
             {
@@ -110,23 +113,29 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 // may be out of range when applying an offset. for such cases we can just drop the results.
                 if (index >= 0 && index < bins.Length)
-                    bins[index]++;
+                {
+                    bins[index].TryGetValue(e.Result, out int value);
+                    bins[index][e.Result] = ++value;
+                }
             }
 
             if (barDrawables != null)
             {
                 for (int i = 0; i < barDrawables.Length; i++)
                 {
-                    barDrawables[i].UpdateOffset(bins[i]);
+                    barDrawables[i].UpdateOffset(bins[i].Sum(b => b.Value));
                 }
             }
             else
             {
-                int maxCount = bins.Max();
+                int maxCount = bins.Max(b => b.Values.Sum());
                 barDrawables = new Bar[total_timing_distribution_bins];
 
                 for (int i = 0; i < barDrawables.Length; i++)
-                    barDrawables[i] = new Bar(bins[i], maxCount, i == timing_distribution_centre_bin_index);
+                {
+                    IReadOnlyList<BarValue> values = bins[i].Select(b => new BarValue(b.Key.OrderingIndex(), b.Value, colours.DrawForHitResult(b.Key))).OrderBy(b => b.Index).ToList();
+                    barDrawables[i] = new Bar(values, maxCount, i == timing_distribution_centre_bin_index);
+                }
 
                 Container axisFlow;
 
@@ -207,52 +216,102 @@ namespace osu.Game.Screens.Ranking.Statistics
             }
         }
 
+        private readonly struct BarValue
+        {
+            public readonly int Index;
+            public readonly float Value;
+            public readonly Color4 Colour;
+
+            public BarValue(int index, float value, Color4 colour)
+            {
+                Index = index;
+                Value = value;
+                Colour = colour;
+            }
+        }
+
         private class Bar : CompositeDrawable
         {
-            private readonly float value;
+            private float totalValue => values.Sum(v => v.Value);
+            private float basalHeight => BoundingBox.Width / BoundingBox.Height;
+            private float availableHeight => 1 - basalHeight;
+
+            private readonly IReadOnlyList<BarValue> values;
             private readonly float maxValue;
 
-            private readonly Circle boxOriginal;
+            private readonly Circle[] boxOriginals;
             private Circle boxAdjustment;
 
-            private const float minimum_height = 0.05f;
-
-            public Bar(float value, float maxValue, bool isCentre)
+            public Bar(IReadOnlyList<BarValue> values, float maxValue, bool isCentre)
             {
-                this.value = value;
+                this.values = values;
                 this.maxValue = maxValue;
 
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
 
-                InternalChildren = new Drawable[]
+                if (values.Any())
                 {
-                    boxOriginal = new Circle
+                    boxOriginals = values.Select(v => new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Colour = isCentre ? Color4.White : Color4Extensions.FromHex("#66FFCC"),
-                        Height = minimum_height,
-                    },
-                };
+                        Colour = isCentre ? Color4.White : v.Colour,
+                        Height = 0,
+                    }).ToArray();
+                    InternalChildren = boxOriginals.Reverse().ToArray();
+                }
+                else
+                {
+                    InternalChildren = boxOriginals = new[]
+                    {
+                        new Circle
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Colour = isCentre ? Color4.White : Color4.Gray,
+                            Height = 0,
+                        },
+                    };
+                }
             }
 
             private const double duration = 300;
+
+            private float offsetForValue(float value)
+            {
+                return availableHeight * value / maxValue;
+            }
+
+            private float heightForValue(float value)
+            {
+                return basalHeight + offsetForValue(value);
+            }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                float height = Math.Clamp(value / maxValue, minimum_height, 1);
+                float offsetValue = 0;
 
-                if (height > minimum_height)
-                    boxOriginal.ResizeHeightTo(height, duration, Easing.OutQuint);
+                if (values.Any())
+                {
+                    for (int i = 0; i < values.Count; i++)
+                    {
+                        boxOriginals[i].Y = BoundingBox.Height * offsetForValue(offsetValue);
+                        boxOriginals[i].Delay(duration * i).ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
+                        offsetValue -= values[i].Value;
+                    }
+                }
+                else
+                    boxOriginals.Single().ResizeHeightTo(basalHeight, duration, Easing.OutQuint);
             }
 
             public void UpdateOffset(float adjustment)
             {
-                bool hasAdjustment = adjustment != value && adjustment / maxValue >= minimum_height;
+                bool hasAdjustment = adjustment != totalValue;
 
                 if (boxAdjustment == null)
                 {
@@ -271,7 +330,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     });
                 }
 
-                boxAdjustment.ResizeHeightTo(Math.Clamp(adjustment / maxValue, minimum_height, 1), duration, Easing.OutQuint);
+                boxAdjustment.ResizeHeightTo(heightForValue(adjustment), duration, Easing.OutQuint);
                 boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
             }
         }
