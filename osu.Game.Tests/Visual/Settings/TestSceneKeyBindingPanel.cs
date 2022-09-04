@@ -67,6 +67,26 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
+        public void TestBindingLeftAndRightButtonWithTheSameKey()
+        {
+            scrollToAndStartBinding("Left button");
+            AddStep("bind z to left button", () => InputManager.Key(Key.Z));
+            scrollToAndStartBinding("Right button");
+            AddStep("bind z to right button", () => InputManager.Key(Key.Z));
+            compareBinding("Left button", "Right button");
+        }
+
+        [Test]
+        public void TestBindingLeftButtonAndRightAlternateButtonWithTheSameKey()
+        {
+            scrollToAndStartBinding("Left button");
+            AddStep("bind z to left button", () => InputManager.Key(Key.Z));
+            scrollToAndStartBindingAlternate("Right button");
+            AddStep("bind z to right button", () => InputManager.Key(Key.Z));
+            compareBindingAlternate("Left button", "Right button");
+        }
+
+        [Test]
         public void TestClickTwiceOnClearButton()
         {
             KeyBindingRow firstRow = null;
@@ -260,6 +280,34 @@ namespace osu.Game.Tests.Visual.Settings
             });
         }
 
+        private void compareBinding(string name1, string name2)
+        {
+            AddAssert($"Check if {name1} is not bound with the same key as {name2}", () =>
+            {
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name1));
+                var firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
+
+                var secondRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name2));
+                var secondButton = secondRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
+
+                return firstButton.Text.Text != secondButton.Text.Text;
+            });
+        }
+
+        private void compareBindingAlternate(string name1, string name2)
+        {
+            AddAssert($"Check if {name1} is not bound with the same key as {name2}", () =>
+            {
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name1));
+                var firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
+
+                var secondRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name2));
+                var secondButton = secondRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1);
+
+                return firstButton.Text.Text != secondButton.Text.Text;
+            });
+        }
+
         private void scrollToAndStartBinding(string name)
         {
             KeyBindingRow.KeyButton firstButton = null;
@@ -277,6 +325,27 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("click to bind", () =>
             {
                 InputManager.MoveMouseTo(firstButton);
+                InputManager.Click(MouseButton.Left);
+            });
+        }
+
+        private void scrollToAndStartBindingAlternate(string name)
+        {
+            KeyBindingRow.KeyButton secondButton = null;
+
+            AddStep($"Scroll to {name}", () =>
+            {
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
+                secondButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1);
+
+                panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollTo(secondButton);
+            });
+
+            AddWaitStep("wait for scroll", 5);
+
+            AddStep("click to bind", () =>
+            {
+                InputManager.MoveMouseTo(secondButton);
                 InputManager.Click(MouseButton.Left);
             });
         }
