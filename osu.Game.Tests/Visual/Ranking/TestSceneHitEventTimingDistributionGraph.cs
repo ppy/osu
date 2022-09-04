@@ -44,6 +44,50 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestSparse()
+        {
+            createTest(new List<HitEvent>
+            {
+                new HitEvent(-7, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(-6, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(-5, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(5, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(6, HitResult.Perfect, placeholder_object, placeholder_object, null),
+                new HitEvent(7, HitResult.Perfect, placeholder_object, placeholder_object, null),
+            });
+        }
+
+        [Test]
+        public void TestVariousTypesOfHitResult()
+        {
+            createTest(CreateDistributedHitEvents(0, 50).Select(h =>
+            {
+                var offset = Math.Abs(h.TimeOffset);
+                var result = offset > 36 ? HitResult.Miss : offset > 32 ? HitResult.Meh : offset > 24 ? HitResult.Ok : offset > 16 ? HitResult.Good : offset > 8 ? HitResult.Great : HitResult.Perfect;
+                return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
+            }).ToList());
+        }
+
+        [Test]
+        public void TestMultipleWindowsOfHitResult()
+        {
+            var wide = CreateDistributedHitEvents(0, 50).Select(h =>
+            {
+                var offset = Math.Abs(h.TimeOffset);
+                var result = offset > 36 ? HitResult.Miss : offset > 32 ? HitResult.Meh : offset > 24 ? HitResult.Ok : offset > 16 ? HitResult.Good : offset > 8 ? HitResult.Great : HitResult.Perfect;
+                return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
+            });
+            var narrow = CreateDistributedHitEvents(0, 50).Select(h =>
+            {
+                var offset = Math.Abs(h.TimeOffset);
+                var result = offset > 25 ? HitResult.Miss : offset > 20 ? HitResult.Meh : offset > 15 ? HitResult.Ok : offset > 10 ? HitResult.Good : offset > 5 ? HitResult.Great : HitResult.Perfect;
+                return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
+            });
+            createTest(wide.Concat(narrow).ToList());
+        }
+
+
+        [Test]
         public void TestZeroTimeOffset()
         {
             createTest(Enumerable.Range(0, 100).Select(_ => new HitEvent(0, HitResult.Perfect, placeholder_object, placeholder_object, null)).ToList());
