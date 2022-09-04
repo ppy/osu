@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                 double positionWithRepeats = (time - slider.StartTime) / slider.Duration * slider.SpanCount();
                 double pathPosition = positionWithRepeats - (int)positionWithRepeats;
                 // every second span is in the reverse direction - need to reverse the path position.
-                if (Precision.AlmostBigger(positionWithRepeats % 2, 1))
+                if (positionWithRepeats % 2d >= 1d)
                     pathPosition = 1 - pathPosition;
 
                 Vector2 position = slider.Position + slider.Path.PositionAt(pathPosition);
