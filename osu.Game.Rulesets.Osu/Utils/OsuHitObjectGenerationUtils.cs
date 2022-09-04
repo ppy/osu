@@ -233,5 +233,71 @@ namespace osu.Game.Rulesets.Osu.Utils
                 time = slider.StartTime + i * streamSpacing;
             }
         }
+
+        /// <summary>
+        /// A special version of <see cref="ConvertSliderToStream"/>. Generates more playable pattern for short sliders with multiple repeats.
+        /// </summary>
+        /// <param name="slider">Slider to convert.</param>
+        /// <param name="timingPoint">Timing point in which the slider is placed.</param>
+        /// <param name="spacing">Beat divisor to place objects on.</param>
+        /// <returns>List of circles.</returns>
+        public static IEnumerable<HitCircle> ConvertKickSliderToBurst(Slider slider, TimingControlPoint timingPoint, int spacing)
+        {
+            double streamSpacing = timingPoint.BeatLength / spacing;
+
+            if (slider.RepeatCount % 2 == 1)
+            {
+                // slider head and tail are in the same place - creating a stack.
+
+                int i = 0;
+                double time = slider.StartTime;
+
+                while (!Precision.DefinitelyBigger(time, slider.GetEndTime(), 1))
+                {
+                    var samplePoint = (SampleControlPoint)slider.SampleControlPoint.DeepClone();
+                    samplePoint.Time = time;
+
+                    yield return new HitCircle
+                    {
+                        StartTime = time,
+                        Position = slider.Position,
+                        NewCombo = i == 0 && slider.NewCombo,
+                        SampleControlPoint = samplePoint,
+                        Samples = slider.HeadCircle.Samples.Select(s => s.With()).ToList()
+                    };
+
+                    i += 1;
+                    time = slider.StartTime + i * streamSpacing;
+                }
+            }
+            else
+            {
+                // slider head and tail are different - creating a compressed stream
+
+                int i = 0;
+                double time = slider.StartTime;
+
+                while (!Precision.DefinitelyBigger(time, slider.GetEndTime(), 1))
+                {
+                    double pathPosition = (time - slider.StartTime) / slider.Duration;
+                    Vector2 position = slider.Position + slider.Path.PositionAt(pathPosition);
+
+                    var samplePoint = (SampleControlPoint)slider.SampleControlPoint.DeepClone();
+                    samplePoint.Time = time;
+
+                    yield return new HitCircle
+                    {
+                        StartTime = time,
+                        Position = position,
+                        NewCombo = i == 0 && slider.NewCombo,
+                        SampleControlPoint = samplePoint,
+                        Samples = slider.HeadCircle.Samples.Select(s => s.With()).ToList()
+                    };
+
+                    i += 1;
+                    time = slider.StartTime + i * streamSpacing;
+                }
+            }
+        }
     }
 }

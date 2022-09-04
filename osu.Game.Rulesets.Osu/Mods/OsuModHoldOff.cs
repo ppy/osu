@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -47,7 +48,16 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     var point = beatmap.ControlPointInfo.TimingPointAt(s.StartTime);
                     s.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
-                    newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertSliderToStream(s, point, BeatDivisor.Value));
+
+                    // SpanDuration <= beat/(divisor/2) && has repeats
+                    if (!Precision.DefinitelyBigger(s.SpanDuration, point.BeatLength * 2d / BeatDivisor.Value) && s.RepeatCount > 0)
+                    {
+                        newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertKickSliderToBurst(s, point, BeatDivisor.Value));
+                    }
+                    else
+                    {
+                        newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertSliderToStream(s, point, BeatDivisor.Value));
+                    }
                 }
                 else
                 {
