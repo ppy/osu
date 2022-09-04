@@ -436,6 +436,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             private bool isBinding;
 
+            private bool isBindingInvalid = false;
+
             public bool IsBinding
             {
                 get => isBinding;
@@ -522,9 +524,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     box.FadeColour(colourProvider.Light2, transition_time, Easing.OutQuint);
                     Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
                 }
+                else if (isBindingInvalid)
+                {
+                    box.FadeColour(Color4.Red, transition_time, Easing.OutQuint);
+                }
                 else
                 {
-                    box.FadeColour(IsHovered ? colourProvider.Light4 : colourProvider.Background6, transition_time, Easing.OutQuint);
+                    box.FadeColour(IsHovered ? colourProvider.Light4 : colourProvider.Background6, transition_time, Easing.InOutBounce);
                     Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
                 }
             }
@@ -534,9 +540,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
                     return;
 
-                if (RulesetBindings.Select(k => k.KeyCombination).Contains(newCombination))
+                if (KeyBinding.RulesetName != null && RulesetBindings.Select(k => k.KeyCombination).Contains(newCombination))
+                {
+                    isBindingInvalid = true;
                     return;
+                }
 
+                isBindingInvalid = false;
                 KeyBinding.KeyCombination = newCombination;
                 updateKeyCombinationText();
             }
