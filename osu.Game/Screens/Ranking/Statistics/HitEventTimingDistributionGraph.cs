@@ -278,7 +278,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
             }
 
-            private const double duration = 300;
+            private const double total_duration = 300;
+
+            private double duration => total_duration / Math.Max(values.Count, 1);
 
             private float offsetForValue(float value)
             {
