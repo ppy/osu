@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override LocalisableString Description => @"Converts all sliders to streams.";
+        public override LocalisableString Description => @"Convert all sliders to streams.";
 
         public override ModType Type => ModType.Conversion;
 
