@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Select
     {
         public const float SHEAR_WIDTH = 7.5f;
         private const float corner_radius = 7;
+        private const int ease_out_time = 250;
 
         protected Colour4 BaseColour = Colour4.FromHex("#394642");
         protected Colour4 ColourOnHover = Colour4.FromHex("#394642").Lighten(.1f);
@@ -43,20 +44,16 @@ namespace osu.Game.Screens.Select
         protected readonly Container TextContainer;
         private readonly SpriteText spriteText;
         private readonly Box box;
+        private readonly Box colouredBox;
 
         protected FooterButton()
         {
-            Margin = new MarginPadding
-            {
-                Top = 30
-            };
-            AutoSizeAxes = Axes.X;
-            Height = 100;
+            Anchor = Anchor.BottomLeft;
+            AutoSizeAxes = Axes.Both;
             Shear = shear;
-            Origin = Anchor.CentreLeft;
             CornerRadius = corner_radius;
             Masking = true;
-            Margin = new MarginPadding { Left = 5 };
+            Margin = new MarginPadding { Left = 5, Top = -20 };
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
@@ -69,8 +66,28 @@ namespace osu.Game.Screens.Select
                 box = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    EdgeSmoothness = new Vector2(2, 0),
-                    Colour = BaseColour
+                    Colour = BaseColour,
+                    Depth = 2
+                },
+                new Container
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Height = 30,
+                    Width = 60,
+                    CornerRadius = corner_radius,
+                    Masking = true,
+                    Children = new Drawable[]
+                    {
+                        colouredBox = new Box
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Colour4.Aqua,
+                            Depth = 1,
+                        }
+                    }
                 },
                 new Container
                 {
@@ -79,6 +96,7 @@ namespace osu.Game.Screens.Select
                     {
                         ButtonContentContainer = new FillFlowContainer
                         {
+                            CornerRadius = CornerRadius,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Direction = FillDirection.Horizontal,
@@ -144,17 +162,16 @@ namespace osu.Game.Screens.Select
             HoverLost?.Invoke();
         }
 
-
-        protected override bool OnClick(ClickEvent e)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             this.ScaleTo(.8f, 900, Easing.OutQuint);
-            return base.OnClick(e);
+            return base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            this.ScaleTo(1.25f, 500, Easing.OutQuint);
-            box.FadeColour(Colour4.White).Then().FadeColour(BaseColour, 300);
+            this.ScaleTo(1, ease_out_time, Easing.OutBounce);
+            box.FadeColour(Colour4.White).Then().FadeColour(BaseColour, ease_out_time);
             base.OnMouseUp(e);
         }
 
@@ -162,14 +179,15 @@ namespace osu.Game.Screens.Select
         {
             if (e.Action != Hotkey || e.Repeat) return false;
 
+            this.ScaleTo(.8f, 900, Easing.OutQuint);
             TriggerClick();
             return true;
         }
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            this.ScaleTo(1.25f, 500, Easing.OutQuint);
-            box.FadeColour(Colour4.White).Then().FadeColour(BaseColour, 300);
+            this.ScaleTo(1, ease_out_time, Easing.OutBounce);
+            box.FadeColour(Colour4.White).Then().FadeColour(BaseColour, ease_out_time);
         }
     }
 }
