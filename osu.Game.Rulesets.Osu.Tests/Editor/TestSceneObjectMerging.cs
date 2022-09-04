@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("add two circles on the same position", () =>
             {
                 circle1 = new HitCircle();
-                circle2 = new HitCircle { Position = circle1.Position + Vector2.UnitX, StartTime = 1 };
+                circle2 = new HitCircle { Position = circle1.Position + Vector2.UnitX };
                 EditorClock.Seek(0);
                 EditorBeatmap.Add(circle1);
                 EditorBeatmap.Add(circle2);
@@ -203,6 +203,33 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             mergeSelection();
             AddAssert("circles not merged", () => circle1 is not null && circle2 is not null
                                                                       && EditorBeatmap.HitObjects.Contains(circle1) && EditorBeatmap.HitObjects.Contains(circle2));
+        }
+
+        [Test]
+        public void TestSameStartTimeMerge()
+        {
+            HitCircle? circle1 = null;
+            HitCircle? circle2 = null;
+
+            AddStep("add two circles at the same time", () =>
+            {
+                circle1 = new HitCircle();
+                circle2 = new HitCircle { Position = circle1.Position + 100 * Vector2.UnitX };
+                EditorClock.Seek(0);
+                EditorBeatmap.Add(circle1);
+                EditorBeatmap.Add(circle2);
+                EditorBeatmap.SelectedHitObjects.Add(circle1);
+                EditorBeatmap.SelectedHitObjects.Add(circle2);
+            });
+
+            moveMouseToHitObject(1);
+            AddAssert("merge option available", () => selectionHandler.ContextMenuItems.Any(o => o.Text.Value == "Merge selection"));
+
+            mergeSelection();
+
+            AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
+                (pos: circle1.Position, pathType: PathType.Linear),
+                (pos: circle2.Position, pathType: null)));
         }
 
         private void mergeSelection()
