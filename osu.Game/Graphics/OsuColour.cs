@@ -102,7 +102,7 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Retrieves the colour for a <see cref="HitResult"/>.
         /// </summary>
-        public Color4 ForHitResult(HitResult judgement)
+        public Color4 TextForHitResult(HitResult judgement)
         {
             switch (judgement)
             {
@@ -122,6 +122,34 @@ namespace osu.Game.Graphics
 
                 default:
                     return Color4.White;
+            }
+        }
+
+        public Color4 DrawForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
+                case HitResult.Miss:
+                    return Red;
+
+                case HitResult.Meh:
+                    return Yellow;
+
+                case HitResult.Ok:
+                    return Green;
+
+                case HitResult.Good:
+                    return GreenLight;
+
+                case HitResult.SmallTickHit:
+                case HitResult.LargeTickHit:
+                case HitResult.Great:
+                    return Blue;
+
+                default:
+                    return BlueLight;
             }
         }
 
