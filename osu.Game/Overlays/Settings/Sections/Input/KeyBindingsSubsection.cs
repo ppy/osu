@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             string rulesetName = Ruleset?.ShortName;
 
-            var className = this.GetType().Name;
+            var className = GetType().Name;
 
             var bindings = realm.Run(r => r.All<RealmKeyBinding>()
                                            .Where(b => b.RulesetName == rulesetName && b.Variant == variant)
