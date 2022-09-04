@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Judgements
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = Result.GetDescription().ToUpperInvariant(),
-                    Colour = colours.ForHitResult(Result),
+                    Colour = colours.TextForHitResult(Result),
                     Font = OsuFont.Numeric.With(size: 20),
                     Scale = new Vector2(0.85f, 1),
                 }
