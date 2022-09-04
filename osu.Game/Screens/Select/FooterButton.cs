@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Select
 
         protected Colour4 BaseColour = Colour4.FromHex("#394642");
         protected Colour4 ColourOnHover = Colour4.FromHex("#394642").Lighten(.1f);
+        public Colour4 ButtonTypeColour = Colour4.DarkRed;
 
         private static readonly Vector2 shear = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
@@ -73,7 +74,7 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Height = 30,
+                    Height = 40,
                     Width = 60,
                     CornerRadius = corner_radius,
                     Masking = true,
@@ -84,7 +85,7 @@ namespace osu.Game.Screens.Select
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Colour4.Aqua,
+                            Colour = ButtonTypeColour,
                             Depth = 1,
                         }
                     }
@@ -116,7 +117,7 @@ namespace osu.Game.Screens.Select
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     AutoSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Top = 5 },
+                                    Padding = new MarginPadding { Top = -5 },
                                     Child = spriteText = new OsuSpriteText
                                     {
                                         Font = OsuFont.TorusAlternate.With(size: 16),
