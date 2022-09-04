@@ -205,6 +205,8 @@ namespace osu.Game.Rulesets.Osu.Utils
             int i = 0;
             double time = slider.StartTime;
 
+            List<HitCircle> hitCircles = new List<HitCircle>((int)Math.Ceiling(slider.Duration / timingPoint.BeatLength * spacing));
+
             while (!Precision.DefinitelyBigger(time, slider.GetEndTime(), 1))
             {
                 // positionWithRepeats is a fractional number in the range of [0, HitObject.SpanCount()]
@@ -220,18 +222,20 @@ namespace osu.Game.Rulesets.Osu.Utils
                 var samplePoint = (SampleControlPoint)slider.SampleControlPoint.DeepClone();
                 samplePoint.Time = time;
 
-                yield return new HitCircle
+                hitCircles.Add(new HitCircle
                 {
                     StartTime = time,
                     Position = position,
                     NewCombo = i == 0 && slider.NewCombo,
                     SampleControlPoint = samplePoint,
                     Samples = slider.HeadCircle.Samples.Select(s => s.With()).ToList()
-                };
+                });
 
                 i += 1;
                 time = slider.StartTime + i * streamSpacing;
             }
+
+            return hitCircles;
         }
 
         /// <summary>
