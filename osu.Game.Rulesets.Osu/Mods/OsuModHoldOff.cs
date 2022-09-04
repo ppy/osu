@@ -36,6 +36,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 16
         };
 
+        [SettingSource("Maximum stream length", "Streams longer than this value will be lightened.")]
+        public BindableInt MaxStreamLength { get; } = new BindableInt(16)
+        {
+            MinValue = 5,
+            MaxValue = 100,
+        };
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var osuBeatmap = (OsuBeatmap)beatmap;
@@ -44,24 +51,26 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             foreach (var hitObject in osuBeatmap.HitObjects)
             {
-                if (hitObject is Slider s)
+                if (hitObject is not Slider s)
                 {
-                    var point = beatmap.ControlPointInfo.TimingPointAt(s.StartTime);
-                    s.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+                    newObjects.Add(hitObject);
+                    continue;
+                }
 
-                    // SpanDuration <= beat/(divisor/2) && has repeats
-                    if (!Precision.DefinitelyBigger(s.SpanDuration, point.BeatLength * 2d / BeatDivisor.Value) && s.RepeatCount > 0)
-                    {
-                        newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertKickSliderToBurst(s, point, BeatDivisor.Value));
-                    }
-                    else
-                    {
-                        newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertSliderToStream(s, point, BeatDivisor.Value));
-                    }
+                var point = beatmap.ControlPointInfo.TimingPointAt(s.StartTime);
+                s.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+                // SpanDuration <= beat/(divisor/2) && has repeats - likely a kickslider, using another method.
+                if (!Precision.DefinitelyBigger(s.SpanDuration, point.BeatLength * 2d / BeatDivisor.Value) && s.RepeatCount > 0)
+                {
+                    newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertKickSliderToBurst(s, point, BeatDivisor.Value));
                 }
                 else
                 {
-                    newObjects.Add(hitObject);
+                    double divisor = BeatDivisor.Value;
+                    if (s.Duration / point.BeatLength * divisor > MaxStreamLength.Value)
+                        divisor /= 2d; // making stream slower twice, if it's longer than the limit.
+                    newObjects.AddRange(OsuHitObjectGenerationUtils.ConvertSliderToStream(s, point, divisor));
                 }
             }
 

@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <param name="timingPoint">Timing point in which the slider is placed.</param>
         /// <param name="spacing">Beat divisor to place objects on.</param>
         /// <returns>List of circles.</returns>
-        public static IEnumerable<HitCircle> ConvertSliderToStream(Slider slider, TimingControlPoint timingPoint, int spacing)
+        public static IEnumerable<HitCircle> ConvertSliderToStream(Slider slider, TimingControlPoint timingPoint, double spacing)
         {
             double streamSpacing = timingPoint.BeatLength / spacing;
 
@@ -241,7 +241,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <param name="timingPoint">Timing point in which the slider is placed.</param>
         /// <param name="spacing">Beat divisor to place objects on.</param>
         /// <returns>List of circles.</returns>
-        public static IEnumerable<HitCircle> ConvertKickSliderToBurst(Slider slider, TimingControlPoint timingPoint, int spacing)
+        public static IEnumerable<HitCircle> ConvertKickSliderToBurst(Slider slider, TimingControlPoint timingPoint, double spacing)
         {
             double streamSpacing = timingPoint.BeatLength / spacing;
 
