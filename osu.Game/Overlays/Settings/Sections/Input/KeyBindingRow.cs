@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             };
 
             foreach (var b in bindings)
-                buttons.Add(new KeyButton(b) { RulesetBindings = RulesetBindings });
+                buttons.Add(new KeyButton(b));
 
             updateIsDefaultValue();
         }
@@ -206,9 +206,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         public bool AllowMainMouseButtons;
 
         public IEnumerable<KeyCombination> Defaults;
-
-        public List<RealmKeyBinding> RulesetBindings;
-
+        
         private bool isModifier(Key k) => k < Key.F1;
 
         protected override bool OnClick(ClickEvent e) => true;
@@ -436,8 +434,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             private bool isBinding;
 
-            private bool isBindingInvalid = false;
-
             public bool IsBinding
             {
                 get => isBinding;
@@ -451,7 +447,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             }
 
-            public List<RealmKeyBinding> RulesetBindings;
+            private bool isBindingInvalid = false;
+
+            [Resolved]
+            private RealmAccess realm { get; set; }
+
+            private List<RealmKeyBinding> rulesetBindings;
 
             public KeyButton(RealmKeyBinding keyBinding)
             {
@@ -502,6 +503,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             [BackgroundDependencyLoader]
             private void load()
             {
+                rulesetBindings = realm.Run(r => r.All<RealmKeyBinding>()
+                                           .Where(b => b.RulesetName == KeyBinding.RulesetName && b.Variant == KeyBinding.Variant)
+                                           .Detach());
+
                 updateHoverState();
             }
 
@@ -540,7 +545,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
                     return;
 
-                if (KeyBinding.RulesetName != null && RulesetBindings.Select(k => k.KeyCombination).Contains(newCombination))
+                if (KeyBinding.RulesetName != null && rulesetBindings.Select(k => k.KeyCombination).Contains(newCombination))
                 {
                     isBindingInvalid = true;
                     return;
