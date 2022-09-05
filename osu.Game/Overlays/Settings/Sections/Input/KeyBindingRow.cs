@@ -226,7 +226,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             }
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.CheckAndUpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
             return true;
         }
 
@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState, e.ScrollDelta));
+                    bindTarget.CheckAndUpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState, e.ScrollDelta));
                     finalise();
                     return true;
                 }
@@ -266,7 +266,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.CheckAndUpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
             if (!isModifier(e.Key)) finalise();
 
             return true;
@@ -288,7 +288,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.CheckAndUpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
             finalise();
 
             return true;
@@ -310,7 +310,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.CheckAndUpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
             finalise();
 
             return true;
@@ -447,12 +447,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             }
 
-            private bool isBindingInvalid = false;
+            private bool isBindingInvalid;
 
             [Resolved]
             private RealmAccess realm { get; set; }
-
-            private List<RealmKeyBinding> rulesetBindings;
 
             public KeyButton(RealmKeyBinding keyBinding)
             {
@@ -503,10 +501,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             [BackgroundDependencyLoader]
             private void load()
             {
-                rulesetBindings = realm.Run(r => r.All<RealmKeyBinding>()
-                                           .Where(b => b.RulesetName == KeyBinding.RulesetName && b.Variant == KeyBinding.Variant)
-                                           .Detach());
-
                 updateHoverState();
             }
 
@@ -531,7 +525,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
                 else if (isBindingInvalid)
                 {
-                    box.FadeColour(Color4.Red, transition_time, Easing.OutQuint);
+                    box.FlashColour(Color4.Red, 800, Easing.InElastic).Loop(0, 5);
+                    isBindingInvalid = false;
                 }
                 else
                 {
@@ -540,10 +535,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             }
 
-            public void UpdateKeyCombination(KeyCombination newCombination)
+            public void CheckAndUpdateKeyCombination(KeyCombination newCombination)
             {
-                if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
-                    return;
+                var rulesetBindings = realm.Run(r => r.All<RealmKeyBinding>()
+                                           .Where(b => b.RulesetName == KeyBinding.RulesetName && b.Variant == KeyBinding.Variant)
+                                           .Detach());
 
                 if (KeyBinding.RulesetName != null && rulesetBindings.Select(k => k.KeyCombination).Contains(newCombination))
                 {
@@ -552,6 +548,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
 
                 isBindingInvalid = false;
+
+                UpdateKeyCombination(newCombination);
+            }
+
+            public void UpdateKeyCombination(KeyCombination newCombination)
+            {
+                if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
+                    return;
+                
                 KeyBinding.KeyCombination = newCombination;
                 updateKeyCombinationText();
             }
