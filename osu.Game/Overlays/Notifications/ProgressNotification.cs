@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Notifications
             base.LoadComplete();
 
             // we may have received changes before we were displayed.
-            updateState();
+            Scheduler.AddOnce(updateState);
         }
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -87,13 +87,8 @@ namespace osu.Game.Overlays.Notifications
 
                 state = value;
 
-                if (IsLoaded)
-                {
-                    Schedule(updateState);
-
-                    if (state == ProgressNotificationState.Completed)
-                        CompletionTarget?.Invoke(CreateCompletionNotification());
-                }
+                Scheduler.AddOnce(updateState);
+                attemptPostCompletion();
             }
         }
 
@@ -146,9 +141,31 @@ namespace osu.Game.Overlays.Notifications
 
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
+                    attemptPostCompletion();
                     base.Close();
                     break;
             }
+        }
+
+        private bool completionSent;
+
+        /// <summary>
+        /// Attempt to post a completion notification.
+        /// </summary>
+        private void attemptPostCompletion()
+        {
+            if (state != ProgressNotificationState.Completed) return;
+
+            // This notification may not have been posted yet (and thus may not have a target to post the completion to).
+            // Completion posting will be re-attempted in a scheduled invocation.
+            if (CompletionTarget == null)
+                return;
+
+            if (completionSent)
+                return;
+
+            CompletionTarget.Invoke(CreateCompletionNotification());
+            completionSent = true;
         }
 
         private ProgressNotificationState state;
