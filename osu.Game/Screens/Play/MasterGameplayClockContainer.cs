@@ -238,10 +238,13 @@ namespace osu.Game.Screens.Play
         void IAdjustableAudioComponent.RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) =>
             track.RemoveAdjustment(type, adjustBindable);
 
-        public void RemoveAllAdjustments(AdjustableProperty type)
+        public override void ResetSpeedAdjustments()
         {
-            throw new NotImplementedException();
+            track.RemoveAllAdjustments(AdjustableProperty.Frequency);
+            track.RemoveAllAdjustments(AdjustableProperty.Tempo);
         }
+
+        public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotImplementedException();
 
         public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
         public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
