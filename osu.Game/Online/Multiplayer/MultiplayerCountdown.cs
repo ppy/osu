@@ -29,5 +29,10 @@ namespace osu.Game.Online.Multiplayer
         /// </remarks>
         [Key(1)]
         public TimeSpan TimeRemaining { get; set; }
+
+        /// <summary>
+        /// Whether only a single instance of this <see cref="MultiplayerCountdown"/> type may be active at any one time.
+        /// </summary>
+        public virtual bool IsExclusive => false;
     }
 }
