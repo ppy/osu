@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Play
@@ -225,22 +224,6 @@ namespace osu.Game.Screens.Play
 
         public FrameTimeInfo TimeInfo => GameplayClock.TimeInfo;
 
-        public double TrueGameplayRate
-        {
-            get
-            {
-                double baseRate = Rate;
-
-                foreach (double adjustment in NonGameplayAdjustments)
-                {
-                    if (Precision.AlmostEquals(adjustment, 0))
-                        return 0;
-
-                    baseRate /= adjustment;
-                }
-
-                return baseRate;
-            }
-        }
+        public virtual double TrueGameplayRate => Rate;
     }
 }
