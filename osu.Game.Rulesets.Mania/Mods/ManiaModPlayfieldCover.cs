@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Objects;
@@ -13,9 +14,11 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public abstract class ManiaModPlayfieldCover : ModHidden, IApplicableToDrawableRuleset<ManiaHitObject>
+    public abstract class ManiaModPlayfieldCover : ModHidden, IApplicableToDrawableRuleset<ManiaHitObject>, ICanBeToggledDuringReplay
     {
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
+
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         /// <summary>
         /// The direction in which the cover should expand.
@@ -30,14 +33,19 @@ namespace osu.Game.Rulesets.Mania.Mods
             {
                 HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
                 Container hocParent = (Container)hoc.Parent;
+                PlayfieldCoveringWrapper pcw;
 
                 hocParent.Remove(hoc);
-                hocParent.Add(new PlayfieldCoveringWrapper(hoc).With(c =>
+                hocParent.Add(pcw = new PlayfieldCoveringWrapper(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Direction = ExpandDirection;
                     c.Coverage = 0.5f;
                 }));
+                IsDisabled.BindValueChanged(s =>
+                {
+                    pcw.Coverage = s.NewValue ? 0f : 0.5f;
+                });
             }
         }
 
