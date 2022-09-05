@@ -88,7 +88,12 @@ namespace osu.Game.Overlays.Notifications
                 state = value;
 
                 if (IsLoaded)
+                {
                     Schedule(updateState);
+
+                    if (state == ProgressNotificationState.Completed)
+                        CompletionTarget?.Invoke(CreateCompletionNotification());
+                }
             }
         }
 
@@ -141,7 +146,7 @@ namespace osu.Game.Overlays.Notifications
 
                 case ProgressNotificationState.Completed:
                     loadingSpinner.Hide();
-                    Completed();
+                    base.Close();
                     break;
             }
         }
@@ -153,12 +158,6 @@ namespace osu.Game.Overlays.Notifications
             Activated = CompletionClickAction,
             Text = CompletionText
         };
-
-        protected void Completed()
-        {
-            CompletionTarget?.Invoke(CreateCompletionNotification());
-            base.Close();
-        }
 
         public override bool DisplayOnTop => false;
 

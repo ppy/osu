@@ -71,7 +71,6 @@ namespace osu.Game.Overlays
                 },
                 mainContent = new Container
                 {
-                    AlwaysPresent = true,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
@@ -137,9 +136,9 @@ namespace osu.Game.Overlays
 
         private readonly Scheduler postScheduler = new Scheduler();
 
-        public override bool IsPresent => base.IsPresent
-                                          || postScheduler.HasPendingTasks
-                                          || toastTray.IsDisplayingToasts;
+        public override bool IsPresent =>
+            // Delegate presence as we need to consider the toast tray in addition to the main overlay.
+            State.Value == Visibility.Visible || mainContent.IsPresent || toastTray.IsPresent || postScheduler.HasPendingTasks;
 
         private bool processingPosts = true;
 
