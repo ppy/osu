@@ -35,13 +35,14 @@ namespace osu.Game.Rulesets.Mania.Mods
                 Container hocParent = (Container)hoc.Parent;
                 PlayfieldCoveringWrapper pcw;
 
-                hocParent.Remove(hoc);
+                hocParent.Remove(hoc, false);
                 hocParent.Add(pcw = new PlayfieldCoveringWrapper(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Direction = ExpandDirection;
                     c.Coverage = 0.5f;
                 }));
+
                 IsDisabled.BindValueChanged(s =>
                 {
                     pcw.Coverage = s.NewValue ? 0f : 0.5f;
