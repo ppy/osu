@@ -40,20 +40,25 @@ namespace osu.Game.Screens.Select
             ButtonContentContainer.Add(modDisplay = new ModDisplay
             {
                 Shear = -SHEAR,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
                 Scale = new Vector2(0.8f),
+                Margin = new MarginPadding
+                {
+                    Top = 41.89f,
+                },
                 ExpansionMode = ExpansionMode.ExpandOnHover,
             });
             ButtonContentContainer.Add(MultiplierText = new OsuSpriteText
             {
-                Shear = -SHEAR,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
                 Margin = new MarginPadding
                 {
-                    Top = -3,
+                    Top = 41.89f,
+                    Right = 10,
                 },
+                Shear = -SHEAR,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
                 Font = OsuFont.GetFont(weight: FontWeight.Bold),
             });
         }
@@ -62,7 +67,7 @@ namespace osu.Game.Screens.Select
         private void load(OsuColour colours)
         {
             //TODO: use https://fontawesome.com/icons/arrow-right-arrow-left?s=solid&f=classic when local Fontawesome is updated
-            IconUsageBox = FontAwesome.Solid.ArrowsAltH;
+            IconUsageBox = FontAwesome.Solid.ArrowsAlt;
             ButtonColour = Colour4.FromHex("#B2FF66");
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;

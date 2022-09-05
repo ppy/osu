@@ -22,14 +22,16 @@ namespace osu.Game.Screens.Select
 {
     public abstract class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        public const float SHEAR_WIDTH = 7.5f;
-        private const float outer_corner_radius = 7;
+        public const float SHEAR_WIDTH = 16;
+        private const float outer_corner_radius = 10;
         private const int ease_out_time = 800;
-        protected readonly FontUsage TorusFont = OsuFont.TorusAlternate.With(size: 20);
+        private const int button_height = 120;
+        private const float shear_padding = 10;
+        protected readonly FontUsage TorusFont = OsuFont.TorusAlternate.With(size: 16);
 
         private readonly Colour4 backgroundColour = Colour4.FromHex("#394642");
 
-        protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
+        protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / button_height, 0);
 
         protected LocalisableString Text
         {
@@ -64,16 +66,17 @@ namespace osu.Game.Screens.Select
 
         protected FooterButton()
         {
-            Anchor = Anchor.BottomLeft;
+            Anchor = Anchor.TopLeft;
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
             CornerRadius = outer_corner_radius;
             Masking = true;
-            Margin = new MarginPadding { Left = 2, Top = -20 };
+            Margin = new MarginPadding { Left = 10, Top = -20 };
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
-                Colour = new Colour4(0, 0, 0, 50),
+                Offset = new Vector2(.250f, 2),
+                Colour = Colour4.Black.Opacity(.25f),
                 Radius = outer_corner_radius
             };
 
@@ -83,26 +86,38 @@ namespace osu.Game.Screens.Select
                     backgroundColourBox = new Box
                     {
                         Colour = backgroundColour,
-                        RelativeSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Both,
                         Depth = 2,
-                        Height = 100
                     },
-                    sprite = new SpriteIcon
+                    new Box
                     {
-                        Shear = -SHEAR,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Size = new Vector2(20),
-                        Margin = new MarginPadding
+                        Alpha = 0.0002f,
+                        Height = 120,
+                        Width = 140,
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding
                         {
                             Top = 12,
-                            Left = -10
+                            Right = shear_padding,
+                        },
+                        Children = new Drawable[]
+                        {
+                            sprite = new SpriteIcon
+                            {
+                                Shear = -SHEAR,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Size = new Vector2(20)
+                            }
                         }
                     },
                     ButtonContentContainer = new FillFlowContainer
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
                         Direction = FillDirection.Horizontal,
                         AutoSizeAxes = Axes.X,
                         Children = new Drawable[]
@@ -110,11 +125,12 @@ namespace osu.Game.Screens.Select
                             TextContainer = new Container
                             {
                                 Colour = Colour4.White,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
                                 Shear = -SHEAR,
+                                Margin = new MarginPadding { Top = 41.89f },
+                                Padding = new MarginPadding { Right = 14 },
                                 AutoSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Top = -5 },
                                 Child = spriteText = new OsuSpriteText
                                 {
                                     Font = TorusFont,
@@ -127,27 +143,34 @@ namespace osu.Game.Screens.Select
                     },
                     new Container
                     {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Height = 6,
-                        Width = 130,
-                        Margin = new MarginPadding
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Padding = new MarginPadding
                         {
-                            Left = 10,
-                            Bottom = 27
+                            Top = 77,
                         },
-                        Shear = -SHEAR,
-                        CornerRadius = 3,
-                        Masking = true,
                         Children = new Drawable[]
                         {
-                            boxColour = new Box
+                            new Container
                             {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Both,
-                                Depth = 1,
-                            }
+                                CornerRadius = 3,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Height = 6,
+                                Width = 120.74f,
+                                Shear = -SHEAR,
+                                Masking = true,
+                                Children = new Drawable[]
+                                {
+                                    boxColour = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Origin = Anchor.Centre,
+                                        Anchor = Anchor.Centre,
+                                        Depth = 1,
+                                    }
+                                }
+                            },
                         }
                     },
                     flashLayer = new Box
@@ -164,19 +187,6 @@ namespace osu.Game.Screens.Select
         protected Action Hovered;
         protected Action HoverLost;
         protected GlobalAction? Hotkey;
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            float horizontalMargin = (100 - TextContainer.Width) / 2;
-            ButtonContentContainer.Padding = new MarginPadding
-            {
-                Left = horizontalMargin,
-                // right side margin offset to compensate for shear
-                Right = horizontalMargin - SHEAR_WIDTH / 2
-            };
-        }
 
         protected override bool OnClick(ClickEvent e)
         {

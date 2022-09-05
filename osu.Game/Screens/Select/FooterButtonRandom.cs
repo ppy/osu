@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Select
         private void load()
         {
             //TODO: use https://fontawesome.com/icons/shuffle?s=solid&f=classic when local Fontawesome is updated
-            IconUsageBox = FontAwesome.Solid.DiceFive;
+            IconUsageBox = FontAwesome.Solid.Random;
             ButtonColour = Colour4.FromHex("#66CCFF");
             TextContainer.Add(persistentText = new Container
             {

@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Select
 {
     public class Footer : Container
     {
-        public const float HEIGHT = 50;
+        public const float HEIGHT = 60;
 
         public const int TRANSITION_LENGTH = 300;
 
