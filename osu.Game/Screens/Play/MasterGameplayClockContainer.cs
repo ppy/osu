@@ -45,8 +45,6 @@ namespace osu.Game.Screens.Play
 
         private readonly double skipTargetTime;
 
-        private readonly List<Bindable<double>> nonGameplayAdjustments = new List<Bindable<double>>();
-
         /// <summary>
         /// Stores the time at which the last <see cref="StopGameplayClock"/> call was triggered.
         /// This is used to ensure we resume from that precise point in time, ignoring the proceeding frequency ramp.
@@ -57,8 +55,6 @@ namespace osu.Game.Screens.Play
         /// In the future I want to change this.
         /// </summary>
         private double? actualStopTime;
-
-        public override IEnumerable<double> NonGameplayAdjustments => nonGameplayAdjustments.Select(b => b.Value);
 
         /// <summary>
         /// Create a new master gameplay clock container.
@@ -201,9 +197,6 @@ namespace osu.Game.Screens.Play
             track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
-            nonGameplayAdjustments.Add(GameplayClock.ExternalPauseFrequencyAdjust);
-            nonGameplayAdjustments.Add(UserPlaybackRate);
-
             speedAdjustmentsApplied = true;
         }
 
@@ -214,9 +207,6 @@ namespace osu.Game.Screens.Play
 
             track.RemoveAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
             track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
-
-            nonGameplayAdjustments.Remove(GameplayClock.ExternalPauseFrequencyAdjust);
-            nonGameplayAdjustments.Remove(UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
         }
@@ -232,11 +222,30 @@ namespace osu.Game.Screens.Play
 
         ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
 
-        void IAdjustableAudioComponent.AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) =>
-            track.AddAdjustment(type, adjustBindable);
+        private readonly List<IBindable<double>> speedAdjustments = new List<IBindable<double>>();
 
-        void IAdjustableAudioComponent.RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) =>
+        public override double TrueGameplayRate
+        {
+            get
+            {
+                double rate = Rate;
+                foreach (var a in speedAdjustments)
+                    rate *= a.Value;
+                return rate;
+            }
+        }
+
+        void IAdjustableAudioComponent.AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
+        {
+            speedAdjustments.Add(adjustBindable);
+            track.AddAdjustment(type, adjustBindable);
+        }
+
+        void IAdjustableAudioComponent.RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
+        {
+            speedAdjustments.Remove(adjustBindable);
             track.RemoveAdjustment(type, adjustBindable);
+        }
 
         public override void ResetSpeedAdjustments()
         {
