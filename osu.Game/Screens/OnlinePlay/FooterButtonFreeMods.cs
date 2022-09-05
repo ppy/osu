@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -40,8 +41,8 @@ namespace osu.Game.Screens.OnlinePlay
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            ColourOnHover = colours.Yellow;
-            BaseColour = ColourOnHover.Opacity(0.5f);
+            IconUsageBox = FontAwesome.Solid.ExpandArrowsAlt;
+            BoxTypeColour = Colour4.FromHex("FFCC22");
             Text = @"freemods";
         }
 
