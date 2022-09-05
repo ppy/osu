@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play
     /// <remarks>
     /// This is intended to be used as a single controller for gameplay, or as a reference source for other <see cref="GameplayClockContainer"/>s.
     /// </remarks>
-    public class MasterGameplayClockContainer : GameplayClockContainer, IBeatSyncProvider
+    public class MasterGameplayClockContainer : GameplayClockContainer, IBeatSyncProvider, IAdjustableAudioComponent
     {
         /// <summary>
         /// Duration before gameplay start time required before skip button displays.
@@ -40,6 +40,8 @@ namespace osu.Game.Screens.Play
         };
 
         private readonly WorkingBeatmap beatmap;
+
+        private readonly Track track;
 
         private readonly double skipTargetTime;
 
@@ -66,6 +68,7 @@ namespace osu.Game.Screens.Play
         public MasterGameplayClockContainer(WorkingBeatmap beatmap, double skipTargetTime)
             : base(beatmap.Track, true)
         {
+            track = beatmap.Track;
             this.beatmap = beatmap;
             this.skipTargetTime = skipTargetTime;
 
@@ -195,9 +198,6 @@ namespace osu.Game.Screens.Play
             if (speedAdjustmentsApplied)
                 return;
 
-            if (SourceClock is not Track track)
-                return;
-
             track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
@@ -210,9 +210,6 @@ namespace osu.Game.Screens.Play
         private void removeSourceClockAdjustments()
         {
             if (!speedAdjustmentsApplied)
-                return;
-
-            if (SourceClock is not Track track)
                 return;
 
             track.RemoveAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
@@ -234,5 +231,29 @@ namespace osu.Game.Screens.Play
         IClock IBeatSyncProvider.Clock => this;
 
         ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
+
+        void IAdjustableAudioComponent.AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) =>
+            track.AddAdjustment(type, adjustBindable);
+
+        void IAdjustableAudioComponent.RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) =>
+            track.RemoveAdjustment(type, adjustBindable);
+
+        public void RemoveAllAdjustments(AdjustableProperty type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+        public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+
+        public BindableNumber<double> Volume => throw new NotImplementedException();
+        public BindableNumber<double> Balance => throw new NotImplementedException();
+        public BindableNumber<double> Frequency => throw new NotImplementedException();
+        public BindableNumber<double> Tempo => throw new NotImplementedException();
+
+        public IBindable<double> AggregateVolume => throw new NotImplementedException();
+        public IBindable<double> AggregateBalance => throw new NotImplementedException();
+        public IBindable<double> AggregateFrequency => throw new NotImplementedException();
+        public IBindable<double> AggregateTempo => throw new NotImplementedException();
     }
 }
