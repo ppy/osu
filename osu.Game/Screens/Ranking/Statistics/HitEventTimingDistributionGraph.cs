@@ -278,9 +278,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
             }
 
-            private const double total_duration = 300;
-
-            private double duration => total_duration / Math.Max(values.Count, 1);
+            private const double duration = 300;
 
             private float offsetForValue(float value)
             {
@@ -296,19 +294,20 @@ namespace osu.Game.Screens.Ranking.Statistics
             {
                 base.LoadComplete();
 
+                foreach (var boxOriginal in boxOriginals)
+                    boxOriginal.Height = basalHeight;
+
                 float offsetValue = 0;
 
                 if (values.Any())
                 {
                     for (int i = 0; i < values.Count; i++)
                     {
-                        boxOriginals[i].Y = BoundingBox.Height * offsetForValue(offsetValue);
-                        boxOriginals[i].Delay(duration * i).ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
+                        boxOriginals[i].MoveToY(offsetForValue(offsetValue) * BoundingBox.Height, duration, Easing.OutQuint);
+                        boxOriginals[i].ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
                         offsetValue -= values[i].Value;
                     }
                 }
-                else
-                    boxOriginals.Single().ResizeHeightTo(basalHeight, duration, Easing.OutQuint);
             }
 
             public void UpdateOffset(float adjustment)
