@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Select
             set => modDisplay.Current = value;
         }
 
+
+
         protected readonly OsuSpriteText MultiplierText;
         private readonly ModDisplay modDisplay;
         private Color4 lowMultiplierColour;
@@ -54,6 +56,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            BoxTypeColour = Colour4.FromHex("#B2FF66");
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
             Text = @"Mods";

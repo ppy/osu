@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
@@ -11,6 +12,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load()
         {
+            BoxTypeColour = Colour4.FromHex("#8C66FF");
             Text = @"Options";
             Hotkey = GlobalAction.ToggleBeatmapOptions;
         }

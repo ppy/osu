@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Select
         public Action NextRandom { get; set; }
         public Action PreviousRandom { get; set; }
 
+
+
         private Container persistentText;
         private OsuSpriteText randomSpriteText;
         private OsuSpriteText rewindSpriteText;
@@ -29,6 +31,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load()
         {
+            BoxTypeColour = Colour4.FromHex("#66CCFF");
             TextContainer.Add(persistentText = new Container
             {
                 Anchor = Anchor.Centre,

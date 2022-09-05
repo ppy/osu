@@ -28,7 +28,8 @@ namespace osu.Game.Screens.Select
 
         protected Colour4 BaseColour = Colour4.FromHex("#394642");
         protected Colour4 ColourOnHover = Colour4.FromHex("#394642").Lighten(.1f);
-        public Colour4 ButtonTypeColour = Colour4.DarkRed;
+
+        public Colour4 ButtonTypeColour { get; set; }
 
         private static readonly Vector2 shear = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
@@ -41,10 +42,16 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        public Colour4 BoxTypeColour
+        {
+            set => boxColour.Colour = value;
+        }
+
         protected FillFlowContainer ButtonContentContainer;
         protected readonly Container TextContainer;
         private readonly SpriteText spriteText;
         private readonly Box box;
+        private readonly Box boxColour;
 
         protected FooterButton()
         {
@@ -79,12 +86,11 @@ namespace osu.Game.Screens.Select
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new Box
+                        boxColour = new Box
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ButtonTypeColour,
                             Depth = 1,
                         }
                     }
@@ -190,8 +196,6 @@ namespace osu.Game.Screens.Select
 
             this.ScaleTo(1, ease_out_time, Easing.OutBounce);
             box.FadeColour(Colour4.White).Then().FadeColour(BaseColour, ease_out_time);
-
-
         }
     }
 }
