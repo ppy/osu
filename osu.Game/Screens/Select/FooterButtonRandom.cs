@@ -7,6 +7,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -21,8 +22,6 @@ namespace osu.Game.Screens.Select
         public Action NextRandom { get; set; }
         public Action PreviousRandom { get; set; }
 
-
-
         private Container persistentText;
         private OsuSpriteText randomSpriteText;
         private OsuSpriteText rewindSpriteText;
@@ -31,6 +30,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load()
         {
+            IconUsageBox = FontAwesome.Solid.Dice;
             BoxTypeColour = Colour4.FromHex("#66CCFF");
             TextContainer.Add(persistentText = new Container
             {

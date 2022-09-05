@@ -29,8 +29,6 @@ namespace osu.Game.Screens.Select
         protected Colour4 BaseColour = Colour4.FromHex("#394642");
         protected Colour4 ColourOnHover = Colour4.FromHex("#394642").Lighten(.1f);
 
-        public Colour4 ButtonTypeColour { get; set; }
-
         private static readonly Vector2 shear = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
         protected LocalisableString Text
@@ -42,9 +40,18 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public Colour4 BoxTypeColour
+        protected Colour4 BoxTypeColour
         {
-            set => boxColour.Colour = value;
+            set
+            {
+                boxColour.Colour = value;
+                sprite.Colour = value;
+            }
+        }
+
+        public IconUsage IconUsageBox
+        {
+            set => sprite.Icon = value;
         }
 
         protected FillFlowContainer ButtonContentContainer;
@@ -52,6 +59,7 @@ namespace osu.Game.Screens.Select
         private readonly SpriteText spriteText;
         private readonly Box box;
         private readonly Box boxColour;
+        private readonly SpriteIcon sprite;
 
         protected FooterButton()
         {
@@ -60,7 +68,7 @@ namespace osu.Game.Screens.Select
             Shear = shear;
             CornerRadius = corner_radius;
             Masking = true;
-            Margin = new MarginPadding { Left = 5, Top = -20 };
+            Margin = new MarginPadding { Left = 3, Top = -20 };
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
@@ -76,13 +84,31 @@ namespace osu.Game.Screens.Select
                     Colour = BaseColour,
                     Depth = 2
                 },
+                sprite = new SpriteIcon
+                {
+                    Shear = -shear,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Size = new Vector2(20),
+                    Margin = new MarginPadding
+                    {
+                        Top = 12,
+                        Left = -10
+                    }
+                },
                 new Container
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Height = 37,
-                    Width = 60,
-                    CornerRadius = corner_radius,
+                    Height = 6,
+                    Width = 120,
+                    Margin = new MarginPadding
+                    {
+                        Left = 10,
+                        Bottom = 27
+                    },
+                    Shear = -shear,
+                    CornerRadius = 3,
                     Masking = true,
                     Children = new Drawable[]
                     {
@@ -95,46 +121,39 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                new Container
+                ButtonContentContainer = new FillFlowContainer
                 {
-                    AutoSizeAxes = Axes.Both,
+                    CornerRadius = CornerRadius,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Direction = FillDirection.Horizontal,
+                    Width = 150,
+                    Height = 100,
                     Children = new Drawable[]
                     {
-                        ButtonContentContainer = new FillFlowContainer
+                        new Container
                         {
-                            CornerRadius = CornerRadius,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Direction = FillDirection.Horizontal,
-                            AutoSizeAxes = Axes.X,
-                            Height = 100,
-                            Children = new Drawable[]
-                            {
-                                new Container
-                                {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                },
-                                TextContainer = new Container
-                                {
-                                    Colour = Colour4.White,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Shear = -shear,
-                                    AutoSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Top = -5 },
-                                    Child = spriteText = new OsuSpriteText
-                                    {
-                                        Font = OsuFont.TorusAlternate.With(size: 16),
-                                        AlwaysPresent = true,
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                    }
-                                },
-                            },
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                         },
-                    },
-                },
+                        TextContainer = new Container
+                        {
+                            Colour = Colour4.White,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Shear = -shear,
+                            AutoSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Top = -5 },
+                            Child = spriteText = new OsuSpriteText
+                            {
+                                Font = OsuFont.TorusAlternate.With(size: 16),
+                                AlwaysPresent = true,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }
+                        }
+                    }
+                }
             };
         }
 

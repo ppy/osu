@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -28,8 +29,6 @@ namespace osu.Game.Screens.Select
             get => modDisplay.Current;
             set => modDisplay.Current = value;
         }
-
-
 
         protected readonly OsuSpriteText MultiplierText;
         private readonly ModDisplay modDisplay;
@@ -56,6 +55,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            IconUsageBox = FontAwesome.Solid.ArrowsAltH;
             BoxTypeColour = Colour4.FromHex("#B2FF66");
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
