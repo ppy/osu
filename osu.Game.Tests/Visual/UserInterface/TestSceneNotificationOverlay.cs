@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -45,6 +46,18 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
+        public void TestPresence()
+        {
+            AddAssert("tray not present", () => !notificationOverlay.ChildrenOfType<NotificationOverlayToastTray>().Single().IsPresent);
+            AddAssert("overlay not present", () => !notificationOverlay.IsPresent);
+
+            AddStep(@"post notification", sendBackgroundNotification);
+
+            AddUntilStep("wait tray not present", () => !notificationOverlay.ChildrenOfType<NotificationOverlayToastTray>().Single().IsPresent);
+            AddUntilStep("wait overlay not present", () => !notificationOverlay.IsPresent);
+        }
+
+        [Test]
         public void TestCompleteProgress()
         {
             ProgressNotification notification = null!;
@@ -63,6 +76,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait completion", () => notification.State == ProgressNotificationState.Completed);
 
             AddAssert("Completion toast shown", () => notificationOverlay.ToastCount == 1);
+            AddUntilStep("wait forwarded", () => notificationOverlay.ToastCount == 0);
         }
 
         [Test]

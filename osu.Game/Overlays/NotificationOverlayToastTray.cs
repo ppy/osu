@@ -24,6 +24,8 @@ namespace osu.Game.Overlays
     /// </summary>
     public class NotificationOverlayToastTray : CompositeDrawable
     {
+        public override bool IsPresent => IsDisplayingToasts;
+
         public bool IsDisplayingToasts => displayedCount > 0;
 
         private FillFlowContainer<Notification> toastFlow = null!;
