@@ -1,12 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -35,6 +41,16 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly OsuInputManager osuInputManager;
 
+        [Resolved(canBeNull: true)]
+        private Player player { get; set; }
+
+        private bool detectedTouchscreen;
+
+        private readonly BindableInt detectedTouches = new BindableInt
+        {
+            MaxValue = 25
+        };
+
         private int getTouchIndex(TouchSource source) => source - TouchSource.Touch1;
 
         public OsuDrawableTouchInputHandler(OsuInputManager inputManager)
@@ -59,6 +75,12 @@ namespace osu.Game.Rulesets.Osu.UI
                 return false;
 
             osuInputManager.DragMode = sourceIndex == last_concurrent_touch_index;
+
+            if (!detectedTouchscreen && ++detectedTouches.Value == detectedTouches.MaxValue)
+            {
+                detectedTouchscreen = true;
+                player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
+            }
 
             if (isCursorTouch(source))
                 return base.OnTouchDown(e);
