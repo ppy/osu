@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -11,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModFloatingFruits : Mod, IApplicableToDrawableRuleset<CatchHitObject>
+    public class CatchModFloatingFruits : Mod, IApplicableToDrawableRuleset<CatchHitObject>, ICanBeToggledDuringReplay
     {
         public override string Name => "Floating Fruits";
         public override string Acronym => "FF";
@@ -19,12 +20,17 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => FontAwesome.Solid.Cloud;
 
+        public BindableBool IsDisabled { get; } = new BindableBool();
+
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
             drawableRuleset.Anchor = Anchor.Centre;
             drawableRuleset.Origin = Anchor.Centre;
 
-            drawableRuleset.Scale = new Vector2(1, -1);
+            IsDisabled.BindValueChanged(s =>
+            {
+                drawableRuleset.Scale = s.NewValue ? new Vector2(1, 1) : new Vector2(1, -1);
+            }, true);
         }
     }
 }
