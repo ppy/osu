@@ -206,7 +206,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         public bool AllowMainMouseButtons;
 
         public IEnumerable<KeyCombination> Defaults;
-        
+
         private bool isModifier(Key k) => k < Key.F1;
 
         protected override bool OnClick(ClickEvent e) => true;
@@ -556,7 +556,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
                     return;
-                
+
                 KeyBinding.KeyCombination = newCombination;
                 updateKeyCombinationText();
             }
