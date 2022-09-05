@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Select
         {
             ButtonContentContainer.Add(modDisplay = new ModDisplay
             {
+                Shear = -SHEAR,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.8f),
@@ -46,9 +47,10 @@ namespace osu.Game.Screens.Select
             });
             ButtonContentContainer.Add(MultiplierText = new OsuSpriteText
             {
+                Shear = -SHEAR,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                Font = TorusFont
             });
         }
 

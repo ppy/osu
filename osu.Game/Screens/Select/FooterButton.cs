@@ -23,13 +23,14 @@ namespace osu.Game.Screens.Select
     public abstract class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float SHEAR_WIDTH = 7.5f;
-        private const float corner_radius = 7;
+        private const float outer_corner_radius = 7;
         private const int ease_out_time = 250;
+        protected readonly FontUsage TorusFont = OsuFont.TorusAlternate.With(size: 20);
 
-        protected Colour4 BaseColour = Colour4.FromHex("#394642");
-        protected Colour4 ColourOnHover = Colour4.FromHex("#394642").Lighten(.1f);
+        private readonly Colour4 baseColour = Colour4.FromHex("#394642");
+        private readonly Colour4 colourOnHover = Colour4.FromHex("#394642").Lighten(.1f);
 
-        private static readonly Vector2 shear = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
+        protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
         protected LocalisableString Text
         {
@@ -49,7 +50,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public IconUsage IconUsageBox
+        protected IconUsage IconUsageBox
         {
             set => sprite.Icon = value;
         }
@@ -65,15 +66,15 @@ namespace osu.Game.Screens.Select
         {
             Anchor = Anchor.BottomLeft;
             AutoSizeAxes = Axes.Both;
-            Shear = shear;
-            CornerRadius = corner_radius;
+            Shear = SHEAR;
+            CornerRadius = outer_corner_radius;
             Masking = true;
             Margin = new MarginPadding { Left = 2, Top = -20 };
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = new Colour4(0, 0, 0, 50),
-                Radius = corner_radius
+                Radius = outer_corner_radius
             };
 
             Children = new Drawable[]
@@ -81,12 +82,12 @@ namespace osu.Game.Screens.Select
                 box = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = BaseColour,
+                    Colour = baseColour,
                     Depth = 2
                 },
                 sprite = new SpriteIcon
                 {
-                    Shear = -shear,
+                    Shear = -SHEAR,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Size = new Vector2(20),
@@ -107,7 +108,7 @@ namespace osu.Game.Screens.Select
                         Left = 10,
                         Bottom = 27
                     },
-                    Shear = -shear,
+                    Shear = -SHEAR,
                     CornerRadius = 3,
                     Masking = true,
                     Children = new Drawable[]
@@ -141,12 +142,12 @@ namespace osu.Game.Screens.Select
                             Colour = Colour4.White,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Shear = -shear,
+                            Shear = -SHEAR,
                             AutoSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = -5 },
                             Child = spriteText = new OsuSpriteText
                             {
-                                Font = OsuFont.TorusAlternate.With(size: 16),
+                                Font = TorusFont,
                                 AlwaysPresent = true,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -176,14 +177,14 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnHover(HoverEvent e)
         {
-            box.FadeColour(ColourOnHover, 0, Easing.OutQuint);
+            box.FadeColour(colourOnHover, 0, Easing.OutQuint);
             Hovered?.Invoke();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            box.FadeColour(BaseColour, 500, Easing.OutQuint);
+            box.FadeColour(baseColour, 500, Easing.OutQuint);
             HoverLost?.Invoke();
         }
 
@@ -196,7 +197,7 @@ namespace osu.Game.Screens.Select
         protected override void OnMouseUp(MouseUpEvent e)
         {
             this.ScaleTo(1, ease_out_time, Easing.OutBounce);
-            box.FadeColour(Colour4.White).Then().FadeColour(BaseColour, ease_out_time);
+            box.FadeColour(Colour4.White).Then().FadeColour(baseColour, ease_out_time);
             base.OnMouseUp(e);
         }
 
@@ -214,7 +215,7 @@ namespace osu.Game.Screens.Select
             if (e.Action != Hotkey) return;
 
             this.ScaleTo(1, ease_out_time, Easing.OutBounce);
-            box.FadeColour(Colour4.White).Then().FadeColour(BaseColour, ease_out_time);
+            box.FadeColour(Colour4.White).Then().FadeColour(baseColour, ease_out_time);
         }
     }
 }

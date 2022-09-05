@@ -43,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay
         {
             IconUsageBox = FontAwesome.Solid.ExpandArrowsAlt;
             BoxTypeColour = Colour4.FromHex("FFCC22");
-            Text = @"freemods";
+            Text = @"Freemods";
         }
 
         protected override void LoadComplete()
