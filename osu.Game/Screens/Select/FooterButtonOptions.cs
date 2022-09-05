@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load()
         {
-            IconUsageBox = FontAwesome.Solid.Cogs;
+            IconUsageBox = FontAwesome.Solid.Cog;
             BoxTypeColour = Colour4.FromHex("#8C66FF");
             Text = @"Options";
             Hotkey = GlobalAction.ToggleBeatmapOptions;

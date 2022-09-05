@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Select
             Shear = shear;
             CornerRadius = corner_radius;
             Masking = true;
-            Margin = new MarginPadding { Left = 3, Top = -20 };
+            Margin = new MarginPadding { Left = 2, Top = -20 };
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
