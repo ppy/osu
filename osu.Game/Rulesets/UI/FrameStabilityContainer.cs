@@ -263,23 +263,7 @@ namespace osu.Game.Rulesets.UI
 
         public FrameTimeInfo TimeInfo => framedClock.TimeInfo;
 
-        public double TrueGameplayRate
-        {
-            get
-            {
-                double baseRate = Rate;
-
-                foreach (double adjustment in NonGameplayAdjustments)
-                {
-                    if (Precision.AlmostEquals(adjustment, 0))
-                        return 0;
-
-                    baseRate /= adjustment;
-                }
-
-                return baseRate;
-            }
-        }
+        public double TrueGameplayRate => parentGameplayClock?.TrueGameplayRate ?? Rate;
 
         public double StartTime => parentGameplayClock?.StartTime ?? 0;
 
