@@ -525,7 +525,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
                 else if (isBindingInvalid)
                 {
-                    box.FlashColour(Color4.Red, 800, Easing.InElastic).Loop(0, 5);
+                    Text.FadeColour(Color4.White, transition_time, Easing.OutQuint);
+                    box.FadeColour(Color4.Red, transition_time, Easing.OutQuint).Then()
+                       .FadeColour(colourProvider.Background6, transition_time, Easing.OutQuint)
+                       .Loop(0, 3);
+
                     isBindingInvalid = false;
                 }
                 else
