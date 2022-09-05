@@ -27,13 +27,15 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
     }
 
-    public abstract class ModMuted<TObject> : ModMuted, IApplicableToDrawableRuleset<TObject>, IApplicableToTrack, IApplicableToScoreProcessor
+    public abstract class ModMuted<TObject> : ModMuted, IApplicableToDrawableRuleset<TObject>, IApplicableToTrack, IApplicableToScoreProcessor, ICanBeToggledDuringReplay
         where TObject : HitObject
     {
         private readonly BindableNumber<double> mainVolumeAdjust = new BindableDouble(0.5);
         private readonly BindableNumber<double> metronomeVolumeAdjust = new BindableDouble(0.5);
 
         private readonly BindableNumber<int> currentCombo = new BindableInt();
+
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
         public BindableBool EnableMetronome { get; } = new BindableBool
@@ -95,14 +97,34 @@ namespace osu.Game.Rulesets.Mods
             currentCombo.BindTo(scoreProcessor.Combo);
             currentCombo.BindValueChanged(combo =>
             {
-                double dimFactor = MuteComboCount.Value == 0 ? 1 : (double)combo.NewValue / MuteComboCount.Value;
+                updateMuteState(combo.NewValue);
+            }, true);
+
+            IsDisabled.BindValueChanged(s =>
+            {
+                if (s.NewValue)
+                {
+                    scoreProcessor.TransformBindableTo(metronomeVolumeAdjust, 0, 500, Easing.OutQuint);
+                    scoreProcessor.TransformBindableTo(mainVolumeAdjust, 1, 500, Easing.OutQuint);
+                }
+                else
+                {
+                    updateMuteState(currentCombo.Value);
+                }
+            });
+
+            void updateMuteState(int combo)
+            {
+                double dimFactor = MuteComboCount.Value == 0 ? 1 : (double)combo / MuteComboCount.Value;
 
                 if (InverseMuting.Value)
                     dimFactor = 1 - dimFactor;
 
+                dimFactor = IsDisabled.Value ? 0 : dimFactor;
+
                 scoreProcessor.TransformBindableTo(metronomeVolumeAdjust, dimFactor, 500, Easing.OutQuint);
                 scoreProcessor.TransformBindableTo(mainVolumeAdjust, 1 - dimFactor, 500, Easing.OutQuint);
-            }, true);
+            }
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
