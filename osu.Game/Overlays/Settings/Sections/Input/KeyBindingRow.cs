@@ -527,8 +527,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     Text.FadeColour(Color4.White, transition_time, Easing.OutQuint);
                     box.FadeColour(Color4.Red, transition_time, Easing.OutQuint).Then()
-                    .FadeColour(colourProvider.Background6, transition_time, Easing.OutQuint)
-                    .Loop(0, 3);
+                       .FadeColour(colourProvider.Background6, transition_time, Easing.OutQuint)
+                       .Loop(0, 3);
 
                     isBindingInvalid = false;
                 }
@@ -541,9 +541,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             public void CheckAndUpdateKeyCombination(KeyCombination newCombination)
             {
-                var rulesetBindings = realm.Run(r => r.All<RealmKeyBinding>()
-                                      .Where(b => b.RulesetName == KeyBinding.RulesetName && b.Variant == KeyBinding.Variant)
-                                      .Detach());
+                var rulesetBindings = realm.Run(r => r.All<RealmKeyBinding>().Where(b => b.RulesetName == KeyBinding.RulesetName && b.Variant == KeyBinding.Variant).Detach());
 
                 if (KeyBinding.RulesetName != null && rulesetBindings.Select(k => k.KeyCombination).Contains(newCombination))
                 {
