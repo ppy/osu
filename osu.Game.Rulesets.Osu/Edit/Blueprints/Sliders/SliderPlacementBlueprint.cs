@@ -92,7 +92,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                     // Replacing the DifficultyControlPoint above doesn't trigger any kind of invalidation.
                     // Without re-applying defaults, velocity won't be updated.
-                    // If this causes further issues, it may be better to copy the velocity p
                     ApplyDefaultsToHitObject();
                     break;
 
