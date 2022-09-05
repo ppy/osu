@@ -58,6 +58,19 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestPresenceWithManualDismiss()
+        {
+            AddAssert("tray not present", () => !notificationOverlay.ChildrenOfType<NotificationOverlayToastTray>().Single().IsPresent);
+            AddAssert("overlay not present", () => !notificationOverlay.IsPresent);
+
+            AddStep(@"post notification", sendBackgroundNotification);
+            AddStep("click notification", () => notificationOverlay.ChildrenOfType<Notification>().Single().TriggerClick());
+
+            AddUntilStep("wait tray not present", () => !notificationOverlay.ChildrenOfType<NotificationOverlayToastTray>().Single().IsPresent);
+            AddUntilStep("wait overlay not present", () => !notificationOverlay.IsPresent);
+        }
+
+        [Test]
         public void TestCompleteProgress()
         {
             ProgressNotification notification = null!;

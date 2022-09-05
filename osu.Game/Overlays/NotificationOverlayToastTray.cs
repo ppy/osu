@@ -97,6 +97,8 @@ namespace osu.Game.Overlays
 
         public void Post(Notification notification)
         {
+            notification.Closed += stopTrackingNotification;
+
             ++runningDepth;
             displayedCount++;
 
@@ -139,12 +141,21 @@ namespace osu.Game.Overlays
             notification.MoveToOffset(new Vector2(400, 0), NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             notification.FadeOut(NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint).OnComplete(_ =>
             {
+                notification.Closed -= stopTrackingNotification;
+                if (!notification.WasClosed)
+                    stopTrackingNotification();
+
                 RemoveInternal(notification, false);
-                displayedCount--;
                 ForwardNotificationToPermanentStore?.Invoke(notification);
 
                 notification.FadeIn(300, Easing.OutQuint);
             });
+        }
+
+        private void stopTrackingNotification()
+        {
+            Debug.Assert(displayedCount > 0);
+            displayedCount--;
         }
 
         protected override void Update()
