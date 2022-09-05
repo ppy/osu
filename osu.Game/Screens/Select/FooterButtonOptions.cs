@@ -13,6 +13,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load()
         {
+            //TODO: Figma design uses similar premium icon with hollowed out sprite
             IconUsageBox = FontAwesome.Solid.Cog;
             ButtonColour = Colour4.FromHex("#8C66FF");
             Text = @"Options";

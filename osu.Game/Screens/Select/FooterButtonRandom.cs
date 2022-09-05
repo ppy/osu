@@ -29,7 +29,8 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load()
         {
-            IconUsageBox = FontAwesome.Solid.Dice;
+            //TODO: use https://fontawesome.com/icons/shuffle?s=solid&f=classic when local Fontawesome is updated
+            IconUsageBox = FontAwesome.Solid.DiceFive;
             ButtonColour = Colour4.FromHex("#66CCFF");
             TextContainer.Add(persistentText = new Container
             {

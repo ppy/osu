@@ -61,6 +61,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            //TODO: use https://fontawesome.com/icons/arrow-right-arrow-left?s=solid&f=classic when local Fontawesome is updated
             IconUsageBox = FontAwesome.Solid.ArrowsAltH;
             ButtonColour = Colour4.FromHex("#B2FF66");
             lowMultiplierColour = colours.Red;

@@ -31,16 +31,18 @@ namespace osu.Game.Screens.OnlinePlay
         {
             ButtonContentContainer.Add(modDisplay = new ModDisplay
             {
+                Shear = -SHEAR,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.8f),
-                ExpansionMode = ExpansionMode.AlwaysContracted,
+                ExpansionMode = ExpansionMode.ExpandOnHover
             });
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            //TODO: no design for freemod button provided
             IconUsageBox = FontAwesome.Solid.ExpandArrowsAlt;
             ButtonColour = Colour4.FromHex("FFCC22");
             Text = @"Freemods";

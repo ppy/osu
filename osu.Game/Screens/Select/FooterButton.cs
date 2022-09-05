@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.Select
         private const int ease_out_time = 800;
         protected readonly FontUsage TorusFont = OsuFont.TorusAlternate.With(size: 20);
 
-        private Colour4 backgroundColour = Colour4.FromHex("#394642");
+        private readonly Colour4 backgroundColour = Colour4.FromHex("#394642");
 
         protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
@@ -59,6 +60,7 @@ namespace osu.Game.Screens.Select
         private readonly Box boxColour;
         private readonly Box flashLayer;
         private readonly SpriteIcon sprite;
+        private readonly Box backgroundColourBox;
 
         protected FooterButton()
         {
@@ -75,88 +77,92 @@ namespace osu.Game.Screens.Select
                 Radius = outer_corner_radius
             };
 
-            Children = new Drawable[]
             {
-                new Box
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Colour = backgroundColour,
-                    Depth = 2,
-                    Height = 100,
-                },
-                sprite = new SpriteIcon
-                {
-                    Shear = -SHEAR,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Size = new Vector2(20),
-                    Margin = new MarginPadding
+                    backgroundColourBox = new Box
                     {
-                        Top = 12,
-                        Left = -10
-                    }
-                },
-                ButtonContentContainer = new FillFlowContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Direction = FillDirection.Horizontal,
-                    AutoSizeAxes = Axes.X,
-                    Children = new Drawable[]
+                        Colour = backgroundColour,
+                        RelativeSizeAxes = Axes.X,
+                        Depth = 2,
+                        Height = 100
+                    },
+                    sprite = new SpriteIcon
                     {
-                        TextContainer = new Container
+                        Shear = -SHEAR,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Size = new Vector2(20),
+                        Margin = new MarginPadding
                         {
-                            Colour = Colour4.White,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Shear = -SHEAR,
-                            AutoSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = -5 },
-                            Child = spriteText = new OsuSpriteText
+                            Top = 12,
+                            Left = -10
+                        }
+                    },
+                    ButtonContentContainer = new FillFlowContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Direction = FillDirection.Horizontal,
+                        AutoSizeAxes = Axes.X,
+                        Children = new Drawable[]
+                        {
+                            TextContainer = new Container
                             {
-                                Font = TorusFont,
-                                AlwaysPresent = true,
+                                Colour = Colour4.White,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
+                                Shear = -SHEAR,
+                                AutoSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Top = -5 },
+                                Child = spriteText = new OsuSpriteText
+                                {
+                                    Font = TorusFont,
+                                    AlwaysPresent = true,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                }
                             }
                         }
-                    }
-                },
-                new Container
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Height = 6,
-                    Width = 130,
-                    Margin = new MarginPadding
-                    {
-                        Left = 10,
-                        Bottom = 27
                     },
-                    Shear = -SHEAR,
-                    CornerRadius = 3,
-                    Masking = true,
-                    Children = new Drawable[]
+                    new Container
                     {
-                        boxColour = new Box
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Height = 6,
+                        Width = 130,
+                        Margin = new MarginPadding
                         {
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Depth = 1,
+                            Left = 10,
+                            Bottom = 27
+                        },
+                        Shear = -SHEAR,
+                        CornerRadius = 3,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            boxColour = new Box
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Depth = 1,
+                            }
                         }
-                    }
-                },
-                flashLayer = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.White.Opacity(0.9f),
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0,
-                },
-            };
+                    },
+                    flashLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.White.Opacity(0.9f),
+                        Blending = BlendingParameters.Additive,
+                        Alpha = 0,
+                    },
+                };
+            }
         }
 
+        protected Action Hovered;
+        protected Action HoverLost;
         protected GlobalAction? Hotkey;
 
         protected override void UpdateAfterChildren()
@@ -181,14 +187,15 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnHover(HoverEvent e)
         {
-            Scheduler.AddOnce(updateState);
-            return base.OnHover(e);
+            backgroundColourBox.FadeColour(backgroundColour.Lighten(.2f));
+            Hovered?.Invoke();
+            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            Scheduler.AddOnce(updateState);
-            base.OnHoverLost(e);
+            backgroundColourBox.FadeColour(backgroundColour, 500, Easing.OutQuint);
+            HoverLost?.Invoke();
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -217,14 +224,6 @@ namespace osu.Game.Screens.Select
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
             base.OnMouseUp(e);
-        }
-
-        private void updateState()
-        {
-            if (IsHovered)
-            {
-                backgroundColour = backgroundColour.Lighten(0.2f);
-            }
         }
     }
 }
