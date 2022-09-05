@@ -86,7 +86,6 @@ namespace osu.Game.Tests.Visual.Ranking
             createTest(wide.Concat(narrow).ToList());
         }
 
-
         [Test]
         public void TestZeroTimeOffset()
         {
