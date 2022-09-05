@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Select
         private void load()
         {
             IconUsageBox = FontAwesome.Solid.Dice;
-            BoxTypeColour = Colour4.FromHex("#66CCFF");
+            ButtonColour = Colour4.FromHex("#66CCFF");
             TextContainer.Add(persistentText = new Container
             {
                 Anchor = Anchor.Centre,

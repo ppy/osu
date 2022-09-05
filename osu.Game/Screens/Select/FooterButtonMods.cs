@@ -50,7 +50,11 @@ namespace osu.Game.Screens.Select
                 Shear = -SHEAR,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Font = TorusFont
+                Margin = new MarginPadding
+                {
+                    Top = -3,
+                },
+                Font = OsuFont.GetFont(weight: FontWeight.Bold),
             });
         }
 
@@ -58,7 +62,7 @@ namespace osu.Game.Screens.Select
         private void load(OsuColour colours)
         {
             IconUsageBox = FontAwesome.Solid.ArrowsAltH;
-            BoxTypeColour = Colour4.FromHex("#B2FF66");
+            ButtonColour = Colour4.FromHex("#B2FF66");
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
             Text = @"Mods";

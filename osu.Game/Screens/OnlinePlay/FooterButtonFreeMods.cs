@@ -42,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay
         private void load(OsuColour colours)
         {
             IconUsageBox = FontAwesome.Solid.ExpandArrowsAlt;
-            BoxTypeColour = Colour4.FromHex("FFCC22");
+            ButtonColour = Colour4.FromHex("FFCC22");
             Text = @"Freemods";
         }
 

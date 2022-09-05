@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Select
         private void load()
         {
             IconUsageBox = FontAwesome.Solid.Cog;
-            BoxTypeColour = Colour4.FromHex("#8C66FF");
+            ButtonColour = Colour4.FromHex("#8C66FF");
             Text = @"Options";
             Hotkey = GlobalAction.ToggleBeatmapOptions;
         }

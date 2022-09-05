@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -24,11 +23,10 @@ namespace osu.Game.Screens.Select
     {
         public const float SHEAR_WIDTH = 7.5f;
         private const float outer_corner_radius = 7;
-        private const int ease_out_time = 250;
+        private const int ease_out_time = 800;
         protected readonly FontUsage TorusFont = OsuFont.TorusAlternate.With(size: 20);
 
-        private readonly Colour4 baseColour = Colour4.FromHex("#394642");
-        private readonly Colour4 colourOnHover = Colour4.FromHex("#394642").Lighten(.1f);
+        private Colour4 backgroundColour = Colour4.FromHex("#394642");
 
         protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
@@ -41,7 +39,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected Colour4 BoxTypeColour
+        protected Colour4 ButtonColour
         {
             set
             {
@@ -58,8 +56,8 @@ namespace osu.Game.Screens.Select
         protected FillFlowContainer ButtonContentContainer;
         protected readonly Container TextContainer;
         private readonly SpriteText spriteText;
-        private readonly Box box;
         private readonly Box boxColour;
+        private readonly Box flashLayer;
         private readonly SpriteIcon sprite;
 
         protected FooterButton()
@@ -79,11 +77,12 @@ namespace osu.Game.Screens.Select
 
             Children = new Drawable[]
             {
-                box = new Box
+                new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = baseColour,
-                    Depth = 2
+                    RelativeSizeAxes = Axes.X,
+                    Colour = backgroundColour,
+                    Depth = 2,
+                    Height = 100,
                 },
                 sprite = new SpriteIcon
                 {
@@ -97,12 +96,38 @@ namespace osu.Game.Screens.Select
                         Left = -10
                     }
                 },
+                ButtonContentContainer = new FillFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Direction = FillDirection.Horizontal,
+                    AutoSizeAxes = Axes.X,
+                    Children = new Drawable[]
+                    {
+                        TextContainer = new Container
+                        {
+                            Colour = Colour4.White,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Shear = -SHEAR,
+                            AutoSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Top = -5 },
+                            Child = spriteText = new OsuSpriteText
+                            {
+                                Font = TorusFont,
+                                AlwaysPresent = true,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }
+                        }
+                    }
+                },
                 new Container
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Height = 6,
-                    Width = 120,
+                    Width = 130,
                     Margin = new MarginPadding
                     {
                         Left = 10,
@@ -122,45 +147,17 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                ButtonContentContainer = new FillFlowContainer
+                flashLayer = new Box
                 {
-                    CornerRadius = CornerRadius,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Direction = FillDirection.Horizontal,
-                    Width = 150,
-                    Height = 100,
-                    Children = new Drawable[]
-                    {
-                        new Container
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        },
-                        TextContainer = new Container
-                        {
-                            Colour = Colour4.White,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Shear = -SHEAR,
-                            AutoSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = -5 },
-                            Child = spriteText = new OsuSpriteText
-                            {
-                                Font = TorusFont,
-                                AlwaysPresent = true,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            }
-                        }
-                    }
-                }
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Colour4.White.Opacity(0.9f),
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
+                },
             };
         }
 
-        public Action Hovered;
-        public Action HoverLost;
-        public GlobalAction? Hotkey;
+        protected GlobalAction? Hotkey;
 
         protected override void UpdateAfterChildren()
         {
@@ -175,37 +172,30 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        protected override bool OnClick(ClickEvent e)
+        {
+            flashLayer.FadeOutFromOne(800, Easing.OutQuint);
+
+            return base.OnClick(e);
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
-            box.FadeColour(colourOnHover, 0, Easing.OutQuint);
-            Hovered?.Invoke();
-            return true;
+            Scheduler.AddOnce(updateState);
+            return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            box.FadeColour(baseColour, 500, Easing.OutQuint);
-            HoverLost?.Invoke();
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            this.ScaleTo(.8f, 900, Easing.OutQuint);
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            this.ScaleTo(1, ease_out_time, Easing.OutBounce);
-            box.FadeColour(Colour4.White).Then().FadeColour(baseColour, ease_out_time);
-            base.OnMouseUp(e);
+            Scheduler.AddOnce(updateState);
+            base.OnHoverLost(e);
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Action != Hotkey || e.Repeat) return false;
 
-            this.ScaleTo(.8f, 900, Easing.OutQuint);
+            this.ScaleTo(.9f, 2000, Easing.OutQuint);
             TriggerClick();
             return true;
         }
@@ -215,7 +205,26 @@ namespace osu.Game.Screens.Select
             if (e.Action != Hotkey) return;
 
             this.ScaleTo(1, ease_out_time, Easing.OutBounce);
-            box.FadeColour(Colour4.White).Then().FadeColour(baseColour, ease_out_time);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            Content.ScaleTo(0.9f, 2000, Easing.OutQuint);
+            return base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            Content.ScaleTo(1, 1000, Easing.OutElastic);
+            base.OnMouseUp(e);
+        }
+
+        private void updateState()
+        {
+            if (IsHovered)
+            {
+                backgroundColour = backgroundColour.Lighten(0.2f);
+            }
         }
     }
 }
