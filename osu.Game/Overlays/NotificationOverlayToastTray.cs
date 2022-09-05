@@ -70,7 +70,7 @@ namespace osu.Game.Overlays
                     postEffectDrawable.AutoSizeAxes = Axes.None;
                     postEffectDrawable.RelativeSizeAxes = Axes.X;
                 })),
-                toastFlow = new AlwaysUpdateFillFlowContainer<Notification>
+                toastFlow = new FillFlowContainer<Notification>
                 {
                     LayoutDuration = 150,
                     LayoutEasing = Easing.OutQuart,
