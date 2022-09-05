@@ -24,9 +24,9 @@ namespace osu.Game.Overlays
     /// </summary>
     public class NotificationOverlayToastTray : CompositeDrawable
     {
-        public override bool IsPresent => IsDisplayingToasts;
+        public override bool IsPresent => toastContentBackground.Height > 0 || toastFlow.Count > 0;
 
-        public bool IsDisplayingToasts => displayedCount > 0;
+        public bool IsDisplayingToasts => allNotifications.Any();
 
         private FillFlowContainer<Notification> toastFlow = null!;
         private BufferedContainer toastContentBackground = null!;
@@ -41,8 +41,6 @@ namespace osu.Game.Overlays
         private IEnumerable<Notification> allNotifications => toastFlow.Concat(InternalChildren.OfType<Notification>());
 
         private int runningDepth;
-
-        private int displayedCount;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -61,6 +59,7 @@ namespace osu.Game.Overlays
                         colourProvider.Background6.Opacity(0.7f),
                         colourProvider.Background6.Opacity(0.5f)),
                     RelativeSizeAxes = Axes.Both,
+                    Height = 0,
                 }.WithEffect(new BlurEffect
                 {
                     PadExtent = true,
@@ -97,10 +96,7 @@ namespace osu.Game.Overlays
 
         public void Post(Notification notification)
         {
-            notification.Closed += stopTrackingNotification;
-
             ++runningDepth;
-            displayedCount++;
 
             int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
 
@@ -141,10 +137,6 @@ namespace osu.Game.Overlays
             notification.MoveToOffset(new Vector2(400, 0), NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             notification.FadeOut(NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint).OnComplete(_ =>
             {
-                notification.Closed -= stopTrackingNotification;
-                if (!notification.WasClosed)
-                    stopTrackingNotification();
-
                 RemoveInternal(notification, false);
                 ForwardNotificationToPermanentStore?.Invoke(notification);
 
@@ -152,17 +144,11 @@ namespace osu.Game.Overlays
             });
         }
 
-        private void stopTrackingNotification()
-        {
-            Debug.Assert(displayedCount > 0);
-            displayedCount--;
-        }
-
         protected override void Update()
         {
             base.Update();
 
-            float height = toastFlow.DrawHeight + 120;
+            float height = toastFlow.Count > 0 ? toastFlow.DrawHeight + 120 : 0;
             float alpha = toastFlow.Count > 0 ? MathHelper.Clamp(toastFlow.DrawHeight / 41, 0, 1) * toastFlow.Children.Max(n => n.Alpha) : 0;
 
             toastContentBackground.Height = (float)Interpolation.DampContinuously(toastContentBackground.Height, height, 10, Clock.ElapsedFrameTime);
