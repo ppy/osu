@@ -6,10 +6,8 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -87,27 +85,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     MD5Hash = apiBeatmap.MD5Hash
                 };
 
-                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
-                            .ContinueWith(task => Schedule(() =>
-                            {
-                                if (loadCancellationSource.IsCancellationRequested)
-                                    return;
+                var scores = scoreManager.OrderByTotalScore(value.Scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo))).ToArray();
+                var topScore = scores.First();
 
-                                var scores = task.GetResultSafely();
+                scoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());
+                scoreTable.Show();
 
-                                var topScore = scores.First();
+                var userScore = value.UserScore;
+                var userScoreInfo = userScore?.Score.ToScoreInfo(rulesets, beatmapInfo);
 
-                                scoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());
-                                scoreTable.Show();
+                topScoresContainer.Add(new DrawableTopScore(topScore));
 
-                                var userScore = value.UserScore;
-                                var userScoreInfo = userScore?.Score.ToScoreInfo(rulesets, beatmapInfo);
-
-                                topScoresContainer.Add(new DrawableTopScore(topScore));
-
-                                if (userScoreInfo != null && userScoreInfo.OnlineID != topScore.OnlineID)
-                                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
-                            }), TaskContinuationOptions.OnlyOnRanToCompletion);
+                if (userScoreInfo != null && userScoreInfo.OnlineID != topScore.OnlineID)
+                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
             });
         }
 

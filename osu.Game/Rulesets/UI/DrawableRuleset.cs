@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.UI
 
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        public override IFrameStableClock FrameStableClock => frameStabilityContainer.FrameStableClock;
+        public override IFrameStableClock FrameStableClock => frameStabilityContainer;
 
         private bool frameStablePlayback = true;
 

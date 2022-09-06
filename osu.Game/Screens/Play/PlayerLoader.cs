@@ -123,6 +123,8 @@ namespace osu.Game.Screens.Play
 
         private EpilepsyWarning? epilepsyWarning;
 
+        private bool quickRestart;
+
         [Resolved(CanBeNull = true)]
         private INotificationOverlay? notificationOverlay { get; set; }
 
@@ -361,6 +363,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
+            CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
@@ -375,8 +378,9 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void restartRequested()
+        private void restartRequested(bool quickRestartRequested)
         {
+            quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
         }
@@ -526,7 +530,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, AudioManager audioManager, INotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
-                IconBackground.Colour = colours.RedDark;
+                IconContent.Colour = colours.RedDark;
 
                 Activated = delegate
                 {
@@ -580,7 +584,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.BatteryQuarter;
-                IconBackground.Colour = colours.RedDark;
+                IconContent.Colour = colours.RedDark;
 
                 Activated = delegate
                 {

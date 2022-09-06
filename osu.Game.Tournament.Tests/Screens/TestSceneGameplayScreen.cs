@@ -53,7 +53,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("setup screen", () =>
             {
-                Remove(chat);
+                Remove(chat, false);
 
                 Children = new Drawable[]
                 {
