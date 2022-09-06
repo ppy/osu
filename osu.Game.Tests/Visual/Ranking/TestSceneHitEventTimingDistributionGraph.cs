@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             createTest(CreateDistributedHitEvents(0, 50).Select(h =>
             {
-                var offset = Math.Abs(h.TimeOffset);
+                double offset = Math.Abs(h.TimeOffset);
                 var result = offset > 36 ? HitResult.Miss : offset > 32 ? HitResult.Meh : offset > 24 ? HitResult.Ok : offset > 16 ? HitResult.Good : offset > 8 ? HitResult.Great : HitResult.Perfect;
                 return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
             }).ToList());
@@ -73,13 +73,13 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var wide = CreateDistributedHitEvents(0, 50).Select(h =>
             {
-                var offset = Math.Abs(h.TimeOffset);
+                double offset = Math.Abs(h.TimeOffset);
                 var result = offset > 36 ? HitResult.Miss : offset > 32 ? HitResult.Meh : offset > 24 ? HitResult.Ok : offset > 16 ? HitResult.Good : offset > 8 ? HitResult.Great : HitResult.Perfect;
                 return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
             });
             var narrow = CreateDistributedHitEvents(0, 50).Select(h =>
             {
-                var offset = Math.Abs(h.TimeOffset);
+                double offset = Math.Abs(h.TimeOffset);
                 var result = offset > 25 ? HitResult.Miss : offset > 20 ? HitResult.Meh : offset > 15 ? HitResult.Ok : offset > 10 ? HitResult.Good : offset > 5 ? HitResult.Great : HitResult.Perfect;
                 return new HitEvent(h.TimeOffset, result, placeholder_object, placeholder_object, null);
             });
