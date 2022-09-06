@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -24,10 +24,8 @@ namespace osu.Game.Screens.Select
     {
         public const float SHEAR_WIDTH = 16;
         private const float outer_corner_radius = 10;
-        private const int ease_out_time = 800;
         private const int button_height = 120;
         private const float shear_padding = 10;
-        protected readonly FontUsage TorusFont = OsuFont.TorusAlternate.With(size: 16);
 
         private readonly Colour4 backgroundColour = Colour4.FromHex("#394642");
 
@@ -133,7 +131,7 @@ namespace osu.Game.Screens.Select
                                 AutoSizeAxes = Axes.Both,
                                 Child = spriteText = new OsuSpriteText
                                 {
-                                    Font = TorusFont,
+                                    Font = OsuFont.TorusAlternate.With(size: 16),
                                     AlwaysPresent = true,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -212,28 +210,12 @@ namespace osu.Game.Screens.Select
         {
             if (e.Action != Hotkey || e.Repeat) return false;
 
-            this.ScaleTo(.9f, 2000, Easing.OutQuint);
             TriggerClick();
             return true;
         }
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            if (e.Action != Hotkey) return;
-
-            this.ScaleTo(1, ease_out_time, Easing.OutBounce);
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            Content.ScaleTo(0.9f, 2000, Easing.OutQuint);
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            Content.ScaleTo(1, 1000, Easing.OutElastic);
-            base.OnMouseUp(e);
         }
     }
 }
