@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu
                 case ModType.Conversion:
                     return new Mod[]
                     {
-                        new OsuModMobileDevice(),
+                        new OsuModMobileFriendly(),
                         new OsuModTarget(),
                         new OsuModDifficultyAdjust(),
                         new OsuModClassic(),
