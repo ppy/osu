@@ -46,8 +46,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var hitCircle = drawableHitCircle.HitObject;
 
-                //it will be easier to disable this mod if not Clear its Transforms and it seens like doesn't affect mod behavior
-                //drawableHitCircle.ApproachCircle.ClearTransforms(targetMember: nameof(Scale));
+                drawableHitCircle.ApproachCircle.ClearTransforms(targetMember: nameof(Scale));
 
                 using (drawableHitCircle.BeginAbsoluteSequence(hitCircle.StartTime - hitCircle.TimePreempt))
                     drawableHitCircle.ApproachCircle.ScaleTo(Scale.Value).ScaleTo(1f, hitCircle.TimePreempt, getEasing(Style.Value));
