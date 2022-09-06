@@ -126,13 +126,13 @@ namespace osu.Game.Overlays
             Debug.Assert(notification.Parent == toastFlow);
 
             // Temporarily remove from flow so we can animate the position off to the right.
-            toastFlow.Remove(notification);
+            toastFlow.Remove(notification, false);
             AddInternal(notification);
 
             notification.MoveToOffset(new Vector2(400, 0), NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             notification.FadeOut(NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint).OnComplete(_ =>
             {
-                RemoveInternal(notification);
+                RemoveInternal(notification, false);
                 ForwardNotificationToPermanentStore?.Invoke(notification);
 
                 notification.FadeIn(300, Easing.OutQuint);
