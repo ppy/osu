@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override ModType Type => ModType.Conversion;
 
-        public override Type[] IncompatibleMods => new Type[] { typeof(OsuModDifficultyAdjust) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModDifficultyAdjust) };
 
         public override IconUsage? Icon => FontAwesome.Solid.Mobile;
 
