@@ -60,6 +60,7 @@ namespace osu.Game.Rulesets.Mods
             CurrentCombo.BindValueChanged(combo =>
             {
                 if (IsDisabled.Value) return;
+
                 ComboBasedAlpha = updateComboBasedAlpha(combo.NewValue);
             }, true);
 
