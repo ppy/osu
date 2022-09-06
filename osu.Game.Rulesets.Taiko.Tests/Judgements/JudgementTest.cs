@@ -17,7 +17,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Taiko.Tests
+namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
     public class JudgementTest : RateAdjustedBeatmapTestScene
     {
