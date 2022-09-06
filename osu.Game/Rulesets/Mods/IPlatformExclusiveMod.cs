@@ -5,7 +5,7 @@ using static osu.Framework.RuntimeInfo;
 
 namespace osu.Game.Rulesets.Mods
 {
-    internal interface IPlatformExclusiveMod
+    public interface IPlatformExclusiveMod
     {
         Platform[] AllowedPlatforms { get; }
     }
