@@ -45,6 +45,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             Guid deletedDifficultyID = Guid.Empty;
             int countBeforeDeletion = 0;
+            string beatmapSetHashBefore = string.Empty;
 
             for (int i = 0; i < 12; i++)
             {
@@ -55,6 +56,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     deletedDifficultyID = EditorBeatmap.BeatmapInfo.ID;
                     countBeforeDeletion = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count;
+                    beatmapSetHashBefore = Beatmap.Value.BeatmapSetInfo.Hash;
                 });
 
                 AddStep("click File", () => this.ChildrenOfType<DrawableOsuMenuItem>().First().TriggerClick());
@@ -72,6 +74,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                     AddAssert($"difficulty {i} is deleted", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Select(b => b.ID), () => Does.Not.Contain(deletedDifficultyID));
                     AddAssert("count decreased by one", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Count, () => Is.EqualTo(countBeforeDeletion - 1));
+                    AddAssert("set hash changed", () => Beatmap.Value.BeatmapSetInfo.Hash, () => Is.Not.EqualTo(beatmapSetHashBefore));
                 }
             }
         }

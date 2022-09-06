@@ -319,8 +319,7 @@ namespace osu.Game.Beatmaps
 
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
-                setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
-                setInfo.Status = BeatmapOnlineStatus.LocallyModified;
+                updateHashAndMarkDirty(setInfo);
 
                 Realm.Write(r =>
                 {
@@ -384,6 +383,8 @@ namespace osu.Game.Beatmaps
 
                 DeleteFile(setInfo, beatmapInfo.File);
                 setInfo.Beatmaps.Remove(beatmapInfo);
+
+                updateHashAndMarkDirty(setInfo);
             });
         }
 
@@ -439,6 +440,12 @@ namespace osu.Game.Beatmaps
 
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
+
+        private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
+        {
+            setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
+            setInfo.Status = BeatmapOnlineStatus.LocallyModified;
+        }
 
         #region Implementation of ICanAcceptFiles
 
