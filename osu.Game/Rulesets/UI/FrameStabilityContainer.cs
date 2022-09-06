@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
 
@@ -263,11 +262,9 @@ namespace osu.Game.Rulesets.UI
 
         public FrameTimeInfo TimeInfo => framedClock.TimeInfo;
 
-        public double TrueGameplayRate => parentGameplayClock?.TrueGameplayRate ?? Rate;
-
         public double StartTime => parentGameplayClock?.StartTime ?? 0;
 
-        public IEnumerable<double> NonGameplayAdjustments => parentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<double>();
+        public IEnumerable<double> GameplayAdjustments => parentGameplayClock?.GameplayAdjustments ?? Enumerable.Empty<double>();
 
         #endregion
 

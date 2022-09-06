@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         public double StartTime { get; protected set; }
 
-        public virtual IEnumerable<double> NonGameplayAdjustments => Enumerable.Empty<double>();
+        public virtual IEnumerable<double> GameplayAdjustments => Enumerable.Empty<double>();
 
         private readonly BindableBool isPaused = new BindableBool(true);
 
@@ -223,7 +223,5 @@ namespace osu.Game.Screens.Play
         public double FramesPerSecond => GameplayClock.FramesPerSecond;
 
         public FrameTimeInfo TimeInfo => GameplayClock.TimeInfo;
-
-        public virtual double TrueGameplayRate => Rate;
     }
 }

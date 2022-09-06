@@ -224,16 +224,7 @@ namespace osu.Game.Screens.Play
 
         private readonly List<IBindable<double>> speedAdjustments = new List<IBindable<double>>();
 
-        public override double TrueGameplayRate
-        {
-            get
-            {
-                double rate = Rate;
-                foreach (var a in speedAdjustments)
-                    rate *= a.Value;
-                return rate;
-            }
-        }
+        public override IEnumerable<double> GameplayAdjustments => speedAdjustments.Select(bindable => bindable.Value);
 
         void IAdjustableAudioComponent.AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
         {
