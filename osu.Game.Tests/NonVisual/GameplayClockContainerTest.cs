@@ -13,17 +13,17 @@ namespace osu.Game.Tests.NonVisual
     {
         [TestCase(0)]
         [TestCase(1)]
-        public void TestTrueGameplayRateWithZeroAdjustment(double underlyingClockRate)
+        public void TestTrueGameplayRateWithGameplayAdjustment(double underlyingClockRate)
         {
             var framedClock = new FramedClock(new ManualClock { Rate = underlyingClockRate });
             var gameplayClock = new TestGameplayClockContainer(framedClock);
 
-            Assert.That(gameplayClock.TrueGameplayRate, Is.EqualTo(0));
+            Assert.That(gameplayClock.GetTrueGameplayRate(), Is.EqualTo(2));
         }
 
         private class TestGameplayClockContainer : GameplayClockContainer
         {
-            public override IEnumerable<double> NonGameplayAdjustments => new[] { 0.0 };
+            public override IEnumerable<double> GameplayAdjustments => new[] { 2.0 };
 
             public TestGameplayClockContainer(IFrameBasedClock underlyingClock)
                 : base(underlyingClock)

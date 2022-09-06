@@ -370,7 +370,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void confirmNoTrackAdjustments()
         {
-            AddAssert("track has no adjustments", () => Beatmap.Value.Track.AggregateFrequency.Value == 1);
+            AddUntilStep("track has no adjustments", () => Beatmap.Value.Track.AggregateFrequency.Value, () => Is.EqualTo(1));
         }
 
         private void restart() => AddStep("restart", () => Player.Restart());
