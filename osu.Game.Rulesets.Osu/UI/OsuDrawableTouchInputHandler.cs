@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly BindableInt detectedTouches = new BindableInt
         {
-            MaxValue = 25
+            MaxValue = 10
         };
 
         private int getTouchIndex(TouchSource source) => source - TouchSource.Touch1;
