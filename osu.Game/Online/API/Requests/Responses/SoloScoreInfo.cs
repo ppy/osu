@@ -18,9 +18,6 @@ namespace osu.Game.Online.API.Requests.Responses
     [Serializable]
     public class SoloScoreInfo : IHasOnlineID<long>
     {
-        [JsonProperty("has_replay")]
-        public bool HasReplay { get; set; }
-
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
 
@@ -114,12 +111,16 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("pp")]
         public double? PP { get; set; }
 
+        [JsonProperty("has_replay")]
+        public bool HasReplay { get; set; }
+
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeUser() => false;
         public bool ShouldSerializeBeatmap() => false;
         public bool ShouldSerializeBeatmapSet() => false;
         public bool ShouldSerializePP() => false;
         public bool ShouldSerializeOnlineID() => false;
+        public bool ShouldSerializeHasReplay() => false;
 
         #endregion
 

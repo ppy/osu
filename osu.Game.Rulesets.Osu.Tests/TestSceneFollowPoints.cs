@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var drawableObject = getFunc.Invoke();
 
-                hitObjectContainer.Remove(drawableObject);
+                hitObjectContainer.Remove(drawableObject, false);
                 followPointRenderer.RemoveFollowPoints(drawableObject.HitObject);
             });
         }
@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 else
                     targetTime = getObject(hitObjectContainer.Count - 1).HitObject.StartTime + 1;
 
-                hitObjectContainer.Remove(toReorder);
+                hitObjectContainer.Remove(toReorder, false);
                 toReorder.HitObject.StartTime = targetTime;
                 hitObjectContainer.Add(toReorder);
             });
