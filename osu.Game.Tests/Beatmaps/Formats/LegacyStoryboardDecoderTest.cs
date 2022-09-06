@@ -128,8 +128,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
-                Assert.AreEqual(1, background.Elements.Count);
+                Assert.AreEqual(2, background.Elements.Count);
+
                 Assert.AreEqual(1000, background.Elements[0].StartTime);
+                Assert.AreEqual(1000, background.Elements[1].StartTime);
+
                 Assert.AreEqual(1000, storyboard.EarliestEventTime);
             }
         }
