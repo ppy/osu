@@ -83,6 +83,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     detectedTouchscreen = true;
                     player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
                 }
+
                 return base.OnTouchDown(e);
             }
 
