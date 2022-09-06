@@ -8,6 +8,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -57,6 +58,11 @@ namespace osu.Game.Screens.Play
         private double? actualStopTime;
 
         /// <summary>
+        /// Maintained solely to delegate <see cref="IAdjustableAudioComponent"/> pieces to (to maintain parent lookups).
+        /// </summary>
+        private readonly AudioContainer audioContainer;
+
+        /// <summary>
         /// Create a new master gameplay clock container.
         /// </summary>
         /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
@@ -69,6 +75,8 @@ namespace osu.Game.Screens.Play
             this.skipTargetTime = skipTargetTime;
 
             StartTime = findEarliestStartTime();
+
+            AddInternal(audioContainer = new AudioContainer());
         }
 
         private double findEarliestStartTime()
@@ -238,25 +246,32 @@ namespace osu.Game.Screens.Play
             track.RemoveAdjustment(type, adjustBindable);
         }
 
+        void IAdjustableAudioComponent.RemoveAllAdjustments(AdjustableProperty type) => audioContainer.RemoveAllAdjustments(type);
+
+        void IAdjustableAudioComponent.BindAdjustments(IAggregateAudioAdjustment component) => audioContainer.BindAdjustments(component);
+
+        void IAdjustableAudioComponent.UnbindAdjustments(IAggregateAudioAdjustment component) => audioContainer.UnbindAdjustments(component);
+
+        BindableNumber<double> IAdjustableAudioComponent.Volume => audioContainer.Volume;
+
+        BindableNumber<double> IAdjustableAudioComponent.Balance => audioContainer.Balance;
+
+        BindableNumber<double> IAdjustableAudioComponent.Frequency => audioContainer.Frequency;
+
+        BindableNumber<double> IAdjustableAudioComponent.Tempo => audioContainer.Tempo;
+
         public override void ResetSpeedAdjustments()
         {
             track.RemoveAllAdjustments(AdjustableProperty.Frequency);
             track.RemoveAllAdjustments(AdjustableProperty.Tempo);
         }
 
-        public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotImplementedException();
+        IBindable<double> IAggregateAudioAdjustment.AggregateVolume => audioContainer.AggregateVolume;
 
-        public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
-        public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+        IBindable<double> IAggregateAudioAdjustment.AggregateBalance => audioContainer.AggregateBalance;
 
-        public BindableNumber<double> Volume => throw new NotImplementedException();
-        public BindableNumber<double> Balance => throw new NotImplementedException();
-        public BindableNumber<double> Frequency => throw new NotImplementedException();
-        public BindableNumber<double> Tempo => throw new NotImplementedException();
+        IBindable<double> IAggregateAudioAdjustment.AggregateFrequency => audioContainer.AggregateFrequency;
 
-        public IBindable<double> AggregateVolume => throw new NotImplementedException();
-        public IBindable<double> AggregateBalance => throw new NotImplementedException();
-        public IBindable<double> AggregateFrequency => throw new NotImplementedException();
-        public IBindable<double> AggregateTempo => throw new NotImplementedException();
+        IBindable<double> IAggregateAudioAdjustment.AggregateTempo => audioContainer.AggregateTempo;
     }
 }
