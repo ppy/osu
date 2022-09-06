@@ -66,18 +66,20 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(-10000, -10000, true)]
         public void TestStoryboardProducesCorrectStartTimeFadeInAfterOtherEvents(double firstStoryboardEvent, double expectedStartTime, bool addEventToLoop)
         {
+            const double loop_start_time = -20000;
+
             var storyboard = new Storyboard();
 
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
 
             // these should be ignored as we have an alpha visibility blocker proceeding this command.
-            sprite.TimelineGroup.Scale.Add(Easing.None, -20000, -18000, 0, 1);
-            var loopGroup = sprite.AddLoop(-20000, 50);
-            loopGroup.Scale.Add(Easing.None, -20000, -18000, 0, 1);
+            sprite.TimelineGroup.Scale.Add(Easing.None, loop_start_time, -18000, 0, 1);
+            var loopGroup = sprite.AddLoop(loop_start_time, 50);
+            loopGroup.Scale.Add(Easing.None, loop_start_time, -18000, 0, 1);
 
             var target = addEventToLoop ? loopGroup : sprite.TimelineGroup;
-            double targetTime = addEventToLoop ? 20000 : 0;
-            target.Alpha.Add(Easing.None, targetTime + firstStoryboardEvent, targetTime + firstStoryboardEvent + 500, 0, 1);
+            double loopRelativeOffset = addEventToLoop ? -loop_start_time : 0;
+            target.Alpha.Add(Easing.None, loopRelativeOffset + firstStoryboardEvent, loopRelativeOffset + firstStoryboardEvent + 500, 0, 1);
 
             // these should be ignored due to being in the future.
             sprite.TimelineGroup.Alpha.Add(Easing.None, 18000, 20000, 0, 1);
