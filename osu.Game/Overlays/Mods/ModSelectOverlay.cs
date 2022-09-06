@@ -327,6 +327,7 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             case IPlatformExclusiveMod platformMod:
                                                 return platformMod.AcceptPlatform();
+
                                             default:
                                                 return true;
                                         }
