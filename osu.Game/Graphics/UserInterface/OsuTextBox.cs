@@ -283,7 +283,7 @@ namespace osu.Game.Graphics.UserInterface
             return samples[RNG.Next(0, samples.Length)]?.GetChannel();
         }
 
-        private void playSample(FeedbackSampleType feedbackSample)
+        private void playSample(FeedbackSampleType feedbackSample) => Schedule(() =>
         {
             if (Time.Current < sampleLastPlaybackTime + 15) return;
 
@@ -300,7 +300,7 @@ namespace osu.Game.Graphics.UserInterface
             channel.Play();
 
             sampleLastPlaybackTime = Time.Current;
-        }
+        });
 
         private class OsuCaret : Caret
         {
