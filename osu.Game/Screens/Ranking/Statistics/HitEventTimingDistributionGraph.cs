@@ -299,14 +299,11 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 float offsetValue = 0;
 
-                if (values.Any())
+                for (int i = 0; i < values.Count; i++)
                 {
-                    for (int i = 0; i < values.Count; i++)
-                    {
-                        boxOriginals[i].MoveToY(offsetForValue(offsetValue) * BoundingBox.Height, duration, Easing.OutQuint);
-                        boxOriginals[i].ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
-                        offsetValue -= values[i].Value;
-                    }
+                    boxOriginals[i].MoveToY(offsetForValue(offsetValue) * BoundingBox.Height, duration, Easing.OutQuint);
+                    boxOriginals[i].ResizeHeightTo(heightForValue(values[i].Value), duration, Easing.OutQuint);
+                    offsetValue -= values[i].Value;
                 }
             }
 
