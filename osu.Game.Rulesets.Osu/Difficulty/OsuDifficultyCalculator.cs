@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.0675;
-        private double hitWindowGreat;
 
         public override int Version => 20220902;
 
@@ -76,6 +75,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
+            double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
+
             return new OsuDifficultyAttributes
             {
                 StarRating = starRating,
@@ -112,16 +116,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
-
-            hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
-
             return new Skill[]
             {
                 new Aim(mods, true),
                 new Aim(mods, false),
-                new Speed(mods, hitWindowGreat),
+                new Speed(mods),
                 new Flashlight(mods)
             };
         }
