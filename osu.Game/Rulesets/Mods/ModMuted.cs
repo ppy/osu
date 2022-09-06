@@ -115,6 +115,8 @@ namespace osu.Game.Rulesets.Mods
 
             void updateMuteState(int combo)
             {
+                if (IsDisabled.Value) return;
+
                 double dimFactor = MuteComboCount.Value == 0 ? 1 : (double)combo / MuteComboCount.Value;
 
                 if (InverseMuting.Value)

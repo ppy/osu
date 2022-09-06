@@ -59,8 +59,16 @@ namespace osu.Game.Rulesets.Mods
             CurrentCombo.BindTo(scoreProcessor.Combo);
             CurrentCombo.BindValueChanged(combo =>
             {
-                ComboBasedAlpha = IsDisabled.Value ? 1 : Math.Max(MIN_ALPHA, 1 - (float)combo.NewValue / HiddenComboCount.Value);
+                if (IsDisabled.Value) return;
+                ComboBasedAlpha = updateComboBasedAlpha(combo.NewValue);
             }, true);
+
+            IsDisabled.BindValueChanged(s =>
+            {
+                ComboBasedAlpha = s.NewValue ? 1 : updateComboBasedAlpha(CurrentCombo.Value);
+            });
+
+            float updateComboBasedAlpha(int combo) => Math.Max(MIN_ALPHA, 1 - (float)combo / HiddenComboCount.Value);
         }
     }
 
