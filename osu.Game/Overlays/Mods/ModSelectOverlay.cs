@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -321,6 +322,16 @@ namespace osu.Game.Overlays.Mods
             foreach (var (modType, mods) in globalAvailableMods.Value)
             {
                 var modStates = mods.SelectMany(ModUtils.FlattenMod)
+                                    .Where(mod =>
+                                    {
+                                        switch (mod)
+                                        {
+                                            case IPlatformExclusiveMod platformMod:
+                                                return platformMod.AllowedPlatforms.Contains(RuntimeInfo.OS);
+                                            default:
+                                                return true;
+                                        }
+                                    })
                                     .Select(mod => new ModState(mod.DeepClone()))
                                     .ToArray();
 
