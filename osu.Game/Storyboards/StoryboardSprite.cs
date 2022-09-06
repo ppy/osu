@@ -32,17 +32,18 @@ namespace osu.Game.Storyboards
             {
                 // To get the initial start time, we need to check whether the first alpha command to exist has an initial value of zero.
                 // A start value of zero on an alpha governs, above all else, the first valid display time of a sprite.
-                //
-                // To make this valid, we need to aggregate all alpha commands across all loops before checking for the first, time-wise, else we could run into a scenario where:
-                // L,1000,1
-                //  F,0,0,,1          # this NEEDS TO BE considered the StartTime... but has a StartValue greater than zero so won't in the initial pass.
-                // F,0,2000,,0        # ..this will be treated as earliest start due to a StartValue of zero.
-
                 double zeroAlphaStartTimeOverride = double.MaxValue;
+                double earliestAlphaTime = double.MaxValue;
 
                 var topLevelFirstAlphaCommand = TimelineGroup.Alpha.Commands.FirstOrDefault();
-                if (topLevelFirstAlphaCommand?.StartValue == 0)
-                    zeroAlphaStartTimeOverride = topLevelFirstAlphaCommand.StartTime;
+
+                if (topLevelFirstAlphaCommand != null)
+                {
+                    earliestAlphaTime = topLevelFirstAlphaCommand.StartTime;
+                    if (topLevelFirstAlphaCommand.StartValue == 0)
+                        // The found alpha command has a zero StartValue, so should be used as the new override.
+                        zeroAlphaStartTimeOverride = topLevelFirstAlphaCommand.StartTime;
+                }
 
                 foreach (var loop in loops)
                 {
@@ -53,18 +54,24 @@ namespace osu.Game.Storyboards
 
                     double loopFirstAlphaStartTime = loopFirstAlphaCommand.StartTime + loop.LoopStartTime;
 
-                    if (loopFirstAlphaCommand.StartValue == 0)
+                    // Found an alpha command with an earlier start time than an override.
+                    if (loopFirstAlphaStartTime < earliestAlphaTime)
                     {
-                        // Found a loop containing a zero StartValue earlier than previous.
-                        zeroAlphaStartTimeOverride = loopFirstAlphaStartTime;
-                    }
-                    else if (loopFirstAlphaStartTime < zeroAlphaStartTimeOverride)
-                    {
-                        // If a loop's first alpha command's StartValue is non-zero, we need to check whether the command's StartTime is less than any previously found zero alpha command.
-                        // If this is the case, we want to abort zero alpha override logic and use the earliest command time instead.
-                        // This is because if the first alpha command is non-zero, the sprite will be shown at that alpha from the time of the first command (of any type, not just alpha).
-                        zeroAlphaStartTimeOverride = double.MaxValue;
-                        break;
+                        earliestAlphaTime = loopFirstAlphaStartTime;
+
+                        if (loopFirstAlphaCommand.StartValue == 0)
+                        {
+                            // The found alpha command has a zero StartValue, so should be used as the new override.
+                            zeroAlphaStartTimeOverride = loopFirstAlphaStartTime;
+                        }
+                        else if (loopFirstAlphaStartTime < zeroAlphaStartTimeOverride)
+                        {
+                            // The found alpha command's StartValue is non-zero.
+                            // In this case, we want to reset any found alpha override (so if this is the new earliest alpha,
+                            // we will fall through to the earlier command time logic below).
+                            zeroAlphaStartTimeOverride = double.MaxValue;
+                            break;
+                        }
                     }
                 }
 
