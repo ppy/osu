@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     hitErrorMeter.Hide();
             });
 
-            AddRepeatStep("hit", () => newJudgement(), ColourHitErrorMeter.HitErrorShape. *2);
+            AddRepeatStep("hit", () => newJudgement(), 10);
 
             AddAssert("bars added", () => this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
             AddAssert("circle added", () => this.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Any());
@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("ensure max circles not exceeded", () =>
             {
                 return this.ChildrenOfType<ColourHitErrorMeter>()
-                           .All(m => m.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count() <= ColourHitErrorMeter.HitShapeCount.Default);
+                           .All(m => m.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count() <= 10);
             });
 
             AddStep("show displays", () =>
