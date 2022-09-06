@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
     {
         public override bool IsPresent => toastContentBackground.Height > 0 || toastFlow.Count > 0;
 
-        public bool IsDisplayingToasts => allNotifications.Any();
+        public bool IsDisplayingToasts => toastFlow.Count > 0;
 
         private FillFlowContainer<Notification> toastFlow = null!;
         private BufferedContainer toastContentBackground = null!;
@@ -36,9 +36,12 @@ namespace osu.Game.Overlays
 
         public Action<Notification>? ForwardNotificationToPermanentStore { get; set; }
 
-        public int UnreadCount => allNotifications.Count(n => !n.WasClosed && !n.Read);
+        public int UnreadCount => allDisplayedNotifications.Count(n => !n.WasClosed && !n.Read);
 
-        private IEnumerable<Notification> allNotifications => toastFlow.Concat(InternalChildren.OfType<Notification>());
+        /// <summary>
+        /// Notifications contained in the toast flow, or in a detached state while they animate during forwarding to the main overlay.
+        /// </summary>
+        private IEnumerable<Notification> allDisplayedNotifications => toastFlow.Concat(InternalChildren.OfType<Notification>());
 
         private int runningDepth;
 
