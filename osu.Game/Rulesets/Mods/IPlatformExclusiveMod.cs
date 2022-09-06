@@ -3,6 +3,9 @@
 
 namespace osu.Game.Rulesets.Mods
 {
+    /// <summary>
+    /// Interface for any mod that should only be selectable on specific platforms.
+    /// </summary>
     public interface IPlatformExclusiveMod
     {
         bool AcceptPlatform();
