@@ -76,14 +76,15 @@ namespace osu.Game.Rulesets.Osu.UI
 
             osuInputManager.DragMode = sourceIndex == last_concurrent_touch_index;
 
-            if (!detectedTouchscreen && ++detectedTouches.Value == detectedTouches.MaxValue)
-            {
-                detectedTouchscreen = true;
-                player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
-            }
-
             if (isCursorTouch(source))
+            {
+                if (!detectedTouchscreen && ++detectedTouches.Value == detectedTouches.MaxValue)
+                {
+                    detectedTouchscreen = true;
+                    player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
+                }
                 return base.OnTouchDown(e);
+            }
 
             osuInputManager.KeyBindingContainer.TriggerPressed(touchActions[source]);
 
