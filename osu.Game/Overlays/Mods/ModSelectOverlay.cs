@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -327,7 +326,7 @@ namespace osu.Game.Overlays.Mods
                                         switch (mod)
                                         {
                                             case IPlatformExclusiveMod platformMod:
-                                                return platformMod.AllowedPlatforms.Contains(RuntimeInfo.OS);
+                                                return platformMod.AcceptPlatform();
                                             default:
                                                 return true;
                                         }
