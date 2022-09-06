@@ -203,8 +203,8 @@ namespace osu.Game.Rulesets.UI
                 base.ReloadMappings();
 
                 KeyBindings = KeyBindings.Where(b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination))
-                         .GroupBy(b => b.KeyCombination)
-                         .Select(g => g.First()).ToList();
+                                         .GroupBy(b => b.KeyCombination)
+                                         .Select(g => g.First()).ToList();
             }
         }
     }
