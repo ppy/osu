@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -45,6 +46,9 @@ namespace osu.Game.Tests.Visual
         public new bool PauseCooldownActive => base.PauseCooldownActive;
 
         public readonly List<JudgementResult> Results = new List<JudgementResult>();
+
+        [Resolved]
+        private SpectatorClient spectatorClient { get; set; }
 
         public TestPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
             : base(new PlayerConfiguration
@@ -97,6 +101,16 @@ namespace osu.Game.Tests.Visual
                 return;
 
             ScoreProcessor.NewJudgement += r => Results.Add(r);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // Specific to tests, the player can be disposed without OnExiting() ever being called.
+            // We should make sure that the gameplay session has finished even in this case.
+            if (LoadedBeatmapSuccessfully)
+                spectatorClient?.EndPlaying(GameplayState);
         }
     }
 }

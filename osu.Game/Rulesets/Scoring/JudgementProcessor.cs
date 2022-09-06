@@ -61,6 +61,11 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
         public void ApplyResult(JudgementResult result)
         {
+#pragma warning disable CS0618
+            if (result.Type == HitResult.LegacyComboIncrease)
+                throw new ArgumentException(@$"A {nameof(HitResult.LegacyComboIncrease)} hit result cannot be applied.");
+#pragma warning restore CS0618
+
             JudgedHits++;
             lastAppliedResult = result;
 

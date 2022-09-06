@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -27,6 +28,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// Number of rolling hits required to reach the dark/final colour.
         /// </summary>
         private const int rolling_hits_for_engaged_colour = 5;
+
+        public override Quad ScreenSpaceDrawQuad => MainPiece.Drawable.ScreenSpaceDrawQuad;
 
         /// <summary>
         /// Rolling number of tick hits. This increases for hits and decreases for misses.

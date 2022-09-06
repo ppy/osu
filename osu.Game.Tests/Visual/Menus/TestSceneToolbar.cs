@@ -62,8 +62,8 @@ namespace osu.Game.Tests.Visual.Menus
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Remove(nowPlayingOverlay);
-            Remove(volumeOverlay);
+            Remove(nowPlayingOverlay, false);
+            Remove(volumeOverlay, false);
 
             Children = new Drawable[]
             {

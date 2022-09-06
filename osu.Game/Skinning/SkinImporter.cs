@@ -10,6 +10,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
@@ -49,7 +50,7 @@ namespace osu.Game.Skinning
 
         protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
-            var skinInfoFile = model.Files.SingleOrDefault(f => f.Filename == skin_info_file);
+            var skinInfoFile = model.GetFile(skin_info_file);
 
             if (skinInfoFile != null)
             {
@@ -129,7 +130,7 @@ namespace osu.Game.Skinning
                 authorLine,
             };
 
-            var existingFile = item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase));
+            var existingFile = item.GetFile(@"skin.ini");
 
             if (existingFile == null)
             {
@@ -163,7 +164,7 @@ namespace osu.Game.Skinning
                     {
                         Logger.Log($"Skin {item}'s skin.ini had issues and has been removed. Please report this and provide the problematic skin.", LoggingTarget.Database, LogLevel.Important);
 
-                        var existingIni = item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase));
+                        var existingIni = item.GetFile(@"skin.ini");
                         if (existingIni != null)
                             item.Files.Remove(existingIni);
 
@@ -248,7 +249,7 @@ namespace osu.Game.Skinning
                     {
                         string filename = @$"{drawableInfo.Key}.json";
 
-                        var oldFile = s.Files.FirstOrDefault(f => f.Filename == filename);
+                        var oldFile = s.GetFile(filename);
 
                         if (oldFile != null)
                             modelManager.ReplaceFile(oldFile, streamContent, s.Realm);

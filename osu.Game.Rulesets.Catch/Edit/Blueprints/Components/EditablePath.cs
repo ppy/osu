@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         public void UpdateFrom(ScrollingHitObjectContainer hitObjectContainer, JuiceStream hitObject)
         {
             while (path.Vertices.Count < InternalChildren.Count)
-                RemoveInternal(InternalChildren[^1]);
+                RemoveInternal(InternalChildren[^1], true);
 
             while (InternalChildren.Count < path.Vertices.Count)
                 AddInternal(new VertexPiece());
