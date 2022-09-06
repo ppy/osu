@@ -43,7 +43,7 @@ namespace osu.Game.Storyboards
                 foreach (var loop in loops)
                 {
                     command = loop.Alpha.Commands.FirstOrDefault();
-                    if (command != null) alphaCommands.Add((command.StartTime + loop.StartTime, command.StartValue == 0));
+                    if (command != null) alphaCommands.Add((command.StartTime + loop.LoopStartTime, command.StartValue == 0));
                 }
 
                 if (alphaCommands.Count > 0)
