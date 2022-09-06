@@ -96,6 +96,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         public class StrongNestedHit : StrongNestedHitObject
         {
+            // The strong hit of the drum roll doesn't actually provide any score.
+            public override Judgement CreateJudgement() => new IgnoreJudgement();
         }
 
         #region LegacyBeatmapEncoder
