@@ -929,7 +929,7 @@ namespace osu.Game.Screens.Edit
                 // of note, we're still working with the cloned version, so indices are all prior to deletion.
                 BeatmapInfo nextToShow = difficultiesBeforeDeletion[deletedIndex == 0 ? 1 : deletedIndex - 1];
 
-                Beatmap.Value = beatmapManager.GetWorkingBeatmap(nextToShow, true);
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(nextToShow);
 
                 SwitchToDifficulty(nextToShow);
             }

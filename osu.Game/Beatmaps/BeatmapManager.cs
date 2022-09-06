@@ -385,6 +385,7 @@ namespace osu.Game.Beatmaps
                 setInfo.Beatmaps.Remove(beatmapInfo);
 
                 updateHashAndMarkDirty(setInfo);
+                workingBeatmapCache.Invalidate(setInfo);
             });
         }
 
