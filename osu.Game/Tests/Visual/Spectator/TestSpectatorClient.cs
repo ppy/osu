@@ -37,6 +37,7 @@ namespace osu.Game.Tests.Visual.Spectator
         private readonly Dictionary<int, ReplayFrame> lastReceivedUserFrames = new Dictionary<int, ReplayFrame>();
 
         private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
+        private readonly Dictionary<int, APIMod[]> userModsDictionary = new Dictionary<int, APIMod[]>();
         private readonly Dictionary<int, int> userNextFrameDictionary = new Dictionary<int, int>();
 
         [Resolved]
@@ -52,9 +53,11 @@ namespace osu.Game.Tests.Visual.Spectator
         /// </summary>
         /// <param name="userId">The user to start play for.</param>
         /// <param name="beatmapId">The playing beatmap id.</param>
-        public void SendStartPlay(int userId, int beatmapId)
+        /// <param name="mods">The mods the user has applied.</param>
+        public void SendStartPlay(int userId, int beatmapId, APIMod[]? mods = null)
         {
             userBeatmapDictionary[userId] = beatmapId;
+            userModsDictionary[userId] = mods ?? Array.Empty<APIMod>();
             userNextFrameDictionary[userId] = 0;
             sendPlayingState(userId);
         }
@@ -73,10 +76,12 @@ namespace osu.Game.Tests.Visual.Spectator
             {
                 BeatmapID = userBeatmapDictionary[userId],
                 RulesetID = 0,
+                Mods = userModsDictionary[userId],
                 State = state
             });
 
             userBeatmapDictionary.Remove(userId);
+            userModsDictionary.Remove(userId);
         }
 
         /// <summary>
@@ -158,6 +163,7 @@ namespace osu.Game.Tests.Visual.Spectator
             {
                 BeatmapID = userBeatmapDictionary[userId],
                 RulesetID = 0,
+                Mods = userModsDictionary[userId],
                 State = SpectatedUserState.Playing
             });
         }
