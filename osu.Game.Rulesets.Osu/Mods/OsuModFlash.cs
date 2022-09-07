@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -10,7 +11,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override string Description => "Burn the notes into your memory";
+        public override LocalisableString Description => "Burn the notes into your memory";
 
         public override ModType Type => ModType.Fun;
 
@@ -31,22 +31,29 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTarget), typeof(OsuModStrictTracking) };
 
         [SettingSource("Beat divisor")]
-        public BindableFloat BeatDivisor { get; } = new BindableFloat(2)
+        public BindableFloat BeatDivisor { get; } = new BindableFloat(1)
         {
             MinValue = .25f,
-            MaxValue = 2,
-            Precision = .25F
+            MaxValue = 5,
+            Precision = .25f
         };
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
             base.ApplyToBeatmap(beatmap);
 
-            foreach (var hitObject in beatmap.HitObjects.OfType<OsuHitObject>())
+            foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
             {
-                hitObject.TimeFadeIn = hitObject.TimePreempt;
-                var point = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
-                hitObject.TimePreempt += hitObject.StartTime % (point.BeatLength / BeatDivisor.Value);
+                applyFadeInAdjustment(obj);
+                var point = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
+                obj.TimePreempt += obj.StartTime % (point.BeatLength * BeatDivisor.Value);
+            }
+
+            static void applyFadeInAdjustment(OsuHitObject osuObject)
+            {
+                osuObject.TimeFadeIn = osuObject.TimePreempt;
+                foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
+                    applyFadeInAdjustment(nested);
             }
         }
 
