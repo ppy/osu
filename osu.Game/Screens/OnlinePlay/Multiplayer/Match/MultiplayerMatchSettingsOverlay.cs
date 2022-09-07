@@ -4,7 +4,6 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -13,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -71,9 +69,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private OsuEnumDropdown<StartMode> startModeDropdown = null!;
             private OsuSpriteText typeLabel = null!;
             private LoadingLayer loadingLayer = null!;
-
-            [Resolved]
-            private BeatmapManager beatmapManager { get; set; } = null!;
 
             public void SelectBeatmap()
             {
