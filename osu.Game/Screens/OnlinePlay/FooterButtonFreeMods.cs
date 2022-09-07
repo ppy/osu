@@ -29,13 +29,12 @@ namespace osu.Game.Screens.OnlinePlay
 
         public FooterButtonFreeMods()
         {
-            ButtonContentContainer.Add(modDisplay = new ModDisplay
+            ModsContainer.Add(modDisplay = new ModDisplay
             {
-                Shear = -SHEAR,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
                 Scale = new Vector2(0.8f),
-                ExpansionMode = ExpansionMode.ExpandOnHover
+                ExpansionMode = ExpansionMode.AlwaysContracted
             });
         }
 
