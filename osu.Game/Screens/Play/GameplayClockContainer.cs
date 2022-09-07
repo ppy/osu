@@ -2,9 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         public double StartTime { get; protected set; }
 
-        public virtual IEnumerable<double> GameplayAdjustments => Enumerable.Empty<double>();
+        public IAdjustableAudioComponent GameplayAdjustments { get; } = new AudioAdjustments();
 
         private readonly BindableBool isPaused = new BindableBool(true);
 
