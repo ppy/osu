@@ -53,6 +53,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-            => new GameplayClockContainer(spectatorPlayerClock);
+        {
+            var gameplayClockContainer = new GameplayClockContainer(spectatorPlayerClock);
+
+            // Directionality is important, as BindAdjustments is... not actually a bidirectional bind...
+            // We want to ensure that any adjustments applied by the Player instance are applied to the SpectatorPlayerClock
+            // so they can be consumed by the spectator screen (and applied to the master clock / track).
+            spectatorPlayerClock.GameplayAdjustments.BindAdjustments(gameplayClockContainer.GameplayAdjustments);
+
+            return gameplayClockContainer;
+        }
     }
 }
