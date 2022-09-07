@@ -76,13 +76,20 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private bool isValidTouchInput(int index) => index <= last_concurrent_touch_index;
 
+        /// <summary>
+        /// Detects the touchscreen and applies the Touch Device mod for the current score.
+        /// <remarks>
+        /// We wait till some value of detected touches to be detected regardless if the input was surely made from a touch device,
+        /// this because we don't want to penalize players that barely used their touch device with the touch device mod.
+        /// although in a near future we probably must use some kind of metadata on how many touch inputs were detected to properly
+        /// nerf pp according to that, rather than nerfing every play made with a touch device the same.
+        /// </remarks>
+        /// </summary>
         private void detectTouchScreen()
         {
-            if (++detectedTouches.Value == detectedTouches.MaxValue)
-            {
-                detectedTouchscreen = true;
+            detectedTouchscreen = ++detectedTouches.Value == detectedTouches.MaxValue;
+            if (detectedTouchscreen)
                 player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
-            }
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
