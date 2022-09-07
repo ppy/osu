@@ -61,6 +61,7 @@ namespace osu.Game.Screens.Select
         private readonly Box flashLayer;
         private readonly SpriteIcon sprite;
         private readonly Box backgroundColourBox;
+        protected FillFlowContainer ButtonContentContainer;
 
         protected FooterButton()
         {
@@ -84,7 +85,7 @@ namespace osu.Game.Screens.Select
                     backgroundColourBox = new Box
                     {
                         Colour = backgroundColour,
-                        RelativeSizeAxes = Axes.Both,
+                        Height = button_height
                         Depth = 2,
                     },
                     new Box
@@ -95,7 +96,7 @@ namespace osu.Game.Screens.Select
                     },
                     new Container
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        Shear = -SHEAR,
                         Padding = new MarginPadding
                         {
                             Top = 12,
@@ -105,7 +106,7 @@ namespace osu.Game.Screens.Select
                         {
                             sprite = new SpriteIcon
                             {
-                                Shear = -SHEAR,
+                                Margin = new MarginPadding
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Size = new Vector2(20)
@@ -125,7 +126,7 @@ namespace osu.Game.Screens.Select
                                 Colour = Colour4.White,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Shear = -SHEAR,
+
                                 Margin = new MarginPadding { Top = 41.89f },
                                 Padding = new MarginPadding { Right = 14 },
                                 AutoSizeAxes = Axes.Both,
@@ -156,7 +157,6 @@ namespace osu.Game.Screens.Select
                                 Origin = Anchor.TopCentre,
                                 Height = 6,
                                 Width = 120.74f,
-                                Shear = -SHEAR,
                                 Masking = true,
                                 Children = new Drawable[]
                                 {
@@ -165,7 +165,6 @@ namespace osu.Game.Screens.Select
                                         RelativeSizeAxes = Axes.Both,
                                         Origin = Anchor.Centre,
                                         Anchor = Anchor.Centre,
-                                        Depth = 1,
                                     }
                                 }
                             },
@@ -176,7 +175,7 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.Both,
                         Colour = Colour4.White.Opacity(0.9f),
                         Blending = BlendingParameters.Additive,
-                        Alpha = 0,
+                        Alpha = 0
                     },
                 };
             }
