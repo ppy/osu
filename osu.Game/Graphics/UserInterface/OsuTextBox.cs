@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.UserInterface
         private bool selectionStarted;
         private double sampleLastPlaybackTime;
 
-        private enum FeedbackSampleType
+        protected enum FeedbackSampleType
         {
             TextAdd,
             TextAddCaps,
@@ -117,30 +117,30 @@ namespace osu.Game.Graphics.UserInterface
                 return;
 
             if (added.Any(char.IsUpper) && AllowUniqueCharacterSamples)
-                playSample(FeedbackSampleType.TextAddCaps);
+                PlayFeedbackSample(FeedbackSampleType.TextAddCaps);
             else
-                playSample(FeedbackSampleType.TextAdd);
+                PlayFeedbackSample(FeedbackSampleType.TextAdd);
         }
 
         protected override void OnUserTextRemoved(string removed)
         {
             base.OnUserTextRemoved(removed);
 
-            playSample(FeedbackSampleType.TextRemove);
+            PlayFeedbackSample(FeedbackSampleType.TextRemove);
         }
 
         protected override void NotifyInputError()
         {
             base.NotifyInputError();
 
-            playSample(FeedbackSampleType.TextInvalid);
+            PlayFeedbackSample(FeedbackSampleType.TextInvalid);
         }
 
         protected override void OnTextCommitted(bool textChanged)
         {
             base.OnTextCommitted(textChanged);
 
-            playSample(FeedbackSampleType.TextConfirm);
+            PlayFeedbackSample(FeedbackSampleType.TextConfirm);
         }
 
         protected override void OnCaretMoved(bool selecting)
@@ -148,7 +148,7 @@ namespace osu.Game.Graphics.UserInterface
             base.OnCaretMoved(selecting);
 
             if (!selecting)
-                playSample(FeedbackSampleType.CaretMove);
+                PlayFeedbackSample(FeedbackSampleType.CaretMove);
         }
 
         protected override void OnTextSelectionChanged(TextSelectionType selectionType)
@@ -158,15 +158,15 @@ namespace osu.Game.Graphics.UserInterface
             switch (selectionType)
             {
                 case TextSelectionType.Character:
-                    playSample(FeedbackSampleType.SelectCharacter);
+                    PlayFeedbackSample(FeedbackSampleType.SelectCharacter);
                     break;
 
                 case TextSelectionType.Word:
-                    playSample(selectionStarted ? FeedbackSampleType.SelectCharacter : FeedbackSampleType.SelectWord);
+                    PlayFeedbackSample(selectionStarted ? FeedbackSampleType.SelectCharacter : FeedbackSampleType.SelectWord);
                     break;
 
                 case TextSelectionType.All:
-                    playSample(FeedbackSampleType.SelectAll);
+                    PlayFeedbackSample(FeedbackSampleType.SelectAll);
                     break;
             }
 
@@ -179,7 +179,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (!selectionStarted) return;
 
-            playSample(FeedbackSampleType.Deselect);
+            PlayFeedbackSample(FeedbackSampleType.Deselect);
 
             selectionStarted = false;
         }
@@ -198,13 +198,13 @@ namespace osu.Game.Graphics.UserInterface
 
                     case 1:
                         // composition probably ended by pressing backspace, or was cancelled.
-                        playSample(FeedbackSampleType.TextRemove);
+                        PlayFeedbackSample(FeedbackSampleType.TextRemove);
                         return;
 
                     default:
                         // longer text removed, composition ended because it was cancelled.
                         // could be a different sample if desired.
-                        playSample(FeedbackSampleType.TextRemove);
+                        PlayFeedbackSample(FeedbackSampleType.TextRemove);
                         return;
                 }
             }
@@ -212,7 +212,7 @@ namespace osu.Game.Graphics.UserInterface
             if (addedTextLength > 0)
             {
                 // some text was added, probably due to typing new text or by changing the candidate.
-                playSample(FeedbackSampleType.TextAdd);
+                PlayFeedbackSample(FeedbackSampleType.TextAdd);
                 return;
             }
 
@@ -220,14 +220,14 @@ namespace osu.Game.Graphics.UserInterface
             {
                 // text was probably removed by backspacing.
                 // it's also possible that a candidate that only removed text was changed to.
-                playSample(FeedbackSampleType.TextRemove);
+                PlayFeedbackSample(FeedbackSampleType.TextRemove);
                 return;
             }
 
             if (caretMoved)
             {
                 // only the caret/selection was moved.
-                playSample(FeedbackSampleType.CaretMove);
+                PlayFeedbackSample(FeedbackSampleType.CaretMove);
             }
         }
 
@@ -238,13 +238,13 @@ namespace osu.Game.Graphics.UserInterface
             if (successful)
             {
                 // composition was successfully completed, usually by pressing the enter key.
-                playSample(FeedbackSampleType.TextConfirm);
+                PlayFeedbackSample(FeedbackSampleType.TextConfirm);
             }
             else
             {
                 // composition was prematurely ended, eg. by clicking inside the textbox.
                 // could be a different sample if desired.
-                playSample(FeedbackSampleType.TextConfirm);
+                PlayFeedbackSample(FeedbackSampleType.TextConfirm);
             }
         }
 
@@ -283,7 +283,7 @@ namespace osu.Game.Graphics.UserInterface
             return samples[RNG.Next(0, samples.Length)]?.GetChannel();
         }
 
-        private void playSample(FeedbackSampleType feedbackSample) => Schedule(() =>
+        protected void PlayFeedbackSample(FeedbackSampleType feedbackSample) => Schedule(() =>
         {
             if (Time.Current < sampleLastPlaybackTime + 15) return;
 
