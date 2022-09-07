@@ -69,8 +69,9 @@ namespace osu.Game.Database
         /// 21   2022-07-27    Migrate collections to realm (BeatmapCollection).
         /// 22   2022-07-31    Added ModPreset.
         /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
+        /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
         /// </summary>
-        private const int schema_version = 23;
+        private const int schema_version = 24;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.

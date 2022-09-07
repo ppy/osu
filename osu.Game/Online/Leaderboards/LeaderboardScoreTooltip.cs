@@ -10,6 +10,8 @@ using osuTK;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -126,7 +128,7 @@ namespace osu.Game.Online.Leaderboards
 
         private class HitResultCell : CompositeDrawable
         {
-            private readonly string displayName;
+            private readonly LocalisableString displayName;
             private readonly HitResult result;
             private readonly int count;
 
@@ -134,7 +136,7 @@ namespace osu.Game.Online.Leaderboards
             {
                 AutoSizeAxes = Axes.Both;
 
-                displayName = stat.DisplayName;
+                displayName = stat.DisplayName.ToUpper();
                 result = stat.Result;
                 count = stat.Count;
             }
@@ -153,7 +155,7 @@ namespace osu.Game.Online.Leaderboards
                         new OsuSpriteText
                         {
                             Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
-                            Text = displayName.ToUpperInvariant(),
+                            Text = displayName.ToUpper(),
                             Colour = colours.ForHitResult(result),
                         },
                         new OsuSpriteText

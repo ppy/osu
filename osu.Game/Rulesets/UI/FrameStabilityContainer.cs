@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.UI
             this.gameplayStartTime = gameplayStartTime;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(IGameplayClock? gameplayClock)
         {
             if (gameplayClock != null)
@@ -281,7 +281,7 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        public double? StartTime => parentGameplayClock?.StartTime;
+        public double StartTime => parentGameplayClock?.StartTime ?? 0;
 
         public IEnumerable<double> NonGameplayAdjustments => parentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<double>();
 

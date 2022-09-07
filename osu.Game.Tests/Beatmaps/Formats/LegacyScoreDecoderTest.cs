@@ -67,6 +67,24 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
+        [Test]
+        public void TestDecodeTaikoReplay()
+        {
+            var decoder = new TestLegacyScoreDecoder();
+
+            using (var resourceStream = TestResources.OpenResource("Replays/taiko-replay.osr"))
+            {
+                var score = decoder.Parse(resourceStream);
+
+                Assert.AreEqual(1, score.ScoreInfo.Ruleset.OnlineID);
+                Assert.AreEqual(4, score.ScoreInfo.Statistics[HitResult.Great]);
+                Assert.AreEqual(2, score.ScoreInfo.Statistics[HitResult.LargeBonus]);
+                Assert.AreEqual(4, score.ScoreInfo.MaxCombo);
+
+                Assert.That(score.Replay.Frames, Is.Not.Empty);
+            }
+        }
+
         [TestCase(3, true)]
         [TestCase(6, false)]
         [TestCase(LegacyBeatmapDecoder.LATEST_VERSION, false)]

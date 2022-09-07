@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "FL";
         public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => "Restricted view area.";
+        public override LocalisableString Description => "Restricted view area.";
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public abstract BindableFloat SizeMultiplier { get; }
