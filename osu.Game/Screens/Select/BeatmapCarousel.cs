@@ -1005,7 +1005,8 @@ namespace osu.Game.Screens.Select
 
         private class CarouselRoot : CarouselGroupEagerSelect
         {
-            private readonly BeatmapCarousel carousel;
+            // May only be null during construction (State.Value set causes PerformSelection to be triggered).
+            private readonly BeatmapCarousel? carousel;
 
             public readonly Dictionary<Guid, CarouselBeatmapSet> BeatmapSetsByID = new Dictionary<Guid, CarouselBeatmapSet>();
 
@@ -1048,7 +1049,7 @@ namespace osu.Game.Screens.Select
             protected override void PerformSelection()
             {
                 if (LastSelected == null || LastSelected.Filtered.Value)
-                    carousel.SelectNextRandom();
+                    carousel?.SelectNextRandom();
                 else
                     base.PerformSelection();
             }
