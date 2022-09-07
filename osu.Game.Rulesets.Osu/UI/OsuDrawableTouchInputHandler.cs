@@ -57,9 +57,7 @@ namespace osu.Game.Rulesets.Osu.UI
             MaxValue = 10
         };
 
-        private Vector2 previousMousePosition;
-
-        private bool firstMouseDownApplied;
+        private Vector2? previousMousePosition;
 
         private int getTouchIndex(TouchSource source) => source - TouchSource.Touch1;
 
@@ -100,12 +98,10 @@ namespace osu.Game.Rulesets.Osu.UI
             var currentMousePosition = e.MousePosition;
 
             // We ignore the first input since we don't have a proper previousMousePosition
-            if (firstMouseDownApplied && Vector2.Distance(currentMousePosition, previousMousePosition) > mouse_input_touchscreen_distance)
+            if (previousMousePosition != null && Vector2.Distance(currentMousePosition, previousMousePosition.Value) > mouse_input_touchscreen_distance)
                 detectTouchScreen();
 
             previousMousePosition = currentMousePosition;
-
-            firstMouseDownApplied = true;
 
             return base.OnMouseDown(e);
         }
