@@ -13,12 +13,18 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Play;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuDrawableTouchInputHandler : Drawable
     {
         public const TouchSource CURSOR_TOUCH = TouchSource.Touch1;
+
+        /// <summary>
+        /// The distance required for a mouse input to be considered a touchscreen input relative to a previous mouse input.
+        /// </summary>
+        private const int mouse_input_touchscreen_distance = 100;
 
         /// <summary>
         /// How many taps (taps referring as streaming touch input) can be registered.
@@ -51,6 +57,10 @@ namespace osu.Game.Rulesets.Osu.UI
             MaxValue = 10
         };
 
+        private Vector2 previousMousePosition;
+
+        private bool firstMouseDownApplied;
+
         private int getTouchIndex(TouchSource source) => source - TouchSource.Touch1;
 
         public OsuDrawableTouchInputHandler(OsuInputManager inputManager)
@@ -66,6 +76,33 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private bool isValidTouchInput(int index) => index <= last_concurrent_touch_index;
 
+        private void detectTouchScreen()
+        {
+            if (++detectedTouches.Value == detectedTouches.MaxValue)
+            {
+                detectedTouchscreen = true;
+                player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
+            }
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (detectedTouchscreen)
+                return base.OnMouseDown(e);
+
+            var currentMousePosition = e.MousePosition;
+
+            // We ignore the first input since we don't have a proper previousMousePosition
+            if (firstMouseDownApplied && Vector2.Distance(currentMousePosition, previousMousePosition) > mouse_input_touchscreen_distance)
+                detectTouchScreen();
+
+            previousMousePosition = currentMousePosition;
+
+            firstMouseDownApplied = true;
+
+            return base.OnMouseDown(e);
+        }
+
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             var source = e.Touch.Source;
@@ -78,11 +115,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (isCursorTouch(source))
             {
-                if (!detectedTouchscreen && ++detectedTouches.Value == detectedTouches.MaxValue)
-                {
-                    detectedTouchscreen = true;
-                    player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
-                }
+                if (!detectedTouchscreen)
+                    detectTouchScreen();
 
                 return base.OnTouchDown(e);
             }
