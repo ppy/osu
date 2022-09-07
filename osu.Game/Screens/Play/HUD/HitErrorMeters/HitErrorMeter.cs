@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         protected Color4 GetColourForHitResult(HitResult result)
         {
-            return colours.DrawForHitResult(result);
+            return colours.ForHitResult(result);
         }
 
         /// <summary>
