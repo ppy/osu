@@ -1,61 +1,84 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
+using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModFlash : ModWithVisibilityAdjustment, IApplicableAfterBeatmapConversion
+    public class OsuModFlash : ModWithVisibilityAdjustment, IHidesApproachCircles, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        public override string Name => "Var AR Test";
-        public override string Acronym => "TP";
+        public override string Name => "Freeze frame";
+
+        public override string Acronym => "FF";
+
+        public override double ScoreMultiplier => 1;
+
+        public override string Description => "Burn the notes into your memory";
+
         public override ModType Type => ModType.Fun;
-        public override IconUsage? Icon => FontAwesome.Regular.Sun;
-        public override string Description => @"how far will your reading stretch";
-        public override double ScoreMultiplier => 1.03;
+
+        public override IconUsage? Icon => FontAwesome.Solid.Fire;
+
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModTarget), typeof(OsuModStrictTracking) };
+
+        [SettingSource("Beat divisor")]
+        public BindableFloat BeatDivisor { get; } = new BindableFloat(2)
+        {
+            MinValue = .25f,
+            MaxValue = 2,
+            Precision = .25F
+        };
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
             base.ApplyToBeatmap(beatmap);
-            double lastObjectEnd = beatmap.HitObjects.LastOrDefault()?.GetEndTime() ?? 0;
 
-            foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
-                applyVariableAr(obj);
-
-            void applyVariableAr(OsuHitObject osuObject)
+            foreach (var hitObject in beatmap.HitObjects.OfType<OsuHitObject>())
             {
-                double percentageofmap = osuObject.StartTime / lastObjectEnd;
-                osuObject.TimePreempt = (percentageofmap * osuObject.TimePreempt) * ARadded.Value + osuObject.TimePreempt;
-                foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
-                    applyVariableAr(nested);
+                hitObject.TimeFadeIn = hitObject.TimePreempt;
+                var point = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
+                hitObject.TimePreempt += hitObject.StartTime % (point.BeatLength / BeatDivisor.Value);
             }
+        }
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
         }
 
-        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyFrozenState(hitObject, state);
+
+        private void applyFrozenState(DrawableHitObject drawable, ArmedState state)
         {
+            if (drawable is DrawableSpinner)
+                return;
+
+            var h = (OsuHitObject)drawable.HitObject;
+
+            switch (drawable)
+            {
+                case DrawableHitCircle circle:
+                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+                    {
+                        circle.ApproachCircle.Hide();
+                    }
+
+                    break;
+            }
         }
-
-        [SettingSource("Additional AR", "how much AR change to add")]
-        public BindableDouble ARadded { get; } = new BindableDouble(1)
-        {
-            Precision = 0.1f,
-            MinValue = 0,
-            MaxValue = 10,
-        };
-
-        /*[SettingSource("Additional Ar", "how much ar  change to add")]
-        public BindableBool scaledown { get; } = new BindableBool();*/
     }
 }
+
