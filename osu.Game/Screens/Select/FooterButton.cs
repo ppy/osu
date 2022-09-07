@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -54,7 +54,6 @@ namespace osu.Game.Screens.Select
             set => sprite.Icon = value;
         }
 
-        protected FillFlowContainer ButtonContentContainer;
         protected readonly Container TextContainer;
         private readonly SpriteText spriteText;
         private readonly Box boxColour;
@@ -66,11 +65,12 @@ namespace osu.Game.Screens.Select
         protected FooterButton()
         {
             Anchor = Anchor.TopLeft;
-            AutoSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.X;
+            Height = button_height;
             Shear = SHEAR;
             CornerRadius = outer_corner_radius;
             Masking = true;
-            Margin = new MarginPadding { Left = 10, Top = -20 };
+            Margin = new MarginPadding { Top = -20 };
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
@@ -84,85 +84,66 @@ namespace osu.Game.Screens.Select
                 {
                     backgroundColourBox = new Box
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Colour = backgroundColour,
-                        Height = button_height
-                        Depth = 2,
-                    },
-                    new Box
-                    {
-                        Alpha = 0.0002f,
-                        Height = 120,
-                        Width = 140,
                     },
                     new Container
                     {
                         Shear = -SHEAR,
-                        Padding = new MarginPadding
-                        {
-                            Top = 12,
-                            Right = shear_padding,
-                        },
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        AutoSizeAxes = Axes.Both,
+                        X = -10,
                         Children = new Drawable[]
                         {
                             sprite = new SpriteIcon
                             {
                                 Margin = new MarginPadding
+                                {
+                                    Top = 12,
+                                },
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Size = new Vector2(20)
-                            }
-                        }
-                    },
-                    ButtonContentContainer = new FillFlowContainer
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Direction = FillDirection.Horizontal,
-                        AutoSizeAxes = Axes.X,
-                        Children = new Drawable[]
-                        {
-                            TextContainer = new Container
+                            },
+                            ButtonContentContainer = new FillFlowContainer
                             {
-                                Colour = Colour4.White,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-
-                                Margin = new MarginPadding { Top = 41.89f },
-                                Padding = new MarginPadding { Right = 14 },
-                                AutoSizeAxes = Axes.Both,
-                                Child = spriteText = new OsuSpriteText
+                                Margin = new MarginPadding { Top = 42 },
+                                Children = new Drawable[]
                                 {
-                                    Font = OsuFont.TorusAlternate.With(size: 16),
-                                    AlwaysPresent = true,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
+                                    TextContainer = new Container
+                                    {
+                                        Colour = Colour4.White,
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+
+                                        AutoSizeAxes = Axes.Both,
+                                        Child = spriteText = new OsuSpriteText
+                                        {
+                                            Font = OsuFont.TorusAlternate.With(size: 16),
+                                            AlwaysPresent = true,
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    },
-                    new Container
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Padding = new MarginPadding
-                        {
-                            Top = 77,
-                        },
-                        Children = new Drawable[]
-                        {
+                            },
                             new Container
                             {
+                                Masking = true,
                                 CornerRadius = 3,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Height = 6,
-                                Width = 120.74f,
-                                Masking = true,
+                                AutoSizeAxes = Axes.Both,
+                                Margin = new MarginPadding { Top = 77 },
                                 Children = new Drawable[]
                                 {
                                     boxColour = new Box
                                     {
-                                        RelativeSizeAxes = Axes.Both,
+                                        Height = 6,
+                                        Width = 120,
                                         Origin = Anchor.Centre,
                                         Anchor = Anchor.Centre,
                                     }

@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -42,10 +42,6 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
                 Scale = new Vector2(0.8f),
-                Margin = new MarginPadding
-                {
-                    Top = 41.89f,
-                },
                 ExpansionMode = ExpansionMode.ExpandOnHover,
             });
             ButtonContentContainer.Add(MultiplierText = new OsuSpriteText
@@ -53,7 +49,6 @@ namespace osu.Game.Screens.Select
                 Margin = new MarginPadding
                 {
                     Top = 41.89f,
-                    Right = 10,
                 },
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,

@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Select
                         buttons = new FillFlowContainer<FooterButton>
                         {
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(-FooterButton.SHEAR_WIDTH, 0),
+                            Spacing = new Vector2(-FooterButton.SHEAR_WIDTH + 8, 0),
                             AutoSizeAxes = Axes.Both,
                         }
                     }
