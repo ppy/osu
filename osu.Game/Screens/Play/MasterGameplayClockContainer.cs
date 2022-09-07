@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Play
 {
@@ -54,6 +56,9 @@ namespace osu.Game.Screens.Play
         /// In the future I want to change this.
         /// </summary>
         private double? actualStopTime;
+
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
 
         /// <summary>
         /// Create a new master gameplay clock container.
@@ -192,6 +197,8 @@ namespace osu.Game.Screens.Play
         {
             if (speedAdjustmentsApplied)
                 return;
+
+            musicController.ResetTrackAdjustments();
 
             track.BindAdjustments(GameplayAdjustments);
             track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
