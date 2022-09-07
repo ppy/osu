@@ -93,7 +93,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         {
             allTeams.RemoveAll(gt => gt.Team == team);
 
-            if (teams.RemoveAll(gt => gt.Team == team) > 0)
+            if (teams.RemoveAll(gt => gt.Team == team, true) > 0)
             {
                 TeamsCount--;
                 return true;

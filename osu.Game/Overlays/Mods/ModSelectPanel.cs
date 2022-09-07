@@ -143,8 +143,24 @@ namespace osu.Game.Overlays.Mods
                 }
             };
 
-            Action = () => Active.Toggle();
+            Action = () =>
+            {
+                if (!Active.Value)
+                    Select();
+                else
+                    Deselect();
+            };
         }
+
+        /// <summary>
+        /// Performs all actions necessary to select this <see cref="ModSelectPanel"/>.
+        /// </summary>
+        protected abstract void Select();
+
+        /// <summary>
+        /// Performs all actions necessary to deselect this <see cref="ModSelectPanel"/>.
+        /// </summary>
+        protected abstract void Deselect();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, ISamplePlaybackDisabler? samplePlaybackDisabler)

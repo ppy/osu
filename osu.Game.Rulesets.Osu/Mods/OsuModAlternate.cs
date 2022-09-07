@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => @"Alternate";
         public override string Acronym => @"AL";
-        public override string Description => @"Don't use the same key twice in a row!";
+        public override LocalisableString Description => @"Don't use the same key twice in a row!";
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModSingleTap) }).ToArray();
 
