@@ -47,9 +47,6 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         private readonly IReadOnlyList<HitEvent> hitEvents;
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         /// <summary>
         /// Creates a new <see cref="HitEventTimingDistributionGraph"/>.
         /// </summary>
@@ -129,13 +126,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             else
             {
                 int maxCount = bins.Max(b => b.Values.Sum());
-                barDrawables = new Bar[total_timing_distribution_bins];
-
-                for (int i = 0; i < barDrawables.Length; i++)
-                {
-                    IReadOnlyList<BarValue> values = bins[i].Select(b => new BarValue(b.Key.OrderingIndex(), b.Value, colours.DrawForHitResult(b.Key))).OrderBy(b => b.Index).ToList();
-                    barDrawables[i] = new Bar(values, maxCount, i == timing_distribution_centre_bin_index);
-                }
+                barDrawables = bins.Select((bin, i) => new Bar(bins[i], maxCount, i == timing_distribution_centre_bin_index)).ToArray();
 
                 Container axisFlow;
 
@@ -216,53 +207,53 @@ namespace osu.Game.Screens.Ranking.Statistics
             }
         }
 
-        private readonly struct BarValue
-        {
-            public readonly int Index;
-            public readonly float Value;
-            public readonly Color4 Colour;
-
-            public BarValue(int index, float value, Color4 colour)
-            {
-                Index = index;
-                Value = value;
-                Colour = colour;
-            }
-        }
-
         private class Bar : CompositeDrawable
         {
             private float totalValue => values.Sum(v => v.Value);
             private float basalHeight => BoundingBox.Width / BoundingBox.Height;
             private float availableHeight => 1 - basalHeight;
 
-            private readonly IReadOnlyList<BarValue> values;
+            private readonly IReadOnlyList<KeyValuePair<HitResult, int>> values;
             private readonly float maxValue;
+            private readonly bool isCentre;
 
-            private readonly Circle[] boxOriginals;
+            private Circle[] boxOriginals;
             private Circle boxAdjustment;
 
-            public Bar(IReadOnlyList<BarValue> values, float maxValue, bool isCentre)
+            [Resolved]
+            private OsuColour colours { get; set; }
+
+            public Bar(IDictionary<HitResult, int> values, float maxValue, bool isCentre)
             {
-                this.values = values;
+                this.values = values.OrderBy(v => v.Key.OrderingIndex()).ToList();
                 this.maxValue = maxValue;
+                this.isCentre = isCentre;
 
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
+            }
 
+            [BackgroundDependencyLoader]
+            private void load()
+            {
                 if (values.Any())
                 {
-                    InternalChildren = boxOriginals = values.Select((v, i) => new Circle
+                    boxOriginals = values.Select((v, i) => new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Colour = isCentre && i == 0 ? Color4.White : v.Colour,
+                        Colour = isCentre && i == 0 ? Color4.White : colours.DrawForHitResult(v.Key),
                         Height = 0,
                     }).ToArray();
+                    // The bars of the stacked bar graph will be processed (stacked) from the bottom, which is the base position,
+                    // to the top, and the bottom bar should be drawn more toward the front by design,
+                    // while the drawing order is from the back to the front, so the order passed to `InternalChildren` is the opposite.
+                    InternalChildren = boxOriginals.Reverse().ToArray();
                 }
                 else
                 {
+                    // A bin with no value draws a grey dot instead.
                     InternalChildren = boxOriginals = new[]
                     {
                         new Circle
