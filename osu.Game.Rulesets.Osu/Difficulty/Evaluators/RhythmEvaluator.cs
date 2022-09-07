@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double lastDelta = lastObj.StrainTime;
                 double currRatio = 1.0 + 6.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
-                double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - currObj.HitWindowGreat * 0.6) / (currObj.HitWindowGreat * 0.6));
+                double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - currObj.HitWindowGreat * 0.3) / (currObj.HitWindowGreat * 0.3));
 
                 windowPenalty = Math.Min(1, windowPenalty);
 
