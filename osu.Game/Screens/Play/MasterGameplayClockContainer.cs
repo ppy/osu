@@ -68,9 +68,10 @@ namespace osu.Game.Screens.Play
         public MasterGameplayClockContainer(WorkingBeatmap beatmap, double skipTargetTime)
             : base(beatmap.Track, true)
         {
-            track = beatmap.Track;
             this.beatmap = beatmap;
             this.skipTargetTime = skipTargetTime;
+
+            track = beatmap.Track;
 
             StartTime = findEarliestStartTime();
         }
