@@ -13,10 +13,12 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public static double GetTrueGameplayRate(this IGameplayClock clock)
         {
+            // To handle rewind, we still want to maintain the same direction as the underlying clock.
             double rate = Math.Sign(clock.Rate);
-            foreach (double a in clock.GameplayAdjustments)
-                rate *= a;
-            return rate;
+
+            return rate
+                   * clock.GameplayAdjustments.AggregateFrequency.Value
+                   * clock.GameplayAdjustments.AggregateTempo.Value;
         }
     }
 }

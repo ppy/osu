@@ -2,13 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -25,7 +23,7 @@ namespace osu.Game.Screens.Play
     /// <remarks>
     /// This is intended to be used as a single controller for gameplay, or as a reference source for other <see cref="GameplayClockContainer"/>s.
     /// </remarks>
-    public class MasterGameplayClockContainer : GameplayClockContainer, IBeatSyncProvider, IAdjustableAudioComponent
+    public class MasterGameplayClockContainer : GameplayClockContainer, IBeatSyncProvider
     {
         /// <summary>
         /// Duration before gameplay start time required before skip button displays.
@@ -58,11 +56,6 @@ namespace osu.Game.Screens.Play
         private double? actualStopTime;
 
         /// <summary>
-        /// Maintained solely to delegate <see cref="IAdjustableAudioComponent"/> pieces to (to maintain parent lookups).
-        /// </summary>
-        private readonly AudioContainer audioContainer;
-
-        /// <summary>
         /// Create a new master gameplay clock container.
         /// </summary>
         /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
@@ -75,8 +68,6 @@ namespace osu.Game.Screens.Play
             this.skipTargetTime = skipTargetTime;
 
             StartTime = findEarliestStartTime();
-
-            AddInternal(audioContainer = new AudioContainer());
         }
 
         private double findEarliestStartTime()
@@ -202,6 +193,7 @@ namespace osu.Game.Screens.Play
             if (speedAdjustmentsApplied)
                 return;
 
+            track.BindAdjustments(GameplayAdjustments);
             track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
@@ -213,6 +205,7 @@ namespace osu.Game.Screens.Play
             if (!speedAdjustmentsApplied)
                 return;
 
+            track.UnbindAdjustments(GameplayAdjustments);
             track.RemoveAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
             track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
@@ -229,49 +222,5 @@ namespace osu.Game.Screens.Play
         IClock IBeatSyncProvider.Clock => this;
 
         ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
-
-        private readonly List<IBindable<double>> speedAdjustments = new List<IBindable<double>>();
-
-        public override IEnumerable<double> GameplayAdjustments => speedAdjustments.Select(bindable => bindable.Value);
-
-        void IAdjustableAudioComponent.AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-        {
-            speedAdjustments.Add(adjustBindable);
-            track.AddAdjustment(type, adjustBindable);
-        }
-
-        void IAdjustableAudioComponent.RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-        {
-            speedAdjustments.Remove(adjustBindable);
-            track.RemoveAdjustment(type, adjustBindable);
-        }
-
-        void IAdjustableAudioComponent.RemoveAllAdjustments(AdjustableProperty type) => audioContainer.RemoveAllAdjustments(type);
-
-        void IAdjustableAudioComponent.BindAdjustments(IAggregateAudioAdjustment component) => audioContainer.BindAdjustments(component);
-
-        void IAdjustableAudioComponent.UnbindAdjustments(IAggregateAudioAdjustment component) => audioContainer.UnbindAdjustments(component);
-
-        BindableNumber<double> IAdjustableAudioComponent.Volume => audioContainer.Volume;
-
-        BindableNumber<double> IAdjustableAudioComponent.Balance => audioContainer.Balance;
-
-        BindableNumber<double> IAdjustableAudioComponent.Frequency => audioContainer.Frequency;
-
-        BindableNumber<double> IAdjustableAudioComponent.Tempo => audioContainer.Tempo;
-
-        public override void ResetSpeedAdjustments()
-        {
-            track.RemoveAllAdjustments(AdjustableProperty.Frequency);
-            track.RemoveAllAdjustments(AdjustableProperty.Tempo);
-        }
-
-        IBindable<double> IAggregateAudioAdjustment.AggregateVolume => audioContainer.AggregateVolume;
-
-        IBindable<double> IAggregateAudioAdjustment.AggregateBalance => audioContainer.AggregateBalance;
-
-        IBindable<double> IAggregateAudioAdjustment.AggregateFrequency => audioContainer.AggregateFrequency;
-
-        IBindable<double> IAggregateAudioAdjustment.AggregateTempo => audioContainer.AggregateTempo;
     }
 }

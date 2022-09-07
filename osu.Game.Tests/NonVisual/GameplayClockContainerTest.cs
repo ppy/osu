@@ -1,8 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
 
@@ -23,11 +24,10 @@ namespace osu.Game.Tests.NonVisual
 
         private class TestGameplayClockContainer : GameplayClockContainer
         {
-            public override IEnumerable<double> GameplayAdjustments => new[] { 2.0 };
-
             public TestGameplayClockContainer(IFrameBasedClock underlyingClock)
                 : base(underlyingClock)
             {
+                GameplayAdjustments.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(2.0));
             }
         }
     }

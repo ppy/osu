@@ -2,10 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -264,7 +263,9 @@ namespace osu.Game.Rulesets.UI
 
         public double StartTime => parentGameplayClock?.StartTime ?? 0;
 
-        public IEnumerable<double> GameplayAdjustments => parentGameplayClock?.GameplayAdjustments ?? Enumerable.Empty<double>();
+        private readonly AudioAdjustments gameplayAdjustments = new AudioAdjustments();
+
+        public IAdjustableAudioComponent GameplayAdjustments => parentGameplayClock?.GameplayAdjustments ?? gameplayAdjustments;
 
         #endregion
 
