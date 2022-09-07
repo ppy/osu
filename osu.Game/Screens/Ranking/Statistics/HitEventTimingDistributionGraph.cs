@@ -252,7 +252,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 if (values.Any())
                 {
-                    boxOriginals = values.Select((v, i) => new Circle
+                    InternalChildren = boxOriginals = values.Select((v, i) => new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomCentre,
@@ -260,7 +260,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Colour = isCentre && i == 0 ? Color4.White : v.Colour,
                         Height = 0,
                     }).ToArray();
-                    InternalChildren = boxOriginals.Reverse().ToArray();
                 }
                 else
                 {
