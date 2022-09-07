@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -75,6 +76,16 @@ namespace osu.Game.Tests.Visual.Online
                 AddAssert("Check link presence", () => postTarget.LastMessage.Contains("/b/1234"));
             else
                 AddAssert("Check link not present", () => !postTarget.LastMessage.Contains("https://"));
+        }
+
+        [Test]
+        public void TestModPresence()
+        {
+            AddStep("Add Hidden mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModHidden>() });
+
+            AddStep("Run command", () => Add(new NowPlayingCommand()));
+
+            AddAssert("Check mod is present", () => postTarget.LastMessage.Contains("+Hidden"));
         }
 
         public class PostTarget : Component, IChannelPostTarget
