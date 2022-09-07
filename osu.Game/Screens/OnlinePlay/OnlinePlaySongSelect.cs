@@ -49,11 +49,6 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly PlaylistItem? initialItem;
         private readonly FreeModSelectOverlay freeModSelectOverlay;
 
-        private WorkingBeatmap initialBeatmap = null!;
-        private RulesetInfo initialRuleset = null!;
-        private IReadOnlyList<Mod> initialMods = null!;
-        private bool itemSelected;
-
         private IDisposable? freeModSelectOverlayRegistration;
 
         /// <summary>
@@ -80,12 +75,6 @@ namespace osu.Game.Screens.OnlinePlay
         private void load()
         {
             LeftArea.Padding = new MarginPadding { Top = Header.HEIGHT };
-
-            // Store the initial beatmap/ruleset/mods at the point of entering song select, so they can be reverted to upon exit.
-            initialBeatmap = Beatmap.Value;
-            initialRuleset = Ruleset.Value;
-            initialMods = Mods.Value.ToList();
-
             LoadComponent(freeModSelectOverlay);
         }
 
@@ -152,13 +141,7 @@ namespace osu.Game.Screens.OnlinePlay
                 AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()
             };
 
-            if (SelectItem(item))
-            {
-                itemSelected = true;
-                return true;
-            }
-
-            return false;
+            return SelectItem(item);
         }
 
         /// <summary>
@@ -181,15 +164,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            if (!itemSelected)
-            {
-                Beatmap.Value = initialBeatmap;
-                Ruleset.Value = initialRuleset;
-                Mods.Value = initialMods;
-            }
-
             freeModSelectOverlay.Hide();
-
             return base.OnExiting(e);
         }
 
