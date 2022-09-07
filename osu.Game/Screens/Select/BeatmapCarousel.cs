@@ -264,8 +264,11 @@ namespace osu.Game.Screens.Select
             foreach (int i in changes.InsertedIndices)
                 UpdateBeatmapSet(sender[i].Detach());
 
-            if (changes.DeletedIndices.Length > 0)
+            if (changes.DeletedIndices.Length > 0 && SelectedBeatmapInfo != null)
             {
+                // If SelectedBeatmapInfo is non-null, the set should also be non-null.
+                Debug.Assert(SelectedBeatmapSet != null);
+
                 // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
                 // When an update occurs, the previous beatmap set is either soft or hard deleted.
                 // Check if the current selection was potentially deleted by re-querying its validity.
@@ -440,6 +443,9 @@ namespace osu.Game.Screens.Select
 
         private void selectNextSet(int direction, bool skipDifficulties)
         {
+            if (selectedBeatmap == null || selectedBeatmapSet == null)
+                return;
+
             var unfilteredSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
 
             var nextSet = unfilteredSets[(unfilteredSets.IndexOf(selectedBeatmapSet) + direction + unfilteredSets.Count) % unfilteredSets.Count];
@@ -452,7 +458,7 @@ namespace osu.Game.Screens.Select
 
         private void selectNextDifficulty(int direction)
         {
-            if (selectedBeatmap == null)
+            if (selectedBeatmap == null || selectedBeatmapSet == null)
                 return;
 
             var unfilteredDifficulties = selectedBeatmapSet.Items.Where(s => !s.Filtered.Value).ToList();
@@ -481,7 +487,7 @@ namespace osu.Game.Screens.Select
             if (!visibleSets.Any())
                 return false;
 
-            if (selectedBeatmap != null)
+            if (selectedBeatmap != null && selectedBeatmapSet != null)
             {
                 randomSelectedBeatmaps.Push(selectedBeatmap);
 
@@ -524,11 +530,13 @@ namespace osu.Game.Screens.Select
 
                 if (!beatmap.Filtered.Value)
                 {
-                    if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
-                        previouslyVisitedRandomSets.Remove(selectedBeatmapSet);
-
                     if (selectedBeatmapSet != null)
+                    {
+                        if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
+                            previouslyVisitedRandomSets.Remove(selectedBeatmapSet);
+
                         playSpinSample(distanceBetween(beatmap, selectedBeatmapSet));
+                    }
 
                     select(beatmap);
                     break;
@@ -540,9 +548,13 @@ namespace osu.Game.Screens.Select
 
         private void playSpinSample(double distance)
         {
-            var chan = spinSample.GetChannel();
-            chan.Frequency.Value = 1f + Math.Min(1f, distance / visibleSetsCount);
-            chan.Play();
+            var chan = spinSample?.GetChannel();
+
+            if (chan != null)
+            {
+                chan.Frequency.Value = 1f + Math.Min(1f, distance / visibleSetsCount);
+                chan.Play();
+            }
 
             randomSelectSample?.Play();
         }
