@@ -243,7 +243,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Colour = isCentre && i == 0 ? Color4.White : colours.DrawForHitResult(v.Key),
+                        Colour = isCentre && i == 0 ? Color4.White : colours.ForHitResult(v.Key),
                         Height = 0,
                     }).ToArray();
                     // The bars of the stacked bar graph will be processed (stacked) from the bottom, which is the base position,

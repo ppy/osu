@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            HeaderText.Colour = colours.TextForHitResult(Result);
+            HeaderText.Colour = colours.ForHitResult(Result);
         }
     }
 }

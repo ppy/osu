@@ -102,30 +102,7 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Retrieves the colour for a <see cref="HitResult"/>.
         /// </summary>
-        public Color4 TextForHitResult(HitResult judgement)
-        {
-            switch (judgement)
-            {
-                case HitResult.Perfect:
-                case HitResult.Great:
-                    return Blue;
-
-                case HitResult.Ok:
-                case HitResult.Good:
-                    return Green;
-
-                case HitResult.Meh:
-                    return Yellow;
-
-                case HitResult.Miss:
-                    return Red;
-
-                default:
-                    return Color4.White;
-            }
-        }
-
-        public Color4 DrawForHitResult(HitResult result)
+        public Color4 ForHitResult(HitResult result)
         {
             switch (result)
             {
