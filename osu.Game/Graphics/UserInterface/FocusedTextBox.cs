@@ -88,6 +88,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (Text.Length > 0)
                 {
                     Text = string.Empty;
+                    PlayFeedbackSample(FeedbackSampleType.TextRemove);
                     return true;
                 }
             }
