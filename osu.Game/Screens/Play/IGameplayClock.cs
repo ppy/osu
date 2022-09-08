@@ -19,9 +19,9 @@ namespace osu.Game.Screens.Play
         double StartTime { get; }
 
         /// <summary>
-        /// All adjustments applied to this clock which come from gameplay or mods.
+        /// All adjustments applied to this clock which come from mods.
         /// </summary>
-        IAdjustableAudioComponent GameplayAdjustments { get; }
+        IAdjustableAudioComponent AdjustmentsFromMods { get; }
 
         IBindable<bool> IsPaused { get; }
     }

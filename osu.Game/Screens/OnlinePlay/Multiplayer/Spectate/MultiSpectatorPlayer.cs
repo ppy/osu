@@ -14,7 +14,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// </summary>
     public class MultiSpectatorPlayer : SpectatorPlayer
     {
-        public IAdjustableAudioComponent GameplayAdjustments => GameplayClockContainer.GameplayAdjustments;
+        /// <summary>
+        /// All adjustments applied to the clock of this <see cref="MultiSpectatorPlayer"/> which come from mods.
+        /// </summary>
+        public readonly AudioAdjustments ClockAdjustmentsFromMods = new AudioAdjustments();
 
         private readonly SpectatorPlayerClock spectatorPlayerClock;
 
@@ -56,6 +59,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-            => new GameplayClockContainer(spectatorPlayerClock);
+        {
+            var gameplayClockContainer = new GameplayClockContainer(spectatorPlayerClock);
+            ClockAdjustmentsFromMods.BindAdjustments(gameplayClockContainer.AdjustmentsFromMods);
+            return gameplayClockContainer;
+        }
     }
 }

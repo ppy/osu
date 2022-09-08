@@ -265,7 +265,7 @@ namespace osu.Game.Rulesets.UI
 
         private readonly AudioAdjustments gameplayAdjustments = new AudioAdjustments();
 
-        public IAdjustableAudioComponent GameplayAdjustments => parentGameplayClock?.GameplayAdjustments ?? gameplayAdjustments;
+        public IAdjustableAudioComponent AdjustmentsFromMods => parentGameplayClock?.AdjustmentsFromMods ?? gameplayAdjustments;
 
         #endregion
 

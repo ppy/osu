@@ -27,7 +27,7 @@ namespace osu.Game.Tests.NonVisual
             public TestGameplayClockContainer(IFrameBasedClock underlyingClock)
                 : base(underlyingClock)
             {
-                GameplayAdjustments.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(2.0));
+                AdjustmentsFromMods.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(2.0));
             }
         }
     }

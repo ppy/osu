@@ -997,7 +997,7 @@ namespace osu.Game.Screens.Play
                 mod.ApplyToHUD(HUDOverlay);
 
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrack>())
-                mod.ApplyToTrack(GameplayClockContainer.GameplayAdjustments);
+                mod.ApplyToTrack(GameplayClockContainer.AdjustmentsFromMods);
 
             updateGameplayState();
 

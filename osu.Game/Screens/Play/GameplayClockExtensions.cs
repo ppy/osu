@@ -17,8 +17,8 @@ namespace osu.Game.Screens.Play
             double rate = clock.Rate == 0 ? 1 : Math.Sign(clock.Rate);
 
             return rate
-                   * clock.GameplayAdjustments.AggregateFrequency.Value
-                   * clock.GameplayAdjustments.AggregateTempo.Value;
+                   * clock.AdjustmentsFromMods.AggregateFrequency.Value
+                   * clock.AdjustmentsFromMods.AggregateTempo.Value;
         }
     }
 }

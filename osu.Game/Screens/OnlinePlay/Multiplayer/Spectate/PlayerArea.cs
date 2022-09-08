@@ -43,9 +43,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public readonly SpectatorPlayerClock SpectatorPlayerClock;
 
         /// <summary>
-        /// The gameplay adjustments applied by the <see cref="Player"/> loaded in this area.
+        /// The clock adjustments applied by the <see cref="Player"/> loaded in this area.
         /// </summary>
-        public readonly AudioAdjustments GameplayAdjustments = new AudioAdjustments();
+        public readonly AudioAdjustments ClockAdjustmentsFromMods = new AudioAdjustments();
 
         /// <summary>
         /// The currently-loaded score.
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 var player = new MultiSpectatorPlayer(Score, SpectatorPlayerClock);
                 player.OnGameplayStarted += () => OnGameplayStarted?.Invoke();
 
-                GameplayAdjustments.BindAdjustments(player.GameplayAdjustments);
+                ClockAdjustmentsFromMods.BindAdjustments(player.ClockAdjustmentsFromMods);
 
                 return player;
             }));
