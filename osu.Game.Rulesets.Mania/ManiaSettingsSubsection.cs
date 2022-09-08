@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania
                     LabelText = "Scrolling direction",
                     Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
                 },
-                new SettingsSlider<double, ManiaScorllSlider>
+                new SettingsSlider<double, ManiaScrollSlider>
                 {
                     LabelText = "Scroll speed",
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania
             };
         }
 
-        private class ManiaScorllSlider : OsuSliderBar<double>
+        private class ManiaScrollSlider : OsuSliderBar<double>
         {
             public override LocalisableString TooltipText => $"{(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / Current.Value)} ({Current.Value}ms)";
         }
