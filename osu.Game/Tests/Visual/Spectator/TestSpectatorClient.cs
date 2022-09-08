@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -130,6 +131,7 @@ namespace osu.Game.Tests.Visual.Spectator
             // Track the local user's playing beatmap ID.
             Debug.Assert(state.BeatmapID != null);
             userBeatmapDictionary[api.LocalUser.Value.Id] = state.BeatmapID.Value;
+            userModsDictionary[api.LocalUser.Value.Id] = state.Mods.ToArray();
 
             return ((ISpectatorClient)this).UserBeganPlaying(api.LocalUser.Value.Id, state);
         }
