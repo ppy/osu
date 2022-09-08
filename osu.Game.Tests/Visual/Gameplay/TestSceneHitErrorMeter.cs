@@ -147,6 +147,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestProcessingWhileHidden()
         {
+            const int max_displayed_judgements = 20;
             AddStep("OD 1", () => recreateDisplay(new OsuHitWindows(), 1));
 
             AddStep("hide displays", () =>
@@ -155,7 +156,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     hitErrorMeter.Hide();
             });
 
-            AddRepeatStep("hit", () => newJudgement(), 10);
+            AddRepeatStep("hit", () => newJudgement(), max_displayed_judgements * 2);
 
             AddAssert("bars added", () => this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
             AddAssert("circle added", () => this.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Any());
