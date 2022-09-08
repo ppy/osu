@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osuTK.Graphics;
 using osuTK;
 using System.Collections.Generic;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -119,45 +120,29 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (getTouchCatchActionFromInput(e.ScreenSpaceMousePosition) == TouchCatchAction.None)
-                return false;
-
-            handleDown(e.Button, e.ScreenSpaceMousePosition);
-            return true;
+            return handleDown(e.Button, e.ScreenSpaceMousePosition);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (getTouchCatchActionFromInput(e.ScreenSpaceMousePosition) == TouchCatchAction.None)
-                return;
-
             handleUp(e.Button);
             base.OnMouseUp(e);
         }
 
-        protected override bool OnDragStart(DragStartEvent e)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            return true;
-        }
+            TouchCatchAction touchCatchAction = getTouchCatchActionFromInput(e.ScreenSpaceMousePosition);
 
-        protected override void OnDrag(DragEvent e)
-        {
-            // I'm not sure if this is posible but let's be safe
-            if (!trackedActions.ContainsKey(e.Button))
-                trackedActions.Add(e.Button, TouchCatchAction.None);
+            // Loop through the buttons to avoid keeping a button pressed if both mouse buttons are pressed.
+            foreach (MouseButton i in e.PressedButtons)
+                trackedActions[i] = touchCatchAction;
 
-            trackedActions[e.Button] = getTouchCatchActionFromInput(e.ScreenSpaceMousePosition);
             calculateActiveKeys();
-
-            base.OnDrag(e);
+            return true;
         }
 
         protected override void OnTouchMove(TouchMoveEvent e)
         {
-            // I'm not sure if this is posible but let's be safe
-            if (!trackedActions.ContainsKey(e.Touch.Source))
-                trackedActions.Add(e.Touch.Source, TouchCatchAction.None);
-
             trackedActions[e.Touch.Source] = getTouchCatchActionFromInput(e.ScreenSpaceTouch.Position);
             calculateActiveKeys();
 
@@ -194,18 +179,20 @@ namespace osu.Game.Rulesets.Catch.UI
                 keyBindingContainer.TriggerReleased(CatchAction.Dash);
         }
 
-        private void handleDown(object source, Vector2 position)
+        private bool handleDown(object source, Vector2 position)
         {
-            Show();
-
             TouchCatchAction catchAction = getTouchCatchActionFromInput(position);
 
-            // Not too sure how this can happen, but let's avoid throwing.
-            if (trackedActions.ContainsKey(source))
-                return;
+            if (catchAction == TouchCatchAction.None)
+                return false;
 
-            trackedActions.Add(source, catchAction);
+            Show();
+
+            trackedActions[source] = catchAction;
+
             calculateActiveKeys();
+
+            return true;
         }
 
         private void handleUp(object source)
