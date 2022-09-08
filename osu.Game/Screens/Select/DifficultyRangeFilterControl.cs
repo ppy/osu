@@ -65,7 +65,10 @@ namespace osu.Game.Screens.Select
 
         private class MinimumStarsSlider : StarsSlider
         {
-            public MinimumStarsSlider() : base("0") { }
+            public MinimumStarsSlider()
+                : base("0")
+            {
+            }
 
             public override LocalisableString TooltipText => Current.Value.ToString(@"0.## stars");
 
@@ -86,7 +89,10 @@ namespace osu.Game.Screens.Select
 
         private class MaximumStarsSlider : StarsSlider
         {
-            public MaximumStarsSlider() : base("∞") { }
+            public MaximumStarsSlider()
+                : base("∞")
+            {
+            }
 
             protected override void LoadComplete()
             {
@@ -102,15 +108,15 @@ namespace osu.Game.Screens.Select
 
         private class StarsSlider : OsuSliderBar<double>
         {
+            private readonly string defaultString;
+
             public override LocalisableString TooltipText => Current.IsDefault
                 ? UserInterfaceStrings.NoLimit
                 : Current.Value.ToString(@"0.## stars");
 
-            protected readonly string DefaultValue;
-
-            public StarsSlider(string defaultValue)
+            protected StarsSlider(string defaultString)
             {
-                DefaultValue = defaultValue;
+                this.defaultString = defaultString;
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -138,7 +144,7 @@ namespace osu.Game.Screens.Select
 
                 Current.BindValueChanged(current =>
                 {
-                    currentDisplay.Text = current.NewValue != Current.Default ? current.NewValue.ToString("N1") : DefaultValue;
+                    currentDisplay.Text = current.NewValue != Current.Default ? current.NewValue.ToString("N1") : defaultString;
                 }, true);
             }
         }
