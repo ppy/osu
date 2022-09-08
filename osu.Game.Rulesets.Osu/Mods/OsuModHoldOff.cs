@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 16
         };
 
-        [SettingSource("Maximum stream length", "Streams longer than this value will be lightened.")]
+        [SettingSource("Maximum stream length in beats", "Streams with more notes than this value will be lightened.")]
         public BindableInt MaxStreamLength { get; } = new BindableInt(16)
         {
             MinValue = 5,
