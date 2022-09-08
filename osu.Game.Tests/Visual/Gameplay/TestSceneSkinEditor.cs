@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -22,7 +20,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSkinEditor : PlayerTestScene
     {
-        private SkinEditor skinEditor;
+        private SkinEditor skinEditor = null!;
 
         protected override bool Autoplay => true;
 
@@ -54,7 +52,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestEditComponent()
         {
-            BarHitErrorMeter hitErrorMeter = null;
+            BarHitErrorMeter hitErrorMeter = null!;
 
             AddStep("select bar hit error blueprint", () =>
             {
@@ -64,6 +62,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 skinEditor.SelectedComponents.Clear();
                 skinEditor.SelectedComponents.Add(blueprint.Item);
             });
+
+            AddStep("move by keyboard", () => InputManager.Key(Key.Right));
+
+            AddAssert("hitErrorMeter moved", () => hitErrorMeter.X != 0);
 
             AddAssert("value is default", () => hitErrorMeter.JudgementLineThickness.IsDefault);
 
