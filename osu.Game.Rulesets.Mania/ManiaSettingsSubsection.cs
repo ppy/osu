@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania
 
         private class ManiaScrollSlider : OsuSliderBar<double>
         {
-            public override LocalisableString TooltipText => $"{(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / Current.Value)} ({Current.Value}ms)";
+            public override LocalisableString TooltipText => $"{Current.Value}ms (speed {(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / Current.Value)})";
         }
     }
 }
