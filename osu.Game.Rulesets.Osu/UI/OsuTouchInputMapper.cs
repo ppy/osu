@@ -10,7 +10,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuDrawableTouchInputHandler : Drawable
+    public class OsuTouchInputMapper : Drawable
     {
         public const TouchSource CURSOR_TOUCH = TouchSource.Touch1;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private int getTouchIndex(TouchSource source) => source - TouchSource.Touch1;
 
-        public OsuDrawableTouchInputHandler(OsuInputManager inputManager)
+        public OsuTouchInputMapper(OsuInputManager inputManager)
         {
             osuInputManager = inputManager;
             foreach (var source in AllowedTouchSources)

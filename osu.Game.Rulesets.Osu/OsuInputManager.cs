@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu
 
         protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
-            if (e.Touch.Source != OsuDrawableTouchInputHandler.CURSOR_TOUCH)
+            if (e.Touch.Source != OsuTouchInputMapper.CURSOR_TOUCH)
                 return false;
 
             if (DragMode)

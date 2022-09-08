@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
 
-        public OsuDrawableTouchInputHandler TouchInputHandler;
+        public OsuTouchInputMapper TouchInputMapper;
 
         public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            KeyBindingInputManager.Add(TouchInputHandler = new OsuDrawableTouchInputHandler((OsuInputManager)KeyBindingInputManager) { RelativeSizeAxes = Axes.Both });
+            KeyBindingInputManager.Add(TouchInputMapper = new OsuTouchInputMapper((OsuInputManager)KeyBindingInputManager) { RelativeSizeAxes = Axes.Both });
         }
 
         public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h) => null;
