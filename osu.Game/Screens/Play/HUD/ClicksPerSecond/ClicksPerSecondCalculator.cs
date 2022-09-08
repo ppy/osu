@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
             base.Update();
 
             double latestValidTime = clock.CurrentTime;
-            double earliestTimeValid = latestValidTime - 1000 * gameplayClock.TrueGameplayRate;
+            double earliestTimeValid = latestValidTime - 1000 * gameplayClock.GetTrueGameplayRate();
 
             int count = 0;
 
