@@ -362,10 +362,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             return breaks.Any(breakPeriod =>
             {
-                var firstObjAfterBreak = originalHitObjects.First(obj => almostBigger(obj.StartTime, breakPeriod.EndTime));
+                OsuHitObject? firstObjAfterBreak = originalHitObjects.FirstOrDefault(obj => almostBigger(obj.StartTime, breakPeriod.EndTime));
 
                 return almostBigger(time, breakPeriod.StartTime)
-                       && definitelyBigger(firstObjAfterBreak.StartTime, time);
+                       // There should never really be a break section with no objects after it, but we've seen crashes from users with malformed beatmaps,
+                       // so it's best to guard against this.
+                       && (firstObjAfterBreak == null || definitelyBigger(firstObjAfterBreak.StartTime, time));
             });
         }
 

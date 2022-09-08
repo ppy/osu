@@ -317,6 +317,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                     break;
 
                 default:
+                    if (!result.Type.IsScorable())
+                        break;
+
                     judgementContainer.Add(judgementPools[result.Type].Get(j =>
                     {
                         j.Apply(result, judgedObject);
