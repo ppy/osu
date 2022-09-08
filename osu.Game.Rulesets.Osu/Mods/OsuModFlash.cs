@@ -38,28 +38,29 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = .25f
         };
 
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
+        }
+
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
             base.ApplyToBeatmap(beatmap);
 
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
             {
-                applyFadeInAdjustment(obj);
                 var point = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
-                obj.TimePreempt += obj.StartTime % (point.BeatLength * BeatDivisor.Value);
-            }
+                double val = obj.TimePreempt + obj.StartTime % (point.BeatLength * BeatDivisor.Value);
+                applyFadeInAdjustment(obj);
 
-            static void applyFadeInAdjustment(OsuHitObject osuObject)
-            {
-                osuObject.TimeFadeIn = osuObject.TimePreempt;
-                foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
-                    applyFadeInAdjustment(nested);
+                void applyFadeInAdjustment(OsuHitObject osuObject)
+                {
+                    osuObject.TimePreempt = val;
+                    foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
+                        applyFadeInAdjustment(nested);
+                }
             }
-        }
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
@@ -74,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             var h = (OsuHitObject)drawable.HitObject;
-
+            /*
             switch (drawable)
             {
                 case DrawableHitCircle circle:
@@ -84,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     }
 
                     break;
-            }
+            }*/
         }
     }
 }
