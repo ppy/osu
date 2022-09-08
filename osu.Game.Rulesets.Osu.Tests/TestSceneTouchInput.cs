@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Input;
@@ -11,24 +12,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneTouchInput : TestSceneOsuPlayer
     {
-        private OsuInputManager osuInputManager = null!;
-        private OsuTouchInputMapper touchInputMapper = null!;
+        private OsuInputManager osuInputManager => Player.DrawableRuleset.ChildrenOfType<OsuInputManager>().Single();
 
-        [SetUpSteps]
-        public override void SetUpSteps()
-        {
-            base.SetUpSteps();
-            AddStep("Setup touch", () =>
-            {
-                var drawableRuleset = (DrawableOsuRuleset)Player.DrawableRuleset;
-                osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
-                touchInputMapper = drawableRuleset.TouchInputMapper;
-            });
-        }
+        private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, osuInputManager.ScreenSpaceDrawQuad.Centre));
 
-        private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, touchInputMapper.ScreenSpaceDrawQuad.Centre));
-
-        private void release(TouchSource source) => InputManager.EndTouch(new Touch(source, touchInputMapper.ScreenSpaceDrawQuad.Centre));
+        private void release(TouchSource source) => InputManager.EndTouch(new Touch(source, osuInputManager.ScreenSpaceDrawQuad.Centre));
 
         [Test]
         public void TestTouchInput()
@@ -47,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("Release", () =>
             {
-                foreach (var source in touchInputMapper.AllowedTouchSources)
+                foreach (var source in Enum.GetValues<TouchSource>())
                     release(source);
             });
         }
