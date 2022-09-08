@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
@@ -107,7 +108,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool IsRunning => true;
 
-            public double TrueGameplayRate { get; set; } = 1;
+            public double TrueGameplayRate { set => adjustableAudioComponent.Tempo.Value = value; }
+
+            private readonly AudioAdjustments adjustableAudioComponent = new AudioAdjustments();
 
             public void ProcessFrame()
             {
@@ -117,6 +120,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             public double FramesPerSecond => throw new NotImplementedException();
             public FrameTimeInfo TimeInfo => throw new NotImplementedException();
             public double StartTime => throw new NotImplementedException();
+
+            public IAdjustableAudioComponent AdjustmentsFromMods => adjustableAudioComponent;
+
             public IEnumerable<double> NonGameplayAdjustments => throw new NotImplementedException();
             public IBindable<bool> IsPaused => throw new NotImplementedException();
         }
