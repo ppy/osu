@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -13,6 +14,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// </summary>
     public class MultiSpectatorPlayer : SpectatorPlayer
     {
+        public IAdjustableAudioComponent GameplayAdjustments => GameplayClockContainer.GameplayAdjustments;
+
         private readonly SpectatorPlayerClock spectatorPlayerClock;
 
         /// <summary>
@@ -53,15 +56,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-        {
-            var gameplayClockContainer = new GameplayClockContainer(spectatorPlayerClock);
-
-            // Directionality is important, as BindAdjustments is... not actually a bidirectional bind...
-            // We want to ensure that any adjustments applied by the Player instance are applied to the SpectatorPlayerClock
-            // so they can be consumed by the spectator screen (and applied to the master clock / track).
-            spectatorPlayerClock.GameplayAdjustments.BindAdjustments(gameplayClockContainer.GameplayAdjustments);
-
-            return gameplayClockContainer;
-        }
+            => new GameplayClockContainer(spectatorPlayerClock);
     }
 }
