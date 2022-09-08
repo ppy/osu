@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Audio;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
 
@@ -19,8 +18,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private const double catchup_rate = 2;
 
         private readonly GameplayClockContainer masterClock;
-
-        public readonly AudioAdjustments GameplayAdjustments = new AudioAdjustments();
 
         public double CurrentTime { get; private set; }
 

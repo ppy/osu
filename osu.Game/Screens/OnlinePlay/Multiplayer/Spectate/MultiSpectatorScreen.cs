@@ -189,7 +189,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (boundAdjustments != null)
                 masterClockContainer.GameplayAdjustments.UnbindAdjustments(boundAdjustments);
 
-            boundAdjustments = first.SpectatorPlayerClock.GameplayAdjustments;
+            boundAdjustments = first.GameplayAdjustments;
             masterClockContainer.GameplayAdjustments.BindAdjustments(boundAdjustments);
         }
 
