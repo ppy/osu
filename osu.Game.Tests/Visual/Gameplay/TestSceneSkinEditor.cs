@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSkinEditor : PlayerTestScene
     {
-        private SkinEditor skinEditor = null!;
+        private SkinEditor? skinEditor;
 
         protected override bool Autoplay => true;
 
@@ -40,13 +40,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Player.ScaleTo(0.4f);
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
-            AddUntilStep("wait for loaded", () => skinEditor.IsLoaded);
+            AddUntilStep("wait for loaded", () => skinEditor!.IsLoaded);
         }
 
         [Test]
         public void TestToggleEditor()
         {
-            AddToggleStep("toggle editor visibility", _ => skinEditor.ToggleVisibility());
+            AddToggleStep("toggle editor visibility", _ => skinEditor!.ToggleVisibility());
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First(b => b.Item is BarHitErrorMeter);
 
                 hitErrorMeter = (BarHitErrorMeter)blueprint.Item;
-                skinEditor.SelectedComponents.Clear();
+                skinEditor!.SelectedComponents.Clear();
                 skinEditor.SelectedComponents.Add(blueprint.Item);
             });
 
