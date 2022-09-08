@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class TouchInputField : VisibilityContainer
+    public class CatchTouchInputMapper : VisibilityContainer
     {
         public enum TouchCatchAction
         {
