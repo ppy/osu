@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Select
                         config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1);
                     });
 
-                    string lowerStar = filter.UserStarDifficulty.Min == null ? "0,0" : $"{filter.UserStarDifficulty.Min:N1}";
+                    string lowerStar = $"{filter.UserStarDifficulty.Min ?? 0:N1}";
                     string upperStar = filter.UserStarDifficulty.Max == null ? "∞" : $"{filter.UserStarDifficulty.Max:N1}";
 
                     textFlow.AddText($" the {lowerStar} - {upperStar} star difficulty filter.");
