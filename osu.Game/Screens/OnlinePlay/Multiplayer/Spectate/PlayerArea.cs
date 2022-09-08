@@ -45,7 +45,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The clock adjustments applied by the <see cref="Player"/> loaded in this area.
         /// </summary>
-        public readonly AudioAdjustments ClockAdjustmentsFromMods = new AudioAdjustments();
+        public IAggregateAudioAdjustment ClockAdjustmentsFromMods => clockAdjustmentsFromMods;
 
         /// <summary>
         /// The currently-loaded score.
@@ -55,6 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
+        private readonly AudioAdjustments clockAdjustmentsFromMods = new AudioAdjustments();
         private readonly BindableDouble volumeAdjustment = new BindableDouble();
         private readonly Container gameplayContent;
         private readonly LoadingLayer loadingLayer;
@@ -101,9 +102,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             stack.Push(new MultiSpectatorPlayerLoader(Score, () =>
             {
                 var player = new MultiSpectatorPlayer(Score, SpectatorPlayerClock);
-                player.OnGameplayStarted += () => OnGameplayStarted?.Invoke();
 
-                ClockAdjustmentsFromMods.BindAdjustments(player.ClockAdjustmentsFromMods);
+                player.OnGameplayStarted += () =>
+                {
+                    clockAdjustmentsFromMods.BindAdjustments(player.ClockAdjustmentsFromMods);
+                    OnGameplayStarted?.Invoke();
+                };
 
                 return player;
             }));

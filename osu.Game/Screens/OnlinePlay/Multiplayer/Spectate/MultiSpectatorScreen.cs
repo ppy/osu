@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
-        private AudioAdjustments? boundAdjustments;
+        private IAggregateAudioAdjustment? boundAdjustments;
 
         private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer = null!;
