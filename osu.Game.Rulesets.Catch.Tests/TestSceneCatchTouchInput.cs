@@ -12,19 +12,19 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public class TestSceneCatchTouchInput : OsuTestScene
     {
-        private TouchInputField touchInputField = null!;
+        private CatchTouchInputMapper catchTouchInputMapper = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("create inputfield", () =>
+            AddStep("create input overlay", () =>
             {
                 Child = new CatchInputManager(new CatchRuleset().RulesetInfo)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        touchInputField = new TouchInputField
+                        catchTouchInputMapper = new CatchTouchInputMapper
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestInputField()
         {
-            AddStep("show inputfield", () => touchInputField.Show());
+            AddStep("show overlay", () => catchTouchInputMapper.Show());
         }
     }
 }

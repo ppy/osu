@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            KeyBindingInputManager.Add(new TouchInputField());
+            KeyBindingInputManager.Add(new CatchTouchInputMapper());
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
