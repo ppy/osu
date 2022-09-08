@@ -18,28 +18,17 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchTouchInputMapper : VisibilityContainer
     {
-        public enum TouchCatchAction
-        {
-            MoveLeft = 0,
-            MoveRight = 1,
-            DashLeft = 2,
-            DashRight = 3,
-            None = 4
-        }
-
         private Dictionary<object, TouchCatchAction> trackedActions = new Dictionary<object, TouchCatchAction>();
 
         private KeyBindingContainer<CatchAction> keyBindingContainer = null!;
 
         private Container mainContent = null!;
 
-        // Fill values with null because UI is not declared in constructor
         private ArrowHitbox leftBox = null!;
         private ArrowHitbox rightBox = null!;
         private ArrowHitbox leftDashBox = null!;
         private ArrowHitbox rightDashBox = null!;
 
-        // Force input to be prossed even when hidden.
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
 
@@ -151,11 +140,6 @@ namespace osu.Game.Rulesets.Catch.UI
             return true;
         }
 
-        protected override void OnDragEnd(DragEndEvent e)
-        {
-            base.OnDragEnd(e);
-        }
-
         protected override void OnDrag(DragEvent e)
         {
             // I'm not sure if this is posible but let's be safe
@@ -167,6 +151,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             base.OnDrag(e);
         }
+
         protected override void OnTouchMove(TouchMoveEvent e)
         {
             // I'm not sure if this is posible but let's be safe
@@ -240,6 +225,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 return TouchCatchAction.MoveLeft;
             if (rightBox.Contains(inputPosition))
                 return TouchCatchAction.MoveRight;
+
             return TouchCatchAction.None;
         }
 
@@ -315,6 +301,15 @@ namespace osu.Game.Rulesets.Catch.UI
                     overlay.FadeOut(1000, Easing.Out);
                 }
             }
+        }
+
+        public enum TouchCatchAction
+        {
+            MoveLeft = 0,
+            MoveRight = 1,
+            DashLeft = 2,
+            DashRight = 3,
+            None = 4
         }
     }
 }
