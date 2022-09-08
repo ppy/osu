@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneClicksPerSecond : OsuTestScene
+    public class TestSceneClicksPerSecondCalculator : OsuTestScene
     {
         private ClicksPerSecondCalculator calculator = null!;
 
