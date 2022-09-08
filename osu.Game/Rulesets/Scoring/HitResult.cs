@@ -286,14 +286,11 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Ordered index of a <see cref="HitResult"/>. Used for sorting.
+        /// Ordered index of a <see cref="HitResult"/>. Used for consistent order when displaying hit results to the user.
         /// </summary>
         /// <param name="result">The <see cref="HitResult"/> to get the index of.</param>
         /// <returns>The index of <paramref name="result"/>.</returns>
-        public static int OrderingIndex(this HitResult result)
-        {
-            return order.IndexOf(result);
-        }
+        public static int GetIndexForOrderedDisplay(this HitResult result) => order.IndexOf(result);
     }
 #pragma warning restore CS0618
 }
