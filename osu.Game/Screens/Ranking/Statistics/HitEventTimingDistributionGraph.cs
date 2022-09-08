@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             public Bar(IDictionary<HitResult, int> values, float maxValue, bool isCentre)
             {
-                this.values = values.OrderBy(v => v.Key.OrderingIndex()).ToList();
+                this.values = values.OrderBy(v => v.Key.GetIndexForOrderedDisplay()).ToList();
                 this.maxValue = maxValue;
                 this.isCentre = isCentre;
 
