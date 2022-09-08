@@ -187,10 +187,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private void bindAudioAdjustments(PlayerArea first)
         {
             if (boundAdjustments != null)
-                masterClockContainer.GameplayAdjustments.UnbindAdjustments(boundAdjustments);
+                masterClockContainer.AdjustmentsFromMods.UnbindAdjustments(boundAdjustments);
 
-            boundAdjustments = first.GameplayAdjustments;
-            masterClockContainer.GameplayAdjustments.BindAdjustments(boundAdjustments);
+            boundAdjustments = first.ClockAdjustmentsFromMods;
+            masterClockContainer.AdjustmentsFromMods.BindAdjustments(boundAdjustments);
         }
 
         private bool isCandidateAudioSource(SpectatorPlayerClock? clock)
