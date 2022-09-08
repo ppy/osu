@@ -6,17 +6,13 @@ using NUnit.Framework;
 using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu.UI;
-using osuTK;
-
-#nullable disable
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneTouchInput : TestSceneOsuPlayer
     {
-        private OsuInputManager osuInputManager;
-        private OsuDrawableTouchInputHandler touchInputHandler;
-        private Vector2 touchPosition;
+        private OsuInputManager osuInputManager = null!;
+        private OsuTouchInputMapper touchInputMapper = null!;
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -26,27 +22,20 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var drawableRuleset = (DrawableOsuRuleset)Player.DrawableRuleset;
                 osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
-                touchInputHandler = drawableRuleset.TouchInputHandler;
-                touchPosition = touchInputHandler.ScreenSpaceDrawQuad.Centre;
+                touchInputMapper = drawableRuleset.TouchInputMapper;
             });
         }
 
-        private void touch(TouchSource source)
-        {
-            InputManager.BeginTouch(new Touch(source, touchPosition));
-        }
+        private void touch(TouchSource source) => InputManager.BeginTouch(new Touch(source, touchInputMapper.ScreenSpaceDrawQuad.Centre));
 
-        private void release(TouchSource source)
-        {
-            InputManager.EndTouch(new Touch(source, touchPosition));
-        }
+        private void release(TouchSource source) => InputManager.EndTouch(new Touch(source, touchInputMapper.ScreenSpaceDrawQuad.Centre));
 
         [Test]
         public void TestTouchInput()
         {
-            AddStep("Touch", () => touch(OsuDrawableTouchInputHandler.CURSOR_TOUCH));
+            AddStep("Touch", () => touch(OsuTouchInputMapper.CURSOR_TOUCH));
 
-            AddAssert("Pressed", () => osuInputManager.CurrentState.Touch.IsActive(OsuDrawableTouchInputHandler.CURSOR_TOUCH));
+            AddAssert("Pressed", () => osuInputManager.CurrentState.Touch.IsActive(OsuTouchInputMapper.CURSOR_TOUCH));
 
             AddStep("Touch with other finger", () => touch(TouchSource.Touch2));
 
@@ -58,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("Release", () =>
             {
-                foreach (var source in touchInputHandler.AllowedTouchSources)
+                foreach (var source in touchInputMapper.AllowedTouchSources)
                     release(source);
             });
         }
