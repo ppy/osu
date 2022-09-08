@@ -4,24 +4,27 @@
 #nullable disable
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
     public class Footer : Container
     {
-        public const float HEIGHT = 60;
+        public const float HEIGHT = 50;
 
         public const int TRANSITION_LENGTH = 300;
 
         private const float padding = 80;
 
         private readonly FillFlowContainer<FooterButton> buttons;
+        private readonly Box backgroundColour;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -57,11 +60,10 @@ namespace osu.Game.Screens.Select
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
-                new Box
+                backgroundColour = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = Vector2.One,
-                    Colour = Colour4.FromHex("#222A28")
                 },
                 new FillFlowContainer
                 {
@@ -76,13 +78,21 @@ namespace osu.Game.Screens.Select
                     {
                         buttons = new FillFlowContainer<FooterButton>
                         {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(-FooterButton.SHEAR_WIDTH + 8, 0),
+                            Spacing = new Vector2(-FooterButton.SHEAR_WIDTH + 10, 0),
                             AutoSizeAxes = Axes.Both,
                         }
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            backgroundColour.Colour = colours.B5;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;

@@ -4,6 +4,8 @@
 #nullable disable
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -16,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Select
@@ -25,8 +28,6 @@ namespace osu.Game.Screens.Select
         public const float SHEAR_WIDTH = 16;
         private const float outer_corner_radius = 10;
         private const int button_height = 120;
-
-        private readonly Colour4 backgroundColour = Colour4.FromHex("#394642");
 
         protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / button_height, 0);
 
@@ -38,6 +39,9 @@ namespace osu.Game.Screens.Select
                     spriteText.Text = value;
             }
         }
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         protected Colour4 ButtonColour
         {
@@ -59,16 +63,14 @@ namespace osu.Game.Screens.Select
         private readonly Box flashLayer;
         private readonly SpriteIcon sprite;
         private readonly Box backgroundColourBox;
-        protected Container ButtonContentContainer;
         protected FillFlowContainer ModsContainer;
 
         protected FooterButton()
         {
             Shear = SHEAR;
-            Anchor = Anchor.BottomLeft;
-            AutoSizeAxes = Axes.X;
+            Width = 140;
             Height = button_height;
-            Margin = new MarginPadding { Top = -20 };
+            Margin = new MarginPadding { Bottom = -40 };
             {
                 Children = new Drawable[]
                 {
@@ -89,7 +91,7 @@ namespace osu.Game.Screens.Select
                             backgroundColourBox = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = backgroundColour
+                                Colour = colourProvider.Background3
                             },
                             flashLayer = new Box
                             {
@@ -106,7 +108,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         AutoSizeAxes = Axes.Both,
-                        X = -10,
+                        X = -5,
                         Children = new Drawable[]
                         {
                             sprite = new SpriteIcon
@@ -119,7 +121,7 @@ namespace osu.Game.Screens.Select
                                     Top = 12,
                                 }
                             },
-                            ButtonContentContainer = new Container
+                            new Container
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
@@ -150,6 +152,7 @@ namespace osu.Game.Screens.Select
                             },
                             new Container
                             {
+                                X = -5,
                                 Masking = true,
                                 CornerRadius = 3,
                                 Anchor = Anchor.TopCentre,
@@ -186,14 +189,14 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnHover(HoverEvent e)
         {
-            backgroundColourBox.FadeColour(backgroundColour.Lighten(.2f));
+            backgroundColourBox.FadeColour(colourProvider.Background3.Lighten(.2f));
             Hovered?.Invoke();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            backgroundColourBox.FadeColour(backgroundColour, 500, Easing.OutQuint);
+            backgroundColourBox.FadeColour(colourProvider.Background3, 500, Easing.OutQuint);
             HoverLost?.Invoke();
         }
 
