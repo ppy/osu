@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 
         public int Value { get; private set; }
 
+        // Even though `FrameStabilityContainer` caches as a `GameplayClock`, we need to check it directly via `drawableRuleset`
+        // as this calculator is not contained within the `FrameStabilityContainer` and won't see the dependency.
         private IGameplayClock clock => drawableRuleset?.FrameStableClock ?? gameplayClock;
 
         public ClicksPerSecondCalculator()
