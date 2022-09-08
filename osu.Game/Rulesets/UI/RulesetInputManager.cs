@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.UI
 
             public bool OnPressed(KeyBindingPressEvent<T> e)
             {
-                calculator.AddTimestamp();
+                calculator.AddInputTimestamp();
                 return false;
             }
 
