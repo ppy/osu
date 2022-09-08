@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
                 scrollTime => new SettingDescription(
                     rawValue: scrollTime,
                     name: "Scroll Speed",
-                    value: $"{(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime)} ({scrollTime}ms)"
+                    value: $"{scrollTime}ms (speed {(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime)})"
                 )
             )
         };
