@@ -102,12 +102,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             stack.Push(new MultiSpectatorPlayerLoader(Score, () =>
             {
                 var player = new MultiSpectatorPlayer(Score, SpectatorPlayerClock);
+                player.OnGameplayStarted += () => OnGameplayStarted?.Invoke();
 
-                player.OnGameplayStarted += () =>
-                {
-                    clockAdjustmentsFromMods.BindAdjustments(player.ClockAdjustmentsFromMods);
-                    OnGameplayStarted?.Invoke();
-                };
+                clockAdjustmentsFromMods.BindAdjustments(player.ClockAdjustmentsFromMods);
 
                 return player;
             }));
