@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.UI;
@@ -11,56 +10,48 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
     public class ClicksPerSecondCalculator : Component
     {
-        private readonly List<double> timestamps;
+        private readonly List<double> timestamps = new List<double>();
 
         [Resolved]
         private IGameplayClock gameplayClock { get; set; } = null!;
 
-        [Resolved]
-        private DrawableRuleset drawableRuleset { get; set; } = null!;
-
-        private double rate;
-
-        // The latest timestamp GC seeked. Does not affect normal gameplay
-        // but prevents duplicate inputs on replays.
-        private double latestTime = double.NegativeInfinity;
+        [Resolved(canBeNull: true)]
+        private DrawableRuleset? drawableRuleset { get; set; }
 
         public int Value { get; private set; }
+
+        private IGameplayClock clock => drawableRuleset?.FrameStableClock ?? gameplayClock;
 
         public ClicksPerSecondCalculator()
         {
             RelativeSizeAxes = Axes.Both;
-            timestamps = new List<double>();
         }
+
+        public void AddInputTimestamp() => timestamps.Add(clock.CurrentTime);
 
         protected override void Update()
         {
             base.Update();
 
-            // When pausing in replays (using the space bar) GC.TrueGameplayRate returns 0
-            // To prevent CPS value being 0, we store and use the last non-zero TrueGameplayRate
-            if (gameplayClock.TrueGameplayRate > 0)
+            double latestValidTime = clock.CurrentTime;
+            double earliestTimeValid = latestValidTime - 1000 * gameplayClock.TrueGameplayRate;
+
+            int count = 0;
+
+            for (int i = timestamps.Count - 1; i >= 0; i--)
             {
-                rate = gameplayClock.TrueGameplayRate;
+                // handle rewinding by removing future timestamps as we go
+                if (timestamps[i] > latestValidTime)
+                {
+                    timestamps.RemoveAt(i);
+                    continue;
+                }
+
+                if (timestamps[i] >= earliestTimeValid)
+                    count++;
             }
 
-            Value = timestamps.Count(timestamp =>
-            {
-                double window = 1000 * rate;
-                double relativeTime = drawableRuleset.FrameStableClock.CurrentTime - timestamp;
-                return relativeTime > 0 && relativeTime <= window;
-            });
-        }
-
-        public void AddTimestamp()
-        {
-            // Discard inputs if current gameplay time is not the latest
-            // to prevent duplicate inputs
-            if (drawableRuleset.FrameStableClock.CurrentTime >= latestTime)
-            {
-                timestamps.Add(drawableRuleset.FrameStableClock.CurrentTime);
-                latestTime = drawableRuleset.FrameStableClock.CurrentTime;
-            }
+            Value = count;
         }
     }
 }
