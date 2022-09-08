@@ -38,19 +38,17 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(OsuConfigManager config, SessionStatics sessionStatics)
         {
             seasonalBackgroundMode = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode);
-            seasonalBackgroundMode.BindValueChanged(_ => triggerSeasonalBackgroundChanged());
+            seasonalBackgroundMode.BindValueChanged(_ => SeasonalBackgroundChanged?.Invoke());
 
             seasonalBackgrounds = sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds);
-            seasonalBackgrounds.BindValueChanged(_ => triggerSeasonalBackgroundChanged());
+            seasonalBackgrounds.BindValueChanged(_ =>
+            {
+                if (shouldShowSeasonal)
+                    SeasonalBackgroundChanged?.Invoke();
+            });
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(fetchSeasonalBackgrounds, true);
-        }
-
-        private void triggerSeasonalBackgroundChanged()
-        {
-            if (shouldShowSeasonal)
-                SeasonalBackgroundChanged?.Invoke();
         }
 
         private void fetchSeasonalBackgrounds(ValueChangedEvent<APIState> stateChanged)

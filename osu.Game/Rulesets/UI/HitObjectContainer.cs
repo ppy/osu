@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.UI
 
             unbindStartTime(drawable);
 
-            RemoveInternal(drawable);
+            RemoveInternal(drawable, false);
         }
 
         #endregion
