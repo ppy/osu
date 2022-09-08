@@ -11,6 +11,5 @@ namespace osu.Game.Online.Multiplayer
     [MessagePackObject]
     public sealed class MatchStartCountdown : MultiplayerCountdown
     {
-        public override bool IsExclusive => true;
     }
 }
