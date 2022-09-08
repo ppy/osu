@@ -18,7 +18,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     public class ColourHitErrorMeter : HitErrorMeter
     {
-        private const int default_shape_alpha = 0;
         private const int animation_duration = 200;
         private const int drawable_judgement_size = 8;
 
@@ -35,7 +34,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             MinValue = 0.01f,
             MaxValue = 1,
-            Precision = .01f,
+            Precision = 0.01f,
         };
 
         [SettingSource("Spacing", "Space between hit error shapes")]
@@ -43,10 +42,10 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             MinValue = 0,
             MaxValue = 10,
-            Precision = .1f
+            Precision = 0.1f
         };
 
-        [SettingSource("Shape", "What shape to use for hit errors")]
+        [SettingSource("Shape", "The shape of each displayed error")]
         public Bindable<ShapeStyle> HitShape { get; } = new Bindable<ShapeStyle>();
 
         private readonly JudgementFlow judgementsFlow;
@@ -81,7 +80,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }, true);
             HitShape.BindValueChanged(_ =>
             {
-                judgementsFlow.ValueParser = getShapeStyle(HitShape.Value);
+                judgementsFlow.Shape = getShapeStyle(HitShape.Value);
                 judgementsFlow.Clear();
             }, true);
         }
@@ -91,7 +90,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private class JudgementFlow : FillFlowContainer<HitErrorShape>
         {
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
-            internal string ValueParser = null!;
+            internal string Shape = null!;
 
             public JudgementFlow()
             {
@@ -103,7 +102,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             public void Push(Color4 colour, int maxErrorShapeCount)
             {
-                Add(new HitErrorShape(colour, drawable_judgement_size, ValueParser));
+                Add(new HitErrorShape(colour, drawable_judgement_size, Shape));
 
                 if (Children.Count > maxErrorShapeCount)
                     Children.FirstOrDefault(c => !c.IsRemoved)?.Remove();
@@ -124,7 +123,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                         Child = new Circle
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = default_shape_alpha,
+                            Alpha = 0,
                             Colour = colour
                         };
                         break;
@@ -133,7 +132,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = default_shape_alpha,
+                            Alpha = 0,
                             Colour = colour
                         };
                         break;
