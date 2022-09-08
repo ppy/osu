@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Timing;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.UI
 {
-    public interface IFrameStableClock : IFrameBasedClock
+    public interface IFrameStableClock : IGameplayClock
     {
         IBindable<bool> IsCatchingUp { get; }
 
