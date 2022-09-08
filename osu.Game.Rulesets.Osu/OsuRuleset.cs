@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModNoScope(),
                         new MultiMod(new OsuModMagnetised(), new OsuModRepel()),
                         new ModAdaptiveSpeed(),
-                        new OsuModFlash()
+                        new OsuModFreezeFrame()
                     };
 
                 case ModType.System:

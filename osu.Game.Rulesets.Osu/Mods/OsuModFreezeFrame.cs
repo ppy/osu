@@ -8,13 +8,12 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModFlash : ModWithVisibilityAdjustment, IHidesApproachCircles, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModFreezeFrame : ModWithVisibilityAdjustment, IHidesApproachCircles, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Freeze frame";
 
@@ -26,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override ModType Type => ModType.Fun;
 
-        public override IconUsage? Icon => FontAwesome.Solid.Fire;
+        public override IconUsage? Icon => FontAwesome.Solid.Camera;
 
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTarget), typeof(OsuModStrictTracking) };
 
@@ -37,7 +36,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 5,
             Precision = .25f
         };
-
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -69,23 +67,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyFrozenState(hitObject, state);
 
-        private void applyFrozenState(DrawableHitObject drawable, ArmedState state)
+        private void applyFrozenState(DrawableHitObject drawableObject, ArmedState state)
         {
-            if (drawable is DrawableSpinner)
-                return;
-
-            var h = (OsuHitObject)drawable.HitObject;
-            /*
-            switch (drawable)
-            {
-                case DrawableHitCircle circle:
-                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-                    {
-                        circle.ApproachCircle.Hide();
-                    }
-
-                    break;
-            }*/
         }
     }
 }
