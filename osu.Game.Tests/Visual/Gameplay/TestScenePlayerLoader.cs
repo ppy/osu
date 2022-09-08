@@ -14,11 +14,10 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -30,7 +29,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Utils;
 using osuTK.Input;
-using SkipOverlay = osu.Game.Screens.Play.SkipOverlay;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -82,6 +80,20 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [SetUp]
         public void Setup() => Schedule(() => player = null);
+
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("read all notifications", () =>
+            {
+                notificationOverlay.Show();
+                notificationOverlay.Hide();
+            });
+
+            AddUntilStep("wait for no notifications", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(0));
+        }
 
         /// <summary>
         /// Sets the input manager child to a new test player loader container instance.
@@ -287,16 +299,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             saveVolumes();
 
-            AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value == 1);
-            AddStep("click notification", () =>
-            {
-                var scrollContainer = (OsuScrollContainer)notificationOverlay.Children.Last();
-                var flowContainer = scrollContainer.Children.OfType<FillFlowContainer<NotificationSection>>().First();
-                var notification = flowContainer.First();
+            AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(1));
 
-                InputManager.MoveMouseTo(notification);
-                InputManager.Click(MouseButton.Left);
-            });
+            clickNotification();
 
             AddAssert("check " + volumeName, assert);
 
@@ -365,16 +370,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 batteryInfo.SetChargeLevel(chargeLevel);
             }));
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
-            AddAssert($"notification {(shouldWarn ? "triggered" : "not triggered")}", () => notificationOverlay.UnreadCount.Value == (shouldWarn ? 1 : 0));
-            AddStep("click notification", () =>
-            {
-                var scrollContainer = (OsuScrollContainer)notificationOverlay.Children.Last();
-                var flowContainer = scrollContainer.Children.OfType<FillFlowContainer<NotificationSection>>().First();
-                var notification = flowContainer.First();
 
-                InputManager.MoveMouseTo(notification);
-                InputManager.Click(MouseButton.Left);
-            });
+            if (shouldWarn)
+                clickNotification();
+            else
+                AddAssert("notification not triggered", () => notificationOverlay.UnreadCount.Value == 0);
+
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
@@ -437,6 +438,15 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("time reached zero", () => getCurrentPlayer()?.GameplayClockContainer.CurrentTime > 0);
             AddUntilStep("skip button not visible", () => !checkSkipButtonVisible());
+        }
+
+        private void clickNotification()
+        {
+            Notification notification = null;
+
+            AddUntilStep("wait for notification", () => (notification = notificationOverlay.ChildrenOfType<Notification>().FirstOrDefault()) != null);
+            AddStep("open notification overlay", () => notificationOverlay.Show());
+            AddStep("click notification", () => notification.TriggerClick());
         }
 
         private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();
