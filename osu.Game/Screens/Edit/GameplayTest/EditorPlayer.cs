@@ -27,7 +27,11 @@ namespace osu.Game.Screens.Edit.GameplayTest
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-            => new MasterGameplayClockContainer(beatmap, gameplayStart) { StartTime = editorState.Time };
+        {
+            var masterGameplayClockContainer = new MasterGameplayClockContainer(beatmap, gameplayStart);
+            masterGameplayClockContainer.Reset(editorState.Time);
+            return masterGameplayClockContainer;
+        }
 
         protected override void LoadComplete()
         {

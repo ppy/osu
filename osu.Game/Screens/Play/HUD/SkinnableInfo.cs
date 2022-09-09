@@ -98,5 +98,14 @@ namespace osu.Game.Screens.Play.HUD
                 return Drawable.Empty();
             }
         }
+
+        public static Type[] GetAllAvailableDrawables()
+        {
+            return typeof(OsuGame).Assembly.GetTypes()
+                                  .Where(t => !t.IsInterface && !t.IsAbstract)
+                                  .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
+                                  .OrderBy(t => t.Name)
+                                  .ToArray();
+        }
     }
 }

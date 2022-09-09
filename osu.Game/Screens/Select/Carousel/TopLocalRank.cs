@@ -3,11 +3,8 @@
 
 using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -39,7 +36,6 @@ namespace osu.Game.Screens.Select.Carousel
         private IAPIProvider api { get; set; } = null!;
 
         private IDisposable? scoreSubscription;
-        private CancellationTokenSource? scoreOrderCancellationSource;
 
         private readonly UpdateableRank updateable;
 
@@ -83,25 +79,16 @@ namespace osu.Game.Screens.Select.Carousel
                 if (changes?.HasCollectionChanges() == false)
                     return;
 
-                scoreOrderCancellationSource?.Cancel();
+                ScoreInfo? topScore = scoreManager.OrderByTotalScore(sender.Detach()).FirstOrDefault();
 
-                scoreManager.OrderByTotalScoreAsync(sender.Detach().ToArray(), (scoreOrderCancellationSource = new CancellationTokenSource()).Token)
-                            .ContinueWith(ordered => Schedule(() =>
-                            {
-                                if (scoreOrderCancellationSource.IsCancellationRequested)
-                                    return;
-
-                                updateable.Rank = ordered.GetResultSafely().FirstOrDefault()?.Rank;
-                                updateable.Alpha = updateable.Rank != null ? 1 : 0;
-                            }), TaskContinuationOptions.OnlyOnRanToCompletion);
+                updateable.Rank = topScore?.Rank;
+                updateable.Alpha = topScore != null ? 1 : 0;
             }
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
-            scoreOrderCancellationSource?.Cancel();
             scoreSubscription?.Dispose();
         }
     }

@@ -58,10 +58,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Create new game instance", () =>
             {
                 if (Game?.Parent != null)
-                {
-                    Remove(Game);
-                    Game.Dispose();
-                }
+                    Remove(Game, true);
 
                 RecycleLocalStorage(false);
 
@@ -171,6 +168,11 @@ namespace osu.Game.Tests.Visual
                 API.Login("Rhythm Champion", "osu!");
 
                 Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);
+
+                // set applied version to latest so that the BackgroundBeatmapProcessor doesn't consider
+                // beatmap star ratings as outdated and reset them throughout the test.
+                foreach (var ruleset in RulesetStore.AvailableRulesets)
+                    ruleset.LastAppliedDifficultyVersion = ruleset.CreateInstance().CreateDifficultyCalculator(Beatmap.Default).Version;
             }
 
             protected override void Update()

@@ -31,10 +31,7 @@ namespace osu.Game.Overlays.Mods
             set => current.Current = value;
         }
 
-        private readonly BindableNumberWithCurrent<double> current = new BindableNumberWithCurrent<double>(1)
-        {
-            Precision = 0.01
-        };
+        private readonly BindableNumberWithCurrent<double> current = new BindableNumberWithCurrent<double>(1);
 
         private readonly Box underlayBackground;
         private readonly Box contentBackground;

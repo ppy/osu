@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.IO;
 using System.Runtime.Versioning;
@@ -21,9 +19,13 @@ namespace osu.Desktop
 {
     public static class Program
     {
+#if DEBUG
+        private const string base_game_name = @"osu-development";
+#else
         private const string base_game_name = @"osu";
+#endif
 
-        private static LegacyTcpIpcProvider legacyIpc;
+        private static LegacyTcpIpcProvider? legacyIpc;
 
         [STAThread]
         public static void Main(string[] args)

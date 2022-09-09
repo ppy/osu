@@ -78,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private IBeatmapInfo beatmap;
         private IRulesetInfo ruleset;
-        private Mod[] requiredMods;
+        private Mod[] requiredMods = Array.Empty<Mod>();
 
         private Container maskingContainer;
         private Container difficultyIconContainer;
@@ -93,6 +93,9 @@ namespace osu.Game.Screens.OnlinePlay
         private Drawable removeButton;
         private PanelBackground panelBackground;
         private FillFlowContainer mainFillFlow;
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -111,9 +114,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private CollectionManager collectionManager { get; set; }
 
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
@@ -139,7 +139,8 @@ namespace osu.Game.Screens.OnlinePlay
             ruleset = rulesets.GetRuleset(Item.RulesetID);
             var rulesetInstance = ruleset?.CreateInstance();
 
-            requiredMods = Item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+            if (rulesetInstance != null)
+                requiredMods = Item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
         }
 
         protected override void LoadComplete()
@@ -495,11 +496,11 @@ namespace osu.Game.Screens.OnlinePlay
                 if (beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
 
-                if (collectionManager != null && beatmap != null)
+                if (beatmap != null)
                 {
                     if (beatmaps.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID) is BeatmapInfo local && !local.BeatmapSet.AsNonNull().DeletePending)
                     {
-                        var collectionItems = collectionManager.Collections.Select(c => new CollectionToggleMenuItem(c, beatmap)).Cast<OsuMenuItem>().ToList();
+                        var collectionItems = realm.Realm.All<BeatmapCollection>().AsEnumerable().Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
                         if (manageCollectionsDialog != null)
                             collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
@@ -560,6 +561,10 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 switch (state.NewValue)
                 {
+                    case DownloadState.Unknown:
+                        // Ignore initial state to ensure the button doesn't briefly appear.
+                        break;
+
                     case DownloadState.LocallyAvailable:
                         // Perform a local query of the beatmap by beatmap checksum, and reset the state if not matching.
                         if (beatmapManager.QueryBeatmap(b => b.MD5Hash == beatmap.MD5Hash) == null)
