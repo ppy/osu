@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.UI
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.5f,
-                                    Colour = colours.GrayC,
+                                    Colour = colours.Gray9,
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                 },
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Catch.UI
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.5f,
-                                    Colour = colours.GrayC,
+                                    Colour = colours.Gray9,
                                 },
                                 rightDashBox = new InputArea(TouchCatchAction.DashRight, trackedActionSources)
                                 {
@@ -223,13 +223,14 @@ namespace osu.Game.Rulesets.Catch.UI
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = 10,
                         Children = new Drawable[]
                         {
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Alpha = 0.2f,
-                                Colour = OsuColour.Gray(0.8f),
+                                Alpha = 0.15f,
                             },
                             highlightOverlay = new Box
                             {

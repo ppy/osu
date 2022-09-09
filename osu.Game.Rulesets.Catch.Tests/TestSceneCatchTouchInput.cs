@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [Test]
-        public void TestInputField()
+        public void TestBasic()
         {
             AddStep("show overlay", () => catchTouchInputMapper.Show());
         }
