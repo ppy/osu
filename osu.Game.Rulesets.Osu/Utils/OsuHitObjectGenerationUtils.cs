@@ -195,19 +195,17 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <returns>true if hitObject is on a (down-)beat, false otherwise.</returns>
         public static bool IsHitObjectOnBeat(OsuBeatmap beatmap, OsuHitObject hitObject, bool downbeatsOnly = false)
         {
-            var timingPoints = beatmap.ControlPointInfo.TimingPoints;
-            var currentTimingPoint = timingPoints.LastOrDefault(p => p.Time <= hitObject.StartTime);
+            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
 
-            if (currentTimingPoint == null)
-                return false;
+            double timeSinceTimingPoint = hitObject.StartTime - timingPoint.Time;
 
-            double timeSinceTimingPoint = hitObject.StartTime - currentTimingPoint.Time;
+            double beatLength = timingPoint.BeatLength;
 
-            double length = downbeatsOnly
-                ? currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator
-                : currentTimingPoint.BeatLength;
+            if (downbeatsOnly)
+                beatLength *= timingPoint.TimeSignature.Numerator;
 
-            return (timeSinceTimingPoint + 1) % length < 2;
+            // Ensure within 1ms of expected location.
+            return Math.Abs(timeSinceTimingPoint + 1) % beatLength < 2;
         }
 
         /// <summary>
