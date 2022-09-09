@@ -58,10 +58,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Create new game instance", () =>
             {
                 if (Game?.Parent != null)
-                {
-                    Remove(Game);
-                    Game.Dispose();
-                }
+                    Remove(Game, true);
 
                 RecycleLocalStorage(false);
 
