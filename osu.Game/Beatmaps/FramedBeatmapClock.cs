@@ -131,8 +131,8 @@ namespace osu.Game.Beatmaps
                 // Rather than trying to get around this by fixing the framework clock stack, let's work around it for now.
                 Seek(Source.CurrentTime);
             }
-
-            finalClockSource.ProcessFrame();
+            else
+                finalClockSource.ProcessFrame();
         }
 
         public double TotalAppliedOffset
