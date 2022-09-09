@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
-        private Random? rng;
+        private Random random = null!;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             Seed.Value ??= RNG.Next();
 
-            rng = new Random((int)Seed.Value);
+            random = new Random((int)Seed.Value);
 
             var positionInfos = OsuHitObjectGenerationUtils.GeneratePositionInfos(osuBeatmap.HitObjects);
 
@@ -50,14 +50,14 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 if (shouldStartNewSection(osuBeatmap, positionInfos, i))
                 {
-                    sectionOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.0008f);
+                    sectionOffset = OsuHitObjectGenerationUtils.RandomGaussian(random, 0, 0.0008f);
                     flowDirection = !flowDirection;
                 }
 
                 if (i == 0)
                 {
-                    positionInfos[i].DistanceFromPrevious = (float)(rng.NextDouble() * OsuPlayfield.BASE_SIZE.Y / 2);
-                    positionInfos[i].RelativeAngle = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
+                    positionInfos[i].DistanceFromPrevious = (float)(random.NextDouble() * OsuPlayfield.BASE_SIZE.Y / 2);
+                    positionInfos[i].RelativeAngle = (float)(random.NextDouble() * 2 * Math.PI - Math.PI);
                 }
                 else
                 {
@@ -65,11 +65,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                     float flowChangeOffset = 0;
 
                     // Offsets only the angle of the current hit object.
-                    float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.002f);
+                    float oneTimeOffset = OsuHitObjectGenerationUtils.RandomGaussian(random, 0, 0.002f);
 
                     if (shouldApplyFlowChange(positionInfos, i))
                     {
-                        flowChangeOffset = OsuHitObjectGenerationUtils.RandomGaussian(rng, 0, 0.002f);
+                        flowChangeOffset = OsuHitObjectGenerationUtils.RandomGaussian(random, 0, 0.002f);
                         flowDirection = !flowDirection;
                     }
 
@@ -108,9 +108,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             bool previousObjectWasOnDownbeat = OsuHitObjectGenerationUtils.IsHitObjectOnBeat(beatmap, positionInfos[i - 1].HitObject, true);
             bool previousObjectWasOnBeat = OsuHitObjectGenerationUtils.IsHitObjectOnBeat(beatmap, positionInfos[i - 1].HitObject);
 
-            return (previousObjectStartedCombo && randomBool(0.6f)) ||
+            return (previousObjectStartedCombo && random.NextDouble() < 0.6f) ||
                    previousObjectWasOnDownbeat ||
-                   (previousObjectWasOnBeat && randomBool(0.4f));
+                   (previousObjectWasOnBeat && random.NextDouble() < 0.4f);
         }
 
         /// <returns>Whether a flow change should be applied at the current <see cref="OsuHitObject"/>.</returns>
@@ -120,11 +120,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             bool previousObjectStartedCombo = positionInfos[Math.Max(0, i - 2)].HitObject.IndexInCurrentCombo > 1 &&
                                               positionInfos[i - 1].HitObject.NewCombo;
 
-            return previousObjectStartedCombo && randomBool(0.6f);
+            return previousObjectStartedCombo && random.NextDouble() < 0.6f;
         }
-
-        /// <returns>true with a probability of <paramref name="probability"/>, false otherwise.</returns>
-        private bool randomBool(float probability) =>
-            rng?.NextDouble() < probability;
     }
 }
