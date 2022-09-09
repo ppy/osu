@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
@@ -50,7 +49,7 @@ namespace osu.Game
             {
                 Logger.Log("Beginning background beatmap processing..");
                 checkForOutdatedStarRatings();
-                processBeatmapSetsWithMissingMetrics();
+                await processBeatmapSetsWithMissingMetrics();
                 await processScoresWithMissingStatistics();
             }).ContinueWith(t =>
             {
@@ -100,7 +99,7 @@ namespace osu.Game
             }
         }
 
-        private void processBeatmapSetsWithMissingMetrics()
+        private async Task processBeatmapSetsWithMissingMetrics()
         {
             HashSet<Guid> beatmapSetIds = new HashSet<Guid>();
 
@@ -124,7 +123,7 @@ namespace osu.Game
                 while (localUserPlayInfo?.IsPlaying.Value == true)
                 {
                     Logger.Log("Background processing sleeping due to active gameplay...");
-                    Thread.Sleep(TimeToSleepDuringGameplay);
+                    await Task.Delay(TimeToSleepDuringGameplay);
                 }
 
                 realmAccess.Run(r =>
@@ -169,7 +168,7 @@ namespace osu.Game
                 while (localUserPlayInfo?.IsPlaying.Value == true)
                 {
                     Logger.Log("Background processing sleeping due to active gameplay...");
-                    Thread.Sleep(TimeToSleepDuringGameplay);
+                    await Task.Delay(TimeToSleepDuringGameplay);
                 }
 
                 try
